@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea,
@@ -43,6 +43,8 @@ const state = reactive({
 /* Event */
 const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setSelectedWidgetName(widgetName);
+    widgetGenerateStore.setWidgetValueMap({});
+    widgetGenerateStore.setWidgetValidMap({});
 };
 const handleUpdateWidgetTitle = (title: string) => {
     widgetGenerateStore.setTitle(title);
@@ -63,11 +65,6 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
     _validMap[fieldName] = isValid;
     widgetGenerateStore.setWidgetValidMap(_validMap);
 };
-
-watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
-    widgetGenerateStore.initWidgetForm(widgetName);
-}, { immediate: true });
-// TODO: state.fieldValueMap 채워주기
 </script>
 
 <template>

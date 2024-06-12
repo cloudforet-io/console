@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, onBeforeMount, reactive } from 'vue';
+import {
+    computed, onBeforeMount, onUnmounted, reactive,
+} from 'vue';
 
 import {
     PDivider, PSelectButton, PButton,
@@ -8,7 +10,7 @@ import { cloneDeep } from 'lodash';
 
 import type {
     DashboardVariables as IDashboardVariables,
-    DashboardVariablesSchema, DateRange,
+    DashboardOptions,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import WidgetFormOverlayStep2WidgetForm
@@ -26,7 +28,6 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
@@ -49,15 +50,17 @@ const state = reactive({
     }),
     //
     variablesSnapshot: {} as IDashboardVariables,
-    variableSchemaSnapshot: {} as DashboardVariablesSchema,
-    basedOnDateSnapshot: {} as DateRange,
+    dashboardOptionsSnapshot: {} as DashboardOptions,
 });
 
 /* Util */
 const initSnapshot = () => {
     state.variablesSnapshot = cloneDeep(dashboardDetailState.variables);
-    state.variableSchemaSnapshot = cloneDeep(dashboardDetailGetters.refinedVariablesSchema);
-    state.basedOnDateSnapshot = cloneDeep(dashboardDetailState.options.date_range);
+    state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
+};
+const reset = () => {
+    dashboardDetailStore.setVariables(state.variablesSnapshot);
+    dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
 
 /* Event */
@@ -71,6 +74,9 @@ const handleUpdateWidgetSize = (size: WidgetSize) => {
 onBeforeMount(() => {
     initSnapshot();
 });
+onUnmounted(() => {
+    reset();
+});
 </script>
 
 <template>
@@ -78,7 +84,7 @@ onBeforeMount(() => {
         <div class="left-part">
             <div class="dashboard-settings-wrapper">
                 <div class="toolbox-wrapper">
-                    <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
+                    <dashboard-toolset-date-dropdown :date-range="state.dashboardOptionsSnapshot.date_range" />
                     <p-divider vertical
                                class="divider"
                     />
