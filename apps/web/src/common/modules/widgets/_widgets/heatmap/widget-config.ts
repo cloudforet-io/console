@@ -1,4 +1,3 @@
-import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/configs/widget-field-config';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
@@ -23,11 +22,6 @@ const heatmap: WidgetConfig = {
                 defaultMaxCount: 7,
                 max: 14,
                 multiSelectable: false,
-            },
-        },
-        formatRules: {
-            options: {
-                formatRulesType: FORMAT_RULE_TYPE.nameAndThreshold,
             },
         },
     },
