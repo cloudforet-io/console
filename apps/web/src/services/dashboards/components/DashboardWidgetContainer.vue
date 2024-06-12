@@ -19,7 +19,6 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type {
-    UpdatableWidgetInfo,
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_types/widget-type';
 
@@ -35,6 +34,7 @@ const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
+    initiatedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed(() => Object.values(state.mountedWidgetMap).every((d) => d)),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
 });
@@ -96,12 +96,6 @@ const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isInt
 /* Widget event handlers */
 const handleWidgetMounted = (widgetKey: string) => {
     state.mountedWidgetMap[widgetKey] = true;
-};
-const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: UpdatableWidgetInfo) => {
-    dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
-};
-const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
-    dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
 };
 const handleClickWidgetExpand = (widget: ReformedWidgetInfo) => {
     widgetFullModeState.targetWidget = widget;
@@ -197,8 +191,6 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="getWidgetLoading(widget.widget_key)"
                                @mounted="handleWidgetMounted(widget.widget_key)"
-                               @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
-                               @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
                                @click-expand="handleClickWidgetExpand(widget)"
                     />
                 </template>

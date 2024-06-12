@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { AsyncComponent, ComponentPublicInstance } from 'vue';
 import {
-    computed, nextTick, onBeforeMount, onBeforeUnmount, reactive, toRef,
+    computed, onBeforeMount, onBeforeUnmount, reactive, toRef,
 } from 'vue';
 
 import {
     PButton, PBadge, PI,
 } from '@spaceone/design-system';
-import { cloneDeep, debounce } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import type {
     DashboardOptions,
@@ -21,14 +21,13 @@ import { gray } from '@/styles/colors';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
-import WidgetFullModeModalSidebar from '@/services/dashboards/components/WidgetFullModeModalSidebar.vue';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
 import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-component-helper';
 import type {
-    UpdatableWidgetInfo, WidgetExpose, WidgetProps, WidgetTheme,
+    WidgetExpose, WidgetProps, WidgetTheme,
 } from '@/services/dashboards/widgets/_types/widget-type';
 
 
@@ -63,7 +62,6 @@ const state = reactive({
     variablesSnapshot: {} as IDashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
     optionsSnapshot: {} as DashboardOptions,
-    sidebarVisible: false,
     hasNonInheritedWidgetOptions: false,
     originWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
         if (!props.widgetKey) return undefined;
@@ -86,35 +84,9 @@ const handleCloseModal = () => {
     dashboardDetailStore.setOptions(state.optionsSnapshot);
     emit('update:visible', false);
 };
-// const handleClickEditOption = () => {
-//     state.sidebarVisible = true;
-// };
-const handleCloseSidebar = async (save: boolean) => {
-    state.sidebarVisible = false;
-    if (!save) widgetFormStore.returnToInitialSettings();
-    await nextTick();
-    state.widgetRef?.refreshWidget();
-};
-const handleUpdateSidebarWidgetInfo = debounce(async (widgetInfo: UpdatableWidgetInfo) => {
-    // NOTE: Do not refresh when the title changes. There are no cases where title and other options change together.
-    const refreshWidget = widgetInfo.title === widgetFormGetters.updatedWidgetInfo?.title;
-    await nextTick();
-    if (refreshWidget) state.widgetRef?.refreshWidget();
-}, 150);
-const handleUpdateHasNonInheritedWidgetOptions = (value: boolean) => {
-    state.hasNonInheritedWidgetOptions = value;
-};
-
-const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: UpdatableWidgetInfo) => {
-    dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
-};
-const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
-    dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
-};
 
 onBeforeMount(() => {
     if (!state.originWidgetInfo) return;
-    state.sidebarVisible = false;
     initSnapshot();
     state.component = getWidgetComponent(state.originWidgetInfo.widget_name);
 });
@@ -153,15 +125,6 @@ onBeforeUnmount(() => {
                                 </span>
                             </p-badge>
                         </template>
-                        <!--                        <p-button icon-left="ic_edit"-->
-                        <!--                                  size="md"-->
-                        <!--                                  style-type="tertiary"-->
-                        <!--                                  :disabled="state.sidebarVisible"-->
-                        <!--                                  class="edit-button"-->
-                        <!--                                  @click="handleClickEditOption"-->
-                        <!--                        >-->
-                        <!--                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}-->
-                        <!--                        </p-button>-->
                     </div>
                 </div>
                 <div class="filter-wrapper">
@@ -199,21 +162,9 @@ onBeforeUnmount(() => {
                                :loading="state.loadingWidget"
                                disable-full-mode
                                @mounted="state.loadingWidget = false"
-                               @update-widget-info="handleUpdateWidgetInfo(props.widgetKey, $event)"
-                               @update-widget-validation="handleUpdateValidation(props.widgetKey, $event)"
                     />
                 </div>
             </div>
-            <widget-full-mode-modal-sidebar v-if="state.originWidgetInfo"
-                                            v-show="state.sidebarVisible"
-                                            :widget-config-id="state.originWidgetInfo.widget_name"
-                                            :widget-key="state.originWidgetInfo.widget_key"
-                                            :template-widget-id="state.originWidgetInfo.template_widget_id"
-                                            :visible="state.sidebarVisible"
-                                            @close="handleCloseSidebar"
-                                            @update:widget-info="handleUpdateSidebarWidgetInfo"
-                                            @update:has-non-inherited-widget-options="handleUpdateHasNonInheritedWidgetOptions"
-            />
         </div>
     </transition>
 </template>
