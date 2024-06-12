@@ -20,7 +20,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
-import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
+import type { DataTableModel, WidgetModel } from '@/common/modules/widgets/types/widget-model';
+
 
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const state = reactive({
@@ -51,6 +52,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     });
 
     /* Mutations */
+    const setWidgetId = (widgetId: string) => {
+        state.widgetId = widgetId;
+    };
     const setShowOverlay = (showOverlay: boolean) => {
         state.showOverlay = showOverlay;
     };
@@ -86,6 +90,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     };
 
     const mutations = {
+        setWidgetId,
         setShowOverlay,
         setOverlayStep,
         setSelectedDataTableId,
@@ -191,13 +196,14 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 ErrorHandler.handleError(e);
             }
         },
-        initWidgetForm: (widgetName = 'table') => {
-            // chart type 바꿀 때 trigger
-            state.selectedWidgetName = widgetName;
-            const _widgetConfig = getWidgetConfig(widgetName);
-            state.title = _widgetConfig.meta.title || '';
-            state.description = '';
-            state.size = _widgetConfig.meta.sizes[0];
+        initWidgetForm: (widgetInfo?: WidgetModel) => {
+            state.selectedWidgetName = widgetInfo?.widget_type || 'table';
+            const _widgetConfig = getWidgetConfig(widgetInfo?.widget_type || 'table');
+            state.title = widgetInfo?.name || _widgetConfig.meta.title || '';
+            state.description = widgetInfo?.description || '';
+            state.size = _widgetConfig.meta.sizes[0]; // TODO
+            state.selectedDataTableId = widgetInfo?.data_table_id || undefined;
+            state.widgetValueMap = widgetInfo?.options || {};
         },
     };
 

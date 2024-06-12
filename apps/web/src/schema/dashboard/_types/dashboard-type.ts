@@ -98,6 +98,10 @@ export interface DashboardLayoutWidgetInfo {
     fixed_options?: Record<string, any>; // fixed options for the widget
 }
 
+export interface DashboardLayoutWidgetInfoV2 {
+    widget_id?: string;
+    widget_key?: string; // widget config name
+}
 
 
 export interface NewDashboardLayoutWidgetInfo {

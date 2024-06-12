@@ -20,6 +20,7 @@ import DashboardToolsetDateDropdown from '@/services/dashboards/components/Dashb
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
+import DashboardWidgetContainerV2 from '@/services/dashboards/components/DashboardWidgetContainerV2.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -114,6 +115,7 @@ onBeforeUnmount(() => {
             />
         </div>
         <dashboard-widget-container edit-mode />
+        <dashboard-widget-container-v2 edit-mode />
         <dashboard-customize-sidebar :loading="props.loading"
                                      :save-button-text="props.saveButtonText"
                                      :hide-cancel-button="props.hideCancelButton"

@@ -20,8 +20,8 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
 });
 const emit = defineEmits<{(event: 'click-delete'): void;
     (event: 'click-edit'): void;
+    (event: 'click-expand'): void;
     (event: 'update:size', size: WidgetSize): void;
-    (event: 'expand'): void;
 }>();
 
 const state = reactive({
@@ -41,7 +41,7 @@ const handleClickDeleteButton = () => {
     emit('click-delete');
 };
 const handleClickExpandButton = () => {
-    emit('expand');
+    emit('click-expand');
 };
 const handleSelectSize = (size: WidgetSize) => {
     emit('update:size', size);
@@ -122,11 +122,12 @@ const handleSelectSize = (size: WidgetSize) => {
         <div class="body-wrapper">
             <slot />
         </div>
-        <p-select-dropdown v-if="state.sizeDropdownMenuItems.length > 1"
+        <p-select-dropdown v-if="state.sizeDropdownMenuItems.length > 1 && props.mode === 'edit'"
                            class="widget-size-dropdown"
                            style-type="transparent"
                            :menu="state.sizeDropdownMenuItems"
                            :selected="props.size"
+                           use-fixed-menu-style
                            @select="handleSelectSize"
         />
     </div>
