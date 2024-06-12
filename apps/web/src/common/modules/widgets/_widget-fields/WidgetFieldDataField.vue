@@ -21,6 +21,7 @@ const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
     selectedItem: undefined as undefined | MenuItem[] | string,
     isValid: computed<boolean>(() => {
+        if (state.menuItems.length === 0) return false;
         if (Array.isArray(state.selectedItem)) {
             return !!state.selectedItem.length;
         }
