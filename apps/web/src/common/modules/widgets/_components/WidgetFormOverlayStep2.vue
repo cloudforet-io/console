@@ -21,7 +21,7 @@ import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
-import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
+import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -82,11 +82,7 @@ onBeforeMount(() => {
                     <p-divider vertical
                                class="divider"
                     />
-                    <dashboard-variables disable-more-button
-                                         disable-save-button
-                                         :origin-variables="state.variablesSnapshot"
-                                         :origin-variables-schema="state.variableSchemaSnapshot"
-                    />
+                    <dashboard-variables-v2 disable-save-button />
                 </div>
                 <div class="widget-size-wrapper">
                     <p-select-button v-for="widgetSize in state.widgetSizeOptions"
@@ -152,6 +148,10 @@ onBeforeMount(() => {
                 display: flex;
                 align-items: center;
                 gap: 0.5rem;
+                .dashboard-variables-select-dropdown {
+                    @apply relative flex items-center flex-wrap;
+                    gap: 0.5rem;
+                }
             }
             .widget-size-wrapper {
                 display: flex;
