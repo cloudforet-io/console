@@ -96,7 +96,6 @@ const loadWidget = async (): Promise<Data|null> => {
         }
         return await SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>({
             widget_id: 'public-widget-74bd848364d0',
-            data_table_id: 'public-dt-3d35c80a0cee',
             query: {
                 granularity: state.granularity,
                 start: _start,
