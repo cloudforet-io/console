@@ -178,6 +178,8 @@ const resetAllFilter = () => {
 const resetFilterByKey = (key: string) => {
     unset(state.proxyFilters, key);
     unset(state.selectedItemsMap, key);
+    state.proxyFilters = { ...state.proxyFilters };
+    state.selectedItemsMap = { ...state.selectedItemsMap };
 };
 const getCostMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
     try {
