@@ -48,6 +48,7 @@ const handleUpdateVisible = (value: boolean) => {
 
 watch(() => widgetGenerateState.showOverlay, (val) => {
     if (!val) widgetGenerateStore.reset();
+    else widgetGenerateStore.listDataTable();
 });
 
 onMounted(async () => {
