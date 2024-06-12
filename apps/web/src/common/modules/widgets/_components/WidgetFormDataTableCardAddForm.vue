@@ -205,8 +205,6 @@ onMounted(async () => {
     <div class="widget-form-data-table-card-add-form">
         <p-field-group label="Group by"
                        required
-                       :invalid="state.proxySelectedGroupByItems.length === 0"
-                       :invalid-text="'Please select at least one item'"
         >
             <p-select-dropdown class="group-by-select-dropdown"
                                :menu="groupByState.items"

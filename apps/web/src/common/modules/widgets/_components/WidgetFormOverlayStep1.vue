@@ -110,17 +110,20 @@ documentEventMount('mouseup', endResizing);
         <div ref="dataTableContentsRef"
              class="data-table-contents"
         >
-            <div class="data-source-wrapper">
-                <widget-form-data-table-card v-for="(dataTable) in storeState.dataTables"
-                                             :key="`data-table-${dataTable.data_table_id}`"
-                                             :item="dataTable"
-                />
-                <widget-form-data-source-popover />
+            <div class="data-table-area">
+                <div class="data-table-wrapper">
+                    <widget-form-data-table-card v-for="(dataTable) in storeState.dataTables"
+                                                 :key="`data-table-${dataTable.data_table_id}`"
+                                                 :item="dataTable"
+                    />
+                    <widget-form-data-source-popover />
+                </div>
             </div>
             <div class="resizer-area"
                  :style="displayState.resizerStyle"
                  @mousedown="startResizing"
             >
+                <div class="gradation-area" />
                 <hr v-if="displayState.dataTableAreaOpen"
                     class="resizer-bar"
                 >
@@ -136,7 +139,7 @@ documentEventMount('mouseup', endResizing);
                     />
                 </p-tooltip>
             </div>
-            <div class="data-table-area"
+            <div class="preview-table-area"
                  :class="{ 'transition': displayState.transition, 'unselectable': displayState.resizing }"
                  :style="displayState.tableContainerStyle"
             >
@@ -153,24 +156,40 @@ documentEventMount('mouseup', endResizing);
     gap: 1rem;
     padding: 0 1.5rem 1rem 1.5rem;
     .data-table-contents {
-        @apply bg-gray-150 rounded-md relative w-full;
+        @apply bg-gray-150 rounded-md relative w-full flex flex-col;
 
         padding: 0.125rem;
-        .data-source-wrapper {
-            @apply flex gap-4 h-full;
+        .data-table-area {
+            @apply relative flex-1 h-full;
+            padding: 1rem 1rem 0;
+            margin-bottom: 1.125rem;
             overflow: auto;
-            padding: 1rem;
+            .data-table-wrapper {
+                @apply flex gap-4;
+                height: auto;
+            }
         }
         .resizer-area {
-            @apply absolute w-full flex items-center justify-center;
-            padding: 0.5rem 1rem;
+            @apply absolute flex items-center justify-center bg-gray-150;
+            width: calc(100% - 0.25rem);
+            padding: 0 1rem;
             transition: top 0.2s;
             z-index: 1;
 
+            .gradation-area {
+                @apply absolute;
+                width: calc(100% - 2rem);
+                height: 2rem;
+                top: -2rem;
+                background: linear-gradient(180deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.150') 100%);
+                z-index: 1;
+            }
             .resizer-bar {
-                @apply w-full bg-blue-600;
+                @apply relative w-full bg-blue-600;
+                margin: 0.5rem 0;
                 height: 0.0625rem;
                 opacity: 0;
+                z-index: 2;
             }
 
             &:hover {
@@ -185,7 +204,7 @@ documentEventMount('mouseup', endResizing);
                 width: 1.5rem;
                 height: 1.5rem;
                 left: 0.75rem;
-                top: 0.375rem;
+                top: 0.3125rem;
                 z-index: 2;
                 &.hide {
                     @apply bg-white justify-end;
@@ -209,9 +228,8 @@ documentEventMount('mouseup', endResizing);
                 }
             }
         }
-        .data-table-area {
-            @apply absolute;
-            bottom: 0;
+        .preview-table-area {
+            @apply rounded-lg overflow-hidden;
             height: 20%;
             max-height: calc(100% - 2rem);
 
