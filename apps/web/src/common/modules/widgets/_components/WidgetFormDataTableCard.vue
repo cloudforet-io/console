@@ -64,10 +64,10 @@ const state = reactive({
         ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
         : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
     selectedGroupByItems: [] as { name: string; label: string; }[],
-    filters: {} as Record<string, string[]>,
+    filter: {} as Record<string, string[]>,
     consoleFilters: computed<ConsoleFilter[]>(() => {
         const results: ConsoleFilter[] = [];
-        Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
+        Object.entries(state.filter ?? {}).forEach(([category, filterItems]) => {
             if (filterItems.length) {
                 results.push({
                     k: category,
@@ -111,7 +111,7 @@ const state = reactive({
     optionsChanged: computed(() => {
         const sourceKeyChanged = state.selectedSourceEndItem !== originDataState.sourceKey;
         const groupByChanged = !isEqual(state.selectedGroupByItems, originDataState.groupBy);
-        const filtersChanged = !isEqual(state.filters, originDataState.filters);
+        const filterChanged = !isEqual(state.filter, originDataState.filter);
         const dataTableNameChanged = state.dataFieldName !== originDataState.dataName;
         const dataUnitChanged = state.dataUnit !== originDataState.dataUnit;
         const additionalLabelChanged = !isEqual(advancedOptionsState.additionalLabels.map(({ name, value }) => ({ name, value })), originDataState.additionalLabels);
@@ -119,7 +119,7 @@ const state = reactive({
         const timeDiffChanged = advancedOptionsState.selectedTimeDiff !== originDataState.timeDiff;
         const timeDiffDateChanged = advancedOptionsState.selectedTimeDiffDate !== originDataState.timeDiffDate;
 
-        return sourceKeyChanged || groupByChanged || filtersChanged || dataTableNameChanged || dataUnitChanged
+        return sourceKeyChanged || groupByChanged || filterChanged || dataTableNameChanged || dataUnitChanged
         || additionalLabelChanged || seperateDateChanged || timeDiffChanged || timeDiffDateChanged;
     }),
 });
@@ -142,12 +142,12 @@ const originDataState = reactive({
         name: group.key,
         label: group.name,
     }))),
-    filters: computed(() => {
-        const _filters = {} as Record<string, string[]>;
-        (props.item.options.filters ?? []).forEach((filter) => {
-            _filters[filter.k] = filter.v;
+    filter: computed(() => {
+        const _filter = {} as Record<string, string[]>;
+        (props.item.options.filter ?? []).forEach((filter) => {
+            _filter[filter.k] = filter.v;
         });
-        return _filters;
+        return _filter;
     }),
     dataName: computed(() => props.item.options.data_name ?? ''),
     dataUnit: computed(() => props.item.options.data_unit ?? ''),
@@ -290,7 +290,7 @@ const handleUpdateDataTable = async () => {
         options: {
             [state.sourceType]: domainOptions,
             group_by: groupBy,
-            filters: dataTableApiQueryHelper.data.filter,
+            filter: dataTableApiQueryHelper.data.filter,
             data_name: state.dataFieldName,
             data_unit: state.dataUnit,
             additional_labels: additionalLabelsRequest,
@@ -317,7 +317,7 @@ const setInitialDataTableForm = () => {
     // Initial Form Setting
     // Basic Options
     state.selectedGroupByItems = [...originDataState.groupBy];
-    state.filters = originDataState.filters;
+    state.filter = originDataState.filter;
     state.dataFieldName = originDataState.dataName;
     state.dataUnit = originDataState.dataUnit;
 
@@ -341,7 +341,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     state.selectedGroupByItems = [];
     state.dataFieldName = state.selectableSourceItems.find((source) => source.name === _selectedSourceItem)?.label;
     state.dataUnit = state.sourceType === DATA_SOURCE_DOMAIN.ASSET ? storeState.metrics[_selectedSourceItem]?.data?.unit || '' : '';
-    state.filters = {};
+    state.filter = {};
 
 
     // Advanced Options
@@ -417,7 +417,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                                   :source-key="state.selectedSourceEndItem"
                                                   :source-type="state.sourceType"
                                                   :selected-group-by-items.sync="state.selectedGroupByItems"
-                                                  :filters.sync="state.filters"
+                                                  :filter.sync="state.filter"
                                                   :data-field-name.sync="state.dataFieldName"
                                                   :data-unit.sync="state.dataUnit"
                                                   :additional-labels.sync="advancedOptionsState.additionalLabels"

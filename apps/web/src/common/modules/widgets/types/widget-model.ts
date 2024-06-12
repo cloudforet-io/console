@@ -72,8 +72,8 @@ export interface DataTableAddOptions {
     date_format?: DateFormat;
     additional_labels?: AdditionalLabels;
     timediff?: TimeDiff;
-    filters?: any[];
-    filters_or?: any[];
+    filter?: any[];
+    filter_or?: any[];
 }
 export interface AssetOptions {
     metric_id: string;
