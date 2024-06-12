@@ -20,4 +20,7 @@ export const AUTH_ROUTE = Object.freeze({
         _NAME: 'email',
         INVALID: { _NAME: 'invalid' },
     },
+    SAML: {
+        _NAME: 'saml',
+    },
 });

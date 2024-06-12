@@ -117,7 +117,7 @@ export const getRefinedMetricXYChartData = (rawData: AnalyzeResponse<MetricDataA
                 }
                 chartDataByDate[groupByName] = val;
             } else {
-                chartDataByDate.totalCount = val || 0;
+                chartDataByDate.totalCount = val;
             }
         });
         chartData.push(chartDataByDate);

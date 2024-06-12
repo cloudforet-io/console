@@ -70,10 +70,4 @@ const state = reactive({
     flex-flow: row;
     z-index: 1000;
 }
-
-@screen tablet {
-    .hidden-option {
-        @apply hidden;
-    }
-}
 </style>

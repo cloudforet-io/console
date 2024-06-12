@@ -67,6 +67,9 @@ const state = reactive({
     }),
     showErrorMessage: route.query.error === 'error' || computed(() => store.state.display.isSignInFailed),
 });
+
+// Note: 아래 메서드는 모든 LoginPage(e.g. KeycloakPage, SAMLRedirectPage ...)에서 로그인 성공 이후 동일 적용되어야하는 핸들러입니다.
+// Note: This method should be applied to all LoginPage (e.g. KeycloakPage, SAMLRedirectPage ...) after login success.
 const onSignIn = async (userId:string) => {
     appContextStore.setGlobalGrantLoading(true);
     try {
@@ -139,7 +142,7 @@ watch(() => route.name, () => {
         margin-bottom: 1.5rem;
     }
     .btn-divider {
-        @apply flex items-center text-gray-200;
+        @apply flex items-center text-gray-200 justify-center;
         flex-basis: 100%;
         font-size: 0.75rem;
         line-height: 120%;
@@ -149,9 +152,9 @@ watch(() => route.name, () => {
             margin: 0.5rem;
         }
         &::before, &::after {
-            @apply bg-gray-200;
+            @apply bg-gray-300;
             content: "";
-            flex-grow: 1;
+            width: 5.5rem;
             height: 1px;
         }
     }

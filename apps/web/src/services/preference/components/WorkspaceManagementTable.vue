@@ -23,6 +23,7 @@ import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
@@ -34,7 +35,6 @@ import {
 import type { WorkspaceTableModel } from '@/services/preference/store/workspace-page-store';
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
-
 
 interface Props {
     tableHeight?: number;
@@ -188,11 +188,17 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
                 />
             </template>
             <template #col-name-format="{value, item}">
-                <p-link :text="value"
-                        action-icon="internal-link"
-                        new-tab
-                        :to="getWorkspaceRouteLocationByWorkspaceName(item)"
-                />
+                <div class="col-name">
+                    <workspace-logo-icon :text="value"
+                                         :theme="item?.tags?.theme"
+                                         size="xs"
+                    />
+                    <p-link :text="value"
+                            action-icon="internal-link"
+                            new-tab
+                            :to="getWorkspaceRouteLocationByWorkspaceName(item)"
+                    />
+                </div>
             </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"
@@ -215,6 +221,10 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
 
 <style lang="postcss" scoped>
 .workspace-management-table {
+    .col-name {
+        @apply flex items-center;
+        gap: 0.5rem;
+    }
     .left-toolbox-item-select-dropdown {
         min-width: 6.5rem;
     }

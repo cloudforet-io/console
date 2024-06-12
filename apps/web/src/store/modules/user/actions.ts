@@ -69,14 +69,25 @@ const updateUser = async (userType: string, userRequest: UpdateUserRequest): Pro
 
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
     const domainId = signInRequest.domainId;
-    const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
-        domain_id: domainId,
-        auth_type: signInRequest.authType,
-        credentials: signInRequest.credentials,
-        verify_code: signInRequest.verify_code,
-    }, { skipAuthRefresh: true });
+    let response;
 
-    SpaceConnector.setToken(response.access_token, response.refresh_token);
+    if (signInRequest.authType === 'SAML') {
+        response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>({
+            grant_type: 'REFRESH_TOKEN',
+            scope: 'USER',
+            token: signInRequest.credentials.refreshToken,
+        }, { skipAuthRefresh: true });
+        SpaceConnector.setToken(response.access_token, signInRequest.credentials.refreshToken);
+    } else {
+        response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
+            domain_id: domainId,
+            auth_type: signInRequest.authType,
+            credentials: signInRequest.credentials,
+            verify_code: signInRequest.verify_code,
+        }, { skipAuthRefresh: true });
+        SpaceConnector.setToken(response.access_token, response.refresh_token);
+    }
+
 
     const userInfo = await getUserInfo();
     commit('setUser', userInfo);

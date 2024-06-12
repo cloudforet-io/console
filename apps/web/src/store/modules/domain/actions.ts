@@ -5,6 +5,9 @@ import type { DomainGetAuthInfoParams, DomainGetAuthInfoResponse, Metadata } fro
 import type { ExtendedAuthType } from './type';
 
 const getExtendedAuthType = (provider:Metadata['identity_provider'], protocol: Metadata['protocol']): ExtendedAuthType | undefined => {
+    if (protocol === 'saml') {
+        return 'SAML';
+    }
     if (provider && protocol) {
         return `${provider.toUpperCase()}_${protocol.toUpperCase()}` as ExtendedAuthType;
     }
