@@ -26,6 +26,7 @@ import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vu
 import DashboardRefreshDropdown from '@/services/dashboards/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
+import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/constants/dashboard-constant';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
@@ -78,6 +79,7 @@ const state = reactive({
         type: FAVORITE_TYPE.DASHBOARD,
         id: props.dashboardId,
     })),
+    dashboardVariablesLoading: false,
 });
 
 const getDashboardData = async (dashboardId: string) => {
@@ -102,6 +104,18 @@ const handleUpdateLabels = async (labels: string[]) => {
         });
     } catch (e) {
         ErrorHandler.handleError(e);
+    }
+};
+const handleUpdateDashboardVariables = async () => {
+    state.dashboardVariablesLoading = true;
+    try {
+        await dashboardDetailStore.updateDashboard(props.dashboardId as string, {
+            variables: dashboardDetailState.variables,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.dashboardVariablesLoading = false;
     }
 };
 
@@ -141,9 +155,15 @@ onUnmounted(() => {
         </div>
         <p-divider class="divider" />
         <div class="dashboard-selectors">
-            <dashboard-variables class="variable-selector-wrapper"
-                                 :dashboard-id="props.dashboardId"
-                                 is-manageable
+            <dashboard-variables v-if="dashboardDetailGetters.isDeprecatedDashboard"
+                                 class="variable-selector-wrapper"
+                                 :loading="state.dashboardVariablesLoading"
+                                 @update="handleUpdateDashboardVariables"
+            />
+            <dashboard-variables-v2 v-else
+                                    class="variable-selector-wrapper"
+                                    :loading="state.dashboardVariablesLoading"
+                                    @update="handleUpdateDashboardVariables"
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         :loading="dashboardDetailState.loadingWidgets"

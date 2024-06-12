@@ -166,9 +166,7 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="filter-wrapper">
                     <div class="left-part">
-                        <dashboard-variables is-manageable
-                                             disable-more-button
-                                             disable-save-button
+                        <dashboard-variables disable-save-button
                                              :origin-variables="state.variablesSnapshot"
                                              :origin-variables-schema="state.variableSchemaSnapshot"
                         />

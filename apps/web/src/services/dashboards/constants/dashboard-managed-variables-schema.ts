@@ -6,7 +6,7 @@ import {
 
 
 export const MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP = {
-    // workspace: { key: 'workspace', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
+    workspace: { key: 'workspace', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
     project_group: { key: 'project_group', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group },
     project: { key: 'project', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
     provider: { key: 'provider', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
@@ -21,17 +21,17 @@ export const MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP = {
 
 export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
     properties: {
-        // [MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key]: {
-        //     name: 'Workspace',
-        //     variable_type: 'MANAGED',
-        //     use: true,
-        //     selection_type: 'MULTI',
-        //     description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_WORKSPACE',
-        //     options: [{
-        //         type: 'MANAGED',
-        //         key: MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.modelKey,
-        //     }],
-        // },
+        [MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key]: {
+            name: 'Workspace',
+            variable_type: 'MANAGED',
+            use: true,
+            selection_type: 'MULTI',
+            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_WORKSPACE',
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.modelKey,
+            }],
+        },
         project_group: {
             name: 'Project Group',
             variable_type: 'MANAGED',

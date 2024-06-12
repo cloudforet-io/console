@@ -18,6 +18,7 @@ import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vu
 import DashboardRefreshDropdown from '@/services/dashboards/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
+import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -36,6 +37,7 @@ const emit = defineEmits<{(e: 'go-back'): void,
 const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     name: dashboardDetailState.name,
@@ -50,7 +52,6 @@ const getDashboardData = async () => {
         await SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
     }
 };
-
 
 
 /* Event */
@@ -99,9 +100,13 @@ onBeforeUnmount(() => {
         </div>
         <p-divider />
         <div class="dashboard-selectors">
-            <dashboard-variables class="variable-selector-wrapper"
+            <dashboard-variables v-if="dashboardDetailGetters.isDeprecatedDashboard"
+                                 class="variable-selector-wrapper"
                                  disable-save-button
-                                 is-manageable
+            />
+            <dashboard-variables-v2 v-else
+                                    class="variable-selector-wrapper"
+                                    disable-save-button
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         :loading="props.loading"
