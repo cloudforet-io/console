@@ -13,7 +13,7 @@ export interface WidgetFrameProps {
     width?: number;
     // widgetLocation?: Location;
     //
-    mode: 'overlay'|'customize'|'view';
+    mode: 'overlay'|'view';
     // dateText?: string;
     // currency?: Currency;
 
