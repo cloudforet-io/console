@@ -28,6 +28,7 @@ import DashboardToolsetDateDropdown from '@/services/dashboards/components/Dashb
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
+import DashboardWidgetContainerV2 from '@/services/dashboards/components/DashboardWidgetContainerV2.vue';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/constants/dashboard-constant';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -170,7 +171,12 @@ onUnmounted(() => {
                                         @refresh="handleRefresh"
             />
         </div>
-        <dashboard-widget-container ref="widgetContainerRef" />
+        <dashboard-widget-container v-if="dashboardDetailGetters.isDeprecatedDashboard"
+                                    ref="widgetContainerRef"
+        />
+        <dashboard-widget-container-v2 v-else
+                                       ref="widgetContainerRef"
+        />
     </div>
 </template>
 
