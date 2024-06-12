@@ -9,7 +9,6 @@ export interface ComparisonValue {
 export interface FormatRulesValue {
     threshold?: number;
     color: string;
-    name?: string;
 }
 export interface LineByValue {
     value: string;
