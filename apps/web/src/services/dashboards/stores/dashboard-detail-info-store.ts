@@ -14,7 +14,7 @@ import type {
     DashboardVariables, DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
     DashboardTemplate,
-    TemplateType,
+    TemplateType, DashboardLayoutWidgetInfoV2,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -101,7 +101,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         templateId: 'blank', // "templateId" exists in new dashboard, but not in existing dashboard.
         templateType: 'MANAGED' as TemplateType,
         // widget info states
-        dashboardWidgetInfoList: [] as DashboardLayoutWidgetInfo[],
+        dashboardWidgetInfoList: [] as Array<DashboardLayoutWidgetInfo|DashboardLayoutWidgetInfoV2>,
         loadingWidgets: false,
         // validation
         isNameValid: undefined as boolean | undefined,
