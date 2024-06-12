@@ -648,6 +648,11 @@
 				"TOTAL_COST": "총 비용",
 				"YEARLY": "연도별 데이터"
 			},
+			"COST_ANOMALY_DETECTION": {
+				"CONFIG_TITLE": "",
+				"HISTORY_TITLE": "",
+				"POLICY_TITLE": ""
+			},
 			"COST_REPORT": {
 				"ADDITIONAL_RECIPIENTS": "추가 수신인",
 				"ADD_EMAIL": "이메일 추가",
@@ -3071,6 +3076,7 @@
 		"COST_EXPLORER": "비용 관리",
 		"COST_EXPLORER_BUDGET": "예산",
 		"COST_EXPLORER_COST_ANALYSIS": "비용 분석",
+		"COST_EXPLORER_COST_ANOMALY_DETECTION": "",
 		"COST_EXPLORER_DASHBOARD": "대시보드",
 		"COST_EXPLORER_DATA_SOURCES": "데이터 소스",
 		"COST_EXPLORER_DESC": "비용 분석, 예산, 비용 리포트를 이용할 수 있습니다.",
