@@ -29,7 +29,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         overlayStep: 1,
         // Widget
         widget: undefined as undefined | PublicWidgetModel,
-        widgetId: 'public-widget-dc67835fce38',
+        widgetId: '',
         selectedWidgetName: 'stackedColumnChart',
         title: '',
         description: '',
