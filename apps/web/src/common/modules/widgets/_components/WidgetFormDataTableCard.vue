@@ -108,6 +108,20 @@ const state = reactive({
         ];
     }),
     filterFormKey: getRandomId(),
+    optionsChanged: computed(() => {
+        const sourceKeyChanged = state.selectedSourceEndItem !== originDataState.sourceKey;
+        const groupByChanged = !isEqual(state.selectedGroupByItems, originDataState.groupBy);
+        const filtersChanged = !isEqual(state.filters, originDataState.filters);
+        const dataTableNameChanged = state.dataFieldName !== originDataState.dataName;
+        const dataUnitChanged = state.dataUnit !== originDataState.dataUnit;
+        const additionalLabelChanged = !isEqual(advancedOptionsState.additionalLabels.map(({ name, value }) => ({ name, value })), originDataState.additionalLabels);
+        const seperateDateChanged = advancedOptionsState.separateDate !== originDataState.separateDate;
+        const timeDiffChanged = advancedOptionsState.selectedTimeDiff !== originDataState.timeDiff;
+        const timeDiffDateChanged = advancedOptionsState.selectedTimeDiffDate !== originDataState.timeDiffDate;
+
+        return sourceKeyChanged || groupByChanged || filtersChanged || dataTableNameChanged || dataUnitChanged
+        || additionalLabelChanged || seperateDateChanged || timeDiffChanged || timeDiffDateChanged;
+    }),
 });
 
 const dataTableNameState = reactive({
@@ -122,43 +136,38 @@ const advancedOptionsState = reactive({
     selectedTimeDiffDate: undefined as string|undefined,
 });
 
-const applyState = reactive({
-    optionsChanged: computed(() => {
-        const _initialOptions = props.item.options;
-        const _originSourceKey = state.sourceType === DATA_SOURCE_DOMAIN.COST ? _initialOptions[DATA_SOURCE_DOMAIN.COST]?.data_key : _initialOptions[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
-        const sourceKeyChanged = state.selectedSourceEndItem !== _originSourceKey;
-
-        const costGroupBy = state.selectedGroupByItems.map((group) => ({
-            key: group.name,
-            name: group.label,
-        }));
-        const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
-        const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
-        const _targetGroupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
-        const groupByChanged = !isEqual(_targetGroupBy, _initialOptions.group_by);
-
-        const changedCheckApiQueryHelper = new ApiQueryHelper();
-        changedCheckApiQueryHelper.setFilters(state.consoleFilters);
-        const filtersChanged = !isEqual(changedCheckApiQueryHelper.data.filter, _initialOptions.filters);
-
-        const dataTableNameChanged = state.dataFieldName !== _initialOptions.data_name;
-        const dataUnitChanged = state.dataUnit !== _initialOptions.data_unit;
-
-        const _targetAdditionalLabels = {} as AdditionalLabels;
-        advancedOptionsState.additionalLabels.filter((label) => label.name.length && label.value.length).forEach((label) => {
-            _targetAdditionalLabels[label.name] = label.value;
+const originDataState = reactive({
+    sourceKey: computed(() => (state.sourceType === DATA_SOURCE_DOMAIN.COST ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id)),
+    groupBy: computed(() => (props.item.options.group_by ?? []).map((group) => ({
+        name: group.key,
+        label: group.name,
+    }))),
+    filters: computed(() => {
+        const _filters = {} as Record<string, string[]>;
+        (props.item.options.filters ?? []).forEach((filter) => {
+            _filters[filter.k] = filter.v;
         });
-        const additionalLabelChanged = !isEqual(_targetAdditionalLabels, _initialOptions.additional_labels);
-
-        const seperateDateChanged = advancedOptionsState.separateDate !== (_initialOptions.date_format === 'SEPARATE');
-
-        const timeDiffChanged = advancedOptionsState.selectedTimeDiff !== 'none' && Number(advancedOptionsState.selectedTimeDiffDate)
-            ? !isEqual({ [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate) }, _initialOptions.timediff)
-            : _initialOptions.timediff !== undefined;
-
-        return sourceKeyChanged || groupByChanged || filtersChanged || dataTableNameChanged || dataUnitChanged || additionalLabelChanged || seperateDateChanged || timeDiffChanged;
+        return _filters;
+    }),
+    dataName: computed(() => props.item.options.data_name ?? ''),
+    dataUnit: computed(() => props.item.options.data_unit ?? ''),
+    additionalLabels: computed(() => Object.entries((props.item.options.additional_labels ?? {})).map(([key, value]) => ({
+        name: key,
+        value: value as string,
+    }))),
+    separateDate: computed(() => props.item.options.date_format === 'SEPARATE'),
+    timeDiff: computed(() => {
+        const timeDiff = props.item.options.timediff;
+        const timeDiffKeys = Object.keys(timeDiff || {});
+        return timeDiffKeys.length ? timeDiffKeys[0] : 'none';
+    }),
+    timeDiffDate: computed(() => {
+        const timeDiff = props.item.options.timediff;
+        const timeDiffKeys = Object.keys(timeDiff || {});
+        return timeDiffKeys.length ? `${-timeDiff[timeDiffKeys[0]]}` : undefined;
     }),
 });
+
 const modalState = reactive({
     visible: false,
     mode: '' as 'DELETE'|'DELETE_UNABLED'|'RESET',
@@ -254,6 +263,10 @@ const handleCancelModal = () => {
     modalState.visible = false;
 };
 const handleUpdateDataTable = async () => {
+    if (!state.dataFieldName.length) {
+        showErrorMessage('Unable to apply changes. Please check the form.', '');
+        return;
+    }
     const additionalLabelsRequest = {} as AdditionalLabels;
     advancedOptionsState.additionalLabels.filter((label) => label.name.length && label.value.length).forEach((label) => {
         additionalLabelsRequest[label.name] = label.value;
@@ -271,11 +284,6 @@ const handleUpdateDataTable = async () => {
     const groupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
     const dataTableApiQueryHelper = new ApiQueryHelper();
     dataTableApiQueryHelper.setFilters(state.consoleFilters);
-
-    if (!groupBy.length || !state.dataFieldName.length) {
-        showErrorMessage('Unable to apply changes. Please check the form.', '');
-        return;
-    }
 
     const updateParams: DataTableUpdateParameters = {
         data_table_id: state.dataTableId,
@@ -308,35 +316,19 @@ const handleUpdateDataTable = async () => {
 const setInitialDataTableForm = () => {
     // Initial Form Setting
     // Basic Options
-    const initialGroupBy = (props.item.options?.group_by || []).map((group) => ({
-        label: group.name,
-        name: group.key,
-    }));
-    // TODO: refactor groupBy & set filters
-    state.selectedGroupByItems = [...initialGroupBy];
-    const _filters = {} as Record<string, string[]>;
-    props.item.options?.filters?.forEach((filter) => {
-        _filters[filter.k] = filter.v;
-    });
-    state.filters = _filters;
-
-    state.dataFieldName = props.item.options.data_name || '';
-    state.dataUnit = props.item.options.data_unit || '';
+    state.selectedGroupByItems = [...originDataState.groupBy];
+    state.filters = originDataState.filters;
+    state.dataFieldName = originDataState.dataName;
+    state.dataUnit = originDataState.dataUnit;
 
     // Advanced Options
-    const initialAdditionalLabels = (props.item.options.additional_labels || {})as AdditionalLabels;
-    advancedOptionsState.additionalLabels = Object.entries(initialAdditionalLabels).map(([key, value]) => ({
+    advancedOptionsState.additionalLabels = originDataState.additionalLabels.map((label) => ({
+        ...label,
         key: getRandomId(),
-        name: key,
-        value,
     }));
-    const initialSeparateDate = props.item.options?.date_format;
-    advancedOptionsState.separateDate = !!(initialSeparateDate && initialSeparateDate === 'SEPARATE');
-    const timeDiff = props.item.options?.timediff;
-    const timeDiffKeys = Object.keys(timeDiff || {});
-    const selectedKey = timeDiffKeys.length ? timeDiffKeys[0] : 'none';
-    advancedOptionsState.selectedTimeDiff = selectedKey;
-    advancedOptionsState.selectedTimeDiffDate = selectedKey === 'none' ? undefined : `${-timeDiff[selectedKey]}`;
+    advancedOptionsState.separateDate = originDataState.separateDate;
+    advancedOptionsState.selectedTimeDiff = originDataState.timeDiff;
+    advancedOptionsState.selectedTimeDiffDate = originDataState.timeDiffDate;
 };
 
 onMounted(() => {
@@ -452,7 +444,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                               @click="handleUpdateDataTable"
                     >
                         Apply
-                        <div v-if="applyState.optionsChanged"
+                        <div v-if="state.optionsChanged"
                              class="update-dot"
                         />
                     </p-button>
@@ -481,13 +473,12 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 
 <style lang="postcss" scoped>
 .widget-form-data-table-card {
-    @apply relative;
     height: auto;
 
     .card-wrapper {
-        @apply relative border border-gray-300 rounded-lg w-full bg-white;
+        @apply border border-gray-300 rounded-lg w-full bg-white;
         width: 24rem;
-        height: auto;
+        margin-bottom: 2rem;
 
         &.selected {
             @apply border-violet-600;
