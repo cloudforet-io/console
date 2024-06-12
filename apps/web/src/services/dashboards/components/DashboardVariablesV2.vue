@@ -1,86 +1,83 @@
 <script lang="ts" setup>
-import type Vue from 'vue';
-import { computed, getCurrentInstance, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PI, PTextButton, PDivider } from '@spaceone/design-system';
-import { isEqual, xor } from 'lodash';
+import { isEqual } from 'lodash';
 
-import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVariables, DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/dashboard-type';
 
-import DashboardManageVariableOverlay
-    from '@/services/dashboards/components/DashboardManageVariableOverlay.vue';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import DashboardVariableDropdown from '@/services/dashboards/components/DashboardVariableDropdown.vue';
-import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
+import {
+    MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP,
+    MANAGED_DASHBOARD_VARIABLES_SCHEMA,
+} from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 interface Props {
     loading?: boolean;
-    originVariables?: DashboardVariables;
-    originVariablesSchema?: DashboardVariablesSchema;
     disableSaveButton?: boolean;
+    originVariables?: DashboardVariables;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update', val: { variables?: DashboardVariables, variables_schema?: DashboardVariablesSchema }): void;
+const emit = defineEmits<{(e: 'update', val: { variables?: DashboardVariables }): void;
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
-
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+const appContextStore = useAppContextStore();
 
-const vm = getCurrentInstance()?.proxy as Vue;
-
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
-    showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
-    variableProperties: computed(() => dashboardDetailGetters.refinedVariablesSchema.properties),
-    order: computed(() => dashboardDetailGetters.refinedVariablesSchema.order),
+    variableProperties: computed<Record<string, DashboardVariableSchemaProperty>>(() => {
+        const _defaultDashboardVariables: Record<string, DashboardVariableSchemaProperty> = {
+            project: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project.key],
+            service_account: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.service_account.key],
+            region: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.region.key],
+        };
+        if (storeState.isAdminMode) {
+            _defaultDashboardVariables.workspace = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key];
+        }
+        return _defaultDashboardVariables;
+    }),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];
-        const prevUsedProperties = Object.entries(dashboardDetailState.dashboardInfo?.variables_schema.properties ?? {}).filter(([, v]) => v.use);
-        const currUsedProperties = Object.entries(dashboardDetailGetters.refinedVariablesSchema.properties).filter(([, v]) => v.use);
-        // check variables changed
-        currUsedProperties.forEach(([k]) => {
+        Object.entries(state.variableProperties).forEach(([k]) => {
             if (!isEqual(dashboardDetailState.dashboardInfo?.variables?.[k], dashboardDetailState.variables?.[k])) {
                 results.push(k);
             }
         });
-        // check schema changed
-        results.push(...xor(prevUsedProperties.map(([k]) => k), currUsedProperties.map(([k]) => k)));
         return results;
     }),
     showSaveButton: computed<boolean>(() => !props.disableSaveButton && state.modifiedVariablesSchemaProperties.length > 0),
 });
 
 const handleClickSaveButton = () => {
-    emit('update', {
-        variables: dashboardDetailState.variables,
-        variables_schema: dashboardDetailState.variablesSchema,
-    });
+    emit('update', { variables: dashboardDetailState.variables });
 };
 const handleResetVariables = () => {
-    const _originVariables = props.originVariables ?? dashboardDetailState.dashboardInfo?.variables ?? DASHBOARD_TEMPLATES[dashboardDetailState.templateId].variables;
-    const _originVariablesSchema = props.originVariablesSchema ?? dashboardDetailState.dashboardInfo?.variables_schema ?? DASHBOARD_TEMPLATES[dashboardDetailState.templateId].variables_schema;
-    dashboardDetailStore.resetVariables(_originVariables, _originVariablesSchema);
+    const _originVariables = props.originVariables ?? dashboardDetailState.dashboardInfo?.variables ?? {};
+    dashboardDetailStore.setVariables(_originVariables);
 };
-
 </script>
 
 <template>
     <div class="dashboard-variables-select-dropdown">
-        <template v-for="(propertyName, idx) in state.order">
-            <div v-if="state.variableProperties[propertyName]?.use"
-                 :key="`${propertyName}-${idx}`"
+        <template v-for="([propertyName, property], idx) in Object.entries(state.variableProperties)">
+            <div :key="`${propertyName}-${idx}`"
                  class="variable-selector-box"
             >
                 <dashboard-variable-dropdown :property-name="propertyName"
-                                             :property="dashboardDetailGetters.refinedVariablesSchema.properties[propertyName]"
+                                             :property="property"
                                              :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"
                                              :disabled="props.loading"
                                              :dashboard-variables="dashboardDetailState.variables"
@@ -113,7 +110,6 @@ const handleResetVariables = () => {
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
         </p-text-button>
-        <dashboard-manage-variable-overlay :visible="state.showOverlay" />
     </div>
 </template>
 
