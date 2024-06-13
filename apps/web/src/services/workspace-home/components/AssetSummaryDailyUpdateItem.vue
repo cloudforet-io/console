@@ -3,9 +3,6 @@ import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
 import { PLazyImg, PI } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -33,8 +30,6 @@ const props = withDefaults(defineProps<Props>(), {
     item: () => ({} as CloudServiceData),
 });
 
-const queryHelper = new QueryHelper();
-
 const state = reactive({
     dailyUpdateItem: computed<CloudServiceItem>(() => ({
         cloudServiceGroup: props.item.cloud_service_group,
@@ -46,30 +41,21 @@ const state = reactive({
         createdCount: props.item.created_count,
         deletedCount: props.item.deleted_count,
         createdHref: {
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
             params: {
-                provider: props.item.provider,
+                metricId: 'metric-managed-created-count',
+                groupBy: props.item.provider,
                 group: props.item.cloud_service_group,
-                name: props.item.cloud_service_type,
-            },
-            query: {
-                filters: queryHelper.setFilters([
-                    { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                ]).rawQueryStrings,
+                type: props.item.cloud_service_type,
             },
         },
         deletedHref: {
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
             params: {
-                provider: props.item.provider,
+                metricId: 'metric-managed-deleted-count',
+                groupBy: props.item.provider,
                 group: props.item.cloud_service_group,
-                name: props.item.cloud_service_type,
-            },
-            query: {
-                filters: queryHelper.setFilters([
-                    { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                    { k: 'state', v: 'DELETED', o: '=' },
-                ]).rawQueryStrings,
+                type: props.item.cloud_service_type,
             },
         },
     })),

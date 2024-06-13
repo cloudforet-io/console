@@ -19,6 +19,8 @@ import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -34,28 +36,36 @@ const dailyUpdateEl = ref<null | HTMLElement>(null);
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
+    cloudServiceTypeMap: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloud_service_type),
 });
 const state = reactive({
     dailyUpdatesListItems: { created: [] as CloudServiceData[], deleted: [] as CloudServiceData[] },
+    cloudServiceTypeList: computed<CloudServiceTypeItem[]>(() => Object.values(storeState.cloudServiceTypeMap)),
     dailyUpdatesList: computed<CloudServiceData[]>(() => {
         const mergedArray = [...state.dailyUpdatesListItems.created, ...state.dailyUpdatesListItems.deleted];
 
         const grouped = groupBy(mergedArray, (item) => `${item.cloud_service_group}-${item.cloud_service_type}-${item.provider}`);
 
-        return map(grouped, (group) => ({
-            cloud_service_group: group[0].cloud_service_group,
-            cloud_service_type: group[0].cloud_service_type,
-            total_count: sumBy(group, 'total_count') || 0,
-            provider: group[0].provider,
-            created_count: sumBy(group, 'created_count') || 0,
-            deleted_count: sumBy(group, 'deleted_count') || 0,
-        }));
+        return map(grouped, (group) => {
+            const cloudServiceType = state.cloudServiceTypeList.find((i) => i.data.cloud_service_type_key === `${group[0].provider}.${group[0].cloud_service_group}.${group[0].cloud_service_type}`);
+            return {
+                cloud_service_group: cloudServiceType?.data.group,
+                cloud_service_type: cloudServiceType?.name,
+                total_count: sumBy(group, 'total_count') || 0,
+                provider: cloudServiceType?.data.provider,
+                icon: cloudServiceType?.icon,
+                created_count: sumBy(group, 'created_count') || 0,
+                deleted_count: sumBy(group, 'deleted_count') || 0,
+            };
+        });
     }),
     pageStart: 0,
     pageMax: computed(() => {
