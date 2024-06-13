@@ -17,10 +17,13 @@ import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-t
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
-import type { DataTableModel, WidgetModel } from '@/common/modules/widgets/types/widget-model';
+import type {
+    DataTableModel, WidgetModel, DataTableOperator, DataTableTransformOptions,
+} from '@/common/modules/widgets/types/widget-model';
 
 
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
@@ -142,6 +145,33 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
+        },
+        createUnsavedTransformDataTable: (operatorType: DataTableOperator) => {
+            const options = {
+                JOIN: {
+                    data_tables: [],
+                    on: undefined,
+                },
+                CONCAT: {
+                    data_tables: [],
+                },
+                AGGREGATE: {
+                    data_table_id: '',
+                    group_by: [],
+                },
+                WHERE: {
+                    data_table_id: '',
+                    conditions: [],
+                },
+            } as DataTableTransformOptions;
+            const unsavedTransformData = {
+                name: `${operatorType} Data`,
+                data_type: DATA_TABLE_TYPE.TRANSFORMED,
+                options: {
+                    [operatorType]: options[operatorType],
+                },
+            } as DataTableModel;
+            state.dataTables.push(unsavedTransformData);
         },
         updateDataTable: async (updateParams: DataTableUpdateParameters) => {
             try {
