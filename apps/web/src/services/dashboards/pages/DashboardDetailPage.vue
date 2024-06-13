@@ -177,12 +177,6 @@ onUnmounted(() => {
         <dashboard-widget-container-v2 v-else
                                        ref="widgetContainerRef"
         />
-        <!--        <dashboard-customize-sidebar :loading="props.loading"-->
-        <!--                                     :save-button-text="props.saveButtonText"-->
-        <!--                                     :hide-cancel-button="props.hideCancelButton"-->
-        <!--                                     @save="handleSave"-->
-        <!--                                     @cancel="goBack"-->
-        <!--        />-->
     </div>
 </template>
 

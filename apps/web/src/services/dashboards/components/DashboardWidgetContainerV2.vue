@@ -9,20 +9,16 @@ import { debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
-
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetExpose, WidgetProps, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetModel } from '@/common/modules/widgets/types/widget-model';
 
+import DashboardCustomizeSidebar from '@/services/dashboards/components/DashboardCustomizeSidebar.vue';
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
@@ -30,16 +26,13 @@ import { widgetWidthAssigner } from '@/services/dashboards/helpers/widget-width-
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type {
-    WidgetExpose, WidgetProps,
-} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
 interface RefinedWidgetInfo extends WidgetModel {
     size: WidgetSize;
-    width: number;
+    width?: number;
     component: AsyncComponent|null;
 }
 
@@ -56,9 +49,8 @@ const state = reactive({
     initiatedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed(() => Object.values(state.mountedWidgetMap).every((d) => d)),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
-    widgetList: [] as Array<PublicWidgetModel|PrivateWidgetModel>,
     refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => {
-        if (!state.widgetList.length) return [];
+        if (!dashboardDetailState.dashboardWidgets.length) return [];
         return getRefinedWidgetInfoList();
     }),
 });
@@ -73,7 +65,7 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
     dashboardDetailState.dashboardLayouts.forEach((d) => {
         const _widgetIdList = d.widgets;
         _widgetIdList?.forEach((widgetId) => {
-            const _widget = state.widgetList.find((w) => w.widget_id === widgetId);
+            const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
             if (!_widget) return;
             const config = getWidgetConfig(_widget.widget_type);
             if (!config) return;
@@ -95,17 +87,6 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
 };
 
 /* Api */
-const listWidget = async () => {
-    if (!dashboardDetailState.dashboardId) return;
-    try {
-        const { results } = await SpaceConnector.clientV2.dashboard.publicWidget.list<PublicWidgetListParameters, ListResponse<PublicWidgetModel>>({
-            dashboard_id: dashboardDetailState.dashboardId,
-        });
-        state.widgetList = results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
 const deleteWidget = async (widgetId: string) => {
     try {
         await SpaceConnector.clientV2.dashboard.publicWidget.delete({
@@ -197,16 +178,16 @@ onBeforeUnmount(() => {
 /* refresh widgets */
 const refreshAllWidget = debounce(async () => {
     dashboardDetailStore.setLoadingWidgets(true);
-    const initWidgetPromises: WidgetExpose['initWidget'][] = [];
+    const loadWidgetPromises: WidgetExpose['loadWidget'][] = [];
 
     widgetRef.value.forEach((comp) => {
-        if (!comp || typeof comp.initWidget() !== 'function') return false;
+        if (!comp || typeof comp.loadWidget() !== 'function') return false;
         if (!state.initiatedWidgetMap[comp.$el?.id]) return false;
-        initWidgetPromises.push(comp.initWidget);
+        loadWidgetPromises.push(comp.loadWidget);
         return true;
     });
 
-    await Promise.allSettled(initWidgetPromises);
+    await Promise.allSettled(loadWidgetPromises);
 
     dashboardDetailStore.setLoadingWidgets(false);
 }, 150);
@@ -229,8 +210,9 @@ const handleDeleteModalConfirm = async () => {
     widgetDeleteState.targetWidget = null;
 };
 
+/* Watcher */
 watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
-    if (dashboardId) listWidget();
+    if (dashboardId) dashboardDetailStore.listDashboardWidgets();
 }, { immediate: true });
 watch(() => widgetGenerateState.showOverlay, (showOverlay) => {
     if (!showOverlay) {
@@ -250,6 +232,7 @@ watch(() => widgetGenerateState.showOverlay, (showOverlay) => {
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">
                     <component :is="widget.component"
+                               :id="widget.widget_id"
                                :key="widget.widget_id"
                                ref="widgetRef"
                                :widget-name="widget.widget_type"
@@ -279,6 +262,9 @@ watch(() => widgetGenerateState.showOverlay, (showOverlay) => {
                       @confirm="handleDeleteModalConfirm"
         />
         <widget-form-overlay overlay-type="EDIT" />
+        <dashboard-customize-sidebar
+            :widget-info-list="state.refinedWidgetInfoList"
+        />
     </div>
 </template>
 
