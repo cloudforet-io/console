@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PSelectDropdown, PFieldGroup, PTextInput, PSelectButton,
+    PSelectDropdown, PFieldGroup, PTextInput, PSelectButton, PTooltip, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -14,7 +14,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
-
+const DEFAULT_COUNT = 5;
 const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions>>(), {
 });
 const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
@@ -32,17 +32,32 @@ const state = reactive({
     ]),
     selectedFieldType: 'dynamicField',
     selectedItem: undefined as undefined | MenuItem[] | string,
-    menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    menuItems: computed<MenuItem[]>(() => {
+        const dataTarget = state.selectedFieldType === 'staticField' ? 'data_info' : 'labels_info';
+        if (!props.dataTable) return [];
+        const dataInfoList = Object.keys(props.dataTable[dataTarget] ?? {}) ?? [];
+        return dataInfoList.map((d) => ({
+            name: d,
+            label: d,
+        }));
+    }),
     isValid: computed<boolean>(() => {
         if (!state.proxyValue?.count) return false;
         if (state.selectedFieldType === 'staticField' && !state.selectedItem?.length) return false;
         return !!state.selectedItem;
     }),
+    max: computed(() => props.widgetFieldSchema?.options?.max),
+    isMaxValid: computed<boolean>(() => (state.max ? (state.proxyValue?.count <= state.max) : true)),
+    tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
+        fieldName: state.fieldName,
+        max: state.max,
+    })),
 });
 
 /* Event */
 const handleChangeDataFieldType = (value: string) => {
     state.selectedFieldType = value;
+    state.selectedItem = state.menuItems[0]?.name;
 };
 const handleUpdateSelect = (val: string|MenuItem[]) => {
     state.selectedItem = val;
@@ -61,11 +76,11 @@ watch(() => state.isValid, (isValid) => {
 
 /* Init */
 onMounted(() => {
-    // TODO: set state.proxyValue with the value from the widget or set default value
     state.proxyValue = {
         value: state.menuItems[0]?.name, // TODO: string | string[]
-        count: props.widgetFieldSchema.options?.default,
+        count: props.widgetFieldSchema?.options?.default ?? DEFAULT_COUNT,
     };
+    state.selectedItem = state.menuItems[0]?.name;
 });
 </script>
 
@@ -86,19 +101,47 @@ onMounted(() => {
                 </p-select-button>
             </div>
             <div class="field-form-wrapper">
-                <p-select-dropdown :menu="state.menuItems"
-                                   :multi-selectable="state.selectedFieldType === 'staticField'"
-                                   show-select-marker
-                                   appearance-type="badge"
-                                   :selected="state.selectedItem"
-                                   @update:selected="handleUpdateSelect"
-                />
-                <p-text-input type="number"
-                              :min="1"
-                              :max="props.widgetFieldSchema.options?.max"
-                              :value="state.proxyValue?.count"
-                              @update:value="handleUpdateCount"
-                />
+                <p-field-group :label="$t('COMMON.WIDGETS.FIELD')"
+                               style-type="secondary"
+                               required
+                               class="w-full"
+                >
+                    <p-select-dropdown :menu="state.menuItems"
+                                       :selected="state.selectedItem"
+                                       :multi-selectable="state.selectedFieldType === 'staticField'"
+                                       show-select-marker
+                                       appearance-type="badge"
+                                       @update:selected="handleUpdateSelect"
+                    />
+                </p-field-group>
+                <p-field-group :label="$t('COMMON.WIDGETS.MAX_ITEMS')"
+                               style-type="secondary"
+                               class="max-items"
+                               :invalid="!state.isMaxValid"
+                               :invalid-text="$t('COMMON.WIDGETS.NUMBER_FIELD_VALIDATION', {max: state.max})"
+                               required
+                >
+                    <p-text-input type="number"
+                                  :min="1"
+                                  :max="props.widgetFieldSchema?.options?.max"
+                                  :invalid="!state.isMaxValid"
+                                  :value="state.proxyValue?.count ?? DEFAULT_COUNT"
+                                  @update:value="handleUpdateCount"
+                    />
+                    <template #label-extra>
+                        <p-tooltip v-if="state.max"
+                                   :contents="state.tooltipDesc"
+                                   position="bottom"
+                                   class="tooltip"
+                        >
+                            <p-i width="1rem"
+                                 height="1rem"
+                                 name="ic_info-circle"
+                                 class="icon"
+                            />
+                        </p-tooltip>
+                    </template>
+                </p-field-group>
             </div>
         </p-field-group>
     </div>

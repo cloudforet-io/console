@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { asyncComputed } from '@vueuse/core/index';
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
@@ -40,8 +40,10 @@ watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
 
-onMounted(() => {
-    state.proxyValue = 'MONTHLY';
+watch(() => state.granularityMenuItems, (granularityMenuItems) => {
+    if (granularityMenuItems.length) {
+        state.proxyValue = granularityMenuItems[0].name;
+    }
 });
 </script>
 

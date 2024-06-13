@@ -4,9 +4,11 @@ import {
 } from 'vue';
 
 import {
-    PSelectDropdown, PFieldGroup, PTextInput,
+    PSelectDropdown, PFieldGroup, PTextInput, PTooltip, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+
+import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type {
@@ -17,18 +19,34 @@ import type {
 import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
+const DEFAULT_COUNT = 5;
 const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions>>(), {
 });
 const emit = defineEmits<WidgetFieldComponentEmit<GroupByValue>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
-    menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    menuItems: computed<MenuItem[]>(() => {
+        const dataTarget = props.widgetFieldSchema?.options?.dataTarget ?? 'labels_info';
+        if (!props.dataTable) return [];
+        const dataInfoList = Object.keys(props.dataTable[dataTarget] ?? {}) ?? [];
+        return dataInfoList.map((d) => ({
+            name: d,
+            label: d,
+        }));
+    }),
+    fieldName: computed(() => i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.GROUP_BY')),
     selectedItem: undefined as undefined | MenuItem[] | string,
     isValid: computed<boolean>(() => {
         if (!props.widgetFieldSchema?.options?.hideCount && !state.proxyValue?.count) return false;
         if (props.widgetFieldSchema?.options?.multiSelectable && !state.selectedItem?.length) return false;
         return !!state.selectedItem;
     }),
+    max: computed(() => props.widgetFieldSchema?.options?.max),
+    isMaxValid: computed<boolean>(() => (state.max ? (state.proxyValue?.count <= state.max) : true)),
+    tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
+        fieldName: state.fieldName,
+        max: state.max,
+    })),
 });
 
 /* Event */
@@ -52,34 +70,62 @@ watch(() => state.isValid, (isValid) => {
 
 /* Init */
 onMounted(() => {
-    // TODO: set state.proxyValue with the value from the widget or set default value
     state.proxyValue = {
         value: state.menuItems[0]?.name, // TODO: string | string[]
-        count: props.widgetFieldSchema?.options?.defaultMaxCount,
+        count: props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT,
     };
+    state.selectedItem = state.menuItems[0]?.name;
 });
 </script>
 
 <template>
     <div class="widget-field-group-by">
-        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.GROUP_BY')"
+        <p-field-group :label="state.fieldName"
                        required
         >
             <div class="field-form-wrapper">
-                <p-select-dropdown :menu="state.menuItems"
-                                   :selected="state.selectedItem"
-                                   :multi-selectable="props.widgetFieldSchema.options?.multiSelectable"
-                                   show-select-marker
-                                   appearance-type="badge"
-                                   @update:selected="handleUpdateSelect"
-                />
-                <p-text-input v-if="!widgetFieldSchema?.options?.hideCount"
-                              type="number"
-                              :min="1"
-                              :max="props.widgetFieldSchema?.options?.max"
-                              :value="state.proxyValue?.count"
-                              @update:value="handleUpdateCount"
-                />
+                <p-field-group :label="$t('COMMON.WIDGETS.FIELD')"
+                               style-type="secondary"
+                               required
+                               class="w-full"
+                >
+                    <p-select-dropdown :menu="state.menuItems"
+                                       :selected="state.selectedItem"
+                                       :multi-selectable="props.widgetFieldSchema?.options?.multiSelectable"
+                                       show-select-marker
+                                       appearance-type="badge"
+                                       @update:selected="handleUpdateSelect"
+                    />
+                </p-field-group>
+                <p-field-group :label="$t('COMMON.WIDGETS.MAX_ITEMS')"
+                               style-type="secondary"
+                               class="max-items"
+                               :invalid="!state.isMaxValid"
+                               :invalid-text="$t('COMMON.WIDGETS.NUMBER_FIELD_VALIDATION', {max: state.max})"
+                               required
+                >
+                    <p-text-input v-if="!widgetFieldSchema?.options?.hideCount"
+                                  type="number"
+                                  :min="1"
+                                  :max="props.widgetFieldSchema?.options?.max"
+                                  :invalid="!state.isMaxValid"
+                                  :value="state.proxyValue?.count ?? DEFAULT_COUNT"
+                                  @update:value="handleUpdateCount"
+                    />
+                    <template #label-extra>
+                        <p-tooltip v-if="state.max"
+                                   :contents="state.tooltipDesc"
+                                   position="bottom"
+                                   class="tooltip"
+                        >
+                            <p-i width="1rem"
+                                 height="1rem"
+                                 name="ic_info-circle"
+                                 class="icon"
+                            />
+                        </p-tooltip>
+                    </template>
+                </p-field-group>
             </div>
         </p-field-group>
     </div>
@@ -98,6 +144,19 @@ onMounted(() => {
         width: 6.5rem;
         .input-container {
             padding-right: 1.5rem;
+        }
+    }
+
+    .max-items {
+        width: 7.5rem;
+
+        .tooltip {
+            position: relative;
+            padding-left: 1.25rem;
+            .icon {
+                position: absolute;
+                right: 0;
+            }
         }
     }
 }
