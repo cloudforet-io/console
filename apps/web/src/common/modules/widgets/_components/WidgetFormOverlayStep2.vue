@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onBeforeMount, onUnmounted, reactive,
+    computed, onBeforeMount, onUnmounted, reactive, ref,
 } from 'vue';
 
 import {
@@ -27,6 +27,7 @@ import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVari
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
+const overlayWidgetRef = ref<HTMLElement|null>(null);
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
@@ -70,6 +71,9 @@ const handleChangeWidgetSize = (widgetSize: string) => {
 const handleUpdateWidgetSize = (size: WidgetSize) => {
     widgetGenerateStore.setSize(size);
 };
+const handleUpdatePreview = () => {
+    overlayWidgetRef.value?.initWidget();
+};
 
 onBeforeMount(() => {
     initSnapshot();
@@ -106,6 +110,7 @@ onUnmounted(() => {
                  :class="{ 'full-size': state.selectedWidgetSize === 'FULL' }"
             >
                 <component :is="getWidgetComponent(widgetGenerateState.selectedWidgetName)"
+                           ref="overlayWidgetRef"
                            :widget-name="widgetGenerateState.selectedWidgetName"
                            :widget-id="widgetGenerateState.widgetId"
                            :data-table-id="widgetGenerateState.selectedDataTableId"
@@ -120,6 +125,7 @@ onUnmounted(() => {
                 <p-button style-type="substitutive"
                           icon-left="ic_refresh"
                           class="update-preview-button"
+                          @click="handleUpdatePreview"
                 >
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.UPDATE_PREVIEW') }}
                 </p-button>
