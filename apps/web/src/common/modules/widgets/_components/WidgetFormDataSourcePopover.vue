@@ -20,9 +20,13 @@ import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
 import WidgetFormDataSourceAddButton from '@/common/modules/widgets/_components/WidgetFormDataSourceAddButton.vue';
-import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DATA_SOURCE_DOMAIN,
+    DATA_TABLE_OPERATOR,
+    DATA_TABLE_TYPE,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { DataTableDataType, DataTableSourceType } from '@/common/modules/widgets/types/widget-model';
+import type { DataTableDataType, DataTableSourceType, DataTableOperator } from '@/common/modules/widgets/types/widget-model';
 
 
 
@@ -108,11 +112,15 @@ const handleClickDataSourceDomain = (domainName: DataTableSourceType) => {
     state.selectedDataSourceDomain = domainName;
     resetSelectedDataSource();
 };
+const handleClickOperator = (operator: DataTableOperator) => {
+    widgetGenerateStore.createUnsavedTransformDataTable(operator);
+    state.showPopover = false;
+};
 const handleSelectPopperCondition = (condition: DataTableDataType) => {
     state.selectedPopperCondition = condition;
 };
 const handleConfirmDataSource = async () => {
-    if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADD) {
+    if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADDED) {
         const dataTableBaseName = state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST
             ? `${storeState.costDataSources[state.selectedCostDataSourceId].name} - ${state.selectedCostDataTypeLabel}`
             : `${state.selectedNamespace.name} - ${storeState.metrics[state.selectedMetricId]?.label}`;
@@ -140,9 +148,6 @@ const handleConfirmDataSource = async () => {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
         });
-    } else {
-        // TODO: implement transform data table
-        await widgetGenerateStore.createTransformDataTable({});
     }
     state.showPopover = false;
 };
@@ -191,15 +196,15 @@ watch(() => state.showPopover, (val) => {
                 <p-select-card :label="i18n.t('Add Data Table')"
                                icon="ic_service_data-sources"
                                block
-                               @click="handleSelectPopperCondition(DATA_TABLE_TYPE.ADD)"
+                               @click="handleSelectPopperCondition(DATA_TABLE_TYPE.ADDED)"
                 />
                 <p-select-card :label="i18n.t('Add Transformation')"
                                icon="ic_link"
                                block
-                               @click="handleSelectPopperCondition(DATA_TABLE_TYPE.ADD)"
+                               @click="handleSelectPopperCondition(DATA_TABLE_TYPE.TRANSFORMED)"
                 />
             </div>
-            <div v-else
+            <div v-else-if="state.selectedPopperCondition === DATA_TABLE_TYPE.ADDED"
                  class="data-source-popover-content"
             >
                 <div class="top-part">
@@ -252,6 +257,30 @@ watch(() => state.showPopover, (val) => {
                         {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.DONE') }}
                     </p-button>
                 </div>
+            </div>
+            <div v-else
+                 class="data-source-popover-content"
+            >
+                <p-select-card :label="DATA_TABLE_OPERATOR.JOIN"
+                               :value="DATA_TABLE_OPERATOR.JOIN"
+                               @click="handleClickOperator(DATA_TABLE_OPERATOR.JOIN)"
+                />
+                <p-select-card :label="DATA_TABLE_OPERATOR.CONCAT"
+                               :value="DATA_TABLE_OPERATOR.CONCAT"
+                               @click="handleClickOperator(DATA_TABLE_OPERATOR.CONCAT)"
+                />
+                <p-select-card :label="DATA_TABLE_OPERATOR.AGGREGATE"
+                               :value="DATA_TABLE_OPERATOR.AGGREGATE"
+                               @click="handleClickOperator(DATA_TABLE_OPERATOR.AGGREGATE)"
+                />
+                <p-select-card :label="DATA_TABLE_OPERATOR.EVAL"
+                               :value="DATA_TABLE_OPERATOR.EVAL"
+                               @click="handleClickOperator(DATA_TABLE_OPERATOR.EVAL)"
+                />
+                <p-select-card :label="DATA_TABLE_OPERATOR.WHERE"
+                               :value="DATA_TABLE_OPERATOR.WHERE"
+                               @click="handleClickOperator(DATA_TABLE_OPERATOR.WHERE)"
+                />
             </div>
         </template>
     </p-popover>

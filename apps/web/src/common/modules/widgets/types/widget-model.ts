@@ -1,6 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 
-import type { DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
+import type { DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN, DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
@@ -24,14 +24,14 @@ export type WidgetType = string; // TODO: make this widget type enum
 
 export interface DataTableModel {
     data_table_id: string;
-    name: string;
+    name?: string;
     data_type: DataTableDataType;
     source_type?: DataTableSourceType;
     operator?: DataTableOperator;
     options: DataTableOptions;
     tags?: Tags;
-    labels_info: LabelsInfo;
-    data_info: DataInfo;
+    labels_info?: LabelsInfo;
+    data_info?: DataInfo;
     widget_id: string;
     workspace_id: string;
     domain_id: string;
@@ -40,7 +40,7 @@ export interface DataTableModel {
 }
 
 export type DataTableSourceType = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAIN];
-export type DataTableOperator = 'CONCAT' | 'JOIN' | 'WHERE' | 'AGGREGATE' | 'EVAL';
+export type DataTableOperator = typeof DATA_TABLE_OPERATOR[keyof typeof DATA_TABLE_OPERATOR];
 export type DataTableDataType = typeof DATA_TABLE_TYPE[keyof typeof DATA_TABLE_TYPE];
 export type AdditionalLabels = Record<string, string>;
 export type DateFormat = 'SINGLE' | 'SEPARATE';
@@ -101,7 +101,7 @@ export interface ConcatOptions {
 
 export interface JoinOptions {
     data_tables: string[];
-    on: 'LEFT' | 'RIGHT' | 'INNER' | 'OUTER';
+    on?: 'LEFT' | 'RIGHT' | 'INNER' | 'OUTER';
 }
 
 export interface WhereOptions {

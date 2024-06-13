@@ -203,9 +203,7 @@ onMounted(async () => {
 
 <template>
     <div class="widget-form-data-table-card-add-form">
-        <p-field-group label="Group by"
-                       required
-        >
+        <p-field-group label="Group by">
             <p-select-dropdown class="group-by-select-dropdown"
                                :menu="groupByState.items"
                                :selected.sync="state.proxySelectedGroupByItems"
@@ -256,9 +254,7 @@ onMounted(async () => {
                 <span>Advanced Options</span>
             </div>
             <div class="form-wrapper">
-                <p-field-group label="Additional Labels"
-                               required
-                >
+                <p-field-group label="Additional Labels">
                     <div class="additional-labels-wrapper">
                         <div v-if="advancedOptionsState.proxyAdditionalLabels.length"
                              class="field-title-wrapper"
@@ -303,9 +299,7 @@ onMounted(async () => {
                         </p-button>
                     </div>
                 </p-field-group>
-                <p-field-group label="Separate Date"
-                               required
-                >
+                <p-field-group label="Separate Date">
                     <div class="separate-date-wrapper">
                         <p class="description">
                             Separate date into 3 columns (Year, Month, Day)
@@ -316,9 +310,7 @@ onMounted(async () => {
                         />
                     </div>
                 </p-field-group>
-                <p-field-group label="Time Diff"
-                               required
-                >
+                <p-field-group label="Time Diff">
                     <div class="time-diff-dropdown-wrapper">
                         <p-select-dropdown class="time-diff-dropdown"
                                            use-fixed-menu-style

@@ -283,7 +283,6 @@ onMounted(() => {
 <template>
     <p-field-group class="widget-form-data-table-card-filters"
                    label="Filters"
-                   required
     >
         <div class="filters-area">
             <div v-for="(item) in state.selectedItems"
