@@ -16,6 +16,8 @@ import type { DataTableTransformParameters } from '@/schema/dashboard/public-dat
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
+import getRandomId from '@/lib/random-id-generator';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -165,6 +167,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 },
             } as DataTableTransformOptions;
             const unsavedTransformData = {
+                data_table_id: getRandomId(),
                 name: `${operatorType} Data`,
                 data_type: DATA_TABLE_TYPE.TRANSFORMED,
                 options: {
