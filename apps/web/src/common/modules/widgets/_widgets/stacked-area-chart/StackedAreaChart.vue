@@ -7,6 +7,7 @@ import {
 import {
     PDataLoader,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 import type { LineSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
 import type {
@@ -26,6 +27,7 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
+    getDateLabelFormat,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
@@ -67,6 +69,15 @@ const state = reactive({
             type: 'category',
             boundaryGap: false,
             data: state.xAxisData,
+            axisLabel: {
+                interval: 0,
+                formatter: (val) => {
+                    if (state.xAxisField === DATE_FIELD) {
+                        return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
+                    }
+                    return val;
+                },
+            },
         },
         yAxis: {
             type: 'value',
