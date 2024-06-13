@@ -506,24 +506,5 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
             }
         }
     }
-
-    .button-group-wrapper {
-        @apply border-t border-gray-200 flex justify-between;
-        padding: 0.75rem 1rem;
-
-        .apply-button {
-            @apply relative;
-            .update-dot {
-                @apply absolute rounded-full bg-blue-500 border-2 border-white;
-                width: 0.5rem;
-                height: 0.5rem;
-                right: -0.25rem;
-                top: -0.25rem;
-            }
-        }
-        .form-button-wrapper {
-            @apply flex gap-2;
-        }
-    }
 }
 </style>
