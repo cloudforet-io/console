@@ -9,32 +9,34 @@ import { debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
+import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import { widgetWidthAssigner } from '@/common/modules/widgets/_helpers/widget-width-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { WidgetExpose, WidgetProps, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
-import type { WidgetModel } from '@/common/modules/widgets/types/widget-model';
 
 import DashboardCustomizeSidebar from '@/services/dashboards/components/DashboardCustomizeSidebar.vue';
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
-import { widgetWidthAssigner } from '@/services/dashboards/helpers/widget-width-helper';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
-
-interface RefinedWidgetInfo extends WidgetModel {
+type WidgetModel = PublicWidgetModel|PrivateWidgetModel;
+type RefinedWidgetInfo = WidgetModel & {
     size: WidgetSize;
     width?: number;
     component: AsyncComponent|null;
-}
+};
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;

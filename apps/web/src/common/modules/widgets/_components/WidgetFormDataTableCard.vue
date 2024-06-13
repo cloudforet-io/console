@@ -1,8 +1,10 @@
 <script setup lang="ts">
-
 import {
     computed, reactive,
 } from 'vue';
+
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
 import WidgetFormDataTableCardAddContents
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddContents.vue';
@@ -10,10 +12,10 @@ import WidgetFormDataTableCardTransformContents
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformContents.vue';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { DataTableModel, DataTableDataType } from '@/common/modules/widgets/types/widget-model';
+import type { DataTableDataType } from '@/common/modules/widgets/types/widget-model';
 
 interface Props {
-    item: DataTableModel;
+    item: PublicDataTableModel|PrivateDataTableModel;
 }
 
 const props = defineProps<Props>();

@@ -7,7 +7,7 @@ import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-fra
 
 
 export const useWidgetFrame = (
-    props: UnwrapRef<WidgetProps<any>>,
+    props: UnwrapRef<WidgetProps>,
     emit: WidgetEmit,
 ) => {
     const _widgetConfig = getWidgetConfig(props.widgetName);
