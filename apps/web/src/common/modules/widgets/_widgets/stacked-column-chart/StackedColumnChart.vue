@@ -61,7 +61,7 @@ const state = reactive({
         tooltip: {},
         xAxis: {
             type: 'category',
-            data: [],
+            data: state.xAxisData,
             axisLabel: {
                 interval: 0,
             },
