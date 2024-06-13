@@ -267,7 +267,6 @@ watch(() => state.showPopover, (val) => {
                 />
                 <p-select-card :label="DATA_TABLE_OPERATOR.CONCAT"
                                :value="DATA_TABLE_OPERATOR.CONCAT"
-                               s
                                @click="handleClickOperator(DATA_TABLE_OPERATOR.CONCAT)"
                 />
                 <p-select-card :label="DATA_TABLE_OPERATOR.AGGREGATE"
