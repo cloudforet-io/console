@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed,
-    onMounted, reactive, ref,
+    computed, defineExpose, reactive, ref,
 } from 'vue';
 
 import {
@@ -22,10 +21,11 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type {
-    WidgetProps, WidgetEmit,
+    WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { CategoryByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
@@ -80,12 +80,12 @@ const state = reactive({
 });
 
 /* Util */
-const loadWidget = async (): Promise<Data|null> => {
+const fetchWidget = async (): Promise<Data|null> => {
     try {
         state.loading = true;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 1);
         return await SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>({
-            widget_id: 'public-widget-74bd848364d0',
+            widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
                 start: _start,
@@ -121,18 +121,20 @@ const drawChart = (rawData: Data|null) => {
     state.chart.setOption(state.chartOptions);
 };
 
-const initWidget = async (data?: Data) => {
-    state.data = data ?? await loadWidget();
+const loadWidget = async (data?: Data): Promise<Data> => {
+    state.data = data ?? await fetchWidget();
     drawChart(state.data);
+    return state.data;
 };
-
-onMounted(() => {
-    initWidget();
-});
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
+
+useWidgetInitAndRefresh({ props, emit, loadWidget });
+defineExpose<WidgetExpose<Data>>({
+    loadWidget,
+});
 </script>
 
 <template>

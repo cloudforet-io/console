@@ -26,7 +26,7 @@ const state = reactive({
         const { results } = await model.list();
         return results.map((d) => ({ name: d.key, label: d.name }));
     }),
-    isValid: computed<boolean>(() => ((state.granularityMenuItems.length) ? !!state.proxyValue?.length : false)),
+    isValid: computed<boolean>(() => ((state.granularityMenuItems?.length) ? !!state.proxyValue?.length : false)),
 });
 
 /* Event */

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    reactive,
+    defineExpose, reactive,
 } from 'vue';
 
 import {
@@ -10,9 +10,10 @@ import {
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import type {
-    WidgetProps, WidgetEmit,
+    WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 
 
@@ -28,6 +29,13 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 const state = reactive({
     loading: false,
     data: null as Data | null,
+});
+
+const loadWidget = async (data?: Data): Promise<Data> => data;
+
+useWidgetInitAndRefresh({ props, emit, loadWidget });
+defineExpose<WidgetExpose<Data>>({
+    loadWidget,
 });
 </script>
 

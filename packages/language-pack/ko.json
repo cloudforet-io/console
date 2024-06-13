@@ -1302,6 +1302,7 @@
 			"TITLE": "프로젝트 변경"
 		},
 		"WIDGETS": {
+			"ADD_WIDGET_TO_DASHBOARD": "",
 			"ALL_SUMMARY": {
 				"ADD_SERVICE_ACCOUNTS": "서비스 어카운트 추가",
 				"ALL": "전체 서비스",
@@ -1338,6 +1339,7 @@
 				"TWO_DAYS_AGO": "이틀전",
 				"YESTERDAY": "어제 "
 			},
+			"CANCEL": "취소",
 			"CLOUD_SERVICE": {
 				"HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
 				"NO_DATA": "클라우드 리소스가 없습니다.",
@@ -1372,6 +1374,7 @@
 				"PREVIOUS_MONTH": "",
 				"PREVIOUS_YEAR": ""
 			},
+			"CONTINUE": "계속하기",
 			"DAILY_UPDATE_CREATED": "생성 ",
 			"DAILY_UPDATE_DELETED": "삭제",
 			"DAILY_UPDATE_DESC": "00:00 ~ 현재 (로컬 시간 기준) ",
@@ -1445,6 +1448,7 @@
 			"RUN_COLLECTOR_COMPLETED_TOTAL": "완료 / 전체 ",
 			"RUN_COLLECTOR_NO_RECENT_RUN": "최근 수집 작업이 없습니다. ",
 			"RUN_COLLECTOR_START_TIME": "시작 시간 ",
+			"SAVE": "저장",
 			"SERVICE_ACCOUNTS": "서비스 어카운트 ",
 			"SERVICE_ACCOUNTS_ACCOUNT": "계정 ",
 			"SERVICE_ACCOUNTS_ADD": "추가",
@@ -1679,7 +1683,8 @@
 			"PERIOD_THIS_MONTH": "이번 달",
 			"REFRESH": "자동 새로고침",
 			"SELECT_MONTH": "월 선택",
-			"SET_HOME": "홈 대시보드로 설정"
+			"SET_HOME": "홈 대시보드로 설정",
+			"WIDGET_REORDER": ""
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "대시보드 생성 실패",

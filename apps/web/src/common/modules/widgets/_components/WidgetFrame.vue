@@ -110,7 +110,7 @@ const handleSelectSize = (size: WidgetSize) => {
         <div class="body-wrapper">
             <slot />
         </div>
-        <p-select-dropdown v-if="state.sizeDropdownMenuItems.length > 1 && props.mode === 'edit'"
+        <p-select-dropdown v-if="state.sizeDropdownMenuItems.length > 1"
                            class="widget-size-dropdown"
                            style-type="transparent"
                            :menu="state.sizeDropdownMenuItems"

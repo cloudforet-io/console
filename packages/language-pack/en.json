@@ -1302,6 +1302,7 @@
 			"TITLE": "Change Project"
 		},
 		"WIDGETS": {
+			"ADD_WIDGET_TO_DASHBOARD": "Add Widget to Dashboard",
 			"ALL_SUMMARY": {
 				"ADD_SERVICE_ACCOUNTS": "Add Service Accounts",
 				"ALL": "All",
@@ -1338,6 +1339,7 @@
 				"TWO_DAYS_AGO": "Two days ago",
 				"YESTERDAY": "Yesterday"
 			},
+			"CANCEL": "Cancel",
 			"CLOUD_SERVICE": {
 				"HELP": "Displays only major services in cloud service.",
 				"NO_DATA": "No Cloud Resources",
@@ -1372,6 +1374,7 @@
 				"PREVIOUS_MONTH": "Previous Month",
 				"PREVIOUS_YEAR": "Previous Year"
 			},
+			"CONTINUE": "Continue",
 			"DAILY_UPDATE_CREATED": "Created",
 			"DAILY_UPDATE_DELETED": "Deleted",
 			"DAILY_UPDATE_DESC": "00:00 ~ present (Local Time)",
@@ -1445,6 +1448,7 @@
 			"RUN_COLLECTOR_COMPLETED_TOTAL": "Completed / Total",
 			"RUN_COLLECTOR_NO_RECENT_RUN": "No Run performed recentely",
 			"RUN_COLLECTOR_START_TIME": "Start Time",
+			"SAVE": "Save",
 			"SERVICE_ACCOUNTS": "Service Accounts",
 			"SERVICE_ACCOUNTS_ACCOUNT": "Account",
 			"SERVICE_ACCOUNTS_ADD": "Add",
@@ -1679,7 +1683,8 @@
 			"PERIOD_THIS_MONTH": "This month",
 			"REFRESH": "Auto Refresh",
 			"SELECT_MONTH": "Select Month",
-			"SET_HOME": "Set as Home Dashboard"
+			"SET_HOME": "Set as Home Dashboard",
+			"WIDGET_REORDER": "Widget Reorder"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",

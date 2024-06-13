@@ -14,6 +14,7 @@ import type { DataTableListParameters } from '@/schema/dashboard/public-data-tab
 import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
+import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -34,7 +35,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         selectedWidgetName: 'stackedColumnChart',
         title: '',
         description: '',
-        size: 'full',
+        size: 'full' as WidgetSize,
         widgetValueMap: {} as Record<string, WidgetFieldValues>,
         widgetValidMap: {} as Record<string, boolean>,
         // Data Table
@@ -115,7 +116,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 ErrorHandler.handleError(e);
             }
         },
-        /* Step - 1 */
+        /* Step 1 */
         createAddDataTable: async (addParams: Partial<DataTableAddParameters>) => {
             const parameters = {
                 widget_id: state.widgetId,
@@ -176,6 +177,17 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             } finally {
                 state.dataTableUpdating = false;
                 state.dataTableLoadLoading = false;
+            }
+        },
+        /* Step 2 */
+        updateWidget: async (widgetInfo: Partial<PublicWidgetUpdateParameters>) => {
+            try {
+                state.widget = await SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>({
+                    widget_id: state.widgetId,
+                    ...widgetInfo,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         },
         reset: () => {
