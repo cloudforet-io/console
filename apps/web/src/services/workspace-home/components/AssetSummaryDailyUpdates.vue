@@ -103,8 +103,8 @@ const fetchDailyUpdatesList = async (): Promise<void> => {
                 query: {
                     granularity: 'DAILY',
                     group_by: ['labels.Provider', 'labels.Cloud Service Group', 'labels.Cloud Service Type'],
-                    start: dayjs.tz(dayjs.utc(), storeState.timezone).subtract(1, 'days').format('YYYY-MM-DD'),
-                    end: dayjs.tz(dayjs.utc(), storeState.timezone).subtract(1, 'days').format('YYYY-MM-DD'),
+                    start: dayjs.tz(dayjs.utc(), storeState.timezone).format('YYYY-MM-DD'),
+                    end: dayjs.tz(dayjs.utc(), storeState.timezone).format('YYYY-MM-DD'),
                     fields: {
                         count: {
                             key: 'value',
