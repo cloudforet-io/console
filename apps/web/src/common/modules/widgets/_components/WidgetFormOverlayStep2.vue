@@ -71,10 +71,6 @@ const handleUpdateWidgetSize = (size: WidgetSize) => {
     widgetGenerateStore.setSize(size);
 };
 
-const handleUpdateWidgetPreview = () => {
-
-};
-
 onBeforeMount(() => {
     initSnapshot();
 });
@@ -124,7 +120,6 @@ onUnmounted(() => {
                 <p-button style-type="substitutive"
                           icon-left="ic_refresh"
                           class="update-preview-button"
-                          @click="handleUpdateWidgetPreview"
                 >
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.UPDATE_PREVIEW') }}
                 </p-button>
