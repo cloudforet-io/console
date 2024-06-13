@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance, AsyncComponent } from 'vue';
 import {
-    reactive, ref, watch, computed, onBeforeUnmount,
+    reactive, ref, watch, computed,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -106,45 +106,7 @@ const getWidgetLoading = (widgetId: string) => {
     return false;
 };
 
-
-/* Widget intersection observer */
-const widgetRef = ref<Array<WidgetComponent|null>>([]);
-let widgetObserverMap: Record<string, IntersectionObserver> = {};
-const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
-    if (widgetObserverMap) {
-        Object.values(widgetObserverMap).forEach((observer) => observer.disconnect());
-        widgetObserverMap = {};
-    }
-
-    if (!allMounted) return;
-
-    widgetRefs.forEach((widget) => {
-        if (!widget) return;
-        const observer = new IntersectionObserver(handleIntersectionObserver, {
-            threshold: 0.25,
-        });
-        widgetObserverMap[widget.$el.id] = observer;
-        observer.observe(widget.$el);
-    });
-});
-onBeforeUnmount(() => {
-    stopWidgetRefWatch();
-    Object.values(widgetObserverMap).forEach((observer) => observer.disconnect());
-});
-// eslint-disable-next-line no-undef
-const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isIntersecting, target }], observer) => {
-    if (isIntersecting) {
-        if (state.isAllWidgetsMounted) {
-            state.intersectedWidgetMap[target.id] = true;
-            observer.unobserve(target);
-        }
-    }
-};
-
 /* Widget event handlers */
-const handleWidgetMounted = (widgetId: string) => {
-    state.mountedWidgetMap[widgetId] = true;
-};
 const handleClickDeleteWidget = (widget: RefinedWidgetInfo) => {
     widgetDeleteState.targetWidget = widget;
     widgetDeleteState.visibleModal = true;
@@ -155,27 +117,8 @@ const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo) => {
     widgetGenerateStore.setShowOverlay(true);
 };
 
-/* init states */
-const stopWidgetInfoWatch = watch(state.refinedWidgetInfoList, (widgetInfoList) => {
-    if (!Array.isArray(widgetInfoList)) return;
-
-    const mountedWidgetMap = {};
-    const intersectedWidgetMap = {};
-    widgetInfoList.forEach((widget) => {
-        mountedWidgetMap[widget.widget_id] = state.mountedWidgetMap[widget.widget_id];
-        intersectedWidgetMap[widget.widget_id] = state.intersectedWidgetMap[widget.widget_id];
-    });
-    state.mountedWidgetMap = mountedWidgetMap;
-    state.intersectedWidgetMap = intersectedWidgetMap;
-}, {
-    immediate: true, deep: true,
-});
-
-onBeforeUnmount(() => {
-    stopWidgetInfoWatch();
-});
-
 /* refresh widgets */
+const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const refreshAllWidget = debounce(async () => {
     dashboardDetailStore.setLoadingWidgets(true);
     const loadWidgetPromises: WidgetExpose['loadWidget'][] = [];
@@ -225,7 +168,7 @@ watch(() => widgetGenerateState.showOverlay, (showOverlay) => {
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <p-data-loader :loading="dashboardDetailState.loadingDashboard && !state.isAllWidgetsMounted"
+        <p-data-loader :loading="dashboardDetailState.loadingDashboard"
                        :data="true"
                        disable-empty-case
         >
@@ -248,7 +191,6 @@ watch(() => widgetGenerateState.showOverlay, (showOverlay) => {
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-variables="dashboardDetailState.variables"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
-                               @mounted="handleWidgetMounted(widget.widget_id)"
                                @click-edit="handleOpenWidgetOverlay(widget)"
                                @click-delete="handleClickDeleteWidget(widget)"
                     />
