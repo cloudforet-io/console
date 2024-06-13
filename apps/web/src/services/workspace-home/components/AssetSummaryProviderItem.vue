@@ -40,7 +40,7 @@ const handleClickButton = (type: string) => {
 </script>
 
 <template>
-    <div class="asset-summary-item">
+    <div class="asset-summary-provider-item">
         <div class="title-wrapper">
             <p-lazy-img
                 v-if="props.item.icon"
@@ -78,7 +78,7 @@ const handleClickButton = (type: string) => {
 </template>
 
 <style scoped lang="postcss">
-.asset-summary-item {
+.asset-summary-provider-item {
     @apply flex flex-col bg-gray-100 border-l-4 border-gray-200 cursor-default;
     min-width: 11.5rem;
     width: 11.5rem;

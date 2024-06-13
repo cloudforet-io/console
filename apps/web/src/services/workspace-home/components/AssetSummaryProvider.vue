@@ -21,7 +21,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
-import AssetSummaryItem from '@/services/workspace-home/components/AssetSummaryItem.vue';
+import AssetSummaryProviderItem from '@/services/workspace-home/components/AssetSummaryProviderItem.vue';
 import {
     DEFAULT_PADDING,
 } from '@/services/workspace-home/types/workspace-home-type';
@@ -119,9 +119,9 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
         <div ref="providerEl"
              class="row-items-container"
         >
-            <asset-summary-item v-for="(item, idx) in state.providers"
-                                :key="`asset-summary-item-${idx}`"
-                                :item="item"
+            <asset-summary-provider-item v-for="(item, idx) in state.providers"
+                                         :key="`asset-summary-item-${idx}`"
+                                         :item="item"
             />
         </div>
         <p-icon-button v-if="state.pageStart !== 0"
