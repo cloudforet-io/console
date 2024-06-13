@@ -1,0 +1,255 @@
+<script setup lang="ts">
+
+import { useElementSize } from '@vueuse/core/index';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
+
+import { PFieldTitle, PIconButton, PEmpty } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import {
+    groupBy, map, mapKeys, sumBy,
+} from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
+import { store } from '@/store';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
+import AssetSummaryDailyUpdateItem from '@/services/workspace-home/components/AssetSummaryDailyUpdateItem.vue';
+import { DEFAULT_PADDING } from '@/services/workspace-home/types/workspace-home-type';
+import type { CloudServiceData } from '@/services/workspace-home/types/workspace-home-type';
+
+const DAILY_UPDATE__DEFAULT_WIDTH = 136 + 8;
+
+const rowItemsWrapperRef = ref<null | HTMLElement>(null);
+const dailyUpdateEl = ref<null | HTMLElement>(null);
+
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
+
+const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
+
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
+});
+const state = reactive({
+    dailyUpdatesListItems: { created: [] as CloudServiceData[], deleted: [] as CloudServiceData[] },
+    dailyUpdatesList: computed<CloudServiceData[]>(() => {
+        const mergedArray = [...state.dailyUpdatesListItems.created, ...state.dailyUpdatesListItems.deleted];
+
+        const grouped = groupBy(mergedArray, (item) => `${item.cloud_service_group}-${item.cloud_service_type}-${item.provider}`);
+
+        return map(grouped, (group) => ({
+            cloud_service_group: group[0].cloud_service_group,
+            cloud_service_type: group[0].cloud_service_type,
+            total_count: sumBy(group, 'total_count') || 0,
+            provider: group[0].provider,
+            created_count: sumBy(group, 'created_count') || 0,
+            deleted_count: sumBy(group, 'deleted_count') || 0,
+        }));
+    }),
+    pageStart: 0,
+    pageMax: computed(() => {
+        const dailyUpdateCount: number = state.dailyUpdatesList.length / Math.floor(rowItemsWrapperWidth.value / (DAILY_UPDATE__DEFAULT_WIDTH + DEFAULT_PADDING) - 1);
+        return Math.ceil(dailyUpdateCount);
+    }),
+});
+
+const handleClickArrowButton = (increment: number) => {
+    const element = {
+        el: dailyUpdateEl.value,
+        defaultWidth: DAILY_UPDATE__DEFAULT_WIDTH,
+    };
+    if (!element.el) return;
+
+    state.pageStart += increment;
+
+    const marginLeft = increment * state.pageStart * element.defaultWidth;
+    element.el.style.marginLeft = increment === 1 ? `-${marginLeft}px` : `${marginLeft}px`;
+};
+
+const convertFormKeys = (data: MetricDataAnalyzeResult) => {
+    const convertFormKey = (key: string) => key.toLowerCase().replace(/ /g, '_');
+
+    return data.map((item) => mapKeys(item, (value, key) => convertFormKey(key)));
+};
+const fetchDailyUpdatesList = async (): Promise<void> => {
+    const labels = ['created', 'deleted'];
+    try {
+        await Promise.all(labels.map(async (label) => {
+            const metricId = `metric-managed-${label.toLowerCase()}-count`;
+            const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
+            const { status, response } = await fetcher({
+                metric_id: metricId,
+                query: {
+                    granularity: 'DAILY',
+                    group_by: ['labels.Provider', 'labels.Cloud Service Group', 'labels.Cloud Service Type'],
+                    start: dayjs.tz(dayjs.utc(), storeState.timezone).subtract(1, 'days').format('YYYY-MM-DD'),
+                    end: dayjs.tz(dayjs.utc(), storeState.timezone).subtract(1, 'days').format('YYYY-MM-DD'),
+                    fields: {
+                        count: {
+                            key: 'value',
+                            operator: 'sum',
+                        },
+                    },
+                    sort: [{ key: '_total_count', desc: true }],
+                    field_group: ['date'],
+                },
+            });
+
+            if (status === 'succeed') {
+                const results = convertFormKeys(response.results || []);
+                state.dailyUpdatesListItems[label] = results.map((i) => ({
+                    cloud_service_group: i.cloud_service_group,
+                    cloud_service_type: i.cloud_service_type,
+                    total_count: i._total_count,
+                    provider: i.provider,
+                    [`${label}_count`]: i.count[0].value,
+                }));
+            }
+        }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.dailyUpdatesListItems = { created: state.dailyUpdatesListItems.created || [], deleted: state.dailyUpdatesListItems.deleted || [] };
+    }
+};
+
+watch([() => storeState.currentWorkspaceId], async ([currentWorkspaceId]) => {
+    if (!currentWorkspaceId) return;
+    await fetchDailyUpdatesList();
+}, { immediate: true });
+</script>
+
+<template>
+    <div class="daily-update-wrapper">
+        <p-field-title :label="$t('HOME.ASSET_SUMMARY_DAILY_UPDATE_TITLE')"
+                       class="daily-update-title"
+        >
+            <template #right>
+                <span class="desc">{{ $t('HOME.ASSET_SUMMARY_DAILY_UPDATE_DESC') }}</span>
+            </template>
+        </p-field-title>
+        <div v-if="state.dailyUpdatesList.length > 0"
+             ref="rowItemsWrapperRef"
+             class="row-items-wrapper"
+        >
+            <div ref="dailyUpdateEl"
+                 class="row-items-container"
+            >
+                <asset-summary-daily-update-item v-for="(item, idx) in state.dailyUpdatesList"
+                                                 :key="`asset-summary-daily-update-item-${idx}`"
+                                                 :item="item"
+                />
+            </div>
+            <p-icon-button v-if="state.pageStart !== 0"
+                           class="arrow-button left"
+                           name="ic_chevron-left"
+                           color="inherit transparent"
+                           width="1.5rem"
+                           height="1.5rem"
+                           @click="handleClickArrowButton(-1)"
+            />
+            <p-icon-button v-if="state.pageStart !== Number(state.pageMax)"
+                           class="arrow-button right"
+                           name="ic_chevron-right"
+                           color="inherit transparent"
+                           width="1.5rem"
+                           height="1.5rem"
+                           @click="handleClickArrowButton(1)"
+            />
+        </div>
+        <p-empty v-else
+                 show-image
+                 image-size="sm"
+                 :title="$t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA')"
+                 class="empty"
+        >
+            <template #image>
+                <img alt="empty-image"
+                     src="@/assets/images/illust_circle_boy.svg"
+                >
+            </template>
+        </p-empty>
+    </div>
+</template>
+
+<style scoped lang="postcss">
+.daily-update-wrapper {
+    @apply flex flex-col;
+    gap: 0.75rem;
+    .daily-update-title {
+        padding-left: 1.5rem;
+        .desc {
+            @apply text-label-sm text-gray-600;
+        }
+    }
+
+    /* custom design-system component - p-field-title */
+    :deep(.p-field-title) {
+        .title-wrapper {
+            @apply items-center;
+            gap: 0.5rem;
+        }
+    }
+
+    .row-items-wrapper {
+        @apply relative overflow-hidden;
+        .row-items-container {
+            @apply flex overflow-hidden;
+            gap: 0.5rem;
+            padding-left: 1.5rem;
+            transition: margin-left 0.3s ease;
+        }
+        &::after {
+            @apply absolute;
+            content: '';
+            top: 0;
+            right: 0;
+            width: 2rem;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, theme('colors.white') 50%);
+        }
+        .arrow-button {
+            @apply absolute bg-white border border-gray-300 rounded-full;
+            top: calc(50% - 1rem);
+            width: 2rem;
+            height: 2rem;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            &.left {
+                margin-right: auto;
+                left: 0.5rem;
+            }
+            &.right {
+                margin-left: auto;
+                right: 0.75rem;
+            }
+            &:hover {
+                @apply text-gray-900;
+            }
+        }
+
+        /* custom design-system component - p-empty */
+        :deep(.p-empty) {
+            .image-wrapper {
+                margin-bottom: 0.5rem;
+            }
+        }
+    }
+
+    .empty {
+        width: calc(100% - 3rem);
+        height: 10rem;
+        margin-left: 1.5rem;
+    }
+}
+</style>
