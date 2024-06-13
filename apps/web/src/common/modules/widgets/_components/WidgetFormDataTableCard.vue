@@ -6,6 +6,8 @@ import {
 
 import WidgetFormDataTableCardAddContents
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddContents.vue';
+import WidgetFormDataTableCardTransformContents
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformContents.vue';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel, DataTableDataType } from '@/common/modules/widgets/types/widget-model';
@@ -31,6 +33,10 @@ const state = reactive({
         <widget-form-data-table-card-add-contents v-if="state.dataType === DATA_TABLE_TYPE.ADDED"
                                                   :item="props.item"
                                                   :selected="state.selected"
+        />
+        <widget-form-data-table-card-transform-contents v-else-if="state.dataType === DATA_TABLE_TYPE.TRANSFORMED"
+                                                        :item="props.item"
+                                                        :selected="state.selected"
         />
     </div>
 </template>

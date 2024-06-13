@@ -36,11 +36,19 @@ const state = reactive({
         [FORM_TITLE_MAP.REQUIRED_FIELDS]: false,
         [FORM_TITLE_MAP.OPTIONAL_FIELDS]: false,
     },
+    selectableDataTableItems: computed(() => widgetGenerateState.dataTables.map((d) => ({
+        name: d.data_table_id,
+        label: d.name,
+    }))),
+    selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
 });
 
 /* Util */
 
 /* Event */
+const handleSelectDataTable = (dataTableId: string) => {
+    widgetGenerateStore.setSelectedDataTableId(dataTableId);
+};
 const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setSelectedWidgetName(widgetName);
     widgetGenerateStore.setWidgetValueMap({});
@@ -82,7 +90,10 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
                         {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.EDIT_DATA') }}
                     </p-button>
                 </template>
-                <p-select-dropdown :options="[]" />
+                <p-select-dropdown :menu="state.selectableDataTableItems"
+                                   :selected="state.selectedDataTableId"
+                                   @select="handleSelectDataTable"
+                />
             </p-field-group>
         </div>
         <div class="basic-field-wrapper">

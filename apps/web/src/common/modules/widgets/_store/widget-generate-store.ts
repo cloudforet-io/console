@@ -168,7 +168,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 },
             } as DataTableTransformOptions;
             const unsavedTransformData = {
-                data_table_id: getRandomId(),
+                data_table_id: `UNSAVED-${getRandomId()}`,
                 name: `${operatorType} Data`,
                 data_type: DATA_TABLE_TYPE.TRANSFORMED,
                 options: {
