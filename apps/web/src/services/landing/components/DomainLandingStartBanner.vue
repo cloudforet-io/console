@@ -3,11 +3,12 @@ import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PButton, screens } from '@spaceone/design-system';
+import { PButton, screens, PTextButton } from '@spaceone/design-system';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const router = useRouter();
@@ -48,18 +49,27 @@ const handleClickButton = (type: string) => {
                   class="desc"
             >{{ $t('LADING.DOMAIN.GET_STARTED_DESC') }}</span>
             <div class="buttons-wrapper">
-                <p-button style-type="primary"
-                          size="lg"
-                          @click="handleClickButton('create')"
+                <div class="buttons">
+                    <p-button style-type="primary"
+                              size="lg"
+                              @click="handleClickButton('create')"
+                    >
+                        {{ $t('LADING.DOMAIN.CREATE_WORKSPACE_BUTTON') }}
+                    </p-button>
+                    <p-button style-type="substitutive"
+                              size="lg"
+                              @click="handleClickButton('invite')"
+                    >
+                        {{ $t('LADING.DOMAIN.INVITE_ADMINS') }}
+                    </p-button>
+                </div>
+                <p-text-button icon-left="ic_rocket-filled"
+                               style-type="highlight"
+                               class="workspace-button"
+                               @click="router.push({ name: LANDING_ROUTE.WORKSPACE._NAME })"
                 >
-                    {{ $t('LADING.DOMAIN.CREATE_WORKSPACE_BUTTON') }}
-                </p-button>
-                <p-button style-type="substitutive"
-                          size="lg"
-                          @click="handleClickButton('invite')"
-                >
-                    {{ $t('LADING.DOMAIN.INVITE_ADMINS') }}
-                </p-button>
+                    {{ $t('LADING.DOMAIN.EXPLORE_WORKSPACE_TITLE') }}
+                </p-text-button>
             </div>
         </div>
         <div v-if="!state.isMobileSize"
@@ -78,7 +88,7 @@ const handleClickButton = (type: string) => {
 <style scoped lang="postcss">
 .domain-landing-start-banner {
     @apply flex bg-violet-150 border border-violet-200;
-    height: 18rem;
+    height: 19.5rem;
     padding: 2.5rem 2rem;
     border-radius: 0.375rem;
     .section {
@@ -97,8 +107,16 @@ const handleClickButton = (type: string) => {
             flex: 1;
         }
         .buttons-wrapper {
-            @apply flex items-end;
-            gap: 1rem;
+            @apply flex flex-col;
+            gap: 1.5rem;
+            .buttons {
+                @apply flex items-end;
+                gap: 1rem;
+            }
+            .workspace-button {
+                @apply block text-left;
+                padding: 0;
+            }
         }
     }
     .image-wrapper {
@@ -106,27 +124,29 @@ const handleClickButton = (type: string) => {
         flex: 1;
         .get-started-illustration {
             width: 28rem;
-            height: 25rem;
+            height: 26.5rem;
             margin-bottom: -4.5rem;
         }
     }
 
     @screen laptop {
-        height: 19.5rem;
+        height: 21rem;
     }
 
     @screen tablet {
-        height: 17.75rem;
+        height: 19.25rem;
         .text-section {
             .title {
                 flex: 1;
             }
             .buttons-wrapper {
-                @apply block;
-                button {
+                .buttons {
                     @apply block;
-                    & + button {
-                        margin-top: 1rem;
+                    button {
+                        @apply block;
+                        & + button {
+                            margin-top: 1rem;
+                        }
                     }
                 }
             }
@@ -134,18 +154,20 @@ const handleClickButton = (type: string) => {
     }
 
     @screen mobile {
-        height: 12.5rem;
+        height: 14rem;
         .text-section {
             .title {
                 flex: 1;
             }
             .buttons-wrapper {
-                @apply flex;
-                gap: 1rem;
-                button {
-                    @apply block;
-                    & + button {
-                        margin-top: 1rem;
+                .buttons {
+                    @apply flex;
+                    gap: 1rem;
+                    button {
+                        @apply block;
+                        & + button {
+                            margin-top: 1rem;
+                        }
                     }
                 }
             }
@@ -153,14 +175,16 @@ const handleClickButton = (type: string) => {
     }
 
     @media (max-width: 478px) {
-        height: 19.5rem;
+        height: 21rem;
         .text-section {
             .buttons-wrapper {
-                @apply block;
-                button {
+                .buttons {
                     @apply block;
-                    & + button {
-                        margin-top: 1rem;
+                    button {
+                        @apply block;
+                        & + button {
+                            margin-top: 1rem;
+                        }
                     }
                 }
             }

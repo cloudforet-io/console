@@ -159,7 +159,6 @@ onUnmounted(() => {
 <style scoped lang="postcss">
 .landing-contents {
     @apply flex flex-col;
-    min-width: 44.5rem;
     max-width: 44.5rem;
     padding-top: 5rem;
     gap: 2rem;
