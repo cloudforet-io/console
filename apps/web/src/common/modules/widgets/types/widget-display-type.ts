@@ -41,8 +41,7 @@ export interface WidgetEmit {
 }
 
 export interface WidgetExpose<Data = any> {
-    initWidget: (data?: Data) => Promise<Data>;
-    refreshWidget: () => Promise<Data>;
+    loadWidget: (data?: Data) => Promise<Data>;
 }
 
 

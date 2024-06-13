@@ -13,10 +13,8 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import type {
-    WidgetProps, WidgetEmit,
+    WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-
-import type { WidgetExpose } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 type Data = ListResponse<{
@@ -33,11 +31,11 @@ const state = reactive({
     data: null as Data | null,
 });
 
-const initWidget = async (data?: Data) => data;
+const loadWidget = async (data?: Data): Promise<Data> => data;
 
-useWidgetInitAndRefresh({ props, emit, initWidget });
+useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
-    initWidget,
+    loadWidget,
 });
 </script>
 

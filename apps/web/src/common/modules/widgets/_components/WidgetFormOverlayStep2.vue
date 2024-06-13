@@ -72,7 +72,7 @@ const handleUpdateWidgetSize = (size: WidgetSize) => {
     widgetGenerateStore.setSize(size);
 };
 const handleUpdatePreview = () => {
-    overlayWidgetRef.value?.initWidget();
+    overlayWidgetRef.value?.loadWidget();
 };
 
 onBeforeMount(() => {

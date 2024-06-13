@@ -24,11 +24,9 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type {
-    WidgetProps, WidgetEmit,
+    WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
-
-import type { WidgetExpose } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 type Data = ListResponse<{
@@ -100,7 +98,7 @@ const state = reactive({
 });
 
 /* Util */
-const loadWidget = async (): Promise<Data|null> => {
+const fetchWidget = async (): Promise<Data|null> => {
     try {
         state.loading = true;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 1);
@@ -141,8 +139,8 @@ const drawChart = (rawData: Data|null) => {
     state.chart.setOption(state.chartOptions);
 };
 
-const initWidget = async (data?: Data): Promise<Data> => {
-    state.data = data ?? await loadWidget();
+const loadWidget = async (data?: Data): Promise<Data> => {
+    state.data = data ?? await fetchWidget();
     drawChart(state.data);
     return state.data;
 };
@@ -154,9 +152,9 @@ watch(() => props.size, () => {
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-useWidgetInitAndRefresh({ props, emit, initWidget });
+useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
-    initWidget,
+    loadWidget,
 });
 </script>
 

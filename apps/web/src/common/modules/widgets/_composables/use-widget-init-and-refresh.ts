@@ -11,24 +11,24 @@ import type {
 interface UseWidgetInitAndRefreshOptions<Data> {
     props: WidgetProps;
     emit: WidgetEmit;
-    initWidget: (data?: Data) => Promise<Data>;
+    loadWidget: (data?: Data) => Promise<Data>;
 }
 
 export const useWidgetInitAndRefresh = <Data = any>({
     props,
     emit,
-    initWidget,
+    loadWidget,
 }: UseWidgetInitAndRefreshOptions<Data>): void => {
     const initiated = ref(false);
 
     const stopVariablesWatch = watch(() => props.dashboardVariables, () => {
         if (!initiated.value || props.disableRefreshOnVariableChange) return;
-        initWidget();
+        loadWidget();
     }, { deep: true });
 
     const stopLoadingWatch = watch(() => props.loading, async (loading) => {
         if (!initiated.value && !loading) {
-            await initWidget();
+            await loadWidget();
             initiated.value = true;
         }
     }, { immediate: true });
@@ -39,7 +39,7 @@ export const useWidgetInitAndRefresh = <Data = any>({
         stopDashboardOptionsWatch = watch(() => props.dashboardOptions, (current, previous) => {
             if (!current || !previous || props.disableRefreshOnVariableChange) return;
             if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
-                initWidget();
+                loadWidget();
             }
         });
     }

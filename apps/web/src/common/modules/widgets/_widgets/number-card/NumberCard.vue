@@ -27,10 +27,8 @@ import {
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type {
-    WidgetProps, WidgetEmit,
+    WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-
-import type { WidgetExpose } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 type Data = ListResponse<{
@@ -83,7 +81,7 @@ const state = reactive({
 });
 
 /* Util */
-const loadWidget = async (): Promise<Data|null> => {
+const fetchWidget = async (): Promise<Data|null> => {
     try {
         state.loading = true;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
@@ -110,14 +108,14 @@ const loadWidget = async (): Promise<Data|null> => {
     }
 };
 
-const initWidget = async (data?: Data): Promise<Data> => {
-    state.data = data ?? await loadWidget();
+const loadWidget = async (data?: Data): Promise<Data> => {
+    state.data = data ?? await fetchWidget();
     return state.data;
 };
 
-useWidgetInitAndRefresh({ props, emit, initWidget });
+useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
-    initWidget,
+    loadWidget,
 });
 </script>
 

@@ -31,11 +31,9 @@ import {
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type {
-    WidgetProps, WidgetEmit,
+    WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { LineByValue, XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
-
-import type { WidgetExpose } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 type Data = ListResponse<{
@@ -91,7 +89,7 @@ const state = reactive({
 });
 
 /* Util */
-const loadWidget = async (): Promise<Data|null> => {
+const fetchWidget = async (): Promise<Data|null> => {
     try {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
@@ -151,8 +149,8 @@ const drawChart = (rawData: Data|null) => {
     state.chart.setOption(state.chartOptions);
 };
 
-const initWidget = async (data?: Data): Promise<Data> => {
-    state.data = data ?? await loadWidget();
+const loadWidget = async (data?: Data): Promise<Data> => {
+    state.data = data ?? await fetchWidget();
     drawChart(state.data);
     return state.data;
 };
@@ -160,9 +158,9 @@ const initWidget = async (data?: Data): Promise<Data> => {
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-useWidgetInitAndRefresh({ props, emit, initWidget });
+useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
-    initWidget,
+    loadWidget,
 });
 </script>
 
