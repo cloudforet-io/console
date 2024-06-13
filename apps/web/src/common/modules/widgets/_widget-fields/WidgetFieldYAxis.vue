@@ -48,6 +48,7 @@ const handleIsValid = (isValid: boolean) => {
                        required
         >
             <widget-field-dropdown-and-max :default-count="props.widgetFieldSchema?.options?.defaultMaxCount ?? 1"
+                                           :value="props.value"
                                            :menu-items="state.menuItems"
                                            :max="props.widgetFieldSchema?.options?.max"
                                            :field-name="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.Y_AXIS')"

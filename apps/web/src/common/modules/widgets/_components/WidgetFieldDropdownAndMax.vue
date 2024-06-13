@@ -19,6 +19,7 @@ const props = withDefaults(defineProps<{
     max?: number;
     menuItems: MenuItem[];
     fieldName?:string|TranslateResult;
+    value: {value: string; count: number};
 }>(), {
     defaultCount: 1,
     max: undefined,

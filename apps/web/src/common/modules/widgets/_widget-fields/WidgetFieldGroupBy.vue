@@ -34,11 +34,12 @@ const state = reactive({
             label: d,
         }));
     }),
+    multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     fieldName: computed(() => i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.GROUP_BY')),
     selectedItem: undefined as undefined | MenuItem[] | string,
     isValid: computed<boolean>(() => {
         if (!props.widgetFieldSchema?.options?.hideCount && !state.proxyValue?.count) return false;
-        if (props.widgetFieldSchema?.options?.multiSelectable && !state.selectedItem?.length) return false;
+        if (state.multiselectable && !state.selectedItem?.length) return false;
         return !!state.selectedItem;
     }),
     max: computed(() => props.widgetFieldSchema?.options?.max),
@@ -91,7 +92,7 @@ onMounted(() => {
                 >
                     <p-select-dropdown :menu="state.menuItems"
                                        :selected="state.selectedItem"
-                                       :multi-selectable="props.widgetFieldSchema?.options?.multiSelectable"
+                                       :multi-selectable="state.multiselectable"
                                        show-select-marker
                                        appearance-type="badge"
                                        @update:selected="handleUpdateSelect"

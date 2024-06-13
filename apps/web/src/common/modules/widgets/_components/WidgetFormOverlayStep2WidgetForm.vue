@@ -152,7 +152,7 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetRequiredFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="`required-field-${fieldName}`"
+                               :key="`${widgetGenerateGetters.selectedDataTable?.data_table_id}-required-${fieldName}-${widgetGenerateState.widgetId}`"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :value="widgetGenerateState.widgetValueMap[fieldName]"

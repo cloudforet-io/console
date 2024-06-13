@@ -46,7 +46,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         // Data Table
         selectedDataTableId: undefined as undefined | string,
         dataTables: [] as DataTableModel[],
-        selectedDataTable: undefined as DataTableModel|undefined,
         selectedPreviewGranularity: GRANULARITY.MONTHLY as Granularity,
         previewData: { results: [], total_count: 0 } as ListResponse<any>,
         dataTableUpdating: false,
