@@ -80,10 +80,10 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
         icon: 'ic_service_cost-anlaysis',
     },
-    [MENU_ID.COST_ANOMALY_DETECTION]: {
-        menuId: MENU_ID.COST_ANOMALY_DETECTION,
-        routeName: COST_EXPLORER_ROUTE.COST_ANOMALY_DETECTION._NAME,
-        translationId: 'MENU.COST_EXPLORER_COST_ANOMALY_DETECTION',
+    [MENU_ID.ANOMALY_DETECTION]: {
+        menuId: MENU_ID.ANOMALY_DETECTION,
+        routeName: COST_EXPLORER_ROUTE.ANOMALY_DETECTION._NAME,
+        translationId: 'MENU.COST_EXPLORER_ANOMALY_DETECTION',
         highlightTag: 'new',
         icon: 'ic_service_budget',
     },

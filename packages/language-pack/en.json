@@ -396,6 +396,11 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"ANOMALY_DETECTION": {
+				"CONFIG_TITLE": "Detection Configuration",
+				"HISTORY_TITLE": "Anomaly Detection History",
+				"POLICY_TITLE": "Policy Management"
+			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "Failed to Create Budget",
 				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "The selected data source ({dataSourceName}) already has a budget created for the same target ({name}).",
@@ -647,11 +652,6 @@
 				"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items.",
 				"TOTAL_COST": "Total Cost",
 				"YEARLY": "Yearly"
-			},
-			"COST_ANOMALY_DETECTION": {
-				"CONFIG_TITLE": "Detection Configuration",
-				"HISTORY_TITLE": "Anomaly Detection History",
-				"POLICY_TITLE": "Policy Management"
 			},
 			"COST_REPORT": {
 				"ADDITIONAL_RECIPIENTS": "Additional Recipients",
@@ -3074,9 +3074,9 @@
 		"ASSET_INVENTORY_SERVER": "Server",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "Service Account",
 		"COST_EXPLORER": "Cost Explorer",
+		"COST_EXPLORER_ANOMALY_DETECTION": "Anomaly Detection",
 		"COST_EXPLORER_BUDGET": "Budget",
 		"COST_EXPLORER_COST_ANALYSIS": "Cost Analysis",
-		"COST_EXPLORER_COST_ANOMALY_DETECTION": "Cost Anomaly Detection",
 		"COST_EXPLORER_DASHBOARD": "Dashboard",
 		"COST_EXPLORER_DATA_SOURCES": "Data Sources",
 		"COST_EXPLORER_DESC": "This contains Cost Analysis, Budget, Cost Report.",
