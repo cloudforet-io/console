@@ -81,7 +81,7 @@ const handleAddWidget = async () => {
     state.loading = false;
 };
 const handleClickWidgetReorder = () => {
-    // TODO
+    store.dispatch('display/showWidget');
 };
 </script>
 

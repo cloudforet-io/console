@@ -37,7 +37,7 @@ const state = reactive({
         return i18n.t('DASHBOARDS.WIDGET.OVERLAY.EDIT_WIDGET');
     }),
     buttonText: computed<TranslateResult>(() => {
-        if (widgetGenerateState.overlayStep === 1) return i18n.t('COMMON.WIDGETS.CONTINUE');
+        if (widgetGenerateState.overlayStep === 1) return i18n.t('COMMON.WIDGETS.CONFIGURE_WIDGET');
         if (props.overlayType === 'ADD') return i18n.t('COMMON.WIDGETS.ADD_WIDGET_TO_DASHBOARD');
         return i18n.t('COMMON.WIDGETS.SAVE');
     }),
@@ -94,6 +94,7 @@ onUnmounted(() => {
                         {{ $t('COMMON.WIDGETS.CANCEL') }}
                     </p-button>
                     <p-button :style-type="widgetGenerateState.overlayStep === 1 ? 'substitutive' : 'primary'"
+                              :icon-right="widgetGenerateState.overlayStep === 1 ? 'ic_arrow-right' : undefined"
                               @click="handleClickContinue"
                     >
                         {{ state.buttonText }}

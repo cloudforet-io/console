@@ -1,60 +1,52 @@
 <script setup lang="ts">
 import {
-    computed,
-    defineEmits,
-    onMounted, onUnmounted, reactive,
+    onUnmounted, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import draggable from 'vuedraggable';
 
 import {
-    PButton, PI, PToggleButton, PFieldTitle,
+    PI,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
 
-import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
+import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
+import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
-
-import { red } from '@/styles/colors';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
-interface Props {
-    loading?: boolean;
-    saveButtonText?: TranslateResult;
-    hideCancelButton?: boolean;
-}
-
-const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'save'): void,
-    (e: 'cancel'): void,
-}>();
-
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
-    widgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => dashboardDetailState.dashboardWidgetInfoList),
-    enableDateRange: computed(() => dashboardDetailState.options.date_range?.enabled ?? false),
+    widgetList: [] as Array<PublicWidgetModel|PrivateWidgetModel>,
 });
 
 /* Event */
-const handleChangeDateRangeToggle = () => {
-    const _options = cloneDeep(dashboardDetailState.options);
-    _options.date_range.enabled = !_options.date_range.enabled;
-    dashboardDetailStore.setOptions(_options);
-};
-const handleClickCancelButton = () => {
-    emit('cancel');
-    // TODO: revert dashboardState here
-};
-const handleClickSaveButton = () => {
-    emit('save');
+const handleChangeWidgetOrder = () => {
+    // HACK: implement widget panel
+    const _widgetIdList = state.widgetList.map((w) => w.widget_id);
+    dashboardDetailStore.updateDashboard(dashboardDetailState.dashboardId, {
+        layouts: [{ widgets: _widgetIdList }],
+    });
 };
 
-onMounted(() => {
-    store.dispatch('display/showWidget');
+/* Util */
+const getDashboardWidgetList = (): Array<PublicWidgetModel|PrivateWidgetModel> => {
+    const widgetList: Array<PublicWidgetModel|PrivateWidgetModel> = [];
+    dashboardDetailState.dashboardLayouts.forEach((d) => {
+        const _widgetIdList = d.widgets;
+        _widgetIdList?.forEach((widgetId) => {
+            const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
+            widgetList.push(_widget as PublicWidgetModel|PrivateWidgetModel);
+        });
+    });
+    return widgetList;
+};
+
+watch(() => store.state.display.visibleSidebar, (visible) => {
+    if (visible) {
+        state.widgetList = getDashboardWidgetList();
+    }
 });
 onUnmounted(() => {
     store.dispatch('display/hideSidebar');
@@ -64,28 +56,17 @@ onUnmounted(() => {
 <template>
     <div class="dashboard-customize-sidebar">
         <portal to="widget-title">
-            <span class="sidebar-title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.SIDEBAR_TITLE') }}</span> <br>
+            <span class="sidebar-title">{{ $t('DASHBOARDS.DETAIL.WIDGET_REORDER') }}</span> <br>
         </portal>
         <portal to="widget-contents">
             <div class="sidebar-contents">
-                <div class="selector-wrapper">
-                    <p-field-title :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE')"
-                                   font-weight="regular"
-                    >
-                        <template #left>
-                            <p-toggle-button :value="state.enableDateRange"
-                                             class="toggle-button"
-                                             @change-toggle="handleChangeDateRangeToggle"
-                            />
-                        </template>
-                    </p-field-title>
-                </div>
                 <draggable class="draggable-wrapper"
                            ghost-class="ghost"
-                           :list="state.widgetInfoList"
+                           :list="state.widgetList"
+                           @change="handleChangeWidgetOrder"
                 >
-                    <div v-for="(widget, idx) in state.widgetInfoList"
-                         :key="`drag-item-${widget.widget_name}-${idx}`"
+                    <div v-for="(widget, idx) in state.widgetList"
+                         :key="`drag-item-${widget.widget_id}-${idx}`"
                          class="draggable-item"
                     >
                         <span>
@@ -93,36 +74,9 @@ onUnmounted(() => {
                                  width="1rem"
                                  height="1rem"
                             /></span>
-                        <span class="text">{{ widget.title }}</span>
-                        <span v-if="dashboardDetailState.widgetValidMap[widget.widget_key] === false"
-                              class="error-icon-wrapper"
-                        >
-                            <p-i name="ic_error-filled"
-                                 height="1rem"
-                                 width="1rem"
-                                 :color="red[400]"
-                            />
-                        </span>
+                        <span class="text">{{ widget.name }}</span>
                     </div>
                 </draggable>
-            </div>
-        </portal>
-        <portal to="widget-footer">
-            <div class="footer-wrapper">
-                <p-button v-if="!props.hideCancelButton"
-                          style-type="transparent"
-                          :disabled="props.loading"
-                          @click="handleClickCancelButton"
-                >
-                    {{ $t('DASHBOARDS.CUSTOMIZE.CANCEL') }}
-                </p-button>
-                <p-button style-type="primary"
-                          :disabled="!dashboardDetailGetters.isWidgetLayoutValid || !dashboardDetailState.isNameValid"
-                          :loading="props.loading"
-                          @click="handleClickSaveButton"
-                >
-                    {{ props.saveButtonText || $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
-                </p-button>
             </div>
         </portal>
     </div>
@@ -141,14 +95,6 @@ onUnmounted(() => {
     font-size: 0.875rem;
     line-height: 125%;
 
-    .selector-wrapper {
-        &:first-child {
-            padding-bottom: 0.5rem;
-        }
-        .toggle-button {
-            margin-right: 0.25rem;
-        }
-    }
     .draggable-wrapper {
         display: flex;
         flex-direction: column;
@@ -166,9 +112,6 @@ onUnmounted(() => {
             .text {
                 @apply truncate;
             }
-            .error-icon-wrapper {
-                @apply text-red-400;
-            }
         }
         .ghost {
             @apply bg-blue-200;
@@ -182,17 +125,6 @@ onUnmounted(() => {
     padding: 0.75rem 1rem;
     .p-button {
         width: 100%;
-    }
-}
-</style>
-<!--style for p-sidebar outside of this module.-->
-<style lang="postcss">
-$footer-height: 57px;
-.p-sidebar .sidebar-wrapper {
-    padding-bottom: $footer-height;
-    .title {
-        @apply text-label-md;
-        min-height: initial;
     }
 }
 </style>
