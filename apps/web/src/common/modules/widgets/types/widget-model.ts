@@ -1,6 +1,7 @@
 import type { Tags } from '@/schema/_common/model';
 
 import type { DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
+import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
@@ -8,6 +9,7 @@ export interface WidgetModel {
     widget_id: string;
     name: string;
     description: string;
+    size?: WidgetSize;
     data_table_id?: string;
     widget_type: WidgetType;
     options: Record<WidgetFieldName, WidgetFieldValues>;

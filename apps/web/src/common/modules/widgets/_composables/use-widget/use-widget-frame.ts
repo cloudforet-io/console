@@ -45,9 +45,6 @@ export const useWidgetFrame = (
         'click-delete': () => {
             emit('click-delete');
         },
-        'click-expand': () => {
-            emit('click-expand');
-        },
         'update-size': (size: WidgetSize) => {
             emit('update-size', size);
         },

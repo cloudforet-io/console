@@ -28,12 +28,12 @@ interface PreviewTableField {
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
-const widgetGenrateGetters = widgetGenerateStore.getters;
+const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const storeState = reactive({
     previewData: computed(() => widgetGenerateState.previewData),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
-    selectedDataTable: computed(() => widgetGenrateGetters.selectedDataTable),
+    selectedDataTable: computed(() => widgetGenerateGetters.selectedDataTable),
     loading: computed(() => widgetGenerateState.dataTableLoadLoading),
     dataTableUpdating: computed(() => widgetGenerateState.dataTableUpdating),
 });

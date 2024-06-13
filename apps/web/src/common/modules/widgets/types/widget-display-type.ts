@@ -18,14 +18,14 @@ export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export interface WidgetProps {
     widgetName: string;
     widgetId: string;
-    dataTableId: string;
+    dataTableId?: string;
     title?: string;
     description?: string;
     size?: WidgetSize;
     width?: number;
     widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>;
     //
-    mode?: 'overlay'|'customize'|'view';
+    mode?: 'overlay'|'view';
     // from dashboard
     loading?: boolean;
     dashboardOptions?: DashboardOptions;
@@ -37,7 +37,6 @@ export interface WidgetEmit {
     (e: 'mounted'): void;
     (e: 'update-size', size: WidgetSize): void;
     (event: 'click-delete'): void;
-    (event: 'click-expand'): void;
     (event: 'click-edit'): void;
 }
 

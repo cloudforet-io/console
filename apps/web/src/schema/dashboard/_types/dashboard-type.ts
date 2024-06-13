@@ -3,7 +3,7 @@ import type {
     DASHBOARD_TYPE,
 } from '@/schema/dashboard/_constants/dashboard-constant';
 import type {
-    InheritOptions, WidgetOptions, WidgetSize, NewWidgetFilters,
+    InheritOptions, WidgetOptions, WidgetSize,
 } from '@/schema/dashboard/_types/widget-type';
 
 import type { VariableModelType } from '@/lib/variable-models';
@@ -82,7 +82,7 @@ export interface DashboardTemplate {
 
 export interface DashboardLayout {
     name?: string;
-    widgets?: DashboardLayoutWidgetInfo[];
+    widgets?: Array<DashboardLayoutWidgetInfo|string>;
     options?: any;
 }
 export interface DashboardLayoutWidgetInfo {
@@ -97,30 +97,6 @@ export interface DashboardLayoutWidgetInfo {
     schema_properties?: string[]; // schema properties that are shown on widget form. updated when use add more options.
     fixed_options?: Record<string, any>; // fixed options for the widget
 }
-
-export interface DashboardLayoutWidgetInfoV2 {
-    widget_id?: string;
-    widget_key?: string; // widget config name
-}
-
-
-export interface NewDashboardLayoutWidgetInfo {
-    widget_name: string;
-    widget_key: string;
-    template_widget_id?: string;
-    title?: string;
-    size?: WidgetSize;
-    version: string;
-    schema_properties?: string[];
-    fixed_options?: Record<string, any>;
-
-    // Widget Options
-    data_sources: DataSource[],
-    data_mapping: Record<string, string|string[]>;
-    chart_options: Record<string, any>;
-    filters?: NewWidgetFilters;
-}
-
 
 export interface DataSource {
     // data_domain: string; // Cost/Asset/Security

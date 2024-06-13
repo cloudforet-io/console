@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance, AsyncComponent } from 'vue';
 import {
-    reactive, ref, watch, computed, onBeforeUnmount, onMounted,
+    reactive, ref, watch, computed, onBeforeUnmount,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -31,16 +31,11 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type {
-    UpdatableWidgetInfo,
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
-
-const props = defineProps<{
-    editMode?: boolean;
-}>();
 
 interface RefinedWidgetInfo extends WidgetModel {
     size: WidgetSize;
@@ -58,39 +53,43 @@ const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
+    initiatedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed(() => Object.values(state.mountedWidgetMap).every((d) => d)),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetList: [] as Array<PublicWidgetModel|PrivateWidgetModel>,
-    refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => getRefinedWidgetInfoList()),
+    refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => {
+        if (!state.widgetList.length) return [];
+        return getRefinedWidgetInfoList();
+    }),
 });
+
 
 /* Widget Display */
 const containerRef = ref<HTMLElement|null>(null);
 const { containerWidth } = useDashboardContainerWidth({ containerRef, observeResize: true });
 const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
-    // size
-    const _sizes: WidgetSize[] = [];
-    dashboardDetailState.dashboardWidgetInfoList.forEach((d) => {
-        const _widget = state.widgetList.find((w) => w.widget_id === d.widget_id);
-        if (!_widget) return;
-        const config = getWidgetConfig(_widget.widget_type);
-        _sizes.push(config.meta.sizes[0]);
+    const _refinedWidgets: RefinedWidgetInfo[] = [];
+    const _widgetSizeList: WidgetSize[] = [];
+    dashboardDetailState.dashboardLayouts.forEach((d) => {
+        const _widgetIdList = d.widgets;
+        _widgetIdList?.forEach((widgetId) => {
+            const _widget = state.widgetList.find((w) => w.widget_id === widgetId);
+            if (!_widget) return;
+            const config = getWidgetConfig(_widget.widget_type);
+            if (!config) return;
+            _refinedWidgets.push({
+                ..._widget,
+                size: config.meta.sizes[0],
+                component: getWidgetComponent(_widget.widget_type),
+            });
+            _widgetSizeList.push(config.meta.sizes[0]);
+        });
     });
 
     // width
-    const _widths = flattenDeep(widgetWidthAssigner(_sizes, containerWidth.value));
-
-    // refine widgets
-    const _refinedWidgets: RefinedWidgetInfo[] = [];
-    dashboardDetailState.dashboardWidgetInfoList.forEach((widget, idx) => {
-        const _widget = state.widgetList.find((w) => w.widget_id === widget.widget_id);
-        if (!_widget) return;
-        _refinedWidgets.push({
-            ..._widget,
-            size: _sizes[idx],
-            width: _widths[idx],
-            component: getWidgetComponent(_widget.widget_type),
-        });
+    const _widths = flattenDeep(widgetWidthAssigner(_widgetSizeList, containerWidth.value));
+    _refinedWidgets.forEach((widget, idx) => {
+        widget.width = _widths[idx];
     });
     return _refinedWidgets;
 };
@@ -107,13 +106,22 @@ const listWidget = async () => {
         ErrorHandler.handleError(e);
     }
 };
+const deleteWidget = async (widgetId: string) => {
+    try {
+        await SpaceConnector.clientV2.dashboard.publicWidget.delete({
+            widget_id: widgetId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
 
 /* widget loading */
 const getWidgetLoading = (widgetId: string) => {
     if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
     if (!state.intersectedWidgetMap[widgetId]) return true;
-    // if (widgetFullModeState.targetWidget?.widget_key === widgetKey) return true;
+    if (widgetGenerateState.widgetId === widgetId) return true;
     return false;
 };
 
@@ -156,12 +164,6 @@ const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isInt
 const handleWidgetMounted = (widgetId: string) => {
     state.mountedWidgetMap[widgetId] = true;
 };
-const handleUpdateWidgetInfo = (widgetId: string, widgetInfo: UpdatableWidgetInfo) => {
-    dashboardDetailStore.updateWidgetInfo(widgetId, widgetInfo);
-};
-const handleUpdateValidation = (widgetId: string, isValid: boolean) => {
-    dashboardDetailStore.updateWidgetValidation(isValid, widgetId);
-};
 const handleClickDeleteWidget = (widget: RefinedWidgetInfo) => {
     widgetDeleteState.targetWidget = widget;
     widgetDeleteState.visibleModal = true;
@@ -173,41 +175,38 @@ const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo) => {
 };
 
 /* init states */
-// const stopWidgetInfoWatch = watch(reformedWidgetInfoList, (widgetInfoList) => {
-//     if (!Array.isArray(widgetInfoList)) return;
-//
-//     const mountedWidgetMap = {};
-//     const intersectedWidgetMap = {};
-//     widgetInfoList.forEach((widget) => {
-//         mountedWidgetMap[widget.widget_key] = state.mountedWidgetMap[widget.widget_key];
-//         intersectedWidgetMap[widget.widget_key] = state.intersectedWidgetMap[widget.widget_key];
-//     });
-//     state.mountedWidgetMap = mountedWidgetMap;
-//     state.intersectedWidgetMap = intersectedWidgetMap;
-// }, {
-//     immediate: true, deep: true,
-// });
+const stopWidgetInfoWatch = watch(state.refinedWidgetInfoList, (widgetInfoList) => {
+    if (!Array.isArray(widgetInfoList)) return;
 
-onMounted(() => {
-    listWidget();
+    const mountedWidgetMap = {};
+    const intersectedWidgetMap = {};
+    widgetInfoList.forEach((widget) => {
+        mountedWidgetMap[widget.widget_id] = state.mountedWidgetMap[widget.widget_id];
+        intersectedWidgetMap[widget.widget_id] = state.intersectedWidgetMap[widget.widget_id];
+    });
+    state.mountedWidgetMap = mountedWidgetMap;
+    state.intersectedWidgetMap = intersectedWidgetMap;
+}, {
+    immediate: true, deep: true,
 });
+
 onBeforeUnmount(() => {
-    // stopWidgetInfoWatch();
+    stopWidgetInfoWatch();
 });
 
 /* refresh widgets */
 const refreshAllWidget = debounce(async () => {
     dashboardDetailStore.setLoadingWidgets(true);
-    const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
+    const initWidgetPromises: WidgetExpose['initWidget'][] = [];
 
     widgetRef.value.forEach((comp) => {
-        if (!comp || typeof comp.refreshWidget() !== 'function') return false;
+        if (!comp || typeof comp.initWidget() !== 'function') return false;
         if (!state.initiatedWidgetMap[comp.$el?.id]) return false;
-        refreshWidgetPromises.push(comp.refreshWidget);
+        initWidgetPromises.push(comp.initWidget);
         return true;
     });
 
-    await Promise.allSettled(refreshWidgetPromises);
+    await Promise.allSettled(initWidgetPromises);
 
     dashboardDetailStore.setLoadingWidgets(false);
 }, 150);
@@ -215,29 +214,24 @@ defineExpose({
     refreshAllWidget,
 });
 
-// const handleWidgetEditModalConfirm = async (widgetInfo: UpdatableWidgetInfo) => {
-//     const widgetKey = widgetEditState.targetWidget?.widget_key;
-//     if (!widgetKey || !widgetInfo) return;
-//     dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
-//     dashboardDetailStore.updateWidgetValidation(true, widgetKey);
-//     widgetEditState.visibleModal = false;
-//     widgetEditState.targetWidget = null;
-//     await nextTick(); // wait for updated widget info to be applied to the widget component's states
-//     widgetRef.value.find((comp) => comp?.$el.id === widgetKey)?.refreshWidget();
-// };
-
 /* widget delete modal */
 const widgetDeleteState = reactive({
     visibleModal: false,
     targetWidget: null as RefinedWidgetInfo|null,
 });
-const handleDeleteModalConfirm = () => {
-    // const target = widgetDeleteState.targetWidget;
-    // if (!target) return;
-    // dashboardDetailStore.deleteWidget(target.widget_id);
-    // widgetDeleteState.visibleModal = false;
-    // widgetDeleteState.targetWidget = null;
+const handleDeleteModalConfirm = async () => {
+    // 1. remove from dashboard layouts
+    await dashboardDetailStore.deleteDashboardWidget(widgetDeleteState.targetWidget?.widget_id);
+    // 2. delete widget
+    await deleteWidget(widgetDeleteState.targetWidget?.widget_id as string);
+    // 3. close modal
+    widgetDeleteState.visibleModal = false;
+    widgetDeleteState.targetWidget = null;
 };
+
+watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
+    if (dashboardId) listWidget();
+}, { immediate: true });
 </script>
 
 <template>
@@ -261,18 +255,14 @@ const handleDeleteModalConfirm = () => {
                                :size="widget.size"
                                :width="widget.width"
                                :widget-options="widget.options"
-                               :mode="props.editMode ? 'customize' : 'view'"
+                               mode="view"
                                :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-variables="dashboardDetailState.variables"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
-                               :data="{}"
                                @mounted="handleWidgetMounted(widget.widget_id)"
-                               @update-widget-info="handleUpdateWidgetInfo(widget.widget_id, $event)"
-                               @update-widget-validation="handleUpdateValidation(widget.widget_id, $event)"
                                @click-edit="handleOpenWidgetOverlay(widget)"
                                @click-delete="handleClickDeleteWidget(widget)"
-                               @click-expand="handleOpenWidgetOverlay(widget)"
                     />
                 </template>
             </div>
