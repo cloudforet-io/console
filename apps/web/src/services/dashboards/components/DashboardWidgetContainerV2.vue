@@ -150,7 +150,7 @@ const handleClickDeleteWidget = (widget: RefinedWidgetInfo) => {
     widgetDeleteState.visibleModal = true;
 };
 const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo) => {
-    widgetGenerateStore.initWidgetForm(widget);
+    widgetGenerateStore.setWidgetForm(widget);
     widgetGenerateStore.setOverlayStep(2);
     widgetGenerateStore.setShowOverlay(true);
 };
