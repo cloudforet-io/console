@@ -8,6 +8,8 @@ import type { ReferenceMap } from '@/store/reference/type';
 import type { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 
 // summary
+
+export const DEFAULT_PADDING = 24;
 export interface CloudServiceData {
     cloud_service_group: string;
     cloud_service_type: string;
@@ -16,8 +18,8 @@ export interface CloudServiceData {
     provider: string;
     created_count: number;
     deleted_count: number;
-    create_warning: boolean;
-    delete_warning: boolean;
+    create_warning?: boolean;
+    delete_warning?: boolean;
     display_name?: string;
 }
 export type ProviderResourceDataItem = ProviderItem & {
