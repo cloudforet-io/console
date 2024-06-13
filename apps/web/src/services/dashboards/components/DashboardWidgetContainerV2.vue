@@ -120,7 +120,7 @@ const deleteWidget = async (widgetId: string) => {
 const getWidgetLoading = (widgetId: string) => {
     if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
-    // if (!state.intersectedWidgetMap[widgetId]) return true; // HACK: fix this
+    // if (!state.intersectedWidgetMap[widgetId]) return true; // HACK: Currently, interceptWidgetMap is not working properly. Need to be fixed.
     if (widgetGenerateState.widgetId === widgetId) return true;
     return false;
 };
