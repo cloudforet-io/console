@@ -3,14 +3,22 @@ import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-const
 
 
 export const DATA_TABLE_TYPE = {
-    ADD: 'ADD',
-    TRANSFORM: 'TRANSFORM',
+    ADDED: 'ADDED',
+    TRANSFORMED: 'TRANSFORMED',
 };
 
 export const DATA_SOURCE_DOMAIN = {
     COST: 'COST',
     ASSET: 'ASSET',
     SECURITY: 'SECURITY',
+};
+
+export const DATA_TABLE_OPERATOR = {
+    CONCAT: 'CONCAT',
+    JOIN: 'JOIN',
+    WHERE: 'WHERE',
+    AGGREGATE: 'AGGREGATE',
+    EVAL: 'EVAL',
 };
 
 // NOTE: temporary solution for the global variable
