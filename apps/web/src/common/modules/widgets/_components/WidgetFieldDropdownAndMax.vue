@@ -90,7 +90,8 @@ onMounted(() => {
                           @update:value="handleUpdateCount"
             />
             <template #label-extra>
-                <p-tooltip :contents="state.tooltipDesc"
+                <p-tooltip v-if="props.max"
+                           :contents="state.tooltipDesc"
                            position="bottom"
                            class="tooltip"
                 >
