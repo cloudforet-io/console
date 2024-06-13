@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton, POverlayLayout,
@@ -35,15 +36,34 @@ const state = reactive({
         }
         return i18n.t('DASHBOARDS.WIDGET.OVERLAY.EDIT_WIDGET');
     }),
+    buttonText: computed<TranslateResult>(() => {
+        if (widgetGenerateState.overlayStep === 1) return i18n.t('COMMON.WIDGETS.CONTINUE');
+        if (props.overlayType === 'ADD') return i18n.t('COMMON.WIDGETS.ADD_WIDGET_TO_DASHBOARD');
+        return i18n.t('COMMON.WIDGETS.SAVE');
+    }),
 });
 
 /* Event */
-const handleClickContinue = () => {
-    const _nextStep = widgetGenerateState.overlayStep + 1;
-    widgetGenerateStore.setOverlayStep(_nextStep);
+const handleClickContinue = async () => {
+    if (widgetGenerateState.overlayStep === 1) {
+        widgetGenerateStore.setOverlayStep(2);
+        return;
+    }
+    await widgetGenerateStore.updateWidget({
+        name: widgetGenerateState.title,
+        description: widgetGenerateState.description,
+        size: widgetGenerateState.size,
+        widget_type: widgetGenerateState.selectedWidgetName,
+        data_table_id: widgetGenerateState.selectedDataTableId,
+        options: widgetGenerateState.widgetValueMap,
+    });
+    widgetGenerateStore.setShowOverlay(false);
 };
 const handleUpdateVisible = (value: boolean) => {
     widgetGenerateStore.setShowOverlay(value);
+};
+const handleCloseOverlay = () => {
+    widgetGenerateStore.setShowOverlay(false);
 };
 
 watch(() => widgetGenerateState.showOverlay, (val) => {
@@ -51,9 +71,6 @@ watch(() => widgetGenerateState.showOverlay, (val) => {
     else widgetGenerateStore.listDataTable();
 });
 
-onMounted(async () => {
-    await widgetGenerateStore.listDataTable();
-});
 onUnmounted(() => {
     widgetGenerateStore.reset();
 });
@@ -71,11 +88,15 @@ onUnmounted(() => {
             <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2" />
             <template #footer>
                 <div class="footer-wrapper">
-                    <p-button style-type="substitutive"
-                              icon-right="ic_arrow-right"
+                    <p-button style-type="transparent"
+                              @click="handleCloseOverlay"
+                    >
+                        {{ $t('COMMON.WIDGETS.CANCEL') }}
+                    </p-button>
+                    <p-button :style-type="widgetGenerateState.overlayStep === 1 ? 'substitutive' : 'primary'"
                               @click="handleClickContinue"
                     >
-                        {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CONTINUE') }}
+                        {{ state.buttonText }}
                     </p-button>
                 </div>
             </template>
@@ -89,6 +110,7 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: right;
+    gap: 0.5rem;
     padding-right: 1.5rem;
 }
 </style>
