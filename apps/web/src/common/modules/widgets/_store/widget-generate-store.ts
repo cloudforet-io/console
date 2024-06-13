@@ -176,9 +176,18 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             } as DataTableModel;
             state.dataTables.push(unsavedTransformData);
         },
-        updateDataTable: async (updateParams: DataTableUpdateParameters) => {
+        updateDataTable: async (updateParams: DataTableUpdateParameters, unsaved?: boolean) => {
             try {
-                const result = await SpaceConnector.clientV2.dashboard.publicDataTable.update<DataTableUpdateParameters, DataTableModel>(updateParams);
+                let result: DataTableModel;
+                if (unsaved) {
+                    const unsavedDataTable = state.dataTables.find((dataTable) => dataTable.data_table_id === updateParams.data_table_id) as DataTableModel;
+                    result = {
+                        ...unsavedDataTable,
+                        ...updateParams,
+                    };
+                } else {
+                    result = await SpaceConnector.clientV2.dashboard.publicDataTable.update<DataTableUpdateParameters, DataTableModel>(updateParams);
+                }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
             } catch (e) {
                 ErrorHandler.handleError(e);
