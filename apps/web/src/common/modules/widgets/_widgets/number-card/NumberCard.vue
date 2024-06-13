@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import {
-    computed,
-    onMounted,
-    reactive,
+    computed, defineExpose, reactive,
 } from 'vue';
 
 import {
@@ -19,6 +17,7 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
@@ -30,6 +29,8 @@ import {
 import type {
     WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
+
+import type { WidgetExpose } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 type Data = ListResponse<{
@@ -87,7 +88,7 @@ const loadWidget = async (): Promise<Data|null> => {
         state.loading = true;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
         return await SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>({
-            widget_id: 'public-widget-74bd848364d0',
+            widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
                 start: _start,
@@ -109,12 +110,14 @@ const loadWidget = async (): Promise<Data|null> => {
     }
 };
 
-const initWidget = async (data?: Data) => {
+const initWidget = async (data?: Data): Promise<Data> => {
     state.data = data ?? await loadWidget();
+    return state.data;
 };
 
-onMounted(async () => {
-    await initWidget();
+useWidgetInitAndRefresh({ props, emit, initWidget });
+defineExpose<WidgetExpose<Data>>({
+    initWidget,
 });
 </script>
 

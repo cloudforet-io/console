@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core';
 import {
-    computed,
-    onMounted, reactive, ref,
+    computed, defineExpose, reactive, ref,
 } from 'vue';
 
 import {
@@ -22,6 +21,7 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
@@ -33,6 +33,8 @@ import type {
     WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { GroupByValue, XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
+
+import type { WidgetExpose } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 type Data = ListResponse<{
@@ -75,16 +77,19 @@ const state = reactive({
             position: 'top',
         },
         visualMap: {
-            type: 'piecewise',
+            // type: 'piecewise',
             calculable: true,
             orient: 'horizontal',
             left: 'left',
             bottom: 0,
-            pieces: [
-                { min: 1000000001, color: '#d94e5d' },
-                { min: 1000001, max: 1000000000, color: '#50a3ba' },
-                { min: 1000, max: 1000000, color: '#eac736' },
-            ],
+            // pieces: [
+            //     {
+            //         label: 'high', min: '50%', color: '#d94e5d',
+            //     },
+            //     {
+            //         label: 'low', min: '30%', max: '49%', color: '#eca7a7',
+            //     },
+            // ],
             outOfRange: {
                 color: '#999',
             },
@@ -96,6 +101,11 @@ const state = reactive({
                 data: state.chartData,
             },
         ],
+        itemStyle: {
+            borderWidth: 2,
+            borderColor: 'white',
+            borderType: 'solid',
+        },
     })),
     //
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
@@ -117,7 +127,7 @@ const loadWidget = async (): Promise<Data|null> => {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         }
         return await SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>({
-            widget_id: 'public-widget-74bd848364d0',
+            widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
                 start: _start,
@@ -167,17 +177,19 @@ const drawChart = (rawData: Data|null) => {
     state.chart.setOption(state.chartOptions);
 };
 
-const initWidget = async (data?: Data) => {
+const initWidget = async (data?: Data): Promise<Data> => {
     state.data = data ?? await loadWidget();
     drawChart(state.data);
+    return state.data;
 };
-onMounted(async () => {
-    await initWidget();
-});
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
+useWidgetInitAndRefresh({ props, emit, initWidget });
+defineExpose<WidgetExpose<Data>>({
+    initWidget,
+});
 </script>
 
 <template>
