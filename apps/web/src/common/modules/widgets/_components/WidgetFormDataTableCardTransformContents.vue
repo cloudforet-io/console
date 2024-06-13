@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
 import {
@@ -7,21 +6,20 @@ import {
 } from '@spaceone/design-system';
 
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, violet } from '@/styles/colors';
 
 
 
-
-
 interface Props {
     selected: boolean;
-    item: DataTableModel;
+    item: PublicDataTableModel|PrivateDataTableModel;
 }
 const props = defineProps<Props>();
 

@@ -1,8 +1,9 @@
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
-import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/configs/widget-field-config';
+import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
-import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
 
 
 export interface DataFieldOptions {
@@ -111,7 +112,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'granularity';
 
 export interface WidgetFieldComponentProps<FieldOptions> {
-    dataTable?: DataTableModel;
+    dataTable?: PublicDataTableModel|PrivateDataTableModel;
     widgetFieldSchema?: WidgetFieldSchema<FieldOptions>;
     isValid?: boolean;
 }

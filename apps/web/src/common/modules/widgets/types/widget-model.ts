@@ -1,43 +1,6 @@
-import type { Tags } from '@/schema/_common/model';
-
 import type { DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN, DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
-import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
-import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
-import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
-
-export interface WidgetModel {
-    widget_id: string;
-    name: string;
-    description: string;
-    size?: WidgetSize;
-    data_table_id?: string;
-    widget_type: WidgetType;
-    options: Record<WidgetFieldName, WidgetFieldValues>;
-    tags: Tags;
-    workspace_id?: string;
-    domain_id?: string;
-    created_at: string;
-    updated_at: string;
-}
 
 export type WidgetType = string; // TODO: make this widget type enum
-
-export interface DataTableModel {
-    data_table_id: string;
-    name?: string;
-    data_type: DataTableDataType;
-    source_type?: DataTableSourceType;
-    operator?: DataTableOperator;
-    options: DataTableOptions;
-    tags?: Tags;
-    labels_info?: LabelsInfo;
-    data_info?: DataInfo;
-    widget_id: string;
-    workspace_id: string;
-    domain_id: string;
-    created_at: string;
-    updated_at: string;
-}
 
 export type DataTableSourceType = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAIN];
 export type DataTableOperator = typeof DATA_TABLE_OPERATOR[keyof typeof DATA_TABLE_OPERATOR];

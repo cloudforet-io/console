@@ -10,7 +10,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { cloneDeep } from 'lodash';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/configs/widget-field-config';
+import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type {
     FormatRulesOptions,
     FormatRulesType,

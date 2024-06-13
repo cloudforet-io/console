@@ -7,6 +7,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import type { DataTableDeleteParameters } from '@/schema/dashboard/public-data-table/api-verbs/delete';
@@ -14,6 +15,7 @@ import type { DataTableListParameters } from '@/schema/dashboard/public-data-tab
 import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
@@ -25,10 +27,12 @@ import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type {
-    DataTableModel, WidgetModel, DataTableOperator, DataTableTransformOptions,
+    DataTableOperator, DataTableTransformOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 
+type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
+type WidgetModel = PublicWidgetModel|PrivateWidgetModel;
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const state = reactive({
         // display

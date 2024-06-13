@@ -14,7 +14,9 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -30,7 +32,7 @@ import WidgetFormDataTableCardSourceForm
 import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data-table-type';
-import type { AdditionalLabels, DataTableModel, DateFormat } from '@/common/modules/widgets/types/widget-model';
+import type { AdditionalLabels, DateFormat } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, violet } from '@/styles/colors';
 
@@ -40,7 +42,7 @@ import { gray, violet } from '@/styles/colors';
 
 interface Props {
     selected: boolean;
-    item: DataTableModel;
+    item: PublicDataTableModel|PrivateDataTableModel;
 }
 const props = defineProps<Props>();
 
