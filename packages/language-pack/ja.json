@@ -1812,7 +1812,7 @@
 			},
 			"DATE_PAST_7_DAYS": "過去7日間",
 			"DATE_TODAY": "今日",
-			"DELETE_CONTENTS": "このウィジェットを本当に削除しますか？ダッシュボードが保存されると、削除したウィジェットを復元することはできません。",
+			"DELETE_CONTENTS": "",
 			"DELETE_TITLE": "ウィジェットの削除",
 			"DESCRIPTION": "",
 			"DETAILS": "詳細情報",
