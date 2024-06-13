@@ -1812,7 +1812,7 @@
 			},
 			"DATE_PAST_7_DAYS": "지난 7 일",
 			"DATE_TODAY": "오늘",
-			"DELETE_CONTENTS": "이 위젯을 삭제하시겠습니까? 대시보드를 저장하게 될 경우, 삭제한 위젯은 복구할 수 없습니다. ",
+			"DELETE_CONTENTS": "",
 			"DELETE_TITLE": "위젯 삭제 ",
 			"DESCRIPTION": "",
 			"DETAILS": "상세 정보",

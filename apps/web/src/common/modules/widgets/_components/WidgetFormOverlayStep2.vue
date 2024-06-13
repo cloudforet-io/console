@@ -6,7 +6,7 @@ import {
 import {
     PDivider, PSelectButton, PButton,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import type {
     DashboardVariables as IDashboardVariables,
@@ -21,6 +21,7 @@ import { getWidgetDefaultWidth } from '@/common/modules/widgets/_helpers/widget-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
@@ -49,7 +50,9 @@ const state = reactive({
         }
         return getWidgetDefaultWidth(state.widgetSize);
     }),
+    isWidgetOptionsChanged: computed<boolean>(() => !isEqual(widgetGenerateState.widgetValueMap, state.widgetValueMapSnapshot)),
     //
+    widgetValueMapSnapshot: {} as Record<string, WidgetFieldValues>,
     variablesSnapshot: {} as IDashboardVariables,
     dashboardOptionsSnapshot: {} as DashboardOptions,
 });
@@ -58,6 +61,7 @@ const state = reactive({
 const initSnapshot = () => {
     state.variablesSnapshot = cloneDeep(dashboardDetailState.variables);
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
+    state.widgetValueMapSnapshot = cloneDeep(widgetGenerateState.widgetValueMap);
 };
 const reset = () => {
     dashboardDetailStore.setVariables(state.variablesSnapshot);
@@ -127,7 +131,10 @@ onUnmounted(() => {
                           class="update-preview-button"
                           @click="handleUpdatePreview"
                 >
-                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.UPDATE_PREVIEW') }}
+                    <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.UPDATE_PREVIEW') }}</span>
+                    <div v-if="state.isWidgetOptionsChanged"
+                         class="update-dot"
+                    />
                 </p-button>
             </div>
         </div>
@@ -186,6 +193,13 @@ onUnmounted(() => {
                 position: absolute;
                 top: 1rem;
                 right: 1rem;
+                .update-dot {
+                    @apply absolute bg-blue-500 rounded-full border-2 border-white;
+                    width: 0.5rem;
+                    height: 0.5rem;
+                    right: -0.25rem;
+                    top: -5px;
+                }
             }
         }
     }

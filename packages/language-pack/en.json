@@ -1812,7 +1812,7 @@
 			},
 			"DATE_PAST_7_DAYS": "Past 7 days",
 			"DATE_TODAY": "Today",
-			"DELETE_CONTENTS": "Are you sure you want to delete this widget? Once the dashboard has been saved, you won't be able to recover deleted widget(s).",
+			"DELETE_CONTENTS": "Are you sure you want to delete the widget?",
 			"DELETE_TITLE": "Delete Widget",
 			"DESCRIPTION": "Description",
 			"DETAILS": "Details",
