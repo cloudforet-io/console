@@ -7,6 +7,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type {
     DashboardLayoutWidgetInfo,
     DashboardOptions, DashboardType,
@@ -15,10 +16,15 @@ import type {
     TemplateType,
     DashboardLayout,
 } from '@/schema/dashboard/_types/dashboard-type';
+import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
+import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
+import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import getRandomId from '@/lib/random-id-generator';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import type {
@@ -101,6 +107,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         dashboardWidgetInfoList: [] as DashboardLayoutWidgetInfo[], // only for 1.0 dashboard
         dashboardLayouts: [] as DashboardLayout[], // only for 2.0 dashboard
         loadingWidgets: false,
+        dashboardWidgets: [] as Array<PublicWidgetModel|PrivateWidgetModel>,
         // validation
         isNameValid: undefined as boolean | undefined,
         widgetValidMap: {} as WidgetValidMap,
@@ -376,6 +383,17 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const deleteDashboard = async (dashboardId: string) => {
         await dashboardStore.deleteDashboard(dashboardId);
     };
+    const listDashboardWidgets = async () => {
+        if (!state.dashboardId) return;
+        try {
+            const { results } = await SpaceConnector.clientV2.dashboard.publicWidget.list<PublicWidgetListParameters, ListResponse<PublicWidgetModel>>({
+                dashboard_id: state.dashboardId,
+            });
+            state.dashboardWidgets = results || [];
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        }
+    };
 
     const mutations = {
         setName,
@@ -404,6 +422,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         createDashboard,
         updateDashboard,
         deleteDashboard,
+        listDashboardWidgets,
     };
 
     return {
