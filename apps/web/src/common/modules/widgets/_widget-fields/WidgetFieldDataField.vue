@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -18,7 +20,13 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOption
 const emit = defineEmits<WidgetFieldComponentEmit<string | string[]>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
-    menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    menuItems: computed<MenuItem[]>(() => {
+        const dataInfoList = Object.keys(props.dataTable?.data_info ?? {}) ?? [];
+        return dataInfoList.map((d) => ({
+            name: d,
+            label: d,
+        }));
+    }),
     selectedItem: undefined as undefined | MenuItem[] | string,
     isValid: computed<boolean>(() => {
         if (state.menuItems.length === 0) return false;
@@ -43,6 +51,14 @@ const handleUpdateSelect = (val: string|MenuItem[]) => {
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
+
+onMounted(() => {
+    if (state.menuItems.length) {
+        state.selectedItem = state.menuItems[0].name;
+        state.proxyValue = state.menuItems[0].name;
+    }
+});
+
 </script>
 
 <template>

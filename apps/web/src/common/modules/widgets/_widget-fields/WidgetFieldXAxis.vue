@@ -18,7 +18,15 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<XAxisOptions>>(
 });
 const emit = defineEmits<WidgetFieldComponentEmit<XAxisValue>>();
 const state = reactive({
-    menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    menuItems: computed<MenuItem[]>(() => {
+        const dataTarget = props.widgetFieldSchema?.options?.dataTarget ?? 'labels_info';
+        if (!props.dataTable) return [];
+        const dataInfoList = Object.keys(props.dataTable[dataTarget] ?? {}) ?? [];
+        return dataInfoList.map((d) => ({
+            name: d,
+            label: d,
+        }));
+    }),
 });
 
 /* Event */
