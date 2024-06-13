@@ -73,6 +73,8 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
     _validMap[fieldName] = isValid;
     widgetGenerateStore.setWidgetValidMap(_validMap);
 };
+
+const keyGenerator = (name:string) => (`${widgetGenerateGetters.selectedDataTable?.data_table_id}-required-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}`);
 </script>
 
 <template>
@@ -152,7 +154,7 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetRequiredFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="`${widgetGenerateGetters.selectedDataTable?.data_table_id}-required-${fieldName}-${widgetGenerateState.widgetId}`"
+                               :key="keyGenerator(fieldName)"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :value="widgetGenerateState.widgetValueMap[fieldName]"

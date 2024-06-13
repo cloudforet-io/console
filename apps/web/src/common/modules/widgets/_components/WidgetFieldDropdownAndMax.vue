@@ -19,12 +19,13 @@ const props = withDefaults(defineProps<{
     max?: number;
     menuItems: MenuItem[];
     fieldName?:string|TranslateResult;
-    value: {value: string; count: number};
+    value?: {value?: string; count?: number};
 }>(), {
     defaultCount: 1,
     max: undefined,
     fieldName: '',
     menuItems: () => ([]),
+    value: () => ({}),
 });
 const emit = defineEmits<{(e: 'update:is-valid', isValid:boolean): void;
     (e: 'update:value', value: {value: string; count: number}): void;
@@ -57,8 +58,8 @@ watch(() => state.isAllValid, (isValid) => {
 /* Init */
 onMounted(() => {
     state.proxyValue = {
-        value: props.menuItems[0]?.name ?? '',
-        count: props.defaultCount,
+        value: props.value?.value ?? props.menuItems[0]?.name ?? '',
+        count: props.value?.count ?? props.defaultCount,
     };
 });
 </script>
@@ -87,7 +88,7 @@ onMounted(() => {
                           :min="1"
                           :max="props.max"
                           :invalid="!state.isMaxValid"
-                          :value="state.proxyValue?.count"
+                          :value="state.proxyValue?.count ?? props.value?.value"
                           @update:value="handleUpdateCount"
             />
             <template #label-extra>
