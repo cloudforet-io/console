@@ -13,6 +13,7 @@ export default class ServiceAccountVariableModel extends ResourceVariableModel<S
         resourceType: 'identity.ServiceAccount',
         idKey: 'service_account_id',
         nameKey: 'name',
+        _searchTargets: ['name'],
     };
 
     constructor(config: VariableModelConstructorConfig = {}) {
