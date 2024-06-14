@@ -177,6 +177,7 @@ onClickOutside(secondContainerRef, () => hideMenu(true));
         @apply flex flex-col gap-2 w-full;
 
         .dropdown-container {
+            @apply relative;
             .select-button {
                 @apply flex justify-between items-center bg-gray-100 border border-gray-300 rounded-xl w-full cursor-pointer;
                 border-left-width: 0.375rem;
