@@ -5,7 +5,7 @@ const stackedAreaChart: WidgetConfig = {
     widgetName: 'stackedAreaChart',
     meta: {
         title: 'Stacked Area Chart',
-        sizes: ['full'],
+        sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
         granularity: {},

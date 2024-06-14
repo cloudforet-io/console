@@ -5,7 +5,7 @@ const lineChart: WidgetConfig = {
     widgetName: 'lineChart',
     meta: {
         title: 'Line Chart',
-        sizes: ['full'],
+        sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
         granularity: {},

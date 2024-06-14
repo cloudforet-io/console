@@ -5,7 +5,7 @@ const stackedColumnChart: WidgetConfig = {
     widgetName: 'stackedColumnChart',
     meta: {
         title: 'Stacked Column Chart',
-        sizes: ['full'],
+        sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
         granularity: {},

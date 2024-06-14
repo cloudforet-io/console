@@ -5,7 +5,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
     widgetName: 'stackedHorizontalBarChart',
     meta: {
         title: 'Stacked Horizontal Bar Chart',
-        sizes: ['full'],
+        sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
         granularity: {},
