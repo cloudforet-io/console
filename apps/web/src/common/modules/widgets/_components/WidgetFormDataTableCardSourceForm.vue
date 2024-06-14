@@ -173,6 +173,7 @@ watch(() => props.selected, () => {
 
 <style scoped lang="postcss">
 .widget-form-data-table-card-source-form {
+    margin-top: 0.5rem;
     .selected-source {
         @apply flex items-center gap-1 text-label-md text-gray-900;
         margin-bottom: 0.25rem;
