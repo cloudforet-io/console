@@ -61,14 +61,11 @@ const state = reactive({
             data: state.xAxisData,
             axisLabel: {
                 interval: 0,
-                axisLabel: {
-                    interval: 0,
-                    formatter: (val) => {
-                        if (state.xAxisField === DATE_FIELD) {
-                            return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
-                        }
-                        return val;
-                    },
+                formatter: (val) => {
+                    if (state.xAxisField === DATE_FIELD) {
+                        return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
+                    }
+                    return val;
                 },
             },
         },
