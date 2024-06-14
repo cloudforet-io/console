@@ -3,6 +3,8 @@ import {
     watch,
 } from 'vue';
 
+import { isEqual } from 'lodash';
+
 import type {
     WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -21,7 +23,8 @@ export const useWidgetInitAndRefresh = <Data = any>({
 }: UseWidgetInitAndRefreshOptions<Data>): void => {
     const initiated = ref(false);
 
-    const stopVariablesWatch = watch(() => props.dashboardVariables, () => {
+    const stopVariablesWatch = watch(() => props.dashboardVariables, (after, before) => {
+        if (isEqual(after, before)) return;
         if (!initiated.value || props.disableRefreshOnVariableChange) return;
         loadWidget();
     }, { deep: true });
