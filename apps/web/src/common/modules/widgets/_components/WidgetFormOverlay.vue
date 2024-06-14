@@ -52,14 +52,19 @@ const state = reactive({
 
 /* Event */
 const handleClickContinue = async () => {
-    if (widgetGenerateState.overlayStep === 1) {
-        widgetGenerateStore.setOverlayStep(2);
-        return;
-    }
     const isPrivate = widgetGenerateState.widgetId.startsWith('private');
     const fetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
         : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
+    if (widgetGenerateState.overlayStep === 1) {
+        await fetcher({
+            widget_id: widgetGenerateState.widgetId,
+            widget_type: widgetGenerateState.selectedWidgetName,
+            data_table_id: widgetGenerateState.selectedDataTableId,
+        });
+        widgetGenerateStore.setOverlayStep(2);
+        return;
+    }
     await fetcher({
         widget_id: widgetGenerateState.widgetId,
         name: widgetGenerateState.title,
