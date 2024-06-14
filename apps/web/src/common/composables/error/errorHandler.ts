@@ -19,6 +19,10 @@ interface GlobalErrorHandlers {
     authorizationErrorHandler: () => void;
 }
 
+export interface APIErrorToast {
+    (errorTitle?:string|TranslateResult): void
+}
+
 export default class ErrorHandler {
     private static authenticationErrorHandler;
 
@@ -51,6 +55,17 @@ export default class ErrorHandler {
         } else {
             console.error(error);
         }
+    }
+
+    static makeAPIErrorToast(error: unknown): APIErrorToast {
+        if (isInstanceOfAPIError(error)) {
+            return (errorTitle?:string|TranslateResult) => {
+                showErrorMessage(errorTitle ?? error.code, error.message);
+            };
+        }
+        return () => {
+            console.error('Failed to make API error toast');
+        };
     }
 
     static handleRequestError(error: unknown, errorMessage: TranslateResult) {

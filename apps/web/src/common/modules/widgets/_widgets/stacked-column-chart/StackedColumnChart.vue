@@ -22,6 +22,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
+import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
@@ -94,7 +95,7 @@ const state = reactive({
 });
 
 /* Util */
-const fetchWidget = async (): Promise<Data|null> => {
+const fetchWidget = async (): Promise<Data|null|APIErrorToast> => {
     try {
         state.loading = true;
         let _start = state.basedOnDate;
@@ -123,7 +124,7 @@ const fetchWidget = async (): Promise<Data|null> => {
         });
     } catch (e) {
         ErrorHandler.handleError(e);
-        return null;
+        return ErrorHandler.makeAPIErrorToast(e);
     } finally {
         state.loading = false;
     }
@@ -163,8 +164,14 @@ const drawChart = (rawData?: Data|null) => {
     state.chart.setOption(state.chartOptions);
 };
 
-const loadWidget = async (data?: Data): Promise<Data> => {
-    state.data = data ?? await fetchWidget();
+const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+    if (data) {
+        state.data = data;
+    } else {
+        const res = await fetchWidget();
+        if (typeof res === 'function') return res;
+        state.data = null;
+    }
     drawChart(state.data);
     return state.data;
 };
