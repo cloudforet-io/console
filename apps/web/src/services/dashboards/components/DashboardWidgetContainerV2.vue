@@ -157,6 +157,7 @@ const handleDeleteModalConfirm = async () => {
     // 2. delete widget
     await deleteWidget(widgetDeleteState.targetWidget?.widget_id as string);
     // 3. close modal
+    await dashboardDetailStore.listDashboardWidgets();
     widgetDeleteState.visibleModal = false;
     widgetDeleteState.targetWidget = null;
 };
