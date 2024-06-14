@@ -51,6 +51,7 @@ const handleIsValid = (isValid: boolean) => {
             <widget-field-dropdown-and-max :default-count="props.widgetFieldSchema?.options?.defaultMaxCount ?? 1"
                                            :menu-items="state.menuItems"
                                            :max="props.widgetFieldSchema?.options?.max"
+                                           :value="props.value"
                                            :field-name="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.STACK_BY')"
                                            @update:is-valid="handleIsValid"
                                            @update:value="handleUpdateSelect"

@@ -50,7 +50,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         // Data Table
         selectedDataTableId: undefined as undefined | string,
         dataTables: [] as DataTableModel[],
-        selectedDataTable: undefined as DataTableModel|undefined,
         selectedPreviewGranularity: GRANULARITY.MONTHLY as Granularity,
         previewData: { results: [], total_count: 0 } as ListResponse<any>,
         dataTableUpdating: false,
@@ -245,7 +244,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.description = '';
             state.size = 'full';
         },
-        initWidgetForm: (widgetInfo?: WidgetModel) => {
+        setWidgetForm: (widgetInfo?: WidgetModel) => {
             state.selectedWidgetName = widgetInfo?.widget_type || 'table';
             const _widgetConfig = getWidgetConfig(widgetInfo?.widget_type || 'table');
             state.widget = widgetInfo;

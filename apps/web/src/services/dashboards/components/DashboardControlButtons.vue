@@ -75,7 +75,7 @@ const handleAddWidget = async () => {
     const createdWidget = await createWidget();
     if (createdWidget) {
         await updateDashboardLayouts(createdWidget?.widget_id as string);
-        widgetGenerateStore.initWidgetForm(createdWidget);
+        widgetGenerateStore.setWidgetForm(createdWidget);
         widgetGenerateStore.setShowOverlay(true);
     }
     state.loading = false;

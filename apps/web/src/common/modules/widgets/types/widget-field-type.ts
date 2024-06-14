@@ -115,6 +115,7 @@ export interface WidgetFieldComponentProps<FieldOptions> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;
     widgetFieldSchema?: WidgetFieldSchema<FieldOptions>;
     isValid?: boolean;
+    value?: any;
 }
 
 export interface WidgetFieldComponentEmit<ValueType> {
