@@ -414,7 +414,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const actions = {
         reset,
         getDashboardInfo,
-        setDashboardInfo,
         setOriginDashboardName,
         deleteDashboardWidget,
         resetVariables,
