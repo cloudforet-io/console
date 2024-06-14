@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import {
-    PIconButton, PI, PTextInput, PTooltip,
-} from '@spaceone/design-system';
-
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
+import WidgetFormDataTableCardAlertModal
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardAlertModal.vue';
+import WidgetFormDataTableCardFooter from '@/common/modules/widgets/_components/WidgetFormDataTableCardFooter.vue';
+import WidgetFormDataTableCardHeaderTitle
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
+import WidgetFormDataTableCardTransformForm
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
+import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { DataTableOperator } from '@/common/modules/widgets/types/widget-model';
 
-import { gray, violet } from '@/styles/colors';
 
 
 
@@ -29,53 +31,61 @@ const widgetGenerateState = widgetGenerateStore.state;
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
+    selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
 });
 
 const state = reactive({
     dataTableId: computed(() => props.item.data_table_id),
-    unsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
     options: computed(() => props.item.options),
+    dataTableName: props.item.name ?? '',
+    applyDisabled: computed(() => !state.dataTableName.length),
+    optionsChanged: computed(() => false),
+
+    operator: computed(() => props.item.operator as DataTableOperator),
 });
 
-const dataTableNameState = reactive({
-    editMode: false,
-    dataTableName: props.item.name ?? '',
+const modalState = reactive({
+    visible: false,
+    mode: '' as DataTableAlertModalMode,
 });
+
 
 /* Events */
-const handleSelectDataTable = async (dataTableId: string) => {
-    if (state.unsaved) {
-        showErrorMessage('Please save the data table first.', '');
-        return;
-    }
-    widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    widgetGenerateStore.setSelectedPreviewGranularity(GRANULARITY.MONTHLY);
+const handleClickDeleteDataTable = async () => {
+    modalState.mode = 'DELETE';
+    modalState.visible = true;
 };
-const handleUpdateDataTableName = (value: string) => {
-    if (value.length <= 60) {
-        dataTableNameState.dataTableName = value;
-    }
+const handleClickResetDataTable = () => {
+    modalState.mode = 'RESET';
+    modalState.visible = true;
 };
-const handleClickNameEdit = () => {
-    dataTableNameState.editMode = true;
+const handleConfirmModal = async () => {
+    if (modalState.mode === 'DELETE') {
+        const beforeSelectedDataTableId = storeState.selectedDataTableId;
+        const deleteParams = {
+            data_table_id: state.dataTableId,
+        };
+        await widgetGenerateStore.deleteDataTable(deleteParams);
+        if (beforeSelectedDataTableId === state.dataTableId) {
+            const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
+            widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
+        }
+    }
+    if (modalState.mode === 'RESET') {
+        setInitialDataTableForm();
+    }
+    modalState.visible = false;
 };
-const handleClickNameConfirm = async () => {
-    const editedDataTableName = dataTableNameState.dataTableName.trim();
-    if (props.item.name === editedDataTableName) {
-        dataTableNameState.editMode = false;
-        return;
-    }
-    const dataTableNames = storeState.dataTables.map((dataTable) => dataTable.name);
-    if (dataTableNames.includes(editedDataTableName)) {
-        showErrorMessage('A data with this name already exists.', '');
-        return;
-    }
-    await widgetGenerateStore.updateDataTable({
-        data_table_id: state.dataTableId,
-        name: editedDataTableName,
-    }, state.unsaved);
-    showSuccessMessage('Data name successfully changed.', '');
-    dataTableNameState.editMode = false;
+const handleCancelModal = () => {
+    modalState.visible = false;
+};
+const handleUpdateDataTable = async () => {
+    modalState.visible = false;
+};
+
+/* Utils */
+const setInitialDataTableForm = () => {
+    console.debug('reset!');
 };
 
 </script>
@@ -85,65 +95,47 @@ const handleClickNameConfirm = async () => {
          :class="{ 'selected': props.selected }"
     >
         <div class="card-header">
-            <div class="title-wrapper">
-                <button class="selected-radio-icon"
-                        @click="handleSelectDataTable(state.dataTableId)"
-                >
-                    <p-i :name="props.selected ? 'ic_checkbox-circle-selected' : 'ic_radio'"
-                         :color="props.selected ? violet[500] : gray[400]"
-                         size="md"
-                    />
-                </button>
-                <div v-if="dataTableNameState.editMode"
-                     class="data-table-name-form"
-                >
-                    <p-text-input :value="dataTableNameState.dataTableName"
-                                  class="name-input"
-                                  size="sm"
-                                  @update:value="handleUpdateDataTableName"
-                                  @keydown.enter="handleClickNameConfirm"
-                    />
-                    <p-icon-button name="ic_check"
-                                   size="sm"
-                                   @click="handleClickNameConfirm"
-                    />
-                </div>
-                <div v-else
-                     class="data-table-name-wrapper"
-                >
-                    <p-i class="data-table-icon"
-                         name="ic_service_data-sources"
-                         width="1.25rem"
-                         height="1.25rem"
-                    />
-                    <p-tooltip class="data-table-name"
-                               :contents="props.item.name"
-                    >
-                        <p>
-                            {{ props.item.name }}
-                        </p>
-                    </p-tooltip>
-                    <p-icon-button class="edit-button"
-                                   style-type="transparent"
-                                   name="ic_edit-text"
-                                   size="sm"
-                                   @click="handleClickNameEdit"
-                    />
-                </div>
-            </div>
+            <widget-form-data-table-card-header-title :data-table-id="state.dataTableId"
+                                                      :data-type="DATA_TABLE_TYPE.TRANSFORMED"
+                                                      :selected="props.selected"
+                                                      :data-table-name.sync="state.dataTableName"
+            />
         </div>
+        <widget-form-data-table-card-transform-form :operator="state.operator" />
+        <widget-form-data-table-card-footer :disabled="state.applyDisabled"
+                                            :changed="state.optionsChanged"
+                                            @delete="handleClickDeleteDataTable"
+                                            @reset="handleClickResetDataTable"
+                                            @update="handleUpdateDataTable"
+        />
+        <widget-form-data-table-card-alert-modal :mode="modalState.mode"
+                                                 :visible="modalState.visible"
+                                                 @cancel="handleCancelModal"
+                                                 @confirm="handleConfirmModal"
+        />
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .widget-form-data-table-card-transform-contents {
-    @apply border border-gray-300 rounded-lg w-full bg-white;
+    @apply border border-gray-200 rounded-lg w-full bg-white;
     width: 24rem;
+    padding-top: 0.125rem;
     margin-bottom: 2rem;
 
     &.selected {
         @apply border-violet-600;
         box-shadow: 0 0 0 0.1875rem rgba(137, 124, 214, 0.6);
+        .card-header {
+            @apply bg-violet-100 border border-violet-200;
+        }
+    }
+
+    .card-header {
+        @apply bg-gray-100 rounded-lg border border-gray-200;
+        width: 23.5rem;
+        padding: 0.75rem;
+        margin: auto;
     }
 }
 </style>

@@ -173,6 +173,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 data_table_id: `UNSAVED-${getRandomId()}`,
                 name: `${operatorType} Data`,
                 data_type: DATA_TABLE_TYPE.TRANSFORMED,
+                operator: operatorType,
                 options: {
                     [operatorType]: options[operatorType],
                 },
