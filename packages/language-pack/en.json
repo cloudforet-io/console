@@ -1658,6 +1658,7 @@
 			}
 		},
 		"DETAIL": {
+			"ADD_WIDGET": "Add Widget",
 			"APPLY": "Confirm",
 			"AUTO": "Auto",
 			"BASED_ON": "Based on",

@@ -9,7 +9,9 @@ import { debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
+import type { PublicWidgetDeleteParameters } from '@/schema/dashboard/public-widget/api-verbs/delete';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -90,8 +92,12 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
 
 /* Api */
 const deleteWidget = async (widgetId: string) => {
+    const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+    const fetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.delete<PrivateWidgetDeleteParameters>
+        : SpaceConnector.clientV2.dashboard.publicWidget.delete<PublicWidgetDeleteParameters>;
     try {
-        await SpaceConnector.clientV2.dashboard.publicWidget.delete({
+        await fetcher({
             widget_id: widgetId,
         });
     } catch (e) {

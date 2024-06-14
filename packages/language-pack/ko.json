@@ -1658,6 +1658,7 @@
 			}
 		},
 		"DETAIL": {
+			"ADD_WIDGET": "",
 			"APPLY": "확인",
 			"AUTO": "자동",
 			"BASED_ON": "기준월",

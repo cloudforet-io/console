@@ -12,6 +12,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 import { i18n } from '@/translations';
 
@@ -85,7 +86,11 @@ const fetchWidget = async (): Promise<Data|null> => {
     try {
         state.loading = true;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
-        return await SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>({
+        const _isPrivate = props.widgetId.startsWith('private');
+        const _fetcher = _isPrivate
+            ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
+            : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        return await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,

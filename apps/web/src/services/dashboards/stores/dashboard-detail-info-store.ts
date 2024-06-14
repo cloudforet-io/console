@@ -16,6 +16,7 @@ import type {
     TemplateType,
     DashboardLayout,
 } from '@/schema/dashboard/_types/dashboard-type';
+import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
@@ -36,6 +37,7 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 interface WidgetValidMap {
     [widgetKey: string]: boolean;
 }
+type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 
 const DEFAULT_REFRESH_INTERVAL = '5m';
 export const DASHBOARD_DEFAULT = Object.freeze<{ options: DashboardOptions }>({
@@ -386,7 +388,11 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const listDashboardWidgets = async () => {
         if (!state.dashboardId) return;
         try {
-            const { results } = await SpaceConnector.clientV2.dashboard.publicWidget.list<PublicWidgetListParameters, ListResponse<PublicWidgetModel>>({
+            const isPrivate = state.dashboardId.startsWith('private');
+            const fetcher = isPrivate
+                ? SpaceConnector.clientV2.dashboard.privateWidget.list
+                : SpaceConnector.clientV2.dashboard.publicWidget.list;
+            const { results } = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
                 dashboard_id: state.dashboardId,
             });
             state.dashboardWidgets = results || [];
