@@ -41,6 +41,7 @@ export default class ProjectVariableModel extends ResourceVariableModel<ProjectM
         idKey: 'project_id',
         nameKey: 'name',
         _only: ['project_id', 'name', 'project_group_id'],
+        _searchTargets: ['name'],
     };
 
     constructor(config: VariableModelConstructorConfig = {}) {
@@ -76,11 +77,11 @@ export default class ProjectVariableModel extends ResourceVariableModel<ProjectM
                 }
 
                 // get project group info
-                const projectGroupIdList = response.results.map((d) => d.project_group_id);
+                const projectGroupIdList = response.results?.map((d) => d.project_group_id) ?? [];
                 const projectGroupList = await listProjectGroup(projectGroupIdList);
 
                 this.#response = {
-                    results: response.results ? response.results.map((d) => ({
+                    results: response.results ? response.results?.map((d) => ({
                         key: d[this._meta.idKey], name: this.#nameFormatter(d, projectGroupList),
                     })) : [],
                     more,

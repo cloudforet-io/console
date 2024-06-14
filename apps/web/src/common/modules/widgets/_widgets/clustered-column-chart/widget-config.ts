@@ -5,7 +5,7 @@ const clusteredColumnChart: WidgetConfig = {
     widgetName: 'clusteredColumnChart',
     meta: {
         title: 'Clustered Column Chart',
-        sizes: ['full'],
+        sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
         granularity: {},

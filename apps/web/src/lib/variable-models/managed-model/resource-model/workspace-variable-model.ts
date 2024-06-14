@@ -11,6 +11,7 @@ export default class WorkspaceVariableModel extends ResourceVariableModel<Worksp
         resourceType: 'identity.Workspace',
         idKey: 'workspace_id',
         nameKey: 'name',
+        _searchTargets: ['name'],
     };
 
     constructor(config: VariableModelConstructorConfig = {}) {

@@ -5,7 +5,7 @@ const treemap: WidgetConfig = {
     widgetName: 'treemap',
     meta: {
         title: 'Treemap',
-        sizes: ['full'],
+        sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
         granularity: {},

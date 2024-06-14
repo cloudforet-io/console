@@ -102,6 +102,7 @@ const state = reactive({
 /* Util */
 const fetchWidget = async (): Promise<Data|null> => {
     try {
+        state.loading = true;
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
         if (state.xAxisField === DATE_FIELD) {
@@ -129,6 +130,8 @@ const fetchWidget = async (): Promise<Data|null> => {
     } catch (e) {
         ErrorHandler.handleError(e);
         return null;
+    } finally {
+        state.loading = false;
     }
 };
 const drawChart = (rawData: Data|null) => {
