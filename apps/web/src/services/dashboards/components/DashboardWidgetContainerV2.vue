@@ -155,13 +155,23 @@ const handleDeleteModalConfirm = async () => {
     widgetDeleteState.targetWidget = null;
 };
 
+
+const loadAWidget = async (widgetId: string) => {
+    if (!widgetId) return;
+    widgetRef.value.forEach((comp) => {
+        if (!comp || comp.$el.id !== widgetId) return;
+        if (typeof comp.loadWidget !== 'function') return;
+        comp.loadWidget();
+    });
+};
 /* Watcher */
 watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
     if (dashboardId) dashboardDetailStore.listDashboardWidgets();
 }, { immediate: true });
 watch(() => widgetGenerateState.showOverlay, (showOverlay) => {
     if (!showOverlay) {
-        refreshAllWidget();
+        dashboardDetailStore.listDashboardWidgets();
+        loadAWidget(widgetGenerateStore.state.widgetId);
     }
 });
 </script>
