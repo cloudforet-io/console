@@ -7,6 +7,13 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
+import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
+import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
+import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -43,11 +50,26 @@ const state = reactive({
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
 });
 
-/* Util */
+/* Api */
+const updateWidget = async (dataTableId: string) => {
+    const isPrivate = widgetGenerateState.widgetId.startsWith('private');
+    const fetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
+        : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
+    if (widgetGenerateState.overlayStep === 1) {
+        await fetcher({
+            widget_id: widgetGenerateState.widgetId,
+            widget_type: widgetGenerateState.selectedWidgetName,
+            data_table_id: dataTableId,
+        });
+        widgetGenerateStore.setOverlayStep(2);
+    }
+};
 
 /* Event */
 const handleSelectDataTable = (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
+    updateWidget(dataTableId);
 };
 const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setSelectedWidgetName(widgetName);
