@@ -31,7 +31,6 @@ const state = reactive({
         },
     ]),
     selectedFieldType: 'dynamicField',
-    selectedItem: undefined as undefined | MenuItem[] | string,
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = state.selectedFieldType === 'staticField' ? 'data_info' : 'labels_info';
         if (!props.dataTable) return [];
@@ -43,8 +42,8 @@ const state = reactive({
     }),
     isValid: computed<boolean>(() => {
         if (!state.proxyValue?.count) return false;
-        if (state.selectedFieldType === 'staticField' && !state.selectedItem?.length) return false;
-        return !!state.selectedItem;
+        if (state.selectedFieldType === 'staticField' && !state.proxyValue.value?.length) return false;
+        return !!state.proxyValue.value;
     }),
     max: computed(() => props.widgetFieldSchema?.options?.max),
     isMaxValid: computed<boolean>(() => (state.max ? (state.proxyValue?.count <= state.max) : true)),
@@ -57,12 +56,10 @@ const state = reactive({
 /* Event */
 const handleChangeDataFieldType = (value: string) => {
     state.selectedFieldType = value;
-    state.selectedItem = state.menuItems[0]?.name;
+    state.proxyValue = { ...state.proxyValue, value: state.menuItems[0]?.name, fieldType: value };
 };
-const handleUpdateSelect = (val: string|MenuItem[]) => {
-    state.selectedItem = val;
-    const _val = Array.isArray(val) ? val.map((item) => item.name) : val;
-    state.proxyValue = { ...state.proxyValue, value: _val };
+const handleUpdateValue = (val: string|MenuItem[]) => {
+    state.proxyValue = { ...state.proxyValue, value: val };
 };
 const handleUpdateCount = (val: number) => {
     if (val === state.proxyValue?.count) return;
@@ -77,10 +74,10 @@ watch(() => state.isValid, (isValid) => {
 /* Init */
 onMounted(() => {
     state.proxyValue = {
-        value: state.menuItems[0]?.name, // TODO: string | string[]
-        count: props.widgetFieldSchema?.options?.default ?? DEFAULT_COUNT,
+        value: props.value?.value ?? state.menuItems[0]?.name,
+        count: props.value?.count ?? props.widgetFieldSchema?.options?.default ?? DEFAULT_COUNT,
     };
-    state.selectedItem = state.menuItems[0]?.name;
+    state.selectedFieldType = props.value?.fieldType ?? 'dynamicField';
 });
 </script>
 
@@ -107,11 +104,11 @@ onMounted(() => {
                                class="w-full"
                 >
                     <p-select-dropdown :menu="state.menuItems"
-                                       :selected="state.selectedItem"
+                                       :selected="state.proxyValue.value"
                                        :multi-selectable="state.selectedFieldType === 'staticField'"
                                        show-select-marker
                                        appearance-type="badge"
-                                       @update:selected="handleUpdateSelect"
+                                       @update:selected="handleUpdateValue"
                     />
                 </p-field-group>
                 <p-field-group :label="$t('COMMON.WIDGETS.MAX_ITEMS')"

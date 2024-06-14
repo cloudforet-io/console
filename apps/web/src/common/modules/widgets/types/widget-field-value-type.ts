@@ -31,6 +31,7 @@ export interface YAxisValue {
     count: number;
 }
 export interface TableDataFieldValue {
+    fieldType: 'dynamicField' | 'staticField';
     value: string | string[];
     count: number;
 }
