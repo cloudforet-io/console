@@ -16,6 +16,7 @@ import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-wid
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 import { i18n } from '@/translations';
 
+import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
@@ -82,7 +83,7 @@ const state = reactive({
 });
 
 /* Util */
-const fetchWidget = async (): Promise<Data|null> => {
+const fetchWidget = async (): Promise<Data|null|APIErrorToast> => {
     try {
         state.loading = true;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
@@ -107,14 +108,20 @@ const fetchWidget = async (): Promise<Data|null> => {
         });
     } catch (e) {
         ErrorHandler.handleError(e);
-        return null;
+        return ErrorHandler.makeAPIErrorToast(e);
     } finally {
         state.loading = false;
     }
 };
 
-const loadWidget = async (data?: Data): Promise<Data> => {
-    state.data = data ?? await fetchWidget();
+const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+    if (data) {
+        state.data = data;
+    } else {
+        const res = await fetchWidget();
+        if (typeof res === 'function') return res;
+        state.data = null;
+    }
     return state.data;
 };
 

@@ -75,8 +75,11 @@ const handleChangeWidgetSize = (widgetSize: string) => {
 const handleUpdateWidgetSize = (size: WidgetSize) => {
     widgetGenerateStore.setSize(size);
 };
-const handleUpdatePreview = () => {
-    overlayWidgetRef.value?.loadWidget();
+const handleUpdatePreview = async () => {
+    const res = await overlayWidgetRef.value?.loadWidget();
+    if (typeof res === 'function') {
+        res('Please check the widget options.');
+    }
 };
 
 onBeforeMount(() => {
