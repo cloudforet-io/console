@@ -16,7 +16,6 @@ import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-tab
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -39,7 +38,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         showOverlay: false,
         overlayStep: 1,
         // Widget
-        widget: undefined as undefined | PublicWidgetModel | PrivateWidgetModel,
+        widget: undefined as undefined | WidgetModel,
         widgetId: '',
         selectedWidgetName: 'stackedColumnChart',
         title: '',
@@ -225,16 +224,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             }
         },
         /* Step 2 */
-        updateWidget: async (widgetInfo: Partial<PublicWidgetUpdateParameters>) => {
-            try {
-                state.widget = await SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>({
-                    widget_id: state.widgetId,
-                    ...widgetInfo,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        },
         reset: () => {
             state.showOverlay = false;
             state.overlayStep = 1;

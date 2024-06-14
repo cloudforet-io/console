@@ -7,18 +7,23 @@ import { cloneDeep } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { DashboardLayout } from '@/schema/dashboard/_types/dashboard-type';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
+import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
+import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-widget/api-verbs/create';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
 const widgetGenerateStore = useWidgetGenerateStore();
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
@@ -44,9 +49,13 @@ const addWidgetToDashboardLayouts = (createdWidgetId: string): DashboardLayout[]
 };
 
 /* Api */
-const createWidget = async (): Promise<PublicWidgetModel|null> => {
+const createWidget = async (): Promise<PublicWidgetModel|PrivateWidgetModel|null> => {
+    const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+    const fetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.create<PrivateWidgetCreateParameters, PrivateWidgetModel>
+        : SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>;
     try {
-        return await SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>({
+        return await fetcher({
             dashboard_id: dashboardDetailState.dashboardId as string,
             tags: { created_by: store.state.user.userId },
             widget_type: 'table',
@@ -57,11 +66,10 @@ const createWidget = async (): Promise<PublicWidgetModel|null> => {
         return null;
     }
 };
-const updateDashboardLayouts = async (createdWidgetId: string): Promise<PublicDashboardModel|null> => {
+const updateDashboardLayouts = async (createdWidgetId: string): Promise<DashboardModel|null> => {
     try {
         const _layouts = addWidgetToDashboardLayouts(createdWidgetId);
-        return await SpaceConnector.clientV2.dashboard.publicDashboard.update({
-            dashboard_id: dashboardDetailState.dashboardId as string,
+        return await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
             layouts: _layouts,
         });
     } catch (e) {
@@ -92,13 +100,13 @@ const handleClickWidgetReorder = () => {
                   :loading="state.loading"
                   @click="handleAddWidget"
         >
-            Add Widget
+            {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
         </p-button>
         <p-button icon-left="ic_duplicate"
                   style-type="secondary"
                   @click="handleClickWidgetReorder"
         >
-            Widget Reorder
+            {{ $t('DASHBOARDS.DETAIL.WIDGET_REORDER') }}
         </p-button>
     </div>
 </template>
