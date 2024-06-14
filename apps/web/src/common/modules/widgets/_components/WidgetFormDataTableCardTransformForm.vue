@@ -3,9 +3,12 @@ import { computed, reactive } from 'vue';
 
 import { PI } from '@spaceone/design-system';
 
+import WidgetFormDataTableCardTransformDataTableDropdown
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformDataTableDropdown.vue';
 import type { DataTableOperator } from '@/common/modules/widgets/types/widget-model';
 
 interface Props {
+    dataTableId: string;
     operator: DataTableOperator;
 }
 
@@ -33,7 +36,9 @@ const state = reactive({
                 <span>{{ state.operatorMap.name }}</span>
             </div>
             <div class="data-table-dropdown-wrapper">
-                <!--                <widget-form-data-table-card-transform-data-table-dropdown />-->
+                <widget-form-data-table-card-transform-data-table-dropdown :data-table-id="props.dataTableId"
+                                                                           :operator="props.operator"
+                />
             </div>
         </div>
     </div>

@@ -101,7 +101,9 @@ const setInitialDataTableForm = () => {
                                                       :data-table-name.sync="state.dataTableName"
             />
         </div>
-        <widget-form-data-table-card-transform-form :operator="state.operator" />
+        <widget-form-data-table-card-transform-form :data-table-id="state.dataTableId"
+                                                    :operator="state.operator"
+        />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
                                             :changed="state.optionsChanged"
                                             @delete="handleClickDeleteDataTable"

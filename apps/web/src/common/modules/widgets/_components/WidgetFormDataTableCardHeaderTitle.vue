@@ -95,6 +95,11 @@ const handleClickNameConfirm = async () => {
         <div v-if="dataTableNameState.editMode"
              class="data-table-name-form"
         >
+            <p-i class="data-table-icon"
+                 :name="props.dataType === DATA_TABLE_TYPE.ADDED ? 'ic_service_data-sources' : 'ic_transform-data'"
+                 width="1.25rem"
+                 height="1.25rem"
+            />
             <p-text-input :value="dataTableNameState.proxyDataTableName"
                           class="name-input"
                           size="sm"
@@ -111,7 +116,7 @@ const handleClickNameConfirm = async () => {
              class="data-table-name-wrapper"
         >
             <p-i class="data-table-icon"
-                 name="ic_transform-data"
+                 :name="props.dataType === DATA_TABLE_TYPE.ADDED ? 'ic_service_data-sources' : 'ic_transform-data'"
                  width="1.25rem"
                  height="1.25rem"
             />
@@ -159,6 +164,11 @@ const handleClickNameConfirm = async () => {
         @apply flex items-center;
         width: calc(100% - 1.625rem);
         gap: 0.0625rem;
+
+        .data-table-icon {
+            min-width: 1.25rem;
+            margin-right: 0.125rem;
+        }
 
         /* custom design-system component - p-text-input */
         :deep(.p-text-input) {
