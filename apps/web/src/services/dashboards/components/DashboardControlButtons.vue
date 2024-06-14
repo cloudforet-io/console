@@ -40,6 +40,7 @@ const addWidgetToDashboardLayouts = (createdWidgetId: string): DashboardLayout[]
         } else {
             _targetLayout.widgets = [createdWidgetId];
         }
+        _layouts[0] = _targetLayout;
     } else {
         _layouts.push({
             widgets: [createdWidgetId],
@@ -66,11 +67,11 @@ const createWidget = async (): Promise<PublicWidgetModel|PrivateWidgetModel|null
         return null;
     }
 };
-const updateDashboardLayouts = async (createdWidgetId: string): Promise<DashboardModel|null> => {
+const updateDashboardLayouts = async (layouts: DashboardLayout[]): Promise<DashboardModel|null> => {
     try {
-        const _layouts = addWidgetToDashboardLayouts(createdWidgetId);
         return await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
-            layouts: _layouts,
+            dashboard_id: dashboardDetailState.dashboardId,
+            layouts,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -78,11 +79,16 @@ const updateDashboardLayouts = async (createdWidgetId: string): Promise<Dashboar
     }
 };
 
+/* Event */
 const handleAddWidget = async () => {
     state.loading = true;
     const createdWidget = await createWidget();
     if (createdWidget) {
-        await updateDashboardLayouts(createdWidget?.widget_id as string);
+        const newDashboardLayouts = addWidgetToDashboardLayouts(createdWidget.widget_id);
+        const dashboardUpdated = await updateDashboardLayouts(newDashboardLayouts);
+        if (dashboardUpdated) {
+            dashboardDetailStore.setDashboardLayouts(newDashboardLayouts);
+        }
         widgetGenerateStore.setWidgetForm(createdWidget);
         widgetGenerateStore.setShowOverlay(true);
     }
