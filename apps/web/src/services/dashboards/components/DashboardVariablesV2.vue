@@ -77,6 +77,7 @@ const handleResetVariables = () => {
                  class="variable-selector-box"
             >
                 <dashboard-variable-dropdown :property-name="propertyName"
+                                             :property-label="property.name"
                                              :property="property"
                                              :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"
                                              :disabled="props.loading"
