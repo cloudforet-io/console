@@ -54,9 +54,9 @@ const state = reactive({
 const handleUpdateSelect = (val: string|MenuItem[]) => {
     state.selectedItem = val;
     if (Array.isArray(val)) {
-        state.proxyValue = val.map((item) => item.name);
+        state.proxyValue.value = val.map((item) => item.name);
     } else {
-        state.proxyValue = val;
+        state.proxyValue.value = val;
     }
 };
 const handleUpdateCount = (val: number) => {
@@ -69,13 +69,21 @@ watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
 
+const convertToMenuItem = (data: string[]) => data.map((d) => ({
+    name: d,
+    label: d,
+}));
+
 /* Init */
 onMounted(() => {
-    state.proxyValue = {
-        value: state.proxyValue.value ?? state.menuItems[0]?.name, // TODO: string | string[]
-        count: state.proxyValue.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT,
-    };
-    state.selectedItem = state.menuItems[0]?.name;
+    if (state.multiselectable) {
+        state.proxyValue.value = state.proxyValue.value ?? [state.menuItems[0].name];
+        state.selectedItem = convertToMenuItem(state.proxyValue.value);
+    } else {
+        state.proxyValue.value = state.proxyValue.value ?? state.menuItems[0]?.name;
+        state.selectedItem = state.menuItems[0]?.name;
+    }
+    state.proxyValue.count = state.proxyValue.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT;
 });
 </script>
 
