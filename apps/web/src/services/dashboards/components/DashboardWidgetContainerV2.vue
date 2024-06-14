@@ -21,7 +21,7 @@ import { widgetWidthAssigner } from '@/common/modules/widgets/_helpers/widget-wi
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { WidgetExpose, WidgetProps, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 
-import DashboardCustomizeSidebar from '@/services/dashboards/components/DashboardCustomizeSidebar.vue';
+import DashboardReorderSidebar from '@/services/dashboards/components/DashboardReorderSidebar.vue';
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
@@ -206,7 +206,7 @@ watch(() => widgetGenerateState.showOverlay, (showOverlay) => {
                       @confirm="handleDeleteModalConfirm"
         />
         <widget-form-overlay overlay-type="EDIT" />
-        <dashboard-customize-sidebar
+        <dashboard-reorder-sidebar
             :widget-info-list="state.refinedWidgetInfoList"
         />
     </div>
