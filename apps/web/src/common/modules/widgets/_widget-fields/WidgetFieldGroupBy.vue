@@ -72,8 +72,8 @@ watch(() => state.isValid, (isValid) => {
 /* Init */
 onMounted(() => {
     state.proxyValue = {
-        value: state.menuItems[0]?.name, // TODO: string | string[]
-        count: props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT,
+        value: state.proxyValue.value ?? state.menuItems[0]?.name, // TODO: string | string[]
+        count: state.proxyValue.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT,
     };
     state.selectedItem = state.menuItems[0]?.name;
 });
