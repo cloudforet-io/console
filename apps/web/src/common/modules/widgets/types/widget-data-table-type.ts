@@ -40,15 +40,14 @@ export interface Field {
     link?: string | Handler;
     rapidIncrease?: boolean | BoolHandler;
 }
-
-
 export interface WidgetTableData {
     [fieldName: string]: any;
 }
-
-
 export interface AdditionalLabel {
     key: string;
     name: string;
     value: string;
 }
+
+export type DataTableAlertModalMode = 'DELETE'|'DELETE_UNABLED'|'RESET';
+

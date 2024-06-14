@@ -3,9 +3,6 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
-import {
-    PIconButton, PI, PButtonModal, PTextInput, PTooltip,
-} from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 import { isEqual } from 'lodash';
@@ -13,7 +10,6 @@ import { isEqual } from 'lodash';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -26,19 +22,17 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAddForm from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddForm.vue';
+import WidgetFormDataTableCardAlertModal
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardAlertModal.vue';
 import WidgetFormDataTableCardFooter from '@/common/modules/widgets/_components/WidgetFormDataTableCardFooter.vue';
+import WidgetFormDataTableCardHeaderTitle
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
 import WidgetFormDataTableCardSourceForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardSourceForm.vue';
-import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
+import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { AdditionalLabel, DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { AdditionalLabels, DateFormat } from '@/common/modules/widgets/types/widget-model';
-
-import { gray, violet } from '@/styles/colors';
-
-
-
-
 
 interface Props {
     selected: boolean;
@@ -129,7 +123,6 @@ const state = reactive({
 });
 
 const dataTableNameState = reactive({
-    editMode: false,
     dataTableName: props.item.name ?? '',
 });
 
@@ -174,63 +167,12 @@ const originDataState = reactive({
 
 const modalState = reactive({
     visible: false,
-    mode: '' as 'DELETE'|'DELETE_UNABLED'|'RESET',
-    headerTitle: computed(() => {
-        if (modalState.mode === 'DELETE') {
-            return 'Delete Data';
-        } if (modalState.mode === 'DELETE_UNABLED') {
-            return 'Cannot Delete the Data';
-        } if (modalState.mode === 'RESET') {
-            return 'Are you sure you want to reset the data options?';
-        }
-        return '';
-    }),
-    description: computed(() => {
-        if (modalState.mode === 'DELETE') {
-            return 'Are you sure you want to delete this data?';
-        } if (modalState.mode === 'DELETE_UNABLED') {
-            return 'This data is currently in use by {data_name}. \nDelete {data_name} first before deleting this data.';
-        } if (modalState.mode === 'RESET') {
-            return 'Resetting the data options will revert all inputss to their most recent values. This action cannot be undone.';
-        }
-        return '';
-    }),
+    mode: '' as DataTableAlertModalMode,
 });
 
 
 
 /* Events */
-const handleUpdateDataTableName = (value: string) => {
-    if (value.length <= 60) {
-        dataTableNameState.dataTableName = value;
-    }
-};
-const handleClickNameConfirm = async () => {
-    const editedDataTableName = dataTableNameState.dataTableName.trim();
-    if (props.item.name === editedDataTableName) {
-        dataTableNameState.editMode = false;
-        return;
-    }
-    const dataTableNames = storeState.dataTables.map((dataTable) => dataTable.name);
-    if (dataTableNames.includes(editedDataTableName)) {
-        showErrorMessage('A data with this name already exists.', '');
-        return;
-    }
-    await widgetGenerateStore.updateDataTable({
-        data_table_id: state.dataTableId,
-        name: editedDataTableName,
-    });
-    showSuccessMessage('Data name successfully changed.', '');
-    dataTableNameState.editMode = false;
-};
-const handleClickNameEdit = () => {
-    dataTableNameState.editMode = true;
-};
-const handleSelectDataTable = async (dataTableId: string) => {
-    widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    widgetGenerateStore.setSelectedPreviewGranularity(GRANULARITY.MONTHLY);
-};
-
 const handleSelectSourceItem = (selectedItem: string) => {
     state.selectedSourceEndItem = selectedItem;
     showSuccessMessage('Data successfully changed.', '');
@@ -254,7 +196,7 @@ const handleConfirmModal = async () => {
         await widgetGenerateStore.deleteDataTable(deleteParams);
         if (beforeSelectedDataTableId === state.dataTableId) {
             const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
-            widgetGenerateStore.setSelectedDataTableId(dataTableId);
+            widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
         }
     }
     if (modalState.mode === 'RESET') {
@@ -361,52 +303,11 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
          :class="{ 'selected': props.selected }"
     >
         <div class="card-header">
-            <div class="title-wrapper">
-                <button class="selected-radio-icon"
-                        @click="handleSelectDataTable(state.dataTableId)"
-                >
-                    <p-i :name="props.selected ? 'ic_checkbox-circle-selected' : 'ic_radio'"
-                         :color="props.selected ? violet[500] : gray[400]"
-                         size="md"
-                    />
-                </button>
-                <div v-if="dataTableNameState.editMode"
-                     class="data-table-name-form"
-                >
-                    <p-text-input :value="dataTableNameState.dataTableName"
-                                  class="name-input"
-                                  size="sm"
-                                  @update:value="handleUpdateDataTableName"
-                                  @keydown.enter="handleClickNameConfirm"
-                    />
-                    <p-icon-button name="ic_check"
-                                   size="sm"
-                                   @click="handleClickNameConfirm"
-                    />
-                </div>
-                <div v-else
-                     class="data-table-name-wrapper"
-                >
-                    <p-i class="data-table-icon"
-                         name="ic_service_data-sources"
-                         width="1.25rem"
-                         height="1.25rem"
-                    />
-                    <p-tooltip class="data-table-name"
-                               :contents="props.item.name"
-                    >
-                        <p>
-                            {{ props.item.name }}
-                        </p>
-                    </p-tooltip>
-                    <p-icon-button class="edit-button"
-                                   style-type="transparent"
-                                   name="ic_edit-text"
-                                   size="sm"
-                                   @click="handleClickNameEdit"
-                    />
-                </div>
-            </div>
+            <widget-form-data-table-card-header-title :data-table-id="state.dataTableId"
+                                                      :data-type="DATA_TABLE_TYPE.ADDED"
+                                                      :selected="props.selected"
+                                                      :data-table-name.sync="dataTableNameState.dataTableName"
+            />
             <widget-form-data-table-card-source-form :source-type="state.sourceType"
                                                      :parent-source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.namespaceId"
                                                      :menu="state.selectableSourceItems"
@@ -434,79 +335,34 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                             @reset="handleClickResetDataTable"
                                             @update="handleUpdateDataTable"
         />
-        <p-button-modal :visible="modalState.visible"
-                        size="sm"
-                        theme-color="alert"
-                        :header-title="modalState.headerTitle"
-                        :hide-footer-close-button="modalState.mode === 'DELETE_UNABLED'"
-                        @confirm="handleConfirmModal"
-                        @cancel="handleCancelModal"
-        >
-            <template #body>
-                <p>{{ modalState.description }}</p>
-            </template>
-            <template v-if="modalState.mode === 'DELETE_UNABLED'"
-                      #confirm-button
-            >
-                OK
-            </template>
-        </p-button-modal>
+        <widget-form-data-table-card-alert-modal :mode="modalState.mode"
+                                                 :visible="modalState.visible"
+                                                 @cancel="handleCancelModal"
+                                                 @confirm="handleConfirmModal"
+        />
     </div>
 </template>
 
 <style lang="scss" scoped>
 .widget-form-data-table-card-add-contents {
-    @apply border border-gray-300 rounded-lg w-full bg-white;
+    @apply border border-gray-200 rounded-lg w-full bg-white;
     width: 24rem;
+    padding-top: 0.125rem;
     margin-bottom: 2rem;
 
     &.selected {
         @apply border-violet-600;
         box-shadow: 0 0 0 0.1875rem rgba(137, 124, 214, 0.6);
+        .card-header {
+            @apply bg-violet-100 border border-violet-200;
+        }
     }
 
     .card-header {
-        @apply bg-gray-100 rounded-lg;
-        padding: 0.5rem 0.75rem;
-
-        .title-wrapper {
-            @apply flex items-center text-paragraph-sm font-bold w-full;
-            gap: 0.125rem;
-            margin-bottom: 0.5rem;
-            .selected-radio-icon {
-                width: 1.5rem;
-                height: 1.5rem;
-            }
-            .data-table-name-wrapper {
-                @apply inline-flex items-center gap-1;
-                overflow: hidden;
-                width: auto;
-                .data-table-name {
-                    overflow: hidden;
-                    p {
-                        @apply truncate;
-                    }
-                }
-                .data-table-icon {
-                    min-width: 1.25rem;
-                    margin-right: 0.125rem;
-                }
-            }
-            .data-table-name-form {
-                @apply flex items-center;
-                width: calc(100% - 1.625rem);
-                gap: 0.0625rem;
-
-                /* custom design-system component - p-text-input */
-                :deep(.p-text-input) {
-                    @apply w-full font-normal;
-                    height: 1.5rem;
-                    .tag-container {
-                        padding: 0;
-                    }
-                }
-            }
-        }
+        @apply bg-gray-100 rounded-lg border border-gray-200;
+        width: 23.5rem;
+        padding: 0.75rem;
+        margin: auto;
     }
 }
 </style>
