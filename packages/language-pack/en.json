@@ -1302,6 +1302,7 @@
 			"TITLE": "Change Project"
 		},
 		"WIDGETS": {
+			"ADD_WIDGET": "Add Widget",
 			"ADD_WIDGET_TO_DASHBOARD": "Add Widget to Dashboard",
 			"ALL_SUMMARY": {
 				"ADD_SERVICE_ACCOUNTS": "Add Service Accounts",
@@ -1382,6 +1383,11 @@
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
 			"DAILY_UPDATE_NO_DATA": "No Daily Update",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
+			"DELETE": "Delete",
+			"EDIT": "Edit",
+			"EDIT_WIDGET": "Edit Widget",
+			"EXPAND": "Expand",
+			"EXPAND_WIDGET": "Expand Widget",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "Cloud Service",
 				"LABEL_PROJECT": "Project",
@@ -1468,6 +1474,8 @@
 			"SERVICE_SUMMARY_CLOUD_SERVICE": "Cloud Services",
 			"SERVICE_SUMMARY_PROJECT": "Project",
 			"SERVICE_SUMMARY_SERVER": "Server",
+			"SET_CHART_OPTIONS": "Set Chart Options",
+			"SET_DATA_SOURCE": "Set Data Source",
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "Create Project",
 				"NO_PROJECT": "No Project",
@@ -1834,10 +1842,6 @@
 			"NO_DATA": "No Data",
 			"NO_SELECTED_ITEM": "One of the options must be selected.",
 			"OVERLAY": {
-				"ADD_WIDGET": "Add Widget",
-				"EDIT_WIDGET": "Edit Widget",
-				"SET_CHART_OPTIONS": "Set Chart Options",
-				"SET_DATA_SOURCE": "Set Data Source",
 				"STEP_1": {
 					"ASSET": "Asset",
 					"BUDGET": "Budget",

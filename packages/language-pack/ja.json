@@ -1302,6 +1302,7 @@
 			"TITLE": "プロジェクト変更"
 		},
 		"WIDGETS": {
+			"ADD_WIDGET": "ウィジェットを追加する",
 			"ADD_WIDGET_TO_DASHBOARD": "",
 			"ALL_SUMMARY": {
 				"ADD_SERVICE_ACCOUNTS": "サービスアカウントの追加",
@@ -1382,6 +1383,11 @@
 			"DAILY_UPDATE_HELP": "管理しているリソースの使用量を確認します",
 			"DAILY_UPDATE_NO_DATA": "本日の変更事項はありません。",
 			"DAILY_UPDATE_TITLE": "本日の変更事項",
+			"DELETE": "",
+			"EDIT": "",
+			"EDIT_WIDGET": "ウィジェット編集",
+			"EXPAND": "",
+			"EXPAND_WIDGET": "",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "クラウドサービス",
 				"LABEL_PROJECT": "プロジェクト",
@@ -1468,6 +1474,8 @@
 			"SERVICE_SUMMARY_CLOUD_SERVICE": "クラウドサービス",
 			"SERVICE_SUMMARY_PROJECT": "プロジェクト",
 			"SERVICE_SUMMARY_SERVER": "サーバ",
+			"SET_CHART_OPTIONS": "チャートオプション設定",
+			"SET_DATA_SOURCE": "データソース設定",
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "プロジェクト作成",
 				"NO_PROJECT": "プロジェクトなし",
@@ -1834,10 +1842,6 @@
 			"NO_DATA": "データがありません",
 			"NO_SELECTED_ITEM": "オプションのうちの一つを選択する必要があります。",
 			"OVERLAY": {
-				"ADD_WIDGET": "ウィジェットを追加する",
-				"EDIT_WIDGET": "ウィジェット編集",
-				"SET_CHART_OPTIONS": "チャートオプション設定",
-				"SET_DATA_SOURCE": "データソース設定",
 				"STEP_1": {
 					"ASSET": "アセット",
 					"BUDGET": "予算",
