@@ -197,7 +197,11 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 ErrorHandler.handleError(e);
             }
         },
-        deleteDataTable: async (deleteParams: DataTableDeleteParameters) => {
+        deleteDataTable: async (deleteParams: DataTableDeleteParameters, unsaved?: boolean) => {
+            if (unsaved) {
+                state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== deleteParams.data_table_id);
+                return;
+            }
             try {
                 await SpaceConnector.clientV2.dashboard.publicDataTable.delete<DataTableDeleteParameters, DataTableModel>(deleteParams);
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== deleteParams.data_table_id);

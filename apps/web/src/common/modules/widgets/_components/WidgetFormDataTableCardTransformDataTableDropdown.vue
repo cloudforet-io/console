@@ -96,7 +96,9 @@ onClickOutside(secondContainerRef, () => hideMenu(true));
 
 <template>
     <div class="widget-form-data-table-card-transform-data-table-dropdown">
-        <div class="data-relation" />
+        <div v-if="state.isDualDropdown"
+             class="data-relation"
+        />
         <div :class="{'dropdown-wrapper': true, 'is-dual': state.isDualDropdown}">
             <div ref="containerRef"
                  class="dropdown-container"
