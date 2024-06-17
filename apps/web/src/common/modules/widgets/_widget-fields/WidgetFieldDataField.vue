@@ -16,6 +16,7 @@ import type {
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions>>(), {
     widgetFieldSchema: () => ({}),
+    value: () => ({}),
 });
 const emit = defineEmits<WidgetFieldComponentEmit<string | string[]>>();
 const state = reactive({
@@ -58,12 +59,20 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
     name: d,
     label: d,
 }));
+
+const isIncludedInMenuItems = (data: string[]|string):boolean => {
+    if (Array.isArray(data)) {
+        return data.every((d) => state.menuItems.some((m) => m.name === d));
+    }
+    return state.menuItems.some((m) => m.name === data);
+};
+
 onMounted(() => {
     if (state.multiselectable) {
-        state.proxyValue = state.proxyValue ?? [state.menuItems[0].name];
-        state.selectedItem = convertToMenuItem(state.proxyValue);
+        state.proxyValue.value = isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : [state.menuItems[0]?.name];
+        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
     } else {
-        state.proxyValue = state.proxyValue ?? state.menuItems[0]?.name;
+        state.proxyValue.value = isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name;
         state.selectedItem = state.menuItems[0]?.name;
     }
 });
