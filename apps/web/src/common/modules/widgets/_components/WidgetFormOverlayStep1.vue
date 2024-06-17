@@ -120,7 +120,6 @@ documentEventMount('mouseup', endResizing);
                  :style="displayState.resizerStyle"
                  @mousedown="startResizing"
             >
-                <!--                <div class="gradation-area" />-->
                 <hr v-if="displayState.dataTableAreaOpen"
                     class="resizer-bar"
                 >
