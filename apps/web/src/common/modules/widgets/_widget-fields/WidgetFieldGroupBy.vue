@@ -21,6 +21,7 @@ import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-v
 
 const DEFAULT_COUNT = 5;
 const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions>>(), {
+    value: () => ({}),
 });
 const emit = defineEmits<WidgetFieldComponentEmit<GroupByValue>>();
 const state = reactive({
@@ -77,10 +78,10 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
 /* Init */
 onMounted(() => {
     if (state.multiselectable) {
-        state.proxyValue.value = state.proxyValue.value ?? [state.menuItems[0].name];
-        state.selectedItem = convertToMenuItem(state.proxyValue.value);
+        state.proxyValue.value = state.proxyValue?.value ?? [state.menuItems[0]?.name];
+        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
     } else {
-        state.proxyValue.value = state.proxyValue.value ?? state.menuItems[0]?.name;
+        state.proxyValue.value = state.proxyValue?.value ?? state.menuItems[0]?.name;
         state.selectedItem = state.menuItems[0]?.name;
     }
     state.proxyValue.count = state.proxyValue.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT;

@@ -42,8 +42,8 @@ const state = reactive({
     }),
     isValid: computed<boolean>(() => {
         if (!state.proxyValue?.count) return false;
-        if (state.selectedFieldType === 'staticField' && !state.proxyValue.value?.length) return false;
-        return !!state.proxyValue.value;
+        if (state.selectedFieldType === 'staticField' && !state.proxyValue?.value?.length) return false;
+        return !!state.proxyValue?.value;
     }),
     max: computed(() => props.widgetFieldSchema?.options?.max),
     isMaxValid: computed<boolean>(() => (state.max ? (state.proxyValue?.count <= state.max) : true)),
@@ -104,7 +104,7 @@ onMounted(() => {
                                class="w-full"
                 >
                     <p-select-dropdown :menu="state.menuItems"
-                                       :selected="state.proxyValue.value"
+                                       :selected="state.proxyValue?.value"
                                        :multi-selectable="state.selectedFieldType === 'staticField'"
                                        show-select-marker
                                        appearance-type="badge"
