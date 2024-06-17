@@ -175,10 +175,10 @@ const loadAWidget = async (widgetId: string) => {
 watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
     if (dashboardId) dashboardDetailStore.listDashboardWidgets();
 }, { immediate: true });
-watch(() => widgetGenerateState.showOverlay, (showOverlay) => {
+watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay) {
-        dashboardDetailStore.listDashboardWidgets();
-        loadAWidget(widgetGenerateStore.state.widgetId);
+        await dashboardDetailStore.listDashboardWidgets();
+        await loadAWidget(widgetGenerateStore.state.widgetId);
     }
 });
 </script>
