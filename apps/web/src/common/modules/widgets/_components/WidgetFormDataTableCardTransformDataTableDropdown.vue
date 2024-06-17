@@ -1,11 +1,14 @@
 <script setup lang="ts">
 
 import { onClickOutside } from '@vueuse/core';
-import { computed, reactive, ref } from 'vue';
+import {
+    computed, onMounted, reactive, ref, watch,
+} from 'vue';
 
 import { PI, PContextMenu } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableOperator } from '@/common/modules/widgets/types/widget-model';
@@ -15,8 +18,11 @@ import { gray } from '@/styles/colors';
 interface Props {
     dataTableId: string;
     operator: DataTableOperator;
+    dataTableInfo: string|string[]|undefined;
 }
 const props = defineProps<Props>();
+
+const emit = defineEmits<{(e: 'update:data-table-info', value: string|string[]): void;}>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
@@ -28,6 +34,7 @@ const storeState = reactive({
 
 const state = reactive({
     isDualDropdown: computed(() => props.operator === 'JOIN' || props.operator === 'CONCAT'),
+    proxyDataTableInfo: useProxyValue('dataTableInfo', props, emit),
     visibleMenu: false,
     secondaryVisibleMenu: false,
     baseMenuItems: computed(() => storeState.dataTables
@@ -91,6 +98,24 @@ const hideMenu = (isSecondary?: boolean) => {
 
 onClickOutside(containerRef, () => hideMenu(false));
 onClickOutside(secondContainerRef, () => hideMenu(true));
+
+watch([() => state.selected, () => state.secondarySelected], () => {
+    if (state.selected === undefined && state.secondarySelected === undefined) return;
+
+    if (state.isDualDropdown) {
+        state.proxyDataTableInfo = [state.selected?.[0]?.name, state.secondarySelected?.[0]?.name];
+    }
+    state.proxyDataTableInfo = state.selected?.[0]?.name;
+});
+
+onMounted(() => {
+    if (state.isDualDropdown && Array.isArray(props.dataTableInfo)) {
+        state.selected = props.dataTableInfo[0] ?? undefined;
+        state.secondarySelected = props.dataTableInfo[1] ?? undefined;
+        return;
+    }
+    state.selected = props.dataTableInfo ?? undefined;
+});
 
 </script>
 

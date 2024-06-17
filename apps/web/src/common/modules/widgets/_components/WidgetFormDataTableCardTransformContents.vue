@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+
+import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardAlertModal.vue';
@@ -14,7 +16,9 @@ import WidgetFormDataTableCardTransformForm
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
-import type { DataTableOperator } from '@/common/modules/widgets/types/widget-model';
+import type {
+    DataTableOperator, JoinType, EvalFormula, WhereCondition, ConcatOptions, JoinOptions, WhereOptions, EvalOptions,
+} from '@/common/modules/widgets/types/widget-model';
 
 
 
@@ -27,7 +31,6 @@ const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
-// const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
@@ -38,15 +41,67 @@ const state = reactive({
     dataTableId: computed(() => props.item.data_table_id),
     options: computed(() => props.item.options),
     dataTableName: props.item.name ?? '',
-    applyDisabled: computed(() => !state.dataTableName.length),
-    optionsChanged: computed(() => false),
+    applyDisabled: computed(() => {
+        const haveSavedName = !!originState.name;
+        const haveRequiredConcatOptions = haveSavedName && Array.isArray(state.dataTableInfo) && state.dataTableInfo.length === 2;
+        const haveRequiredJoinOptions = haveSavedName && Array.isArray(state.dataTableInfo) && state.dataTableInfo.length === 2 && joinState.joinType;
+        const haveRequiredWhereOptions = haveSavedName && state.dataTableInfo && whereState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
+        const haveRequiredEvalOptions = haveSavedName && state.dataTableInfo && evalState.functions.filter((func) => !!func.name.trim() && !!func.value.trim()).length > 0;
+        if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
+        if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
+        if (state.operator === 'WHERE') return !haveRequiredWhereOptions;
+        if (state.operator === 'EVAL') return !haveRequiredEvalOptions;
+        return true;
+    }),
+    optionsChanged: computed(() => {
+        const dataTableInfoChanged = state.dataTableInfo !== originState.dataTableInfo;
+        const joinTypeChanged = joinState.joinType !== originState.joinType;
+        const conditionsChanged = whereState.conditions.map((cond) => ({ value: cond.value })) !== originState.conditions;
+        const functionsChanged = evalState.functions.map((func) => ({ name: func.name, value: func.value })) !== originState.functions;
+        if (state.operator === 'CONCAT') return dataTableInfoChanged;
+        if (state.operator === 'JOIN') return dataTableInfoChanged || joinTypeChanged;
+        if (state.operator === 'WHERE') return dataTableInfoChanged || conditionsChanged;
+        if (state.operator === 'EVAL') return dataTableInfoChanged || functionsChanged;
+        return false;
+    }),
     isUnsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
     operator: computed(() => props.item.operator as DataTableOperator),
+    dataTableInfo: undefined as string|string[]|undefined,
 });
 
 const modalState = reactive({
     visible: false,
     mode: '' as DataTableAlertModalMode,
+});
+
+const joinState = reactive({
+    joinType: undefined as JoinType | undefined,
+});
+
+const whereState = reactive({
+    conditions: [{ key: getRandomId(), value: '' }] as WhereCondition[],
+});
+
+const evalState = reactive({
+    functions: [{ key: getRandomId(), name: '', value: '' }] as EvalFormula[],
+});
+
+const originState = reactive({
+    name: computed(() => props.item.name),
+    dataTableInfo: computed<string|string[]>(() => {
+        if (state.operator === 'JOIN' || state.operator === 'CONCAT') {
+            return props.item.options[state.operator].data_tables as string[];
+        }
+        return props.item.options[state.operator].data_table_id as string;
+    }),
+    joinType: computed(() => props.item.options.JOIN.how as JoinType),
+    conditions: computed(() => props.item.options.WHERE.conditions.map((condition) => ({
+        value: condition,
+    }))),
+    functions: computed(() => props.item.options.EVAL.formulas.map((func) => ({
+        name: func.name,
+        value: func.value,
+    }))),
 });
 
 
@@ -80,13 +135,70 @@ const handleCancelModal = () => {
     modalState.visible = false;
 };
 const handleUpdateDataTable = async () => {
-    modalState.visible = false;
+    const firstUpdating = state.isUnsaved;
+    const concatOptions: ConcatOptions = {
+        data_tables: state.dataTableinfo,
+    };
+    const joinOptions: JoinOptions = {
+        data_tables: state.dataTableInfo,
+        how: joinState.joinType as JoinType,
+    };
+    const whereOptions: WhereOptions = {
+        data_table_id: state.dataTableInfo,
+        conditions: whereState.conditions.map((conditionInfo) => conditionInfo.value),
+    };
+    const evalOptions: EvalOptions = {
+        data_table_id: state.dataTableInfo,
+        formulas: evalState.functions.map((functionInfo) => ({
+            name: functionInfo.name,
+            value: functionInfo.value,
+        })),
+    };
+    const options = () => {
+        switch (state.operator) {
+        case 'CONCAT':
+            return concatOptions;
+        case 'JOIN':
+            return joinOptions;
+        case 'WHERE':
+            return whereOptions;
+        case 'EVAL':
+            return evalOptions;
+        default:
+            return {};
+        }
+    };
+    if (firstUpdating) {
+        const createParams = {
+            name: state.dataTableName,
+            data_type: DATA_TABLE_TYPE.TRANSFORMED,
+            operator: state.operator,
+            options: { [state.operator]: options() },
+        };
+        await widgetGenerateStore.createTransformDataTable(createParams);
+    } else {
+        const updateParams = {
+            data_table_id: state.dataTableId,
+            name: state.dataTableName,
+            options: { [state.operator]: options() },
+        };
+        await widgetGenerateStore.updateDataTable(updateParams);
+    }
 };
 
 /* Utils */
 const setInitialDataTableForm = () => {
-    console.debug('reset!');
+    // Initial Form Setting
+    state.dataTableInfo = originState.dataTableInfo;
+    joinState.joinType = originState.joinType;
+    whereState.conditions = originState.conditions;
+    evalState.functions = originState.functions;
 };
+
+onMounted(() => {
+    // Initial Form Setting
+    setInitialDataTableForm();
+});
 
 </script>
 
@@ -103,6 +215,10 @@ const setInitialDataTableForm = () => {
         </div>
         <widget-form-data-table-card-transform-form :data-table-id="state.dataTableId"
                                                     :operator="state.operator"
+                                                    :data-table-info.sync="state.dataTableInfo"
+                                                    :join-type.sync="joinState.joinType"
+                                                    :conditions.sync="whereState.conditions"
+                                                    :functions.sync="evalState.functions"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
                                             :changed="state.optionsChanged"
