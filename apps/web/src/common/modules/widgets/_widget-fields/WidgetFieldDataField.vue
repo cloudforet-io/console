@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOption
 const emit = defineEmits<WidgetFieldComponentEmit<string | string[]>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
+    multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     menuItems: computed<MenuItem[]>(() => {
         const dataInfoList = Object.keys(props.dataTable?.data_info ?? {}) ?? [];
         return dataInfoList.map((d) => ({
@@ -52,10 +53,18 @@ watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
 
+
+const convertToMenuItem = (data: string[]) => data.map((d) => ({
+    name: d,
+    label: d,
+}));
 onMounted(() => {
-    if (state.menuItems.length) {
-        state.selectedItem = state.menuItems[0].name;
-        state.proxyValue = state.menuItems[0].name;
+    if (state.multiselectable) {
+        state.proxyValue = state.proxyValue ?? [state.menuItems[0].name];
+        state.selectedItem = convertToMenuItem(state.proxyValue);
+    } else {
+        state.proxyValue = state.proxyValue ?? state.menuItems[0]?.name;
+        state.selectedItem = state.menuItems[0]?.name;
     }
 });
 
@@ -68,7 +77,7 @@ onMounted(() => {
         >
             <p-select-dropdown :menu="state.menuItems"
                                :selected="state.selectedItem"
-                               :multi-selectable="props.widgetFieldSchema.options?.multiSelectable"
+                               :multi-selectable="state.multiselectable"
                                show-select-marker
                                appearance-type="badge"
                                @update:selected="handleUpdateSelect"
