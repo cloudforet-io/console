@@ -21,7 +21,9 @@ import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-com
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { widgetWidthAssigner } from '@/common/modules/widgets/_helpers/widget-width-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { WidgetExpose, WidgetProps, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
+import type {
+    WidgetExpose, WidgetProps, WidgetSize, WidgetOverlayType,
+} from '@/common/modules/widgets/types/widget-display-type';
 
 import DashboardReorderSidebar from '@/services/dashboards/components/DashboardReorderSidebar.vue';
 import {
@@ -57,6 +59,9 @@ const state = reactive({
         if (!dashboardDetailState.dashboardWidgets.length) return [];
         return getRefinedWidgetInfoList();
     }),
+    overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
+    showExpandOverlay: false,
+    expandOverlayWidget: null as RefinedWidgetInfo|null,
 });
 
 
@@ -119,7 +124,8 @@ const handleClickDeleteWidget = (widget: RefinedWidgetInfo) => {
     widgetDeleteState.targetWidget = widget;
     widgetDeleteState.visibleModal = true;
 };
-const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo) => {
+const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo, overlayType: WidgetOverlayType) => {
+    widgetGenerateStore.setOverlayType(overlayType);
     widgetGenerateStore.setWidgetForm(widget);
     widgetGenerateStore.setOverlayStep(2);
     widgetGenerateStore.setShowOverlay(true);
@@ -171,12 +177,13 @@ const loadAWidget = async (widgetId: string) => {
         comp.loadWidget();
     });
 };
+
 /* Watcher */
 watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
     if (dashboardId) dashboardDetailStore.listDashboardWidgets();
 }, { immediate: true });
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
-    if (!showOverlay) {
+    if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
         await dashboardDetailStore.listDashboardWidgets();
         await loadAWidget(widgetGenerateStore.state.widgetId);
     }
@@ -210,8 +217,9 @@ watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-variables="dashboardDetailState.variables"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
-                               @click-edit="handleOpenWidgetOverlay(widget)"
+                               @click-edit="handleOpenWidgetOverlay(widget, 'EDIT')"
                                @click-delete="handleClickDeleteWidget(widget)"
+                               @click-expand="handleOpenWidgetOverlay(widget, 'EXPAND')"
                     />
                 </template>
             </div>
@@ -222,7 +230,7 @@ watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
                       @update:visible="widgetDeleteState.visibleModal = $event"
                       @confirm="handleDeleteModalConfirm"
         />
-        <widget-form-overlay overlay-type="EDIT" />
+        <widget-form-overlay />
         <dashboard-reorder-sidebar
             :widget-info-list="state.refinedWidgetInfoList"
         />

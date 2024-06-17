@@ -46,7 +46,7 @@ const state = reactive({
         return widgetGenerateState.size;
     }),
     widgetWidth: computed(() => {
-        if (state.widgetSize === 'full' || state.selectedWidgetSize === 'FULL') {
+        if (state.widgetSize === 'full' || state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND') {
             return undefined;
         }
         return getWidgetDefaultWidth(state.widgetSize);
@@ -104,7 +104,9 @@ onUnmounted(() => {
                     />
                     <dashboard-variables-v2 disable-save-button />
                 </div>
-                <div class="widget-size-wrapper">
+                <div v-if="widgetGenerateState.overlayType !== 'EXPAND'"
+                     class="widget-size-wrapper"
+                >
                     <p-select-button v-for="widgetSize in state.widgetSizeOptions"
                                      :key="`widget-size-${widgetSize.name}`"
                                      :value="widgetSize.name"
@@ -117,7 +119,7 @@ onUnmounted(() => {
                 </div>
             </div>
             <div class="widget-wrapper"
-                 :class="{ 'full-size': state.selectedWidgetSize === 'FULL' }"
+                 :class="{ 'full-size': state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND' }"
             >
                 <component :is="getWidgetComponent(widgetGenerateState.selectedWidgetName)"
                            ref="overlayWidgetRef"
@@ -134,7 +136,8 @@ onUnmounted(() => {
                            mode="overlay"
                            @update-size="handleUpdateWidgetSize"
                 />
-                <p-button style-type="substitutive"
+                <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
+                          style-type="substitutive"
                           icon-left="ic_refresh"
                           class="update-preview-button"
                           :disabled="state.disableUpdatePreview"
@@ -147,7 +150,7 @@ onUnmounted(() => {
                 </p-button>
             </div>
         </div>
-        <widget-form-overlay-step2-widget-form />
+        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'" />
     </div>
 </template>
 

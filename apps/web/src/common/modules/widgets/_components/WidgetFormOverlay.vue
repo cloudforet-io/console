@@ -22,31 +22,25 @@ import WidgetFormOverlayStep2 from '@/common/modules/widgets/_components/WidgetF
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 
-interface Props {
-    overlayType?: 'ADD' | 'EDIT';
-}
-const props = withDefaults(defineProps<Props>(), {
-    overlayType: 'ADD',
-});
-
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const state = reactive({
     sidebarTitle: computed(() => {
-        if (props.overlayType === 'ADD') {
-            const _title = i18n.t('DASHBOARDS.WIDGET.OVERLAY.ADD_WIDGET');
-            let _subTitle = i18n.t('DASHBOARDS.WIDGET.OVERLAY.SET_DATA_SOURCE');
+        if (widgetGenerateState.overlayType === 'ADD') {
+            const _title = i18n.t('COMMON.WIDGETS.ADD_WIDGET');
+            let _subTitle = i18n.t('COMMON.WIDGETS.SET_DATA_SOURCE');
             if (widgetGenerateState.overlayStep === 2) {
-                _subTitle = i18n.t('DASHBOARDS.WIDGET.OVERLAY.SET_CHART_OPTIONS');
+                _subTitle = i18n.t('COMMON.WIDGETS.SET_CHART_OPTIONS');
             }
             return `${_title} - ${_subTitle}`;
         }
-        return i18n.t('DASHBOARDS.WIDGET.OVERLAY.EDIT_WIDGET');
+        if (widgetGenerateState.overlayType === 'EDIT') return i18n.t('COMMON.WIDGETS.EDIT_WIDGET');
+        return i18n.t('COMMON.WIDGETS.EXPAND_WIDGET');
     }),
     buttonText: computed<TranslateResult>(() => {
         if (widgetGenerateState.overlayStep === 1) return i18n.t('COMMON.WIDGETS.CONFIGURE_WIDGET');
-        if (props.overlayType === 'ADD') return i18n.t('COMMON.WIDGETS.ADD_WIDGET_TO_DASHBOARD');
+        if (widgetGenerateState.overlayType === 'ADD') return i18n.t('COMMON.WIDGETS.ADD_WIDGET_TO_DASHBOARD');
         return i18n.t('COMMON.WIDGETS.SAVE');
     }),
     isAllValid: computed<boolean>(() => {
@@ -111,7 +105,9 @@ onUnmounted(() => {
         >
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
             <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2" />
-            <template #footer>
+            <template v-if="widgetGenerateState.overlayType !== 'EXPAND'"
+                      #footer
+            >
                 <div class="footer-wrapper">
                     <p-button style-type="transparent"
                               @click="handleCloseOverlay"

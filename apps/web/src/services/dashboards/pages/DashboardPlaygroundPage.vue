@@ -52,6 +52,7 @@ const state = reactive({
 
 /* Event */
 const handleClickAddWidget = () => {
+    widgetGenerateStore.setOverlayType('ADD');
     widgetGenerateStore.setShowOverlay(true);
 };
 </script>
@@ -114,6 +115,6 @@ const handleClickAddWidget = () => {
                 </div>
             </div>
         </div>
-        <widget-form-overlay overlay-type="ADD" />
+        <widget-form-overlay />
     </div>
 </template>
