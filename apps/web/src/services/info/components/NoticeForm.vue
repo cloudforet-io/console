@@ -173,6 +173,7 @@ const fetchListWorkspaces = async (inputText: string) => {
         workspaceState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
             name: role.workspace_id,
+            tags: role.tags,
         }));
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -234,8 +235,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                     >
                         <template #menu-item--format="{item}">
                             <div class="menu-item-wrapper">
-                                <workspace-logo-icon v-if="item.name !== 'all'"
-                                                     :text="item?.label || ''"
+                                <workspace-logo-icon :text="item?.label || ''"
                                                      :theme="item?.tags?.theme"
                                                      size="xxs"
                                 />
