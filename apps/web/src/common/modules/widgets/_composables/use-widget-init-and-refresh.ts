@@ -5,6 +5,7 @@ import {
 
 import { isEqual } from 'lodash';
 
+import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import type {
     WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -13,7 +14,7 @@ import type {
 interface UseWidgetInitAndRefreshOptions<Data> {
     props: WidgetProps;
     emit: WidgetEmit;
-    loadWidget: (data?: Data) => Promise<Data>;
+    loadWidget: (data?: Data) => Promise<Data|APIErrorToast>;
 }
 
 export const useWidgetInitAndRefresh = <Data = any>({

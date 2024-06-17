@@ -13,7 +13,9 @@ import type {
 } from 'echarts/core';
 import { isEmpty, throttle } from 'lodash';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
@@ -24,6 +26,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
+import { getWidgetConsoleFilters } from '@/common/modules/widgets/_helpers/widget-console-filters-helper';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
@@ -45,6 +48,7 @@ const state = reactive({
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: [],
+    consoleFilters: computed<ConsoleFilter[]>(() => getWidgetConsoleFilters(props.dashboardVariables)),
     chartOptions: computed<PieSeriesOption>(() => ({
         tooltip: {
             trigger: 'item',
@@ -100,11 +104,13 @@ const state = reactive({
 });
 
 /* Util */
-const fetchWidget = async (): Promise<Data|null|APIErrorToast> => {
+const apiQueryHelper = new ApiQueryHelper();
+const fetchWidget = async (): Promise<Data|APIErrorToast> => {
     try {
         state.loading = true;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 1);
         const _isPrivate = props.widgetId.startsWith('private');
+        // apiQueryHelper.setFilters(state.consoleFilters);
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
@@ -121,6 +127,7 @@ const fetchWidget = async (): Promise<Data|null|APIErrorToast> => {
                         operator: 'sum',
                     },
                 },
+                ...apiQueryHelper.data,
             },
         });
     } catch (e) {
@@ -146,13 +153,9 @@ const drawChart = (rawData: Data|null) => {
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
-    if (data) {
-        state.data = data;
-    } else {
-        const res = await fetchWidget();
-        if (typeof res === 'function') return res;
-        state.data = null;
-    }
+    const res = data ?? await fetchWidget();
+    if (typeof res === 'function') return res;
+    state.data = res;
     drawChart(state.data);
     return state.data;
 };
