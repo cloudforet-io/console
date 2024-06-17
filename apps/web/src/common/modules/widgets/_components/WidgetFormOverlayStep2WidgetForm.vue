@@ -136,7 +136,7 @@ const keyGenerator = (name:string) => (`${widgetGenerateGetters.selectedDataTabl
                              height="1.25rem"
                              color="inherit"
                         />
-                        <span>{{ widgetGenerateState.selectedWidgetName }}</span>
+                        <span>{{ state.chartTypeMenuItems.find((d) => d.name === widgetGenerateState.selectedWidgetName).label }}</span>
                     </template>
                 </p-select-dropdown>
             </p-field-group>
