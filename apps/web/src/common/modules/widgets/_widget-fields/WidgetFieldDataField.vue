@@ -52,7 +52,7 @@ const handleUpdateSelect = (val: string|MenuItem[]) => {
 /* Watcher */
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
-});
+}, { immediate: true });
 
 
 const convertToMenuItem = (data: string[]) => data.map((d) => ({
