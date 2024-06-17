@@ -30,6 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const state = reactive({
     sidebarTitle: computed(() => {
@@ -51,7 +52,7 @@ const state = reactive({
     isAllValid: computed<boolean>(() => {
         if (widgetGenerateState.overlayStep === 1) return true; // TODO: Add validation for step 1
         if (widgetGenerateState.overlayStep === 2) {
-            return widgetGenerateStore.getters.isAllWidgetFormValid;
+            return widgetGenerateGetters.isAllWidgetFormValid;
         }
         return false;
     }),

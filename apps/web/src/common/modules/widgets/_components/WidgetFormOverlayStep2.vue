@@ -32,6 +32,7 @@ const overlayWidgetRef = ref<HTMLElement|null>(null);
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const state = reactive({
     widgetSizeOptions: [
@@ -51,7 +52,7 @@ const state = reactive({
         return getWidgetDefaultWidth(state.widgetSize);
     }),
     isWidgetOptionsChanged: computed<boolean>(() => !isEqual(widgetGenerateState.widgetValueMap, state.widgetValueMapSnapshot)),
-    disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateStore.getters.isAllWidgetFormValid),
+    disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateGetters.isAllWidgetFormValid),
     //
     widgetValueMapSnapshot: {} as Record<string, WidgetFieldValues>,
     variablesSnapshot: {} as IDashboardVariables,
