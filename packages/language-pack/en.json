@@ -2647,8 +2647,8 @@
 			},
 			"DOMAIN_NOTICE": "Internal Notice",
 			"FORM": {
+				"ALL": "All",
 				"ALL_DOMAINS": "All Domains",
-				"ALL_WORKSPACE": "All Workspaces",
 				"ALT_E_CREATE_NOTICE": "Failed to create notice",
 				"ALT_E_DELETE_NOTICE": "Failed to delete notice",
 				"ALT_E_SEND_EMAIL": "Failed to send email",
@@ -2680,6 +2680,7 @@
 				"SELECTED_DOMAIN": "Selected Domain",
 				"SEND_EMAIL_MODAL_DESC": "{domainText}",
 				"SEND_EMAIL_MODAL_TITLE": "Send Email",
+				"SPECIFIC_WORKSPACE": "Specific Workspaces",
 				"TITLE_REQUIRED": "Title is required",
 				"WORKSPACE": "Workspace",
 				"WRITER_REQUIRED": "Writer name is required"

@@ -2647,8 +2647,8 @@
 			},
 			"DOMAIN_NOTICE": "内部通知",
 			"FORM": {
+				"ALL": "全体",
 				"ALL_DOMAINS": "全顧客",
-				"ALL_WORKSPACE": "すべてのワークスペース",
 				"ALT_E_CREATE_NOTICE": "お知らせの作成に失敗しました",
 				"ALT_E_DELETE_NOTICE": "お知らせの削除に失敗しました",
 				"ALT_E_SEND_EMAIL": "電子メール送信に失敗しました",
@@ -2680,6 +2680,7 @@
 				"SELECTED_DOMAIN": "選択された顧客会社",
 				"SEND_EMAIL_MODAL_DESC": "{domainText}ドメインに登録されたアカウントでメールを送信します。",
 				"SEND_EMAIL_MODAL_TITLE": "Eメール転送",
+				"SPECIFIC_WORKSPACE": "",
 				"TITLE_REQUIRED": "タイトルを入力してください。",
 				"WORKSPACE": "ワークスペース",
 				"WRITER_REQUIRED": "作成者名を入力してください。"

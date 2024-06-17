@@ -2647,8 +2647,8 @@
 			},
 			"DOMAIN_NOTICE": "내부 공지",
 			"FORM": {
+				"ALL": "전체",
 				"ALL_DOMAINS": "전체 고객사",
-				"ALL_WORKSPACE": "전체 워크스페이스",
 				"ALT_E_CREATE_NOTICE": "공지사항 생성 실패",
 				"ALT_E_DELETE_NOTICE": "공지사항 삭제 실패",
 				"ALT_E_SEND_EMAIL": "이메일 발송 실패",
@@ -2680,6 +2680,7 @@
 				"SELECTED_DOMAIN": "선택된 고객사",
 				"SEND_EMAIL_MODAL_DESC": "{domainText} 도메인에 등록된 계정으로 메일을 전송합니다.",
 				"SEND_EMAIL_MODAL_TITLE": "이메일 전송",
+				"SPECIFIC_WORKSPACE": "",
 				"TITLE_REQUIRED": "제목을 입력해 주세요.",
 				"WORKSPACE": "워크스페이스",
 				"WRITER_REQUIRED": "작성자명을 입력해 주세요."
