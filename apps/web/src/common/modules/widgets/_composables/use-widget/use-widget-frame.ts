@@ -127,6 +127,9 @@ export const useWidgetFrame = (
     }));
 
     const widgetFrameEventHandlers = {
+        'click-expand': () => {
+            emit('click-expand');
+        },
         'click-edit': () => {
             emit('click-edit');
         },

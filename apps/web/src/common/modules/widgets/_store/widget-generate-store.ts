@@ -23,7 +23,7 @@ import getRandomId from '@/lib/random-id-generator';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetSize, WidgetOverlayType } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type {
     DataTableOperator,
@@ -37,6 +37,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         // display
         showOverlay: false,
         overlayStep: 1,
+        overlayType: 'EDIT' as WidgetOverlayType,
         // Widget
         widget: undefined as undefined | WidgetModel,
         widgetId: '',
@@ -75,6 +76,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setOverlayStep = (overlayStep: number) => {
         state.overlayStep = overlayStep;
     };
+    const setOverlayType = (overlayType: WidgetOverlayType) => {
+        state.overlayType = overlayType;
+    };
     const setSelectedDataTableId = (selectedDataTableId?: string) => {
         state.selectedDataTableId = selectedDataTableId;
     };
@@ -107,6 +111,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setWidgetId,
         setShowOverlay,
         setOverlayStep,
+        setOverlayType,
         setSelectedDataTableId,
         setSelectedWidgetName,
         setTitle,
