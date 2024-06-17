@@ -4,6 +4,7 @@ import { computed, onMounted, reactive } from 'vue';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
@@ -15,9 +16,11 @@ import WidgetFormDataTableCardTransformForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DataTableOperator, JoinType, EvalFormula, WhereCondition, ConcatOptions, JoinOptions, WhereOptions, EvalOptions,
+    DataTableAlertModalMode, WhereCondition, EvalFormula, TransformDataTableInfo,
+} from '@/common/modules/widgets/types/widget-data-table-type';
+import type {
+    DataTableOperator, JoinType, ConcatOptions, JoinOptions, WhereOptions, EvalOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -40,13 +43,13 @@ const storeState = reactive({
 const state = reactive({
     dataTableId: computed(() => props.item.data_table_id),
     options: computed(() => props.item.options),
-    dataTableName: props.item.name ?? '',
+    dataTableName: props.item.name ? props.item.name : `${props.item.operator} Data`,
     applyDisabled: computed(() => {
         const haveSavedName = !!originState.name;
-        const haveRequiredConcatOptions = haveSavedName && Array.isArray(state.dataTableInfo) && state.dataTableInfo.length === 2;
-        const haveRequiredJoinOptions = haveSavedName && Array.isArray(state.dataTableInfo) && state.dataTableInfo.length === 2 && joinState.joinType;
-        const haveRequiredWhereOptions = haveSavedName && state.dataTableInfo && whereState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
-        const haveRequiredEvalOptions = haveSavedName && state.dataTableInfo && evalState.functions.filter((func) => !!func.name.trim() && !!func.value.trim()).length > 0;
+        const haveRequiredConcatOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined);
+        const haveRequiredJoinOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined) && joinState.joinType;
+        const haveRequiredWhereOptions = haveSavedName && !!state.dataTableInfo.dataTableId && whereState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
+        const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.functions.filter((func) => !!func.name.trim() && !!func.value.trim()).length > 0;
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
         if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
         if (state.operator === 'WHERE') return !haveRequiredWhereOptions;
@@ -54,19 +57,23 @@ const state = reactive({
         return true;
     }),
     optionsChanged: computed(() => {
-        const dataTableInfoChanged = state.dataTableInfo !== originState.dataTableInfo;
+        const dataTablesChanged = state.dataTableInfo.dataTables !== originState.dataTableInfo.dataTables;
+        const dataTableIdChanged = state.dataTableInfo.dataTableId !== originState.dataTableInfo.dataTableId;
         const joinTypeChanged = joinState.joinType !== originState.joinType;
         const conditionsChanged = whereState.conditions.map((cond) => ({ value: cond.value })) !== originState.conditions;
         const functionsChanged = evalState.functions.map((func) => ({ name: func.name, value: func.value })) !== originState.functions;
-        if (state.operator === 'CONCAT') return dataTableInfoChanged;
-        if (state.operator === 'JOIN') return dataTableInfoChanged || joinTypeChanged;
-        if (state.operator === 'WHERE') return dataTableInfoChanged || conditionsChanged;
-        if (state.operator === 'EVAL') return dataTableInfoChanged || functionsChanged;
+        if (state.operator === 'CONCAT') return dataTablesChanged;
+        if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
+        if (state.operator === 'WHERE') return dataTableIdChanged || conditionsChanged;
+        if (state.operator === 'EVAL') return dataTableIdChanged || functionsChanged;
         return false;
     }),
     isUnsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
     operator: computed(() => props.item.operator as DataTableOperator),
-    dataTableInfo: undefined as string|string[]|undefined,
+    dataTableInfo: {
+        dataTables: [] as string[],
+        dataTableId: undefined,
+    } as TransformDataTableInfo,
 });
 
 const modalState = reactive({
@@ -88,17 +95,15 @@ const evalState = reactive({
 
 const originState = reactive({
     name: computed(() => props.item.name),
-    dataTableInfo: computed<string|string[]>(() => {
-        if (state.operator === 'JOIN' || state.operator === 'CONCAT') {
-            return props.item.options[state.operator].data_tables as string[];
-        }
-        return props.item.options[state.operator].data_table_id as string;
-    }),
-    joinType: computed(() => props.item.options.JOIN.how as JoinType),
-    conditions: computed(() => props.item.options.WHERE.conditions.map((condition) => ({
+    dataTableInfo: computed<TransformDataTableInfo>(() => ({
+        dataTables: props.item.options[state.operator]?.data_tables ?? [] as string[],
+        dataTableId: props.item.options[state.operator]?.data_table_id as string,
+    })),
+    joinType: computed(() => props.item.options.JOIN?.how as JoinType),
+    conditions: computed(() => (props.item.options.WHERE?.conditions ?? []).map((condition) => ({
         value: condition,
     }))),
-    functions: computed(() => props.item.options.EVAL.formulas.map((func) => ({
+    functions: computed(() => (props.item.options.EVAL?.formulas ?? []).map((func) => ({
         name: func.name,
         value: func.value,
     }))),
@@ -135,20 +140,29 @@ const handleCancelModal = () => {
     modalState.visible = false;
 };
 const handleUpdateDataTable = async () => {
+    const isValidDataTableId = state.dataTableInfo.dataTableId && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTableId);
+    const isValidDataTables = state.dataTableInfo.dataTables.length === 2
+        && !state.dataTableInfo.dataTables.includes(undefined)
+        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0])
+        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
+    if (!isValidDataTableId && !isValidDataTables) {
+        showErrorMessage('Unable to apply changes. Please check the form.', '');
+        return;
+    }
     const firstUpdating = state.isUnsaved;
     const concatOptions: ConcatOptions = {
-        data_tables: state.dataTableinfo,
+        data_tables: state.dataTableInfo.dataTables,
     };
     const joinOptions: JoinOptions = {
-        data_tables: state.dataTableInfo,
+        data_tables: state.dataTableInfo.dataTables,
         how: joinState.joinType as JoinType,
     };
     const whereOptions: WhereOptions = {
-        data_table_id: state.dataTableInfo,
+        data_table_id: state.dataTableInfo.dataTableId,
         conditions: whereState.conditions.map((conditionInfo) => conditionInfo.value),
     };
     const evalOptions: EvalOptions = {
-        data_table_id: state.dataTableInfo,
+        data_table_id: state.dataTableInfo.dataTableId,
         formulas: evalState.functions.map((functionInfo) => ({
             name: functionInfo.name,
             value: functionInfo.value,
@@ -191,8 +205,8 @@ const setInitialDataTableForm = () => {
     // Initial Form Setting
     state.dataTableInfo = originState.dataTableInfo;
     joinState.joinType = originState.joinType;
-    whereState.conditions = originState.conditions;
-    evalState.functions = originState.functions;
+    whereState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
+    evalState.functions = originState.functions.length ? originState.functions.map((func) => ({ ...func, key: getRandomId() })) : [{ key: getRandomId(), name: '', value: '' }];
 };
 
 onMounted(() => {
