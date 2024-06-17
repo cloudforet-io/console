@@ -30,6 +30,7 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 
 const state = reactive({
     loading: false,
+    errorMessage: undefined as string|undefined,
     data: null as Response | null,
     chart: null as null | EChartsType,
     chartData: [],

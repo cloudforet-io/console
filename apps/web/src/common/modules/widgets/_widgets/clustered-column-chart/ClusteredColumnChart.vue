@@ -50,6 +50,7 @@ const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: false,
+    errorMessage: undefined as string|undefined,
     data: null as Data | null,
     chart: null as EChartsType | null,
     xAxisData: [],
@@ -101,6 +102,7 @@ const state = reactive({
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
+    errorMessage: computed(() => state.errorMessage),
 });
 
 /* Util */
@@ -115,7 +117,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
-        return await _fetcher({
+        const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
@@ -126,8 +128,11 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
             },
             vars: props.dashboardVariables,
         });
-    } catch (e) {
+        state.errorMessage = undefined;
+        return res;
+    } catch (e: any) {
         ErrorHandler.handleError(e);
+        state.errorMessage = e.message;
         return ErrorHandler.makeAPIErrorToast(e);
     } finally {
         state.loading = false;

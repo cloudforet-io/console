@@ -34,6 +34,7 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 const state = reactive({
     loading: false,
+    errorMessage: undefined as string|undefined,
     data: null as Data | null,
     //
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
@@ -51,6 +52,7 @@ const state = reactive({
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
+    errorMessage: computed(() => state.errorMessage),
 });
 
 const fetchWidget = async (): Promise<Data|APIErrorToast> => {
@@ -68,7 +70,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
         } else {
             _fields[state.tableDataField] = { key: state.tableDataField, operator: 'sum' };
         }
-        return await _fetcher({
+        const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
@@ -79,7 +81,10 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
             },
             vars: props.dashboardVariables,
         });
-    } catch (e) {
+        state.errorMessage = undefined;
+        return res;
+    } catch (e: any) {
+        state.errorMessage = e.message;
         ErrorHandler.handleError(e);
         return ErrorHandler.makeAPIErrorToast(e);
     } finally {
