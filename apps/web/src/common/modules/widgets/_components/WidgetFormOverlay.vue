@@ -48,6 +48,13 @@ const state = reactive({
         if (props.overlayType === 'ADD') return i18n.t('COMMON.WIDGETS.ADD_WIDGET_TO_DASHBOARD');
         return i18n.t('COMMON.WIDGETS.SAVE');
     }),
+    isAllValid: computed<boolean>(() => {
+        if (widgetGenerateState.overlayStep === 1) return true; // TODO: Add validation for step 1
+        if (widgetGenerateState.overlayStep === 2) {
+            return widgetGenerateStore.getters.isAllWidgetFormValid;
+        }
+        return false;
+    }),
 });
 
 /* Event */
@@ -112,6 +119,7 @@ onUnmounted(() => {
                     </p-button>
                     <p-button :style-type="widgetGenerateState.overlayStep === 1 ? 'substitutive' : 'primary'"
                               :icon-right="widgetGenerateState.overlayStep === 1 ? 'ic_arrow-right' : undefined"
+                              :disabled="!state.isAllValid"
                               @click="handleClickContinue"
                     >
                         {{ state.buttonText }}

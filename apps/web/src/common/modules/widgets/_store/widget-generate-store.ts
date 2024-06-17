@@ -57,6 +57,12 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
 
     const getters = reactive({
         selectedDataTable: computed<Partial<DataTableModel>|undefined>(() => state.dataTables.find((dataTable) => dataTable.data_table_id === state.selectedDataTableId)),
+        isAllWidgetFormValid: computed<boolean>(() => {
+            const widgetValidMapValues = Object.values(state.widgetValidMap);
+            const widgetValueMapKeys = Object.keys(state.widgetValueMap);
+            if (widgetValidMapValues.length !== widgetValueMapKeys.length) return false;
+            return widgetValidMapValues.every((valid) => valid);
+        }),
     });
 
     /* Mutations */
