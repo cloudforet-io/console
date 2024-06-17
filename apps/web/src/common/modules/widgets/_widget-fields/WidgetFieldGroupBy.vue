@@ -44,11 +44,7 @@ const state = reactive({
         return !!state.selectedItem;
     }),
     max: computed(() => props.widgetFieldSchema?.options?.max),
-    isMaxValid: computed<boolean>(() => {
-        console.log('state.proxyValue?.count', state.proxyValue?.count);
-        console.log('state.max', state.max);
-        return (state.max ? ((state.proxyValue?.count ?? DEFAULT_COUNT) <= state.max) : true);
-    }),
+    isMaxValid: computed<boolean>(() => (state.max ? ((state.proxyValue?.count ?? DEFAULT_COUNT) <= state.max) : true)),
     tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
         fieldName: state.fieldName,
         max: state.max,

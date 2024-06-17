@@ -133,6 +133,7 @@ onUnmounted(() => {
                 <p-button style-type="substitutive"
                           icon-left="ic_refresh"
                           class="update-preview-button"
+                          :disabled="!widgetGenerateStore.getters.isAllWidgetFormValid"
                           @click="handleUpdatePreview"
                 >
                     <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.UPDATE_PREVIEW') }}</span>
