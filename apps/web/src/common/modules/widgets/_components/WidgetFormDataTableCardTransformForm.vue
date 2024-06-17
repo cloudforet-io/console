@@ -12,14 +12,15 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformDataTableDropdown
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformDataTableDropdown.vue';
 import { DATA_TABLE_OPERATOR, JOIN_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import type { WhereCondition, EvalFormula, TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DataTableOperator, JoinType, EvalFormula, WhereCondition,
+    DataTableOperator, JoinType,
 } from '@/common/modules/widgets/types/widget-model';
 
 interface Props {
     dataTableId: string;
     operator: DataTableOperator;
-    dataTableInfo: string|string[]|undefined;
+    dataTableInfo: TransformDataTableInfo;
     joinType: JoinType|undefined;
     conditions: WhereCondition[];
     functions: EvalFormula[];
@@ -27,7 +28,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const emit = defineEmits<{(e: 'update:data-table-info', value: string|string[]): void;
+const emit = defineEmits<{(e: 'update:data-table-info', value: TransformDataTableInfo): void;
     (e: 'update:join-type', value: JoinType): void;
     (e: 'update:conditions', value: WhereCondition[]): void;
     (e: 'update:functions', value: EvalFormula[]): void;

@@ -11,6 +11,7 @@ import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/t
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableOperator } from '@/common/modules/widgets/types/widget-model';
 
 import { gray } from '@/styles/colors';
@@ -18,11 +19,11 @@ import { gray } from '@/styles/colors';
 interface Props {
     dataTableId: string;
     operator: DataTableOperator;
-    dataTableInfo: string|string[]|undefined;
+    dataTableInfo: TransformDataTableInfo;
 }
 const props = defineProps<Props>();
 
-const emit = defineEmits<{(e: 'update:data-table-info', value: string|string[]): void;}>();
+const emit = defineEmits<{(e: 'update:data-table-info', value: TransformDataTableInfo): void;}>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
@@ -103,18 +104,25 @@ watch([() => state.selected, () => state.secondarySelected], () => {
     if (state.selected === undefined && state.secondarySelected === undefined) return;
 
     if (state.isDualDropdown) {
-        state.proxyDataTableInfo = [state.selected?.[0]?.name, state.secondarySelected?.[0]?.name];
+        state.proxyDataTableInfo = {
+            ...state.proxyDataTableInfo,
+            dataTables: [state.selected?.[0]?.name, state.secondarySelected?.[0]?.name],
+        };
+        return;
     }
-    state.proxyDataTableInfo = state.selected?.[0]?.name;
+    state.proxyDataTableInfo = {
+        ...state.proxyDataTableInfo,
+        dataTableId: state.selected?.[0]?.name,
+    };
 });
 
 onMounted(() => {
-    if (state.isDualDropdown && Array.isArray(props.dataTableInfo)) {
-        state.selected = props.dataTableInfo[0] ?? undefined;
-        state.secondarySelected = props.dataTableInfo[1] ?? undefined;
+    if (state.isDualDropdown) {
+        state.selected = props.dataTableInfo.dataTables[0] ?? undefined;
+        state.secondarySelected = props.dataTableInfo.dataTables[1] ?? undefined;
         return;
     }
-    state.selected = props.dataTableInfo ?? undefined;
+    state.selected = props.dataTableInfo.dataTableId ?? undefined;
 });
 
 </script>

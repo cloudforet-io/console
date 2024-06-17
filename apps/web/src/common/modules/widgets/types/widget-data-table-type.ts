@@ -49,5 +49,21 @@ export interface AdditionalLabel {
     value: string;
 }
 
+export interface WhereCondition {
+    key: string;
+    value: string;
+}
+
+export interface EvalFormula {
+    key: string;
+    name: string;
+    value: string;
+}
+
+export interface TransformDataTableInfo {
+    dataTables: string[];
+    dataTableId: string|undefined;
+}
+
 export type DataTableAlertModalMode = 'DELETE'|'DELETE_UNABLED'|'RESET';
 
