@@ -288,6 +288,8 @@ watch(() => state.showPopover, (val) => {
 
 <style lang="scss" scoped>
 .data-source-popover {
+    width: 4.5rem;
+    padding-right: 2rem;
     display: inline-block;
     position: relative;
     :deep(&.p-popover) {

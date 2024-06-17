@@ -21,15 +21,6 @@ const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
 });
 
-// const state = reactive({
-//     // data table
-//     fields: computed(() => [
-//         { name: 'key', label: 'something', type: 'item' },
-//         { name: 'value', label: 'table', type: 'item' },
-//     ]),
-//     selectedData: undefined as string|undefined,
-// });
-
 const displayState = reactive({
     dataTableAreaOpen: true,
     tableAreaHeight: (dataTableContentsRef.value?.clientHeight || 1000) / 5,
@@ -160,13 +151,15 @@ documentEventMount('mouseup', endResizing);
 
         padding: 0.125rem;
         .data-table-area {
-            @apply relative flex-1 h-full;
+            @apply relative flex-1 h-full w-full;
             padding: 1rem 1rem 0;
             margin-bottom: 1.125rem;
             overflow: auto;
             .data-table-wrapper {
                 @apply flex gap-4;
                 height: auto;
+                width: auto;
+                padding-right: 2rem;
             }
         }
         .resizer-area {
