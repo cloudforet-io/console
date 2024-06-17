@@ -72,22 +72,27 @@ const handleSelectSize = (size: WidgetSize) => {
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>
-                            <span class="metadata-value">$USD</span>
+                            <span class="metadata-value">{{ props.unit || '--' }}</span>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.FULL_DATA_LINK') }}</span>
-                            <p-link new-tab
-                                    highlight
-                                    action-icon="internal-link"
-                                    :to="{}"
-                                    class="metadata-value"
-                            >
-                                Storage Data
-                            </p-link>
+                            <template v-if="props.fullDataLocation">
+                                <p-link new-tab
+                                        highlight
+                                        action-icon="internal-link"
+                                        :to="props.fullDataLocation"
+                                        class="metadata-value"
+                                >
+                                    {{ props.fullDataLinkText }}
+                                </p-link>
+                            </template>
+                            <template v-else>
+                                <span class="metadata-value">--</span>
+                            </template>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.DESCRIPTION') }}</span>
-                            <span class="metadata-value">Description</span>
+                            <span class="metadata-value">{{ props.description || '--' }}</span>
                         </div>
                     </div>
                 </template>

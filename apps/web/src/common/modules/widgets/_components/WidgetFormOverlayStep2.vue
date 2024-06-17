@@ -51,6 +51,7 @@ const state = reactive({
         return getWidgetDefaultWidth(state.widgetSize);
     }),
     isWidgetOptionsChanged: computed<boolean>(() => !isEqual(widgetGenerateState.widgetValueMap, state.widgetValueMapSnapshot)),
+    disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateStore.getters.isAllWidgetFormValid),
     //
     widgetValueMapSnapshot: {} as Record<string, WidgetFieldValues>,
     variablesSnapshot: {} as IDashboardVariables,
@@ -76,6 +77,7 @@ const handleUpdateWidgetSize = (size: WidgetSize) => {
     widgetGenerateStore.setSize(size);
 };
 const handleUpdatePreview = async () => {
+    state.widgetValueMapSnapshot = cloneDeep(widgetGenerateState.widgetValueMap);
     const res = await overlayWidgetRef.value?.loadWidget();
     if (typeof res === 'function') {
         res('Please check the widget options.');
@@ -134,7 +136,7 @@ onUnmounted(() => {
                 <p-button style-type="substitutive"
                           icon-left="ic_refresh"
                           class="update-preview-button"
-                          :disabled="!widgetGenerateStore.getters.isAllWidgetFormValid"
+                          :disabled="state.disableUpdatePreview"
                           @click="handleUpdatePreview"
                 >
                     <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.UPDATE_PREVIEW') }}</span>
