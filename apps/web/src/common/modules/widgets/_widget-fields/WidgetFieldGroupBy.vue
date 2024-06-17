@@ -21,6 +21,7 @@ import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-v
 
 const DEFAULT_COUNT = 5;
 const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions>>(), {
+    value: () => ({}),
 });
 const emit = defineEmits<WidgetFieldComponentEmit<GroupByValue>>();
 const state = reactive({
@@ -43,7 +44,11 @@ const state = reactive({
         return !!state.selectedItem;
     }),
     max: computed(() => props.widgetFieldSchema?.options?.max),
-    isMaxValid: computed<boolean>(() => (state.max ? (state.proxyValue?.count <= state.max) : true)),
+    isMaxValid: computed<boolean>(() => {
+        console.log('state.proxyValue?.count', state.proxyValue?.count);
+        console.log('state.max', state.max);
+        return (state.max ? ((state.proxyValue?.count ?? DEFAULT_COUNT) <= state.max) : true);
+    }),
     tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
         fieldName: state.fieldName,
         max: state.max,
@@ -73,17 +78,32 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
     name: d,
     label: d,
 }));
+const isIncludedInMenuItems = (data: string[]|string):boolean => {
+    if (Array.isArray(data)) {
+        return data.every((d) => state.menuItems.some((m) => m.name === d));
+    }
+    return state.menuItems.some((m) => m.name === data);
+};
 
 /* Init */
 onMounted(() => {
     if (state.multiselectable) {
-        state.proxyValue.value = state.proxyValue.value ?? [state.menuItems[0].name];
-        state.selectedItem = convertToMenuItem(state.proxyValue.value);
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : [state.menuItems[0]?.name],
+        };
+        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
     } else {
-        state.proxyValue.value = state.proxyValue.value ?? state.menuItems[0]?.name;
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
+        };
         state.selectedItem = state.menuItems[0]?.name;
     }
-    state.proxyValue.count = state.proxyValue.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT;
+    state.proxyValue = {
+        ...state.proxyValue,
+        count: state.proxyValue.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT,
+    };
 });
 </script>
 
