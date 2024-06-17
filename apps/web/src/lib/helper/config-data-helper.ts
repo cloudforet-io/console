@@ -1,7 +1,8 @@
-import { find } from 'lodash';
+import { cloneDeep, find } from 'lodash';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
+import { i18n } from '@/translations';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
@@ -11,10 +12,12 @@ import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/stor
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
+import { MENU_ID } from '@/lib/menu/config';
 
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig, FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 type Config = FavoriteConfig;
@@ -30,7 +33,30 @@ export interface ReferenceData extends ReferenceItem {
 }
 
 export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menuList: DisplayMenu[]): ReferenceData[] => {
-    const allMenuList = getAllSuggestionMenuList(menuList);
+    const convertMenuList = cloneDeep(menuList);
+    const costIdx = convertMenuList.findIndex((i) => i.id === MENU_ID.COST_EXPLORER);
+
+    if (convertMenuList[costIdx].subMenuList?.length === 4) {
+        convertMenuList[costIdx].subMenuList?.push(
+            {
+                id: MENU_ID.ANOMALY_DETECTION_CONFIGURATION,
+                to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION._NAME },
+                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG_TITLE'),
+            },
+            {
+                id: MENU_ID.ANOMALY_DETECTION_POLICY,
+                to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.POLICY._NAME },
+                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.POLICY_TITLE'),
+            },
+            {
+                id: MENU_ID.ANOMALY_DETECTION_HISTORY,
+                to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY._NAME },
+                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY_TITLE'),
+            },
+        );
+    }
+
+    const allMenuList = getAllSuggestionMenuList(convertMenuList);
     const results: ReferenceData[] = [];
     if (!config) return results;
 
