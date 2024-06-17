@@ -55,10 +55,18 @@ watch(() => state.isValid, (isValid) => {
 }, { immediate: true });
 
 
-const convertToMenuItem = (data: string[]) => data.map((d) => ({
-    name: d,
-    label: d,
-}));
+const convertToMenuItem = (data: string[]|string) => {
+    if (Array.isArray(data)) {
+        return data.map((d) => ({
+            name: d,
+            label: d,
+        }));
+    }
+    return {
+        name: data,
+        label: data,
+    };
+};
 
 const isIncludedInMenuItems = (data: string[]|string):boolean => {
     if (Array.isArray(data)) {
@@ -69,16 +77,10 @@ const isIncludedInMenuItems = (data: string[]|string):boolean => {
 
 onMounted(() => {
     if (state.multiselectable) {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : [state.menuItems[0]?.name],
-        };
-        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+        state.proxyValue = isIncludedInMenuItems(state.proxyValue) ? state.proxyValue : [state.menuItems[0]?.name];
+        state.selectedItem = convertToMenuItem(state.proxyValue);
     } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
-        };
+        state.proxyValue = isIncludedInMenuItems(state.proxyValue) ? state.proxyValue : state.menuItems[0]?.name;
         state.selectedItem = state.menuItems[0]?.name;
     }
 });

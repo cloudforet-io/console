@@ -31,8 +31,10 @@ const state = reactive({
         },
     ]),
     selectedFieldType: 'dynamicField',
+    selectedItem: undefined as undefined | MenuItem[] | string,
+    multiSelectable: computed(() => state.selectedFieldType === 'staticField'),
     menuItems: computed<MenuItem[]>(() => {
-        const dataTarget = state.selectedFieldType === 'staticField' ? 'data_info' : 'labels_info';
+        const dataTarget = state.multiSelectable ? 'data_info' : 'labels_info';
         if (!props.dataTable) return [];
         const dataInfoList = Object.keys(props.dataTable[dataTarget] ?? {}) ?? [];
         return dataInfoList.map((d) => ({
@@ -41,12 +43,15 @@ const state = reactive({
         }));
     }),
     isValid: computed<boolean>(() => {
-        if (!state.proxyValue?.count) return false;
-        if (state.selectedFieldType === 'staticField' && !state.proxyValue?.value?.length) return false;
-        return !!state.proxyValue?.value;
+        if (state.proxyValue?.count === undefined) return false;
+        if (state.menuItems.length === 0) return false;
+        if (Array.isArray(state.selectedItem)) {
+            return !!state.selectedItem.length;
+        }
+        return !!state.selectedItem;
     }),
     max: computed(() => props.widgetFieldSchema?.options?.max),
-    isMaxValid: computed<boolean>(() => (state.max ? (state.proxyValue?.count <= state.max) : true)),
+    isMaxValid: computed<boolean>(() => (state.max ? (state.proxyValue?.count <= state.max) && !!state.proxyValue?.count : true)),
     tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
         fieldName: state.fieldName,
         max: state.max,
@@ -56,10 +61,34 @@ const state = reactive({
 /* Event */
 const handleChangeDataFieldType = (value: string) => {
     state.selectedFieldType = value;
+    if (state.selectedFieldType === 'staticField') {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: state.menuItems[0]?.name,
+        };
+        state.selectedItem = convertToMenuItem([state.menuItems[0].name]);
+    } else {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: state.menuItems[0]?.name,
+        };
+        state.selectedItem = state.menuItems[0]?.name;
+    }
     state.proxyValue = { ...state.proxyValue, value: state.menuItems[0]?.name, fieldType: value };
 };
 const handleUpdateValue = (val: string|MenuItem[]) => {
-    state.proxyValue = { ...state.proxyValue, value: val };
+    state.selectedItem = val;
+    if (Array.isArray(val)) {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: val.map((item) => item?.name),
+        };
+    } else {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: val,
+        };
+    }
 };
 const handleUpdateCount = (val: number) => {
     if (val === state.proxyValue?.count) return;
@@ -70,14 +99,37 @@ const handleUpdateCount = (val: number) => {
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
-
+const isIncludedInMenuItems = (data: string[]|string):boolean => {
+    if (Array.isArray(data)) {
+        return data.every((d) => state.menuItems.some((m) => m?.name === d));
+    }
+    return state.menuItems.some((m) => m?.name === data);
+};
+const convertToMenuItem = (data: string[]) => data.map((d) => ({
+    name: d,
+    label: d,
+}));
 /* Init */
 onMounted(() => {
-    state.proxyValue = {
-        value: props.value?.value ?? state.menuItems[0]?.name,
-        count: props.value?.count ?? props.widgetFieldSchema?.options?.default ?? DEFAULT_COUNT,
-    };
     state.selectedFieldType = props.value?.fieldType ?? 'dynamicField';
+    if (state.selectedFieldType === 'staticField') {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : [state.menuItems[0]?.name],
+        };
+        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+    } else {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
+
+        };
+        state.selectedItem = state.menuItems[0]?.name;
+    }
+    state.proxyValue = {
+        ...state.proxyValue,
+        count: props.value?.count ?? DEFAULT_COUNT,
+    };
 });
 </script>
 
@@ -104,8 +156,8 @@ onMounted(() => {
                                class="w-full"
                 >
                     <p-select-dropdown :menu="state.menuItems"
-                                       :selected="state.proxyValue?.value"
-                                       :multi-selectable="state.selectedFieldType === 'staticField'"
+                                       :selected="state.selectedItem"
+                                       :multi-selectable="state.multiSelectable"
                                        show-select-marker
                                        appearance-type="badge"
                                        @update:selected="handleUpdateValue"
