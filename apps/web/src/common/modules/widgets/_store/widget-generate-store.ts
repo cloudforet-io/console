@@ -39,8 +39,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         overlayStep: 1,
         // Widget
         widget: undefined as undefined | WidgetModel,
-        widgetId: '',
-        selectedWidgetName: 'stackedColumnChart',
+        widgetId: 'public-widget-7b4e4d283548', // 'public-dash-7b7ae8c6cd84'
+        selectedWidgetName: 'table',
         title: '',
         description: '',
         size: 'full' as WidgetSize,
@@ -167,15 +167,15 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     data_tables: [],
                 },
                 AGGREGATE: {
-                    data_table_id: '',
+                    data_table_id: undefined,
                     group_by: [],
                 },
                 WHERE: {
-                    data_table_id: '',
+                    data_table_id: undefined,
                     conditions: [],
                 },
                 EVAL: {
-                    data_table_id: '',
+                    data_table_id: undefined,
                     formulas: [],
                 },
             };
