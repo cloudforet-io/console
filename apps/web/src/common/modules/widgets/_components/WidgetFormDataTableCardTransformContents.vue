@@ -40,7 +40,7 @@ const state = reactive({
     dataTableName: props.item.name ?? '',
     applyDisabled: computed(() => !state.dataTableName.length),
     optionsChanged: computed(() => false),
-
+    isUnsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
     operator: computed(() => props.item.operator as DataTableOperator),
 });
 
@@ -65,7 +65,7 @@ const handleConfirmModal = async () => {
         const deleteParams = {
             data_table_id: state.dataTableId,
         };
-        await widgetGenerateStore.deleteDataTable(deleteParams);
+        await widgetGenerateStore.deleteDataTable(deleteParams, state.isUnsaved);
         if (beforeSelectedDataTableId === state.dataTableId) {
             const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
             widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);

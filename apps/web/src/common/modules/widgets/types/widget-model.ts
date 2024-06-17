@@ -1,4 +1,6 @@
-import type { DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN, DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import type {
+    DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN, DATA_TABLE_OPERATOR, JOIN_TYPE,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 
 export type WidgetType = string; // TODO: make this widget type enum
 
@@ -12,6 +14,8 @@ export type TimeSeriesAnalyzeQuery = Record<string, any>;
 export type LabelsInfo = DataTableLabelKey[];
 export type DataInfo = DataTableDataKey[];
 export type DataTableOptions = DataTableAddOptions | DataTableTransformOptions;
+export type JoinType = typeof JOIN_TYPE[keyof typeof JOIN_TYPE];
+
 export interface DataTableLabelKey {
     key: string;
     name: string;
@@ -64,7 +68,7 @@ export interface ConcatOptions {
 
 export interface JoinOptions {
     data_tables: string[];
-    on?: 'LEFT' | 'RIGHT' | 'INNER' | 'OUTER';
+    how: JoinType;
 }
 
 export interface WhereOptions {

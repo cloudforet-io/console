@@ -19,7 +19,14 @@ export const DATA_TABLE_OPERATOR = {
     WHERE: 'WHERE',
     AGGREGATE: 'AGGREGATE',
     EVAL: 'EVAL',
-};
+} as const;
+
+export const JOIN_TYPE = {
+    LEFT: 'LEFT',
+    RIGHT: 'RIGHT',
+    OUTER: 'OUTER',
+    INNER: 'INNER',
+} as const;
 
 // NOTE: temporary solution for the global variable
 export const MANAGED_GLOBAL_VARIABLE = [GROUP_BY.WORKSPACE, GROUP_BY.PROJECT, GROUP_BY.SERVICE_ACCOUNT, GROUP_BY.REGION] as string[];
