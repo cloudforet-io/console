@@ -59,7 +59,7 @@ export interface DataTableTransformOptions {
     'JOIN'?: JoinOptions;
     'AGGREGATE'?: AggregateOptions;
     'WHERE'?: WhereOptions;
-    'EVALUATE'?: EvalOptions;
+    'EVAL'?: EvalOptions;
 }
 export interface ConcatOptions {
     data_tables: string[];
