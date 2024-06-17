@@ -37,7 +37,7 @@ const router = useRouter();
 const state = reactive({
     iconColor: computed<string|undefined>(() => {
         if (props.item?.itemType === FAVORITE_TYPE.PROJECT) {
-            return peacock[700];
+            return peacock[600];
         }
         if (props.item?.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
             return indigo[500];

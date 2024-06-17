@@ -8,10 +8,11 @@ import {
     PDataLoader,
     PEmpty,
     PFieldGroup,
-    PPaneLayout,
+    PPaneLayout, PRadio, PRadioGroup,
     PSelectDropdown,
     PTextHighlighting,
     PTextInput,
+    PBadge,
 } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
@@ -43,11 +44,15 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import type { AddModalMenuItem } from '@/services/iam/types/user-type';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
+interface WorkspaceDropdownMenuItem extends SelectDropdownMenuItem {
+    tags?: {
+        theme?: string;
+    };
+}
 interface Props {
     type?: NoticeFormType;
 }
@@ -71,9 +76,14 @@ const state = reactive({
 const workspaceState = reactive({
     loading: true,
     visible: false,
-    menuItems: [] as AddModalMenuItem[],
-    selectedItems: [] as AddModalMenuItem[],
+    menuItems: [] as WorkspaceDropdownMenuItem[],
+    selectedItems: [] as WorkspaceDropdownMenuItem[],
     searchText: '',
+    radioMenuList: computed(() => ([
+        i18n.t('INFO.NOTICE.FORM.ALL'),
+        i18n.t('INFO.NOTICE.FORM.SPECIFIC_WORKSPACE'),
+    ])),
+    selectedRadioIdx: 0,
 });
 
 const {
@@ -115,7 +125,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string) => {
     await fetchListWorkspaces(inputText);
     return {
-        results: workspaceState.menuItems as SelectDropdownMenuItem[],
+        results: workspaceState.menuItems as WorkspaceDropdownMenuItem[],
     };
 };
 const handleConfirm = () => {
@@ -218,8 +228,19 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                                :label="$t('INFO.NOTICE.FORM.WORKSPACE')"
                                required
                 >
-                    <p-select-dropdown use-fixed-menu-style
-                                       :placeholder="$t('INFO.NOTICE.FORM.SELECT')"
+                    <p-radio-group>
+                        <p-radio v-for="(item, idx) in workspaceState.radioMenuList"
+                                 :key="`workspace-scope-${idx}`"
+                                 v-model="workspaceState.selectedRadioIdx"
+                                 :value="idx"
+                        >
+                            <span class="radio-item">
+                                {{ item }}
+                            </span>
+                        </p-radio>
+                    </p-radio-group>
+                    <p-select-dropdown v-if="workspaceState.selectedRadioIdx === 1"
+                                       use-fixed-menu-style
                                        :visible-menu.sync="workspaceState.visible"
                                        :loading="workspaceState.loading"
                                        :search-text.sync="workspaceState.searchText"
@@ -233,6 +254,28 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                                        class="workspace-select-dropdown"
                                        :class="{'no-data': workspaceState.menuItems.length === 0 && !workspaceState.loading}"
                     >
+                        <template #dropdown-button>
+                            <div v-if="workspaceState.selectedItems.length > 0"
+                                 class="selected-workspace-wrapper"
+                            >
+                                <workspace-logo-icon :text="workspaceState.selectedItems[0].label || ''"
+                                                     :theme="workspaceState.selectedItems[0].tags?.theme"
+                                                     size="xxs"
+                                />
+                                <span>{{ workspaceState.selectedItems[0].label }}</span>
+                                <p-badge v-if="workspaceState.selectedItems.length > 1"
+                                         style-type="blue200"
+                                         badge-type="subtle"
+                                >
+                                    + {{ workspaceState.selectedItems.length - 1 }}
+                                </p-badge>
+                            </div>
+                            <span v-else
+                                  class="placeholder"
+                            >
+                                {{ $t('INFO.NOTICE.FORM.SELECT') }}
+                            </span>
+                        </template>
                         <template #menu-item--format="{item}">
                             <div class="menu-item-wrapper">
                                 <workspace-logo-icon :text="item?.label || ''"
@@ -353,6 +396,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
 
     .workspace-select-dropdown {
         width: 50%;
+        margin-top: 0.25rem;
         .no-data-wrapper {
             margin-top: 2rem;
             margin-bottom: 2rem;
@@ -360,6 +404,13 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
         .menu-item-wrapper {
             @apply flex items-center;
             gap: 0.25rem;
+        }
+        .selected-workspace-wrapper {
+            @apply flex items-center;
+            gap: 0.25rem;
+        }
+        .placeholder {
+            @apply text-gray-600;
         }
     }
 }
