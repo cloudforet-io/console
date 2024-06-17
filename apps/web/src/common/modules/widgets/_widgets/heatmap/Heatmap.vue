@@ -103,7 +103,6 @@ const state = reactive({
         },
         series: [
             {
-                name: 'project',
                 type: 'heatmap',
                 data: state.chartData,
             },
@@ -189,7 +188,7 @@ const drawChart = (rawData: Data|null) => {
     state.xAxisData.forEach((x, xIdx) => {
         state.yAxisData.forEach((y, yIdx) => {
             const _data = _xAxisGroupedData[x]?.find((v) => v[state.yAxisField] === y);
-            _chartData.push([xIdx, yIdx, _data ? _data[state.xAxisField] : 0]);
+            _chartData.push([xIdx, yIdx, _data ? _data[state.dataField] : 0]);
         });
     });
     state.chartData = _chartData;
