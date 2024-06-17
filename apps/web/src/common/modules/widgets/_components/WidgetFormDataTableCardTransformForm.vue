@@ -213,7 +213,7 @@ const handleRemoveFunction = (key: string) => {
                               icon-left="ic_plus_bold"
                               @click="handleClickAddFunction"
                     >
-                        Add Label
+                        Add Function
                     </p-button>
                 </div>
             </p-field-group>
