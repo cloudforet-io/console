@@ -129,7 +129,6 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
     }
 };
 const drawChart = (rawData: Data|null) => {
-    console.log('rawData', rawData);
     if (isEmpty(rawData)) return;
 
     // get xAxis data
