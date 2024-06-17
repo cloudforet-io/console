@@ -4,6 +4,7 @@ import { computed, onMounted, reactive } from 'vue';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
@@ -139,6 +140,15 @@ const handleCancelModal = () => {
     modalState.visible = false;
 };
 const handleUpdateDataTable = async () => {
+    const isValidDataTableId = state.dataTableInfo.dataTableId && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTableId);
+    const isValidDataTables = state.dataTableInfo.dataTables.length === 2
+        && !state.dataTableInfo.dataTables.includes(undefined)
+        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0])
+        && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
+    if (!isValidDataTableId && !isValidDataTables) {
+        showErrorMessage('Unable to apply changes. Please check the form.', '');
+        return;
+    }
     const firstUpdating = state.isUnsaved;
     const concatOptions: ConcatOptions = {
         data_tables: state.dataTableInfo.dataTables,

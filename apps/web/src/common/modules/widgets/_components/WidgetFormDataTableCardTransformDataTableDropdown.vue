@@ -137,7 +137,10 @@ onMounted(() => {
                  class="dropdown-container"
             >
                 <div ref="targetRef"
-                     :class="{'select-button': true, selected: !!state.selected}"
+                     :class="{'select-button': true,
+                              selected: !!state.selected,
+                              error: state.selected && !storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.selected?.[0]?.name)
+                     }"
                      @click="handleClickSelectButton(false)"
                 >
                     <span class="text">
@@ -169,7 +172,10 @@ onMounted(() => {
                  class="dropdown-container"
             >
                 <div ref="targetRef"
-                     :class="{'select-button': true, selected: !!state.secondarySelected}"
+                     :class="{'select-button': true,
+                              selected: !!state.secondarySelected,
+                              error: state.secondarySelected && !storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.secondarySelected?.[0]?.name)
+                     }"
                      @click="handleClickSelectButton(true)"
                 >
                     <span class="text">
@@ -236,6 +242,9 @@ onMounted(() => {
                     .text {
                         @apply text-gray-800;
                     }
+                }
+                &.error {
+                    @apply border-red-300 bg-red-100;
                 }
             }
 
