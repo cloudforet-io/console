@@ -104,6 +104,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
                     },
                 },
             },
+            vars: props.dashboardVariables,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
