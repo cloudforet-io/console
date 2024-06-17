@@ -64,6 +64,7 @@ const state = reactive({
         series: [
             {
                 type: 'treemap',
+                roam: 'move',
                 nodeClick: false,
                 breadcrumb: {
                     show: false,
