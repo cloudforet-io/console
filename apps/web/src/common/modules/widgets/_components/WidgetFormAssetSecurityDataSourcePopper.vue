@@ -61,8 +61,9 @@ const state = reactive({
                 }
             }
         });
-        return _groupMenuItems;
+        return _groupMenuItems.filter((d) => d.label.toLowerCase().includes(state.categorySearchText.toLowerCase()));
     }),
+    categorySearchText: '',
     selectedCategory: undefined as undefined|string,
     // namespace
     namespaceMenuItems: computed<MenuItem[]>(() => {
@@ -113,10 +114,13 @@ const handleSelectMetric = (item: MenuItem) => {
 <template>
     <div class="widget-form-asset-security-data-source-popper">
         <div class="data-source-select-col">
-            <p-field-title :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CATEGORY')"
+            <p-field-title class="field-title"
+                           :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CATEGORY')"
                            required
             />
             <p-context-menu :menu="state.categoryMenuItems"
+                            :search-text.sync="state.categorySearchText"
+                            searchable
                             @select="handleSelectCategory"
             >
                 <template #item--format="{ item }">
@@ -133,7 +137,8 @@ const handleSelectMetric = (item: MenuItem) => {
             </p-context-menu>
         </div>
         <div class="data-source-select-col">
-            <p-field-title :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.NAMESPACE')"
+            <p-field-title class="field-title"
+                           :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.NAMESPACE')"
                            required
             />
             <p-context-menu :menu="state.namespaceMenuItems"
@@ -143,7 +148,8 @@ const handleSelectMetric = (item: MenuItem) => {
             />
         </div>
         <div class="data-source-select-col">
-            <p-field-title :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.METRIC')"
+            <p-field-title class="field-title"
+                           :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.METRIC')"
                            required
             />
             <p-context-menu :menu="state.metricMenuItems"
@@ -166,7 +172,10 @@ const handleSelectMetric = (item: MenuItem) => {
         flex-direction: column;
         gap: 0.5rem;
         width: 16rem;
-        padding: 0.75rem;
+        padding: 0.75rem 0;
+        .field-title {
+            padding: 0 0.75rem;
+        }
         &:last-child {
             @apply border-r-0;
         }

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 
 import {
-    PButton, PPopover, PSelectCard,
+    PButton, PPopover, PSelectCard, PI,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 
@@ -19,7 +19,6 @@ import type { NamespaceReferenceMap } from '@/store/reference/namespace-referenc
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
-import WidgetFormDataSourceAddButton from '@/common/modules/widgets/_components/WidgetFormDataSourceAddButton.vue';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
@@ -27,8 +26,6 @@ import {
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableDataType, DataTableSourceType, DataTableOperator } from '@/common/modules/widgets/types/widget-model';
-
-
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const allReferenceStore = useAllReferenceStore();
@@ -94,6 +91,33 @@ const state = reactive({
         }
         return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType);
     }),
+    operatorInfoList: computed<{ key: DataTableOperator, name: string; description: string; icon: string;}[]>(() => [
+        {
+            key: DATA_TABLE_OPERATOR.CONCAT,
+            name: 'Concatenate',
+            description: 'Combines multiple tables into one by stacking tshem.',
+            icon: 'ic_db-concat',
+        },
+        {
+            key: DATA_TABLE_OPERATOR.JOIN,
+            name: 'Join',
+            description: 'Merge rows from different tables based on a common column.',
+            icon: 'ic_join',
+        },
+        {
+            key: DATA_TABLE_OPERATOR.EVAL,
+            name: 'Evaluate',
+            description: 'Apply functions or calculations to data fields.',
+            icon: 'ic_db-evaluation',
+        },
+        {
+            key: DATA_TABLE_OPERATOR.WHERE,
+            name: 'Where',
+            description: 'Filter and extract data that meet specific conditions.',
+            icon: 'ic_db-where',
+        },
+
+    ]),
 });
 
 /* Util */
@@ -178,6 +202,10 @@ watch(() => state.showPopover, (val) => {
         state.selectedPopperCondition = undefined;
     }
 });
+
+onMounted(() => {
+    console.debug(state.operatorMap);
+});
 </script>
 
 <template>
@@ -188,18 +216,27 @@ watch(() => state.showPopover, (val) => {
                hide-padding
                :trigger="POPOVER_TRIGGER.NONE"
     >
-        <widget-form-data-source-add-button @click-add="handleClickAddDataSourceButton" />
+        <button :class="{'add-button': true, opened: state.showPopover}"
+                @click="handleClickAddDataSourceButton"
+        >
+            <p-i class="icon"
+                 name="ic_plus"
+                 width="2rem"
+                 height="2rem"
+                 color="inherit"
+            />
+        </button>
         <template #content>
             <div v-if="!state.selectedPopperCondition"
                  class="data-source-popper-condition-wrapper"
             >
-                <p-select-card :label="i18n.t('Add Data Table')"
+                <p-select-card :label="i18n.t('Add Data')"
                                icon="ic_service_data-sources"
                                block
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.ADDED)"
                 />
-                <p-select-card :label="i18n.t('Add Transformation')"
-                               icon="ic_link"
+                <p-select-card :label="i18n.t('Transform Data')"
+                               icon="ic_transform-data"
                                block
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.TRANSFORMED)"
                 />
@@ -212,24 +249,53 @@ watch(() => state.showPopover, (val) => {
                         <p class="data-source-domain-title">
                             {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COST_EXPLORER') }}
                         </p>
-                        <p-select-card :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COST')"
+                        <p-select-card :class="{'custom-select-card': true, 'selected': state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST }"
                                        :value="DATA_SOURCE_DOMAIN.COST"
-                                       :selected="state.selectedDataSourceDomain"
                                        @click="handleClickDataSourceDomain(DATA_SOURCE_DOMAIN.COST)"
-                        />
+                        >
+                            <div class="domain-contents">
+                                <p-i v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST"
+                                     class="selected-marker"
+                                     name="ic_checkbox-circle-selected"
+                                     width="1.25rem"
+                                     height="1.25rem"
+                                />
+                                <div class="icon-wrapper">
+                                    <p-i name="ic_data-domain-cost"
+                                         width="1.25rem"
+                                         height="1.25rem"
+                                    />
+                                </div>
+                                <p class="name">
+                                    {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COST') }}
+                                </p>
+                            </div>
+                        </p-select-card>
                         <p class="data-source-domain-title mt-2">
                             {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.INVENTORY') }}
                         </p>
-                        <p-select-card :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.ASSET')"
+                        <p-select-card :class="{'custom-select-card': true, 'selected': state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.ASSET }"
                                        :value="DATA_SOURCE_DOMAIN.ASSET"
-                                       :selected="state.selectedDataSourceDomain"
                                        @click="handleClickDataSourceDomain(DATA_SOURCE_DOMAIN.ASSET)"
-                        />
-                        <p-select-card :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.SECURITY')"
-                                       :value="DATA_SOURCE_DOMAIN.SECURITY"
-                                       :selected="state.selectedDataSourceDomain"
-                                       @click="handleClickDataSourceDomain(DATA_SOURCE_DOMAIN.SECURITY)"
-                        />
+                        >
+                            <div class="domain-contents">
+                                <p-i v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.ASSET"
+                                     class="selected-marker"
+                                     name="ic_checkbox-circle-selected"
+                                     width="1.25rem"
+                                     height="1.25rem"
+                                />
+                                <div class="icon-wrapper">
+                                    <p-i name="ic_data-domain-asset"
+                                         width="1.25rem"
+                                         height="1.25rem"
+                                    />
+                                </div>
+                                <p class="name">
+                                    {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.ASSET') }}
+                                </p>
+                            </div>
+                        </p-select-card>
                     </div>
                     <template v-if="state.selectedDataSourceDomain">
                         <widget-form-cost-data-source-popper
@@ -259,28 +325,31 @@ watch(() => state.showPopover, (val) => {
                 </div>
             </div>
             <div v-else
-                 class="data-source-popover-content"
+                 class="data-source-popper-operator-wrapper"
             >
-                <p-select-card :label="DATA_TABLE_OPERATOR.JOIN"
-                               :value="DATA_TABLE_OPERATOR.JOIN"
-                               @click="handleClickOperator(DATA_TABLE_OPERATOR.JOIN)"
-                />
-                <p-select-card :label="DATA_TABLE_OPERATOR.CONCAT"
-                               :value="DATA_TABLE_OPERATOR.CONCAT"
-                               @click="handleClickOperator(DATA_TABLE_OPERATOR.CONCAT)"
-                />
-                <p-select-card :label="DATA_TABLE_OPERATOR.AGGREGATE"
-                               :value="DATA_TABLE_OPERATOR.AGGREGATE"
-                               @click="handleClickOperator(DATA_TABLE_OPERATOR.AGGREGATE)"
-                />
-                <p-select-card :label="DATA_TABLE_OPERATOR.EVAL"
-                               :value="DATA_TABLE_OPERATOR.EVAL"
-                               @click="handleClickOperator(DATA_TABLE_OPERATOR.EVAL)"
-                />
-                <p-select-card :label="DATA_TABLE_OPERATOR.WHERE"
-                               :value="DATA_TABLE_OPERATOR.WHERE"
-                               @click="handleClickOperator(DATA_TABLE_OPERATOR.WHERE)"
-                />
+                <p-select-card v-for="(operatorInfo) in state.operatorInfoList"
+                               :key="operatorInfo.key"
+                               value="operatorKey"
+                               label="a"
+                               block
+                               @click="handleClickOperator(operatorInfo.key)"
+                >
+                    <div class="operator-card-contents">
+                        <p-i :name="operatorInfo.icon"
+                             width="1rem"
+                             height="1rem"
+                             color="inherit"
+                        />
+                        <div class="contents-wrapper">
+                            <p class="name">
+                                {{ operatorInfo.name }}
+                            </p>
+                            <p class="description">
+                                {{ operatorInfo.description }}
+                            </p>
+                        </div>
+                    </div>
+                </p-select-card>
             </div>
         </template>
     </p-popover>
@@ -297,12 +366,53 @@ watch(() => state.showPopover, (val) => {
             padding: 0;
         }
     }
+    .add-button {
+        @apply flex items-center justify-center bg-violet-400 border border-violet-500 text-white rounded-md;
+        width: 2.5rem;
+        height: 2.5rem;
+        .icon {
+            transition: transform 0.2s ease;
+        }
+        &:hover {
+            @apply bg-violet-500;
+        }
+        &.opened {
+            @apply bg-white text-violet-500;
+            .icon {
+                transform: rotate(45deg);
+            }
+            &:hover {
+                @apply bg-violet-200;
+            }
+        }
+    }
     .data-source-popper-condition-wrapper {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        width: 16.25rem;
+        width: 21.5rem;
         padding: 1rem;
+    }
+    .data-source-popper-operator-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 21.5rem;
+        padding: 1rem;
+
+        .operator-card-contents {
+            @apply flex gap-1;
+            .contents-wrapper {
+                width: calc(100% - 1.25rem);
+                .name {
+                    @apply text-label-md font-bold text-gray-900;
+                    margin-bottom: 0.25rem;
+                }
+                .description {
+                    @apply text-label-md text-gray-500;
+                }
+            }
+        }
     }
     .data-source-popover-content {
         display: flex;
@@ -320,6 +430,45 @@ watch(() => state.showPopover, (val) => {
                 min-width: 11.5rem;
                 height: 100%;
                 padding: 1rem 0.75rem;
+
+                /* custom design-system component - p-select-card */
+                :deep(.p-select-card) {
+                    padding: 0.75rem 1.25rem;
+                    .contents {
+                        @apply flex justify-start items-center;
+                        overflow: visible;
+                    }
+                }
+                .custom-select-card {
+                    &.selected {
+                        @apply border-blue-600;
+                    }
+                    .domain-contents {
+                        @apply flex items-center gap-1 w-full relative;
+                        .icon-wrapper {
+                            @apply flex items-center justify-center rounded-xs bg-violet-150;
+                            width: 1.75rem;
+                            height: 1.75rem;
+                        }
+                        .name {
+                            @apply text-label-md font-bold text-gray-900;
+                        }
+
+                        .selected-marker {
+                            @apply absolute;
+                            left: -0.75rem;
+                            top: -0.25rem;
+                            z-index: 1;
+                        }
+
+                        &.selected {
+                            .name {
+                                @apply text-blue-600;
+                            }
+                        }
+                    }
+                }
+
                 .data-source-domain-title {
                     @apply text-label-sm font-bold text-gray-700;
                     margin-bottom: 0.5rem;
@@ -344,7 +493,10 @@ watch(() => state.showPopover, (val) => {
 
 /* custom design-system component - p-select-card */
 :deep(.p-select-card) {
-    padding: 0.5rem;
+    padding: 1rem;
+    .contents {
+        @apply flex justify-start items-center;
+    }
 }
 
 /* custom design-system component - p-context-menu */

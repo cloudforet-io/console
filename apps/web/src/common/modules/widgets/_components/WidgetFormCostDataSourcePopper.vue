@@ -61,12 +61,14 @@ const state = reactive({
         const additionalMenuItems: MenuItem[] = targetCostDataSource.data?.cost_data_keys?.map((key) => ({
             type: 'item', name: key, label: key,
         }));
-        return [
+        const dataTypeItems = [
             { type: 'item', name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },
             { type: 'item', name: 'usage', label: usageAlias ? `Usage (${usageAlias})` : 'Usage' },
             ...(additionalMenuItems || []),
         ];
+        return dataTypeItems.filter((d) => d.label.toLowerCase().includes(state.dataTypeSearchText.toLowerCase()));
     }),
+    dataTypeSearchText: '',
     selectedDataType: [] as MenuItem[],
 });
 const {
@@ -108,7 +110,8 @@ watch(() => state.selectedDataType, (val) => {
 <template>
     <div class="widget-form-cost-data-source-popper">
         <div class="data-source-select-col">
-            <p-field-title :label="i18n.t('Source')"
+            <p-field-title class="field-title"
+                           :label="i18n.t('Data Source')"
                            required
             />
             <p-context-menu :menu="refinedMenu"
@@ -120,10 +123,13 @@ watch(() => state.selectedDataType, (val) => {
             />
         </div>
         <div class="data-source-select-col">
-            <p-field-title :label="i18n.t('Data Type')"
+            <p-field-title class="field-title"
+                           :label="i18n.t('Data Type')"
                            required
             />
             <p-context-menu :menu="state.dataTypeMenuItems"
+                            :search-text.sync="state.dataTypeSearchText"
+                            searchable
                             :selected.sync="state.selectedDataType"
             />
         </div>
@@ -141,7 +147,10 @@ watch(() => state.selectedDataType, (val) => {
         flex-direction: column;
         gap: 0.5rem;
         width: 16rem;
-        padding: 0.75rem;
+        padding: 0.75rem 0;
+        .field-title {
+            padding: 0 0.75rem;
+        }
         &:last-child {
             @apply border-r-0;
         }

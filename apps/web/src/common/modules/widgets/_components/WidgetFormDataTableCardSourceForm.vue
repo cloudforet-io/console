@@ -46,6 +46,11 @@ const state = reactive({
         }
         return '';
     }),
+    sourceIcon: computed(() => {
+        if (props.sourceType === DATA_SOURCE_DOMAIN.COST) return 'ic_data-domain-cost';
+        if (props.sourceType === DATA_SOURCE_DOMAIN.ASSET) return 'ic_data-domain-asset';
+        return '';
+    }),
 });
 const modalState = reactive({
     visible: false,
@@ -127,7 +132,10 @@ watch(() => props.selected, () => {
     <div class="widget-form-data-table-card-source-form">
         <div class="selected-source">
             <div class="source-img">
-                <img>
+                <p-i :name="state.sourceIcon"
+                     width="1.25rem"
+                     height="1.25rem"
+                />
             </div>
             <span>{{ state.selectedParentSourceName }}</span>
         </div>

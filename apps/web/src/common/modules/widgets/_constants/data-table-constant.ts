@@ -17,7 +17,7 @@ export const DATA_TABLE_OPERATOR = {
     CONCAT: 'CONCAT',
     JOIN: 'JOIN',
     WHERE: 'WHERE',
-    AGGREGATE: 'AGGREGATE',
+    // AGGREGATE: 'AGGREGATE',
     EVAL: 'EVAL',
 } as const;
 
