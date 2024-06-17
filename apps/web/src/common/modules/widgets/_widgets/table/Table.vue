@@ -32,9 +32,6 @@ type Data = ListResponse<{
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
-
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
-
 const state = reactive({
     loading: false,
     data: null as Data | null,
@@ -51,6 +48,9 @@ const state = reactive({
         // }
         return { start: _start, end: _end };
     }),
+});
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange: computed(() => state.dateRange),
 });
 
 const fetchWidget = async (): Promise<Data|APIErrorToast> => {

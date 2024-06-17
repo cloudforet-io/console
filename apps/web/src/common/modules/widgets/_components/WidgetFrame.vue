@@ -68,7 +68,7 @@ const handleSelectSize = (size: WidgetSize) => {
                     <div class="metadata-content">
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.BASED_ON') }}</span>
-                            <span class="metadata-value">23/07/01 ~ 23/07/31</span>
+                            <span class="metadata-value">{{ props.basedOnText }}</span>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>

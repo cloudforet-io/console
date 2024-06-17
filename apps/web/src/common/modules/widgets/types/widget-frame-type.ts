@@ -11,13 +11,13 @@ export interface WidgetFrameProps {
     description?: string;
     size?: WidgetSize;
     width?: number;
-    // widgetLocation?: Location;
+    basedOnText?: string;
+    unit?: string;
+    fullDataLinkText?: string;
+    fullDataLocation?: Location;
     //
     mode: 'overlay'|'view';
-    // dateText?: string;
-    // currency?: Currency;
-
-    // loading?: boolean;
+    loading?: boolean;
     // editMode?: boolean;
     // errorMode?: boolean;
     // theme?: WidgetTheme;
