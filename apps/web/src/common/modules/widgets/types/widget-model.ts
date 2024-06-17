@@ -59,7 +59,7 @@ export interface DataTableTransformOptions {
     'JOIN'?: JoinOptions;
     'AGGREGATE'?: AggregateOptions;
     'WHERE'?: WhereOptions;
-    'EVALUATE'?: EvalOptions;
+    'EVAL'?: EvalOptions;
 }
 export interface ConcatOptions {
     data_tables: string[];
@@ -84,4 +84,15 @@ export interface AggregateOptions {
 export interface EvalOptions {
     data_table_id: string;
     formulas: any[]; // TODO: define formula type
+}
+
+export interface WhereCondition {
+    key: string;
+    value: string;
+}
+
+export interface EvalFormula {
+    key: string;
+    name: string;
+    value: string;
 }

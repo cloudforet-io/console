@@ -26,7 +26,7 @@ import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type {
-    DataTableOperator, DataTableTransformOptions,
+    DataTableOperator,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -48,7 +48,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         widgetValidMap: {} as Record<string, boolean>,
         // Data Table
         selectedDataTableId: undefined as undefined | string,
-        dataTables: [] as DataTableModel[],
+        dataTables: [] as Partial<DataTableModel>[],
         selectedPreviewGranularity: GRANULARITY.MONTHLY as Granularity,
         previewData: { results: [], total_count: 0 } as ListResponse<any>,
         dataTableUpdating: false,
@@ -56,7 +56,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     });
 
     const getters = reactive({
-        selectedDataTable: computed<DataTableModel|undefined>(() => state.dataTables.find((dataTable) => dataTable.data_table_id === state.selectedDataTableId)),
+        selectedDataTable: computed<Partial<DataTableModel>|undefined>(() => state.dataTables.find((dataTable) => dataTable.data_table_id === state.selectedDataTableId)),
     });
 
     /* Mutations */
@@ -155,7 +155,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             const options = {
                 JOIN: {
                     data_tables: [],
-                    on: undefined,
+                    how: undefined,
                 },
                 CONCAT: {
                     data_tables: [],
@@ -168,7 +168,11 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     data_table_id: '',
                     conditions: [],
                 },
-            } as DataTableTransformOptions;
+                EVAL: {
+                    data_table_id: '',
+                    formulas: [],
+                },
+            };
             const unsavedTransformData = {
                 data_table_id: `UNSAVED-${getRandomId()}`,
                 name: `${operatorType} Data`,
@@ -177,7 +181,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 options: {
                     [operatorType]: options[operatorType],
                 },
-            } as DataTableModel;
+            } as Partial<DataTableModel>;
             state.dataTables.push(unsavedTransformData);
         },
         updateDataTable: async (updateParams: DataTableUpdateParameters, unsaved?: boolean) => {
