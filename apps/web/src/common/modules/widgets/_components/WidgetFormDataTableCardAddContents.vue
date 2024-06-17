@@ -29,7 +29,11 @@ import WidgetFormDataTableCardHeaderTitle
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
 import WidgetFormDataTableCardSourceForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardSourceForm.vue';
-import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DATA_SOURCE_DOMAIN,
+    DATA_TABLE_OPERATOR,
+    DATA_TABLE_TYPE,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { AdditionalLabel, DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { AdditionalLabels, DateFormat } from '@/common/modules/widgets/types/widget-model';
@@ -179,7 +183,18 @@ const handleSelectSourceItem = (selectedItem: string) => {
 };
 
 const handleClickDeleteDataTable = async () => {
-    // TODO: Check if the data is in use
+    const isExistingDataTableInTransformed = storeState.dataTables.find((dataTable) => {
+        const isTransformedData = dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED;
+        if (!isTransformedData) return undefined;
+        const isDualDataTableOperator = dataTable.operator === DATA_TABLE_OPERATOR.CONCAT || dataTable.operator === DATA_TABLE_OPERATOR.JOIN;
+        const operatorOptions = (dataTable.options ?? {})[dataTable.operator ?? ''];
+        return isDualDataTableOperator ? operatorOptions?.data_tables.includes(state.dataTableId) : operatorOptions?.data_table_id === state.dataTableId;
+    });
+    if (isExistingDataTableInTransformed) {
+        modalState.mode = 'DELETE_UNABLED';
+        modalState.visible = true;
+        return;
+    }
     modalState.mode = 'DELETE';
     modalState.visible = true;
 };
