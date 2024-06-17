@@ -32,7 +32,7 @@ const emit = defineEmits<{(e: 'update:is-valid', isValid:boolean): void;
 }>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
-    isMaxValid: computed<boolean>(() => (props.max ? ((state.proxyValue?.count <= props.max) && !!state.proxyValue.count) : true)),
+    isMaxValid: computed<boolean>(() => (props.max ? ((state.proxyValue?.count <= props.max) && !!state.proxyValue?.count) : true)),
     tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
         fieldName: props.fieldName,
         max: props.max,
@@ -53,7 +53,7 @@ const handleUpdateCount = (val: number) => {
 /* Watcher */
 watch(() => state.isAllValid, (isValid) => {
     emit('update:is-valid', isValid);
-});
+}, { immediate: true });
 
 /* Init */
 onMounted(() => {
