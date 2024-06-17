@@ -2648,6 +2648,7 @@
 			"DOMAIN_NOTICE": "내부 공지",
 			"FORM": {
 				"ALL_DOMAINS": "전체 고객사",
+				"ALL_WORKSPACE": "전체 워크스페이스",
 				"ALT_E_CREATE_NOTICE": "공지사항 생성 실패",
 				"ALT_E_DELETE_NOTICE": "공지사항 삭제 실패",
 				"ALT_E_SEND_EMAIL": "이메일 발송 실패",
@@ -2660,6 +2661,7 @@
 				"CONFIRM": "확인",
 				"CONTENT_REQUIRED": "본문을 입력해 주세요.",
 				"CREATE_NOTICE": "새 공지사항 등록",
+				"CREATE_WORKSPACE": "워크스페이스 생성",
 				"DELETE": "삭제",
 				"DELETE_MODAL_CONTENTS": "본 공지사항을 삭제 하시겠습니까?",
 				"DELETE_MODAL_TITLE": "공지사항 삭제",
@@ -2670,13 +2672,16 @@
 				"LABEL_TITLE": "제목",
 				"LABEL_VIEWER": "노출 대상",
 				"LABEL_WRITER_NAME": "작성자명",
+				"NO_WORKSPACE": "워크스페이스 없음",
 				"PIN_NOTICE": "상단 고정",
 				"PLACEHOLDER_ALL": "전체",
 				"PLACEHOLDER_REQUIRED": "필수입력",
+				"SELECT": "선택하기",
 				"SELECTED_DOMAIN": "선택된 고객사",
 				"SEND_EMAIL_MODAL_DESC": "{domainText} 도메인에 등록된 계정으로 메일을 전송합니다.",
 				"SEND_EMAIL_MODAL_TITLE": "이메일 전송",
 				"TITLE_REQUIRED": "제목을 입력해 주세요.",
+				"WORKSPACE": "워크스페이스",
 				"WRITER_REQUIRED": "작성자명을 입력해 주세요."
 			},
 			"MAIN": {

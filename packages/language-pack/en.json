@@ -2648,6 +2648,7 @@
 			"DOMAIN_NOTICE": "Internal Notice",
 			"FORM": {
 				"ALL_DOMAINS": "All Domains",
+				"ALL_WORKSPACE": "All Workspaces",
 				"ALT_E_CREATE_NOTICE": "Failed to create notice",
 				"ALT_E_DELETE_NOTICE": "Failed to delete notice",
 				"ALT_E_SEND_EMAIL": "Failed to send email",
@@ -2660,6 +2661,7 @@
 				"CONFIRM": "Confirm",
 				"CONTENT_REQUIRED": "Content is required",
 				"CREATE_NOTICE": "Create Notice",
+				"CREATE_WORKSPACE": "Create Workspace",
 				"DELETE": "Delete",
 				"DELETE_MODAL_CONTENTS": "Are you sure you want to delete the notice?",
 				"DELETE_MODAL_TITLE": "Delete Notice",
@@ -2670,13 +2672,16 @@
 				"LABEL_TITLE": "Title",
 				"LABEL_VIEWER": "Viewer",
 				"LABEL_WRITER_NAME": "Writer Name",
+				"NO_WORKSPACE": "No Workspace",
 				"PIN_NOTICE": "Pin Notice",
 				"PLACEHOLDER_ALL": "All",
 				"PLACEHOLDER_REQUIRED": "Required",
+				"SELECT": "Select",
 				"SELECTED_DOMAIN": "Selected Domain",
 				"SEND_EMAIL_MODAL_DESC": "{domainText}",
 				"SEND_EMAIL_MODAL_TITLE": "Send Email",
 				"TITLE_REQUIRED": "Title is required",
+				"WORKSPACE": "Workspace",
 				"WRITER_REQUIRED": "Writer name is required"
 			},
 			"MAIN": {
