@@ -34,6 +34,7 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -96,17 +97,20 @@ const state = reactive({
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     lineByField: computed<string|undefined>(() => (props.widgetOptions?.lineBy as LineByValue)?.value as string),
     lineByCount: computed<number>(() => (props.widgetOptions?.lineBy as LineByValue)?.count as number),
+    dateRange: computed<DateRange>(() => {
+        let _start = state.basedOnDate;
+        let _end = state.basedOnDate;
+        if (state.xAxisField === DATE_FIELD) {
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+        }
+        return { start: _start, end: _end };
+    }),
 });
 
 /* Util */
 const fetchWidget = async (): Promise<Data|APIErrorToast> => {
     try {
         state.loading = true;
-        let _start = state.basedOnDate;
-        let _end = state.basedOnDate;
-        if (state.xAxisField === DATE_FIELD) {
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
-        }
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
@@ -115,8 +119,8 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _start,
-                end: _end,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
                 group_by: [state.xAxisField, state.lineByField],
                 fields: {
                     [state.dataField]: {
@@ -140,8 +144,7 @@ const drawChart = (rawData: Data|null) => {
     // set xAxis data
     let _xAxisData: string[] = [];
     if (state.xAxisField === DATE_FIELD) {
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
-        _xAxisData = getWidgetDateFields(state.granularity, _start, _end);
+        _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
         _xAxisData = Array.from(new Set(rawData.results?.map((v) => v[state.xAxisField] as string)));
     }

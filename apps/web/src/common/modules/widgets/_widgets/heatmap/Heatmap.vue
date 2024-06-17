@@ -33,10 +33,11 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { GroupByValue, XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { XAxisValue, YAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 type Data = ListResponse<{
@@ -118,22 +119,25 @@ const state = reactive({
     //
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
+    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
-    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
-    groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy as GroupByValue)?.value as string),
-    groupByCount: computed<number>(() => (props.widgetOptions?.groupBy as GroupByValue)?.count as number),
+    yAxisField: computed<string>(() => (props.widgetOptions?.yAxis as YAxisValue)?.value),
+    yAxisCount: computed<number>(() => (props.widgetOptions?.yAxis as YAxisValue)?.count),
+    dateRange: computed<DateRange>(() => {
+        let _start = state.basedOnDate;
+        let _end = state.basedOnDate;
+        if (state.xAxisField === DATE_FIELD) {
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+        }
+        return { start: _start, end: _end };
+    }),
 });
 
 /* Util */
 const fetchWidget = async (): Promise<Data|APIErrorToast> => {
     try {
         state.loading = true;
-        let _start = state.basedOnDate;
-        let _end = state.basedOnDate;
-        if (state.xAxisField === DATE_FIELD) {
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
-        }
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
@@ -142,9 +146,9 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _start,
-                end: _end,
-                group_by: [state.xAxisField, state.groupByField],
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                group_by: [state.xAxisField, state.yAxisField],
                 fields: {
                     [state.dataField]: {
                         key: state.dataField,
@@ -167,21 +171,20 @@ const drawChart = (rawData: Data|null) => {
     // get xAxis, yAxis data
     let _xAxisData: string[] = [];
     if (state.xAxisField === DATE_FIELD) {
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
-        _xAxisData = getWidgetDateFields(state.granularity, _start, _end);
+        _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
         _xAxisData = Array.from(new Set(rawData.results?.map((v) => v[state.xAxisField] as string)));
     }
     state.xAxisData = _xAxisData.slice(0, state.xAxisCount);
-    state.yAxisData = Array.from(new Set(rawData.results?.map((v) => v[state.groupByField]))).slice(0, state.groupByCount);
+    state.yAxisData = Array.from(new Set(rawData.results?.map((v) => v[state.yAxisField]))).slice(0, state.yAxisCount);
 
     // get chart data
     const _xAxisGroupedData = groupBy(rawData?.results, state.xAxisField);
     const _chartData: any[] = [];
     state.xAxisData.forEach((x, xIdx) => {
         state.yAxisData.forEach((y, yIdx) => {
-            const _data = _xAxisGroupedData[x]?.find((v) => v[state.groupByField] === y);
-            _chartData.push([xIdx, yIdx, _data ? _data[state.dataField] : 0]);
+            const _data = _xAxisGroupedData[x]?.find((v) => v[state.yAxisField] === y);
+            _chartData.push([xIdx, yIdx, _data ? _data[state.xAxisField] : 0]);
         });
     });
     state.chartData = _chartData;
