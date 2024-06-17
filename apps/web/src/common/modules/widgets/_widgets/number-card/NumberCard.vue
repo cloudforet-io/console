@@ -83,7 +83,7 @@ const state = reactive({
 });
 
 /* Util */
-const fetchWidget = async (): Promise<Data|null|APIErrorToast> => {
+const fetchWidget = async (): Promise<Data|APIErrorToast> => {
     try {
         state.loading = true;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
@@ -105,6 +105,7 @@ const fetchWidget = async (): Promise<Data|null|APIErrorToast> => {
                     },
                 },
             },
+            vars: props.dashboardVariables,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -115,13 +116,9 @@ const fetchWidget = async (): Promise<Data|null|APIErrorToast> => {
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
-    if (data) {
-        state.data = data;
-    } else {
-        const res = await fetchWidget();
-        if (typeof res === 'function') return res;
-        state.data = null;
-    }
+    const res = data ?? await fetchWidget();
+    if (typeof res === 'function') return res;
+    state.data = res;
     return state.data;
 };
 

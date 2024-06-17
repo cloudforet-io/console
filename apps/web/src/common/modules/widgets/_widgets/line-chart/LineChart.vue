@@ -99,7 +99,7 @@ const state = reactive({
 });
 
 /* Util */
-const fetchWidget = async (): Promise<Data|null|APIErrorToast> => {
+const fetchWidget = async (): Promise<Data|APIErrorToast> => {
     try {
         state.loading = true;
         let _start = state.basedOnDate;
@@ -125,6 +125,7 @@ const fetchWidget = async (): Promise<Data|null|APIErrorToast> => {
                     },
                 },
             },
+            vars: props.dashboardVariables,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -167,13 +168,9 @@ const drawChart = (rawData: Data|null) => {
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
-    if (data) {
-        state.data = data;
-    } else {
-        const res = await fetchWidget();
-        if (typeof res === 'function') return res;
-        state.data = res;
-    }
+    const res = data ?? await fetchWidget();
+    if (typeof res === 'function') return res;
+    state.data = res;
     drawChart(state.data);
     return state.data;
 };
