@@ -56,7 +56,7 @@ const state = reactive({
 
 const getIconColor = (itemType: FavoriteType): string|undefined => {
     if (itemType === FAVORITE_TYPE.PROJECT) {
-        return peacock[700];
+        return peacock[600];
     }
     if (itemType === FAVORITE_TYPE.PROJECT_GROUP) {
         return indigo[500];
