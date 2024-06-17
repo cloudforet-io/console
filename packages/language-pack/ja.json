@@ -1501,7 +1501,8 @@
 				"SUB_TITLE_OVERALL": "サマリ",
 				"SUB_TITLE_PROJECT_SUMMARY": "サマリ情報",
 				"TITLE": "Trusted Advisor"
-			}
+			},
+			"UNABLE_TO_LOAD_WIDGET": ""
 		}
 	},
 	"DASHBOARDS": {

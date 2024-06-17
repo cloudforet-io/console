@@ -1501,7 +1501,8 @@
 				"SUB_TITLE_OVERALL": "Overall",
 				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
 				"TITLE": "Trusted Advisor"
-			}
+			},
+			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget"
 		}
 	},
 	"DASHBOARDS": {
