@@ -69,10 +69,16 @@ const isIncludedInMenuItems = (data: string[]|string):boolean => {
 
 onMounted(() => {
     if (state.multiselectable) {
-        state.proxyValue.value = isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : [state.menuItems[0]?.name];
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : [state.menuItems[0]?.name],
+        };
         state.selectedItem = convertToMenuItem(state.proxyValue?.value);
     } else {
-        state.proxyValue.value = isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name;
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
+        };
         state.selectedItem = state.menuItems[0]?.name;
     }
 });
