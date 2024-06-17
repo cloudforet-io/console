@@ -28,6 +28,7 @@ import {
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -80,13 +81,16 @@ const state = reactive({
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
+    dateRange: computed<DateRange>(() => {
+        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
+        return { start: _start, end: _end };
+    }),
 });
 
 /* Util */
 const fetchWidget = async (): Promise<Data|APIErrorToast> => {
     try {
         state.loading = true;
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
@@ -95,8 +99,8 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _start,
-                end: _end,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
                 group_by: [DATE_FIELD],
                 fields: {
                     [state.dataField]: {

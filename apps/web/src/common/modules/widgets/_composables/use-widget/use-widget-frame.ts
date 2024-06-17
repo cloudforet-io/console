@@ -2,13 +2,13 @@ import type { UnwrapRef } from 'vue';
 import { computed } from 'vue';
 
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import type { WidgetProps, WidgetEmit, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetProps, WidgetSize, WidgetFrameEmit } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
 
 export const useWidgetFrame = (
     props: UnwrapRef<WidgetProps>,
-    emit: WidgetEmit,
+    emit: WidgetFrameEmit,
 ) => {
     const _widgetConfig = getWidgetConfig(props.widgetName);
     const _title = computed<string>(() => props.title ?? _widgetConfig?.meta.title ?? '');

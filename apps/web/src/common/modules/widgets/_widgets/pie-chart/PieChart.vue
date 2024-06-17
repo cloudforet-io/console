@@ -24,7 +24,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -97,13 +99,17 @@ const state = reactive({
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy as GroupByValue)?.value as string),
     groupByCount: computed<number>(() => (props.widgetOptions?.groupBy as GroupByValue)?.count as number),
+    dateRange: computed<DateRange>(() => {
+        const _dateRangeCount = state.groupByField === DATE_FIELD ? state.groupByCount : 1;
+        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
+        return { start: _start, end: _end };
+    }),
 });
 
 /* Util */
 const fetchWidget = async (): Promise<Data|APIErrorToast> => {
     try {
         state.loading = true;
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 1);
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
@@ -112,8 +118,8 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _start,
-                end: _end,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
                 group_by: [state.groupByField],
                 fields: {
                     [state.dataField]: {
