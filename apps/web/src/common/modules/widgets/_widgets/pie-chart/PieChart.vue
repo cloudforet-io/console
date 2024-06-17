@@ -38,10 +38,7 @@ type Data = ListResponse<{
 }>;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
-
 const chartContext = ref<HTMLElement|null>(null);
-
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 const state = reactive({
     loading: true,
     data: null as Data | null,
@@ -104,6 +101,9 @@ const state = reactive({
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
         return { start: _start, end: _end };
     }),
+});
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange: computed(() => state.dateRange),
 });
 
 /* Util */

@@ -46,9 +46,6 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
-
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
-
 const state = reactive({
     loading: false,
     data: null as Data | null,
@@ -101,6 +98,9 @@ const state = reactive({
         }
         return { start: _start, end: _end };
     }),
+});
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange: computed(() => state.dateRange),
 });
 
 /* Util */
