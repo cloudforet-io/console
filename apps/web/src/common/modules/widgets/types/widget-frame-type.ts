@@ -19,6 +19,6 @@ export interface WidgetFrameProps {
     mode: 'overlay'|'view';
     loading?: boolean;
     // editMode?: boolean;
-    // errorMode?: boolean;
+    errorMessage?: string;
     // theme?: WidgetTheme;
 }

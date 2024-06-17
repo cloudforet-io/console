@@ -1501,7 +1501,8 @@
 				"SUB_TITLE_OVERALL": "전체요약",
 				"SUB_TITLE_PROJECT_SUMMARY": "요약 정보",
 				"TITLE": "Trusted Advisor"
-			}
+			},
+			"UNABLE_TO_LOAD_WIDGET": ""
 		}
 	},
 	"DASHBOARDS": {

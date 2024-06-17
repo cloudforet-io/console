@@ -246,6 +246,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.title = '';
             state.description = '';
             state.size = 'full';
+            state.widgetValidMap = {};
+            state.widgetValueMap = {};
         },
         setWidgetForm: (widgetInfo?: WidgetModel) => {
             state.selectedWidgetName = widgetInfo?.widget_type || 'table';

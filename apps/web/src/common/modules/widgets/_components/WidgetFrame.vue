@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PI, PIconButton, PPopover, PSelectDropdown, PLink,
+    PI, PIconButton, PPopover, PSelectDropdown, PLink, PEmpty,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -53,7 +53,8 @@ const handleSelectSize = (size: WidgetSize) => {
             <h3 class="title">
                 {{ props.title }}
             </h3>
-            <p-popover class="metric-select-guide-popover"
+            <p-popover v-if="!props.errorMessage"
+                       class="metric-select-guide-popover"
                        position="bottom-start"
                        :trigger="POPOVER_TRIGGER.CLICK"
             >
@@ -113,7 +114,22 @@ const handleSelectSize = (size: WidgetSize) => {
             />
         </div>
         <div class="body-wrapper">
-            <slot />
+            <slot v-if="!props.errorMessage" />
+            <p-empty v-else
+                     class="empty-content"
+                     :title="$t('COMMON.WIDGETS.UNABLE_TO_LOAD_WIDGET')"
+                     :show-image="props.size !== WIDGET_SIZE.sm"
+            >
+                <template #image>
+                    <img class="empty-image"
+                         alt="empty-default-image"
+                         src="@/assets/images/img_ghost_no-connection.png"
+                    >
+                </template>
+                <p class="empty-text">
+                    {{ props.errorMessage }}
+                </p>
+            </p-empty>
         </div>
         <p-select-dropdown v-if="state.sizeDropdownMenuItems.length > 1"
                            class="widget-size-dropdown"
@@ -185,6 +201,12 @@ const handleSelectSize = (size: WidgetSize) => {
     }
     .body-wrapper {
         height: 100%;
+    }
+    .empty-content {
+        height: 100%;
+        .empty-image {
+            opacity: 50%;
+        }
     }
     .action-button-wrapper {
         @apply bg-gray-150 rounded-lg;

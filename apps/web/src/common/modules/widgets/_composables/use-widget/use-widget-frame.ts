@@ -23,6 +23,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 interface OverridableWidgetFrameState {
     dateRange?: DateRange | ComputedRef<DateRange>;
+    errorMessage?: string | ComputedRef<string>;
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 
@@ -122,7 +123,7 @@ export const useWidgetFrame = (
         fullDataLinkText: _state.fullDataLinkText,
         fullDataLocation: _state.fullDataLocation,
         // editMode: props.editMode,
-        // errorMode: props.errorMode,
+        errorMessage: overrides.errorMessage?.value,
     }));
 
     const widgetFrameEventHandlers = {
