@@ -126,6 +126,7 @@ onUnmounted(() => {
                            :title="widgetGenerateState.title"
                            :description="widgetGenerateState.description"
                            :widget-options="widgetGenerateState.widgetValueMap"
+                           :dashboard-options="dashboardDetailState.options"
                            :dashboard-variables="dashboardDetailState.variables"
                            mode="overlay"
                            @update-size="handleUpdateWidgetSize"
