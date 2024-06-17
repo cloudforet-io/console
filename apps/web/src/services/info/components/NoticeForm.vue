@@ -1,17 +1,36 @@
 <script setup lang="ts">
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PPaneLayout, PFieldGroup, PTextInput, PCheckbox, PButton, PDataLoader,
+    PButton,
+    PCheckbox,
+    PDataLoader,
+    PEmpty,
+    PFieldGroup,
+    PPaneLayout,
+    PSelectDropdown,
+    PTextHighlighting,
+    PTextInput,
 } from '@spaceone/design-system';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
+import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -22,9 +41,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import type { AddModalMenuItem } from '@/services/iam/types/user-type';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 interface Props {
     type?: NoticeFormType;
@@ -38,11 +60,20 @@ const props = withDefaults(defineProps<Props>(), {
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 
+const router = useRouter();
+
 const state = reactive({
     userName: computed<string>(() => store.state.user.name),
     isPinned: false,
     isPopup: false,
     attachments: [] as Attachment[],
+});
+const workspaceState = reactive({
+    loading: true,
+    visible: false,
+    menuItems: [] as AddModalMenuItem[],
+    selectedItems: [] as AddModalMenuItem[],
+    searchText: '',
 });
 
 const {
@@ -81,10 +112,17 @@ const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
 const { fileUploader } = useFileUploader();
 const { getProperRouteLocation } = useProperRouteLocation();
 
+const workspaceMenuHandler: AutocompleteHandler = async (inputText: string) => {
+    await fetchListWorkspaces(inputText);
+    return {
+        results: workspaceState.menuItems as SelectDropdownMenuItem[],
+    };
+};
 const handleConfirm = () => {
     if (props.type === 'CREATE') handleCreateNotice();
     else if (props.type === 'EDIT') handleEditNotice();
 };
+
 
 const handleCreateNotice = async () => {
     try {
@@ -118,6 +156,31 @@ const handleEditNotice = async () => {
     }
 };
 
+const workspaceListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(1).setPageLimit(15)
+    .setSort('name', true);
+const fetchListWorkspaces = async (inputText: string) => {
+    workspaceState.loading = true;
+
+    workspaceListApiQueryHelper.setFilters([
+        { k: 'name', v: inputText, o: '' },
+        { k: 'state', v: 'ENABLED', o: '' },
+    ]);
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+            query: workspaceListApiQueryHelper.data,
+        });
+        workspaceState.menuItems = (results ?? []).map((role) => ({
+            label: role.name,
+            name: role.workspace_id,
+            tags: role.tags,
+        }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        workspaceState.loading = false;
+    }
+};
 
 watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([notice, loading]) => {
     if (loading) return;
@@ -150,6 +213,62 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                                       @update:value="setForm('writerName', $event)"
                         />
                     </template>
+                </p-field-group>
+                <p-field-group class="notice-label-wrapper"
+                               :label="$t('INFO.NOTICE.FORM.WORKSPACE')"
+                               required
+                >
+                    <p-select-dropdown use-fixed-menu-style
+                                       :placeholder="$t('INFO.NOTICE.FORM.SELECT')"
+                                       :visible-menu.sync="workspaceState.visible"
+                                       :loading="workspaceState.loading"
+                                       :search-text.sync="workspaceState.searchText"
+                                       :selected.sync="workspaceState.selectedItems"
+                                       :handler="workspaceMenuHandler"
+                                       show-select-marker
+                                       is-filterable
+                                       multi-selectable
+                                       appearance-type="badge"
+                                       show-delete-all-button
+                                       class="workspace-select-dropdown"
+                                       :class="{'no-data': workspaceState.menuItems.length === 0 && !workspaceState.loading}"
+                    >
+                        <template #menu-item--format="{item}">
+                            <div class="menu-item-wrapper">
+                                <workspace-logo-icon :text="item?.label || ''"
+                                                     :theme="item?.tags?.theme"
+                                                     size="xxs"
+                                />
+                                <p-text-highlighting class="label-text"
+                                                     :text="item.label"
+                                                     :term="workspaceState.searchText"
+                                />
+                            </div>
+                        </template>
+                        <template #no-data-area>
+                            <p-empty v-if="workspaceState.menuItems.length === 0 && !workspaceState.loading"
+                                     image-size="sm"
+                                     show-image
+                                     show-button
+                                     class="no-data-wrapper"
+                            >
+                                <template #image>
+                                    <img src="@/assets/images/illust_planet.svg"
+                                         alt="empty-options"
+                                    >
+                                </template>
+                                <template #button>
+                                    <p-button style-type="substitutive"
+                                              icon-left="ic_plus_bold"
+                                              @click="router.push({ name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME) })"
+                                    >
+                                        {{ $t('INFO.NOTICE.FORM.CREATE_WORKSPACE') }}
+                                    </p-button>
+                                </template>
+                                {{ $t('INFO.NOTICE.FORM.NO_WORKSPACE') }}
+                            </p-empty>
+                        </template>
+                    </p-select-dropdown>
                 </p-field-group>
                 <p-field-group class="notice-label-wrapper"
                                :label="$t('INFO.NOTICE.FORM.LABEL_TITLE')"
@@ -230,6 +349,18 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
     }
     .notice-create-options-wrapper {
         @apply flex flex-col gap-2;
+    }
+
+    .workspace-select-dropdown {
+        width: 50%;
+        .no-data-wrapper {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .menu-item-wrapper {
+            @apply flex items-center;
+            gap: 0.25rem;
+        }
     }
 }
 .notice-create-buttons-wrapper {
