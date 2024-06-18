@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { PHeading, PIconButton } from '@spaceone/design-system';
 
+import AnomalyDetectionConfigurationInformation
+    from '@/services/cost-explorer/components/AnomalyDetectionConfigurationInformation.vue';
 import AnomalyDetectionConfigurationTrend
     from '@/services/cost-explorer/components/AnomalyDetectionConfigurationTrend.vue';
 </script>
@@ -19,6 +21,7 @@ import AnomalyDetectionConfigurationTrend
             </template>
         </p-heading>
         <anomaly-detection-configuration-trend class="form" />
+        <anomaly-detection-configuration-information class="form" />
     </div>
 </template>
 

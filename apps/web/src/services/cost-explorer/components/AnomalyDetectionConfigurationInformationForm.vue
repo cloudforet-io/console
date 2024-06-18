@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PSelectDropdown,
+    PFieldGroup, PTextInput, PSelectDropdown, PButton,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -16,6 +16,14 @@ import {
     CONFIG_POLICY_TEMP_DATA,
     CONFIGURATION_CATEGORY_MENU,
 } from '@/services/cost-explorer/constants/anomaly-detection-constant';
+
+interface Props {
+    isDetailPage: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isDetailPage: false,
+});
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -51,61 +59,80 @@ const {
 
 <template>
     <div class="anomaly-detection-configuration-information-form">
-        <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_NAME')"
-                       required
-                       :invalid="invalidState.name"
-                       :invalid-text="invalidTexts.name"
-                       class="field"
-        >
-            <p-text-input :value="name"
-                          block
-                          :placeholder="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_NAME_PLACEHOLDER')"
-                          :invalid="invalidState.name"
-                          @update:value="setForm('name', $event)"
-            />
-        </p-field-group>
-        <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_POLICY')"
-                       required
-                       class="field"
-        >
-            <p-select-dropdown class="select-options-dropdown"
-                               :menu="CONFIG_POLICY_TEMP_DATA"
-                               :placeholder="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_POLICY_PLACEHOLDER')"
-            />
-        </p-field-group>
-        <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_DATA_SOURCE')"
-                       required
-                       class="field"
-        >
-            <p-select-dropdown class="select-options-dropdown"
-                               :menu="state.providerList"
-                               :placeholder="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_DATASOURCE_PLACEHOLDER')"
-            />
-        </p-field-group>
-        <div class="category-wrapper field">
-            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_CATEGORY')"
+        <div>
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_NAME')"
                            required
+                           :invalid="invalidState.name"
+                           :invalid-text="invalidTexts.name"
+                           class="field"
             >
-                <p-select-dropdown class="select-options-dropdown"
-                                   :menu="CONFIGURATION_CATEGORY_MENU"
-                                   :placeholder="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_CATEGORY_PLACEHOLDER')"
+                <p-text-input :value="name"
+                              block
+                              :placeholder="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_NAME_PLACEHOLDER')"
+                              :invalid="invalidState.name"
+                              @update:value="setForm('name', $event)"
                 />
             </p-field-group>
-            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_ITEM')"
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_POLICY')"
                            required
-                           class="col-item"
+                           class="field"
             >
                 <p-select-dropdown class="select-options-dropdown"
-                                   :menu="CONFIGURATION_CATEGORY_MENU"
-                                   :placeholder="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_ITEM_PLACEHOLDER')"
+                                   :menu="CONFIG_POLICY_TEMP_DATA"
+                                   :placeholder="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_POLICY_PLACEHOLDER')"
                 />
             </p-field-group>
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_DATA_SOURCE')"
+                           required
+                           class="field"
+            >
+                <p-select-dropdown class="select-options-dropdown"
+                                   :menu="state.providerList"
+                                   :placeholder="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_DATASOURCE_PLACEHOLDER')"
+                />
+            </p-field-group>
+            <div class="category-wrapper field">
+                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_CATEGORY')"
+                               required
+                >
+                    <p-select-dropdown class="select-options-dropdown"
+                                       :menu="CONFIGURATION_CATEGORY_MENU"
+                                       :placeholder="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_CATEGORY_PLACEHOLDER')"
+                    />
+                </p-field-group>
+                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_ITEM')"
+                               required
+                               class="col-item"
+                >
+                    <p-select-dropdown class="select-options-dropdown"
+                                       :menu="CONFIGURATION_CATEGORY_MENU"
+                                       :placeholder="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_ITEM_PLACEHOLDER')"
+                    />
+                </p-field-group>
+            </div>
+        </div>
+        <div v-if="props.isDetailPage"
+             class="buttons-wrapper"
+        >
+            <p-button style-type="tertiary"
+                      size="md"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CANCEL') }}
+            </p-button>
+            <p-button style-type="primary"
+                      size="md"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.SAVE_CHANGES') }}
+            </p-button>
         </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .anomaly-detection-configuration-information-form {
+    padding-right: 1rem;
+    padding-bottom: 1.5rem;
+    padding-left: 1rem;
     .field {
         max-width: 30rem;
         margin-top: 0.5rem;
@@ -119,6 +146,12 @@ const {
         .col-item {
             flex: 1;
         }
+    }
+    .buttons-wrapper {
+        @apply inline-flex;
+        margin-top: -0.625rem;
+        margin-bottom: 1rem;
+        gap: 0.5rem;
     }
 }
 </style>
