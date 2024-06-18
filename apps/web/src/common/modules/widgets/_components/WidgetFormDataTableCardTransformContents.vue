@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
+import { isEqual } from 'lodash';
+
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
@@ -57,11 +59,12 @@ const state = reactive({
         return true;
     }),
     optionsChanged: computed(() => {
-        const dataTablesChanged = state.dataTableInfo.dataTables !== originState.dataTableInfo.dataTables;
+        const dataTablesChanged = !isEqual(state.dataTableInfo.dataTables, originState.dataTableInfo.dataTables);
         const dataTableIdChanged = state.dataTableInfo.dataTableId !== originState.dataTableInfo.dataTableId;
         const joinTypeChanged = joinState.joinType !== originState.joinType;
-        const conditionsChanged = whereState.conditions.map((cond) => ({ value: cond.value })) !== originState.conditions;
-        const functionsChanged = evalState.functions.map((func) => ({ name: func.name, value: func.value })) !== originState.functions;
+        const conditionsChanged = !isEqual(whereState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
+        const functionsChanged = !isEqual(evalState.functions.map((func) => ({ name: func.name, value: func.value }))
+            .filter((func) => !!func.value.trim().length && !!func.name.trim().length), originState.functions);
         if (state.operator === 'CONCAT') return dataTablesChanged;
         if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
         if (state.operator === 'WHERE') return dataTableIdChanged || conditionsChanged;

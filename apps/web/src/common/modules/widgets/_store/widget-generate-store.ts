@@ -167,15 +167,15 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     data_tables: [],
                 },
                 AGGREGATE: {
-                    data_table_id: '',
+                    data_table_id: undefined,
                     group_by: [],
                 },
                 WHERE: {
-                    data_table_id: '',
+                    data_table_id: undefined,
                     conditions: [],
                 },
                 EVAL: {
-                    data_table_id: '',
+                    data_table_id: undefined,
                     formulas: [],
                 },
             };

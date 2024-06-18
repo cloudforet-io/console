@@ -102,19 +102,24 @@ documentEventMount('mouseup', endResizing);
              class="data-table-contents"
         >
             <div class="data-table-area">
-                <div class="data-table-wrapper">
-                    <widget-form-data-table-card v-for="(dataTable) in storeState.dataTables"
-                                                 :key="`data-table-${dataTable.data_table_id}`"
-                                                 :item="dataTable"
-                    />
-                    <widget-form-data-source-popover />
+                <div class="data-table-scroll-wrapper">
+                    <div class="data-table-contents-wrapper">
+                        <widget-form-data-table-card v-for="(dataTable) in storeState.dataTables"
+                                                     :key="`data-table-${dataTable.data_table_id}`"
+                                                     :item="dataTable"
+                        />
+                        <widget-form-data-source-popover />
+                    </div>
                 </div>
+                <div class="gradation-bottom-area" />
+                <div class="gradation-top-area" />
+                <div class="gradation-left-area" />
+                <div class="gradation-right-area" />
             </div>
             <div class="resizer-area"
                  :style="displayState.resizerStyle"
                  @mousedown="startResizing"
             >
-                <div class="gradation-area" />
                 <hr v-if="displayState.dataTableAreaOpen"
                     class="resizer-bar"
                 >
@@ -152,31 +157,62 @@ documentEventMount('mouseup', endResizing);
         padding: 0.125rem;
         .data-table-area {
             @apply relative flex-1 h-full w-full;
-            padding: 1rem 1rem 0;
-            margin-bottom: 1.125rem;
-            overflow: auto;
-            .data-table-wrapper {
-                @apply flex gap-4;
-                height: auto;
-                width: auto;
-                padding-right: 2rem;
+            //padding: 1rem 1rem 1.125rem;
+            //margin-bottom: 1.125rem;
+            overflow: hidden;
+            .data-table-scroll-wrapper {
+                height: 100%;
+                width: 100%;
+                overflow: auto;
+                .data-table-contents-wrapper {
+                    @apply flex gap-4;
+                    padding: 1rem 1rem 1.125rem;
+                    height: auto;
+                    width: auto;
+                }
+            }
+
+            .gradation-bottom-area {
+                @apply absolute;
+                width: 100%;
+                height: 1.5rem;
+                bottom: 0;
+                background: linear-gradient(180deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.150') 100%);
+                z-index: 1;
+            }
+            .gradation-top-area {
+                @apply absolute;
+                width: 100%;
+                height: 1.5rem;
+                top: 0;
+                background: linear-gradient(180deg, theme('colors.gray.150') 0%, rgba(247, 247, 247, 0) 100%);
+                z-index: 1;
+            }
+            .gradation-left-area {
+                @apply absolute;
+                width: 1.5rem;
+                height: 100%;
+                left: 0;
+                top: 0;
+                background: linear-gradient(90deg, theme('colors.gray.150') 0%, rgba(247, 247, 247, 0) 100%);
+                z-index: 1;
+            }
+            .gradation-right-area {
+                @apply absolute;
+                width: 1.5rem;
+                height: 100%;
+                right: 0;
+                top: 0;
+                background: linear-gradient(90deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.150') 100%);
+                z-index: 1;
             }
         }
         .resizer-area {
-            @apply absolute flex items-center justify-center bg-gray-150;
+            @apply absolute flex items-center justify-center;
             width: calc(100% - 0.25rem);
             padding: 0 1rem;
             transition: top 0.2s;
             z-index: 1;
-
-            .gradation-area {
-                @apply absolute;
-                width: calc(100% - 2rem);
-                height: 2rem;
-                top: -2rem;
-                background: linear-gradient(180deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.150') 100%);
-                z-index: 1;
-            }
             .resizer-bar {
                 @apply relative w-full bg-blue-600;
                 margin: 0.5rem 0;
@@ -203,7 +239,7 @@ documentEventMount('mouseup', endResizing);
                     @apply bg-white justify-end;
                     top: -0.125rem;
                     height: 1.5rem;
-                    margin-top: -0.375rem;
+                    margin-top: -1.375rem;
                     border-bottom-left-radius: 50%;
                     border-bottom-right-radius: 50%;
                     border-bottom: 0;

@@ -50,7 +50,7 @@ const state = reactive({
         return i18n.t('COMMON.WIDGETS.SAVE');
     }),
     isAllValid: computed<boolean>(() => {
-        if (widgetGenerateState.overlayStep === 1) return true; // TODO: Add validation for step 1
+        if (widgetGenerateState.overlayStep === 1) return !!widgetGenerateState.selectedDataTableId;
         if (widgetGenerateState.overlayStep === 2) {
             return widgetGenerateGetters.isAllWidgetFormValid;
         }
