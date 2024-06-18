@@ -2,7 +2,7 @@
 import { reactive } from 'vue';
 
 import {
-    PFieldGroup, PSelectDropdown, PTextHighlighting, PBadge,
+    PFieldGroup, PSelectDropdown, PTextHighlighting, PBadge, PButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
@@ -21,6 +21,14 @@ import { useRoleFormatter } from '@/services/iam/composables/refined-table-data'
 interface DropdownMenuItem extends SelectDropdownMenuItem {
     role_type?: string;
 }
+
+interface Props {
+    isDetailPage: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isDetailPage: false,
+});
 
 const roleListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
@@ -123,11 +131,27 @@ const fetchListRoles = async (inputText?: string) => {
                 </template>
             </p-select-dropdown>
         </p-field-group>
+        <div v-if="props.isDetailPage"
+             class="buttons-wrapper"
+        >
+            <p-button style-type="tertiary"
+                      size="md"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CANCEL') }}
+            </p-button>
+            <p-button style-type="primary"
+                      size="md"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.SAVE_CHANGES') }}
+            </p-button>
+        </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .anomaly-detection-configuration-recipients-form {
+    padding-right: 1rem;
+    padding-left: 1rem;
     .field {
         max-width: 30rem;
         margin-top: 0.5rem;
@@ -150,6 +174,12 @@ const fetchListRoles = async (inputText?: string) => {
                 @apply text-gray-600;
             }
         }
+    }
+    .buttons-wrapper {
+        @apply inline-flex;
+        padding-bottom: 1rem;
+        margin-top: 1rem;
+        gap: 0.5rem;
     }
 }
 </style>
