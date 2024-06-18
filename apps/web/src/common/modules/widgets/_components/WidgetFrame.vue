@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import {
-    reactive, computed,
+    reactive, computed, ref,
 } from 'vue';
 
 import {
-    PI, PIconButton, PPopover, PSelectDropdown, PLink, PEmpty,
+    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
+import { i18n } from '@/translations';
 
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
@@ -19,12 +20,34 @@ import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-fra
 const props = withDefaults(defineProps<WidgetFrameProps>(), {
 });
 const emit = defineEmits<{(event: 'click-delete'): void;
+    (event: 'click-expand'): void;
     (event: 'click-edit'): void;
     (event: 'update-size', size: WidgetSize): void;
 }>();
 
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
+    etcMenuItems: computed<MenuItem[]>(() => ([
+        {
+            type: 'item',
+            name: 'expand',
+            label: i18n.t('COMMON.WIDGETS.EXPAND'),
+            icon: 'ic_arrows-expand-all',
+        },
+        {
+            type: 'item',
+            name: 'edit',
+            label: i18n.t('COMMON.WIDGETS.EDIT'),
+            icon: 'ic_edit',
+        },
+        { type: 'divider', name: '' },
+        {
+            type: 'item',
+            name: 'delete',
+            label: i18n.t('COMMON.WIDGETS.DELETE'),
+            icon: 'ic_delete',
+        },
+    ])),
     sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
         type: 'item',
         name: size,
@@ -32,15 +55,33 @@ const state = reactive({
     }))),
 });
 
+const etcButtonRef = ref<HTMLElement|null>(null);
+const etcContextMenuRef = ref<any|null>(null);
+const {
+    visibleMenu: visibleContextMenu,
+    contextMenuStyle,
+    toggleContextMenu,
+    hideContextMenu,
+} = useContextMenuController({
+    useFixedStyle: true,
+    targetRef: etcButtonRef,
+    contextMenuRef: etcContextMenuRef,
+    position: 'right',
+});
+
 /* Event */
-const handleEditButtonClick = () => {
-    emit('click-edit');
+const handleClickEtcButton = () => {
+    toggleContextMenu();
 };
-const handleClickDeleteButton = () => {
-    emit('click-delete');
-};
-const handleSelectSize = (size: WidgetSize) => {
-    emit('update-size', size);
+const handleSelectEtcMenu = (selected: MenuItem) => {
+    if (selected.name === 'expand') {
+        emit('click-expand');
+    } else if (selected.name === 'edit') {
+        emit('click-edit');
+    } else if (selected.name === 'delete') {
+        emit('click-delete');
+    }
+    hideContextMenu();
 };
 </script>
 
@@ -102,15 +143,22 @@ const handleSelectSize = (size: WidgetSize) => {
         <div v-if="props.mode === 'view'"
              class="action-button-wrapper"
         >
-            <p-icon-button name="ic_edit"
+            <p-icon-button v-if="props.mode === 'view'"
+                           ref="etcButtonRef"
+                           name="ic_ellipsis-horizontal"
                            style-type="transparent"
+                           shape="square"
                            size="sm"
-                           @click="handleEditButtonClick"
+                           @click="handleClickEtcButton"
             />
-            <p-icon-button name="ic_delete"
-                           style-type="transparent"
-                           size="sm"
-                           @click="handleClickDeleteButton"
+            <p-context-menu v-show="visibleContextMenu"
+                            ref="etcContextMenuRef"
+                            class="etc-context-menu"
+                            :menu="state.etcMenuItems"
+                            :selected="[]"
+                            :style="contextMenuStyle"
+                            use-fixed-menu-style
+                            @select="handleSelectEtcMenu"
             />
         </div>
         <div class="body-wrapper">
@@ -131,14 +179,6 @@ const handleSelectSize = (size: WidgetSize) => {
                 </p>
             </p-empty>
         </div>
-        <p-select-dropdown v-if="state.sizeDropdownMenuItems.length > 1"
-                           class="widget-size-dropdown"
-                           style-type="transparent"
-                           :menu="state.sizeDropdownMenuItems"
-                           :selected="props.size"
-                           use-fixed-menu-style
-                           @select="handleSelectSize"
-        />
     </div>
 </template>
 
@@ -209,21 +249,13 @@ const handleSelectSize = (size: WidgetSize) => {
         }
     }
     .action-button-wrapper {
-        @apply bg-gray-150 rounded-lg;
         position: absolute;
         right: 0.25rem;
         top: 0.25rem;
         padding: 0.25rem;
-    }
-    .body {
-        height: auto;
-        flex: 1 1;
-        padding: 0 1.5rem;
-    }
-    .widget-size-dropdown {
-        position: absolute;
-        bottom: 0;
-        right: 0;
+        .etc-context-menu {
+            z-index: 1000;
+        }
     }
 }
 </style>

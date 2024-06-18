@@ -1302,6 +1302,7 @@
 			"TITLE": "프로젝트 변경"
 		},
 		"WIDGETS": {
+			"ADD_WIDGET": "위젯 추가",
 			"ADD_WIDGET_TO_DASHBOARD": "",
 			"ALL_SUMMARY": {
 				"ADD_SERVICE_ACCOUNTS": "서비스 어카운트 추가",
@@ -1382,6 +1383,11 @@
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
 			"DAILY_UPDATE_NO_DATA": "일간 변동 사항이 없습니다.",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
+			"DELETE": "",
+			"EDIT": "",
+			"EDIT_WIDGET": "위젯 수정",
+			"EXPAND": "",
+			"EXPAND_WIDGET": "",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "클라우드 서비스",
 				"LABEL_PROJECT": "프로젝트",
@@ -1468,6 +1474,8 @@
 			"SERVICE_SUMMARY_CLOUD_SERVICE": "클라우드 서비스 ",
 			"SERVICE_SUMMARY_PROJECT": "프로젝트 ",
 			"SERVICE_SUMMARY_SERVER": "서버 ",
+			"SET_CHART_OPTIONS": "차트 옵션 설정",
+			"SET_DATA_SOURCE": "데이터 소스 설정",
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "프로젝트 생성",
 				"NO_PROJECT": "프로젝트 없음",
@@ -1834,10 +1842,6 @@
 			"NO_DATA": "데이터가 없습니다.",
 			"NO_SELECTED_ITEM": "1개 이상의 옵션을 선택해 주세요.",
 			"OVERLAY": {
-				"ADD_WIDGET": "위젯 추가",
-				"EDIT_WIDGET": "위젯 수정",
-				"SET_CHART_OPTIONS": "차트 옵션 설정",
-				"SET_DATA_SOURCE": "데이터 소스 설정",
 				"STEP_1": {
 					"ASSET": "에셋",
 					"BUDGET": "예산",
