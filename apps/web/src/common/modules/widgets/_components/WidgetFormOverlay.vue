@@ -28,16 +28,16 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const state = reactive({
     sidebarTitle: computed(() => {
-        if (widgetGenerateState.overlayType === 'ADD') {
-            const _title = i18n.t('COMMON.WIDGETS.ADD_WIDGET');
-            let _subTitle = i18n.t('COMMON.WIDGETS.SET_DATA_SOURCE');
-            if (widgetGenerateState.overlayStep === 2) {
-                _subTitle = i18n.t('COMMON.WIDGETS.SET_CHART_OPTIONS');
-            }
-            return `${_title} - ${_subTitle}`;
+        if (widgetGenerateState.overlayType === 'EXPAND') return i18n.t('COMMON.WIDGETS.EXPAND_WIDGET');
+        let _title = i18n.t('COMMON.WIDGETS.ADD_WIDGET');
+        if (widgetGenerateState.overlayType === 'EDIT') {
+            _title = i18n.t('COMMON.WIDGETS.EDIT_WIDGET');
         }
-        if (widgetGenerateState.overlayType === 'EDIT') return i18n.t('COMMON.WIDGETS.EDIT_WIDGET');
-        return i18n.t('COMMON.WIDGETS.EXPAND_WIDGET');
+        let _subTitle = i18n.t('COMMON.WIDGETS.SET_DATA_SOURCE');
+        if (widgetGenerateState.overlayStep === 2) {
+            _subTitle = i18n.t('COMMON.WIDGETS.SET_CHART_OPTIONS');
+        }
+        return `${_title} - ${_subTitle}`;
     }),
     buttonText: computed<TranslateResult>(() => {
         if (widgetGenerateState.overlayStep === 1) return i18n.t('COMMON.WIDGETS.CONFIGURE_WIDGET');
