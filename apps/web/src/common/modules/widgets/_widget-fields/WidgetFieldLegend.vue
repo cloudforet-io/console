@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
 
 import { PFieldTitle, PToggleButton } from '@spaceone/design-system';
 
-import type { LegendOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import type { LegendOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const emit = defineEmits<{(e: 'update:value', value: boolean): void;
-}>();
+const emit = defineEmits<WidgetFieldComponentEmit<boolean|undefined>>();
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<LegendOptions>>(), {
     widgetFieldSchema: () => ({
@@ -18,19 +18,24 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<LegendOptions>>
 });
 
 const state = reactive({
-    value: props.widgetFieldSchema.options?.default ?? false,
+    proxyValue: useProxyValue<boolean>('value', props, emit),
 });
 
 const handleUpdateValue = (value: boolean) => {
-    state.value = value;
+    state.proxyValue = value;
     emit('update:value', value);
 };
+
+onMounted(() => {
+    emit('update:is-valid', true);
+    state.proxyValue = props.value;
+});
 </script>
 
 <template>
     <div class="widget-field-legend">
         <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.LEGEND') }}</p-field-title>
-        <p-toggle-button :value="state.value"
+        <p-toggle-button :value="state.proxyValue"
                          @update:value="handleUpdateValue"
         />
     </div>

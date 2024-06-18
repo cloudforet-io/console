@@ -13,11 +13,7 @@ const numberCard: WidgetConfig = {
     },
     optionalFieldsSchema: {
         icon: {},
-        comparison: {
-            options: {
-                forTable: false,
-            },
-        },
+        comparison: {},
     },
 };
 

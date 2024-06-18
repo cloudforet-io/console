@@ -200,7 +200,8 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
             </div>
         </div>
         <!-- optional fields -->
-        <div class="form-group-wrapper"
+        <div v-if="state.widgetOptionalFieldSchemaMap.length"
+             class="form-group-wrapper"
              :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.OPTIONAL_FIELDS] }"
         >
             <div class="title-wrapper"
