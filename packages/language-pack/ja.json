@@ -1683,6 +1683,8 @@
 			"DEFAULT": "既定値",
 			"DELETE": "削除",
 			"DONE_EDITING": "",
+			"DUPLICATE": "複製",
+			"EDIT_DASHBOARD_NAME": "ダッシュボード名の編集",
 			"EXPORT": "エクスポート",
 			"OTHER_MONTHS": "他の月",
 			"PDF_EXPORT": {

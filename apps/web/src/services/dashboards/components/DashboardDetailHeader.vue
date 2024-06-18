@@ -1,9 +1,12 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
-    PIconButton, PHeading, PSkeleton,
+    PHeading, PSkeleton, PSelectDropdown,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+
+import { i18n } from '@/translations';
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
 import DashboardControlButtons from '@/services/dashboards/components/DashboardControlButtons.vue';
@@ -25,23 +28,39 @@ const state = reactive({
     nameEditModalVisible: false,
     deleteModalVisible: false,
     cloneModalVisible: false,
+    menuItems: computed<MenuItem[]>(() => ([
+        {
+            type: 'item',
+            name: 'edit',
+            label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
+            icon: 'ic_edit',
+        },
+        {
+            type: 'item',
+            name: 'duplicate',
+            label: i18n.t('DASHBOARDS.DETAIL.DUPLICATE'),
+            icon: 'ic_duplicate',
+        },
+        { type: 'divider', name: '' },
+        {
+            type: 'item',
+            name: 'delete',
+            label: i18n.t('DASHBOARDS.DETAIL.DELETE'),
+            icon: 'ic_delete',
+        },
+    ])),
 });
 
 /* Event */
-const handleVisibleNameEditModal = () => {
-    state.nameEditModalVisible = true;
-};
-const handleVisibleDeleteModal = () => {
-    state.deleteModalVisible = true;
-};
-const handleVisibleCloneModal = () => {
-    state.cloneModalVisible = true;
+const handleSelectItem = (selected: MenuItem) => {
+    if (selected.name === 'edit') state.nameEditModalVisible = true;
+    if (selected.name === 'duplicate') state.cloneModalVisible = true;
+    if (selected.name === 'delete') state.deleteModalVisible = true;
 };
 const handleNameUpdate = (name: string) => {
     dashboardDetailStore.setName(name);
     dashboardDetailStore.setOriginDashboardName(name);
 };
-
 </script>
 
 <template>
@@ -54,21 +73,14 @@ const handleNameUpdate = (name: string) => {
             <template v-if="dashboardDetailState.name"
                       #title-right-extra
             >
-                <div class="title-right-extra">
-                    <p-icon-button name="ic_edit-text"
-                                   size="md"
-                                   @click="handleVisibleNameEditModal"
-                    />
-                    <p-icon-button name="ic_duplicate"
-                                   size="md"
-                                   @click="handleVisibleCloneModal"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   size="md"
-                                   class="delete-button"
-                                   @click="handleVisibleDeleteModal"
-                    />
-                </div>
+                <p-select-dropdown style-type="icon-button"
+                                   button-icon="ic_ellipsis-horizontal"
+                                   :menu="state.menuItems"
+                                   :selected="[]"
+                                   use-fixed-menu-style
+                                   reset-selection-on-menu-close
+                                   @select="handleSelectItem"
+                />
             </template>
             <template v-if="!dashboardDetailGetters.isDeprecatedDashboard"
                       #extra
@@ -102,13 +114,6 @@ const handleNameUpdate = (name: string) => {
     margin-bottom: 0.75rem;
     .p-heading {
         margin-bottom: 0;
-    }
-    .title-right-extra {
-        @apply flex-shrink-0 inline-flex items-center;
-        margin-bottom: -0.25rem;
-        .favorite-button {
-            margin: 0 0.25rem;
-        }
     }
     .template-name {
         @apply text-paragraph-sm text-gray-500;

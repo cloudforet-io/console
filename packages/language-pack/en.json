@@ -1683,6 +1683,8 @@
 			"DEFAULT": "Default",
 			"DELETE": "Delete",
 			"DONE_EDITING": "Done Editing",
+			"DUPLICATE": "Duplicate",
+			"EDIT_DASHBOARD_NAME": "Edit Dashboard Name",
 			"EXPORT": "Export",
 			"OTHER_MONTHS": "Other Months",
 			"PDF_EXPORT": {
