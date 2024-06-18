@@ -8,7 +8,10 @@ export const COST_EXPLORER_ROUTE = Object.freeze({
     },
     ANOMALY_DETECTION: {
         _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}`,
-        CONFIGURATION: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.configuration` },
+        CONFIGURATION: {
+            _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.configuration`,
+            CREATE: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.configuration.create` },
+        },
         POLICY: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.policy` },
         HISTORY: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.history` },
     },
