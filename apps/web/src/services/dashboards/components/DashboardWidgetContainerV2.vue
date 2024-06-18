@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance, AsyncComponent } from 'vue';
 import {
-    reactive, ref, watch, computed,
+    reactive, ref, watch, computed, onBeforeUnmount,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -54,8 +54,8 @@ const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
-    initiatedWidgetMap: {} as Record<string, boolean>,
-    isAllWidgetsMounted: computed(() => Object.values(state.mountedWidgetMap).every((d) => d)),
+    isAllWidgetsMounted: computed<boolean>(() => Object.keys(state.mountedWidgetMap).length === state.refinedWidgetInfoList.length
+            && Object.values(state.mountedWidgetMap).every((d) => d)),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => {
         if (!dashboardDetailState.dashboardWidgets.length) return [];
@@ -131,7 +131,7 @@ const updateWidget = async (widgetId: string, size: WidgetSize) => {
 const getWidgetLoading = (widgetId: string) => {
     if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
-    // if (!state.intersectedWidgetMap[widgetId]) return true; // HACK: Currently, interceptWidgetMap is not working properly. Need to be fixed.
+    if (!state.intersectedWidgetMap[widgetId]) return true;
     if (widgetGenerateState.widgetId === widgetId) return true;
     return false;
 };
@@ -153,16 +153,51 @@ const handleToggleWidgetSize = async (widget: RefinedWidgetInfo, size: WidgetSiz
     await updateWidget(widget.widget_id, size);
     await dashboardDetailStore.listDashboardWidgets();
 };
+const handleWidgetMounted = (widgetId: string) => {
+    state.mountedWidgetMap[widgetId] = true;
+};
 
-/* refresh widgets */
+/* init & refresh widgets */
 const widgetRef = ref<Array<WidgetComponent|null>>([]);
+let widgetObserverMap: Record<string, IntersectionObserver> = {};
+const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
+    if (widgetObserverMap) {
+        Object.values(widgetObserverMap).forEach((observer) => observer.disconnect());
+        widgetObserverMap = {};
+    }
+
+    if (!allMounted) return;
+
+    widgetRefs.forEach((widget) => {
+        if (!widget) return;
+        const observer = new IntersectionObserver(handleIntersectionObserver, {
+            threshold: 0.25,
+        });
+        widgetObserverMap[widget.$el.id] = observer;
+        observer.observe(widget.$el);
+    });
+});
+onBeforeUnmount(() => {
+    stopWidgetRefWatch();
+    Object.values(widgetObserverMap).forEach((observer) => observer.disconnect());
+});
+// eslint-disable-next-line no-undef
+const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isIntersecting, target }], observer) => {
+    if (isIntersecting) {
+        if (state.isAllWidgetsMounted) {
+            state.intersectedWidgetMap[target.id] = true;
+            state.intersectedWidgetMap = { ...state.intersectedWidgetMap };
+            observer.unobserve(target);
+        }
+    }
+};
+
 const refreshAllWidget = debounce(async () => {
     dashboardDetailStore.setLoadingWidgets(true);
     const loadWidgetPromises: WidgetExpose['loadWidget'][] = [];
 
     widgetRef.value.forEach((comp) => {
         if (!comp || typeof comp.loadWidget() !== 'function') return false;
-        if (!state.initiatedWidgetMap[comp.$el?.id]) return false;
         loadWidgetPromises.push(comp.loadWidget);
         return true;
     });
@@ -240,6 +275,7 @@ watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-variables="dashboardDetailState.variables"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
+                               @mounted="handleWidgetMounted(widget.widget_id)"
                                @click-edit="handleOpenWidgetOverlay(widget, 'EDIT')"
                                @click-delete="handleClickDeleteWidget(widget)"
                                @click-expand="handleOpenWidgetOverlay(widget, 'EXPAND')"
