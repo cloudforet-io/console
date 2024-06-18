@@ -19,7 +19,6 @@ import { i18n } from '@/translations';
 
 import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetFormOverlayStep1.vue';
 import WidgetFormOverlayStep2 from '@/common/modules/widgets/_components/WidgetFormOverlayStep2.vue';
-import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 
@@ -68,12 +67,11 @@ const handleClickContinue = async () => {
         widgetGenerateStore.setOverlayStep(2);
         return;
     }
-    const _widgetConfig = getWidgetConfig(widgetGenerateState.selectedWidgetName);
     await fetcher({
         widget_id: widgetGenerateState.widgetId,
         name: widgetGenerateState.title,
         description: widgetGenerateState.description,
-        size: _widgetConfig.meta.sizes[0],
+        size: widgetGenerateState.size,
         widget_type: widgetGenerateState.selectedWidgetName,
         data_table_id: widgetGenerateState.selectedDataTableId,
         options: widgetGenerateState.widgetValueMap,
