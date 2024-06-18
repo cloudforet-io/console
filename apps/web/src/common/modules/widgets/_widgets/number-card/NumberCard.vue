@@ -74,8 +74,18 @@ const state = reactive({
         return _target?.decreaseColor;
     }),
     comparisonValue: computed<string>(() => {
-        const _comparison = state.currentValue - state.previousValue;
-        return numberFormatter(Math.abs(_comparison), { notation: 'compact' }) || '--';
+        const _target = (props.widgetOptions?.comparison as ComparisonValue[])?.[0];
+        const _comparison = Math.abs(state.currentValue - state.previousValue);
+        const _format = _target?.format || 'all';
+        const _percentage = _comparison / state.previousValue * 100;
+        const _fixedAmount = numberFormatter(_comparison, { notation: 'compact' }) || '--';
+        if (_format === 'all') {
+            return `${_fixedAmount} (${_percentage.toFixed(2)}%)`;
+        }
+        if (_format === 'percent') {
+            return `${_percentage.toFixed(2)}%`;
+        }
+        return _fixedAmount;
     }),
     comparisonText: computed(() => {
         const _comparison = state.currentValue - state.previousValue;
