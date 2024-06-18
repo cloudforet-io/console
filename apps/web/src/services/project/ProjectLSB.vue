@@ -107,11 +107,11 @@ const state = reactive({
     ]),
     projectDetailMenuSet: computed(() => [
         {
-            type: MENU_ITEM_TYPE.TOP_TITLE,
+            type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('PROJECT.DETAIL.DASHBOARD.DASHBOARD'),
-        },
-        {
-            type: MENU_ITEM_TYPE.DIVIDER,
+            id: 'project-dashboard',
+            to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME }),
+            hideFavorite: true,
         },
         {
             type: MENU_ITEM_TYPE.ITEM,

@@ -97,6 +97,10 @@ const state = reactive({
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
         {
+            name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+            label: i18n.t('PROJECT.DETAIL.TAB_DASHBOARD'),
+        },
+        {
             name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
         },

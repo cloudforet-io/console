@@ -37,17 +37,10 @@ export default {
         {
             path: 'detail/:id',
             name: PROJECT_ROUTE.DETAIL._NAME,
-            redirect: PROJECT_ROUTE.DETAIL.DASHBOARD._NAME,
+            redirect: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
             props: true,
             component: ProjectDetailPage,
             children: [
-                {
-                    path: 'dashboard',
-                    name: PROJECT_ROUTE.DETAIL.DASHBOARD._NAME,
-                    meta: { lsbVisible: true },
-                    props: true,
-                    component: ProjectDashboardPage,
-                },
                 {
                     path: '/',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
@@ -55,6 +48,13 @@ export default {
                     props: true,
                     component: ProjectDetailTabPage,
                     children: [
+                        {
+                            path: 'dashboard',
+                            name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+                            meta: { lsbVisible: true },
+                            props: true,
+                            component: ProjectDashboardPage,
+                        },
                         {
                             path: 'member',
                             name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
