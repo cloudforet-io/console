@@ -398,6 +398,13 @@
 		"COST_MANAGEMENT": {
 			"ANOMALY_DETECTION": {
 				"CONFIG_TITLE": "",
+				"CREATE": "作成",
+				"HISTORY": {
+					"ALL": "すべて",
+					"CUSTOM": "カスタム",
+					"LAST_MONTH": "直近の月",
+					"THIS_MONTH": "今月"
+				},
 				"HISTORY_TITLE": "",
 				"POLICY_TITLE": ""
 			},

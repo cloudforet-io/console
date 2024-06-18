@@ -398,6 +398,13 @@
 		"COST_MANAGEMENT": {
 			"ANOMALY_DETECTION": {
 				"CONFIG_TITLE": "",
+				"CREATE": "생성",
+				"HISTORY": {
+					"ALL": "전체",
+					"CUSTOM": "기간 선택",
+					"LAST_MONTH": "지난달",
+					"THIS_MONTH": "이번 달"
+				},
 				"HISTORY_TITLE": "",
 				"POLICY_TITLE": ""
 			},
