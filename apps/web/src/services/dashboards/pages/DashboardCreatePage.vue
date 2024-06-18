@@ -29,7 +29,6 @@ import {
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -46,7 +45,6 @@ import DashboardCreateStep2 from '@/services/dashboards/components/DashboardCrea
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { CreateDashboardParameters, DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
-import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
 interface Step {
@@ -59,19 +57,14 @@ const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 const {
-    forms: { dashboardTemplate, dashboardProject },
+    forms: { dashboardTemplate },
     setForm,
     isAllValid,
 } = useFormValidator({
     dashboardTemplate: {} as DashboardModel,
-    dashboardProject: undefined as undefined|ProjectTreeNodeData,
 }, {
     dashboardTemplate(value: DashboardModel) {
         return !Object.keys(value).length ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
-    },
-    dashboardProject(value: ProjectTreeNodeData|undefined) {
-        return !value && dashboardDetailState.dashboardScope === 'PROJECT'
-            ? i18n.t('DASHBOARDS.CREATE.VALIDATION_PROJECT') : '';
     },
 });
 
@@ -89,10 +82,6 @@ const state = reactive({
         },
     ]),
     currentStep: 1,
-    isValid: computed(() => {
-        if (dashboardDetailState.dashboardScope === 'PROJECT') return !!dashboardProject.value?.id;
-        return true;
-    }),
     isStep2Valid: false,
     closeConfirmModalVisible: false,
     disableCreateButton: computed<boolean>(() => !isAllValid.value || !state.isStep2Valid),
@@ -119,9 +108,6 @@ const createDashboard = async () => {
         if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
             apiParam.resource_group = state.isAdminMode ? RESOURCE_GROUP.DOMAIN : dashboardDetailState.dashboardScope;
         }
-        if (dashboardDetailState.dashboardScope === 'PROJECT') {
-            (apiParam as PublicDashboardCreateParameters).project_id = dashboardDetailState.projectId;
-        }
 
         const createdDashboard = await dashboardDetailStore.createDashboard(apiParam);
         await SpaceRouter.router.push(getProperRouteLocation({
@@ -144,10 +130,6 @@ const handleClickClose = () => {
 const handleSelectTemplate = (template: DashboardModel) => {
     setForm('dashboardTemplate', template);
     goStep('next');
-};
-
-const handleSelectProject = (project: ProjectTreeNodeData) => {
-    setForm('dashboardProject', project);
 };
 
 const { setPathFrom, handleClickBackButton } = useGoBack(getProperRouteLocation({
@@ -175,7 +157,6 @@ defineExpose({ setPathFrom });
         <template v-else-if="state.currentStep === 2">
             <dashboard-create-step2 :selected-template="dashboardTemplate"
                                     :is-valid.sync="state.isStep2Valid"
-                                    @select-project="handleSelectProject"
             />
             <div class="button-area">
                 <p-button style-type="transparent"

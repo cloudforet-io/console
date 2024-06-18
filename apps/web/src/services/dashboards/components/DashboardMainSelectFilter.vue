@@ -22,7 +22,6 @@ const state = reactive({
         const results = [
             { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: 'ALL' },
             { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'), name: 'WORKSPACE' },
-            { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_SINGLE_PROJECT'), name: 'PROJECT' },
             { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PRIVATE'), name: 'PRIVATE' },
         ];
         if (!storeState.isWorkspaceOwner) {

@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PFieldTitle, PI, PBoardItem, PButtonModal,
+    PFieldTitle, PI, PBoardItem,
 } from '@spaceone/design-system';
 import type { IconSet } from '@spaceone/design-system/src/data-display/board-item/type';
 
@@ -13,15 +13,11 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
 interface BoardSet {
@@ -31,10 +27,7 @@ interface BoardSet {
     description: TranslateResult;
     iconButtonSets?: IconSet[];
 }
-const emit = defineEmits<{(event: 'select-project', project: ProjectTreeNodeData): void;
-}>();
 
-const allReferenceStore = useAllReferenceStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -42,27 +35,10 @@ const userWorkspaceState = userWorkspaceStore.$state;
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceState.getters.currentWorkspace),
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
 });
 const state = reactive({
     dashboardScopeBoardSets: computed(() => {
         const boardSets: BoardSet[] = [
-            {
-                value: 'PROJECT',
-                title: i18n.t('DASHBOARDS.CREATE.SINGLE_PROJECT'),
-                description: (state.selectedProject && dashboardDetailState.dashboardScope === 'PROJECT')
-                    ? storeState.projects[state.selectedProject.id]?.label
-                    : i18n.t('DASHBOARDS.CREATE.NO_SELECTED_PROJECT'),
-                leftIcon: 'ic_document-filled',
-                iconButtonSets: dashboardDetailState.dashboardScope === 'PROJECT' ? [
-                    {
-                        iconName: 'ic_edit',
-                        eventAction: () => {
-                            state.projectModalVisible = true;
-                        },
-                    },
-                ] : [],
-            },
             {
                 value: 'PRIVATE',
                 title: i18n.t('DASHBOARDS.CREATE.PRIVATE'),
@@ -80,30 +56,12 @@ const state = reactive({
         }
         return boardSets;
     }),
-    selectedProject: undefined as undefined|ProjectTreeNodeData,
-    projectModalVisible: false,
 });
 
 /* Event */
 const handleSelectDashboardScope = (scopeType: DashboardScope) => {
-    if (scopeType === 'PROJECT') {
-        if (dashboardDetailState.dashboardScope === 'PROJECT') return;
-        state.projectModalVisible = true;
-        return;
-    }
-    state.selectedProject = undefined;
     dashboardDetailStore.setDashboardScope(scopeType);
     dashboardDetailStore.setDashboardType(scopeType === 'PRIVATE' ? 'PRIVATE' : 'PUBLIC');
-};
-const handleSelectProject = (selectedProjects: ProjectTreeNodeData[]) => {
-    state.selectedProject = selectedProjects[0];
-};
-const handleConfirmProject = () => {
-    if (!state.selectedProject) return;
-    emit('select-project', state.selectedProject);
-    dashboardDetailStore.setDashboardScope('PROJECT');
-    dashboardDetailStore.setDashboardType('PUBLIC');
-    state.projectModalVisible = false;
 };
 </script>
 
@@ -119,7 +77,6 @@ const handleConfirmProject = () => {
                               class="dashboard-scope-board-item"
                               :class="{
                                   'selected': dashboardDetailState.dashboardScope === dashboardScopeItem.value,
-                                  'project': dashboardScopeItem.value === 'PROJECT',
                               }"
                               :left-icon="dashboardScopeItem.leftIcon"
                               :icon-button-sets="dashboardScopeItem.iconButtonSets"
@@ -155,27 +112,6 @@ const handleConfirmProject = () => {
                 </p-board-item>
             </div>
         </div>
-        <p-button-modal v-if="state.projectModalVisible"
-                        :header-title="$t('DASHBOARDS.CREATE.SELECT_PROJECT')"
-                        :visible="state.projectModalVisible"
-                        size="sm"
-                        :disabled="!state.selectedProject"
-                        @close="state.projectModalVisible = false"
-                        @cancel="state.projectModalVisible = false"
-                        @confirm="handleConfirmProject"
-        >
-            <template #body>
-                <div class="pb-8">
-                    <p-field-title class="pb-1">
-                        {{ $t('DASHBOARDS.CREATE.SELECT_PROJECT') }}
-                    </p-field-title>
-                    <project-select-dropdown project-selectable
-                                             :project-group-selectable="false"
-                                             @select="handleSelectProject"
-                    />
-                </div>
-            </template>
-        </p-button-modal>
     </section>
 </template>
 
@@ -187,9 +123,6 @@ const handleConfirmProject = () => {
     height: 4.375rem;
     cursor: pointer;
     &.selected {
-        &.project {
-            cursor: default;
-        }
         .dashboard-scope-title {
             font-weight: 700;
         }

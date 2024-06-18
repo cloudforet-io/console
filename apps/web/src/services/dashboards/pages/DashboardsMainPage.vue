@@ -48,19 +48,13 @@ const state = reactive({
         if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
         return target as DashboardModel[];
     }),
-    projectDashboardList: computed<DashboardModel[]>(() => {
-        if (dashboardState.scope && dashboardState.scope !== 'PROJECT') return [];
-        let target = dashboardGetters.projectItems || [];
-        if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
-        return target as DashboardModel[];
-    }),
     privateDashboardList: computed<DashboardModel[]>(() => {
         if (dashboardState.scope && dashboardState.scope !== 'PRIVATE') return [];
         return dashboardGetters.privateItems as DashboardModel[] || [];
     }),
     dashboardTotalCount: computed<number>(() => {
         if (state.isAdminMode) return dashboardGetters.domainItems.length;
-        return state.workspaceDashboardList.length + state.projectDashboardList.length + state.privateDashboardList.length;
+        return state.workspaceDashboardList.length + state.privateDashboardList.length;
     }),
     filteredDashboardStatus: computed(() => {
         if (state.isAdminMode) {
@@ -69,13 +63,10 @@ const state = reactive({
         if (dashboardState.scope === 'WORKSPACE') {
             return !!(state.workspaceDashboardList.length);
         }
-        if (dashboardState.scope === 'PROJECT') {
-            return !!(state.projectDashboardList.length);
-        }
         if (dashboardState.scope === 'PRIVATE') {
             return !!(state.privateDashboardList.length);
         }
-        return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length || state.privateDashboardList.length));
+        return !!(state.dashboardTotalCount && (state.workspaceDashboardList.length || state.privateDashboardList.length));
     }),
 });
 
@@ -172,7 +163,7 @@ onUnmounted(() => {
                    :total-count="state.dashboardTotalCount"
         >
             <template #extra>
-                <p-button v-if="state.workspaceDashboardList || state.projectDashboardList"
+                <p-button v-if="state.workspaceDashboardList"
                           icon-left="ic_plus_bold"
                           @click="handleCreateDashboard"
                 >
@@ -228,13 +219,6 @@ onUnmounted(() => {
                                            :class="{'full-mode': dashboardState.scope === 'WORKSPACE'}"
                                            :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')"
                                            :dashboard-list="state.workspaceDashboardList"
-                />
-                <dashboard-main-board-list v-if="state.projectDashboardList.length"
-                                           scope-type="PROJECT"
-                                           class="dashboard-list"
-                                           :class="{'full-mode': dashboardState.scope === 'PROJECT'}"
-                                           :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT')"
-                                           :dashboard-list="state.projectDashboardList"
                 />
                 <dashboard-main-board-list v-if="state.privateDashboardList.length"
                                            scope-type="PRIVATE"
