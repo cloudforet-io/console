@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PHeading, PFieldGroup, PTextInput, PSelectDropdown,
+    PFieldGroup, PTextInput, PSelectDropdown,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -51,10 +51,6 @@ const {
 
 <template>
     <div class="anomaly-detection-configuration-information-form">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.BASE_INFORMATION')"
-                   heading-type="sub"
-                   class="heading"
-        />
         <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_NAME')"
                        required
                        :invalid="invalidState.name"
@@ -110,14 +106,6 @@ const {
 
 <style scoped lang="postcss">
 .anomaly-detection-configuration-information-form {
-    @apply flex flex-col bg-white border border-gray-200;
-    padding: 2rem 1rem 1.5rem;
-    border-radius: 0.375rem;
-    .heading {
-        margin-top: 0;
-        margin-right: 0;
-        margin-left: 0;
-    }
     .field {
         max-width: 30rem;
         margin-top: 0.5rem;

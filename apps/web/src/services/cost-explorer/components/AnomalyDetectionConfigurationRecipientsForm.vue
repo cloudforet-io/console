@@ -2,7 +2,7 @@
 import { reactive } from 'vue';
 
 import {
-    PHeading, PFieldGroup, PSelectDropdown, PTextHighlighting, PBadge,
+    PFieldGroup, PSelectDropdown, PTextHighlighting, PBadge,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
@@ -72,10 +72,6 @@ const fetchListRoles = async (inputText?: string) => {
 
 <template>
     <div class="anomaly-detection-configuration-recipients-form">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.RECIPIENTS')"
-                   heading-type="sub"
-                   class="heading"
-        />
         <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_SEND_TO')"
                        required
                        class="field"
@@ -132,14 +128,6 @@ const fetchListRoles = async (inputText?: string) => {
 
 <style scoped lang="postcss">
 .anomaly-detection-configuration-recipients-form {
-    @apply flex flex-col bg-white border border-gray-200;
-    padding: 2rem 1rem 1.5rem;
-    border-radius: 0.375rem;
-    .heading {
-        margin-top: 0;
-        margin-right: 0;
-        margin-left: 0;
-    }
     .field {
         max-width: 30rem;
         margin-top: 0.5rem;
