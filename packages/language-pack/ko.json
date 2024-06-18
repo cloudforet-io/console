@@ -1682,6 +1682,8 @@
 			"DEFAULT": "기본",
 			"DELETE": "삭제",
 			"DONE_EDITING": "",
+			"DUPLICATE": "복제",
+			"EDIT_DASHBOARD_NAME": "대시보드 이름 수정",
 			"EXPORT": "파일 저장",
 			"OTHER_MONTHS": "다른 월 선택",
 			"PDF_EXPORT": {

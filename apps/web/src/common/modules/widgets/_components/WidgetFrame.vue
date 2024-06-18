@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onClickOutside } from '@vueuse/core/index';
 import {
     reactive, computed, ref,
 } from 'vue';
@@ -66,6 +67,7 @@ const {
     contextMenuRef: etcContextMenuRef,
     position: 'right',
 });
+onClickOutside(etcContextMenuRef, hideContextMenu);
 
 /* Event */
 const handleClickEtcButton = () => {
