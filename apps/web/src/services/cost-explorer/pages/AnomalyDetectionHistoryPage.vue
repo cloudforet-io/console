@@ -51,6 +51,7 @@ const state = reactive({
             },
         ];
     }),
+    selectedPeriodItem: ANOMALY_DETECTION_MENU.ALL as string,
     selectedPeriod: {} as Period,
     customDateModalVisible: false,
 });
@@ -73,6 +74,7 @@ const handleSelectPeriod = (periodMenuName: string) => {
         return;
     }
 
+    state.selectedPeriodItem = periodMenuName;
     const _selectedPeriodItem = ANOMALY_DETECTION_MENU_ITEM_MAP[periodMenuName];
     if (_selectedPeriodItem) {
         if (_selectedPeriodItem.name !== ANOMALY_DETECTION_MENU.ALL) {
@@ -94,7 +96,7 @@ const handleSelectPeriod = (periodMenuName: string) => {
                                    disable-proxy
                                    reset-selection-on-menu-close
                                    style-type="rounded"
-                                   :selected="state.selectedPeriod"
+                                   :selected.sync="state.selectedPeriodItem"
                                    @select="handleSelectPeriod"
                 />
             </template>
