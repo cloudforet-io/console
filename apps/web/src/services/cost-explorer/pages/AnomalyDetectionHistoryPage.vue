@@ -10,6 +10,7 @@ import { i18n } from '@/translations';
 
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
+import AnomalyDetectionHistoryTable from '@/services/cost-explorer/components/AnomalyDetectionHistoryTable.vue';
 import {
     ANOMALY_DETECTION_MENU,
     ANOMALY_DETECTION_MENU_ITEM_MAP,
@@ -88,7 +89,7 @@ const handleSelectPeriod = (periodMenuName: string) => {
 </script>
 
 <template>
-    <div>
+    <div class="anomaly-detection-history-page">
         <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE')">
             <template #extra>
                 <p-select-dropdown :menu="state.periodMenuItems"
@@ -101,5 +102,12 @@ const handleSelectPeriod = (periodMenuName: string) => {
                 />
             </template>
         </p-heading>
+        <anomaly-detection-history-table />
     </div>
 </template>
+
+<style scoped lang="postcss">
+.anomaly-detection-history-page {
+    @apply flex flex-col;
+}
+</style>

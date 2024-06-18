@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PToolboxTable, PLink, PBadge, PToggleButton,
+    PToolboxTable, PLink, PLazyImg, PToggleButton,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
@@ -11,6 +11,8 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { getRoleInfo } from '@/services/cost-explorer/composables/anomaly-detection-handler';
 import {
@@ -75,11 +77,15 @@ const tableState = reactive({
                 </p-link>
             </template>
             <template #col-data_source-format="{value}">
-                <p-badge :background-color="storeState.providers[value]?.color"
-                         text-color="white"
-                >
-                    {{ storeState.providers[value]?.label }}
-                </p-badge>
+                <div class="col-data-source">
+                    <p-lazy-img width="1rem"
+                                height="1rem"
+                                :src="assetUrlConverter(storeState.providers[value]?.icon)"
+                                alt="provider-icon"
+                                class="icon"
+                    />
+                    <span>{{ storeState.providers[value]?.label }}</span>
+                </div>
             </template>
             <template #col-recipients-format="{value}">
                 <div class="col-recipients">
@@ -117,6 +123,10 @@ const tableState = reactive({
 
 <style scoped lang="postcss">
 .anomaly-detection-configuration-table {
+    .col-data-source {
+        @apply flex items-center;
+        gap: 0.5rem;
+    }
     .col-recipients {
         @apply flex;
         gap: 0.5rem;
