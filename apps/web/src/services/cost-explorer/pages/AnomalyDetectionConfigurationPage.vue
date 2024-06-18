@@ -4,7 +4,7 @@ import { PHeading, PButton } from '@spaceone/design-system';
 
 <template>
     <div>
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG_TITLE')">
+        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.TITLE')">
             <template #extra>
                 <p-button icon-left="ic_plus">
                     {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CREATE') }}

@@ -397,16 +397,22 @@
 	"BILLING": {
 		"COST_MANAGEMENT": {
 			"ANOMALY_DETECTION": {
-				"CONFIG_TITLE": "Detection Configuration",
+				"CONFIG": {
+					"TITLE": "Detection Configuration",
+					"USERS": "Users",
+					"VIEW_HISTORY": "View History"
+				},
 				"CREATE": "Create",
 				"HISTORY": {
 					"ALL": "All",
 					"CUSTOM": "Custom",
 					"LAST_MONTH": "Last Month",
-					"THIS_MONTH": "This Month"
+					"THIS_MONTH": "This Month",
+					"TITLE": "Anomaly Detection History"
 				},
-				"HISTORY_TITLE": "Anomaly Detection History",
-				"POLICY_TITLE": "Policy Management"
+				"POLICY": {
+					"TITLE": "Policy Management"
+				}
 			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "Failed to Create Budget",

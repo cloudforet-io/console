@@ -87,7 +87,7 @@ const handleSelectPeriod = (periodMenuName: string) => {
 
 <template>
     <div>
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY_TITLE')">
+        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE')">
             <template #extra>
                 <p-select-dropdown :menu="state.periodMenuItems"
                                    :selection-label="$t('INVENTORY.ASSET_ANALYSIS.PERIOD.PERIOD')"

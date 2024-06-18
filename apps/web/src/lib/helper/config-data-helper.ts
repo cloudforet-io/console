@@ -41,17 +41,17 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menu
             {
                 id: MENU_ID.ANOMALY_DETECTION_CONFIGURATION,
                 to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION._NAME },
-                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG_TITLE'),
+                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.TITLE'),
             },
             {
                 id: MENU_ID.ANOMALY_DETECTION_POLICY,
                 to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.POLICY._NAME },
-                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.POLICY_TITLE'),
+                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.POLICY.TITLE'),
             },
             {
                 id: MENU_ID.ANOMALY_DETECTION_HISTORY,
                 to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY._NAME },
-                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY_TITLE'),
+                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE'),
             },
         );
     }
