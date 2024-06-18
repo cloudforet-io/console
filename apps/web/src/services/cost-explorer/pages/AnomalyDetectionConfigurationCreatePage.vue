@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PHeading } from '@spaceone/design-system';
+import { PHeading, PButton } from '@spaceone/design-system';
 
 import AnomalyDetectionConfigurationInformationForm
     from '@/services/cost-explorer/components/AnomalyDetectionConfigurationInformationForm.vue';
@@ -15,6 +15,18 @@ import AnomalyDetectionConfigurationRecipientsForm
         />
         <anomaly-detection-configuration-information-form class="form" />
         <anomaly-detection-configuration-recipients-form class="form" />
+        <div class="buttons-wrapper">
+            <p-button style-type="tertiary"
+                      size="lg"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CANCEL') }}
+            </p-button>
+            <p-button style-type="primary"
+                      size="lg"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CREATE') }}
+            </p-button>
+        </div>
     </div>
 </template>
 
@@ -22,6 +34,11 @@ import AnomalyDetectionConfigurationRecipientsForm
 .anomaly-detection-configuration-create-page {
     .form + .form {
         margin-top: 1rem;
+    }
+    .buttons-wrapper {
+        @apply inline-flex float-right;
+        margin-top: 1.5rem;
+        gap: 1rem;
     }
 }
 </style>
