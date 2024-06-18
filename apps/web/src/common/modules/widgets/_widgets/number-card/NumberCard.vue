@@ -162,7 +162,7 @@ defineExpose<WidgetExpose<Data>>({
                     <span class="value-text">{{ numberFormatter(state.currentValue, { notation: 'compact' }) }}</span>
                 </div>
                 <div class="comparison-wrapper">
-                    <p-i :name="state.currentValue - state.previousValue < 0 ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
+                    <p-i :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                          width="1rem"
                          height="1rem"
                     />

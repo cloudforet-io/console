@@ -1679,6 +1679,7 @@
 			"CUSTOM_DATE_MODAL_TITLE": "커스텀 기간 선택",
 			"DEFAULT": "기본",
 			"DELETE": "삭제",
+			"DONE_EDITING": "",
 			"EXPORT": "파일 저장",
 			"OTHER_MONTHS": "다른 월 선택",
 			"PDF_EXPORT": {

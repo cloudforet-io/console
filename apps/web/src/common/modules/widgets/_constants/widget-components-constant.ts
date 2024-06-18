@@ -44,3 +44,19 @@ export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
         component: import('@/common/modules/widgets/_widgets/progress-card/ProgressCard.vue'),
     }),
 };
+
+export const WIDGET_COMPONENT_ICON_MAP: Record<WidgetConfigKey, string> = {
+    numberCard: 'ic_chart-number-card',
+    stackedColumnChart: 'ic_chart-stacked-column',
+    clusteredColumnChart: 'ic_chart-clustered-column',
+    stackedHorizontalBarChart: 'ic_chart-stacked-horizontal-bar',
+    lineChart: 'ic_chart-line',
+    pieChart: 'ic_chart-pie',
+    treemap: 'ic_chart-treemap',
+    heatmap: 'ic_chart-heatmap',
+    geoMap: 'ic_chart-geomap',
+    table: 'ic_chart-table',
+    stackedAreaChart: 'ic_chart-area',
+    gauge: 'ic_chart-gauge',
+    progressCard: 'ic_chart-progress-card',
+};

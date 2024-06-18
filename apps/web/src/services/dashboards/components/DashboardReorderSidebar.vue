@@ -12,6 +12,8 @@ import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
 
+import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
+
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -37,7 +39,9 @@ const getDashboardWidgetList = (): Array<PublicWidgetModel|PrivateWidgetModel> =
         const _widgetIdList = d.widgets;
         _widgetIdList?.forEach((widgetId) => {
             const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
-            widgetList.push(_widget as PublicWidgetModel|PrivateWidgetModel);
+            if (_widget) {
+                widgetList.push(_widget as PublicWidgetModel | PrivateWidgetModel);
+            }
         });
     });
     return widgetList;
@@ -69,12 +73,17 @@ onUnmounted(() => {
                          :key="`drag-item-${widget.widget_id}-${idx}`"
                          class="draggable-item"
                     >
-                        <span>
-                            <p-i name="ic_drag-handle"
+                        <p-i name="ic_drag-handle"
+                             width="1rem"
+                             height="1rem"
+                        />
+                        <div class="text-wrapper">
+                            <p-i :name="WIDGET_COMPONENT_ICON_MAP[widget.widget_type]"
                                  width="1rem"
                                  height="1rem"
-                            /></span>
-                        <span class="text">{{ widget.name }}</span>
+                            />
+                            <span class="text">{{ widget.name }}</span>
+                        </div>
                     </div>
                 </draggable>
             </div>
@@ -111,6 +120,10 @@ onUnmounted(() => {
             }
             .text {
                 @apply truncate;
+            }
+            .text-wrapper {
+                display: flex;
+                gap: 0.25rem;
             }
         }
         .ghost {

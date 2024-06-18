@@ -48,7 +48,7 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
     if (state.sidebarType === SIDEBAR_TYPE.widget) {
         return {
             styleType: 'primary',
-            disableButton: false,
+            disableButton: true,
             size: 'md',
             isFixedSize: true,
             disableScroll: false,

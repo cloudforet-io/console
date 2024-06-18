@@ -14,6 +14,7 @@ import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
+import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -33,6 +34,7 @@ const state = reactive({
     chartTypeMenuItems: computed<MenuItem[]>(() => Object.values(CONSOLE_WIDGET_CONFIG).map((d) => ({
         name: d.widgetName,
         label: d.meta?.title || d.widgetName,
+        icon: WIDGET_COMPONENT_ICON_MAP[d.widgetName],
     }))),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
@@ -127,7 +129,16 @@ const keyGenerator = (name:string) => (`${widgetGenerateGetters.selectedDataTabl
                 <p-select-dropdown :menu="state.chartTypeMenuItems"
                                    :selected="widgetGenerateState.selectedWidgetName"
                                    @select="handleSelectWidgetName"
-                />
+                >
+                    <template #dropdown-button>
+                        <p-i :name="WIDGET_COMPONENT_ICON_MAP[widgetGenerateState.selectedWidgetName]"
+                             width="1.25rem"
+                             height="1.25rem"
+                             color="inherit"
+                        />
+                        <span>{{ state.chartTypeMenuItems.find((d) => d.name === widgetGenerateState.selectedWidgetName).label }}</span>
+                    </template>
+                </p-select-dropdown>
             </p-field-group>
         </div>
         <!-- widget info -->

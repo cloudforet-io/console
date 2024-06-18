@@ -95,24 +95,30 @@ const handleAddWidget = async () => {
     state.loading = false;
 };
 const handleClickWidgetReorder = () => {
-    store.dispatch('display/showWidget');
+    if (store.state.display.visibleSidebar) {
+        store.dispatch('display/hideSidebar');
+    } else {
+        store.dispatch('display/showWidget');
+    }
 };
 </script>
 
 <template>
     <div class="dashboard-control-buttons">
         <p-button icon-left="ic_plus"
-                  style-type="substitutive"
+                  style-type="tertiary"
+                  size="sm"
                   :loading="state.loading"
                   @click="handleAddWidget"
         >
             {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
         </p-button>
-        <p-button icon-left="ic_duplicate"
-                  style-type="secondary"
+        <p-button :icon-left="store.state.display.visibleSidebar ? 'ic_check' : 'ic_edit'"
+                  :style-type="store.state.display.visibleSidebar ? 'substitutive' : 'tertiary'"
+                  size="sm"
                   @click="handleClickWidgetReorder"
         >
-            {{ $t('DASHBOARDS.DETAIL.WIDGET_REORDER') }}
+            {{ store.state.display.visibleSidebar ? $t('DASHBOARDS.DETAIL.DONE_EDITING') : $t('DASHBOARDS.DETAIL.WIDGET_REORDER') }}
         </p-button>
     </div>
 </template>
