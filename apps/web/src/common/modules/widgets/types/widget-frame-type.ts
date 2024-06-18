@@ -7,6 +7,10 @@ export interface WidgetFrameProps {
     widgetId: string;
     widgetSizes: WidgetSize[];
     //
+    mode: 'overlay'|'view';
+    loading?: boolean;
+    errorMessage?: string;
+    //
     title?: TranslateResult;
     description?: string;
     size?: WidgetSize;
@@ -15,10 +19,4 @@ export interface WidgetFrameProps {
     unit?: string;
     fullDataLinkText?: string;
     fullDataLocation?: Location;
-    //
-    mode: 'overlay'|'view';
-    loading?: boolean;
-    // editMode?: boolean;
-    errorMessage?: string;
-    // theme?: WidgetTheme;
 }

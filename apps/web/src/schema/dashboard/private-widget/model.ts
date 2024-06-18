@@ -12,8 +12,8 @@ export interface PrivateWidgetModel {
     widget_id: string;
     name: string;
     description: string;
-    size?: WidgetSize;
-    data_table_id?: string;
+    size: WidgetSize;
+    data_table_id: string;
     widget_type: WidgetType;
     options: Record<WidgetFieldName, WidgetFieldValues>;
     tags: Tags;

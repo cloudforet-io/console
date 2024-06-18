@@ -1383,6 +1383,7 @@
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
 			"DAILY_UPDATE_NO_DATA": "일간 변동 사항이 없습니다.",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
+			"DEFAULT_WIDTH": "",
 			"DELETE": "",
 			"EDIT": "",
 			"EDIT_WIDGET": "위젯 수정",
@@ -1401,6 +1402,7 @@
 				"BASE": "",
 				"GAUGE_DESC": ""
 			},
+			"FULL_WIDTH": "",
 			"HEALTH_DASHBOARD_DESC_1": "AWS의 비즈니스 또는 엔터프라이즈 플랜을 사용하는 경우 AWS Health Dashboard를 사용할 수 있습니다. ",
 			"HEALTH_DASHBOARD_DESC_2": "적합한 플랜을 이용중이지만 위젯을 사용할 수 없다면 아래의 이메일로 문의를 주세요. ",
 			"HEALTH_DASHBOARD_DESC_3": "AWS 플랜을 먼저 확인하세요. ",

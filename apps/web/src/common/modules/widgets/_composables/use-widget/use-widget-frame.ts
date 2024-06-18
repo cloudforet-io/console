@@ -111,8 +111,10 @@ export const useWidgetFrame = (
     const widgetFrameProps = computed<WidgetFrameProps>(() => ({
         widgetId: props.widgetId,
         widgetSizes: _state.widgetConfig.meta.sizes,
+        //
         mode: props.mode ?? 'view',
         loading: props.loading,
+        errorMessage: overrides.errorMessage?.value,
         //
         title: _state.title,
         description: props.description,
@@ -122,8 +124,6 @@ export const useWidgetFrame = (
         unit: _state.unit,
         fullDataLinkText: _state.fullDataLinkText,
         fullDataLocation: _state.fullDataLocation,
-        // editMode: props.editMode,
-        errorMessage: overrides.errorMessage?.value,
     }));
 
     const widgetFrameEventHandlers = {
@@ -136,8 +136,8 @@ export const useWidgetFrame = (
         'click-delete': () => {
             emit('click-delete');
         },
-        'update-size': (size: WidgetSize) => {
-            emit('update-size', size);
+        'toggle-size': (size: WidgetSize) => {
+            emit('toggle-size', size);
         },
     };
 

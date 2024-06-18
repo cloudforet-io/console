@@ -15,12 +15,11 @@ import type {
 
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
+import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import { getWidgetDefaultWidth } from '@/common/modules/widgets/_helpers/widget-width-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
@@ -49,7 +48,7 @@ const state = reactive({
         if (state.widgetSize === 'full' || state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND') {
             return undefined;
         }
-        return getWidgetDefaultWidth(state.widgetSize);
+        return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
     isWidgetOptionsChanged: computed<boolean>(() => !isEqual(widgetGenerateState.widgetValueMap, state.widgetValueMapSnapshot)),
     disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateGetters.isAllWidgetFormValid),
@@ -73,9 +72,6 @@ const reset = () => {
 /* Event */
 const handleChangeWidgetSize = (widgetSize: string) => {
     state.selectedWidgetSize = widgetSize;
-};
-const handleUpdateWidgetSize = (size: WidgetSize) => {
-    widgetGenerateStore.setSize(size);
 };
 const handleUpdatePreview = async () => {
     state.widgetValueMapSnapshot = cloneDeep(widgetGenerateState.widgetValueMap);
@@ -134,7 +130,6 @@ onUnmounted(() => {
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-variables="dashboardDetailState.variables"
                            mode="overlay"
-                           @update-size="handleUpdateWidgetSize"
                 />
                 <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
                           style-type="substitutive"

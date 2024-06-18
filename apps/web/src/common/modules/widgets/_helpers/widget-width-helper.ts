@@ -10,8 +10,6 @@ import {
 } from '@/common/modules/widgets/_constants/widget-display-constant';
 
 
-export const getWidgetDefaultWidth = (size: WidgetSize): number => WIDGET_WIDTH_RANGE_LIST[size]?.[0] || 0;
-
 const isEveryWidthMax = (sizeRow: string[], widthRow: number[]): boolean => sizeRow.every((size, idx) => {
     const maxWidth = max(WIDGET_WIDTH_RANGE_LIST[size]);
     return widthRow[idx] === maxWidth;
@@ -47,7 +45,7 @@ export const widgetWidthAssigner = (widgetSizeList: WidgetSize[], containerWidth
         } else {
             const pMinWidth = WIDGET_WIDTH_RANGE_LIST[widgetSize]?.[0];
             const rowWidthSum = sum(sizeRow.map((d) => WIDGET_WIDTH_RANGE_LIST[d]?.[0]));
-            if (containerWidth - ((sizeRow.length - 1) * WIDGET_GAP) - rowWidthSum >= pMinWidth) {
+            if (containerWidth - ((sizeRow.length - 1) * WIDGET_GAP) - rowWidthSum > pMinWidth) {
                 sizeRow.push(widgetSize);
             } else {
                 results.push(getWidthRow(sizeRow, containerWidth));

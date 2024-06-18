@@ -1383,6 +1383,7 @@
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
 			"DAILY_UPDATE_NO_DATA": "No Daily Update",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
+			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
 			"EDIT": "Edit",
 			"EDIT_WIDGET": "Edit Widget",
@@ -1401,6 +1402,7 @@
 				"BASE": "Base",
 				"GAUGE_DESC": "Gauge color changes based on threshold values."
 			},
+			"FULL_WIDTH": "Full Width",
 			"HEALTH_DASHBOARD_DESC_1": "You can use the AWS Health Dashboard. If you have a Business or Enterprise support plan of AWS.",
 			"HEALTH_DASHBOARD_DESC_2": "Can't see the widget? even you are using a suitable plan. Please contact us.",
 			"HEALTH_DASHBOARD_DESC_3": "Check your AWS Support Plans first.",
