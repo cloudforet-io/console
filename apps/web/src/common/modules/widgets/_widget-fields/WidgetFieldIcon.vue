@@ -201,6 +201,7 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .widget-field-icon {
+    margin-bottom: 1rem;
     .header {
         @apply flex items-center gap-1;
         margin-bottom: 0.5rem;

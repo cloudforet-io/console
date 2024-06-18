@@ -6,13 +6,14 @@ export interface Icon {
 export interface IconValue {
     icon: Icon; color: string
 }
+
+export type ComparisonFormat = 'all'|'percent'|'fixed';
 export interface ComparisonValue {
-    fieldName?: string;
-    compareWith?: string;
-    compareTarget?: string;
+    // fieldName?: string;
+    // compareTarget?: string;
     decreaseColor?: string;
     increaseColor?: string;
-    format?: 'all'|'percent'|'fixed';
+    format?: ComparisonFormat;
 }
 export interface FormatRulesValue {
     threshold?: number;

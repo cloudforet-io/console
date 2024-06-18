@@ -1,4 +1,3 @@
-import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
@@ -77,9 +76,7 @@ export interface TotalOptions {
 
 export interface ComparisonOptions {
     toggle?: boolean;
-    granularity?: Granularity;
-    forTable?: boolean;
-    compareTargets?: any[]; // subTotal or X-Axis
+    // forTable?: boolean;
 }
 
 export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_TYPE];
