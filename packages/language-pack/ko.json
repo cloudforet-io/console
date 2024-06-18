@@ -4053,6 +4053,7 @@
 				"TRIGGERED": "생성"
 			},
 			"TAB_ALERT": "얼럿",
+			"TAB_DASHBOARD": "",
 			"TAB_NOTIFICATIONS": "알림",
 			"TAB_PROJECT_MEMBER": "프로젝트 멤버",
 			"TAB_REPORT": "보고서",
