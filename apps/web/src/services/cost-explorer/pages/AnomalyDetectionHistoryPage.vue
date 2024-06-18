@@ -1,9 +1,10 @@
 <script setup lang="ts">
 
+import { PHeading } from '@spaceone/design-system';
 </script>
 
 <template>
     <div>
-        history page
+        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY_TITLE')" />
     </div>
 </template>
