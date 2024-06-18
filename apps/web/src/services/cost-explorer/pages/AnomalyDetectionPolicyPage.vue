@@ -4,6 +4,6 @@ import { PHeading } from '@spaceone/design-system';
 
 <template>
     <div>
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.POLICY_TITLE')" />
+        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.POLICY.TITLE')" />
     </div>
 </template>

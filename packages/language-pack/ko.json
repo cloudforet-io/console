@@ -397,16 +397,22 @@
 	"BILLING": {
 		"COST_MANAGEMENT": {
 			"ANOMALY_DETECTION": {
-				"CONFIG_TITLE": "",
+				"CONFIG": {
+					"TITLE": "",
+					"USERS": "사용자",
+					"VIEW_HISTORY": ""
+				},
 				"CREATE": "생성",
 				"HISTORY": {
 					"ALL": "전체",
 					"CUSTOM": "기간 선택",
 					"LAST_MONTH": "지난달",
-					"THIS_MONTH": "이번 달"
+					"THIS_MONTH": "이번 달",
+					"TITLE": ""
 				},
-				"HISTORY_TITLE": "",
-				"POLICY_TITLE": ""
+				"POLICY": {
+					"TITLE": ""
+				}
 			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "예산 생성 실패",
