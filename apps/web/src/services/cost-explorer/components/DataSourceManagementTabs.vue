@@ -5,6 +5,8 @@ import { PTab } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
+import DataSourceManagementTabAccessRestriction
+    from '@/services/cost-explorer/components/DataSourceManagementTabAccessRestriction.vue';
 import DataSourceManagementTabDetailBaseInformation
     from '@/services/cost-explorer/components/DataSourceManagementTabDetailBaseInformation.vue';
 import DataSourceManagementTabDetailJob from '@/services/cost-explorer/components/DataSourceManagementTabDetailJob.vue';
@@ -22,6 +24,8 @@ const tabState = reactive({
     tabs: computed(() => [
         { name: 'detail', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_TITLE') },
         { name: 'linked_account', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_LINKED_ACCOUNT_TITLE') },
+        { name: 'data_collection_job', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB') },
+        { name: 'access_restriction', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_RESTRICTION') },
     ]),
 });
 
@@ -40,24 +44,22 @@ const handleChangeTab = (tab: string) => {
         <template v-if="storeState.activeTab === 'detail'"
                   #detail
         >
-            <div class="data-source-management-tab-detail">
-                <data-source-management-tab-detail-base-information />
-                <data-source-management-tab-detail-job />
-            </div>
+            <data-source-management-tab-detail-base-information />
         </template>
-        <template v-else
+        <template v-else-if="storeState.activeTab === 'linked_account'"
                   #linked_account
         >
             <data-source-management-tab-linked-account />
         </template>
+        <template v-else-if="storeState.activeTab === 'data_collection_job'"
+                  #data_collection_job
+        >
+            <data-source-management-tab-detail-job />
+        </template>
+        <template v-else-if="storeState.activeTab === 'access_restriction'"
+                  #access_restriction
+        >
+            <data-source-management-tab-access-restriction />
+        </template>
     </p-tab>
 </template>
-
-<style lang="postcss" scoped>
-.data-source-management-tabs {
-    .data-source-management-tab-detail {
-        @apply flex flex-col;
-        gap: 0.25rem;
-    }
-}
-</style>
