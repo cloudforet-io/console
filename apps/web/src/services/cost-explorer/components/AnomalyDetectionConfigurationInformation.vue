@@ -62,7 +62,7 @@ watch(() => route.params.configId, (configId) => {
                           style-type="secondary"
                           @click="state.isEdit = true"
                 >
-                    {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CREATE') }}
+                    {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.EDIT') }}
                 </p-button>
             </template>
         </p-heading>

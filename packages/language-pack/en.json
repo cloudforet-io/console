@@ -413,12 +413,15 @@
 					"COL_SEND_TO": "Send to",
 					"COL_SEND_TO_PLACEHOLDER": "Select Workspace Owner",
 					"CREATE_TITLE": "Create Detection Configuration",
+					"LAST_12_MONTHS": "Last 12 Months",
 					"RECIPIENTS": "Recipients",
 					"TITLE": "Detection Configuration",
+					"TREND_TITLE": "Detection Configuration Trend",
 					"USERS": "Users",
 					"VIEW_HISTORY": "View History"
 				},
 				"CREATE": "Create",
+				"EDIT": "Edit",
 				"HISTORY": {
 					"ALL": "All",
 					"CUSTOM": "Custom",
@@ -428,7 +431,8 @@
 				},
 				"POLICY": {
 					"TITLE": "Policy Management"
-				}
+				},
+				"SAVE_CHANGES": "Save Changes"
 			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "Failed to Create Budget",

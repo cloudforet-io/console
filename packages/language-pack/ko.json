@@ -413,12 +413,15 @@
 					"COL_SEND_TO": "",
 					"COL_SEND_TO_PLACEHOLDER": "",
 					"CREATE_TITLE": "",
+					"LAST_12_MONTHS": "지난 12개월",
 					"RECIPIENTS": "수신처",
 					"TITLE": "",
+					"TREND_TITLE": "",
 					"USERS": "사용자",
 					"VIEW_HISTORY": ""
 				},
 				"CREATE": "생성",
+				"EDIT": "편집",
 				"HISTORY": {
 					"ALL": "전체",
 					"CUSTOM": "기간 선택",
@@ -428,7 +431,8 @@
 				},
 				"POLICY": {
 					"TITLE": ""
-				}
+				},
+				"SAVE_CHANGES": "변경사항 저장"
 			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "예산 생성 실패",
