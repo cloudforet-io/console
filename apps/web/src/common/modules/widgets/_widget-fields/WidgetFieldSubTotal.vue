@@ -1,15 +1,16 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
 
 import { PFieldTitle, PToggleButton, PCheckbox } from '@spaceone/design-system';
 
-import type { SubTotalOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import type { TotalOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+import type { TotalValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const emit = defineEmits<{(e: 'update:value', value: boolean): void;
-}>();
+const emit = defineEmits<WidgetFieldComponentEmit<TotalValue|undefined>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<SubTotalOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<TotalOptions>>(), {
     widgetFieldSchema: () => ({
         options: {
             toggle: false,
@@ -19,46 +20,67 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<SubTotalOptions
 });
 
 const state = reactive({
-    toggleValue: props.widgetFieldSchema.options?.toggle ?? false,
-    value: props.widgetFieldSchema.options?.default ?? false,
+    proxyValue: useProxyValue('value', props, emit),
 });
 
 const handleUpdateValue = (value: boolean) => {
-    state.value = value;
-    emit('update:value', value);
+    if (!state.proxyValue?.toggleValue) {
+        state.proxyValue = undefined;
+    } else {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value,
+        };
+    }
+    emit('update:value', state.proxyValue);
 };
 const handleUpdateToggle = (value: boolean) => {
-    state.toggleValue = value;
-    if (value) emit('update:value', state.value);
+    state.proxyValue = {
+        toggleValue: value,
+        value: false,
+    };
+    if (value) emit('update:value', state.proxyValue);
     else {
-        state.value = false;
-        emit('update:value', false);
+        state.proxyValue = undefined;
+        emit('update:value', state.proxyValue);
     }
 };
+
+onMounted(() => {
+    emit('update:is-valid', true);
+    if (!props.value) {
+        state.proxyValue = undefined;
+        return;
+    }
+    state.proxyValue = {
+        toggleValue: props.value.toggleValue ?? props.widgetFieldSchema.options?.toggle ?? false,
+        value: props.value.value ?? props.widgetFieldSchema.options?.default ?? false,
+    };
+});
 </script>
 
 <template>
-    <div class="widget-field-sub-total">
+    <div class="widget-field-total">
         <div class="header">
             <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.SUB_TOTAL') }}</p-field-title>
-            <p-toggle-button :value="state.toggleValue"
+            <p-toggle-button :value="state.proxyValue?.toggleValue"
                              @update:value="handleUpdateToggle"
             />
         </div>
-        <div v-if="state.toggleValue"
+        <div v-if="state.proxyValue?.toggleValue"
              class="contents"
         >
-            <p-checkbox :selected="state.value"
+            <p-checkbox :selected="state.proxyValue?.value"
                         @change="handleUpdateValue"
             >
-                {{ $t('COMMON.WIDGETS.TOTAL.DESC') }}
+                {{ $t('COMMON.WIDGETS.TOTAL.SUB_TOTAL_DESC') }}
             </p-checkbox>
         </div>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.widget-field-sub-total {
+.widget-field-total {
     .field-header {
         @apply flex items-center gap-1;
         margin-bottom: 0.5rem;

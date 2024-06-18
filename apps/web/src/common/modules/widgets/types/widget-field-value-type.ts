@@ -49,6 +49,11 @@ export interface GroupByValue {
     count?: number;
 }
 
+export interface TotalValue {
+    toggleValue: boolean;
+    value: boolean;
+}
+
 export type WidgetFieldValues = string | string[] | number | ComparisonValue[] | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
-    | XAxisValue | YAxisValue | TableDataFieldValue | IconValue;
+    | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue;
