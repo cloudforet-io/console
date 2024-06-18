@@ -20,6 +20,7 @@ import {
     CONFIG_TEMP_DATA,
     DETECTION_CONFIGURATION_HANDLERS,
 } from '@/services/cost-explorer/constants/anomaly-detection-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -66,9 +67,12 @@ const getRoleInfo = (type: RoleType): string => {
             :key-item-sets="DETECTION_CONFIGURATION_HANDLERS.keyItemSets"
             :value-handler-map="DETECTION_CONFIGURATION_HANDLERS.valueHandlerMap"
         >
-            <template #col-name-format="{value}">
+            <template #col-name-format="{value, item}">
                 <p-link highlight
-                        :to="{}"
+                        :to="{
+                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.DETAIL._NAME,
+                            params: { configId: item.config_id}
+                        }"
                 >
                     {{ value }}
                 </p-link>

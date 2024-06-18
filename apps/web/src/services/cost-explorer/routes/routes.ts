@@ -23,6 +23,7 @@ const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDeta
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
 const AnomalyDetectionConfigurationPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionConfigurationPage.vue');
 const AnomalyDetectionConfigurationCreatePage = () => import('@/services/cost-explorer/pages/AnomalyDetectionConfigurationCreatePage.vue');
+const AnomalyDetectionConfigurationDetailPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionConfigurationDetailPage.vue');
 const AnomalyDetectionPolicyPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionPolicyPage.vue');
 const AnomalyDetectionHistoryPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionHistoryPage.vue');
 
@@ -131,8 +132,15 @@ const costExplorerRoutes: RouteConfig = {
                         {
                             path: 'create',
                             name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.CREATE._NAME,
-                            meta: { menuId: MENU_ID.ANOMALY_DETECTION_CONFIGURATION },
+                            meta: { translationId: 'BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.CREATE_TITLE' },
                             component: AnomalyDetectionConfigurationCreatePage as any,
+                        },
+                        {
+                            path: ':configId',
+                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.DETAIL._NAME,
+                            props: true,
+                            meta: { label: ({ params }) => params.budgetId },
+                            component: AnomalyDetectionConfigurationDetailPage as any,
                         },
                     ],
                 },
