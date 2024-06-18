@@ -195,7 +195,8 @@ onMounted(() => {
                         <p-select-dropdown :menu="state.formatMenu"
                                            use-fixed-menu-style
                                            class="w-full"
-                                           :selected="state.proxyValue[index].format"
+                                           use-fixed-menu-style
+                                           :selected="state.value[index].format"
                                            @update:selected="(format) => handleUpdateFormat(format, index)"
                         />
                     </p-field-group>

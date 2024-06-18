@@ -32,6 +32,7 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
+import type { IconValue, ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 type Data = ListResponse<{
@@ -54,9 +55,30 @@ const state = reactive({
         const _currentDate = dayjs.utc(state.basedOnDate).format(_dateFormat);
         return state.data?.results.find((item) => item.Date === _currentDate)?.[state.dataField] ?? 0;
     }),
+    // required fields
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
+    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
+    dateRange: computed<DateRange>(() => {
+        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
+        return { start: _start, end: _end };
+    }),
+    // optional fields
+    iconName: computed<string|undefined>(() => (props.widgetOptions?.icon as IconValue)?.icon?.name),
+    iconColor: computed<string>(() => (props.widgetOptions?.icon as IconValue)?.color),
+    comparisonColor: computed<string|undefined>(() => {
+        const _target = (props.widgetOptions?.comparison as ComparisonValue[])?.[0];
+        if (state.currentValue > state.previousValue) {
+            return _target?.increaseColor;
+        }
+        return _target?.decreaseColor;
+    }),
+    comparisonValue: computed<string>(() => {
+        const _comparison = state.currentValue - state.previousValue;
+        return numberFormatter(Math.abs(_comparison), { notation: 'compact' }) || '--';
+    }),
     comparisonText: computed(() => {
         const _comparison = state.currentValue - state.previousValue;
-        const _comparisonAbs = Math.abs(_comparison);
         let _text;
         if (_comparison < 0) {
             if (state.granularity === 'YEARLY') {
@@ -73,15 +95,7 @@ const state = reactive({
         } else {
             _text = i18n.t('COMMON.WIDGETS.NUMBER_CARD.MORE_THAN_PREVIOUS_DAY');
         }
-        return `${numberFormatter(_comparisonAbs, { notation: 'compact' })} ${_text}`;
-    }),
-    //
-    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
-    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
-    dateRange: computed<DateRange>(() => {
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
-        return { start: _start, end: _end };
+        return _text;
     }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -152,17 +166,26 @@ defineExpose<WidgetExpose<Data>>({
         >
             <div class="content-wrapper">
                 <div class="top-part">
-                    <div class="icon-wrapper">
-                        <p-i name="ic_service_metric-explorer"
+                    <div v-if="state.iconName"
+                         class="icon-wrapper"
+                    >
+                        <p-i :name="state.iconName"
                              width="1.5rem"
                              height="1.5rem"
-                             color="inherit"
+                             :color="state.iconColor"
                         />
                     </div>
                     <span class="value-text">{{ numberFormatter(state.currentValue, { notation: 'compact' }) }}</span>
                 </div>
-                <div class="comparison-wrapper">
-                    <p-i :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled' : 'ic_caret-down-filled'" />
+                <div v-if="props.widgetOptions?.comparison"
+                     class="comparison-wrapper"
+                >
+                    <p-i :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
+                         :color="state.comparisonColor"
+                    />
+                    <span :style="{ 'color': state.comparisonColor }">
+                        {{ state.comparisonValue }}
+                    </span>
                     <span>{{ state.comparisonText }}</span>
                 </div>
             </div>
@@ -185,6 +208,7 @@ defineExpose<WidgetExpose<Data>>({
         }
         .comparison-wrapper {
             @apply text-label-sm;
+            padding-top: 0.5rem;
         }
     }
 }
