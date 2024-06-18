@@ -397,7 +397,23 @@
 	"BILLING": {
 		"COST_MANAGEMENT": {
 			"ANOMALY_DETECTION": {
+				"CANCEL": "Cancel",
 				"CONFIG": {
+					"BASE_INFORMATION": "Base Information",
+					"COL_CATEGORY": "Category",
+					"COL_CATEGORY_PLACEHOLDER": "Select Category",
+					"COL_DATASOURCE_PLACEHOLDER": "Select Data Source",
+					"COL_DATA_SOURCE": "Data Source",
+					"COL_ITEM": "Item",
+					"COL_ITEM_PLACEHOLDER": "Select Item",
+					"COL_NAME": "Name",
+					"COL_NAME_PLACEHOLDER": "Detection Configuration Name",
+					"COL_POLICY": "Policy",
+					"COL_POLICY_PLACEHOLDER": "Select Policy",
+					"COL_SEND_TO": "Send to",
+					"COL_SEND_TO_PLACEHOLDER": "Select Workspace Owner",
+					"CREATE_TITLE": "Create Detection Configuration",
+					"RECIPIENTS": "Recipients",
 					"TITLE": "Detection Configuration",
 					"USERS": "Users",
 					"VIEW_HISTORY": "View History"

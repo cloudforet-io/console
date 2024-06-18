@@ -397,7 +397,23 @@
 	"BILLING": {
 		"COST_MANAGEMENT": {
 			"ANOMALY_DETECTION": {
+				"CANCEL": "取消",
 				"CONFIG": {
+					"BASE_INFORMATION": "基本情報",
+					"COL_CATEGORY": "",
+					"COL_CATEGORY_PLACEHOLDER": "",
+					"COL_DATASOURCE_PLACEHOLDER": "",
+					"COL_DATA_SOURCE": "データソース",
+					"COL_ITEM": "",
+					"COL_ITEM_PLACEHOLDER": "",
+					"COL_NAME": "名前",
+					"COL_NAME_PLACEHOLDER": "",
+					"COL_POLICY": "ポリシー",
+					"COL_POLICY_PLACEHOLDER": "",
+					"COL_SEND_TO": "",
+					"COL_SEND_TO_PLACEHOLDER": "",
+					"CREATE_TITLE": "",
+					"RECIPIENTS": "受信者",
 					"TITLE": "",
 					"USERS": "ユーザー",
 					"VIEW_HISTORY": ""

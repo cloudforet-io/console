@@ -397,7 +397,23 @@
 	"BILLING": {
 		"COST_MANAGEMENT": {
 			"ANOMALY_DETECTION": {
+				"CANCEL": "취소",
 				"CONFIG": {
+					"BASE_INFORMATION": "기본 정보",
+					"COL_CATEGORY": "",
+					"COL_CATEGORY_PLACEHOLDER": "",
+					"COL_DATASOURCE_PLACEHOLDER": "",
+					"COL_DATA_SOURCE": "데이터 소스",
+					"COL_ITEM": "",
+					"COL_ITEM_PLACEHOLDER": "",
+					"COL_NAME": "이름",
+					"COL_NAME_PLACEHOLDER": "",
+					"COL_POLICY": "정책(Policy)",
+					"COL_POLICY_PLACEHOLDER": "",
+					"COL_SEND_TO": "",
+					"COL_SEND_TO_PLACEHOLDER": "",
+					"CREATE_TITLE": "",
+					"RECIPIENTS": "수신처",
 					"TITLE": "",
 					"USERS": "사용자",
 					"VIEW_HISTORY": ""
