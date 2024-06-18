@@ -77,7 +77,6 @@ export interface DashboardTemplate {
     labels: string[];
     template_id: string;
     template_type: TemplateType;
-    plugin_ids?: string[];
 }
 
 export interface DashboardLayout {

@@ -8,8 +8,6 @@ import {
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginItem, PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import type {
     FilterLabelItem,
@@ -23,23 +21,19 @@ import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-s
 
 
 const emit = defineEmits<{(e: 'select-template', value: DashboardModel)}>();
-const allReferenceStore = useAllReferenceStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-});
 const state = reactive({
     managedTemplates: [] as DashboardTemplate[],
     outOfTheBoxTemplateSets: computed<DashboardTemplate[]>(() => {
         const _templates = state.managedTemplates;
-        return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders, filterState.selectedPlugins);
+        return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
     }),
     existingTemplateSets: computed<DashboardTemplate[]>(() => {
         const _templates = dashboardGetters.allItems;
         const _filteredTemplates = _templates.filter((d) => d.version !== '1.0');
-        return getFilteredTemplates(_filteredTemplates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders, filterState.selectedPlugins);
+        return getFilteredTemplates(_filteredTemplates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
     }),
 });
 
@@ -47,7 +41,6 @@ const filterState = reactive({
     inputValue: '',
     selectedLabels: [] as FilterLabelItem[],
     selectedProviders: [] as FilterLabelItem[],
-    selectedPlugins: [] as PluginItem[],
 });
 
 /* Util */
@@ -56,11 +49,9 @@ const getFilteredTemplates = (
     inputValue: string,
     selectedLabels: FilterLabelItem[],
     selectedProviders: FilterLabelItem[],
-    selectedPlugins: PluginItem[],
 ): DashboardTemplate[] => {
     const _inputValue = inputValue.toLowerCase();
-    return templates.filter((template) => (!selectedPlugins.length || (template.plugin_ids ?? []).some((pluginId) => selectedPlugins.map((sel) => sel.name).includes(pluginId)))
-        && (!selectedLabels.length || template.labels.some((label) => selectedLabels.map((sel) => sel.label).includes(label)))
+    return templates.filter((template) => (!selectedLabels.length || template.labels.some((label) => selectedLabels.map((sel) => sel.label).includes(label)))
         && (!selectedProviders.length || selectedProviders.some((provider) => template.variables_schema.fixed_options?.provider === provider.name))
         && (_inputValue === '' || template.name.toLowerCase().includes(_inputValue)));
 };
@@ -68,10 +59,6 @@ const getFilteredTemplates = (
 /* Event */
 const handleSelectLabels = (labels: FilterLabelItem[]) => {
     filterState.selectedLabels = labels;
-};
-
-const handleSelectPlugins = (plugins: PluginItem[]) => {
-    filterState.selectedPlugins = plugins;
 };
 
 const handleSelectProvider = (providers: FilterLabelItem[]) => {
@@ -83,7 +70,7 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
 };
 
 const listTemplates = async () => {
-    state.managedTemplates = await generateDashboardTemplateList(storeState.plugins);
+    state.managedTemplates = await generateDashboardTemplateList();
 };
 
 listTemplates();
@@ -98,7 +85,6 @@ listTemplates();
         <div class="contents-container">
             <dashboard-create-step1-search-filter @select-label="handleSelectLabels"
                                                   @select-provider="handleSelectProvider"
-                                                  @select-plugin="handleSelectPlugins"
             />
             <div class="template-contents-area">
                 <p-empty v-if="!state.outOfTheBoxTemplateSets.length && !state.existingTemplateSets.length"
