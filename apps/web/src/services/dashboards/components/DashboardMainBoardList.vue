@@ -83,26 +83,14 @@ const cloneModalState = reactive({
 const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
     const dashboardId = dashboardItem.dashboard_id || '';
     const manageButtonSet = [
-        {
-            iconName: 'ic_edit',
-            tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
-            eventAction: () => {
-                router.push(getProperRouteLocation({
-                    name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-                    params: {
-                        dashboardId,
-                    },
-                }));
-            },
-        },
-        {
-            iconName: 'ic_duplicate',
-            tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
-            eventAction: () => {
-                cloneModalState.dashboardConfig = { ...dashboardItem };
-                cloneModalState.visible = true;
-            },
-        },
+        // {
+        //     iconName: 'ic_duplicate',
+        //     tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
+        //     eventAction: () => {
+        //         cloneModalState.dashboardConfig = { ...dashboardItem };
+        //         cloneModalState.visible = true;
+        //     },
+        // },
     ];
     const defaultButtonSet = [
         {
