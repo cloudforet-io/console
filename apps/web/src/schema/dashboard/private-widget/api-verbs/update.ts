@@ -8,7 +8,7 @@ export interface PrivateWidgetUpdateParameters {
     name?: string;
     description?: string;
     size?: WidgetSize;
-    widget_type: WidgetType;
+    widget_type?: WidgetType;
     options?: Record<string, any>;
     data_table_id?: string;
     tags?: Tags;
