@@ -6,8 +6,7 @@ import {
 } from '@spaceone/design-system';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceItems, CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { PluginItem, PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import type { PluginItem } from '@/store/reference/plugin-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { DASHBOARD_LABELS } from '@/services/dashboards/constants/dashboard-labels';
@@ -44,48 +43,6 @@ const state = reactive({
     selectedLabels: [],
 });
 
-const pluginState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-    pluginList: computed(() => {
-        // Cost Plugin
-        const costDataSourceList: CostDataSourceItems[] = Object.values(pluginState.costDataSources) as CostDataSourceItems[];
-        const costPluginList = costDataSourceList.reduce((acc, current) => {
-            if (!acc.find((pluginInfo) => pluginInfo.name === current.data.plugin_info.plugin_id)) {
-                const pluginId = current.data.plugin_info.plugin_id;
-                const plugin = pluginState.plugins[pluginId];
-                if (plugin) {
-                    acc.push({
-                        name: pluginId,
-                        label: plugin.name,
-                        image: plugin.icon,
-                    });
-                }
-            }
-            return acc;
-        }, [] as FilterLabelItem[]);
-
-        // Asset Plugin
-        const assetPluginIdList = [
-            'plugin-prowler-inven-collector',
-            'plugin-dclo-inven-collector',
-        ];
-        const assetPluginList = [] as FilterLabelItem[];
-        assetPluginIdList.forEach((pluginId) => {
-            const plugin = pluginState.plugins[pluginId];
-            if (!plugin) return;
-            assetPluginList.push({
-                name: pluginId,
-                label: plugin.name,
-                image: plugin.icon,
-            });
-        });
-
-        return [...costPluginList, ...assetPluginList];
-    }),
-    selectedPlugins: [] as PluginItem[],
-});
-
 const handleChangeLabelFilter = (selected: FilterLabelItem[]) => {
     state.selectedLabels = selected;
     emit('select-label', selected);
@@ -95,40 +52,10 @@ const handleChangeProviderFilter = (selected: FilterLabelItem[]) => {
     state.selectedProviders = selected;
     emit('select-provider', selected);
 };
-
-const handleChangePluginFilter = (selected: PluginItem[]) => {
-    pluginState.selectedPlugins = selected;
-    emit('select-plugin', selected);
-};
-
 </script>
 <template>
     <div class="dashboard-create-step-1-search-filter">
         <div class="label-container">
-            <div class="label">
-                <p-field-title class="title">
-                    {{ $t('DASHBOARDS.CREATE.TEMPLATE.FILTER_PLUGIN') }}
-                </p-field-title>
-                <p-checkbox-group direction="vertical">
-                    <p-checkbox v-for="plugin in pluginState.pluginList"
-                                :key="plugin.name"
-                                class="label-item"
-                                :selected="pluginState.selectedPlugins"
-                                :value="plugin"
-                                @change="handleChangePluginFilter"
-                    >
-                        <div class="content-menu-item">
-                            <p-lazy-img width="1.25rem"
-                                        height="1.25rem"
-                                        error-icon="ic_cloud-filled"
-                                        :src="plugin.image"
-                                        class="content-icon"
-                            />
-                            <span class="content-plugin-text">{{ plugin.label }}</span>
-                        </div>
-                    </p-checkbox>
-                </p-checkbox-group>
-            </div>
             <div class="label">
                 <p-field-title class="title">
                     {{ $t('DASHBOARDS.CREATE.TEMPLATE.FILTER_PROVIDER') }}
@@ -173,25 +100,6 @@ const handleChangePluginFilter = (selected: PluginItem[]) => {
             </div>
         </div>
         <div class="dropdown-container">
-            <p-select-dropdown multi-selectable
-                               style-type="rounded"
-                               appearance-type="badge"
-                               selection-label="Plugin"
-                               show-select-marker
-                               :show-delete-all-button="false"
-                               :menu="pluginState.pluginList"
-                               :selected="pluginState.selectedPlugins"
-                               @update:selected="handleChangePluginFilter"
-            >
-                <template #menu-item--format="{item}">
-                    <p-lazy-img width="1rem"
-                                height="1rem"
-                                error-icon="ic_cloud-filled"
-                                :src="item.image"
-                                class="mr-1"
-                    />{{ item.label }}
-                </template>
-            </p-select-dropdown>
             <p-select-dropdown multi-selectable
                                style-type="rounded"
                                appearance-type="badge"
@@ -254,9 +162,6 @@ const handleChangePluginFilter = (selected: PluginItem[]) => {
                     .content-icon {
                         min-width: 1.25rem;
                         margin-right: 0.25rem;
-                    }
-                    .content-plugin-text {
-                        @apply flex-grow text-paragraph-md;
                     }
                 }
             }
