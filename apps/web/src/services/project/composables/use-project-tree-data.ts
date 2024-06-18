@@ -124,7 +124,7 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
         children: item.type === 'PROJECT' ? undefined : convertItemsToTreeData([], depth + 1),
     }));
     const convertProjectTreeNodeToLocation = (item: ProjectDataType): Location => (item.type === 'PROJECT' ? {
-        name: PROJECT_ROUTE.DETAIL.DASHBOARD._NAME,
+        name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
         params: {
             id: item.id,
         },
