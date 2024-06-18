@@ -1496,7 +1496,8 @@
 			"TOP_PROJECT_STORAGE": "Storage",
 			"TOP_PROJECT_TITLE": "Top Resource Managing Projects",
 			"TOTAL": {
-				"DESC": "Freeze total column"
+				"DESC": "Freeze total row",
+				"SUB_TOTAL_DESC": "Freeze sub total column"
 			},
 			"TRUSTED_ADVISOR": {
 				"LABEL_COST_OPTIMIZATION": "Cost Optimization",

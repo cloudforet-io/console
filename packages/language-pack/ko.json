@@ -1496,7 +1496,8 @@
 			"TOP_PROJECT_STORAGE": "저장소",
 			"TOP_PROJECT_TITLE": "가장 많은 리소스를 사용중인 프로젝트",
 			"TOTAL": {
-				"DESC": ""
+				"DESC": "",
+				"SUB_TOTAL_DESC": ""
 			},
 			"TRUSTED_ADVISOR": {
 				"LABEL_COST_OPTIMIZATION": "비용 최적화",
