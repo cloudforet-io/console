@@ -98,7 +98,8 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
     widgetGenerateStore.setWidgetValidMap(_validMap);
 };
 
-const keyGenerator = (name:string) => (`${widgetGenerateGetters.selectedDataTable?.data_table_id}-required-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}`);
+// eslint-disable-next-line max-len
+const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}`;
 </script>
 
 <template>
@@ -187,7 +188,7 @@ const keyGenerator = (name:string) => (`${widgetGenerateGetters.selectedDataTabl
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetRequiredFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="keyGenerator(fieldName)"
+                               :key="keyGenerator(fieldName, 'require')"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :value="widgetGenerateState.widgetValueMap[fieldName]"
@@ -199,33 +200,33 @@ const keyGenerator = (name:string) => (`${widgetGenerateGetters.selectedDataTabl
             </div>
         </div>
         <!-- optional fields -->
-        <!--        <div class="form-group-wrapper"-->
-        <!--             :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.OPTIONAL_FIELDS] }"-->
-        <!--        >-->
-        <!--            <div class="title-wrapper"-->
-        <!--                 @click="handleClickCollapsibleTitle(FORM_TITLE_MAP.OPTIONAL_FIELDS)"-->
-        <!--            >-->
-        <!--                <p-i name="ic_chevron-down"-->
-        <!--                     width="1.25rem"-->
-        <!--                     height="1.25rem"-->
-        <!--                     color="inherit transparent"-->
-        <!--                     class="arrow-button"-->
-        <!--                />-->
-        <!--                <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.OPTIONAL_FIELDS') }}</span>-->
-        <!--            </div>-->
-        <!--            <div class="form-wrapper">-->
-        <!--                <template v-for="[fieldName, fieldSchema] in state.widgetOptionalFieldSchemaMap">-->
-        <!--                    <component :is="getWidgetFieldComponent(fieldName)"-->
-        <!--                               :key="`required-field-${fieldName}`"-->
-        <!--                               :widget-field-schema="fieldSchema"-->
-        <!--                               :value="widgetGenerateState.widgetValueMap[fieldName]"-->
-        <!--                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"-->
-        <!--                               @update:value="handleUpdateFieldValue(fieldName, $event)"-->
-        <!--                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"-->
-        <!--                    />-->
-        <!--                </template>-->
-        <!--            </div>-->
-        <!--        </div>-->
+        <div class="form-group-wrapper"
+             :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.OPTIONAL_FIELDS] }"
+        >
+            <div class="title-wrapper"
+                 @click="handleClickCollapsibleTitle(FORM_TITLE_MAP.OPTIONAL_FIELDS)"
+            >
+                <p-i name="ic_chevron-down"
+                     width="1.25rem"
+                     height="1.25rem"
+                     color="inherit transparent"
+                     class="arrow-button"
+                />
+                <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.OPTIONAL_FIELDS') }}</span>
+            </div>
+            <div class="form-wrapper">
+                <template v-for="[fieldName, fieldSchema] in state.widgetOptionalFieldSchemaMap">
+                    <component :is="getWidgetFieldComponent(fieldName)"
+                               :key="keyGenerator(fieldName, 'option')"
+                               :widget-field-schema="fieldSchema"
+                               :value="widgetGenerateState.widgetValueMap[fieldName]"
+                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
+                               @update:value="handleUpdateFieldValue(fieldName, $event)"
+                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
+                    />
+                </template>
+            </div>
+        </div>
     </div>
 </template>
 

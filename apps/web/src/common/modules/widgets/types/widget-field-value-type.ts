@@ -1,3 +1,11 @@
+export interface Icon {
+    name: string;
+    label: string;
+}
+// Field Value Options
+export interface IconValue {
+    icon: Icon; color: string
+}
 export interface ComparisonValue {
     fieldName?: string;
     compareWith?: string;
@@ -42,4 +50,4 @@ export interface GroupByValue {
 
 export type WidgetFieldValues = string | string[] | number | ComparisonValue[] | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
-    | XAxisValue | YAxisValue | TableDataFieldValue;
+    | XAxisValue | YAxisValue | TableDataFieldValue | IconValue;

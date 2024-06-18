@@ -1,36 +1,40 @@
 <script lang="ts" setup>
-import { reactive, watch } from 'vue';
+import { onMounted, reactive, watch } from 'vue';
 
 import {
     PFieldTitle, PSelectDropdown, PToggleButton, PI, PTooltip,
 } from '@spaceone/design-system';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import type { IconOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import type {
+    IconOptions,
+    WidgetFieldComponentProps,
+    WidgetFieldComponentEmit,
+} from '@/common/modules/widgets/types/widget-field-type';
+import type { Icon, IconValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
 
 
-const emit = defineEmits<WidgetFieldComponentEmit<{ icon: Icon, color: string }>>();
+const emit = defineEmits<WidgetFieldComponentEmit<IconValue>>();
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<IconOptions>>(), {
     widgetFieldSchema: () => ({
         options: {
-            default: false,
+            default: 'ic_circle-filled',
         },
     }),
 });
 
-interface Icon {
-  name: string;
-  label: string;
-}
+const DEFAULT_ICON:Icon = { name: 'ic_circle-filled', label: 'Circle' };
+const DEFAULT_COLOR:string = gray[900];
 
 const state = reactive({
-    value: props.widgetFieldSchema.options?.default ?? false,
+    proxyValue: useProxyValue<IconValue|undefined>('value', props, emit),
+    isEnable: !!props.value,
     visibleMenu: false,
-    color: gray[900],
-    selectedIcon: { name: 'ic_circle-filled', label: 'Circle' } as Icon,
+    selectedIcon: DEFAULT_ICON as Icon,
     iconList: [
         { name: 'ic_circle-filled', label: 'Circle' },
         { name: 'ic_coin-filled', label: 'Coin' },
@@ -59,39 +63,79 @@ const state = reactive({
         { name: 'ic_service_workspaces', label: 'Cube' },
         { name: 'ic_service_domain-settings', label: 'Settings' },
         { name: 'ic_service_security', label: 'Security Lock' },
-        { name: 'ic_service_service-account', label: 'Security' },
         { name: 'ic_my-page_account-and-profile', label: 'Authorization' },
         { name: 'ic_service_service-account', label: 'Security key' },
     ] as Icon[],
 });
 
 const handleUpdateValue = (value: boolean) => {
-    state.value = value;
+    state.isEnable = value;
+    if (!value) {
+        state.proxyValue = undefined;
+    } else {
+        initValue();
+    }
 };
 
 const handleClickIcon = (icon: Icon) => {
     state.selectedIcon = icon;
     state.visibleMenu = false;
+    if (!state.proxyValue) {
+        state.proxyValue = {
+            icon,
+            color: DEFAULT_COLOR,
+        };
+    } else {
+        state.proxyValue = {
+            ...state.proxyValue,
+            icon,
+        };
+    }
 };
 
 const handleUpdateColor = (color: string) => {
-    state.color = color;
+    if (!state.proxyValue?.icon) {
+        state.proxyValue = {
+            icon: DEFAULT_ICON,
+            color,
+        };
+    } else {
+        state.proxyValue = {
+            ...state.proxyValue,
+            color,
+        };
+    }
+    emit('update:value', state.proxyValue);
 };
 
 const checkValue = ():boolean => {
-    if (state.color && state.iconList.find((icon) => icon.name === state.selectedIcon?.name)) {
-        return true;
+    if (state.isEnable) {
+        return !!(state.proxyValue?.color && state.iconList.find((icon) => icon.name === state.proxyValue?.icon?.name));
     }
-    return false;
+    return true;
 };
 
-watch([() => state.selectedIcon, () => state.color], ([icon, color]) => {
-    emit('update:value', {
-        icon,
-        color,
-    });
-    const isValid = checkValue();
-    emit('update:is-valid', isValid);
+watch(() => state.proxyValue, () => {
+    emit('update:is-valid', checkValue());
+}, { immediate: true });
+
+const initValue = () => {
+    if (props.value !== undefined) {
+        state.proxyValue = props.value;
+    } else {
+        state.proxyValue = {
+            icon: state.iconList.find((icon) => icon.name === props.widgetFieldSchema?.options?.default) ?? DEFAULT_ICON,
+            color: gray[900],
+        };
+    }
+    state.selectedIcon = state.iconList.find((icon) => icon.name === state.proxyValue?.icon?.name) ?? DEFAULT_ICON;
+};
+
+onMounted(() => {
+    if (!state.isEnable) state.proxyValue = undefined;
+    else {
+        initValue();
+    }
 });
 
 </script>
@@ -100,21 +144,22 @@ watch([() => state.selectedIcon, () => state.color], ([icon, color]) => {
     <div class="widget-field-icon">
         <div class="header">
             <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ICON') }}</p-field-title>
-            <p-toggle-button :value="state.value"
+            <p-toggle-button :value="state.isEnable"
                              @update:value="handleUpdateValue"
             />
         </div>
-        <div v-if="state.value"
+        <div v-if="state.isEnable"
              class="contents"
         >
             <p-select-dropdown class="w-full"
                                :visible-menu.sync="state.visibleMenu"
+                               use-fixed-menu-style
                                :menu="state.iconList"
             >
                 <template #dropdown-button>
                     <div class="button-label">
                         <p-i :name="state.selectedIcon?.name"
-                             :color="state.color"
+                             :color="state.proxyValue?.color ?? DEFAULT_COLOR"
                              width="1rem"
                              height="1rem"
                         />
@@ -131,7 +176,7 @@ watch([() => state.selectedIcon, () => state.color], ([icon, color]) => {
                         >
                             <div class="icon-box">
                                 <p-i :name="icon.name"
-                                     :color="state.color"
+                                     :color="state.proxyValue?.color ?? DEFAULT_COLOR"
                                      width="1.5rem"
                                      height="1.5rem"
                                 />
@@ -147,7 +192,7 @@ watch([() => state.selectedIcon, () => state.color], ([icon, color]) => {
                     </div>
                 </template>
             </p-select-dropdown>
-            <color-input :value="state.color"
+            <color-input :value="state.proxyValue?.color ?? DEFAULT_COLOR"
                          @update:value="handleUpdateColor"
             />
         </div>

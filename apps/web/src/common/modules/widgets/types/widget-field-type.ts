@@ -5,7 +5,6 @@ import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/
 import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
-
 export interface DataFieldOptions {
     multiSelectable?: boolean;
 }
@@ -63,7 +62,7 @@ export interface LegendOptions { // toggle button
 }
 
 export interface IconOptions {
-    default?: boolean;
+    default?: string; // e.g. 'ic_coin-filled'
 }
 
 export interface SubTotalOptions {
