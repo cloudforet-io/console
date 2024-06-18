@@ -9,7 +9,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -28,7 +27,6 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 const route = useRoute();
 
-const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const dashboardStore = useDashboardStore();
@@ -38,7 +36,6 @@ const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    projects: computed(() => allReferenceStore.getters.project),
     favoriteItems: computed(() => favoriteGetters.dashboardItems),
 });
 const state = reactive({
@@ -53,7 +50,6 @@ const state = reactive({
     }),
     starredMenuItems: computed<LSBMenu[]>(() => [
         ...(storeState.isWorkspaceOwner ? filterStarredItems(state.workspaceMenuSet) : []),
-        ...filterStarredItems(state.projectMenuSet),
         ...filterStarredItems(state.privateMenuSet),
     ]),
     domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
@@ -72,21 +68,6 @@ const state = reactive({
         },
     }))),
     workspaceMenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.map((d) => ({
-        type: MENU_ITEM_TYPE.ITEM,
-        id: d.dashboard_id,
-        label: d.name,
-        to: getProperRouteLocation({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: d.dashboard_id,
-            },
-        }),
-        favoriteOptions: {
-            type: FAVORITE_TYPE.DASHBOARD,
-            id: d.dashboard_id,
-        },
-    }))),
-    projectMenuSet: computed<LSBMenu[]>(() => dashboardGetters.projectItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -159,7 +140,6 @@ const state = reactive({
         return [
             ...defaultMenuSet,
             ...(storeState.isWorkspaceOwner ? filterMenuItems(state.workspaceMenuSet) : []),
-            ...filterMenuItems(state.projectMenuSet),
             ...filterMenuItems(state.privateMenuSet),
         ];
     }),
@@ -178,10 +158,7 @@ const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
 const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
     const result = [] as LSBMenu[];
     menuItems.forEach((d) => {
-        if (Array.isArray(d)) {
-            const hasProject = d.filter((f) => f.type === 'item').length > 0;
-            if (hasProject) result.push(d);
-        } else {
+        if (!Array.isArray(d)) {
             result.push(d);
         }
     });

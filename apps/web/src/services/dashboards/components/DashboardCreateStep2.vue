@@ -17,7 +17,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import DashboardCreateScopeForm from '@/services/dashboards/components/DashboardCreateScopeForm.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
-import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
 const appContextStore = useAppContextStore();
@@ -31,8 +30,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     selectedTemplate: undefined,
 });
-const emit = defineEmits<{(e: 'select-project', value: ProjectTreeNodeData): void,
-    (e: 'update:is-valid', value: boolean): void
+const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void
 }>();
 
 const dashboardStore = useDashboardStore();
@@ -64,9 +62,6 @@ const {
 });
 
 /* Event */
-const handleSelectProject = (project: ProjectTreeNodeData) => {
-    emit('select-project', project);
-};
 const handleUpdateDashboardName = (value: string) => {
     setForm('dashboardName', value);
     dashboardDetailStore.setName(value);
@@ -123,9 +118,7 @@ watch(() => isAllValid.value, (value) => {
                               @update:selected="handleUpdateLabels"
                 />
             </p-field-group>
-            <dashboard-create-scope-form v-if="!state.isAdminMode"
-                                         @select-project="handleSelectProject"
-            />
+            <dashboard-create-scope-form v-if="!state.isAdminMode" />
         </div>
     </div>
 </template>
