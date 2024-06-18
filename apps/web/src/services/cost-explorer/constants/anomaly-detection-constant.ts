@@ -30,6 +30,36 @@ export const DETECTION_CONFIGURATION_HANDLERS = {
         lasted_at: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'lasted_at', 'datetime'),
     },
 };
+export const CONFIGURATION_CATEGORY_MENU = [
+    {
+        name: 'project_group',
+        label: 'Project Group',
+    },
+    {
+        name: 'project',
+        label: 'Project',
+    },
+    {
+        name: 'provider',
+        label: 'Provider',
+    },
+    {
+        name: 'service_account',
+        label: 'Service Account',
+    },
+    {
+        name: 'product',
+        label: 'Product',
+    },
+    {
+        name: 'region',
+        label: 'Region',
+    },
+    {
+        name: 'tags',
+        label: 'Tags',
+    },
+];
 
 // History
 export const ANOMALY_DETECTION_MENU = {
@@ -101,4 +131,10 @@ export const CONFIG_TEMP_DATA = [
         is_use: true,
         lasted_at: '--',
     },
+];
+
+export const CONFIG_POLICY_TEMP_DATA = [
+    { name: '급격한 변화 탐지', label: '급격한 변화 탐지' },
+    { name: '비정상적인 사용량 탐지', label: '비정상적인 사용량 탐지' },
+    { name: '비정상적인 비용 탐지', label: '비정상적인 비용 탐지' },
 ];
