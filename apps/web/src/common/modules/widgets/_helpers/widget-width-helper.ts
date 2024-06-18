@@ -10,8 +10,6 @@ import {
 } from '@/common/modules/widgets/_constants/widget-display-constant';
 
 
-export const getWidgetDefaultWidth = (size: WidgetSize): number => WIDGET_WIDTH_RANGE_LIST[size]?.[0] || 0;
-
 const isEveryWidthMax = (sizeRow: string[], widthRow: number[]): boolean => sizeRow.every((size, idx) => {
     const maxWidth = max(WIDGET_WIDTH_RANGE_LIST[size]);
     return widthRow[idx] === maxWidth;

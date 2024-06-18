@@ -41,7 +41,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         // Widget
         widget: undefined as undefined | WidgetModel,
         widgetId: '',
-        selectedWidgetName: 'stackedColumnChart',
+        selectedWidgetName: 'table',
         title: '',
         description: '',
         size: 'full' as WidgetSize,
@@ -261,7 +261,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.widgetId = widgetInfo?.widget_id || '';
             state.title = widgetInfo?.name || _widgetConfig.meta?.title || '';
             state.description = widgetInfo?.description || '';
-            state.size = _widgetConfig.meta?.sizes[0]; // TODO
+            state.size = widgetInfo?.size || _widgetConfig.meta?.sizes[0];
             state.selectedDataTableId = widgetInfo?.data_table_id || undefined;
             state.widgetValueMap = widgetInfo?.options || {};
         },

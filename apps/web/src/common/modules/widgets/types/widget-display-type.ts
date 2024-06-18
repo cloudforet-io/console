@@ -30,18 +30,18 @@ export interface WidgetProps {
 }
 
 export interface WidgetEmit {
-    (e: 'mounted'): void;
-    (e: 'update-size', size: WidgetSize): void;
+    (event: 'mounted'): void;
     (event: 'click-expand'): void;
     (event: 'click-delete'): void;
     (event: 'click-edit'): void;
+    (event: 'toggle-size', size: WidgetSize): void;
 }
 
 export interface WidgetFrameEmit {
-    (e: 'update-size', size: WidgetSize): void;
     (event: 'click-expand'): void;
     (event: 'click-delete'): void;
     (event: 'click-edit'): void;
+    (event: 'toggle-size', size: WidgetSize): void;
 }
 
 export type WidgetOverlayType = 'ADD'|'EDIT'|'EXPAND';

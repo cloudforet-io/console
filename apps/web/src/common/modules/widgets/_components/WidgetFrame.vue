@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, useContextMenuController,
+    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, PButton, useContextMenuController,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -14,19 +14,17 @@ import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
+import type { WidgetFrameEmit } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
 
 const props = withDefaults(defineProps<WidgetFrameProps>(), {
 });
-const emit = defineEmits<{(event: 'click-delete'): void;
-    (event: 'click-expand'): void;
-    (event: 'click-edit'): void;
-    (event: 'update-size', size: WidgetSize): void;
-}>();
+const emit = defineEmits<WidgetFrameEmit>();
 
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
+    showWidthToggleButton: computed(() => props.widgetSizes.length > 1),
     etcMenuItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -82,6 +80,13 @@ const handleSelectEtcMenu = (selected: MenuItem) => {
         emit('click-delete');
     }
     hideContextMenu();
+};
+const handleToggleWidth = () => {
+    let nextSize: WidgetSize = WIDGET_SIZE.full;
+    if (state.isFull) {
+        nextSize = props.widgetSizes.find((size) => size !== WIDGET_SIZE.full) || WIDGET_SIZE.md;
+    }
+    emit('toggle-size', nextSize);
 };
 </script>
 
@@ -179,6 +184,15 @@ const handleSelectEtcMenu = (selected: MenuItem) => {
                 </p>
             </p-empty>
         </div>
+        <p-button v-if="state.showWidthToggleButton"
+                  style-type="tertiary"
+                  :icon-left="state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all'"
+                  size="sm"
+                  class="width-toggle-button"
+                  @click="handleToggleWidth"
+        >
+            {{ state.isFull ? $t('COMMON.WIDGETS.DEFAULT_WIDTH') : $t('COMMON.WIDGETS.FULL_WIDTH') }}
+        </p-button>
     </div>
 </template>
 
@@ -194,6 +208,11 @@ const handleSelectEtcMenu = (selected: MenuItem) => {
     padding: 1rem;
     &.sm {
         height: 11rem;
+    }
+    &:hover {
+        .action-button-wrapper {
+            display: block;
+        }
     }
 
     .widget-header {
@@ -242,6 +261,11 @@ const handleSelectEtcMenu = (selected: MenuItem) => {
     .body-wrapper {
         height: 100%;
     }
+    .width-toggle-button {
+        position: absolute;
+        bottom: 0.375rem;
+        right: 0.375rem;
+    }
     .empty-content {
         height: 100%;
         .empty-image {
@@ -252,6 +276,7 @@ const handleSelectEtcMenu = (selected: MenuItem) => {
         position: absolute;
         right: 0.25rem;
         top: 0.25rem;
+        display: none;
         padding: 0.25rem;
         .etc-context-menu {
             z-index: 1000;

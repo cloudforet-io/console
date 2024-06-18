@@ -60,7 +60,6 @@ const createWidget = async (): Promise<PublicWidgetModel|PrivateWidgetModel|null
             dashboard_id: dashboardDetailState.dashboardId as string,
             tags: { created_by: store.state.user.userId },
             widget_type: 'table',
-            size: 'full',
         });
     } catch (e) {
         ErrorHandler.handleError(e);
