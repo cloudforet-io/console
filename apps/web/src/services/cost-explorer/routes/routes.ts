@@ -22,6 +22,7 @@ const BudgetCreatePage = () => import('@/services/cost-explorer/pages/BudgetCrea
 const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDetailPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
 const AnomalyDetectionConfigurationPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionConfigurationPage.vue');
+const AnomalyDetectionConfigurationCreatePage = () => import('@/services/cost-explorer/pages/AnomalyDetectionConfigurationCreatePage.vue');
 const AnomalyDetectionPolicyPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionPolicyPage.vue');
 const AnomalyDetectionHistoryPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionHistoryPage.vue');
 
@@ -113,10 +114,27 @@ const costExplorerRoutes: RouteConfig = {
                     path: 'config',
                     name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION._NAME,
                     meta: {
-                        lsbVisible: true,
                         menuId: MENU_ID.ANOMALY_DETECTION_CONFIGURATION,
+                        translationId: 'BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.TITLE',
                     },
-                    component: AnomalyDetectionConfigurationPage as any,
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: '/',
+                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION._NAME,
+                            meta: {
+                                lsbVisible: true,
+                                menuId: MENU_ID.ANOMALY_DETECTION_CONFIGURATION,
+                            },
+                            component: AnomalyDetectionConfigurationPage as any,
+                        },
+                        {
+                            path: 'create',
+                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.CREATE._NAME,
+                            meta: { menuId: MENU_ID.ANOMALY_DETECTION_CONFIGURATION },
+                            component: AnomalyDetectionConfigurationCreatePage as any,
+                        },
+                    ],
                 },
                 {
                     path: 'policy',
@@ -124,6 +142,7 @@ const costExplorerRoutes: RouteConfig = {
                     meta: {
                         lsbVisible: true,
                         menuId: MENU_ID.ANOMALY_DETECTION_POLICY,
+                        translationId: 'BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.POLICY.TITLE',
                     },
                     component: AnomalyDetectionPolicyPage as any,
                 },
@@ -133,6 +152,7 @@ const costExplorerRoutes: RouteConfig = {
                     meta: {
                         lsbVisible: true,
                         menuId: MENU_ID.ANOMALY_DETECTION_HISTORY,
+                        translationId: 'BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE',
                     },
                     component: AnomalyDetectionHistoryPage as any,
                 },
