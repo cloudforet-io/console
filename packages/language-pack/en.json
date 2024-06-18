@@ -1373,6 +1373,7 @@
 				"PERCENT": "Percentage",
 				"PREVIOUS_DAY": "Previous Day",
 				"PREVIOUS_MONTH": "Previous Month",
+				"PREVIOUS_PERIOD": "Previous Period",
 				"PREVIOUS_YEAR": "Previous Year"
 			},
 			"CONFIGURE_WIDGET": "Configure Widget",
