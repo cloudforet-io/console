@@ -1,3 +1,5 @@
+import type { COLOR_SCHEMA } from '@/common/modules/widgets/_constants/widget-field-constant';
+
 export interface Icon {
     name: string;
     label: string;
@@ -61,7 +63,11 @@ export interface TotalValue {
     toggleValue: boolean;
     value: boolean;
 }
+export interface ColorSchemaValue {
+    colorName: keyof typeof COLOR_SCHEMA;
+    colorValue: typeof COLOR_SCHEMA[keyof typeof COLOR_SCHEMA]
+}
 
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
-    | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue;
+    | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue;
