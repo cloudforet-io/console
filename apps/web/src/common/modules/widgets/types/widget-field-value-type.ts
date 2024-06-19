@@ -54,6 +54,6 @@ export interface TotalValue {
     value: boolean;
 }
 
-export type WidgetFieldValues = string | string[] | number | ComparisonValue[] | FormatRulesValue[]
+export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue;

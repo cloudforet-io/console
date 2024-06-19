@@ -28,7 +28,7 @@ const handleUpdateValue = (value: boolean) => {
 
 onMounted(() => {
     emit('update:is-valid', true);
-    state.proxyValue = props.value;
+    state.proxyValue = props.value ?? props.widgetFieldSchema.options?.default ?? false;
 });
 </script>
 
@@ -43,6 +43,6 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .widget-field-legend {
-    @apply flex items-center gap-1;
+    @apply flex items-center gap-1 justify-between;
 }
 </style>

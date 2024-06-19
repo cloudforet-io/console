@@ -61,7 +61,7 @@ onMounted(() => {
 
 <template>
     <div class="widget-field-total">
-        <div class="header">
+        <div class="field-header">
             <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.SUB_TOTAL') }}</p-field-title>
             <p-toggle-button :value="state.proxyValue?.toggleValue"
                              @update:value="handleUpdateToggle"
@@ -82,12 +82,12 @@ onMounted(() => {
 <style lang="postcss" scoped>
 .widget-field-total {
     .field-header {
-        @apply flex items-center gap-1;
-        margin-bottom: 0.5rem;
+        @apply flex items-center gap-1 justify-between;
     }
 
     .contents {
         @apply flex gap-2;
+        margin-top: 0.5rem;
     }
 }
 </style>

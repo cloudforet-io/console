@@ -119,7 +119,7 @@ onMounted(() => {
 
 <template>
     <div class="widget-field-total">
-        <div class="header">
+        <div class="field-header">
             <p-field-title>{{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}</p-field-title>
             <p-toggle-button :value="state.toggleValue"
                              @update:value="handleUpdateToggle"
@@ -214,12 +214,12 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .widget-field-total {
-    .header {
-        @apply flex items-center gap-1;
-        margin-bottom: 0.5rem;
+    .field-header {
+        @apply flex items-center gap-1 justify-between;
     }
 
     .contents-box {
+        margin-top: 0.5rem;
         &.for-table {
             @apply p-2 bg-gray-100 rounded;
         }

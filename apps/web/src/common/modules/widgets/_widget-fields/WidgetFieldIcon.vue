@@ -142,7 +142,7 @@ onMounted(() => {
 
 <template>
     <div class="widget-field-icon">
-        <div class="header">
+        <div class="field-header">
             <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ICON') }}</p-field-title>
             <p-toggle-button :value="state.isEnable"
                              @update:value="handleUpdateValue"
@@ -201,14 +201,13 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .widget-field-icon {
-    margin-bottom: 1rem;
-    .header {
-        @apply flex items-center gap-1;
-        margin-bottom: 0.5rem;
+    .field-header {
+        @apply flex items-center gap-1 justify-between;
     }
 
     .contents {
         @apply flex gap-2;
+        margin-top: 0.5rem;
         .button-label {
             @apply flex items-center;
             gap: 0.125rem;
