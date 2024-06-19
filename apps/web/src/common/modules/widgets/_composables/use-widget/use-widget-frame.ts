@@ -24,6 +24,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 interface OverridableWidgetFrameState {
     dateRange?: DateRange | ComputedRef<DateRange>;
     errorMessage?: string | ComputedRef<string>;
+    widgetLoading?: boolean | ComputedRef<boolean>;
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 
@@ -113,7 +114,7 @@ export const useWidgetFrame = (
         widgetSizes: _state.widgetConfig.meta.sizes,
         //
         mode: props.mode ?? 'view',
-        loading: props.loading,
+        loading: props.loading || overrides.widgetLoading?.value,
         errorMessage: overrides.errorMessage?.value,
         //
         title: _state.title,

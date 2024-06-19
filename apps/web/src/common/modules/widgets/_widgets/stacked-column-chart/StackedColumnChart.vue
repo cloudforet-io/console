@@ -103,12 +103,12 @@ const state = reactive({
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
     errorMessage: computed(() => state.errorMessage),
+    widgetLoading: computed(() => state.loading),
 });
 
 /* Util */
 const fetchWidget = async (): Promise<Data|APIErrorToast> => {
     try {
-        state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
@@ -135,8 +135,6 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
         state.errorMessage = e.message;
         ErrorHandler.handleError(e);
         return ErrorHandler.makeAPIErrorToast(e);
-    } finally {
-        state.loading = false;
     }
 };
 const drawChart = (rawData?: Data|null) => {
@@ -174,10 +172,12 @@ const drawChart = (rawData?: Data|null) => {
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+    state.loading = true;
     const res = data ?? await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);
+    state.loading = false;
     return state.data;
 };
 
