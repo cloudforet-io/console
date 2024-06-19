@@ -62,6 +62,33 @@ export const CONFIGURATION_CATEGORY_MENU = [
 ];
 
 // History
+export const DETECTION_HISTORY_HANDLERS = {
+    keyItemSets: [
+        {
+            title: 'Properties',
+            items: [
+                { name: 'name', label: 'Name' },
+                { name: 'config_id', label: 'Detection Configuration' },
+                { name: 'policy', label: 'Policy' },
+                { name: 'data_source', label: 'Data Source' },
+                { name: 'level', label: 'Notice Level' },
+                {
+                    name: 'detected_at',
+                    label: 'Detected',
+                    dataType: 'datetime',
+                },
+            ],
+        }] as KeyItemSet[],
+    // TODO: temp code
+    valueHandlerMap: {
+        name: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'name', 'string', [{ k: 'name', v: '', o: 'not' }]),
+        config_id: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'config_id'),
+        policy: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'policy'),
+        data_source: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'data_source'),
+        level: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'level'),
+        detected_at: makeDistinctValueHandler('cost_analysis.AnomalyDetectionConfiguration', 'detected_at', 'datetime'),
+    },
+};
 export const ANOMALY_DETECTION_MENU = {
     ALL: 'ALL',
     THIS_MONTH: 'THIS_MONTH',
@@ -131,6 +158,36 @@ export const CONFIG_TEMP_DATA = [
         ],
         is_use: true,
         lasted_at: '--',
+    },
+];
+
+export const HISTORY_TEMP_DATA = [
+    {
+        history_id: 'id1',
+        name: '[Product] AmazonGrafana에서 비용 발생함',
+        config_id: 'Configuration 14',
+        policy: '급격한 변화 탐지',
+        data_source: 'aws',
+        level: 'critical',
+        detected_at: '2021-09-01 12:00:00',
+    },
+    {
+        history_id: 'id2',
+        name: '[Product] AmazonGrafana에서 비용 발생함',
+        config_id: 'Configuration 14',
+        policy: '급격한 변화 탐지',
+        data_source: 'google_cloud',
+        level: 'info',
+        detected_at: '2021-09-01 12:00:00',
+    },
+    {
+        history_id: 'id3',
+        name: '[Product] AmazonGrafana에서 비용 발생함',
+        config_id: 'Configuration 14',
+        policy: '급격한 변화 탐지',
+        data_source: 'google_cloud',
+        level: 'warning',
+        detected_at: '2021-09-01 12:00:00',
     },
 ];
 
