@@ -74,6 +74,7 @@ onMounted(() => {
             <p-select-dropdown :menu="props.menuItems"
                                class="w-full"
                                :selected="state.proxyValue?.value"
+                               use-fixed-menu-style
                                @update:selected="handleUpdateSelect"
             />
         </p-field-group>
