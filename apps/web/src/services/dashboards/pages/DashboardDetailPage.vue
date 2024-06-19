@@ -6,7 +6,7 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PDivider,
+    PDivider, PI,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -144,6 +144,23 @@ onUnmounted(() => {
 
 <template>
     <div class="dashboard-detail-page">
+        <div v-if="dashboardDetailGetters.isDeprecatedDashboard"
+             class="deprecated-banner"
+        >
+            <p-i name="ic_limit-filled"
+                 width="1.25rem"
+                 height="1.25rem"
+                 color="inherit"
+            />
+            <div class="banner-content-wrapper">
+                <p class="title">
+                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED') }}
+                </p>
+                <p class="description">
+                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED_DESCRIPTION') }}
+                </p>
+            </div>
+        </div>
         <dashboard-detail-header :dashboard-id="props.dashboardId"
                                  :template-name="state.templateName"
         />
@@ -181,7 +198,25 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .dashboard-detail-page {
-
+    .deprecated-banner {
+        @apply bg-red-100 text-red-500;
+        top: 0;
+        width: 105%;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1.125rem 1.5rem;
+        margin: -1.5rem 0 1.5rem -1.5rem;
+        .banner-content-wrapper {
+            .title {
+                @apply text-label-lg text-red-500 font-bold;
+                padding-bottom: 0.25rem;
+            }
+            .description {
+                @apply text-paragraph-md text-gray-900;
+            }
+        }
+    }
     .divider {
         @apply mb-6;
     }

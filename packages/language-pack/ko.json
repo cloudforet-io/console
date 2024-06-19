@@ -1529,6 +1529,8 @@
 			"CREATE": "생성",
 			"CREAT_NEW_DASHBOARD": "대시보드 생성",
 			"DASHBOARDS_TITLE": "대시보드",
+			"DEPRECATED": "",
+			"DEPRECATED_DESCRIPTION": "",
 			"FILTER_ALL": "전체",
 			"FILTER_PRIVATE": "비공개",
 			"FILTER_PUBLIC": "공개",

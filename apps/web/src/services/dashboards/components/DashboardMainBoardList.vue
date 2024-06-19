@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PBoard, PFieldTitle, PI, PLabel, PPagination,
+    PBadge, PBoard, PFieldTitle, PI, PLabel, PPagination,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
@@ -53,21 +51,10 @@ const state = reactive({
     projectItems: computed(() => allReferenceStore.getters.project),
     dashboardListByBoardSets: computed<DashboardBoardSet[]>(() => props.dashboardList
         .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
-        .map((d) => {
-            const dashboardWithBoardSet = {
-                ...d,
-                iconButtonSets: convertBoardItemButtonSet(d),
-            };
-            if (d.project_id) {
-                return (
-                    {
-                        ...dashboardWithBoardSet,
-                        label: state.projectItems[d.project_id]?.label || d.project_id,
-                    }
-                );
-            }
-            return dashboardWithBoardSet;
-        })),
+        .map((d) => ({
+            ...d,
+            iconButtonSets: convertBoardItemButtonSet(d),
+        }))),
 });
 
 const deleteModalState = reactive({
@@ -183,6 +170,13 @@ watch(() => props.dashboardList, () => {
                         </div>
                     </div>
                     <div class="labels-wrapper">
+                        <p-badge v-if="board.version === '1.0'"
+                                 shape="square"
+                                 badge-type="subtle"
+                                 style-type="red100"
+                        >
+                            {{ $t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED') }}
+                        </p-badge>
                         <p-label v-for="(label, idx) in board.labels"
                                  :key="`${board.name}-label-${idx}`"
                                  :text="label"
@@ -267,7 +261,7 @@ watch(() => props.dashboardList, () => {
 
             .labels-wrapper {
                 @apply flex items-center flex-wrap;
-                row-gap: 0.375rem;
+                gap: 0.375rem;
             }
         }
     }
