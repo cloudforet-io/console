@@ -3,10 +3,6 @@ import {
     defineExpose, reactive, computed,
 } from 'vue';
 
-import {
-    PDataLoader,
-} from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -108,25 +104,14 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <p-data-loader class="chart-loader"
-                       :loading="state.loading"
-                       loader-type="skeleton"
-                       disable-empty-case
-                       :loader-backdrop-opacity="1"
-                       show-data-from-scratch
-        >
-            <div class="chart">
-                {{ state.data }}
-            </div>
-        </p-data-loader>
+        <div class="chart">
+            {{ state.data }}
+        </div>
     </widget-frame>
 </template>
 
 <style lang="postcss" scoped>
-.chart-loader {
+.chart {
     height: 100%;
-    .chart {
-        height: 100%;
-    }
 }
 </style>

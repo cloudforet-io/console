@@ -5,7 +5,7 @@ import {
 } from 'vue';
 
 import {
-    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, PButton, useContextMenuController,
+    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, PButton, useContextMenuController, PDataLoader,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -25,7 +25,7 @@ const emit = defineEmits<WidgetFrameEmit>();
 
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
-    showWidthToggleButton: computed(() => props.widgetSizes.length > 1),
+    showWidthToggleButton: computed(() => props.widgetSizes.length > 1 && !props.loading),
     etcMenuItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -169,22 +169,32 @@ const handleToggleWidth = () => {
             />
         </div>
         <div class="body-wrapper">
-            <slot v-if="!props.errorMessage" />
-            <p-empty v-else
-                     class="empty-content"
-                     :title="$t('COMMON.WIDGETS.UNABLE_TO_LOAD_WIDGET')"
-                     :show-image="props.size !== WIDGET_SIZE.sm"
+            <p-data-loader class="chart-loader"
+                           :loading="props.loading"
+                           loader-type="skeleton"
+                           disable-empty-case
+                           :loader-backdrop-opacity="1"
+                           show-data-from-scratch
             >
-                <template #image>
-                    <img class="empty-image"
-                         alt="empty-default-image"
-                         src="@/assets/images/img_ghost_no-connection.png"
+                <div class="h-full">
+                    <slot v-if="!props.errorMessage" />
+                    <p-empty v-else
+                             class="empty-content"
+                             :title="$t('COMMON.WIDGETS.UNABLE_TO_LOAD_WIDGET')"
+                             :show-image="props.size !== WIDGET_SIZE.sm"
                     >
-                </template>
-                <p class="empty-text">
-                    {{ props.errorMessage }}
-                </p>
-            </p-empty>
+                        <template #image>
+                            <img class="empty-image"
+                                 alt="empty-default-image"
+                                 src="@/assets/images/img_ghost_no-connection.png"
+                            >
+                        </template>
+                        <p class="empty-text">
+                            {{ props.errorMessage }}
+                        </p>
+                    </p-empty>
+                </div>
+            </p-data-loader>
         </div>
         <p-button v-if="state.showWidthToggleButton"
                   style-type="tertiary"
@@ -262,11 +272,15 @@ const handleToggleWidth = () => {
     }
     .body-wrapper {
         height: 100%;
+        .chart-loader {
+            height: 100%;
+        }
     }
     .width-toggle-button {
         position: absolute;
         bottom: 0.375rem;
         right: 0.375rem;
+        z-index: 100;
     }
     .empty-content {
         height: 100%;
