@@ -103,12 +103,12 @@ const state = reactive({
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
     errorMessage: computed(() => state.errorMessage),
+    widgetLoading: computed(() => state.loading),
 });
 
 /* Util */
 const fetchWidget = async (): Promise<Data|APIErrorToast> => {
     try {
-        state.loading = true;
         const _fields = {};
         state.dataField?.forEach((field) => {
             _fields[field] = { key: field, operator: 'sum' };
@@ -134,8 +134,6 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
         ErrorHandler.handleError(e);
         state.errorMessage = e.message;
         return ErrorHandler.makeAPIErrorToast(e);
-    } finally {
-        state.loading = false;
     }
 };
 const drawChart = (rawData: Data|null) => {
@@ -172,10 +170,12 @@ const drawChart = (rawData: Data|null) => {
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+    state.loading = true;
     const res = data ?? await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);
+    state.loading = false;
     return state.data;
 };
 
