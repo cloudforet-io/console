@@ -81,19 +81,14 @@ const state = reactive({
             position: 'top',
         },
         visualMap: {
-            // type: 'piecewise',
+            show: state.showLegends,
             calculable: true,
             orient: 'horizontal',
             left: 'left',
             bottom: 0,
-            // pieces: [
-            //     {
-            //         label: 'high', min: '50%', color: '#d94e5d',
-            //     },
-            //     {
-            //         label: 'low', min: '30%', max: '49%', color: '#eca7a7',
-            //     },
-            // ],
+            // inRange: {
+            //     color: ['#cdd3ef', '#21e121'],
+            // },
             outOfRange: {
                 color: '#999',
             },
@@ -110,7 +105,7 @@ const state = reactive({
             borderType: 'solid',
         },
     })),
-    //
+    // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
@@ -126,6 +121,8 @@ const state = reactive({
         }
         return { start: _start, end: _end };
     }),
+    // optional fields
+    showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),

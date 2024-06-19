@@ -53,6 +53,7 @@ const state = reactive({
             containLabel: true,
         },
         legend: {
+            show: state.showLegends,
             orient: 'vertical',
             type: 'scroll',
             right: 10,
@@ -90,7 +91,7 @@ const state = reactive({
             },
         ],
     })),
-    //
+    // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
@@ -101,6 +102,8 @@ const state = reactive({
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
         return { start: _start, end: _end };
     }),
+    // optional fields
+    showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
