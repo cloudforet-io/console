@@ -1407,7 +1407,8 @@
 			"FIELD": "",
 			"FORMAT_RULES": {
 				"BASE": "",
-				"GAUGE_DESC": ""
+				"GAUGE_DESC": "",
+				"PROGRESS_CARD_DESC": ""
 			},
 			"FULL_WIDTH": "",
 			"HEALTH_DASHBOARD_DESC_1": "AWSビジネスもしくはエンタープライズサポートプランを使用している場合、AWS Health Dashboardが利用できます",

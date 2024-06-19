@@ -1407,7 +1407,8 @@
 			"FIELD": "Field",
 			"FORMAT_RULES": {
 				"BASE": "Base",
-				"GAUGE_DESC": "Gauge color changes based on threshold values."
+				"GAUGE_DESC": "Gauge color changes based on threshold values.",
+				"PROGRESS_CARD_DESC": "Bar color changes based on threshold values."
 			},
 			"FULL_WIDTH": "Full Width",
 			"HEALTH_DASHBOARD_DESC_1": "You can use the AWS Health Dashboard. If you have a Business or Enterprise support plan of AWS.",
