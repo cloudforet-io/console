@@ -5,7 +5,7 @@ import {
 } from 'vue';
 
 import {
-    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, PButton, useContextMenuController, PDataLoader,
+    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, useContextMenuController, PDataLoader, PTooltip,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -25,7 +25,7 @@ const emit = defineEmits<WidgetFrameEmit>();
 
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
-    showWidthToggleButton: computed(() => props.widgetSizes.length > 1 && !props.loading),
+    showWidthToggleButton: computed(() => props.widgetSizes.length > 1 && !props.loading && props.mode === 'view'),
     etcMenuItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -196,15 +196,21 @@ const handleToggleWidth = () => {
                 </div>
             </p-data-loader>
         </div>
-        <p-button v-if="state.showWidthToggleButton"
-                  style-type="tertiary"
-                  :icon-left="state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all'"
-                  size="sm"
-                  class="width-toggle-button"
-                  @click="handleToggleWidth"
+        <div v-if="state.showWidthToggleButton"
+             class="widget-toggle-button-wrapper"
         >
-            {{ state.isFull ? $t('COMMON.WIDGETS.DEFAULT_WIDTH') : $t('COMMON.WIDGETS.FULL_WIDTH') }}
-        </p-button>
+            <p-tooltip :contents="state.isFull ? $t('COMMON.WIDGETS.DEFAULT_WIDTH') : $t('COMMON.WIDGETS.FULL_WIDTH')"
+                       position="bottom"
+            >
+                <p-icon-button style-type="tertiary"
+                               :name="state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all'"
+                               size="sm"
+                               shape="square"
+                               class="width-toggle-button"
+                               @click="handleToggleWidth"
+                />
+            </p-tooltip>
+        </div>
     </div>
 </template>
 
@@ -224,6 +230,9 @@ const handleToggleWidth = () => {
     &:hover {
         .action-button-wrapper {
             display: block;
+        }
+        .widget-toggle-button-wrapper {
+            display: flex;
         }
     }
 
@@ -276,7 +285,8 @@ const handleToggleWidth = () => {
             height: 100%;
         }
     }
-    .width-toggle-button {
+    .widget-toggle-button-wrapper {
+        display: none;
         position: absolute;
         bottom: 0.375rem;
         right: 0.375rem;
