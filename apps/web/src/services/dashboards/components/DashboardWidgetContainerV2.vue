@@ -54,8 +54,7 @@ const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
-    isAllWidgetsMounted: computed<boolean>(() => Object.keys(state.mountedWidgetMap).length === state.refinedWidgetInfoList.length
-            && Object.values(state.mountedWidgetMap).every((d) => d)),
+    isAllWidgetsMounted: computed<boolean>(() => Object.keys(state.mountedWidgetMap).length === state.refinedWidgetInfoList.length),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => {
         if (!dashboardDetailState.dashboardWidgets.length) return [];
@@ -63,7 +62,6 @@ const state = reactive({
     }),
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
-    expandOverlayWidget: null as RefinedWidgetInfo|null,
 });
 
 
@@ -153,7 +151,10 @@ const handleToggleWidgetSize = async (widget: RefinedWidgetInfo, size: WidgetSiz
     await dashboardDetailStore.listDashboardWidgets();
 };
 const handleWidgetMounted = (widgetId: string) => {
-    state.mountedWidgetMap[widgetId] = true;
+    state.mountedWidgetMap = {
+        ...state.mountedWidgetMap,
+        [widgetId]: true,
+    };
 };
 
 /* init & refresh widgets */
@@ -215,10 +216,14 @@ const widgetDeleteState = reactive({
     targetWidget: null as RefinedWidgetInfo|null,
 });
 const handleDeleteModalConfirm = async () => {
+    const _targetWidgetId = widgetDeleteState.targetWidget?.widget_id as string;
     // 1. remove from dashboard layouts
-    await dashboardDetailStore.deleteDashboardWidget(widgetDeleteState.targetWidget?.widget_id);
+    await dashboardDetailStore.deleteDashboardWidget(_targetWidgetId);
     // 2. delete widget
-    await deleteWidget(widgetDeleteState.targetWidget?.widget_id as string);
+    await deleteWidget(_targetWidgetId);
+    // 3. delete widget from mounted map
+    delete state.mountedWidgetMap[_targetWidgetId];
+    state.mountedWidgetMap = { ...state.mountedWidgetMap };
     // 3. close modal
     await dashboardDetailStore.listDashboardWidgets();
     widgetDeleteState.visibleModal = false;
