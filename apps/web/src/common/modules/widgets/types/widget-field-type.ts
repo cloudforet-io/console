@@ -56,7 +56,6 @@ export interface MaxOptions {
     default?: number;
 }
 export interface LegendOptions { // toggle button
-    dataTarget?: string;
     default?: boolean;
 }
 
