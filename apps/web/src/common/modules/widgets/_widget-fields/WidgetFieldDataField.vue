@@ -107,4 +107,9 @@ onMounted(() => {
 .p-select-dropdown {
     width: 100%;
 }
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
+}
 </style>
