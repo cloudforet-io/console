@@ -75,6 +75,10 @@ const handleSelectDataTable = (dataTableId: string) => {
 };
 const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setSelectedWidgetName(widgetName);
+
+    const _config = getWidgetConfig(widgetName);
+    widgetGenerateStore.setSize(_config.meta.sizes[0]);
+    widgetGenerateStore.setTitle(_config.meta.title);
     widgetGenerateStore.setWidgetValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
 };

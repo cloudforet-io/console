@@ -5,7 +5,7 @@ import type { WidgetFieldName, WidgetFieldSchema } from '@/common/modules/widget
 export interface WidgetConfig {
     widgetName: string;
     meta: {
-        title?: string;
+        title: string;
         sizes: WidgetSize[];
     };
     requiredFieldsSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;

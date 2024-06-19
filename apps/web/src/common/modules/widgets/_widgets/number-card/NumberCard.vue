@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PDataLoader, PI,
+    PI,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -167,59 +167,48 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <p-data-loader class="chart-loader"
-                       :loading="state.loading"
-                       loader-type="skeleton"
-                       disable-empty-case
-                       :loader-backdrop-opacity="1"
-                       show-data-from-scratch
-        >
-            <div class="content-wrapper">
-                <div class="top-part">
-                    <div v-if="state.iconName"
-                         class="icon-wrapper"
-                    >
-                        <p-i :name="state.iconName"
-                             width="1.5rem"
-                             height="1.5rem"
-                             :color="state.iconColor"
-                        />
-                    </div>
-                    <span class="value-text">{{ numberFormatter(state.currentValue, { notation: 'compact' }) }}</span>
-                </div>
-                <div v-if="props.widgetOptions?.comparison"
-                     class="comparison-wrapper"
+        <div class="content-wrapper">
+            <div class="top-part">
+                <div v-if="state.iconName"
+                     class="icon-wrapper"
                 >
-                    <p-i :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
-                         :color="state.comparisonColor"
+                    <p-i :name="state.iconName"
+                         width="1.5rem"
+                         height="1.5rem"
+                         :color="state.iconColor"
                     />
-                    <span :style="{ 'color': state.comparisonColor }">
-                        {{ state.comparisonValue }}
-                    </span>
-                    <span>{{ state.comparisonText }}</span>
                 </div>
+                <span class="value-text">{{ numberFormatter(state.currentValue, { notation: 'compact' }) }}</span>
             </div>
-        </p-data-loader>
+            <div v-if="props.widgetOptions?.comparison"
+                 class="comparison-wrapper"
+            >
+                <p-i :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
+                     :color="state.comparisonColor"
+                />
+                <span :style="{ 'color': state.comparisonColor }">
+                    {{ state.comparisonValue }}
+                </span>
+                <span>{{ state.comparisonText }}</span>
+            </div>
+        </div>
     </widget-frame>
 </template>
 
 <style lang="postcss" scoped>
-.chart-loader {
+.content-wrapper {
     height: 100%;
-    .content-wrapper {
-        height: 100%;
-        .top-part {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            .value-text {
-                @apply text-display-xl;
-            }
+    .top-part {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        .value-text {
+            @apply text-display-xl;
         }
-        .comparison-wrapper {
-            @apply text-label-sm;
-            padding-top: 0.5rem;
-        }
+    }
+    .comparison-wrapper {
+        @apply text-label-sm;
+        padding-top: 0.5rem;
     }
 }
 </style>

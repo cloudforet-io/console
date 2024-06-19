@@ -4,9 +4,6 @@ import {
     onMounted, reactive, ref,
 } from 'vue';
 
-import {
-    PDataLoader,
-} from '@spaceone/design-system';
 import type { GaugeSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
 import type {
@@ -108,25 +105,14 @@ useResizeObserver(chartContext, throttle(() => {
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <p-data-loader class="chart-loader"
-                       :loading="state.loading"
-                       loader-type="skeleton"
-                       disable-empty-case
-                       :loader-backdrop-opacity="1"
-                       show-data-from-scratch
-        >
-            <div ref="chartContext"
-                 class="chart"
-            />
-        </p-data-loader>
+        <div ref="chartContext"
+             class="chart"
+        />
     </widget-frame>
 </template>
 
 <style lang="postcss" scoped>
-.chart-loader {
+.chart {
     height: 100%;
-    .chart {
-        height: 100%;
-    }
 }
 </style>
