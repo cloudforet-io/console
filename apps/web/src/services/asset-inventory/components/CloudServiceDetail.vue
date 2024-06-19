@@ -267,7 +267,7 @@ const fetchData = async () => {
             if (state.isTableTypeInDynamicLayout) {
                 state.data = res.results ?? [];
             } else {
-                state.data = res.results ? res.results[0] : undefined;
+                state.data = res.results?.[0];
             }
         } else {
             const res = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({ cloud_service_id: props.cloudServiceId });
