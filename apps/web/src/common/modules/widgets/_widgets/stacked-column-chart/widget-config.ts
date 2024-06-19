@@ -25,7 +25,13 @@ const stackedColumnChart: WidgetConfig = {
             },
         },
     },
-    optionalFieldsSchema: {},
+    optionalFieldsSchema: {
+        legend: {
+            options: {
+                default: true,
+            },
+        },
+    },
 };
 
 

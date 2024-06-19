@@ -1,4 +1,7 @@
+import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+
+import { indigo, red, yellow } from '@/styles/colors';
 
 
 const progressCard: WidgetConfig = {
@@ -21,14 +24,24 @@ const progressCard: WidgetConfig = {
         },
         formatRules: {
             options: {
-                fields: ['threshold', 'color'],
+                formatRulesType: FORMAT_RULE_TYPE.percentThreshold,
+                default: [{
+                    threshold: 90,
+                    color: yellow[500],
+                },
+                {
+                    threshold: 100,
+                    color: red[400],
+                }],
+                baseColor: indigo[100],
+                description: 'COMMON.WIDGETS.FORMAT_RULES.PROGRESS_CARD_DESC',
             },
         },
     },
     optionalFieldsSchema: {
         comparison: {
             options: {
-                forTable: false,
+                toggle: true,
             },
         },
     },

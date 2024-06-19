@@ -12,7 +12,11 @@ const geoMap: WidgetConfig = {
         dataField: {},
     },
     optionalFieldsSchema: {
-        legend: {},
+        legend: {
+            options: {
+                default: true,
+            },
+        },
     },
 };
 

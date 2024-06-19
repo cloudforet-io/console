@@ -26,7 +26,11 @@ const lineChart: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        legend: {},
+        legend: {
+            options: {
+                default: true,
+            },
+        },
     },
 };
 
