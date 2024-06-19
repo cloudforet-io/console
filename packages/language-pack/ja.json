@@ -413,12 +413,15 @@
 					"COL_SEND_TO": "",
 					"COL_SEND_TO_PLACEHOLDER": "",
 					"CREATE_TITLE": "",
+					"LAST_12_MONTHS": "過去12ヶ月間",
 					"RECIPIENTS": "受信者",
 					"TITLE": "",
+					"TREND_TITLE": "",
 					"USERS": "ユーザー",
 					"VIEW_HISTORY": ""
 				},
 				"CREATE": "作成",
+				"EDIT": "編集",
 				"HISTORY": {
 					"ALL": "すべて",
 					"CUSTOM": "カスタム",
@@ -428,7 +431,8 @@
 				},
 				"POLICY": {
 					"TITLE": ""
-				}
+				},
+				"SAVE_CHANGES": "変更事項保存"
 			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "予算の作成に失敗しました",

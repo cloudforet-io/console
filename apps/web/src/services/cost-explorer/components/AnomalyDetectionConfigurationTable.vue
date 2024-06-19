@@ -7,19 +7,17 @@ import {
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import UserImage from '@/assets/images/role/img_avatar_no-role.png';
-import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
-import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/identity/role/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import { getRoleInfo } from '@/services/cost-explorer/composables/anomaly-detection-handler';
 import {
     CONFIG_TEMP_DATA,
     DETECTION_CONFIGURATION_HANDLERS,
 } from '@/services/cost-explorer/constants/anomaly-detection-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -41,14 +39,6 @@ const tableState = reactive({
         { name: 'history_button', label: ' ', sortable: false },
     ]),
 });
-
-const getRoleInfo = (type: RoleType): string => {
-    switch (type) {
-    case ROLE_TYPE.WORKSPACE_OWNER: return WorkspaceOwnerImage;
-    case ROLE_TYPE.WORKSPACE_MEMBER: return WorkspaceMemberImage;
-    default: return UserImage;
-    }
-};
 </script>
 
 <template>
@@ -66,9 +56,12 @@ const getRoleInfo = (type: RoleType): string => {
             :key-item-sets="DETECTION_CONFIGURATION_HANDLERS.keyItemSets"
             :value-handler-map="DETECTION_CONFIGURATION_HANDLERS.valueHandlerMap"
         >
-            <template #col-name-format="{value}">
+            <template #col-name-format="{value, item}">
                 <p-link highlight
-                        :to="{}"
+                        :to="{
+                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.DETAIL._NAME,
+                            params: { configId: item.config_id}
+                        }"
                 >
                     {{ value }}
                 </p-link>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { PHeading, PButton } from '@spaceone/design-system';
 
-import AnomalyDetectionConfigurationInformationForm
-    from '@/services/cost-explorer/components/AnomalyDetectionConfigurationInformationForm.vue';
-import AnomalyDetectionConfigurationRecipientsForm
-    from '@/services/cost-explorer/components/AnomalyDetectionConfigurationRecipientsForm.vue';
+import AnomalyDetectionConfigurationInformation
+    from '@/services/cost-explorer/components/AnomalyDetectionConfigurationInformation.vue';
+import AnomalyDetectionConfigurationRecipients
+    from '@/services/cost-explorer/components/AnomalyDetectionConfigurationRecipients.vue';
 </script>
 
 <template>
@@ -13,8 +13,8 @@ import AnomalyDetectionConfigurationRecipientsForm
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />
-        <anomaly-detection-configuration-information-form class="form" />
-        <anomaly-detection-configuration-recipients-form class="form" />
+        <anomaly-detection-configuration-information class="form" />
+        <anomaly-detection-configuration-recipients class="form" />
         <div class="buttons-wrapper">
             <p-button style-type="tertiary"
                       size="lg"

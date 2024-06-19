@@ -2,7 +2,7 @@
 import { reactive } from 'vue';
 
 import {
-    PHeading, PFieldGroup, PSelectDropdown, PTextHighlighting, PBadge,
+    PFieldGroup, PSelectDropdown, PTextHighlighting, PBadge, PButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
@@ -21,6 +21,14 @@ import { useRoleFormatter } from '@/services/iam/composables/refined-table-data'
 interface DropdownMenuItem extends SelectDropdownMenuItem {
     role_type?: string;
 }
+
+interface Props {
+    isDetailPage: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isDetailPage: false,
+});
 
 const roleListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
@@ -72,10 +80,6 @@ const fetchListRoles = async (inputText?: string) => {
 
 <template>
     <div class="anomaly-detection-configuration-recipients-form">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.RECIPIENTS')"
-                   heading-type="sub"
-                   class="heading"
-        />
         <p-field-group :label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.COL_SEND_TO')"
                        required
                        class="field"
@@ -127,19 +131,27 @@ const fetchListRoles = async (inputText?: string) => {
                 </template>
             </p-select-dropdown>
         </p-field-group>
+        <div v-if="props.isDetailPage"
+             class="buttons-wrapper"
+        >
+            <p-button style-type="tertiary"
+                      size="md"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CANCEL') }}
+            </p-button>
+            <p-button style-type="primary"
+                      size="md"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.SAVE_CHANGES') }}
+            </p-button>
+        </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .anomaly-detection-configuration-recipients-form {
-    @apply flex flex-col bg-white border border-gray-200;
-    padding: 2rem 1rem 1.5rem;
-    border-radius: 0.375rem;
-    .heading {
-        margin-top: 0;
-        margin-right: 0;
-        margin-left: 0;
-    }
+    padding-right: 1rem;
+    padding-left: 1rem;
     .field {
         max-width: 30rem;
         margin-top: 0.5rem;
@@ -162,6 +174,12 @@ const fetchListRoles = async (inputText?: string) => {
                 @apply text-gray-600;
             }
         }
+    }
+    .buttons-wrapper {
+        @apply inline-flex;
+        padding-bottom: 1rem;
+        margin-top: 1rem;
+        gap: 0.5rem;
     }
 }
 </style>
