@@ -262,6 +262,7 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
         transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     .form-wrapper {
+        @apply flex flex-col gap-4;
         padding: 1rem 1.25rem 0 1.25rem;
     }
     &.collapsed {

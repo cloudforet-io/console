@@ -43,6 +43,6 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .widget-field-legend {
-    @apply flex items-center gap-1;
+    @apply flex items-center gap-1 justify-between;
 }
 </style>
