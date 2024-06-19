@@ -194,7 +194,11 @@ const setOnlyQuery = (query:ApiQueryHelper, type?: DynamicLayoutType) => {
     if (type === 'list') return;
     const fields: DynamicField[] = state.currentLayout.options?.fields ?? [];
     const only:string[] = [];
-    fields.forEach((d) => { if (d) only.push(d.key); });
+    fields.forEach((d) => {
+        if (d.type === 'more' && d.options?.sub_key) {
+            only.push(d.options.sub_key);
+        } else if (d) only.push(d.key);
+    });
     query.setOnly(...only);
 };
 const setListQuery = (options, type?:DynamicLayoutType): any => {
