@@ -28,7 +28,7 @@ const handleUpdateValue = (value: boolean) => {
 
 onMounted(() => {
     emit('update:is-valid', true);
-    state.proxyValue = props.value;
+    state.proxyValue = props.value ?? props.widgetFieldSchema.options?.default ?? false;
 });
 </script>
 
