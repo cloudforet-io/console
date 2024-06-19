@@ -188,7 +188,6 @@ watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
 .data-source-management-tab-detail-base-information {
     .title {
         @apply items-center;
-        margin-top: 2.25rem;
 
         /* custom design-system component - p-toolbox */
         :deep(.p-toolbox) {

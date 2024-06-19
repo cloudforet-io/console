@@ -181,7 +181,6 @@ onUnmounted(() => {
 .data-source-management-tab-linked-account {
     .title {
         @apply items-center;
-        margin-top: 2.25rem;
         margin-bottom: 0;
         .extra-wrapper {
             @apply flex;
