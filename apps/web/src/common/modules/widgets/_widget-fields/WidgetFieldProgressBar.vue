@@ -1,41 +1,145 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PFieldGroup, PTextInput, PToggleButton, PSelectDropdown, PButton, PIconButton,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { cloneDeep } from 'lodash';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-// import type { BasisFieldOptions } from '@/common/modules/widgets/types/widget-config-type';
-// import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import type {
+    ProgressBarOptions,
+    WidgetFieldComponentEmit,
+    WidgetFieldComponentProps,
+} from '@/common/modules/widgets/types/widget-field-type';
+import type { ProgressBarValue, FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
-import { gray } from '@/styles/colors';
+import { indigo } from '@/styles/colors';
 
+const emit = defineEmits<WidgetFieldComponentEmit<ProgressBarValue|undefined>>();
 
-interface FormatRule {
-    threshold: number;
-    color: string;
-}
-// const props = withDefaults(defineProps<WidgetFieldComponentProps<BasisFieldOptions>>(), {
-//     widgetFieldSchema: () => ({}),
-// });
+const props = withDefaults(defineProps<WidgetFieldComponentProps<ProgressBarOptions>>(), {
+    widgetFieldSchema: () => ({}),
+});
 
 const state = reactive({
-    enabled: false,
-    formatRules: [] as FormatRule[],
+    toggleValue: !!props.value,
+    proxyValue: useProxyValue<Partial<ProgressBarValue>|undefined>('value', props, emit),
+    menuItems: computed<MenuItem[]>(() => {
+        if (!props.dataTable) return [];
+        const dataInfoList = Object.keys(props.dataTable.data_info ?? {}) ?? [];
+        return dataInfoList.map((d) => ({
+            name: d,
+            label: d,
+        }));
+    }),
+    formatRulesValidationList: [] as (boolean|undefined)[],
+    isAllValid: computed<boolean>(() => {
+        if (!state.toggleValue) return true;
+        return (state.formatRulesValidationList.every((valid:boolean) => valid) && !!state.proxyValue?.fieldName && !!state.proxyValue?.basisField && !!state.proxyValue?.totalField);
+    }),
 });
 
 /* Event */
 const handleChangeToggleButton = (val: boolean) => {
-    state.enabled = val;
+    state.toggleValue = val;
+    if (!val) state.proxyValue = undefined;
+    else {
+        initValue();
+    }
+};
+
+const handleUpdateSelect = (val: string, target: 'basisField'|'totalField') => {
+    if (val === state.proxyValue?.[target]) return;
+    state.proxyValue = { ...state.proxyValue, [target]: val };
+};
+
+const handleUpdateFieldName = (val: string) => {
+    if (val === state.proxyValue?.fieldName) return;
+    state.proxyValue = { ...state.proxyValue, fieldName: val };
+};
+
+// Format Rules
+const getInitialFormatRulesValue = (): FormatRulesValue => ({
+    threshold: undefined,
+    color: props.widgetFieldSchema?.options?.baseColor ?? indigo[500],
+});
+const handleBaseColor = (val: string) => {
+    state.proxyValue = {
+        ...state.proxyValue,
+        baseColor: val,
+    };
 };
 const handleClickAddFormatRule = () => {
-    state.formatRules.push({ threshold: 0, color: gray[200] });
+    state.proxyValue = {
+        ...state.proxyValue,
+        formatRules: [
+            ...state.proxyValue?.formatRules ?? [],
+            getInitialFormatRulesValue(),
+        ],
+    };
+    state.formatRulesValidationList = [...state.formatRulesValidationList, undefined];
 };
-const handleDeleteFormatRule = (idx: number) => {
-    state.formatRules.splice(idx, 1);
-    state.formatRules = [...state.formatRules];
+const handleFormatRuleInput = (idx: number|string, key: 'threshold'|'color', val: string) => {
+    if (state.proxyValue === undefined) return;
+    const _customValue = cloneDeep(state.proxyValue.formatRules);
+    if (_customValue === undefined) return;
+    _customValue[idx][key] = val;
+    state.proxyValue = {
+        ...state.proxyValue,
+        formatRules: _customValue,
+    };
+    const updatedFormatRulesValidationList = cloneDeep(state.formatRulesValidationList);
+    updatedFormatRulesValidationList[idx] = !!val;
+    state.formatRulesValidationList = updatedFormatRulesValidationList;
 };
+
+const handleDelete = (idx: number) => {
+    const _customValue = cloneDeep(state.proxyValue?.formatRules ?? []);
+    _customValue.splice(idx, 1);
+    state.proxyValue = {
+        ...state.proxyValue,
+        formatRules: _customValue,
+    };
+    const updatedCustomValue = cloneDeep(state.formatRulesValidationList);
+    updatedCustomValue.splice(idx, 1);
+    state.formatRulesValidationList = updatedCustomValue;
+};
+
+const initValue = () => {
+    if (props.value !== undefined) {
+        state.proxyValue = cloneDeep(props.value);
+    } else if (state.toggleValue) {
+        state.proxyValue = {
+            fieldName: 'Rate',
+            basisField: state.menuItems[0]?.name ?? '',
+            totalField: state.menuItems[0]?.name ?? '',
+            formatRules: cloneDeep(props.widgetFieldSchema.options?.defaultFormatRules),
+            baseColor: props.widgetFieldSchema.options?.baseColor ?? indigo[500],
+        };
+        state.formatRulesValidationList = (state.proxyValue.formatRules ?? []).map((fm) => {
+            if (fm.threshold === undefined) return undefined;
+            return !!fm.threshold;
+        }) ?? [];
+    } else {
+        state.proxyValue = undefined;
+    }
+};
+
+watch(() => state.isAllValid, (value) => {
+    emit('update:is-valid', value);
+}, { immediate: true });
+
+onMounted(() => {
+    if (!state.toggleValue) state.proxyValue = undefined;
+    else {
+        initValue();
+    }
+});
 </script>
 
 <template>
@@ -44,13 +148,13 @@ const handleDeleteFormatRule = (idx: number) => {
                        required
         >
             <template #label-extra>
-                <p-toggle-button :value="state.enabled"
+                <p-toggle-button :value="state.toggleValue"
                                  class="toggle-button"
                                  @change-toggle="handleChangeToggleButton"
                 />
             </template>
             <div class="form-content-wrapper"
-                 :class="{ 'display': state.enabled }"
+                 :class="{ 'display': state.toggleValue }"
             >
                 <div class="description">
                     <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.PROGRESS_BAR_DESCRIPTION_1') }}</span>
@@ -60,20 +164,28 @@ const handleDeleteFormatRule = (idx: number) => {
                                style-type="secondary"
                                required
                 >
-                    <p-text-input :value="''" />
+                    <p-text-input :value="state.proxyValue?.fieldName"
+                                  @update:value="handleUpdateFieldName"
+                    />
                 </p-field-group>
                 <div class="field-wrapper">
                     <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.BASIS_FIELD')"
                                    style-type="secondary"
                                    required
                     >
-                        <p-select-dropdown :menu="[]" />
+                        <p-select-dropdown :menu="state.menuItems"
+                                           :selected="state.proxyValue?.basisField"
+                                           @update:selected="handleUpdateSelect($event, 'basisField')"
+                        />
                     </p-field-group>
                     <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.TOTAL_FIELD')"
                                    style-type="secondary"
                                    required
                     >
-                        <p-select-dropdown :menu="[]" />
+                        <p-select-dropdown :menu="state.menuItems"
+                                           :selected="state.proxyValue?.totalField"
+                                           @update:selected="handleUpdateSelect($event, 'totalField')"
+                        />
                     </p-field-group>
                 </div>
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.FORMAT_RULES')"
@@ -88,24 +200,52 @@ const handleDeleteFormatRule = (idx: number) => {
                         >
                             {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ADD_RULE') }}
                         </p-button>
-                        <div v-for="(formatRule, idx) in state.formatRules"
-                             :key="`format-rule-${formatRule.threshold}-${formatRule.color}-${idx}`"
-                             class="format-rules-form-wrapper"
-                        >
-                            <p-text-input :value="formatRule.threshold"
+                        <div class="custom-menu-box">
+                            <div v-for="(formatRule, idx) in state.proxyValue?.formatRules ?? []"
+                                 :key="idx"
+                                 class="format-rules-input-wrapper"
+                            >
+                                <p-field-group required>
+                                    <p-text-input :value="formatRule.threshold"
+                                                  type="number"
+                                                  :name="`format-rule-threshold-${idx}`"
+                                                  :min="0"
+                                                  :invalid="state.formatRulesValidationList[idx] === false"
+                                                  @update:value="handleFormatRuleInput(idx, 'threshold', $event)"
+                                    >
+                                        <template #input-right>
+                                            %
+                                        </template>
+                                    </p-text-input>
+                                </p-field-group>
+                                <div class="right-part">
+                                    <color-input :value="formatRule.color"
+                                                 class="color-input"
+                                                 @update:value="handleFormatRuleInput(idx, 'color', $event)"
+                                    />
+                                    <p-icon-button name="ic_delete"
+                                                   style-type="negative-transparent"
+                                                   size="sm"
+                                                   class="delete-button"
+                                                   @click="handleDelete(idx)"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="format-rules-input-wrapper">
+                            <p-text-input :value="0"
                                           type="number"
-                                          placeholder="Threshold"
-                            />
-                            <color-input :value="formatRule.color"
-                                         @update:value="formatRule.color = $event"
-                            />
-                            <p-icon-button name="ic_delete"
-                                           style-type="negative-transparent"
-                                           size="sm"
-                                           :disabled="state.formatRules.length === 1"
-                                           class="delete-button"
-                                           @click="handleDeleteFormatRule(idx)"
-                            />
+                                          disabled
+                            >
+                                <span class="base-label">{{ $t('COMMON.WIDGETS.FORMAT_RULES.BASE') }}</span>
+                            </p-text-input>
+                            <div class="right-part">
+                                <color-input :value="state.proxyValue?.baseColor"
+                                             class="color-input"
+                                             @update:value="handleBaseColor"
+                                />
+                                <div class="block" />
+                            </div>
                         </div>
                     </div>
                 </p-field-group>
@@ -155,22 +295,54 @@ const handleDeleteFormatRule = (idx: number) => {
             width: 50%;
         }
     }
-    .format-rules-form-wrapper {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        padding-bottom: 0.5rem;
-        .p-text-input {
-            flex: 1;
-            width: 100%;
+    .format-rules-wrapper {
+        @apply bg-gray-100 rounded-md;
+        padding: 0.5rem;
+        .add-button {
+            margin-bottom: 0.5rem;
         }
-        .delete-button {
-            width: 2rem;
+
+        .custom-menu-box {
+            @apply flex flex-col-reverse;
+        }
+
+        .format-rules-input-wrapper {
+            @apply flex gap-2 items-start;
+            padding-bottom: 0.5rem;
+
+            .base-label {
+                @apply text-label-md;
+                line-height: 1.09375rem;
+            }
+
+            .right-part {
+                @apply flex gap-2 items-center;
+                .color-input {
+                    flex-shrink: 0;
+                }
+
+                .delete-button {
+                    flex-shrink: 0;
+                    width: 2rem;
+                }
+
+                .block {
+                    flex-shrink: 0;
+                    width: 1.5rem;
+                }
+            }
+
+            /* custom design-system component - p-text-input */
+            :deep(.p-text-input) {
+                width: 100%;
+            }
+
+            :deep(.p-field-group) {
+                margin-bottom: 0;
+                width: 100%;
+                flex-shrink: 1;
+            }
         }
     }
-}
-.format-rules-wrapper {
-    @apply bg-gray-100 rounded-md;
-    padding: 0.5rem 0.5rem 0 0.5rem;
 }
 </style>

@@ -15,6 +15,14 @@ export interface ComparisonValue {
     increaseColor?: string;
     format?: ComparisonFormat;
 }
+
+export interface ProgressBarValue {
+    fieldName: string;
+    basisField?: string;
+    totalField?: string;
+    formatRules?: FormatRulesValue[];
+    baseColor?: string;
+}
 export interface FormatRulesValue {
     threshold?: number;
     color: string;
