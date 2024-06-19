@@ -39,7 +39,7 @@ const state = reactive({
                 const start = dayjs.utc().subtract(i + 2, 'month').startOf('month');
                 return {
                     name: start.format('YYYY-MM'),
-                    label: dayjs(start).locale(locale).format('MMMM, YYYY'),
+                    label: dayjs(start).utc().locale(locale).format('MMMM, YYYY'),
                 };
             })),
             {

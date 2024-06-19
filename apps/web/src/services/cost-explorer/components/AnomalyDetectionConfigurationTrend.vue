@@ -23,7 +23,7 @@ const dropdownState = reactive({
             },
             ...(range(3).map((i) => {
                 const start = dayjs.utc().subtract(i + 1, 'year').startOf('year');
-                const label = dayjs(start).locale(locale);
+                const label = dayjs(start).utc().locale(locale);
                 return {
                     name: start.format('YYYY-MM'),
                     label: `${label.format('YYYY')} (${label.startOf('year').format('YYYY-MM')} ~ ${label.endOf('year').format('YYYY-MM')})`,
