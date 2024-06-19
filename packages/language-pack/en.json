@@ -1529,6 +1529,8 @@
 			"CREATE": "Create",
 			"CREAT_NEW_DASHBOARD": "Create New Dashboard",
 			"DASHBOARDS_TITLE": "Dashboard",
+			"DEPRECATED": "Deprecated",
+			"DEPRECATED_DESCRIPTION": "This dashboard is no longer supported and will be removed soon as the new dashboard is adopted.",
 			"FILTER_ALL": "All",
 			"FILTER_PRIVATE": "Private",
 			"FILTER_PUBLIC": "Pubilc",

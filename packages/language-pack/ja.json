@@ -1529,6 +1529,8 @@
 			"CREATE": "作成",
 			"CREAT_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"DASHBOARDS_TITLE": "ダッシュボード",
+			"DEPRECATED": "",
+			"DEPRECATED_DESCRIPTION": "",
 			"FILTER_ALL": "すべて",
 			"FILTER_PRIVATE": "非公開",
 			"FILTER_PUBLIC": "公開",
