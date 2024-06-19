@@ -132,7 +132,6 @@ const getWidgetLoading = (widgetId: string) => {
     if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
     if (!state.intersectedWidgetMap[widgetId]) return true;
-    if (widgetGenerateState.widgetId === widgetId) return true;
     return false;
 };
 
@@ -243,7 +242,7 @@ watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
         await dashboardDetailStore.listDashboardWidgets();
-        await loadAWidget(widgetGenerateStore.state.widgetId);
+        await loadAWidget(widgetGenerateState.widgetId);
     }
 });
 </script>

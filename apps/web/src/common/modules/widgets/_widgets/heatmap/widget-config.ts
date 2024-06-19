@@ -26,6 +26,11 @@ const heatmap: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
+        legend: {
+            options: {
+                default: true,
+            },
+        },
     },
 };
 

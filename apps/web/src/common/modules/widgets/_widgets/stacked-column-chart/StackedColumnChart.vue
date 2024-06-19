@@ -52,6 +52,7 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartOptions: computed<BarSeriesOption>(() => ({
         legend: {
+            show: state.showLegends,
             bottom: 0,
             left: 0,
             icon: 'circle',
@@ -80,7 +81,7 @@ const state = reactive({
         },
         series: state.chartData,
     })),
-    //
+    // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
@@ -96,6 +97,8 @@ const state = reactive({
         }
         return { start: _start, end: _end };
     }),
+    // optional fields
+    showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
