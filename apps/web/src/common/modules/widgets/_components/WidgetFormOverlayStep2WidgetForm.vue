@@ -224,6 +224,7 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="keyGenerator(fieldName, 'option')"
                                :widget-field-schema="fieldSchema"
+                               :data-table="widgetGenerateGetters.selectedDataTable"
                                :value="widgetGenerateState.widgetValueMap[fieldName]"
                                :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                @update:value="handleUpdateFieldValue(fieldName, $event)"

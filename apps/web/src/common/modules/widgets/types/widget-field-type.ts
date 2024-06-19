@@ -78,6 +78,11 @@ export interface ComparisonOptions {
     // forTable?: boolean;
 }
 
+export interface ProgressBarOptions {
+    defaultFormatRules?: FormatRulesValue[];
+    baseColor?: string;
+}
+
 export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_TYPE];
 export interface FormatRulesOptions {
     formatRulesType: FormatRulesType;
@@ -90,7 +95,7 @@ type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOption
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
-    | ComparisonOptions;
+    | ComparisonOptions | ProgressBarOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;

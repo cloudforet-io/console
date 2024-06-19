@@ -1,6 +1,6 @@
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+
+import { indigo, red, yellow } from '@/styles/colors';
 
 
 const table: WidgetConfig = {
@@ -26,15 +26,18 @@ const table: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        comparison: {
-            options: {
-                granularity: GRANULARITY.DAILY,
-                forTable: true,
-            },
-        },
+        comparison: {},
         subTotal: {},
         total: {},
-        progressBar: {},
+        progressBar: {
+            options: {
+                defaultFormatRules: [
+                    { threshold: 90, color: yellow[500] },
+                    { threshold: 100, color: red[400] },
+                ],
+                baseColor: indigo[500],
+            },
+        },
     },
 };
 
