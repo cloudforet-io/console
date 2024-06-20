@@ -115,18 +115,11 @@ export const ANOMALY_DETECTION_MENU_ITEM_MAP = {
 export const CONFIG_TEMP_DATA = [
     {
         config_id: 'id1',
-        name: '나영의 detection config1',
+        name: '나영의 detection config1나영의 detection config1',
         policy: '급격한 변화 탐지',
         data_source: 'aws',
         recipients: [
-            {
-                type: 'WORKSPACE_OWNER',
-                cnt: 4,
-            },
-            {
-                type: 'WORKSPACE_MEMBER',
-                cnt: 5,
-            },
+            '나는 롤네임이야123123123', '나도 롤네임이야', '나돈데?',
         ],
         is_use: true,
         lasted_at: '2021-09-01 12:00:00',
@@ -137,10 +130,7 @@ export const CONFIG_TEMP_DATA = [
         policy: '급격한 변화 탐지',
         data_source: 'google_cloud',
         recipients: [
-            {
-                type: 'USER',
-                cnt: 16,
-            },
+            '나는 롤네임이야',
         ],
         is_use: false,
         lasted_at: '2021-09-01 12:00:00',
@@ -151,10 +141,7 @@ export const CONFIG_TEMP_DATA = [
         policy: '급격한 변화 탐지',
         data_source: 'aws',
         recipients: [
-            {
-                type: 'WORKSPACE_MEMBER',
-                cnt: 13,
-            },
+            '나는 롤네임이야', '나도 롤네임이야',
         ],
         is_use: true,
         lasted_at: '--',
