@@ -852,6 +852,7 @@
 			"DATA_SOURCES": {
 				"ACTUAL_COST": "Actual Cost",
 				"ALL": "All",
+				"ALT_S_DISABLED_TOGGLE": "Successfully completed.",
 				"ALT_S_RESET": "Reset successfully completed.",
 				"ALT_S_UPDATE": "Update successfully completed.",
 				"CANCELED": "Canceled",
@@ -864,6 +865,8 @@
 				"ERROR_FOUND_TITLE": "Error Details",
 				"GUIDE": "How to register data sources",
 				"LINKED": "Linked",
+				"MODAL_CONTENT": "By allowing this data type, it will be accessible to all workspaces in user mode.",
+				"MODAL_TITLE": "Allow Access",
 				"NOT_LINKED": "Not Linked",
 				"PAY_AS_YOU_GO": "Pay As You Go",
 				"RESET": "Reset",

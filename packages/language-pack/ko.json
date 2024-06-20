@@ -852,6 +852,7 @@
 			"DATA_SOURCES": {
 				"ACTUAL_COST": "실 사용액",
 				"ALL": "전체",
+				"ALT_S_DISABLED_TOGGLE": "",
 				"ALT_S_RESET": "연결된 어카운트 초기화 완료",
 				"ALT_S_UPDATE": "연결된 어카운트 수정 완료",
 				"CANCELED": "취소됨",
@@ -864,6 +865,8 @@
 				"ERROR_FOUND_TITLE": "오류 내용",
 				"GUIDE": "데이터 소스 등록 방법 알아보기",
 				"LINKED": "연결됨",
+				"MODAL_CONTENT": "",
+				"MODAL_TITLE": "",
 				"NOT_LINKED": "연결되지 않음",
 				"PAY_AS_YOU_GO": "",
 				"RESET": "초기화",

@@ -852,6 +852,7 @@
 			"DATA_SOURCES": {
 				"ACTUAL_COST": "費用",
 				"ALL": "すべて",
+				"ALT_S_DISABLED_TOGGLE": "",
 				"ALT_S_RESET": "接続されたアカウントのリセットが完了しました",
 				"ALT_S_UPDATE": "接続されたアカウントの更新が完了しました",
 				"CANCELED": "キャンセル",
@@ -864,6 +865,8 @@
 				"ERROR_FOUND_TITLE": "エラーの詳細",
 				"GUIDE": "データソース登録方法を調べる",
 				"LINKED": "リンク済み",
+				"MODAL_CONTENT": "",
+				"MODAL_TITLE": "",
 				"NOT_LINKED": "リンク未設定",
 				"PAY_AS_YOU_GO": "",
 				"RESET": "初期化",
