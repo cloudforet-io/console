@@ -51,6 +51,7 @@ watch(() => route.params.configId, (configId) => {
             </template>
         </p-heading>
         <anomaly-detection-configuration-recipients-form v-if="state.isEdit"
+                                                         :is-edit.sync="state.isEdit"
                                                          :is-detail-page="state.isDetailPage"
         />
         <p-definition-table v-else

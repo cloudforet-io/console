@@ -12,6 +12,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import {
     CONFIGURATION_CATEGORY_MENU, MANAGED_POLICY_MENU,
@@ -19,14 +20,19 @@ import {
 
 interface Props {
     isDetailPage: boolean;
+    isEdit: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isDetailPage: false,
+    isEdit: false,
 });
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+
+const emit = defineEmits<{(event: 'is-edit'): void;
+}>();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
@@ -39,6 +45,7 @@ const state = reactive({
         })),
     ]),
     selectedRules: undefined,
+    proxyIsEdit: useProxyValue('isEdit', props, emit),
 });
 
 const {
