@@ -8,6 +8,7 @@ import {
 
 import { i18n } from '@/translations';
 
+import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/bookmark/type/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
