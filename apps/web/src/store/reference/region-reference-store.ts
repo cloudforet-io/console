@@ -20,43 +20,13 @@ import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-con
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const RegionMap = {
-    africa: {
-        continent_code: 'africa',
-        continent_label: 'Africa',
-        latitude: 11.081385,
-        longitude: 21.621094,
-    },
-    europe: {
-        continent_code: 'europe',
-        continent_label: 'Europe',
-        latitude: 50.896104,
-        longitude: 19.160156,
-    },
-    north_america: {
-        continent_code: 'north_america',
-        continent_label: 'North America',
-        latitude: 39.563353,
-        longitude: -99.316406,
-    },
-    south_america: {
-        continent_code: 'south_america',
-        continent_label: 'South America',
-        latitude: -13.6631791,
-        longitude: -69.6417454,
-    },
-    asia_pacific: {
-        continent_code: 'asia_pacific',
-        continent_label: 'Asia Pacific',
-        longitude: 103.183594,
-        latitude: 47.212106,
-    },
-    middle_east: {
-        continent_code: 'middle_east',
-        continent_label: 'Middle East',
-        longitude: 26.3842897,
-        latitude: 26.8448363,
-    },
+const CONTINENT_LABEL_MAP = {
+    africa: 'Africa',
+    europe: 'Europe',
+    north_america: 'North America',
+    south_america: 'South America',
+    asia_pacific: 'Asia Pacific',
+    middle_east: 'Middle East',
 };
 
 type PickedRegionModel = Pick<RegionModel, 'provider'>;
@@ -108,12 +78,15 @@ export const useRegionReferenceStore = defineStore('reference-region', () => {
                     key: regionKey,
                     label: `${regionInfo.name} | ${regionInfo.region_code}`,
                     name: regionInfo.name,
-                    continent: RegionMap[regionInfo.tags.continent] || {},
+                    continent: {
+                        continent_code: regionInfo.tags?.continent,
+                        continent_label: regionInfo.tags?.continent ? CONTINENT_LABEL_MAP[regionInfo.tags.continent] : '',
+                        latitude: regionInfo.tags?.latitude ?? 0,
+                        longitude: regionInfo.tags?.longitude ?? 0,
+                    },
                     data: {
                         provider: regionInfo.provider,
                     },
-                    // latitude: regionInfo.tags.latitude ?? 0,
-                    // longitude: regionInfo.tags.longitude ?? 0,
                 };
             });
             state.items = referenceMap;
@@ -130,7 +103,12 @@ export const useRegionReferenceStore = defineStore('reference-region', () => {
                 key: regionInfo.region_code,
                 label: `${regionInfo.name} | ${regionInfo.region_code}`,
                 name: regionInfo.name,
-                continent: RegionMap[regionInfo.tags.continent] || {},
+                continent: {
+                    continent_code: regionInfo.tags?.continent,
+                    continent_label: regionInfo.tags?.continent ? CONTINENT_LABEL_MAP[regionInfo.tags.continent] : '',
+                    latitude: regionInfo.tags?.latitude ?? 0,
+                    longitude: regionInfo.tags?.longitude ?? 0,
+                },
                 data: {
                     provider: regionInfo.provider,
                 },
