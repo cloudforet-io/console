@@ -68,19 +68,23 @@ const getNotifyLevelInfo = (type: string): string => {
             <template #col-name-format="{value}">
                 <p-link highlight
                         :to="{}"
+                        class="col-name"
                 >
                     {{ value }}
                 </p-link>
             </template>
             <template #col-config_id-format="{value}">
                 <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
                         :to="{}"
+                        class="col-config"
                 >
                     {{ value }}
                 </p-link>
             </template>
             <template #col-policy-format="{value}">
                 <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
                         :to="{}"
                 >
                     {{ value }}
@@ -113,6 +117,23 @@ const getNotifyLevelInfo = (type: string): string => {
 
 <style scoped lang="postcss">
 .anomaly-detection-history-table {
+    .col-name {
+        /* custom design-system component - p-link */
+        :deep(.p-link) {
+            @apply block truncate;
+            max-width: 18.375rem;
+        }
+    }
+    .col-config {
+        /* custom design-system component - p-link */
+        :deep(.p-link) {
+            @apply flex;
+            .text {
+                @apply block truncate;
+                max-width: 10.125rem;
+            }
+        }
+    }
     .col-data-source {
         @apply flex items-center;
         gap: 0.5rem;

@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PHeading, PSelectDropdown } from '@spaceone/design-system';
+import { PHeading, PSelectDropdown, PBadge } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
 import { i18n } from '@/translations';
 
+import CustomDateModal from '@/common/components/custom-date-modal/CustomDateModal.vue';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import AnomalyDetectionHistoryTable from '@/services/cost-explorer/components/AnomalyDetectionHistoryTable.vue';
@@ -53,8 +54,9 @@ const state = reactive({
         ];
     }),
     selectedPeriodItem: ANOMALY_DETECTION_MENU.ALL as string,
-    selectedPeriod: {} as Period,
-    customDateModalVisible: false,
+    selectedPeriod: undefined as Period|undefined,
+    customPeriod: undefined as Period|undefined,
+    customPeriodModalVisible: false,
 });
 
 const convertRelativePeriodToPeriod = (_includeToday: boolean): Period => {
@@ -69,12 +71,18 @@ const getRefinedDailyPeriod = (yearMonth: string): Period => ({
     start: dayjs.utc(yearMonth).startOf('month').format('YYYY-MM-DD'),
     end: dayjs.utc(yearMonth).endOf('month').format('YYYY-MM-DD'),
 });
+const handleConfirmCustomPeriod = (start: string, end: string): void => {
+    state.selectedPeriod = undefined;
+    state.selectedPeriodItem = ANOMALY_DETECTION_MENU.CUSTOM;
+    state.customPeriod = { start, end };
+};
 const handleSelectPeriod = (periodMenuName: string) => {
-    if (periodMenuName === 'custom') {
-        state.customDateModalVisible = true;
+    if (periodMenuName === ANOMALY_DETECTION_MENU.CUSTOM) {
+        state.customPeriodModalVisible = true;
         return;
     }
 
+    state.customPeriod = undefined;
     state.selectedPeriodItem = periodMenuName;
     const _selectedPeriodItem = ANOMALY_DETECTION_MENU_ITEM_MAP[periodMenuName];
     if (_selectedPeriodItem) {
@@ -92,22 +100,44 @@ const handleSelectPeriod = (periodMenuName: string) => {
     <div class="anomaly-detection-history-page">
         <p-heading :title="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE')">
             <template #extra>
-                <p-select-dropdown :menu="state.periodMenuItems"
-                                   :selection-label="$t('INVENTORY.ASSET_ANALYSIS.PERIOD.PERIOD')"
-                                   disable-proxy
-                                   reset-selection-on-menu-close
-                                   style-type="rounded"
-                                   :selected.sync="state.selectedPeriodItem"
-                                   @select="handleSelectPeriod"
-                />
+                <div class="extra-wrapper">
+                    <p-select-dropdown :menu="state.periodMenuItems"
+                                       :selection-label="$t('INVENTORY.ASSET_ANALYSIS.PERIOD.PERIOD')"
+                                       disable-proxy
+                                       reset-selection-on-menu-close
+                                       style-type="rounded"
+                                       :selected.sync="state.selectedPeriodItem"
+                                       @select="handleSelectPeriod"
+                    />
+                    <p-badge v-if="state.customPeriod?.start"
+                             class="custom-period"
+                             style-type="gray200"
+                             badge-type="subtle"
+                    >
+                        <span>{{ state.customPeriod?.start }} ~ {{ state.customPeriod?.end }}</span>
+                    </p-badge>
+                </div>
             </template>
         </p-heading>
         <anomaly-detection-history-table />
+        <custom-date-modal :visible.sync="state.customPeriodModalVisible"
+                           disable-future
+                           :start="state.customPeriod?.start"
+                           :end="state.customPeriod?.end"
+                           @confirm="handleConfirmCustomPeriod"
+        />
     </div>
 </template>
 
 <style scoped lang="postcss">
 .anomaly-detection-history-page {
     @apply flex flex-col;
+    .extra-wrapper {
+        @apply flex items-center;
+        gap: 0.5rem;
+        .custom-period {
+            height: 1.25rem;
+        }
+    }
 }
 </style>
