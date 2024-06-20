@@ -172,8 +172,8 @@ export const CONFIG_TEMP_DATA = [
 export const HISTORY_TEMP_DATA = [
     {
         history_id: 'id1',
-        name: '[Product] AmazonGrafana에서 비용 발생함',
-        config_id: 'Configuration 14',
+        name: '[Product] AmazonGrafana에서 비용 발생함AmazonGrafana에서 비용 발생함AmazonGrafana에서 비용 발생함',
+        config_id: 'Configuration 14Configuration 14Configuration 14',
         policy: '급격한 변화 탐지',
         data_source: 'aws',
         level: 'critical',
