@@ -1,22 +1,18 @@
 <script setup lang="ts">
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
-import { PDivider, PFieldTitle, PLink } from '@spaceone/design-system';
-import type { Dayjs } from 'dayjs';
+import {
+    PDivider, PFieldTitle, PLink, PSpinner,
+} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
-import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
-import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
@@ -31,7 +27,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
 import CostSummaryChart from '@/services/workspace-home/components/CostSummaryChart.vue';
@@ -51,17 +47,15 @@ const storeState = reactive({
     getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
 });
 const state = reactive({
-    loading: false,
-    currentDate: undefined as Dayjs | undefined,
+    loading: true,
     currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency),
     isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    recentReportMonth: undefined as string|undefined,
-    data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     chartData: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
-    totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
+    totalAmount: computed(() => sum(state.chartData?.results[0]?.value_sum.map((d) => d.value))),
+    recentReportMonth: computed(() => dayjs().utc().subtract(1, 'month')),
     period: computed(() => {
-        const start = dayjs.utc(state.recentReportMonth).subtract(5, 'month').format('YYYY-MM');
-        const end = state.recentReportMonth;
+        const start = dayjs(state.recentReportMonth).utc().subtract(5, 'month').format('YYYY-MM');
+        const end = state.recentReportMonth.format('YYYY-MM');
         return { start, end };
     }),
     emptyData: computed<EmptyData>(() => {
@@ -85,12 +79,12 @@ const state = reactive({
     }),
 });
 
-const analyzeCostReportData = async (isChart?: boolean) => {
+const analyzeCostReportData = async () => {
     state.loading = true;
     try {
         const _period = {
-            start: isChart ? state.period.start : state.currentDate?.format('YYYY-MM'),
-            end: isChart ? state.period.end : state.currentDate?.format('YYYY-MM'),
+            start: state.period.start,
+            end: state.period.end,
         };
         const defaultQuery = {
             start: _period.start,
@@ -102,13 +96,6 @@ const analyzeCostReportData = async (isChart?: boolean) => {
                 },
             },
         };
-        const reportQuery = {
-            group_by: [GROUP_BY.PROVIDER],
-            sort: [{
-                key: 'value_sum',
-                desc: true,
-            }],
-        };
         const chartQuery = {
             granularity: GRANULARITY.MONTHLY,
             field_group: ['date'],
@@ -117,56 +104,23 @@ const analyzeCostReportData = async (isChart?: boolean) => {
                 desc: true,
             }],
         };
-        const res = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+        state.chartData = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
             cost_report_config_id: storeState.costReportConfig?.cost_report_config_id,
             is_confirmed: true,
-            query: isChart ? { ...defaultQuery, ...chartQuery } : { ...defaultQuery, ...reportQuery },
+            query: { ...defaultQuery, ...chartQuery },
         });
-        if (!isChart) {
-            state.data = res;
-        } else {
-            state.chartData = res;
-        }
     } catch (e) {
-        if (!isChart) {
-            state.data = {};
-        } else {
-            state.chartData = {};
-        }
+        state.chartData = undefined;
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
     }
 };
-const fetchRecentReportData = async (costReportConfigId?: string) => {
-    if (!costReportConfigId) return;
-    try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
-            status: 'SUCCESS',
-            query: {
-                only: ['report_month', 'issue_date'],
-                filter: [
-                    { k: 'cost_report_config_id', v: costReportConfigId, o: 'eq' },
-                ],
-            },
-        });
-        const reportMonthList: string[] = results?.map((report) => report.report_month) ?? [];
-        state.recentReportMonth = reportMonthList.sort((a, b) => (dayjs.utc(b).isSameOrAfter(dayjs.utc(a)) ? 1 : -1))[0];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
 
 watch(() => storeState.costReportConfig, async () => {
     if (state.isWorkspaceMember) return;
-    await fetchRecentReportData(storeState.costReportConfig?.cost_report_config_id);
     await analyzeCostReportData();
-    await analyzeCostReportData(true);
-}, { immediate: true });
-watch(() => state.recentReportMonth, async (after) => {
-    if (!after) return;
-    state.currentDate = dayjs.utc(after);
-}, { immediate: true });
+});
 </script>
 
 <template>
@@ -175,42 +129,52 @@ watch(() => state.recentReportMonth, async (after) => {
                        size="lg"
                        class="main-title"
         />
-        <div v-if="state.data?.results.length > 0">
-            <div class="content-wrapper">
-                <div class="price-wrapper">
-                    <div>
-                        <p>{{ $t('HOME.COST_SUMMARY_RECENT', { date: state.recentReportMonth }) }}</p>
-                        <p class="price">
-                            <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
-                            <span>{{ currencyMoneyFormatter(state.totalAmount, { currency: state.currency, style: 'decimal' }) }}</span>
-                        </p>
-                    </div>
-                </div>
-                <cost-summary-chart :period="state.period"
-                                    :loading="state.loading"
-                                    :currency="state.currency"
-                                    :data="state.chartData"
-                />
-            </div>
-            <p-divider class="divider" />
-            <p-link highlight
-                    :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
-                    action-icon="internal-link"
-                    class="link"
-            >
-                {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
-            </p-link>
+        <div v-if="state.loading"
+             class="loading"
+        >
+            <p-spinner size="lg" />
         </div>
-        <empty-summary-data v-else
-                            :image-url="require('/images/home/img_workspace-home_cost-summary_empty-state-background-min.png')"
-                            :empty-data="state.emptyData"
-                            :type="SUMMARY_DATA_TYPE.COST"
-        />
+        <div v-else>
+            <div v-if="state.chartData?.results.length > 0">
+                <div class="content-wrapper">
+                    <div class="price-wrapper">
+                        <div>
+                            <p>{{ $t('HOME.COST_SUMMARY_RECENT', { date: state.recentReportMonth.format('YYYY-MM') }) }}</p>
+                            <p class="price">
+                                <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
+                                <span>{{ currencyMoneyFormatter(state.totalAmount, { currency: state.currency, style: 'decimal' }) }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <cost-summary-chart :period="state.period"
+                                        :currency="state.currency"
+                                        :data="state.chartData"
+                    />
+                </div>
+                <p-divider class="divider" />
+                <p-link highlight
+                        :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
+                        action-icon="internal-link"
+                        class="link"
+                >
+                    {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
+                </p-link>
+            </div>
+            <empty-summary-data v-else
+                                :image-url="require('/images/home/img_workspace-home_cost-summary_empty-state-background-min.png')"
+                                :empty-data="state.emptyData"
+                                :type="SUMMARY_DATA_TYPE.COST"
+            />
+        </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .cost-summary {
+    .loading {
+        @apply flex items-center justify-center;
+        height: calc(100% - 2.625rem);
+    }
     .main-title {
         padding-left: 1rem;
     }
@@ -237,24 +201,6 @@ watch(() => state.recentReportMonth, async (after) => {
         @apply flex items-center justify-center text-label-md;
         padding-top: 0.625rem;
         padding-bottom: 0.75rem;
-    }
-    .no-recent {
-        @apply flex flex-col justify-center items-center;
-        height: calc(100% - 1.375rem);
-        background-repeat: no-repeat;
-        background-position: left;
-        gap: 0.75rem;
-        .icon-wrapper {
-            @apply flex justify-center items-center bg-peacock-100 rounded-full;
-            width: 2.75rem;
-            height: 2.75rem;
-        }
-        .title {
-            @apply text-label-xl text-peacock-800 font-medium;
-        }
-        .desc {
-            @apply text-gray-700;
-        }
     }
 }
 </style>

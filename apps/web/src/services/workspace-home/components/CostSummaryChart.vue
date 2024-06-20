@@ -3,7 +3,6 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { PSkeleton } from '@spaceone/design-system';
 import {
     cloneDeep, sortBy,
 } from 'lodash';
@@ -24,13 +23,11 @@ import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/wi
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 
 interface Props {
-    loading: boolean
     period: { start: string; end: string };
     data: AnalyzeResponse<CostReportDataAnalyzeResult>;
     currency: Currency|undefined;
 }
 const props = withDefaults(defineProps<Props>(), {
-    loading: false,
     data: () => ({}),
 });
 
@@ -119,8 +116,8 @@ const drawChart = () => {
 };
 
 /* Watcher */
-watch([() => props.loading, () => chartContext.value], async ([loading, _chartContext]) => {
-    if (!loading && _chartContext && props.data?.results) {
+watch(() => chartContext.value, async (_chartContext) => {
+    if (_chartContext && props.data?.results) {
         drawChart();
     }
 }, { immediate: true });
@@ -128,11 +125,7 @@ watch([() => props.loading, () => chartContext.value], async ([loading, _chartCo
 
 <template>
     <div class="cost-summary-chart">
-        <p-skeleton v-if="props.loading"
-                    height="100%"
-        />
-        <div v-show="!props.loading"
-             ref="chartContext"
+        <div ref="chartContext"
              class="chart"
         />
     </div>
