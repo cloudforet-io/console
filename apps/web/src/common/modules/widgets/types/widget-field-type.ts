@@ -91,11 +91,15 @@ export interface FormatRulesOptions {
     default?: FormatRulesValue[];
     baseColor?: string;
 }
+
+export interface ColorSchemaOptions {
+    default?: string;
+}
 type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
-    | ComparisonOptions | ProgressBarOptions;
+    | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -109,7 +113,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'subTotal' | 'total'
     | 'progressBar'
     | 'formatRules'
-    | 'granularity';
+    | 'granularity' | 'colorSchema';
 
 export interface WidgetFieldComponentProps<FieldOptions> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;

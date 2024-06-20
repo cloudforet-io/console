@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import type { MaxOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import type { MaxOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const emit = defineEmits<{(e: 'update:value', value: number): void;
-}>();
+const emit = defineEmits<WidgetFieldComponentEmit<number>>();
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<MaxOptions>>(), {
     widgetFieldSchema: () => ({
@@ -18,13 +18,18 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<MaxOptions>>(),
 });
 
 const state = reactive({
-    value: props.widgetFieldSchema.options?.default ?? props.widgetFieldSchema.options?.min ?? 0,
+    proxyValue: useProxyValue<number>('value', props, emit),
 });
 
-const handleUpdateValue = (value: number|'') => {
-    state.value = (value < 0) || (value === '') ? 0 : value;
-    emit('update:value', state.value);
+const handleUpdateValue = (value: string|'') => {
+    const parsedValue = value === '' ? 0 : parseInt(value);
+    state.proxyValue = (parsedValue < 0) ? 0 : parsedValue;
 };
+
+onMounted(() => {
+    emit('update:is-valid', true);
+    state.proxyValue = props.value ?? props.widgetFieldSchema.options?.default ?? 0;
+});
 </script>
 
 <template>
@@ -34,7 +39,7 @@ const handleUpdateValue = (value: number|'') => {
         >
             <p-text-input type="number"
                           :min="0"
-                          :value="state.value"
+                          :value="state.proxyValue"
                           @update:value="handleUpdateValue"
             />
         </p-field-group>
@@ -47,5 +52,10 @@ const handleUpdateValue = (value: number|'') => {
     :deep(.p-text-input) {
         width: 100%;
     }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
 }
 </style>

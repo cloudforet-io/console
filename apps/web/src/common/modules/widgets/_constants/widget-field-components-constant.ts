@@ -64,4 +64,7 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComp
     granularity: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldGranularity.vue'),
     }),
+    colorSchema: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldColorSchema.vue'),
+    }),
 };

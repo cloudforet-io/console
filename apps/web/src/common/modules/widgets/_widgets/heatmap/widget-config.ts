@@ -24,6 +24,7 @@ const heatmap: WidgetConfig = {
                 max: 14,
             },
         },
+        colorSchema: {},
     },
     optionalFieldsSchema: {
         legend: {
