@@ -10,7 +10,7 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { groupBy, isEmpty, throttle } from 'lodash';
+import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -150,6 +150,9 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
                         operator: 'sum',
                     },
                 },
+                field_group: [state.yAxisField],
+                sort: [{ key: `_total_${state.dataField}`, desc: true }],
+                page: { start: 1, limit: state.xAxisCount },
             },
             vars: props.dashboardVariables,
         });
@@ -166,22 +169,31 @@ const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
     // get xAxis, yAxis data
-    let _xAxisData: string[] = [];
     if (state.xAxisField === DATE_FIELD) {
-        _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+        state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
-        _xAxisData = Array.from(new Set(rawData.results?.map((v) => v[state.xAxisField] as string)));
+        state.xAxisData = rawData.results?.map((d) => d[state.xAxisField] as string) ?? [];
     }
-    state.xAxisData = _xAxisData.slice(0, state.xAxisCount);
-    state.yAxisData = Array.from(new Set(rawData.results?.map((v) => v[state.yAxisField]))).slice(0, state.yAxisCount);
 
-    // get chart data
-    const _xAxisGroupedData = groupBy(rawData?.results, state.xAxisField);
+    // slice yAxisData by yAxisCount
+    const _refinedByYAxisCount: any[] = [];
+    rawData.results?.forEach((d) => {
+        const _values = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.yAxisCount);
+        _values.forEach((v) => {
+            _refinedByYAxisCount.push({
+                [state.xAxisField]: d[state.xAxisField],
+                ...v,
+            });
+        });
+    });
+    state.yAxisData = Array.from(new Set(_refinedByYAxisCount.map((d) => d[state.yAxisField])));
+
+    // set chartData
     const _chartData: any[] = [];
     state.xAxisData.forEach((x, xIdx) => {
         state.yAxisData.forEach((y, yIdx) => {
-            const _data = _xAxisGroupedData[x]?.find((v) => v[state.yAxisField] === y);
-            _chartData.push([xIdx, yIdx, _data ? _data[state.dataField] : 0]);
+            const _data = _refinedByYAxisCount.find((d) => d[state.xAxisField] === x && d[state.yAxisField] === y);
+            _chartData.push([xIdx, yIdx, _data ? _data.value : 0]);
         });
     });
     state.chartData = _chartData;
