@@ -59,7 +59,7 @@ const {
     name: '',
 }, {
     name(value) {
-        if (!value) return i18n.t('INVENTORY.ASSET_ANALYSIS.NAME_REQUIRED');
+        if (!value) return i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.NAME_REQUIRED');
         return true;
     },
 });
