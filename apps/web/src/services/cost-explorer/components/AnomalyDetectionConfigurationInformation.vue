@@ -80,6 +80,7 @@ watch(() => route.params.configId, (configId) => {
         >
             <template #data-policy="{data}">
                 <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
                         :to="{}"
                 >
                     {{ data }}

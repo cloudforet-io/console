@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -8,11 +7,8 @@ import {
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-
 import AnomalyDetectionConfigurationRecipientsForm
     from '@/services/cost-explorer/components/AnomalyDetectionConfigurationRecipientsForm.vue';
-import { getRoleInfo } from '@/services/cost-explorer/composables/anomaly-detection-handler';
 import { CONFIG_TEMP_DATA } from '@/services/cost-explorer/constants/anomaly-detection-constant';
 
 const route = useRoute();
@@ -67,16 +63,12 @@ watch(() => route.params.configId, (configId) => {
         >
             <template #data-recipients="{data}">
                 <div class="role-item">
-                    <img v-if="data[0].type !== ROLE_TYPE.USER"
-                         :src="getRoleInfo(data[0].type)"
-                         alt="role-type-icon"
-                         class="role-type-icon"
-                    >
-                    <span>role name</span>
-                    <p-badge style-type="blue200"
+                    <span>{{ data[0] }}</span>
+                    <p-badge v-if="data.length > 1"
+                             style-type="blue200"
                              badge-type="subtle"
                     >
-                        + 3
+                        + {{ data.length - 1 }}
                     </p-badge>
                 </div>
             </template>
@@ -92,11 +84,6 @@ watch(() => route.params.configId, (configId) => {
     .role-item {
         @apply flex items-center;
         gap: 0.5rem;
-        .role-type-icon {
-            @apply rounded-full;
-            width: 1rem;
-            height: 1rem;
-        }
     }
     .config-definition-table {
         padding-bottom: 1rem;
