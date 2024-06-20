@@ -38,11 +38,11 @@ const state = reactive({
         if (!props.dataTable) return [];
         return state.selectedFieldType === 'dynamicField' ? state.labelInfoMenuItems : state.dataInfoMenuItems;
     }),
-    dataInfoMenuItems: computed<MenuItem[]>(() => (Object.keys(props.dataTable?.data_info ?? {}) ?? []).map((d) => ({
+    dataInfoMenuItems: computed<MenuItem[]>(() => Object.keys(props.dataTable?.data_info ?? {}).map((d) => ({
         name: d,
         label: d,
     }))),
-    labelInfoMenuItems: computed<MenuItem[]>(() => (Object.keys(props.dataTable?.labels_info ?? {}) ?? []).map((d) => ({
+    labelInfoMenuItems: computed<MenuItem[]>(() => Object.keys(props.dataTable?.labels_info ?? {}).map((d) => ({
         name: d,
         label: d,
     }))),
