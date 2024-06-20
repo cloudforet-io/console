@@ -68,8 +68,21 @@ const handleSelectPeriod = (periodMenuName: string) => {
                                @select="handleSelectPeriod"
             />
         </div>
-        <div class="chart">
-            temp chart area
+        <div class="chart-wrapper">
+            <div class="chart">
+                temp chart area
+            </div>
+            <div class="legend-wrapper">
+                <!-- TODO: temp data -->
+                <div class="legend">
+                    <span>2023-01-01</span>
+                    <span class="count">8</span>
+                </div>
+                <div class="legend">
+                    <span>2023-01-01</span>
+                    <span class="count">8</span>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -88,9 +101,33 @@ const handleSelectPeriod = (periodMenuName: string) => {
             @apply text-label-lg font-bold;
         }
     }
-    .chart {
-        @apply bg-gray-100;
+    .chart-wrapper {
+        @apply flex;
         height: 100%;
+        gap: 1rem;
+        .chart {
+            @apply bg-gray-100;
+            flex: 1;
+            height: 100%;
+            max-width: 53.875rem;
+        }
+        .legend-wrapper {
+            @apply flex flex-col border border-gray-200;
+            width: 12.875rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            .legend {
+                @apply flex text-paragraph-sm;
+                width: 100%;
+                padding: 0.125rem 1rem;
+                .count {
+                    margin-left: auto;
+                }
+                &:hover {
+                    @apply bg-gray-150 cursor-pointer;
+                }
+            }
+        }
     }
 }
 </style>
