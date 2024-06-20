@@ -128,7 +128,6 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
 /* Init */
 onMounted(() => {
     state.selectedFieldType = props.value?.fieldType ?? 'dynamicField';
-    console.debug('props.value', props.value);
     if (state.selectedFieldType === 'staticField') {
         state.proxyValue = {
             ...state.proxyValue,
