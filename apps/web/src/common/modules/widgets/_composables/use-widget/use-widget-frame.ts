@@ -61,12 +61,7 @@ export const useWidgetFrame = (
         unit: computed<string|undefined>(() => {
             if (!_state.dataTable) return undefined;
             if (_state.dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) return undefined;
-            if (_state.dataTable?.source_type === DATA_SOURCE_DOMAIN.COST) {
-                //
-            } else if (_state.dataTable?.source_type === DATA_SOURCE_DOMAIN.ASSET) {
-                return _state.dataTable.options?.data_unit;
-            }
-            return undefined;
+            return _state.dataTable.options?.data_unit;
         }),
         fullDataLinkText: computed<string|undefined>(() => {
             if (!_state.dataTable) return undefined;

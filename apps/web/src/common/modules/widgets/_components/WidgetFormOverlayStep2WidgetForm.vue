@@ -85,6 +85,9 @@ const handleSelectWidgetName = (widgetName: string) => {
 const handleUpdateWidgetTitle = (title: string) => {
     widgetGenerateStore.setTitle(title);
 };
+const handleChangeDescription = (description: string) => {
+    widgetGenerateStore.setDescription(description);
+};
 const handleClickEditDataTable = () => {
     widgetGenerateStore.setOverlayStep(1);
 };
@@ -170,7 +173,9 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
                     />
                 </p-field-group>
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DESCRIPTION')">
-                    <p-textarea />
+                    <p-textarea :value="widgetGenerateState.description"
+                                @update:value="handleChangeDescription"
+                    />
                 </p-field-group>
             </div>
         </div>
