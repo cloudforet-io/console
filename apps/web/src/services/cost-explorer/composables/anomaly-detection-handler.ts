@@ -1,13 +1,19 @@
-import UserImage from '@/assets/images/role/img_avatar_no-role.png';
-import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
-import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/identity/role/type';
+import { yellow, gray, red } from '@/styles/colors';
 
-export const getRoleInfo = (type: RoleType): string => {
+export const getNotifyLevelInfo = (type: string): string => {
     switch (type) {
-    case ROLE_TYPE.WORKSPACE_OWNER: return WorkspaceOwnerImage;
-    case ROLE_TYPE.WORKSPACE_MEMBER: return WorkspaceMemberImage;
-    default: return UserImage;
+    case 'critical': return red[400];
+    case 'info': return gray[400];
+    case 'warning': return yellow[400];
+    default: return '';
+    }
+};
+
+export const getNotifyLevelBadgeInfo = (type: string): string => {
+    switch (type) {
+    case 'critical': return 'alert';
+    case 'info': return 'gray900';
+    case 'warning': return 'coral500';
+    default: return '';
     }
 };
