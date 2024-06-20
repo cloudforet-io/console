@@ -10,7 +10,9 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { groupBy, isEmpty, throttle } from 'lodash';
+import {
+    groupBy, isEmpty, orderBy, throttle,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -52,6 +54,7 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartOptions: computed<BarSeriesOption>(() => ({
         legend: {
+            type: 'scroll',
             show: state.showLegends,
             bottom: 0,
             left: 0,
@@ -126,6 +129,9 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
                         operator: 'sum',
                     },
                 },
+                field_group: [state.stackByField],
+                sort: [{ key: `_total_${state.dataField}`, desc: true }],
+                page: { start: 1, limit: state.xAxisCount },
             },
             vars: props.dashboardVariables,
         });
@@ -142,26 +148,35 @@ const drawChart = (rawData?: Data|null) => {
     if (isEmpty(rawData)) return;
 
     // set xAxisData
-    let _xAxisData: string[] = [];
     if (state.xAxisField === DATE_FIELD) {
-        _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+        state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
-        _xAxisData = Array.from(new Set(rawData.results?.map((v) => v[state.xAxisField] as string)));
+        state.xAxisData = rawData.results?.map((d) => d[state.xAxisField] as string) ?? [];
     }
-    state.xAxisData = _xAxisData.slice(0, state.xAxisCount);
 
-    // set chart data
+    // slice stackByData by stackByCount
+    const _slicedByStackBy: any[] = [];
+    rawData.results?.forEach((d) => {
+        const _values = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.stackByCount);
+        _values.forEach((v) => {
+            _slicedByStackBy.push({
+                [state.xAxisField]: d[state.xAxisField],
+                ...v,
+            });
+        });
+    });
+
+    // set chartData
     const _seriesData: any[] = [];
-    const _slicedData = Object.entries(groupBy(rawData.results, state.stackByField)).slice(0, state.stackByCount);
-    _slicedData.forEach(([key, value]) => {
+    Object.entries(groupBy(_slicedByStackBy, state.stackByField)).forEach(([key, value]) => {
         _seriesData.push({
             name: key,
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
-            data: _xAxisData.map((d) => {
+            data: state.xAxisData.map((d) => {
                 const _data = value.find((v) => v[state.xAxisField] === d);
-                return _data ? _data[state.dataField] : undefined;
+                return _data ? _data?.value : undefined;
             }),
         });
     });

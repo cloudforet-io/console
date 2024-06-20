@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    reactive, ref, computed, defineExpose,
+    computed, defineExpose, reactive, ref,
 } from 'vue';
 
 import dayjs from 'dayjs';
 import type { BarSeriesOption } from 'echarts/charts';
+import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import type {
-    EChartsType,
-} from 'echarts/core';
-import { groupBy, isEmpty, throttle } from 'lodash';
+import {
+    groupBy, isEmpty, orderBy, throttle,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -32,10 +32,7 @@ import {
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
-import type {
-    WidgetProps, WidgetEmit,
-    WidgetExpose,
-} from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type { StackByValue, YAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
@@ -55,6 +52,7 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartOptions: computed<BarSeriesOption>(() => ({
         legend: {
+            type: 'scroll',
             show: state.showLegends,
             bottom: 0,
             left: 0,
@@ -129,6 +127,9 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
                         operator: 'sum',
                     },
                 },
+                field_group: [state.stackByField],
+                sort: [{ key: `_total_${state.dataField}`, desc: true }],
+                page: { start: 1, limit: state.yAxisCount },
             },
             vars: props.dashboardVariables,
         });
@@ -147,26 +148,35 @@ const drawChart = (rawData?: Data|null) => {
     if (isEmpty(rawData)) return;
 
     // set yAxisData
-    let _yAxisData: string[] = [];
     if (state.yAxisField === DATE_FIELD) {
-        _yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+        state.yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
-        _yAxisData = Array.from(new Set(rawData.results?.map((v) => v[state.yAxisField] as string)));
+        state.yAxisData = rawData.results?.map((d) => d[state.yAxisField] as string) ?? [];
     }
-    state.yAxisData = _yAxisData.slice(0, state.yAxisCount);
 
-    // set chart data
+    // slice stackByData by stackByCount
+    const _slicedByStackBy: any[] = [];
+    rawData.results?.forEach((d) => {
+        const _values = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.stackByCount);
+        _values.forEach((v) => {
+            _slicedByStackBy.push({
+                [state.yAxisField]: d[state.yAxisField],
+                ...v,
+            });
+        });
+    });
+
+    // set chartData
     const _seriesData: any[] = [];
-    const _slicedData = Object.entries(groupBy(rawData.results, state.stackByField)).slice(0, state.stackByCount);
-    _slicedData.forEach(([key, value]) => {
+    Object.entries(groupBy(_slicedByStackBy, state.stackByField)).forEach(([key, value]) => {
         _seriesData.push({
             name: key,
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
-            data: _yAxisData.map((d) => {
+            data: state.yAxisData.map((d) => {
                 const _data = value.find((v) => v[state.yAxisField] === d);
-                return _data ? _data[state.dataField] : undefined;
+                return _data ? _data?.value : undefined;
             }),
         });
     });
@@ -185,6 +195,9 @@ const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
     state.loading = false;
     return state.data;
 };
+
+// watch(() => props.dashboardOptions?.date_range, async () => {
+// }, { immediate: true });
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 useResizeObserver(chartContext, throttle(() => {
