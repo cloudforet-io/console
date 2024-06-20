@@ -54,11 +54,11 @@ const state = reactive({
                 center: ['50%', '60%'],
                 startAngle: 200,
                 endAngle: -20,
-                min: 0, // state.min, TODO: set min, max
-                max: 10000, // state.max,
+                min: state.min,
+                max: state.max,
                 splitNumber: 4,
                 itemStyle: {
-                    color: '#FFAB91', // TODO: set color from format rules
+                    color: state.gaugeColor,
                 },
                 progress: {
                     show: true,
@@ -103,6 +103,17 @@ const state = reactive({
     min: computed<number>(() => props.widgetOptions?.min as number),
     max: computed<number>(() => props.widgetOptions?.max as number),
     formatRules: computed<FormatRulesValue[]>(() => props.widgetOptions?.formatRules as FormatRulesValue[]),
+    gaugeColor: computed<string>(() => {
+        let _formatRules = props.widgetOptions?.formatRules as FormatRulesValue[];
+        let _color = gray[200];
+        _formatRules = _formatRules.sort((a, b) => (a?.threshold || 0) - (b?.threshold || 0));
+        _formatRules.forEach((d) => {
+            if (state.chartData >= (d.threshold || 0)) {
+                _color = d.color;
+            }
+        });
+        return _color;
+    }),
     formatRulesBaseColor: computed<string>(() => {
         const _formatRules = props.widgetOptions?.formatRules as FormatRulesValue[];
         return _formatRules?.filter((d) => d.threshold === 0)?.[0]?.color || gray[200];

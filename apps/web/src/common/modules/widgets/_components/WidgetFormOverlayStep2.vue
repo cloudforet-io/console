@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onBeforeMount, onUnmounted, reactive, ref,
+    computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -80,6 +80,15 @@ const handleUpdatePreview = async () => {
         res('Please check the widget options.');
     }
 };
+
+/* Watcher */
+watch(() => widgetGenerateState.selectedWidgetName, () => {
+    if (widgetGenerateState.size === 'sm') {
+        state.selectedWidgetSize = 'ACTUAL';
+    } else {
+        state.selectedWidgetSize = 'FULL';
+    }
+}, { immediate: true });
 
 onBeforeMount(() => {
     initSnapshot();
