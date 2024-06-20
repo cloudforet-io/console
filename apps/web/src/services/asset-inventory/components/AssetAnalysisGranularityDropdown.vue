@@ -23,12 +23,12 @@ const state = reactive({
         {
             type: 'item',
             name: GRANULARITY.DAILY,
-            label: i18n.t('INVENTORY.ASSET_ANALYSIS.DAILY'),
+            label: i18n.t('INVENTORY.METRIC_EXPLORER.DAILY'),
         },
         {
             type: 'item',
             name: GRANULARITY.MONTHLY,
-            label: i18n.t('INVENTORY.ASSET_ANALYSIS.MONTHLY'),
+            label: i18n.t('INVENTORY.METRIC_EXPLORER.MONTHLY'),
         },
     ])),
     granularity: GRANULARITY.MONTHLY as Granularity|undefined,
@@ -48,7 +48,7 @@ const handleSelectGranularity = async (granularity: Granularity) => {
 <template>
     <div class="asset-analysis-granularity-dropdown">
         <p-select-dropdown :menu="state.granularityItems"
-                           :selection-label="$t('INVENTORY.ASSET_ANALYSIS.GRANULARITY')"
+                           :selection-label="$t('INVENTORY.METRIC_EXPLORER.GRANULARITY')"
                            style-type="rounded"
                            :selected="assetAnalysisPageState.granularity"
                            class="granularity-dropdown"

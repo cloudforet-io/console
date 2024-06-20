@@ -34,7 +34,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
 <template>
     <div class="asset-analysis-group-by">
         <div class="left-part">
-            <b class="label">{{ $t('INVENTORY.ASSET_ANALYSIS.GROUP_BY') }}:</b>
+            <b class="label">{{ $t('INVENTORY.METRIC_EXPLORER.GROUP_BY') }}:</b>
             <p-select-button v-for="item in state.groupByItems"
                              :key="item.name"
                              :value="item.name"
@@ -51,7 +51,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
         <div v-if="!assetAnalysisPageState.metricLoading"
              class="right-part"
         >
-            <strong>{{ $t('INVENTORY.ASSET_ANALYSIS.UNIT') }}:</strong>
+            <strong>{{ $t('INVENTORY.METRIC_EXPLORER.UNIT') }}:</strong>
             <span class="ml-1">{{ assetAnalysisPageState.metric?.unit || '--' }}</span>
         </div>
     </div>

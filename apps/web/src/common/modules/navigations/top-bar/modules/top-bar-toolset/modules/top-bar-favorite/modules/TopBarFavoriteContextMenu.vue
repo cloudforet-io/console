@@ -123,7 +123,7 @@ const state = reactive({
         if (state.favoriteMetricItems.length) {
             if (results.length !== 0) results.push({ type: 'divider' });
             results.push({
-                name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_ASSET_ANALYSIS'), type: 'header', itemType: FAVORITE_TYPE.METRIC,
+                name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_METRIC_EXPLORER'), type: 'header', itemType: FAVORITE_TYPE.METRIC,
             });
             results.push(...state.favoriteMetricItems.slice(0, FAVORITE_LIMIT));
         }
@@ -208,7 +208,7 @@ const state = reactive({
         ) : [];
     }),
     favoriteMetricItems: computed<FavoriteItem[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.ASSET_ANALYSIS, store.getters['user/pageAccessPermissionList']);
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.METRIC_EXPLORER, store.getters['user/pageAccessPermissionList']);
         if (!isUserAccessible) return [];
         const favoriteMetricItems = convertMetricConfigToReferenceData(favoriteGetters.metricItems ?? [], storeState.metrics);
         const favoriteMetricExampleItems = convertMetricExampleConfigToReferenceData(favoriteGetters.metricExampleItems ?? [], storeState.metricExamples);
@@ -297,7 +297,7 @@ const handleSelect = (item: FavoriteMenuItem) => {
         }).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.METRIC) {
         router.push({
-            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: {
                 metricId: item.name || '',
             },
@@ -306,7 +306,7 @@ const handleSelect = (item: FavoriteMenuItem) => {
         const metricId = storeState.metricExamples.find((example) => example.example_id === item.name)?.metric_id;
         if (!metricId) return;
         router.push({
-            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
             params: {
                 metricId,
                 metricExampleId: item.name || '',

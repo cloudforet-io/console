@@ -54,7 +54,7 @@ const storeState = reactive({
 const state = reactive({
     selectedId: computed<string|undefined>(() => {
         if (!props.isDetailPage) return undefined;
-        if (route.name === ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME) return route.params.metricId;
+        if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) return route.params.metricId;
         return route.params.metricExampleId;
     }),
     inputValue: '',
@@ -72,7 +72,7 @@ const state = reactive({
                     type: 'metric',
                     is_managed: metric.data.is_managed,
                     to: {
-                        name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                         params: {
                             metricId: metric.key,
                         },
@@ -90,7 +90,7 @@ const state = reactive({
                             ...example,
                             type: 'example',
                             to: {
-                                name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
+                                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                                 params: {
                                     metricId: metric.key,
                                     metricExampleId: example.example_id,
@@ -210,14 +210,14 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                      class="keyword-search-empty"
             >
                 <span>
-                    {{ $t('INVENTORY.ASSET_ANALYSIS.EMPTY_TEXT') }}
+                    {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
                 </span>
             </p-empty>
             <p-empty v-else-if="!state.inputValue && !state.metricItems.length"
                      class="keyword-search-empty"
             >
                 <span>
-                    {{ $t('INVENTORY.ASSET_ANALYSIS.NO_ITEMS') }}
+                    {{ $t('INVENTORY.METRIC_EXPLORER.NO_ITEMS') }}
                 </span>
             </p-empty>
         </div>

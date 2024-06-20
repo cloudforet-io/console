@@ -69,13 +69,13 @@ const state = reactive({
             .map((metric) => metric.name);
     }),
     headerTitle: computed(() => {
-        if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE) return i18n.t('INVENTORY.ASSET_ANALYSIS.ADD_EXAMPLE');
-        if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) return i18n.t('INVENTORY.ASSET_ANALYSIS.SAVE_AS_METRIC_EXAMPLE');
+        if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE');
+        if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS_METRIC_EXAMPLE');
         if (props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
-            if (state.currentMetricExampleId) return i18n.t('INVENTORY.ASSET_ANALYSIS.EDIT_METRIC_EXAMPLE_NAME');
-            return i18n.t('INVENTORY.ASSET_ANALYSIS.EDIT_CUSTOM_METRIC_NAME');
+            if (state.currentMetricExampleId) return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_METRIC_EXAMPLE_NAME');
+            return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_CUSTOM_METRIC_NAME');
         }
-        if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) return i18n.t('INVENTORY.ASSET_ANALYSIS.SAVE_AS_NEW_CUSTOM_METRIC');
+        if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) return i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS_NEW_CUSTOM_METRIC');
         return '';
     }),
 });
@@ -90,9 +90,9 @@ const {
     name: undefined as string|undefined,
 }, {
     name(value) {
-        if (!value) return i18n.t('INVENTORY.ASSET_ANALYSIS.NAME_REQUIRED');
-        if (value.length > 40) return i18n.t('INVENTORY.ASSET_ANALYSIS.MAX_LENGTH_INVALID', { max: 40 });
-        if (state.existingNameList.find((d) => d === value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.NAME_DUPLICATED');
+        if (!value) return i18n.t('INVENTORY.METRIC_EXPLORER.NAME_REQUIRED');
+        if (value.length > 40) return i18n.t('INVENTORY.METRIC_EXPLORER.MAX_LENGTH_INVALID', { max: 40 });
+        if (state.existingNameList.find((d) => d === value)) return i18n.t('INVENTORY.METRIC_EXPLORER.NAME_DUPLICATED');
         return true;
     },
 });
@@ -112,19 +112,19 @@ const createMetricExample = async () => {
                 operator: assetAnalysisPageState.selectedOperator,
             },
         });
-        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_ADD_METRIC_EXAMPLE'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
         state.proxyVisible = false;
         await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
         await gnbStore.fetchMetricExample();
         await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
             params: {
                 metricId: metricExample.metric_id,
                 metricExampleId: metricExample.example_id,
             },
         })).catch(() => {});
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_ADD_METRIC_EXAMPLE'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
     }
 };
 const updateMetricName = async () => {
@@ -135,9 +135,9 @@ const updateMetricName = async () => {
         });
         state.proxyVisible = false;
         await assetAnalysisPageStore.loadMetric(state.currentMetricId);
-        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_UPDATE_METRIC_NAME'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_UPDATE_METRIC_NAME'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
     }
 };
 const updateMetricExampleName = async () => {
@@ -149,9 +149,9 @@ const updateMetricExampleName = async () => {
         state.proxyVisible = false;
         await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
         await gnbStore.fetchMetricExample();
-        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_UPDATE_METRIC_NAME'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_UPDATE_METRIC_NAME'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
     }
 };
 
@@ -199,7 +199,7 @@ watch(() => state.proxyVisible, (visible) => {
     >
         <template #body>
             <p-field-group class="query-name-input-wrap"
-                           :label="$t('INVENTORY.ASSET_ANALYSIS.NAME')"
+                           :label="$t('INVENTORY.METRIC_EXPLORER.NAME')"
                            :invalid="invalidState.name"
                            :invalid-text="invalidTexts.name"
                            required
@@ -207,7 +207,7 @@ watch(() => state.proxyVisible, (visible) => {
                 <template #default="{invalid}">
                     <p-text-input :value="name"
                                   class="block w-full"
-                                  :placeholder="$t('INVENTORY.ASSET_ANALYSIS.NAME')"
+                                  :placeholder="$t('INVENTORY.METRIC_EXPLORER.NAME')"
                                   :invalid="invalid"
                                   @update:value="setForm('name', $event)"
                     />

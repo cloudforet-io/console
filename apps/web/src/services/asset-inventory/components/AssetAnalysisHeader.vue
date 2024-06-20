@@ -69,7 +69,7 @@ const state = reactive({
             type: 'item',
             name: 'saveAs',
             icon: 'ic_disk-edit-filled',
-            label: `${i18n.t('INVENTORY.ASSET_ANALYSIS.SAVE_AS')}...`,
+            label: `${i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS')}...`,
         },
     ])),
     pageTitle: computed<string|TranslateResult>(() => {
@@ -77,19 +77,19 @@ const state = reactive({
         if (assetAnalysisPageState.metric) {
             return state.currentMetricExample?.name || assetAnalysisPageState.metric.name;
         }
-        return i18n.t('INVENTORY.ASSET_ANALYSIS.ASSET_ANALYSIS');
+        return i18n.t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER');
     }),
     deleteModalTitle: computed(() => {
         if (state.currentMetricExampleId) {
-            return i18n.t('INVENTORY.ASSET_ANALYSIS.DELETE_METRIC_EXAMPLE');
+            return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_METRIC_EXAMPLE');
         }
-        return i18n.t('INVENTORY.ASSET_ANALYSIS.DELETE_CUSTOM_METRIC');
+        return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_CUSTOM_METRIC');
     }),
     editQueryTitle: computed<TranslateResult>(() => {
         if (state.isManagedMetric || state.currentMetricExampleId) {
-            return i18n.t('INVENTORY.ASSET_ANALYSIS.VIEW_QUERY');
+            return i18n.t('INVENTORY.METRIC_EXPLORER.VIEW_QUERY');
         }
-        return i18n.t('INVENTORY.ASSET_ANALYSIS.EDIT_QUERY');
+        return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_QUERY');
     }),
     editQueryButtonIcon: computed<string>(() => {
         if (state.isManagedMetric || state.currentMetricExampleId) {
@@ -150,13 +150,13 @@ const duplicateMetric = async () => {
             resource_group: RESOURCE_GROUP.WORKSPACE,
             query_options: assetAnalysisPageState.metric.query_options,
         });
-        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_DUPLICATE_METRIC'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
         await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: { metricId: duplicatedMetric.metric_id },
         }));
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_DUPLICATE_METRIC'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DUPLICATE_METRIC'));
     } finally {
         state.loadingDuplicate = false;
     }
@@ -167,20 +167,20 @@ const deleteCustomMetric = async () => {
         await SpaceConnector.clientV2.inventory.metric.delete<MetricDeleteParameters>({
             metric_id: assetAnalysisPageState.metric.metric_id,
         });
-        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_DELETE_METRIC'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
         const otherMetricId = assetAnalysisPageGetters.metrics[0]?.key;
         if (otherMetricId) {
             await router.replace(getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                 params: { metricId: otherMetricId },
             }));
         } else {
             await router.replace(getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS._NAME,
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
             }));
         }
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_DELETE_METRIC'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
     }
 };
 const deleteMetricExample = async () => {
@@ -189,13 +189,13 @@ const deleteMetricExample = async () => {
             example_id: state.currentMetricExampleId as string,
         });
         await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
-        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_DELETE_METRIC_EXAMPLE'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
         await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: { metricId: state.currentMetricId },
         }));
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_DELETE_METRIC_EXAMPLE'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC_EXAMPLE'));
     }
 };
 const updateMetricExample = async () => {
@@ -211,9 +211,9 @@ const updateMetricExample = async () => {
                 operator: assetAnalysisPageState.selectedOperator,
             },
         });
-        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_UPDATE_METRIC_EXAMPLE'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_EXAMPLE'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_UPDATE_METRIC_EXAMPLE'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_EXAMPLE'));
     }
 };
 
@@ -293,7 +293,7 @@ const handleOpenEditQuery = () => {
             </div>
             <delete-modal :header-title="state.deleteModalTitle"
                           :visible.sync="state.metricDeleteModalVisible"
-                          :contents="$t('INVENTORY.ASSET_ANALYSIS.DELETE_MODAL_DESC')"
+                          :contents="$t('INVENTORY.METRIC_EXPLORER.DELETE_MODAL_DESC')"
                           @confirm="handleDeleteMetric"
             />
         </template>
@@ -319,13 +319,13 @@ const handleOpenEditQuery = () => {
                               :loading="state.loadingDuplicate"
                               @click="handleDuplicate"
                     >
-                        {{ $t('INVENTORY.ASSET_ANALYSIS.DUPLICATE') }}
+                        {{ $t('INVENTORY.METRIC_EXPLORER.DUPLICATE') }}
                     </p-button>
                     <p-button style-type="tertiary"
                               icon-left="ic_plus_bold"
                               @click="handleOpenAddExampleModal"
                     >
-                        {{ $t('INVENTORY.ASSET_ANALYSIS.ADD_EXAMPLE') }}
+                        {{ $t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE') }}
                     </p-button>
                 </template>
                 <!-- example case -->
@@ -335,7 +335,7 @@ const handleOpenEditQuery = () => {
                               icon-left="ic_disk-filled"
                               @click="handleSaveMetricExample"
                     >
-                        {{ $t('INVENTORY.ASSET_ANALYSIS.SAVE') }}
+                        {{ $t('INVENTORY.METRIC_EXPLORER.SAVE') }}
                     </p-button>
                     <p-icon-button ref="targetRef"
                                    class="more-menu-button"
