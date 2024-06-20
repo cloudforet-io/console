@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 
 import {
     PButton, PFieldGroup, PIconButton, PTextInput,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
@@ -25,15 +24,18 @@ import { violet } from '@/styles/colors';
 const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions>>(), {
     widgetFieldSchema: () => ({}),
 });
+
+const BASE_THRESHOLD = 0;
+const DEFAULT_BASE_COLOR = violet[400];
+
 const emit = defineEmits<WidgetFieldComponentEmit<FormatRulesValue[]>>();
 const state = reactive({
-    customValue: props.widgetFieldSchema.options?.default ?? [],
-    baseColor: props.widgetFieldSchema.options?.baseColor ?? violet[400],
-    value: computed(() => [{ threshold: 0, color: state.baseColor }, ...state.customValue]),
-    menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    customValue: [],
+    baseColor: DEFAULT_BASE_COLOR,
+    value: computed(() => cloneDeep([{ threshold: BASE_THRESHOLD, color: state.baseColor }, ...state.customValue])),
     type: computed<FormatRulesType>(() => props.widgetFieldSchema.options?.formatRulesType ?? FORMAT_RULE_TYPE.threshold),
-    isFieldNameValid: [undefined],
-    isAllValid: computed(() => state.isFieldNameValid.every((valid:boolean) => valid)),
+    fieldNameValidationList: [],
+    isAllValid: computed(() => state.fieldNameValidationList.every((valid:boolean) => valid)),
 });
 
 /* Util */
@@ -45,20 +47,23 @@ const getInitialFormatRulesValue = (): FormatRulesValue => ({
 /* Event */
 const handleClickAddRule = () => {
     state.customValue = [...state.customValue, getInitialFormatRulesValue()];
-    state.isFieldNameValid = [...state.isFieldNameValid, undefined];
+    state.fieldNameValidationList = [...state.fieldNameValidationList, undefined];
 };
 const handleDelete = (idx: number) => {
     const _customValue = cloneDeep(state.customValue);
     _customValue.splice(idx, 1);
     state.customValue = _customValue;
-    const updatedCustomValue = cloneDeep(state.isFieldNameValid);
+    const updatedCustomValue = cloneDeep(state.fieldNameValidationList);
     updatedCustomValue.splice(idx, 1);
-    state.isFieldNameValid = updatedCustomValue;
+    state.fieldNameValidationList = updatedCustomValue;
 };
 const handleFormatRuleInput = (idx: number|string, key: 'threshold'|'color', val: string) => {
     const _customValue = cloneDeep(state.customValue);
     _customValue[idx][key] = val;
     state.customValue = _customValue;
+    const updatedFieldNameValidationList = cloneDeep(state.fieldNameValidationList);
+    updatedFieldNameValidationList[idx] = !!val;
+    state.fieldNameValidationList = updatedFieldNameValidationList;
 };
 
 const handleBaseColor = (val: string) => {
@@ -68,11 +73,22 @@ const handleBaseColor = (val: string) => {
 /* Watcher */
 watch(() => state.isAllValid, (isValid) => {
     emit('update:is-valid', isValid);
-});
+}, { immediate: true });
 
 watch(() => state.value, (value) => {
     emit('update:value', value);
 });
+
+onMounted(() => {
+    state.baseColor = props.value[0].color ?? props.widgetFieldSchema.options?.baseColor ?? DEFAULT_BASE_COLOR;
+    const baseRemovedValue = (props.value ?? props.widgetFieldSchema.options?.default ?? []).filter((fm) => fm.threshold !== BASE_THRESHOLD);
+    state.customValue = baseRemovedValue;
+    state.fieldNameValidationList = (state.customValue ?? []).map((fm) => {
+        if (fm.threshold === undefined) return undefined;
+        return !!fm.threshold;
+    }) ?? [];
+});
+
 </script>
 
 <template>
@@ -101,6 +117,7 @@ watch(() => state.value, (value) => {
                                           type="number"
                                           :name="`format-rule-threshold-${idx}`"
                                           :min="0"
+                                          :invalid="state.fieldNameValidationList[idx] === false"
                                           @update:value="handleFormatRuleInput(idx, 'threshold', $event)"
                             >
                                 <template v-if="state.type === FORMAT_RULE_TYPE.percentThreshold"
