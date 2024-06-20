@@ -1,5 +1,9 @@
 <template>
     <div class="sign-in-right-container">
+        <console-logo v-if="isMobileSize"
+                      :position-fixed="false"
+                      class="logo"
+        />
         <div class="form-wrapper">
             <div class="headline-wrapper">
                 <p class="title">
@@ -25,20 +29,24 @@
 </template>
 
 <script lang="ts">
+import { useWindowSize } from '@vueuse/core/index';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PI,
+    PI, screens,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
+import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
+
 export default {
     name: 'SignInRightContainer',
     components: {
+        ConsoleLogo,
         PI,
     },
     props: {
@@ -49,8 +57,10 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const { width } = useWindowSize();
         const state = reactive({
             symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
+            isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
         });
 
         /* event */
@@ -73,7 +83,13 @@ export default {
     flex-direction: column;
     flex-grow: 1;
     overflow-y: auto;
+    align-items: center;
     padding: 2.5rem;
+
+    .logo {
+        display: inline-flex;
+        margin-left: -2rem;
+    }
 
     .form-wrapper {
         @apply border border-gray-200 rounded-lg;
@@ -128,7 +144,7 @@ export default {
 
         .form-wrapper {
             width: 100%;
-            margin-top: 5.75rem;
+            margin-top: 1.75rem;
             padding: 2rem 1rem;
         }
     }

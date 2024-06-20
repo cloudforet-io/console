@@ -73,6 +73,8 @@ const state = reactive({
     }
 
     .version {
+        position: relative;
+        z-index: 100;
         display: inline-flex;
         flex-wrap: wrap;
         gap: 0.5rem;
