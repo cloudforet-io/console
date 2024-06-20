@@ -1384,6 +1384,7 @@
 			},
 			"CONFIGURE_WIDGET": "",
 			"CONTINUE": "계속하기",
+			"CRITERIA": "",
 			"DAILY_UPDATE_CREATED": "생성 ",
 			"DAILY_UPDATE_DELETED": "삭제",
 			"DAILY_UPDATE_DESC": "00:00 ~ 현재 (로컬 시간 기준) ",

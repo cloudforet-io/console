@@ -1384,6 +1384,7 @@
 			},
 			"CONFIGURE_WIDGET": "",
 			"CONTINUE": "次へ",
+			"CRITERIA": "",
 			"DAILY_UPDATE_CREATED": "作成",
 			"DAILY_UPDATE_DELETED": "削除",
 			"DAILY_UPDATE_DESC": "00:00〜現在（ローカル時間基準）",
