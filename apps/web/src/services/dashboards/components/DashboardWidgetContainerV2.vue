@@ -31,8 +31,6 @@ import DashboardReorderSidebar from '@/services/dashboards/components/DashboardR
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
-import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
-import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -49,7 +47,6 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
-const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
@@ -58,7 +55,6 @@ const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed<boolean>(() => Object.keys(state.mountedWidgetMap).length === state.refinedWidgetInfoList.length),
-    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => {
         if (!dashboardDetailState.dashboardWidgets.length) return [];
         return getRefinedWidgetInfoList();
