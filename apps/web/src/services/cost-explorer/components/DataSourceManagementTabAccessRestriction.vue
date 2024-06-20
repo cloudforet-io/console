@@ -1,22 +1,36 @@
 <script setup lang="ts">
 import { reactive, computed } from 'vue';
 
-import { PHeading, PToggleButton } from '@spaceone/design-system';
+import { PHeading, PToggleButton, PButtonModal } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 const state = reactive({
     dataType: computed(() => [
-        i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COST'),
-        i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.USAGE'),
-        i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.PAY_AS_YOU_GO'),
+        { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COST'), name: 'cost' },
+        { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.USAGE'), name: 'usage' },
+        { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.PAY_AS_YOU_GO'), name: 'payAsYouGo' },
     ]),
     dataTypeEnable: {
         cost: true,
         usage: false,
         payAsYouGo: false,
     },
+    selectedDataType: '',
+    modalVisible: false,
 });
+
+const handleChangeToggle = (item: string, value: boolean) => {
+    state.selectedDataType = item as string;
+    state.dataTypeEnable[item] = value;
+    if (value) {
+        state.modalVisible = true;
+    } else {
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_DISABLED_TOGGLE'), '');
+    }
+};
 </script>
 
 <template>
@@ -31,12 +45,13 @@ const state = reactive({
                  :key="idx"
                  class="data-type-card"
             >
-                <p-toggle-button :value="state.dataTypeEnable[item]"
+                <p-toggle-button :value="state.dataTypeEnable[item.name]"
                                  class="toggle-button"
+                                 @change-toggle="handleChangeToggle(item.name, $event)"
                 />
                 <span>
-                    {{ item }}
-                    <span v-if="item.toLowerCase() === 'cost'"
+                    {{ item.label }}
+                    <span v-if="item.name === 'cost'"
                           class="extra"
                     >
                         ({{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ACTUAL_COST') }})
@@ -44,6 +59,20 @@ const state = reactive({
                 </span>
             </div>
         </div>
+        <p-button-modal
+            :header-title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.MODAL_TITLE')"
+            centered
+            size="sm"
+            fade
+            backdrop
+            :visible.sync="state.modalVisible"
+        >
+            <template #body>
+                <p class="modal-body">
+                    {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.MODAL_CONTENT') }}
+                </p>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
