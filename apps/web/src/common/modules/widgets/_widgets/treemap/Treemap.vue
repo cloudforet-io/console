@@ -115,6 +115,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
         state.errorMessage = undefined;
         return res;
     } catch (e: any) {
+        state.loading = false;
         state.errorMessage = e.message;
         ErrorHandler.handleError(e);
         return ErrorHandler.makeAPIErrorToast(e);
