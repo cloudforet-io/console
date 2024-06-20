@@ -52,6 +52,7 @@ export interface YAxisValue {
 export interface TableDataFieldValue {
     fieldType: 'dynamicField' | 'staticField';
     value: string | string[];
+    criteria?: string;
     count: number;
 }
 export interface GroupByValue {
