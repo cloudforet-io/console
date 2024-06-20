@@ -26,6 +26,7 @@ const AnomalyDetectionConfigurationCreatePage = () => import('@/services/cost-ex
 const AnomalyDetectionConfigurationDetailPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionConfigurationDetailPage.vue');
 const AnomalyDetectionPolicyPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionPolicyPage.vue');
 const AnomalyDetectionHistoryPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionHistoryPage.vue');
+const AnomalyDetectionHistoryDetailPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionHistoryDetailPage.vue');
 
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
@@ -158,11 +159,28 @@ const costExplorerRoutes: RouteConfig = {
                     path: 'history',
                     name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY._NAME,
                     meta: {
-                        lsbVisible: true,
                         menuId: MENU_ID.ANOMALY_DETECTION_HISTORY,
                         translationId: 'BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE',
                     },
-                    component: AnomalyDetectionHistoryPage as any,
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: '/',
+                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY._NAME,
+                            meta: {
+                                lsbVisible: true,
+                                menuId: MENU_ID.ANOMALY_DETECTION_HISTORY,
+                            },
+                            component: AnomalyDetectionHistoryPage as any,
+                        },
+                        {
+                            path: ':historyId',
+                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY.DETAIL._NAME,
+                            props: true,
+                            meta: { label: ({ params }) => params.historyId },
+                            component: AnomalyDetectionHistoryDetailPage as any,
+                        },
+                    ],
                 },
             ],
         },

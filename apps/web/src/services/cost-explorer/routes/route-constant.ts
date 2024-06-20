@@ -14,7 +14,10 @@ export const COST_EXPLORER_ROUTE = Object.freeze({
             DETAIL: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.configuration.detail` },
         },
         POLICY: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.policy` },
-        HISTORY: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.history` },
+        HISTORY: {
+            _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.history`,
+            DETAIL: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.history.detail` },
+        },
     },
     BUDGET: {
         _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.BUDGET}`,

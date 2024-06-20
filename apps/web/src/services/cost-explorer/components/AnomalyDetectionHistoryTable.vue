@@ -14,11 +14,11 @@ import type { ProviderReferenceMap } from '@/store/reference/provider-reference-
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import { gray, red, coral } from '@/styles/colors';
-
+import { getNotifyLevelInfo } from '@/services/cost-explorer/composables/anomaly-detection-handler';
 import {
     DETECTION_HISTORY_HANDLERS, HISTORY_TEMP_DATA,
 } from '@/services/cost-explorer/constants/anomaly-detection-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -39,15 +39,6 @@ const tableState = reactive({
         { name: 'detected_at', label: 'Detected' },
     ]),
 });
-
-const getNotifyLevelInfo = (type: string): string => {
-    switch (type) {
-    case 'critical': return red[400];
-    case 'info': return gray[400];
-    case 'warning': return coral[400];
-    default: return '';
-    }
-};
 </script>
 
 <template>
@@ -65,9 +56,12 @@ const getNotifyLevelInfo = (type: string): string => {
             :key-item-sets="DETECTION_HISTORY_HANDLERS.keyItemSets"
             :value-handler-map="DETECTION_HISTORY_HANDLERS.valueHandlerMap"
         >
-            <template #col-name-format="{value}">
+            <template #col-name-format="{value, item}">
                 <p-link highlight
-                        :to="{}"
+                        :to="{
+                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY.DETAIL._NAME,
+                            params: { historyId: item.history_id }
+                        }"
                         class="col-name"
                 >
                     {{ value }}
