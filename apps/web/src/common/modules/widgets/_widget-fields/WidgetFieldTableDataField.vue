@@ -32,16 +32,20 @@ const state = reactive({
     ]),
     selectedFieldType: 'dynamicField',
     selectedItem: undefined as undefined | MenuItem[] | string,
+    selectedCriteria: undefined as undefined | MenuItem[] | string,
     multiSelectable: computed(() => state.selectedFieldType === 'staticField'),
     menuItems: computed<MenuItem[]>(() => {
-        const dataTarget = state.multiSelectable ? 'data_info' : 'labels_info';
         if (!props.dataTable) return [];
-        const dataInfoList = Object.keys(props.dataTable[dataTarget] ?? {}) ?? [];
-        return dataInfoList.map((d) => ({
-            name: d,
-            label: d,
-        }));
+        return state.selectedFieldType === 'dynamicField' ? state.labelInfoMenuItems : state.dataInfoMenuItems;
     }),
+    dataInfoMenuItems: computed<MenuItem[]>(() => Object.keys(props.dataTable?.data_info ?? {}).map((d) => ({
+        name: d,
+        label: d,
+    }))),
+    labelInfoMenuItems: computed<MenuItem[]>(() => Object.keys(props.dataTable?.labels_info ?? {}).map((d) => ({
+        name: d,
+        label: d,
+    }))),
     isValid: computed<boolean>(() => {
         if (state.proxyValue?.count === undefined) return false;
         if (state.menuItems.length === 0) return false;
@@ -59,20 +63,31 @@ const state = reactive({
 });
 
 /* Event */
+const handleUpdateCriteria = (val: string|MenuItem[]) => {
+    state.selectedCriteria = val;
+    state.proxyValue = {
+        ...state.proxyValue,
+        criteria: val,
+    };
+};
 const handleChangeDataFieldType = (value: string) => {
     state.selectedFieldType = value;
     if (state.selectedFieldType === 'staticField') {
         state.proxyValue = {
             ...state.proxyValue,
             value: state.menuItems[0]?.name,
+            criteria: undefined,
         };
         state.selectedItem = convertToMenuItem([state.menuItems[0].name]);
+        state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
     } else {
         state.proxyValue = {
             ...state.proxyValue,
             value: state.menuItems[0]?.name,
+            criteria: state.dataInfoMenuItems[0]?.name,
         };
         state.selectedItem = state.menuItems[0]?.name;
+        state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
     }
     state.proxyValue = { ...state.proxyValue, value: state.menuItems[0]?.name, fieldType: value };
 };
@@ -105,6 +120,7 @@ const isIncludedInMenuItems = (data: string[]|string):boolean => {
     }
     return state.menuItems.some((m) => m?.name === data);
 };
+const isIncludedInDataInfoMenuItems = (data: string):boolean => state.dataInfoMenuItems.some((m) => m?.name === data);
 const convertToMenuItem = (data: string[]) => data.map((d) => ({
     name: d,
     label: d,
@@ -122,9 +138,10 @@ onMounted(() => {
         state.proxyValue = {
             ...state.proxyValue,
             value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
-
+            criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
         };
         state.selectedItem = state.menuItems[0]?.name;
+        state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
     }
     state.proxyValue = {
         ...state.proxyValue,
@@ -149,6 +166,19 @@ onMounted(() => {
                     {{ selectItem.label }}
                 </p-select-button>
             </div>
+            <p-field-group v-if="state.selectedFieldType === 'dynamicField'"
+                           :label="$t('COMMON.WIDGETS.CRITERIA')"
+                           style-type="secondary"
+                           required
+                           class="criteria-field"
+            >
+                <p-select-dropdown :menu="state.dataInfoMenuItems"
+                                   :selected="state.selectedCriteria"
+                                   show-select-marker
+                                   appearance-type="badge"
+                                   @update:selected="handleUpdateCriteria"
+                />
+            </p-field-group>
             <div class="field-form-wrapper">
                 <p-field-group :label="$t('COMMON.WIDGETS.FIELD')"
                                style-type="secondary"
@@ -221,5 +251,9 @@ onMounted(() => {
 /* custom design-system component - p-field-group */
 :deep(.p-field-group) {
     margin-bottom: 0;
+}
+.criteria-field {
+    @apply w-full;
+    margin-bottom: 0.5rem;
 }
 </style>

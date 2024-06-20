@@ -48,14 +48,14 @@ export const getWidgetDateFields = (granularity: string, start: string, end: str
 
 /**
  * @name getWidgetDateRange
- * @description Get start, end date based on granularity, basedOnDate, count
+ * @description Get start, end date based on granularity, basedOnDate, substractCount
  * @example ('MONTHLY', '2024-03', 3) ['2023-01', '2024-03']
  */
-export const getWidgetDateRange = (granularity: string, basedOnDate: string, count: number): string[] => {
+export const getWidgetDateRange = (granularity: string, basedOnDate: string, substractCount: number): string[] => {
     const _timeUnit = getTimeUnit(granularity);
     const _dateFormat = getDateFormat(granularity);
-    // get start, end with granularity and count
-    const start = dayjs.utc(basedOnDate).clone().subtract(count - 1, _timeUnit).format(_dateFormat);
+    // get start, end with granularity and substractCount
+    const start = dayjs.utc(basedOnDate).clone().subtract(substractCount - 1, _timeUnit).format(_dateFormat);
     const end = dayjs.utc(basedOnDate).format(_dateFormat);
     return [start, end];
 };
