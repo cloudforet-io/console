@@ -10,4 +10,5 @@ export interface WidgetConfig {
     };
     requiredFieldsSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;
     optionalFieldsSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;
+    dependencies?: Partial<Record<WidgetFieldName, WidgetFieldName[]>>;
 }
