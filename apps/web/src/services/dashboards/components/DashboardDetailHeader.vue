@@ -28,27 +28,31 @@ const state = reactive({
     nameEditModalVisible: false,
     deleteModalVisible: false,
     cloneModalVisible: false,
-    menuItems: computed<MenuItem[]>(() => ([
-        {
-            type: 'item',
-            name: 'edit',
-            label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
-            icon: 'ic_edit',
-        },
-        {
-            type: 'item',
-            name: 'duplicate',
-            label: i18n.t('DASHBOARDS.DETAIL.DUPLICATE'),
-            icon: 'ic_duplicate',
-        },
-        { type: 'divider', name: '' },
-        {
-            type: 'item',
-            name: 'delete',
-            label: i18n.t('DASHBOARDS.DETAIL.DELETE'),
-            icon: 'ic_delete',
-        },
-    ])),
+    menuItems: computed<MenuItem[]>(() => {
+        const _defaultMenuItems: MenuItem[] = [
+            {
+                type: 'item',
+                name: 'edit',
+                label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
+                icon: 'ic_edit',
+            },
+            {
+                type: 'item',
+                name: 'duplicate',
+                label: i18n.t('DASHBOARDS.DETAIL.DUPLICATE'),
+                icon: 'ic_duplicate',
+            },
+            { type: 'divider', name: '' },
+            {
+                type: 'item',
+                name: 'delete',
+                label: i18n.t('DASHBOARDS.DETAIL.DELETE'),
+                icon: 'ic_delete',
+            },
+        ];
+        if (dashboardDetailGetters.isDeprecatedDashboard) return _defaultMenuItems.filter((item) => item.name !== 'duplicate');
+        return _defaultMenuItems;
+    }),
 });
 
 /* Event */

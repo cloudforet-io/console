@@ -39,6 +39,9 @@ const table: WidgetConfig = {
             },
         },
     },
+    dependencies: {
+        groupBy: ['comparison'],
+    },
 };
 
 

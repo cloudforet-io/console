@@ -187,7 +187,7 @@ const drawChart = (rawData: Data|null) => {
     state.chartData = _chartData;
 
     state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions);
+    state.chart.setOption(state.chartOptions, true);
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {

@@ -88,7 +88,7 @@ onMounted(async () => {
     const geoJson = response.data;
     registerMap('world', geoJson);
     state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions);
+    state.chart.setOption(state.chartOptions, true);
 });
 
 useResizeObserver(chartContext, throttle(() => {

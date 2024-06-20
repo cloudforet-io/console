@@ -169,7 +169,7 @@ const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
     state.chartData = rawData?.results?.[0]?.[state.dataField] || 0;
     state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions);
+    state.chart.setOption(state.chartOptions, true);
 };
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
     state.loading = true;

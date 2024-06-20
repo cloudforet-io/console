@@ -209,6 +209,7 @@ onUnmounted(() => {
                 position: absolute;
                 top: 1rem;
                 right: 1rem;
+                z-index: 100;
                 .update-dot {
                     @apply absolute bg-blue-500 rounded-full border-2 border-white;
                     width: 0.5rem;

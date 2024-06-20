@@ -52,6 +52,11 @@ watch(() => store.state.display.visibleSidebar, (visible) => {
         state.widgetList = getDashboardWidgetList();
     }
 });
+watch(() => dashboardDetailState.dashboardId, (after, before) => {
+    if (after !== before) {
+        store.dispatch('display/hideSidebar');
+    }
+});
 onUnmounted(() => {
     store.dispatch('display/hideSidebar');
 });
