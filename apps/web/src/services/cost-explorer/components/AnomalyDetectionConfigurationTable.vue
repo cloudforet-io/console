@@ -2,19 +2,16 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PToolboxTable, PLink, PLazyImg, PToggleButton,
+    PToolboxTable, PLink, PLazyImg, PToggleButton, PBadge,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import { getRoleInfo } from '@/services/cost-explorer/composables/anomaly-detection-handler';
 import {
     CONFIG_TEMP_DATA,
     DETECTION_CONFIGURATION_HANDLERS,
@@ -64,13 +61,14 @@ const tableState = reactive({
                             name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.DETAIL._NAME,
                             params: { configId: item.config_id}
                         }"
+                        class="col-name"
                 >
                     {{ value }}
                 </p-link>
             </template>
             <template #col-policy-format="{value}">
-                <p-link highlight
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
                         :to="{}"
                 >
                     {{ value }}
@@ -89,18 +87,13 @@ const tableState = reactive({
             </template>
             <template #col-recipients-format="{value}">
                 <div class="col-recipients">
-                    <div v-for="(item, idx) in value"
-                         :key="idx"
-                         class="role-item"
+                    <span class="role-name">{{ value[0] }}</span>
+                    <p-badge v-if="value.length > 1"
+                             style-type="blue200"
+                             badge-type="subtle"
                     >
-                        <img v-if="item.type !== ROLE_TYPE.USER"
-                             :src="getRoleInfo(item.type)"
-                             alt="role-type-icon"
-                             class="role-type-icon"
-                        >
-                        <span>{{ item.cnt }}</span>
-                        <span v-if="item.type === ROLE_TYPE.USER">{{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.USERS') }}</span>
-                    </div>
+                        + {{ value.length - 1 }}
+                    </p-badge>
                 </div>
             </template>
             <template #col-is_use-format="{value}">
@@ -108,7 +101,6 @@ const tableState = reactive({
             </template>
             <template #col-history_button-format="{item}">
                 <p-link v-if="item.lasted_at"
-                        highlight
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         :to="{}"
@@ -123,21 +115,24 @@ const tableState = reactive({
 
 <style scoped lang="postcss">
 .anomaly-detection-configuration-table {
+
+    .col-name {
+        /* custom design-system component - p-link */
+        :deep(.p-link) {
+            @apply block truncate;
+            max-width: 12.875rem;
+        }
+    }
     .col-data-source {
         @apply flex items-center;
         gap: 0.5rem;
     }
     .col-recipients {
-        @apply flex;
+        @apply flex items-center;
         gap: 0.5rem;
-        .role-item {
-            @apply flex items-center;
-            gap: 0.125rem;
-            .role-type-icon {
-                @apply rounded-full;
-                width: 1rem;
-                height: 1rem;
-            }
+        .role-name {
+            @apply block truncate;
+            max-width: 5.625rem;
         }
     }
 }

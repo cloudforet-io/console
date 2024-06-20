@@ -60,6 +60,27 @@ export const CONFIGURATION_CATEGORY_MENU = [
         label: 'Tags',
     },
 ];
+export const MANAGED_POLICY_MENU = [
+    {
+        label: '급격한 변화 탐지',
+        rules: [
+            '15% 이상 증가 Warning', '30% 이상 증가 Critical', '15% 이상 감소 Warning', '30% 이상 감소 Critical',
+        ],
+        id: 'rule1',
+    },
+    {
+        label: '허용한 필드 외 비용 발생 탐지',
+        rules: [
+            '30% 이상 증가 Critical',
+        ],
+        id: 'rule2',
+    },
+    {
+        label: '제외된 필드의 비용 발생 탐지',
+        rules: [],
+        id: 'rule3',
+    },
+];
 
 // History
 export const DETECTION_HISTORY_HANDLERS = {
@@ -115,18 +136,11 @@ export const ANOMALY_DETECTION_MENU_ITEM_MAP = {
 export const CONFIG_TEMP_DATA = [
     {
         config_id: 'id1',
-        name: '나영의 detection config1',
+        name: '나영의 detection config1나영의 detection config1',
         policy: '급격한 변화 탐지',
         data_source: 'aws',
         recipients: [
-            {
-                type: 'WORKSPACE_OWNER',
-                cnt: 4,
-            },
-            {
-                type: 'WORKSPACE_MEMBER',
-                cnt: 5,
-            },
+            '나는 롤네임이야123123123', '나도 롤네임이야', '나돈데?',
         ],
         is_use: true,
         lasted_at: '2021-09-01 12:00:00',
@@ -137,10 +151,7 @@ export const CONFIG_TEMP_DATA = [
         policy: '급격한 변화 탐지',
         data_source: 'google_cloud',
         recipients: [
-            {
-                type: 'USER',
-                cnt: 16,
-            },
+            '나는 롤네임이야',
         ],
         is_use: false,
         lasted_at: '2021-09-01 12:00:00',
@@ -151,10 +162,7 @@ export const CONFIG_TEMP_DATA = [
         policy: '급격한 변화 탐지',
         data_source: 'aws',
         recipients: [
-            {
-                type: 'WORKSPACE_MEMBER',
-                cnt: 13,
-            },
+            '나는 롤네임이야', '나도 롤네임이야',
         ],
         is_use: true,
         lasted_at: '--',
@@ -189,10 +197,4 @@ export const HISTORY_TEMP_DATA = [
         level: 'warning',
         detected_at: '2021-09-01 12:00:00',
     },
-];
-
-export const CONFIG_POLICY_TEMP_DATA = [
-    { name: '급격한 변화 탐지', label: '급격한 변화 탐지' },
-    { name: '비정상적인 사용량 탐지', label: '비정상적인 사용량 탐지' },
-    { name: '비정상적인 비용 탐지', label: '비정상적인 비용 탐지' },
 ];

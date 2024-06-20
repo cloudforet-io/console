@@ -15,6 +15,7 @@ import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 
@@ -24,16 +25,24 @@ interface DropdownMenuItem extends SelectDropdownMenuItem {
 
 interface Props {
     isDetailPage: boolean;
+    isEdit: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isDetailPage: false,
+    isEdit: false,
 });
+
+const emit = defineEmits<{(event: 'is-edit'): void;
+}>();
 
 const roleListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
     .setSort('name', true);
 
+const state = reactive({
+    proxyIsEdit: useProxyValue('isEdit', props, emit),
+});
 const dropdownState = reactive({
     loading: false,
     menuItems: [] as DropdownMenuItem[],
@@ -136,6 +145,7 @@ const fetchListRoles = async (inputText?: string) => {
         >
             <p-button style-type="tertiary"
                       size="md"
+                      @click="state.proxyIsEdit = false"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CANCEL') }}
             </p-button>
