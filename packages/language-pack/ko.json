@@ -399,6 +399,7 @@
 			"ANOMALY_DETECTION": {
 				"CANCEL": "취소",
 				"CONFIG": {
+					"AND_MORE": "...기타 등등",
 					"BASE_INFORMATION": "기본 정보",
 					"COL_CATEGORY": "",
 					"COL_CATEGORY_PLACEHOLDER": "",
@@ -409,16 +410,19 @@
 					"COL_NAME": "이름",
 					"COL_NAME_PLACEHOLDER": "",
 					"COL_POLICY": "정책(Policy)",
-					"COL_POLICY_PLACEHOLDER": "",
 					"COL_SEND_TO": "",
 					"COL_SEND_TO_PLACEHOLDER": "",
 					"CREATE_TITLE": "",
 					"LAST_12_MONTHS": "지난 12개월",
+					"NO_RULES": "",
 					"RECIPIENTS": "수신처",
+					"RULE": "규칙",
+					"RULES": "규칙",
 					"TITLE": "",
 					"TREND_TITLE": "",
 					"USERS": "사용자",
-					"VIEW_HISTORY": ""
+					"VIEW_HISTORY": "",
+					"VIEW_POLICY": ""
 				},
 				"CREATE": "생성",
 				"EDIT": "편집",

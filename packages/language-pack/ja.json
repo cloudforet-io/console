@@ -399,6 +399,7 @@
 			"ANOMALY_DETECTION": {
 				"CANCEL": "取消",
 				"CONFIG": {
+					"AND_MORE": "…その他",
 					"BASE_INFORMATION": "基本情報",
 					"COL_CATEGORY": "",
 					"COL_CATEGORY_PLACEHOLDER": "",
@@ -409,16 +410,19 @@
 					"COL_NAME": "名前",
 					"COL_NAME_PLACEHOLDER": "",
 					"COL_POLICY": "ポリシー",
-					"COL_POLICY_PLACEHOLDER": "",
 					"COL_SEND_TO": "",
 					"COL_SEND_TO_PLACEHOLDER": "",
 					"CREATE_TITLE": "",
 					"LAST_12_MONTHS": "過去12ヶ月間",
+					"NO_RULES": "",
 					"RECIPIENTS": "受信者",
+					"RULE": "ルール",
+					"RULES": "ルール",
 					"TITLE": "",
 					"TREND_TITLE": "",
 					"USERS": "ユーザー",
-					"VIEW_HISTORY": ""
+					"VIEW_HISTORY": "",
+					"VIEW_POLICY": ""
 				},
 				"CREATE": "作成",
 				"EDIT": "編集",
