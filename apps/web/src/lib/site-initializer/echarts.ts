@@ -1,5 +1,5 @@
 import {
-    BarChart, GaugeChart, HeatmapChart, LineChart, MapChart, PieChart, TreemapChart,
+    BarChart, GaugeChart, HeatmapChart, LineChart, MapChart, PieChart, TreemapChart, ScatterChart,
 } from 'echarts/charts';
 import {
     DatasetComponent,
@@ -29,5 +29,6 @@ export const initEcharts = () => {
         LineChart,
         PieChart,
         TreemapChart,
+        ScatterChart,
     ]);
 };
