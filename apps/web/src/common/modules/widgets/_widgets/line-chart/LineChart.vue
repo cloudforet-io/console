@@ -66,6 +66,7 @@ const state = reactive({
         },
         tooltip: {
             trigger: 'axis',
+            valueFormatter: (val) => numberFormatter(val) || '',
         },
         xAxis: {
             type: 'category',

@@ -60,11 +60,18 @@ const state = reactive({
             itemWidth: 10,
             itemHeight: 10,
         },
-        tooltip: {},
+        tooltip: {
+            valueFormatter: (val) => numberFormatter(val) || '',
+        },
+        grid: {
+            left: 0,
+            right: '3%',
+            containLabel: true,
+        },
         xAxis: {
             type: 'value',
-            rotate: 45,
             axisLabel: {
+                interval: 0,
                 formatter: (val) => numberFormatter(val, { notation: 'compact' }),
             },
         },
@@ -196,9 +203,6 @@ const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
     state.loading = false;
     return state.data;
 };
-
-// watch(() => props.dashboardOptions?.date_range, async () => {
-// }, { immediate: true });
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 useResizeObserver(chartContext, throttle(() => {

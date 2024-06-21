@@ -62,7 +62,9 @@ const state = reactive({
             itemWidth: 10,
             itemHeight: 10,
         },
-        tooltip: {},
+        tooltip: {
+            valueFormatter: (val) => numberFormatter(val) || '',
+        },
         xAxis: {
             type: 'category',
             data: state.xAxisData,

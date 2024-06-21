@@ -13,6 +13,7 @@ import type {
 import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
@@ -80,6 +81,7 @@ const state = reactive({
         },
         tooltip: {
             position: 'top',
+            valueFormatter: (val) => numberFormatter(val) || '',
         },
         visualMap: {
             show: state.showLegends,

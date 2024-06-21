@@ -13,6 +13,7 @@ import type {
 import { throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
@@ -70,9 +71,7 @@ const state = reactive({
         },
         tooltip: {
             trigger: 'item',
-            formatter(val) {
-                return `${val.name} : ${val.value[2]}`;
-            },
+            valueFormatter: (val) => numberFormatter(val) || '',
         },
         series: [
             {
