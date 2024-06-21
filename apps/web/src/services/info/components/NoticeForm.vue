@@ -146,7 +146,8 @@ const handleCreateNotice = async () => {
             files: data.files,
             options: data.options,
             writer: data.writer,
-            resource_group: 'DOMAIN',
+            resource_group: workspaceState.selectedRadioIdx === 0 ? 'DOMAIN' : 'WORKSPACE',
+            workspaces: workspaceState.selectedRadioIdx === 0 ? ['*'] : workspaceState.selectedItems.map((item) => item.name),
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
         await SpaceRouter.router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME, query: {} }));
@@ -362,7 +363,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
             </p-button>
             <p-button style-type="primary"
                       size="lg"
-                      :disabled="!isAllValid"
+                      :disabled="!isAllValid || (workspaceState.selectedRadioIdx === 1 && workspaceState.selectedItems.length === 0)"
                       :loading="noticeDetailState.loadingForCUD"
                       @click="handleConfirm"
             >
