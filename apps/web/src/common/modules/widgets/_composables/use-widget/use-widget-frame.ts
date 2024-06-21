@@ -94,7 +94,7 @@ export const useWidgetFrame = (
                 const _metricId = _state.dataTable?.options?.[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
                 if (_metricId) {
                     return {
-                        name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                         params: {
                             metricId: _metricId,
                         },
