@@ -87,7 +87,9 @@ const handleCloseOverlay = () => {
 
 watch(() => widgetGenerateState.showOverlay, (val) => {
     if (!val) widgetGenerateStore.reset();
-    else widgetGenerateStore.listDataTable();
+    else if (widgetGenerateState.overlayType !== 'ADD') {
+        widgetGenerateStore.listDataTable();
+    }
 });
 
 onUnmounted(() => {

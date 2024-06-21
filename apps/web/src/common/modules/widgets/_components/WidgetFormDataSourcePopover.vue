@@ -8,14 +8,23 @@ import {
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
+import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
+import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-widget/api-verbs/create';
+import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
@@ -27,8 +36,15 @@ import {
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableDataType, DataTableSourceType, DataTableOperator } from '@/common/modules/widgets/types/widget-model';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
+
 const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
+const dashboardStore = useDashboardStore();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
@@ -38,6 +54,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    loading: false,
     showPopover: false,
     selectedPopperCondition: undefined as undefined|DataTableDataType,
     dataSourceDomainItems: computed(() => ([
@@ -120,6 +137,24 @@ const state = reactive({
     ]),
 });
 
+/* Api */
+const createWidget = async (): Promise<PublicWidgetModel|PrivateWidgetModel|null> => {
+    const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+    const fetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.create<PrivateWidgetCreateParameters, PrivateWidgetModel>
+        : SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>;
+    try {
+        return await fetcher({
+            dashboard_id: dashboardDetailState.dashboardId as string,
+            tags: { created_by: store.state.user.userId },
+            widget_type: 'table',
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return null;
+    }
+};
+
 /* Util */
 const resetSelectedDataSource = () => {
     state.selectedCostDataSourceId = undefined;
@@ -144,6 +179,20 @@ const handleSelectPopperCondition = (condition: DataTableDataType) => {
     state.selectedPopperCondition = condition;
 };
 const handleConfirmDataSource = async () => {
+    state.loading = true;
+    // create widget
+    if (widgetGenerateState.overlayType === 'ADD' && !widgetGenerateState.widget?.widget_id) {
+        const createdWidget = await createWidget();
+        if (createdWidget) {
+            dashboardDetailStore.addWidgetToDashboardLayouts(createdWidget.widget_id);
+            await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
+                dashboard_id: dashboardDetailState.dashboardId,
+                layouts: dashboardDetailState.dashboardLayouts,
+            });
+            widgetGenerateStore.setWidgetForm(createdWidget);
+        }
+    }
+
     if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADDED) {
         const dataTableBaseName = state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST
             ? `${storeState.costDataSources[state.selectedCostDataSourceId].name} - ${state.selectedCostDataTypeLabel}`
@@ -174,6 +223,7 @@ const handleConfirmDataSource = async () => {
         });
     }
     state.showPopover = false;
+    state.loading = false;
 };
 
 /* Utils */
@@ -318,6 +368,7 @@ onMounted(() => {
                 <div class="popover-footer">
                     <p-button style-type="substitutive"
                               :disabled="state.disableConfirmButton"
+                              :loading="state.loading"
                               @click="handleConfirmDataSource"
                     >
                         {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.DONE') }}
