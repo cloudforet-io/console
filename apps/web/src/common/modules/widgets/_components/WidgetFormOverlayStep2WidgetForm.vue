@@ -37,7 +37,7 @@ const state = reactive({
         icon: WIDGET_COMPONENT_ICON_MAP[d.widgetName ?? ''],
     }))),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
-    widgetConfigDependencies: computed<{[key:string]: string[]}>(() => state.widgetConfig.dependencies),
+    widgetConfigDependencies: computed<{[key:string]: string[]}>(() => state.widgetConfig.dependencies || {}),
     defaultValidationConfig: computed(() => state.widgetConfig.meta?.defaultValidationConfig),
     widgetDefaultValidationModalVisible: false,
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
