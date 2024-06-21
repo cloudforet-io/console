@@ -57,7 +57,7 @@
 		"PASSWORD": {
 			"FIND": {
 				"BACK_TO_SIGN_IN": "로그인 하러 가기",
-				"FORGOT_PASSWORD": "비밀번호 찾",
+				"FORGOT_PASSWORD": "비밀번호 찾기",
 				"HELP_TEXT": "사용자 아이디를 입력하시면, 비밀번호 재설정 링크를 이메일로 보내드립니다.",
 				"INVALID_EMAIL_FORMAT": "잘못된 이메일 형식 또는 \bSingle Sign-On 계정입니다. ",
 				"SEND": "비밀번호 재설정 이메일 발송",
