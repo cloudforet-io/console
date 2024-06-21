@@ -136,7 +136,7 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
                                          scale="0.8"
                         />
                         <p-icon-button v-if="storeState.isDomainAdmin"
-                                       name="ic_edit-text"
+                                       name="ic_settings"
                                        width="1.5rem"
                                        height="1.5rem"
                                        @click="handleActionButton('edit')"

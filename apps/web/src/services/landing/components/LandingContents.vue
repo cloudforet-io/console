@@ -24,6 +24,8 @@ import { useRecentStore } from '@/common/modules/navigations/stores/recent-store
 import type { RecentConfig } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
+import { gray } from '@/styles/colors';
+
 import LandingAllWorkspaces from '@/services/landing/components/LandingAllWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/LandingEmptyContents.vue';
 import LandingRecentVisits from '@/services/landing/components/LandingRecentVisits.vue';
@@ -112,6 +114,7 @@ onUnmounted(() => {
         </div>
         <p-data-loader :loading="storeState.loading"
                        :data="storeState.workspaceList"
+                       :loader-backdrop-color="gray[100]"
         >
             <div class="contents-wrapper">
                 <landing-search @search="handleSearch" />
@@ -159,6 +162,7 @@ onUnmounted(() => {
 <style scoped lang="postcss">
 .landing-contents {
     @apply flex flex-col;
+    min-width: 44.5rem;
     max-width: 44.5rem;
     padding-top: 5rem;
     gap: 2rem;
@@ -199,6 +203,7 @@ onUnmounted(() => {
     }
 
     @screen mobile {
+        min-width: 19.5rem;
         max-width: 22.5rem;
     }
 }

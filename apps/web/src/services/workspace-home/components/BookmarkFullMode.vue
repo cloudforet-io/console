@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
@@ -25,6 +27,7 @@ const bookmarkState = bookmarkStore.state;
 
 const storeState = reactive({
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     folderBoardSets: computed<BookmarkItem[]>(() => {
@@ -32,7 +35,8 @@ const state = reactive({
             name: i18n.t('HOME.BOOKMARK_CREATE_FOLDER'),
             icon: 'ic_plus',
         };
-        return [createFolderItem, ...props.bookmarkFolderList];
+        if (!storeState.isWorkspaceMember) return [createFolderItem, ...props.bookmarkFolderList];
+        return props.bookmarkFolderList;
     }),
     isFullMode: false,
 });
@@ -42,7 +46,7 @@ const state = reactive({
     <div class="bookmark-full-mode"
          :style="{ maxHeight: `${props.height}px` }"
     >
-        <bookmark-board v-if="!storeState.isFileFullMode"
+        <bookmark-board v-if="!storeState.isWorkspaceMember && !storeState.isFileFullMode"
                         :board-list="state.folderBoardSets"
                         is-folder-board
                         is-full-mode

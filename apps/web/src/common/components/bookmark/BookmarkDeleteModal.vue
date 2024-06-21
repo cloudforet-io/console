@@ -150,7 +150,7 @@ const handleClose = () => {
         @apply overflow-y-auto;
         max-height: 16rem;
         .content-wrapper {
-            @apply flex items-center bg-gray-100 border border-gray-200 rounded-xl;
+            @apply flex items-center bg-gray-100 rounded-xl;
             padding: 0.5rem;
             gap: 0.5rem;
             .icon-wrapper {
@@ -163,7 +163,7 @@ const handleClose = () => {
                 }
             }
             .text-wrapper {
-                @apply flex flex-col;
+                @apply flex flex-col text-label-md;
                 .link {
                     @apply text-label-sm text-gray-500;
                 }

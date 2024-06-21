@@ -12,6 +12,7 @@ import {
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { sumBy } from 'lodash';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
@@ -48,6 +49,7 @@ const { width: toolboxWidth } = useElementSize(toolboxRef);
 const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
 
 const storeState = reactive({
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     language: computed<string>(() => store.state.user.language),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
@@ -97,6 +99,7 @@ const handleClickActionButton = (type: BookmarkModalType, isEdit?: boolean, isNe
 const handleClickFolder = (item: BookmarkItem, isClickedMore?: boolean) => {
     if (!isClickedMore) {
         moreState.selectedItems = [];
+        hideContextMenu();
     }
     if (storeState.filterByFolder === item.name) {
         bookmarkStore.setSelectedBookmark(undefined);
@@ -126,6 +129,11 @@ const handleSelectAddMoreMenuItem = (item: MoreMenuItem) => {
         name: item.label,
         workspaceId: item.workspaceId,
     }, true);
+    hideContextMenu();
+};
+const handleClickAllSelection = () => {
+    bookmarkStore.setSelectedBookmark(undefined);
+    moreState.selectedItems = [];
     hideContextMenu();
 };
 
@@ -164,6 +172,7 @@ watch([
 }, { immediate: true });
 watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
     bookmarkStore.setSelectedBookmarks([]);
+    moreState.selectedItems = [];
 });
 </script>
 
@@ -189,7 +198,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                 />
             </div>
         </div>
-        <p-field-title :label="storeState.isFileFullMode ? storeState.filterByFolder : $t('HOME.BOOKMARK_TITLE')"
+        <p-field-title :label="storeState.isFileFullMode ? storeState.filterByFolder : $t('HOME.BOOKMARKS')"
                        size="lg"
         >
             <template v-if="storeState.isFileFullMode"
@@ -279,12 +288,23 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                                 :selected="moreState.selectedItems"
                                 :style="{ ...contextMenuStyle, 'top': `${moreButtonTop + moreButtonHeight}px`} "
                                 show-select-marker
+                                show-clear-selection
                                 class="more-context-menu"
                                 @select="handleSelectAddMoreMenuItem"
-                />
+                >
+                    <template #header>
+                        <p-text-button class="clear-all-wrapper"
+                                       style-type="highlight"
+                                       size="md"
+                                       @click="handleClickAllSelection"
+                        >
+                            {{ $t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }}
+                        </p-text-button>
+                    </template>
+                </p-context-menu>
             </div>
         </div>
-        <div v-if="!storeState.isFullMode && !state.isMobileSize"
+        <div v-if="!storeState.isWorkspaceMember && (!storeState.isFullMode && !state.isMobileSize)"
              class="file-extra-wrapper"
         >
             <p-divider vertical
@@ -310,7 +330,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         <div ref="toolboxRef"
              class="toolbox-wrapper"
         >
-            <p-button v-if="!state.isMobileSize || (state.isMobileSize && storeState.isFullMode)"
+            <p-button v-if="!storeState.isWorkspaceMember && (!state.isMobileSize || (state.isMobileSize && storeState.isFullMode))"
                       icon-left="ic_plus"
                       size="sm"
                       class="add-link-button"
@@ -385,6 +405,10 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         .show-more-wrapper {
             .more-context-menu {
                 z-index: 10;
+            }
+            .clear-all-wrapper {
+                @apply text-label-md;
+                padding: 0.375rem 0.5rem 0.75rem;
             }
         }
     }

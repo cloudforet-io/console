@@ -50,7 +50,7 @@ const state = reactive({
                 <p-link v-if="!state.isWarning"
                         :text="i18n.t('LADING.DOMAIN.GO_TO_EXPLORE')"
                         :to="{name: LANDING_ROUTE.WORKSPACE._NAME}"
-                        size="sm"
+                        size="md"
                         highlight
                         action-icon="internal-link"
                 />
