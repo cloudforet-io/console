@@ -106,7 +106,6 @@ const handleUpdateFieldValue = (fieldName: string, value: WidgetFieldValues) => 
             _valueMap[option] = undefined;
         });
     }
-    console.log('changedOptions', changedOptions);
     widgetGenerateStore.setWidgetValueMap(_valueMap);
 };
 const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
@@ -116,7 +115,7 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
 };
 
 // eslint-disable-next-line max-len
-const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetValueMap[name]}`;
+const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetValueMap[name] === undefined}`;
 </script>
 
 <template>
