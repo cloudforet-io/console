@@ -2487,7 +2487,7 @@
 	},
 	"INVENTORY": {
 		"ADD_SERVICE_ACCOUNT": "Add Service Account",
-		"ASSET_ANALYSIS": {
+		"METRIC_EXPLORER": {
 			"ADD_EXAMPLE": "Add Example",
 			"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
 			"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
@@ -2503,8 +2503,8 @@
 			"ALT_S_SAVE_METRIC": "Successfully saved metric",
 			"ALT_S_UPDATE_METRIC_EXAMPLE": "Successfully updated metric example",
 			"ALT_S_UPDATE_METRIC_NAME": "Metric name successfully changed",
-			"ASSET_ANALYSIS": "Asset Analysis",
-			"ASSET_ANALYSIS_HOME": "Asset Analysis Home",
+			"METRIC_EXPLORER": "Metric Explorer",
+			"METRIC_EXPLORER_HOME": "Metric Explorer Home",
 			"COMMON": "Common",
 			"CUSTOM_METRIC": {
 				"ADD_TITLE": "Add Custom Metric with Query",
@@ -2553,7 +2553,7 @@
 				"LOCATE_METRICS": "Locate Metrics",
 				"LOCATE_METRICS_DESC": "Start by selecting a namespace from the left sidebar, then choose a metric to view.",
 				"RECENTLY_VISITED": "Recently Visited",
-				"TITLE": "Get stared with Asset Analysis",
+				"TITLE": "Get stared with Metric Explorer",
 				"UPCOMING": "Upcoming"
 			},
 			"MAX_LENGTH_INVALID": "{max} characters in max.",
@@ -2671,7 +2671,7 @@
 				"SET": "Set",
 				"SHOW_ALL": "Show all",
 				"SHOW_CHARTS": "Show Charts",
-				"SHOW_IN_ASSET_ANALYSIS": "Show in Asset Analysis",
+				"SHOW_IN_METRIC_EXPLORER": "Show in Metric Explorer",
 				"SHOW_MAJOR": "Show Major Services ",
 				"TITLE": "Cloud Service",
 				"USAGE_OVERVIEW": "Usage Overview",
@@ -3062,7 +3062,7 @@
 		"ALERT_MANAGER_DASHBOARD": "Alert Dashboard",
 		"ALERT_MANAGER_ESCALATION_POLICY": "Escalation Policy",
 		"ASSET_INVENTORY": "Asset Inventory",
-		"ASSET_INVENTORY_ASSET_ANALYSIS": "Asset Analysis",
+		"ASSET_INVENTORY_METRIC_EXPLORER": "Metric Explorer",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "Cloud Service",
 		"ASSET_INVENTORY_COLLECTOR": "Collector",
 		"ASSET_INVENTORY_SECURITY": "Security",

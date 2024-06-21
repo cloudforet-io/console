@@ -41,21 +41,21 @@ const storeState = reactive({
 const state = reactive({
     cardList: computed(() => [
         {
-            title: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.LOCATE_METRICS'),
+            title: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.LOCATE_METRICS'),
             alt: 'metric',
-            desc: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.LOCATE_METRICS_DESC'),
+            desc: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.LOCATE_METRICS_DESC'),
             img: MetricImgHowToUse,
         },
         {
-            title: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.ANALYZE_DATA'),
+            title: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.ANALYZE_DATA'),
             alt: 'analyze',
-            desc: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.ANALYZE_DATA_DESC'),
+            desc: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.ANALYZE_DATA_DESC'),
             img: MetricImgVisualization,
         },
         {
-            title: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.CONFIGURE_ALERTS'),
+            title: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.CONFIGURE_ALERTS'),
             alt: 'alert',
-            desc: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.CONFIGURE_ALERTS_DESC'),
+            desc: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.CONFIGURE_ALERTS_DESC'),
             img: MetricImgAlert,
         },
     ]),
@@ -76,7 +76,7 @@ const state = reactive({
 
 const handleRouteToMetricDetail = (metricId: string) => {
     router.push({
-        name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
         params: {
             metricId,
         },
@@ -89,7 +89,7 @@ const handleClickLearnMore = () => {
 
 const fetchRecentList = async () => {
     const recentList = await recentStore.fetchRecent({
-        type: RECENT_TYPE.ASSET_ANALYSIS,
+        type: RECENT_TYPE.METRIC_EXPLORER,
         workspaceIds: [storeState.currentWorkspaceId ?? ''],
         limit: 10,
     });
@@ -103,11 +103,11 @@ const fetchRecentList = async () => {
 
 <template>
     <div class="asset-analysis-content">
-        <p-heading :title="$t('INVENTORY.ASSET_ANALYSIS.ASSET_ANALYSIS')" />
+        <p-heading :title="$t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER')" />
         <p-pane-layout>
             <div class="contents">
                 <p class="title">
-                    {{ $t('INVENTORY.ASSET_ANALYSIS.MAIN.TITLE') }}
+                    {{ $t('INVENTORY.METRIC_EXPLORER.MAIN.TITLE') }}
                 </p>
                 <div class="card-group">
                     <div v-for="(card, idx) in state.cardList"
@@ -123,7 +123,7 @@ const fetchRecentList = async () => {
                                                       badge-type="subtle"
                                                       style-type="indigo100"
                             >
-                                {{ $t('INVENTORY.ASSET_ANALYSIS.MAIN.UPCOMING') }}
+                                {{ $t('INVENTORY.METRIC_EXPLORER.MAIN.UPCOMING') }}
                             </p-badge>
                         </p>
                         <p class="card-desc">
@@ -136,13 +136,13 @@ const fetchRecentList = async () => {
                           style="margin-top: 0.5rem; margin-bottom: 3rem;"
                           @click="handleClickLearnMore"
                 >
-                    {{ $t('INVENTORY.ASSET_ANALYSIS.MAIN.LEARN_MORE') }}
+                    {{ $t('INVENTORY.METRIC_EXPLORER.MAIN.LEARN_MORE') }}
                 </p-button>
                 <p-divider v-if="state.recentMetricCardList.length" />
                 <div v-if="state.recentMetricCardList.length"
                      class="bottom-area"
                 >
-                    <header>{{ $t('INVENTORY.ASSET_ANALYSIS.MAIN.RECENTLY_VISITED') }}</header>
+                    <header>{{ $t('INVENTORY.METRIC_EXPLORER.MAIN.RECENTLY_VISITED') }}</header>
                     <div class="recent-card-wrapper">
                         <p-card v-for="recent in state.recentMetricCardList"
                                 :key="recent.id"

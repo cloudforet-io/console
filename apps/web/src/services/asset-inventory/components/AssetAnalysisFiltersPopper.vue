@@ -156,7 +156,7 @@ watch(() => props.visible, (visible) => {
                        class="reset-button"
                        @click="handleClickResetFilters"
         >
-            {{ $t('INVENTORY.ASSET_ANALYSIS.RESET') }}
+            {{ $t('INVENTORY.METRIC_EXPLORER.RESET') }}
         </p-text-button>
     </div>
 </template>

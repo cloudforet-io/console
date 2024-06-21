@@ -97,7 +97,7 @@ watch(() => route.params, async () => {
                               icon-left="ic_filter"
                               @click="handleClickFilter"
                     >
-                        {{ $t('INVENTORY.ASSET_ANALYSIS.FILTERS') }}
+                        {{ $t('INVENTORY.METRIC_EXPLORER.FILTERS') }}
                         <p-badge v-if="state.selectedFiltersCount"
                                  badge-type="subtle"
                                  :style-type="state.filtersPopoverVisible ? 'gray100' : 'gray200'"
@@ -117,7 +117,7 @@ watch(() => route.params, async () => {
                 <span class="period-text">
                     {{ assetAnalysisPageState.periodText }}
                 </span>
-                <p-tooltip :contents="$t('INVENTORY.ASSET_ANALYSIS.UPDATE_WITH_THE_LATEST_DATA')"
+                <p-tooltip :contents="$t('INVENTORY.METRIC_EXPLORER.UPDATE_WITH_THE_LATEST_DATA')"
                            position="bottom"
                 >
                     <p-icon-button style-type="secondary"

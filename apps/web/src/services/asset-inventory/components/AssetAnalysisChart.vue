@@ -283,7 +283,7 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
                 <p-empty v-else
                          class="empty-wrapper"
                 >
-                    <span class="text-paragraph-md">{{ $t('INVENTORY.ASSET_ANALYSIS.NO_DATA') }}</span>
+                    <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_DATA') }}</span>
                 </p-empty>
             </div>
             <div class="right-part">

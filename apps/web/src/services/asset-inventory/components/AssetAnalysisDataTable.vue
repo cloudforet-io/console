@@ -171,7 +171,7 @@ const handleExport = async () => {
         await downloadExcel({
             data: refinedData,
             fields: state.excelFields,
-            file_name_prefix: FILE_NAME_PREFIX.assetAnalysis,
+            file_name_prefix: FILE_NAME_PREFIX.metricExplorer,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -282,7 +282,7 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
         <template #col-format="{field, value}">
             <span v-if="state.loading" />
             <span v-else-if="field.name === 'totalCount'">
-                {{ $t('INVENTORY.ASSET_ANALYSIS.TOTAL_COUNT') }}
+                {{ $t('INVENTORY.METRIC_EXPLORER.TOTAL_COUNT') }}
             </span>
             <span v-else>
                 {{ getRefinedColumnValue(field, value) }}

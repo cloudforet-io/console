@@ -36,23 +36,23 @@ const state = reactive({
         return [
             {
                 name: METRIC_PERIOD_MENU.LAST_7_DAYS,
-                label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_7_DAYS'),
+                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_7_DAYS'),
             },
             {
                 name: METRIC_PERIOD_MENU.LAST_14_DAYS,
-                label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_14_DAYS'),
+                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_14_DAYS'),
             },
             {
                 name: METRIC_PERIOD_MENU.LAST_30_DAYS,
-                label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_30_DAYS'),
+                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_30_DAYS'),
             },
             {
                 name: METRIC_PERIOD_MENU.CURRENT_MONTH,
-                label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.THIS_MONTH'),
+                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.THIS_MONTH'),
             },
             {
                 name: METRIC_PERIOD_MENU.LAST_MONTH,
-                label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_MONTH'),
+                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_MONTH'),
             },
             ...(range(12).map((i) => {
                 const start = dayjs.utc().subtract(i, 'month').startOf('month');
@@ -66,23 +66,23 @@ const state = reactive({
     monthlyPeriodMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: METRIC_PERIOD_MENU.LAST_3_MONTHS,
-            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_3_MONTHS'),
+            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_3_MONTHS'),
         },
         {
             name: METRIC_PERIOD_MENU.LAST_6_MONTHS,
-            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_6_MONTHS'),
+            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_6_MONTHS'),
         },
         {
             name: METRIC_PERIOD_MENU.LAST_12_MONTHS,
-            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_12_MONTHS'),
+            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_12_MONTHS'),
         },
         {
             name: METRIC_PERIOD_MENU.CURRENT_YEAR,
-            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.THIS_YEAR'),
+            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.THIS_YEAR'),
         },
         {
             name: METRIC_PERIOD_MENU.LAST_YEAR,
-            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_YEAR'),
+            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_YEAR'),
         }])),
     allPeriodMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         ...state.dailyPeriodMenuItems,
@@ -98,7 +98,7 @@ const state = reactive({
         }, {
             type: 'item',
             name: 'custom',
-            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.CUSTOM'),
+            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.CUSTOM'),
         }];
         return [
             ...menuItems,
@@ -159,7 +159,7 @@ watch(() => assetAnalysisPageState.refreshMetricPeriodDropdown, (refresh) => {
 <template>
     <div>
         <p-select-dropdown :menu="state.periodMenuItems"
-                           :selection-label="$t('INVENTORY.ASSET_ANALYSIS.PERIOD.PERIOD')"
+                           :selection-label="$t('INVENTORY.METRIC_EXPLORER.PERIOD.PERIOD')"
                            disable-proxy
                            reset-selection-on-menu-close
                            style-type="rounded"
