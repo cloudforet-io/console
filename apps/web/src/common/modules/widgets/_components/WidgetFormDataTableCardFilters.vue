@@ -305,9 +305,7 @@ onMounted(() => {
                                            appearance-type="badge"
                                            show-select-marker
                                            use-fixed-menu-style
-                                           selection-highlight
                                            :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name]"
-                                           :selection-label="item.label"
                                            :show-delete-all-button="false"
                                            :page-size="10"
                                            @update:selected="handleUpdateFilterDropdown(item.name, $event)"

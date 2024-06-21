@@ -165,7 +165,7 @@ onUnmounted(() => {
     gap: 1rem;
     padding: 0 1.5rem 1rem 1.5rem;
     .left-part {
-        @apply bg-gray-150 rounded-md;
+        @apply bg-gray-100 border border-gray-150 rounded-md;
         flex-grow: 1;
         display: flex;
         flex-direction: column;

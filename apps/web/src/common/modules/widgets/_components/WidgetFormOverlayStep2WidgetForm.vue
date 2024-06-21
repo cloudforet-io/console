@@ -259,7 +259,19 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
     overflow-y: auto;
     .basic-field-wrapper {
         &.gray {
-            @apply bg-gray-150 rounded-md;
+            @apply bg-gray-100 border border-gray-150 rounded-md;
+
+            /* custom design-system component - p-field-group */
+            :deep(.p-field-group) {
+                .title-wrapper {
+                    .title {
+                        width: 100%;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                }
+            }
         }
         padding: 0.75rem 1.25rem 0 1.25rem;
     }

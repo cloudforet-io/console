@@ -152,9 +152,7 @@ documentEventMount('mouseup', endResizing);
     gap: 1rem;
     padding: 0 1.5rem 1rem 1.5rem;
     .data-table-contents {
-        @apply bg-gray-150 rounded-md relative w-full flex flex-col;
-
-        padding: 0.125rem;
+        @apply bg-gray-100 border border-gray-150 rounded-md relative w-full flex flex-col;
         .data-table-area {
             @apply relative flex-1 h-full w-full;
             //padding: 1rem 1rem 1.125rem;
@@ -261,6 +259,7 @@ documentEventMount('mouseup', endResizing);
             @apply rounded-lg overflow-hidden;
             height: 20%;
             max-height: calc(100% - 2rem);
+            padding: 0 0.125rem 0.125rem 0.125rem;
 
             &.transition {
                 transition: height 0.2s;
