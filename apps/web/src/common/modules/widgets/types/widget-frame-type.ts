@@ -7,7 +7,7 @@ export interface WidgetFrameProps {
     widgetId: string;
     widgetSizes: WidgetSize[];
     //
-    mode: 'overlay'|'view';
+    mode: 'overlay'|'view'|'edit-layout';
     loading?: boolean;
     errorMessage?: string;
     //

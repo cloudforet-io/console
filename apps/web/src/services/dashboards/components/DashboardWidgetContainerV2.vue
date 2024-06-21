@@ -15,6 +15,7 @@ import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model
 import type { PublicWidgetDeleteParameters } from '@/schema/dashboard/public-widget/api-verbs/delete';
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import { store } from '@/store';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -268,7 +269,7 @@ defineExpose({
                                :size="widget.size"
                                :width="widget.width"
                                :widget-options="widget.options"
-                               mode="view"
+                               :mode="store.state.display.visibleSidebar ? 'edit-layout' : 'view'"
                                :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-variables="dashboardDetailState.variables"
