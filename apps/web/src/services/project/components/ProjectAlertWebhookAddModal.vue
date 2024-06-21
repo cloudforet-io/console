@@ -356,7 +356,7 @@ watch(() => props.visible, (visible) => {
             .marker {
                 position: static;
             }
-            .contents {
+            .select-card-contents {
                 .p-lazy-img {
                     display: none;
                 }

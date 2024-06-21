@@ -485,10 +485,6 @@ onMounted(() => {
                 /* custom design-system component - p-select-card */
                 :deep(.p-select-card) {
                     padding: 0.75rem 1.25rem;
-                    .contents {
-                        @apply flex justify-start items-center;
-                        overflow: visible;
-                    }
                 }
                 .custom-select-card {
                     &.selected {
@@ -545,8 +541,13 @@ onMounted(() => {
 /* custom design-system component - p-select-card */
 :deep(.p-select-card) {
     padding: 1rem;
-    .contents {
+    .select-card-contents {
         @apply flex justify-start items-center;
+        flex-direction: row;
+        .p-lazy-img {
+            margin-right: 0.25rem;
+            margin-bottom: 0;
+        }
     }
 }
 
