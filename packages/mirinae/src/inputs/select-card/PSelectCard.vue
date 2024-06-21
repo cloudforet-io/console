@@ -11,7 +11,7 @@
              width="1.25rem"
              height="1.25rem"
         />
-        <div class="contents">
+        <div class="select-card-contents">
             <slot v-bind="{isSelected}">
                 <p-lazy-img v-if="imageUrl || icon"
                             :src="imageUrl"
@@ -223,7 +223,7 @@ export default defineComponent<Props>({
         top: 0.75rem;
         z-index: 1;
     }
-    .contents {
+    .select-card-contents {
         display: flex;
         flex-direction: column;
         justify-content: center;
