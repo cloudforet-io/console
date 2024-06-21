@@ -23,8 +23,8 @@ import type { RegionReferenceMap } from '@/store/reference/region-reference-stor
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange, WidgetLoadData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
