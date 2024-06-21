@@ -34,9 +34,10 @@ const state = reactive({
     chartTypeMenuItems: computed<MenuItem[]>(() => Object.values(CONSOLE_WIDGET_CONFIG).map((d) => ({
         name: d.widgetName,
         label: d.meta?.title || d.widgetName,
-        icon: WIDGET_COMPONENT_ICON_MAP[d.widgetName],
+        icon: WIDGET_COMPONENT_ICON_MAP[d.widgetName ?? ''],
     }))),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
+    widgetConfigDependencies: computed<{[key:string]: string[]}>(() => state.widgetConfig.dependencies),
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     // display
@@ -94,9 +95,17 @@ const handleClickEditDataTable = () => {
 const handleClickCollapsibleTitle = (collapsedTitle: string) => {
     state.collapsedTitleMap[collapsedTitle] = !state.collapsedTitleMap[collapsedTitle];
 };
+
+const checkFormDependencies = (changedFieldName: string):string[] => state.widgetConfigDependencies[changedFieldName] || [];
 const handleUpdateFieldValue = (fieldName: string, value: WidgetFieldValues) => {
     const _valueMap = cloneDeep(widgetGenerateState.widgetValueMap);
     _valueMap[fieldName] = value;
+    const changedOptions = checkFormDependencies(fieldName);
+    if (changedOptions.length) {
+        changedOptions.forEach((option) => {
+            _valueMap[option] = undefined;
+        });
+    }
     widgetGenerateStore.setWidgetValueMap(_valueMap);
 };
 const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
@@ -106,7 +115,7 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
 };
 
 // eslint-disable-next-line max-len
-const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}`;
+const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetValueMap[name] === undefined}`;
 </script>
 
 <template>

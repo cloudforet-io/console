@@ -55,9 +55,15 @@ const state = reactive({
 const handleUpdateSelect = (val: string|MenuItem[]) => {
     state.selectedItem = val;
     if (Array.isArray(val)) {
-        state.proxyValue.value = val.map((item) => item.name);
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: val.map((item) => item.name),
+        };
     } else {
-        state.proxyValue.value = val;
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: val,
+        };
     }
 };
 const handleUpdateCount = (val: number) => {
