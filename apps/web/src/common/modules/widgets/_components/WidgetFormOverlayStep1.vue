@@ -23,7 +23,7 @@ const storeState = reactive({
 
 const displayState = reactive({
     dataTableAreaOpen: true,
-    tableAreaHeight: (dataTableContentsRef.value?.clientHeight || 1000) / 5,
+    tableAreaHeight: (dataTableContentsRef.value?.clientHeight || 1000) / 4,
     minHeight: 32,
     resizerStyle: computed(() => ({
         bottom: `${displayState.tableAreaHeight}px`,

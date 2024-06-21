@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
@@ -63,6 +65,13 @@ const handleSelectDashboardScope = (scopeType: DashboardScope) => {
     dashboardDetailStore.setDashboardScope(scopeType);
     dashboardDetailStore.setDashboardType(scopeType === 'PRIVATE' ? 'PRIVATE' : 'PUBLIC');
 };
+
+onMounted(() => {
+    if (!storeState.isWorkspaceOwner) {
+        dashboardDetailStore.setDashboardScope('PRIVATE');
+        dashboardDetailStore.setDashboardType('PRIVATE');
+    }
+});
 </script>
 
 <template>

@@ -44,7 +44,7 @@ const route = useRoute();
 
 const storeState = reactive({
     userId: computed(() => store.state.user.userId),
-    groupName: computed(() => storeState.projectGroups[state.currentProjectGroupId].name),
+    groupName: computed(() => storeState.projectGroups[state.currentProjectGroupId]?.name),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
 });
@@ -133,7 +133,7 @@ onUnmounted(() => {
 
 <template>
     <div class="page-wrapper">
-        <p-heading :title="state.currentProjectGroupId ? storeState.projectGroups[state.currentProjectGroupId].name : $t('PROJECT.LANDING.ALL_PROJECTS')">
+        <p-heading :title="state.currentProjectGroupId ? storeState.projectGroups[state.currentProjectGroupId]?.name : $t('PROJECT.LANDING.ALL_PROJECTS')">
             <template #title-right-extra>
                 <div v-if="state.currentProjectGroupId"
                      class="title-right-button-wrapper"

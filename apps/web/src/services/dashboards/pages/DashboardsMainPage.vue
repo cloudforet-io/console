@@ -163,8 +163,7 @@ onUnmounted(() => {
                    :total-count="state.dashboardTotalCount"
         >
             <template #extra>
-                <p-button v-if="state.workspaceDashboardList"
-                          icon-left="ic_plus_bold"
+                <p-button icon-left="ic_plus_bold"
                           @click="handleCreateDashboard"
                 >
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREATE') }}

@@ -37,14 +37,14 @@ export default {
         {
             path: 'detail/:id',
             name: PROJECT_ROUTE.DETAIL._NAME,
-            redirect: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
+            redirect: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
             props: true,
             component: ProjectDetailPage,
             children: [
                 {
                     path: '/',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
-                    redirect: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
+                    redirect: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
                     props: true,
                     component: ProjectDetailTabPage,
                     children: [

@@ -63,7 +63,7 @@ const {
 });
 
 /* Api */
-const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name');
+const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name', 'project_group_id');
 const getProjectGroupNames = async () => {
     const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
         query: projectGroupNameApiQuery.data,
