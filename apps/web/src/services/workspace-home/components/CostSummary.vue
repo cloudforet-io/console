@@ -5,7 +5,7 @@ import {
     PDivider, PFieldTitle, PLink, PSpinner,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { sum } from 'lodash';
+import { isEmpty, sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -18,14 +18,17 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 import type { RoleInfo } from '@/store/modules/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -39,16 +42,19 @@ import type { EmptyData } from '@/services/workspace-home/types/workspace-home-t
 const { getProperRouteLocation } = useProperRouteLocation();
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
     costReportConfig: computed<CostReportConfigModel|null|undefined>(() => workspaceHomePageState.costReportConfig),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
     dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageState.dataSource),
     getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
 });
 const state = reactive({
     loading: true,
-    currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency),
+    currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency || CURRENCY.USD),
     isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     chartData: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     totalAmount: computed(() => sum(state.chartData?.results[0]?.value_sum.map((d) => d.value))),
@@ -67,6 +73,11 @@ const state = reactive({
                 desc: i18n.t('HOME.ACTIVATION_REQUIRED_DESC'),
                 buttonText: i18n.t('HOME.LEARN_MORE'),
             };
+        } else if (state.isWorkspaceMember && isEmpty(storeState.projects)) {
+            result = {
+                title: i18n.t('HOME.PROJECT_REQUIRED'),
+                desc: i18n.t('HOME.PROJECT_REQUIRED_DESC'),
+            };
         } else {
             result = {
                 to: { name: COST_EXPLORER_ROUTE.COST_REPORT._NAME },
@@ -77,37 +88,40 @@ const state = reactive({
         }
         return result;
     }),
+    selectedProjects: [] as Array<string>,
 });
+
+const handleSelectedProject = async (selectedProject: string[]) => {
+    state.selectedProjects = selectedProject;
+    await analyzeCostReportData();
+};
 
 const analyzeCostReportData = async () => {
     state.loading = true;
     try {
-        const _period = {
-            start: state.period.start,
-            end: state.period.end,
-        };
-        const defaultQuery = {
-            start: _period.start,
-            end: _period.end,
-            fields: {
-                value_sum: {
-                    key: `cost.${state.currency}`,
-                    operator: 'sum',
-                },
-            },
-        };
-        const chartQuery = {
-            granularity: GRANULARITY.MONTHLY,
-            field_group: ['date'],
-            sort: [{
-                key: '_total_value_sum',
-                desc: true,
-            }],
-        };
         state.chartData = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
             cost_report_config_id: storeState.costReportConfig?.cost_report_config_id,
             is_confirmed: true,
-            query: { ...defaultQuery, ...chartQuery },
+            query: {
+                start: state.period.start,
+                end: state.period.end,
+                group_by: state.isWorkspaceMember ? ['project_id'] : undefined,
+                fields: {
+                    value_sum: {
+                        key: `cost.${state.currency}`,
+                        operator: 'sum',
+                    },
+                },
+                granularity: GRANULARITY.MONTHLY,
+                field_group: ['date'],
+                sort: [{
+                    key: '_total_value_sum',
+                    desc: true,
+                }],
+                filter: state.isWorkspaceMember ? [
+                    { k: 'project_id', v: state.selectedProjects[0], o: 'eq' },
+                ] : undefined,
+            },
         });
     } catch (e) {
         state.chartData = undefined;
@@ -117,18 +131,38 @@ const analyzeCostReportData = async () => {
     }
 };
 
-watch(() => storeState.costReportConfig, async () => {
-    if (state.isWorkspaceMember) return;
+watch(() => storeState.projects, async (projects) => {
+    if (!state.isWorkspaceMember) return;
+    const project = Object.keys(projects)[0];
+    state.selectedProjects = [project];
     await analyzeCostReportData();
 });
+watch(() => storeState.costReportConfig, async (costReportConfig) => {
+    if (!costReportConfig) return;
+    await analyzeCostReportData();
+}, { immediate: true });
 </script>
 
 <template>
     <div class="cost-summary">
-        <p-field-title :label="$t('HOME.COST_SUMMARY_TITLE')"
-                       size="lg"
-                       class="main-title"
-        />
+        <div class="heading-wrapper">
+            <p-field-title :label="$t('HOME.COST_SUMMARY_TITLE')"
+                           size="lg"
+                           class="main-title"
+            />
+            <project-select-dropdown
+                v-if="state.isWorkspaceMember && !isEmpty(storeState.projects)"
+                class="project-select-dropdown"
+                :selected-project-ids="state.selectedProjects"
+                :use-fixed-menu-style="false"
+                project-selectable
+                position="right"
+                hide-create-button
+                :selection-label="$t('HOME.COST_SUMMARY_BY_PROJECT')"
+                :project-group-selectable="false"
+                @update:selected-project-ids="handleSelectedProject"
+            />
+        </div>
         <div v-if="state.loading"
              class="loading"
         >
@@ -151,14 +185,16 @@ watch(() => storeState.costReportConfig, async () => {
                                         :data="state.chartData"
                     />
                 </div>
-                <p-divider class="divider" />
-                <p-link highlight
-                        :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
-                        action-icon="internal-link"
-                        class="link"
-                >
-                    {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
-                </p-link>
+                <div v-if="!state.isWorkspaceMember">
+                    <p-divider class="divider" />
+                    <p-link highlight
+                            :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
+                            action-icon="internal-link"
+                            class="link"
+                    >
+                        {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
+                    </p-link>
+                </div>
             </div>
             <empty-summary-data v-else
                                 :image-url="require('/images/home/img_workspace-home_cost-summary_empty-state-background-min.png')"
@@ -171,9 +207,17 @@ watch(() => storeState.costReportConfig, async () => {
 
 <style scoped lang="postcss">
 .cost-summary {
+    min-height: 30.5rem;
+    .heading-wrapper {
+        @apply flex;
+        .project-select-dropdown {
+            margin-right: 1rem;
+            margin-left: auto;
+        }
+    }
     .loading {
         @apply flex items-center justify-center;
-        height: calc(100% - 2.625rem);
+        min-height: calc(100% - 2.625rem);
     }
     .main-title {
         padding-left: 1rem;

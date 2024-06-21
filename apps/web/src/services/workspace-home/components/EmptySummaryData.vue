@@ -1,13 +1,26 @@
 <script setup lang="ts">
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { PI, PTextButton } from '@spaceone/design-system';
+import { isEmpty } from 'lodash';
 
-import { green, peacock } from '@/styles/colors';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
+
+import type { RoleInfo } from '@/store/modules/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+
+import { green, peacock, violet } from '@/styles/colors';
 
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type { EmptyData, SummaryDataType } from '@/services/workspace-home/types/workspace-home-type';
 
+type IconInfo = {
+    name: string,
+    color: string,
+};
 interface Props {
     imageUrl: string;
     emptyData?: EmptyData;
@@ -20,25 +33,55 @@ const props = withDefaults(defineProps<Props>(), {
     type: undefined,
 });
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
+
 const router = useRouter();
+
+const storeState = reactive({
+    getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
+});
+const state = reactive({
+    isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    icon: computed<IconInfo>(() => {
+        if (props.type === SUMMARY_DATA_TYPE.ASSET) {
+            return {
+                name: 'ic_service_cloud-service',
+                color: peacock[800],
+            };
+        }
+        if (state.isWorkspaceMember && isEmpty(storeState.projects)) {
+            return {
+                name: 'ic_service_project',
+                color: violet[700],
+            };
+        }
+        return {
+            name: 'ic_service_cost-report',
+            color: green[800],
+        };
+    }),
+});
 </script>
 
 <template>
     <div class="empty-summary-data"
          :style="{ backgroundImage: `url(${props.imageUrl})` }"
-         :class="{[props.type]: true}"
+         :class="{[props.type]: true, 'no-project-data': state.isWorkspaceMember && isEmpty(storeState.projects)}"
     >
         <div class="icon-wrapper">
             <p-i class="menu-icon"
-                 :name="props.type === SUMMARY_DATA_TYPE.ASSET ? 'ic_service_cloud-service' : 'ic_service_cost-report'"
+                 :name="state.icon.name"
                  height="1.75rem"
                  width="1.75rem"
-                 :color="props.type === SUMMARY_DATA_TYPE.ASSET ? peacock[800] : green[800]"
+                 :color="state.icon.color"
             />
         </div>
         <span class="title">{{ props.emptyData.title }}</span>
         <span class="desc">{{ props.emptyData.desc }}</span>
-        <p-text-button style-type="highlight"
+        <p-text-button v-if="!state.isWorkspaceMember"
+                       style-type="highlight"
                        @click="router.push(props.emptyData.to)"
         >
             <span>{{ props.emptyData.buttonText }}</span>
@@ -50,7 +93,7 @@ const router = useRouter();
 .empty-summary-data {
     @apply flex flex-col justify-center items-center text-center;
     min-height: 25.25rem;
-    height: calc(100% - 1.375rem);
+    height: 27.625rem;
     background-repeat: no-repeat;
     background-position: left;
     padding-right: 2.5rem;
@@ -63,6 +106,14 @@ const router = useRouter();
         }
         .title {
             @apply text-green-800;
+        }
+        &.no-project-data {
+            .icon-wrapper {
+                @apply bg-violet-150;
+            }
+            .title {
+                @apply text-violet-700;
+            }
         }
     }
     .icon-wrapper {
