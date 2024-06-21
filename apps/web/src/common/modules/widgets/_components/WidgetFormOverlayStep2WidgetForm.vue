@@ -274,6 +274,8 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
     .form-wrapper {
         @apply flex flex-col gap-4;
         padding: 1rem 1.25rem 0 1.25rem;
+        vertical-align: middle;
+        cursor: pointer;
     }
     &.collapsed {
         .form-wrapper {
