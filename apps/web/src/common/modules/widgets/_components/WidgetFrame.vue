@@ -101,7 +101,7 @@ const handleToggleWidth = () => {
                 {{ props.title }}
             </h3>
             <p-popover v-if="!props.errorMessage"
-                       class="metric-select-guide-popover"
+                       class="metadata-popover"
                        position="bottom-start"
                        :trigger="POPOVER_TRIGGER.CLICK"
             >

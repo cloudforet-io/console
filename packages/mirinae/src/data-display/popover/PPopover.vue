@@ -242,6 +242,7 @@ export default defineComponent<PopoverProps>({
                 position: absolute;
                 right: 0.25rem;
                 top: 0.25rem;
+                z-index: 100;
             }
         }
 
