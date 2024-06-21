@@ -194,6 +194,7 @@ export default defineComponent<ContextMenuItemProps>({
 .p-context-menu-item {
     @apply text-gray-900 text-label-md;
     display: flex;
+    align-items: center;
     padding: 0.5rem;
     cursor: pointer;
     &:not(.disabled) {
