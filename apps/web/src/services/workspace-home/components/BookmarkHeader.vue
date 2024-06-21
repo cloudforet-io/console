@@ -12,6 +12,7 @@ import {
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { sumBy } from 'lodash';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
@@ -48,6 +49,7 @@ const { width: toolboxWidth } = useElementSize(toolboxRef);
 const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
 
 const storeState = reactive({
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     language: computed<string>(() => store.state.user.language),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
@@ -302,7 +304,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                 </p-context-menu>
             </div>
         </div>
-        <div v-if="!storeState.isFullMode && !state.isMobileSize"
+        <div v-if="!storeState.isWorkspaceMember && (!storeState.isFullMode && !state.isMobileSize)"
              class="file-extra-wrapper"
         >
             <p-divider vertical
@@ -328,7 +330,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         <div ref="toolboxRef"
              class="toolbox-wrapper"
         >
-            <p-button v-if="!state.isMobileSize || (state.isMobileSize && storeState.isFullMode)"
+            <p-button v-if="!storeState.isWorkspaceMember && (!state.isMobileSize || (state.isMobileSize && storeState.isFullMode))"
                       icon-left="ic_plus"
                       size="sm"
                       class="add-link-button"

@@ -11,6 +11,8 @@ import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/t
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 
 import type { UserConfigModel } from '@/schema/config/user-config/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -44,6 +46,7 @@ const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 
 const storeState = reactive({
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
     bookmarkFolderData: computed<BookmarkItem[]>(() => bookmarkState.bookmarkFolderData),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
@@ -154,7 +157,7 @@ const checkSelectedId = (id?: string) => {
                           @click="handleClickItem(item)"
             >
                 <template #content>
-                    <p-checkbox v-if="props.isFullMode && !item.icon"
+                    <p-checkbox v-if="!storeState.isWorkspaceMember && (props.isFullMode && !item.icon)"
                                 :value="true"
                                 :selected="checkSelectedId(item.id)"
                                 @change="handleClickCheckBox(item)"
@@ -205,7 +208,9 @@ const checkSelectedId = (id?: string) => {
                         </p>
                     </div>
                 </template>
-                <template #overlay-content>
+                <template v-if="!storeState.isWorkspaceMember"
+                          #overlay-content
+                >
                     <p-select-dropdown v-if="!item.icon"
                                        :menu="state.menuItems"
                                        style-type="icon-button"
