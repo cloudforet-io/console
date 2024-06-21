@@ -1918,6 +1918,11 @@
 					"TOTAL": "",
 					"TOTAL_FIELD": "총합 필드",
 					"UPDATE_PREVIEW": "",
+					"VALIDATION_MODAL": {
+						"DESC": "",
+						"EDIT_DATA": "",
+						"TITLE": ""
+					},
 					"WIDGET_INFO": "위젯 기본 정보",
 					"X_AXIS": "",
 					"Y_AXIS": ""

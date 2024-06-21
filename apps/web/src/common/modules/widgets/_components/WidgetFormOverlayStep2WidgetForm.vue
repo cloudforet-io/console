@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea,
+    PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea, PButtonModal,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
@@ -38,6 +38,8 @@ const state = reactive({
     }))),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetConfigDependencies: computed<{[key:string]: string[]}>(() => state.widgetConfig.dependencies || {}),
+    defaultValidationConfig: computed(() => state.widgetConfig.meta?.defaultValidationConfig),
+    widgetDefaultValidationModalVisible: false,
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     // display
@@ -74,6 +76,16 @@ const handleSelectDataTable = (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
     updateWidget(dataTableId);
 };
+
+const checkDefaultValidation = () => {
+    if (state.defaultValidationConfig) {
+        const targetCount = Object.keys((widgetGenerateGetters.selectedDataTable ?? {})[state.defaultValidationConfig.dataTarget]).length;
+        if (targetCount < state.defaultValidationConfig.defaultMaxCount) {
+            state.widgetDefaultValidationModalVisible = true;
+        }
+    }
+};
+
 const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setSelectedWidgetName(widgetName);
 
@@ -82,6 +94,7 @@ const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setTitle(_config.meta.title);
     widgetGenerateStore.setWidgetValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
+    checkDefaultValidation();
 };
 const handleUpdateWidgetTitle = (title: string) => {
     widgetGenerateStore.setTitle(title);
@@ -91,6 +104,7 @@ const handleChangeDescription = (description: string) => {
 };
 const handleClickEditDataTable = () => {
     widgetGenerateStore.setOverlayStep(1);
+    state.widgetDefaultValidationModalVisible = false;
 };
 const handleClickCollapsibleTitle = (collapsedTitle: string) => {
     state.collapsedTitleMap[collapsedTitle] = !state.collapsedTitleMap[collapsedTitle];
@@ -247,6 +261,28 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
                 </template>
             </div>
         </div>
+        <p-button-modal size="sm"
+                        :header-title="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.TITLE')"
+                        theme-color="alert"
+                        :visible.sync="state.widgetDefaultValidationModalVisible"
+                        @confirm="state.widgetDefaultValidationModalVisible = false"
+        >
+            <template #body>
+                <p>
+                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.DESC', {
+                        count: state.defaultValidationConfig?.defaultMaxCount,
+                    }) }}
+                </p>
+                <p-button style-type="tertiary"
+                          size="lg"
+                          icon-left="ic_edit"
+                          class="mt-4"
+                          @click="handleClickEditDataTable"
+                >
+                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.EDIT_DATA') }}
+                </p-button>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 

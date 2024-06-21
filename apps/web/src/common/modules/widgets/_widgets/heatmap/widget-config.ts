@@ -6,6 +6,10 @@ const heatmap: WidgetConfig = {
     meta: {
         title: 'Heatmap',
         sizes: ['md', 'full'],
+        defaultValidationConfig: {
+            dataTarget: 'labels_info',
+            defaultMaxCount: 2,
+        },
     },
     requiredFieldsSchema: {
         granularity: {},

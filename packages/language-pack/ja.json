@@ -1918,6 +1918,11 @@
 					"TOTAL": "",
 					"TOTAL_FIELD": "総合フィールド",
 					"UPDATE_PREVIEW": "",
+					"VALIDATION_MODAL": {
+						"DESC": "",
+						"EDIT_DATA": "",
+						"TITLE": ""
+					},
 					"WIDGET_INFO": "ウィジェット情報",
 					"X_AXIS": "",
 					"Y_AXIS": ""

@@ -9,6 +9,10 @@ const progressCard: WidgetConfig = {
     meta: {
         title: 'Progress Card',
         sizes: ['sm'],
+        defaultValidationConfig: {
+            dataTarget: 'data_info',
+            defaultMaxCount: 2,
+        },
     },
     requiredFieldsSchema: {
         granularity: {},

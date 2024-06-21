@@ -7,6 +7,10 @@ export interface WidgetConfig {
     meta: {
         title: string;
         sizes: WidgetSize[];
+        defaultValidationConfig?: {
+            dataTarget: 'labels_info' | 'data_info',
+            defaultMaxCount: number,
+        };
     };
     requiredFieldsSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;
     optionalFieldsSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;

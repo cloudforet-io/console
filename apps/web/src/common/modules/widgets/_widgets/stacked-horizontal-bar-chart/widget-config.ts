@@ -6,6 +6,10 @@ const stackedHorizontalBarChart: WidgetConfig = {
     meta: {
         title: 'Stacked Horizontal Bar Chart',
         sizes: ['md', 'full'],
+        defaultValidationConfig: {
+            dataTarget: 'labels_info',
+            defaultMaxCount: 2,
+        },
     },
     requiredFieldsSchema: {
         granularity: {},
