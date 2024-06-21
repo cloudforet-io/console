@@ -472,7 +472,7 @@ const checkSelectedId = (id?: string) => {
     }
 
     .empty {
-        padding-bottom: 1.125rem;
+        height: 3.5rem;
     }
 }
 </style>
