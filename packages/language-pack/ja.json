@@ -1260,6 +1260,7 @@
 			"ADMIN_ID": "管理者ID",
 			"ADMIN_SIGN_IN": "管理者ログイン",
 			"ALT_E_SIGN_IN": "ユーザー名またはパスワードを確認してください",
+			"BUTTON_LABEL": "{idp} アカウントでサインイン",
 			"CONTACT": "ここにお問い合わせください",
 			"FOR_DOMAIN_ADMIN": "管理者アカウント",
 			"FOR_MEMBER_ACCOUNT": "一般ユーザー",

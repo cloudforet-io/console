@@ -1260,6 +1260,7 @@
 			"ADMIN_ID": "Admin ID",
 			"ADMIN_SIGN_IN": "Admin Sign in",
 			"ALT_E_SIGN_IN": "Please Confirm your Id or Password.",
+			"BUTTON_LABEL": "Sign in with {idp}",
 			"CONTACT": "Contact us",
 			"FOR_DOMAIN_ADMIN": "for Domain Admin",
 			"FOR_MEMBER_ACCOUNT": "for member account credentials",
