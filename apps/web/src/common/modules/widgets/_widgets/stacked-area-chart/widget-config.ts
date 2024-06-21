@@ -6,6 +6,10 @@ const stackedAreaChart: WidgetConfig = {
     meta: {
         title: 'Stacked Area Chart',
         sizes: ['md', 'full'],
+        defaultValidationConfig: {
+            dataTarget: 'labels_info',
+            defaultMaxCount: 2,
+        },
     },
     requiredFieldsSchema: {
         granularity: {},
