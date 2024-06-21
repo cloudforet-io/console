@@ -2673,6 +2673,7 @@
 	},
 	"INFO": {
 		"NOTICE": {
+			"ALL_WORKSPACE": "전체 워크스페이스",
 			"DETAIL": {
 				"BACK_TO_LIST": "목록",
 				"DETAIL_TITLE": "상세 내용 확인"
