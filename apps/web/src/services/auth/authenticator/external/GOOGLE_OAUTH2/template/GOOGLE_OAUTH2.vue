@@ -9,7 +9,9 @@
                  height="1rem"
                  class="mr-2"
             />
-            <span class="google-signin-button-label">Sign in with Google</span>
+            <span class="google-signin-button-label">{{ $t('COMMON.SIGN_IN.BUTTON_LABEL', {
+                idp: 'Google',
+            }) }}</span>
         </div>
     </p-button>
 </template>
