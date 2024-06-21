@@ -1918,6 +1918,11 @@
 					"TOTAL": "Total",
 					"TOTAL_FIELD": "Total Field",
 					"UPDATE_PREVIEW": "Update Preview",
+					"VALIDATION_MODAL": {
+						"DESC": "To illustrate this chart properly, the data requires at least {number} label fields (or data fields).",
+						"EDIT_DATA": "Go to Edit Data",
+						"TITLE": "Additional fields are required"
+					},
 					"WIDGET_INFO": "Widget Info",
 					"X_AXIS": "X-Axis",
 					"Y_AXIS": "Y-Axis"
