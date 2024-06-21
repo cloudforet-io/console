@@ -11,6 +11,7 @@ import { find } from 'lodash';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
 
@@ -32,6 +33,8 @@ const route = useRoute();
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetters = userWorkspaceStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
@@ -44,6 +47,7 @@ const storeState = reactive({
         if (favoriteMenu.itemType === FAVORITE_TYPE.DASHBOARD && favoriteMenu.itemId.startsWith('project-')) return true;
         return false;
     })),
+    currentWorkspaceId: computed(() => workspaceStoreGetters.currentWorkspaceId as string),
 });
 
 const state = reactive({
@@ -163,8 +167,8 @@ const state = reactive({
             id: project.key,
             icon: { name: 'ic_document-filled', color: peacock[600] },
             to: getProperRouteLocation({
-                name: PROJECT_ROUTE.DETAIL._NAME,
-                params: { id: project.key },
+                name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+                params: { id: project.key, workspaceId: storeState.currentWorkspaceId },
             }),
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: project.key },
         }))),

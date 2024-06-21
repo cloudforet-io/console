@@ -117,7 +117,7 @@ const singleItemTabState = reactive({
             label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
         },
     ]),
-    activeTab: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
+    activeTab: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
 });
 
 const onChangeTab = (activeTab) => {
