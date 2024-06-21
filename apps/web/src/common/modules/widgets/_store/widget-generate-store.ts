@@ -45,7 +45,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         title: '',
         description: '',
         size: 'full' as WidgetSize,
-        widgetValueMap: {} as Record<string, WidgetFieldValues>,
+        widgetValueMap: {} as Record<string, WidgetFieldValues|undefined>,
         widgetValidMap: {} as Record<string, boolean>,
         // Data Table
         selectedDataTableId: undefined as undefined | string,
@@ -94,7 +94,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setSize = (size: WidgetSize) => {
         state.size = size;
     };
-    const setWidgetValueMap = (widgetValueMap: Record<string, WidgetFieldValues>) => {
+    const setWidgetValueMap = (widgetValueMap: Record<string, WidgetFieldValues|undefined>) => {
         state.widgetValueMap = widgetValueMap;
     };
     const setWidgetValidMap = (widgetValidMap: Record<string, boolean>) => {
