@@ -3,9 +3,10 @@
         class="sign-in-left-container"
     >
         <div class="lottie-wrapper">
-            <img v-if="state.signInImage"
-                 :src="state.signInImage"
-            >
+            <div v-if="state.signInImage"
+                 class="custom-image"
+                 :style="{ backgroundImage: `url(${state.signInImage})` }"
+            />
             <img v-else-if="state.showNewYearImage"
                  class="happy-new-year-2024"
                  src="/images/logos/happy-new-year-2024.png"
@@ -69,7 +70,16 @@ const state = reactive({
         @apply flex justify-center items-center;
         width: 80%;
         max-width: 42.625rem;
+        height: 70%;
         margin: auto;
+
+        .custom-image {
+            width: 100%;
+            height: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+        }
     }
 
     .version {
