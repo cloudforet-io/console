@@ -35,4 +35,8 @@ export interface DataSourceModel {
     connected_workspace_count?: number;
     domain_id: string;
     created_at: string;
+    permissions?: {
+        deny: string[];
+    }
+    cost_data_keys?: string[];
 }
