@@ -34,7 +34,7 @@ const state = reactive({
                 type: 'item',
                 name: 'edit',
                 label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
-                icon: 'ic_edit',
+                icon: 'ic_edit-text',
             },
             {
                 type: 'item',

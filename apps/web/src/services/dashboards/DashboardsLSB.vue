@@ -2,7 +2,11 @@
 import {
     computed, reactive,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import {
+    PIconButton,
+} from '@spaceone/design-system';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
@@ -18,6 +22,7 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
+import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
@@ -34,6 +39,8 @@ const dashboardGetters = dashboardStore.getters;
 
 const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
+
+const router = useRouter();
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     favoriteItems: computed(() => favoriteGetters.dashboardItems),
@@ -104,10 +111,10 @@ const state = reactive({
     menuSet: computed<LSBMenu[]>(() => {
         const defaultMenuSet: LSBMenu[] = [
             {
-                type: MENU_ITEM_TYPE.ITEM,
+                // type: MENU_ITEM_TYPE.ITEM,
+                type: MENU_ITEM_TYPE.SLOT,
                 label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
                 id: MENU_ID.DASHBOARDS,
-                foldable: false,
                 to: getProperRouteLocation({
                     name: DASHBOARDS_ROUTE._NAME,
                 }),
@@ -167,6 +174,12 @@ const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
 const loadDashboard = async () => {
     await dashboardStore.load();
 };
+
+/* Event */
+const handleClickAddButton = () => {
+    router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME }));
+};
+
 const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], loadDashboard);
 callApiWithGrantGuard();
 </script>
@@ -174,5 +187,19 @@ callApiWithGrantGuard();
 <template>
     <l-s-b class="dashboards-l-s-b"
            :menu-set="state.menuSet"
-    />
+    >
+        <template #slot-dashboards="item">
+            <l-s-b-router-menu-item :item="item">
+                <template #right-extra>
+                    <p-icon-button name="ic_plus"
+                                   size="sm"
+                                   style-type="tertiary"
+                                   shape="square"
+                                   class="dashboard-create-button"
+                                   @click.prevent="handleClickAddButton"
+                    />
+                </template>
+            </l-s-b-router-menu-item>
+        </template>
+    </l-s-b>
 </template>

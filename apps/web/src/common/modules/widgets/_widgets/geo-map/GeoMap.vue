@@ -57,11 +57,6 @@ const state = reactive({
             map: 'world',
             roam: false,
             silent: true,
-            label: {
-                emphasis: {
-                    show: false,
-                },
-            },
             itemStyle: {
                 normal: {
                     areaColor: gray[200],
@@ -73,28 +68,16 @@ const state = reactive({
                 },
             },
         },
-        legend: {
-            show: state.showLegends,
-            bottom: 0,
-            left: 0,
-            icon: 'circle',
-            itemWidth: 10,
-            itemHeight: 10,
-        },
         tooltip: {
             trigger: 'item',
             formatter(val) {
                 return `${val.name} : ${val.value[2]}`;
             },
         },
-        visualMap: {
-            show: false,
-        },
         series: [
             {
                 type: 'scatter',
                 coordinateSystem: 'geo',
-                tooltip: true,
                 data: state.chartData,
             },
         ],
