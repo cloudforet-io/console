@@ -80,10 +80,10 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
         return { itemType: RECENT_TYPE.COST_ANALYSIS, workspaceId, itemId: costQuerySetId };
     }
 
-    if (to.name === ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME) {
+    if (to.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) {
         const metricId = to?.params?.metricId;
         if (!metricId) return undefined;
-        return { itemType: RECENT_TYPE.ASSET_ANALYSIS, workspaceId, itemId: metricId };
+        return { itemType: RECENT_TYPE.METRIC_EXPLORER, workspaceId, itemId: metricId };
     }
 
     /* MENU */

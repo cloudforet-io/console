@@ -205,33 +205,33 @@ const assetInventoryRoute: RouteConfig = {
             ],
         },
         {
-            path: 'asset-analysis',
-            meta: { menuId: MENU_ID.ASSET_ANALYSIS, translationId: MENU_INFO_MAP[MENU_ID.ASSET_ANALYSIS].translationId },
+            path: 'metric-explorer',
+            meta: { menuId: MENU_ID.METRIC_EXPLORER, translationId: MENU_INFO_MAP[MENU_ID.METRIC_EXPLORER].translationId },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
-                    name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS._NAME,
-                    meta: { menuId: MENU_ID.ASSET_ANALYSIS, lsbVisible: true },
+                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
+                    meta: { menuId: MENU_ID.METRIC_EXPLORER, lsbVisible: true },
                     component: AssetAnalysisMainPage as any,
                 },
                 {
                     path: ':metricId',
-                    name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                     meta: { label: ({ params }) => params.metricId, lsbVisible: true },
                     props: true,
                     component: { template: '<router-view />' },
                     children: [
                         {
                             path: '/',
-                            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                             meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
                             props: true,
                             component: AssetAnalysisDetailPage as any,
                         },
                         {
                             path: ':metricExampleId',
-                            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
+                            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                             meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
                             props: true,
                             component: AssetAnalysisDetailPage as any,

@@ -49,7 +49,7 @@ const state = reactive({
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
                 name: `[${targetNamespace?.name}] ${state.currentMetricExample?.name ?? _targetMetric?.name}`,
-                path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             },
         ];
     }),
@@ -90,8 +90,8 @@ watch([
     () => state.metricFavoriteOptions,
     () => state.metricExampleFavoriteOptions,
 ], ([metricFavoriteOptions, metricExampleFavoriteOptions]) => {
-    if (route.name === ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME) gnbStore.setFavoriteItemId(metricFavoriteOptions);
-    if (route.name === ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME) gnbStore.setFavoriteItemId(metricExampleFavoriteOptions);
+    if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) gnbStore.setFavoriteItemId(metricFavoriteOptions);
+    if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME) gnbStore.setFavoriteItemId(metricExampleFavoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {

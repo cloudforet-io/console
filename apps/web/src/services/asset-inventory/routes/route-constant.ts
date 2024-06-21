@@ -36,12 +36,12 @@ export const ASSET_INVENTORY_ROUTE = Object.freeze({
         ADD: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}.add` },
         NO_RESOURCE: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}.no_resource` },
     },
-    ASSET_ANALYSIS: {
-        _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.ASSET_ANALYSIS}`,
+    METRIC_EXPLORER: {
+        _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.METRIC_EXPLORER}`,
         DETAIL: {
-            _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.ASSET_ANALYSIS}.detail`,
+            _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.METRIC_EXPLORER}.detail`,
             EXAMPLE: {
-                _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.ASSET_ANALYSIS}.detail.example`,
+                _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.METRIC_EXPLORER}.detail.example`,
             },
         },
     },

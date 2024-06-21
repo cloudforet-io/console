@@ -96,7 +96,7 @@ const state = reactive({
                 color: gray[500],
             },
             to: getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                 params: {
                     metricId: metric.key,
                 },
@@ -112,7 +112,7 @@ const state = reactive({
             label: example.name,
             icon: 'ic_example-filled',
             to: getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                 params: {
                     metricId: example.metric_id,
                     metricExampleId: example.example_id,
@@ -196,7 +196,7 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceRefere
     if (commonNamespaces.length === 0) return [];
     return [{
         type: MENU_ITEM_TYPE.COLLAPSIBLE,
-        label: i18n.t('INVENTORY.ASSET_ANALYSIS.COMMON'),
+        label: i18n.t('INVENTORY.METRIC_EXPLORER.COMMON'),
         icon: 'COMMON',
         subItems: commonNamespaces,
     }];
@@ -390,7 +390,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                                  class="keyword-search-empty"
                         >
                             <span>
-                                {{ $t('INVENTORY.ASSET_ANALYSIS.EMPTY_TEXT') }}
+                                {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
                             </span>
                         </p-empty>
                     </div>
@@ -413,19 +413,19 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
             <template #content>
                 <div class="metric-select-guide-content">
                     <p class="title">
-                        {{ $t('INVENTORY.ASSET_ANALYSIS.SELECT_METRIC_GUIDE.TITLE') }}
+                        {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.TITLE') }}
                     </p>
                     <span class="description">
-                        {{ $t('INVENTORY.ASSET_ANALYSIS.SELECT_METRIC_GUIDE.DESCRIPTION') }}
+                        {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.DESCRIPTION') }}
                     </span>
                     <div class="button-wrapper">
                         <p-checkbox v-model="guidePopoverState.noMore">
-                            {{ $t('INVENTORY.ASSET_ANALYSIS.SELECT_METRIC_GUIDE.DONT_SHOW_ME_AGAIN') }}
+                            {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.DONT_SHOW_ME_AGAIN') }}
                         </p-checkbox>
                         <p-button style-type="substitutive"
                                   @click="handleConfirmMetricGuide"
                         >
-                            {{ $t('INVENTORY.ASSET_ANALYSIS.SELECT_METRIC_GUIDE.CONFIRM') }}
+                            {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.CONFIRM') }}
                         </p-button>
                     </div>
                 </div>

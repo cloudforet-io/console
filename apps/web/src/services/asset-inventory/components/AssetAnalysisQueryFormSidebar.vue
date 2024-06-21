@@ -41,9 +41,9 @@ const state = reactive({
     loading: false,
     currentMetricId: computed<string>(() => route.params.metricId),
     sidebarTitle: computed<TranslateResult>(() => {
-        if (assetAnalysisPageState.metricQueryFormMode === 'CREATE') return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ADD_TITLE');
-        if (assetAnalysisPageState.metricQueryFormMode === 'UPDATE') return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UPDATE_TITLE');
-        return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.VIEW_TITLE');
+        if (assetAnalysisPageState.metricQueryFormMode === 'CREATE') return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ADD_TITLE');
+        if (assetAnalysisPageState.metricQueryFormMode === 'UPDATE') return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UPDATE_TITLE');
+        return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.VIEW_TITLE');
     }),
     disableConfirmButton: computed<boolean>(() => {
         if (state.loading) return true;
@@ -75,19 +75,19 @@ const {
     code: '',
 }, {
     name: (value: string) => {
-        if (!value.length) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.REQUIRED_FIELD');
-        if (storeState.metricNameList.includes(value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.DUPLICATED');
+        if (!value.length) return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.REQUIRED_FIELD');
+        if (storeState.metricNameList.includes(value)) return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.DUPLICATED');
         return true;
     },
     // resourceType: (value: string) => {
     //     if (assetAnalysisPageState.metricQueryFormMode === 'VIEW') return true;
-    //     if (!value.length) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.REQUIRED_FIELD');
+    //     if (!value.length) return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.REQUIRED_FIELD');
     //     const regex = /^.+?\..+?\..+?$/;
-    //     if (!regex.test(value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.INVALID_RESOURCE_TYPE');
+    //     if (!regex.test(value)) return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.INVALID_RESOURCE_TYPE');
     //     return true;
     // },
     code: (value: string) => {
-        if (!value.length) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.REQUIRED_FIELD');
+        if (!value.length) return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.REQUIRED_FIELD');
         try {
             JSON.parse(value);
             return true;
@@ -110,17 +110,17 @@ const createCustomMetric = async () => {
             query_options: jsonParsedQuery,
             namespace_id: assetAnalysisPageState.selectedNamespace?.name || '',
         });
-        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
         assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
         await assetAnalysisPageStore.loadMetric(state.currentMetricId);
         await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: {
                 metricId: createdMetric.metric_id,
             },
         })).catch(() => {});
     } catch (e) {
-        showErrorMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_E_CREATE_METRIC'), e);
+        showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_CREATE_METRIC'), e);
     } finally {
         state.loading = false;
     }
@@ -134,12 +134,12 @@ const updateCustomMetric = async () => {
             unit: unit.value,
             query_options: jsonParsedQuery,
         });
-        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
         assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
         await assetAnalysisPageStore.loadMetric(state.currentMetricId);
         assetAnalysisPageStore.setRefreshMetricData(true);
     } catch (e) {
-        showErrorMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);
+        showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);
     } finally {
         state.loading = false;
     }
@@ -179,7 +179,7 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
         >
             <div class="sidebar-contents">
                 <p-field-group v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'"
-                               :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.NAME')"
+                               :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.NAME')"
                                required
                                :invalid="invalidState.name"
                                :invalid-text="invalidTexts.name"
@@ -190,7 +190,7 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
-                <!--                <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.RESOURCE_TYPE')"-->
+                <!--                <p-field-group :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.RESOURCE_TYPE')"-->
                 <!--                               required-->
                 <!--                               :invalid="invalidState.resourceType"-->
                 <!--                               :invalid-text="invalidTexts.resourceType"-->
@@ -208,7 +208,7 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                 <!--                        {{ assetAnalysisPageState.metric?.resource_type }}-->
                 <!--                    </p>-->
                 <!--                </p-field-group>-->
-                <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UNIT')"
+                <p-field-group :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UNIT')"
                                :required="assetAnalysisPageState.metricQueryFormMode === 'VIEW'"
                                class="col-span-8"
                 >
@@ -224,7 +224,7 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                     </p>
                 </p-field-group>
                 <p-field-group class="query-field"
-                               :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.QUERY_OPTION')"
+                               :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.QUERY_OPTION')"
                                required
                 >
                     <p-text-editor :code="code"
@@ -240,14 +240,14 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                     <p-button style-type="transparent"
                               @click="handleClose"
                     >
-                        {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.CANCEL') }}
+                        {{ $t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.CANCEL') }}
                     </p-button>
                     <template v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'">
                         <p-button style-type="primary"
                                   :disabled="state.disableConfirmButton"
                                   @click="handleCreateCustomMetric"
                         >
-                            {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.CONFIRM') }}
+                            {{ $t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.CONFIRM') }}
                         </p-button>
                     </template>
                     <template v-else>
@@ -255,18 +255,18 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                                   :disabled="state.disableConfirmButton"
                                   @click="() => {state.visibleSaveModal = true}"
                         >
-                            {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.SAVE') }}
+                            {{ $t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.SAVE') }}
                         </p-button>
                     </template>
                 </div>
             </template>
         </p-overlay-layout>
-        <delete-modal :header-title="$t('INVENTORY.ASSET_ANALYSIS.DETAIL.SAVE_TITLE')"
+        <delete-modal :header-title="$t('INVENTORY.METRIC_EXPLORER.DETAIL.SAVE_TITLE')"
                       :visible.sync="state.visibleSaveModal"
                       :disabled="state.loading"
                       @confirm="handleSaveCustomMetric"
         >
-            {{ $t('INVENTORY.ASSET_ANALYSIS.DETAIL.SAVE_DESC') }}
+            {{ $t('INVENTORY.METRIC_EXPLORER.DETAIL.SAVE_DESC') }}
         </delete-modal>
     </div>
 </template>

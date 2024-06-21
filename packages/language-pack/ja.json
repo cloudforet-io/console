@@ -2726,7 +2726,7 @@
 	},
 	"INVENTORY": {
 		"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
-		"ASSET_ANALYSIS": {
+		"METRIC_EXPLORER": {
 			"ADD_EXAMPLE": "サンプルを追加",
 			"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 			"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
@@ -2742,8 +2742,8 @@
 			"ALT_S_SAVE_METRIC": "メトリックの保存完了",
 			"ALT_S_UPDATE_METRIC_EXAMPLE": "メトリックサンプルの修正完了",
 			"ALT_S_UPDATE_METRIC_NAME": "メトリック名の修正完了",
-			"ASSET_ANALYSIS": "リソース解析",
-			"ASSET_ANALYSIS_HOME": "リソース解析ホーム",
+			"METRIC_EXPLORER": "メトリック探索",
+			"METRIC_EXPLORER_HOME": "メトリック探索ホーム",
 			"COMMON": "一般的な",
 			"CUSTOM_METRIC": {
 				"ADD_TITLE": "クエリを使ったカスタムメトリック追加",
@@ -2792,7 +2792,7 @@
 				"LOCATE_METRICS": "メトリックを検索する",
 				"LOCATE_METRICS_DESC": "左サイドバーから名前空間を選択し、分析したいメトリックを選択してください。",
 				"RECENTLY_VISITED": "最近のアクセス",
-				"TITLE": "リソース分析を開始する",
+				"TITLE": "メトリック探索を開始する",
 				"UPCOMING": "今後の"
 			},
 			"MAX_LENGTH_INVALID": "{max}文字以内で入力してください",
@@ -2910,7 +2910,7 @@
 				"SET": "設定",
 				"SHOW_ALL": "すべて表示",
 				"SHOW_CHARTS": "チャートの表示",
-				"SHOW_IN_ASSET_ANALYSIS": "[リソース解析]に表示",
+				"SHOW_IN_METRIC_EXPLORER": "",
 				"SHOW_MAJOR": "主なサービスを見る",
 				"TITLE": "クラウドサービス",
 				"USAGE_OVERVIEW": "利用概要",
@@ -3351,7 +3351,7 @@
 		"ALERT_MANAGER_DASHBOARD": "ダッシュボード",
 		"ALERT_MANAGER_ESCALATION_POLICY": "エスカレーションポリシー",
 		"ASSET_INVENTORY": "アセット·インベントリー",
-		"ASSET_INVENTORY_ASSET_ANALYSIS": "リソース解析",
+		"ASSET_INVENTORY_METRIC_EXPLORER": "メトリック探索",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "クラウドサービス",
 		"ASSET_INVENTORY_COLLECTOR": "コレクター",
 		"ASSET_INVENTORY_SECURITY": "セキュリティ",
