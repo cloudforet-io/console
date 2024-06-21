@@ -63,6 +63,7 @@ const state = reactive({
         tooltip: {},
         xAxis: {
             type: 'value',
+            rotate: 45,
             axisLabel: {
                 formatter: (val) => numberFormatter(val, { notation: 'compact' }),
             },

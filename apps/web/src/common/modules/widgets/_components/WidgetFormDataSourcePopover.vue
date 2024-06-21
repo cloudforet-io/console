@@ -478,7 +478,7 @@ onMounted(() => {
                 }
             }
             .empty-wrapper {
-                @apply flex justify-center items-center text-gray-300;
+                @apply flex justify-center items-center text-gray-300 text-paragraph-md;
                 width: 100%;
                 height: 100%;
             }
