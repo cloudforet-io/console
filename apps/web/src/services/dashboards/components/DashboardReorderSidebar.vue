@@ -65,7 +65,7 @@ onUnmounted(() => {
 <template>
     <div class="dashboard-reorder-sidebar">
         <portal to="widget-title">
-            <span class="sidebar-title">{{ $t('DASHBOARDS.DETAIL.WIDGET_REORDER') }}</span> <br>
+            <span class="sidebar-title">{{ $t('DASHBOARDS.DETAIL.EDIT_LAYOUT') }}</span> <br>
         </portal>
         <portal to="widget-contents">
             <div class="sidebar-contents">

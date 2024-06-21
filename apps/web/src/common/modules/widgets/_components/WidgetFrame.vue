@@ -19,13 +19,12 @@ import type { WidgetFrameEmit } from '@/common/modules/widgets/types/widget-disp
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
 
-const props = withDefaults(defineProps<WidgetFrameProps>(), {
-});
+const props = defineProps<WidgetFrameProps>();
 const emit = defineEmits<WidgetFrameEmit>();
 
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
-    showWidthToggleButton: computed(() => props.widgetSizes.length > 1 && !props.loading && props.mode === 'view'),
+    showWidthToggleButton: computed(() => props.widgetSizes.length > 1 && !props.loading && props.mode === 'edit-layout'),
     etcMenuItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -67,7 +66,7 @@ const {
     contextMenuRef: etcContextMenuRef,
     position: 'right',
 });
-onClickOutside(etcContextMenuRef, hideContextMenu);
+onClickOutside(etcButtonRef, hideContextMenu);
 
 /* Event */
 const handleClickEtcButton = () => {
@@ -102,7 +101,7 @@ const handleToggleWidth = () => {
                 {{ props.title }}
             </h3>
             <p-popover v-if="!props.errorMessage"
-                       class="metric-select-guide-popover"
+                       class="metadata-popover"
                        position="bottom-start"
                        :trigger="POPOVER_TRIGGER.CLICK"
             >
@@ -147,11 +146,10 @@ const handleToggleWidth = () => {
                 </template>
             </p-popover>
         </div>
-        <div v-if="props.mode === 'view'"
+        <div v-if="props.mode !== 'overlay'"
              class="action-button-wrapper"
         >
-            <p-icon-button v-if="props.mode === 'view'"
-                           ref="etcButtonRef"
+            <p-icon-button ref="etcButtonRef"
                            name="ic_ellipsis-horizontal"
                            style-type="transparent"
                            shape="square"
@@ -231,9 +229,6 @@ const handleToggleWidth = () => {
         .action-button-wrapper {
             display: block;
         }
-        .widget-toggle-button-wrapper {
-            display: flex;
-        }
     }
 
     .widget-header {
@@ -264,7 +259,10 @@ const handleToggleWidth = () => {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
+            min-height: 6.25rem;
             max-height: 20rem;
+            min-width: 20rem;
+            max-width: 25rem;
             overflow-y: auto;
             z-index: 100;
             padding-top: 0.5rem;
@@ -286,7 +284,6 @@ const handleToggleWidth = () => {
         }
     }
     .widget-toggle-button-wrapper {
-        display: none;
         position: absolute;
         bottom: 0.375rem;
         right: 0.375rem;

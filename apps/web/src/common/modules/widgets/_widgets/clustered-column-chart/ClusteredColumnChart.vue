@@ -66,6 +66,7 @@ const state = reactive({
             type: 'category',
             axisLabel: {
                 interval: 0,
+                rotate: 45,
                 formatter: (val) => {
                     if (state.xAxisField === DATE_FIELD) {
                         return dayjs.utc(val).format(getDateLabelFormat(state.granularity));

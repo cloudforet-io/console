@@ -117,7 +117,7 @@ const handleClickWidgetReorder = () => {
                   size="sm"
                   @click="handleClickWidgetReorder"
         >
-            {{ store.state.display.visibleSidebar ? $t('DASHBOARDS.DETAIL.DONE_EDITING') : $t('DASHBOARDS.DETAIL.WIDGET_REORDER') }}
+            {{ store.state.display.visibleSidebar ? $t('DASHBOARDS.DETAIL.DONE_EDITING') : $t('DASHBOARDS.DETAIL.EDIT_LAYOUT') }}
         </p-button>
     </div>
 </template>
