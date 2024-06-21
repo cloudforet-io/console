@@ -67,7 +67,7 @@ const state = reactive({
             <p-divider class="divider" />
             <p-link highlight
                     :to="{
-                        name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                         params: { metricId: METRIC_MANAGED_CREATED_COUNT},
                     }"
                     action-icon="internal-link"

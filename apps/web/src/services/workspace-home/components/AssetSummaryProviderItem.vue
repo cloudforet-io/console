@@ -33,7 +33,7 @@ const handleClickButton = (type: string) => {
     else target = `metric-managed-${type}-count`;
 
     router.push({
-        name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
         params: { metricId: target, groupBy: props.item.key },
     });
 };
