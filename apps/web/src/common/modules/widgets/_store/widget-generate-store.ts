@@ -246,6 +246,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         /* Step 2 */
         reset: () => {
             state.widget = undefined;
+            state.dataTables = [];
             state.showOverlay = false;
             state.overlayStep = 1;
             state.selectedDataTableId = undefined;

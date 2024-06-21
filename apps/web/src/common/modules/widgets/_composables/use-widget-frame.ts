@@ -46,7 +46,7 @@ export const useWidgetFrame = (
 ) => {
     const _state = reactive({
         widgetConfig: computed(() => getWidgetConfig(props.widgetName)),
-        title: computed(() => props.title ?? _state.widgetConfig?.meta.title ?? ''),
+        title: computed(() => props.title ?? ''),
         size: computed<WidgetSize>(() => {
             if (props.size && _state.widgetConfig.meta.sizes.includes(props.size)) return props.size;
             return _state.widgetConfig.meta.sizes[0];

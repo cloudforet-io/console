@@ -13,6 +13,7 @@ import type {
 import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
@@ -21,8 +22,8 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     getDateLabelFormat,
@@ -80,6 +81,7 @@ const state = reactive({
         },
         tooltip: {
             position: 'top',
+            valueFormatter: (val) => numberFormatter(val) || '',
         },
         visualMap: {
             show: state.showLegends,

@@ -13,6 +13,7 @@ import type {
 import { throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
@@ -23,8 +24,8 @@ import type { RegionReferenceMap } from '@/store/reference/region-reference-stor
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange, WidgetLoadData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
@@ -70,9 +71,7 @@ const state = reactive({
         },
         tooltip: {
             trigger: 'item',
-            formatter(val) {
-                return `${val.name} : ${val.value[2]}`;
-            },
+            valueFormatter: (val) => numberFormatter(val) || '',
         },
         series: [
             {

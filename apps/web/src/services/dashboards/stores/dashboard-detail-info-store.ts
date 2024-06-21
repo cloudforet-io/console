@@ -400,6 +400,23 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             ErrorHandler.handleError(e);
         }
     };
+    const addWidgetToDashboardLayouts = (widgetId: string) => {
+        const _layouts = cloneDeep(state.dashboardInfo?.layouts || []);
+        if (_layouts.length) {
+            const _targetLayout = _layouts[0];
+            if (_targetLayout.widgets) {
+                _targetLayout.widgets.unshift(widgetId);
+            } else {
+                _targetLayout.widgets = [widgetId];
+            }
+            _layouts[0] = _targetLayout;
+        } else {
+            _layouts.push({
+                widgets: [widgetId],
+            });
+        }
+        state.dashboardLayouts = _layouts;
+    };
 
     const mutations = {
         setName,
@@ -428,6 +445,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         updateDashboard,
         deleteDashboard,
         listDashboardWidgets,
+        addWidgetToDashboardLayouts,
     };
 
     return {

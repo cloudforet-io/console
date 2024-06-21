@@ -158,7 +158,6 @@ watch([() => props.property, () => props.dashboardVariables], async ([property])
 <style lang="postcss" scoped>
 .dashboard-variable-dropdown {
     @apply inline-block;
-    max-width: 22.5rem;
 
     /* custom design-system component - p-context-menu */
     :deep(.options-menu) {
