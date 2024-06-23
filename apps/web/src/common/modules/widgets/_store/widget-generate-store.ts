@@ -150,13 +150,14 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 ErrorHandler.handleError(e);
             }
         },
-        createTransformDataTable: async (transformParams: Partial<DataTableTransformParameters>) => {
+        createTransformDataTable: async (transformParams: Partial<DataTableTransformParameters>, unsavedId: string) => {
             const parameters = {
                 widget_id: state.widgetId,
                 ...transformParams,
             } as DataTableTransformParameters;
             try {
                 const result = await SpaceConnector.clientV2.dashboard.publicDataTable.transform<DataTableTransformParameters, DataTableModel>(parameters);
+                state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== unsavedId);
                 state.dataTables.push(result);
             } catch (e) {
                 ErrorHandler.handleError(e);

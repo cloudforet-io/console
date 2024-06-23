@@ -188,11 +188,10 @@ const handleUpdateDataTable = async () => {
     if (firstUpdating) {
         const createParams = {
             name: state.dataTableName,
-            data_type: DATA_TABLE_TYPE.TRANSFORMED,
             operator: state.operator,
             options: { [state.operator]: options() },
         };
-        await widgetGenerateStore.createTransformDataTable(createParams);
+        await widgetGenerateStore.createTransformDataTable(createParams, state.dataTableId);
     } else {
         const updateParams = {
             data_table_id: state.dataTableId,

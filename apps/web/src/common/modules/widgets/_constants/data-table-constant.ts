@@ -22,10 +22,10 @@ export const DATA_TABLE_OPERATOR = {
 } as const;
 
 export const JOIN_TYPE = {
-    LEFT: 'LEFT',
-    RIGHT: 'RIGHT',
-    OUTER: 'OUTER',
-    INNER: 'INNER',
+    LEFT: 'left',
+    RIGHT: 'right',
+    OUTER: 'outer',
+    INNER: 'inner',
 } as const;
 
 // NOTE: temporary solution for the global variable
