@@ -183,7 +183,7 @@ const checkSelectedId = (id?: string) => {
                     >
                         <p-lazy-img v-if="item.imgIcon"
                                     :src="assetUrlConverter(item.imgIcon)"
-                                    error-icon="ic_globe-filled"
+                                    error-icon="ic_link"
                                     :error-icon-color="gray[500]"
                                     class="icon"
                         />
