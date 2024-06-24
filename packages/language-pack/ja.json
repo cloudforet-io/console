@@ -1471,6 +1471,7 @@
 			"RUN_COLLECTOR_NO_RECENT_RUN": "最近の作業履歴はありません。",
 			"RUN_COLLECTOR_START_TIME": "開始時間",
 			"SAVE": "保存",
+			"SELECT_A_DATA_TABLE": "",
 			"SERVICE_ACCOUNTS": "サービスアカウント",
 			"SERVICE_ACCOUNTS_ACCOUNT": "アカウント",
 			"SERVICE_ACCOUNTS_ADD": "追加",
