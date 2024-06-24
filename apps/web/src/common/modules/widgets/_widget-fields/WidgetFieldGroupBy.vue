@@ -80,15 +80,13 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
     name: d,
     label: d,
 }));
-const isIncludedInMenuItems = (data: string[]|string):boolean => {
-    if (Array.isArray(data)) {
-        return data.every((d) => state.menuItems.some((m) => m.name === d));
-    }
-    return state.menuItems.some((m) => m.name === data);
-};
-
-/* Init */
-onMounted(() => {
+watch(() => state.menuItems, (menuItems) => {
+    const isIncludedInMenuItems = (data: string[]|string):boolean => {
+        if (Array.isArray(data)) {
+            return data.every((d) => menuItems.some((m) => m.name === d));
+        }
+        return menuItems.some((m) => m.name === data);
+    };
     if (state.multiselectable) {
         state.proxyValue = {
             ...state.proxyValue,
@@ -100,11 +98,27 @@ onMounted(() => {
             ...state.proxyValue,
             value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
         };
+        state.selectedItem = state.proxyValue.value ?? state.menuItems[0]?.name;
+    }
+}, { immediate: true });
+/* Init */
+onMounted(() => {
+    if (state.multiselectable) {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: props.value?.value ?? [state.menuItems[0]?.name],
+        };
+        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+    } else {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: props.value?.value ?? state.menuItems[0]?.name,
+        };
         state.selectedItem = state.menuItems[0]?.name;
     }
     state.proxyValue = {
         ...state.proxyValue,
-        count: state.proxyValue.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT,
+        count: props.value.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT,
     };
 });
 </script>
