@@ -58,7 +58,7 @@ const state = reactive({
                     results: state.data.results.map((d, idx) => {
                         const results = d;
                         state.tableDataField.forEach((field) => {
-                            const comparisonValue = comparisonData[idx]?.[field] ?? 0;
+                            const comparisonValue = comparisonData?.[idx]?.[field] ?? 0;
                             results[`comparison_${field}`] = comparisonValue;
                         });
                         return results;
