@@ -52,6 +52,7 @@ const storeState = reactive({
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
+    selectedDataTable: computed(() => widgetGenerateStore.getters.selectedDataTable),
     dataTables: computed(() => widgetGenerateState.dataTables),
 });
 
@@ -267,6 +268,38 @@ const handleUpdateDataTable = async () => {
         await widgetGenerateStore.loadDataTable({
             data_table_id: state.dataTableId,
         });
+    }
+
+    // Update Referenced Transformed DataTable
+    if (storeState.selectedDataTableId && storeState.selectedDataTable?.data_type === 'TRANSFORMED') {
+        const referencedDataTableIds = [] as string[];
+        storeState.dataTables.forEach((dataTable) => {
+            const isReferenced = dataTable.data_type === 'TRANSFORMED'
+            && !dataTable?.data_table_id?.startsWith('UNSAVED-')
+            && (
+                dataTable.options?.JOIN?.data_tables?.includes(state.dataTableId)
+                || dataTable.options?.CONCAT?.data_tables?.includes(state.dataTableId)
+                || dataTable.options?.QUERY?.data_table_id === state.dataTableId
+                || dataTable.options?.EVAL?.data_table_id === state.dataTableId
+            );
+            if (isReferenced) referencedDataTableIds.push(dataTable.data_table_id as string);
+        });
+        if (referencedDataTableIds.length && referencedDataTableIds.includes(storeState.selectedDataTableId)) {
+            await Promise.all(referencedDataTableIds.map((dataTableId) => {
+                const dataTable = storeState.dataTables.find((_dataTable) => _dataTable.data_table_id === dataTableId) as PublicDataTableModel|PrivateDataTableModel;
+                widgetGenerateStore.updateDataTable({
+                    data_table_id: dataTable.data_table_id,
+                    name: dataTable.name,
+                    options: {
+                        ...dataTable.options,
+                    },
+                });
+                return null;
+            }));
+            await widgetGenerateStore.loadDataTable({
+                data_table_id: storeState.selectedDataTableId,
+            });
+        }
     }
     showSuccessMessage('Changes have been successfully applied.', '');
     setInitialDataTableForm();
