@@ -2679,7 +2679,8 @@
 			"ALL_WORKSPACE": "All Workspaces",
 			"DETAIL": {
 				"BACK_TO_LIST": "Back to List",
-				"DETAIL_TITLE": "Notice Detail"
+				"DETAIL_TITLE": "Notice Detail",
+				"SHOW_ALL_WORKSPACES": "Show All Workspaces"
 			},
 			"DOMAIN_NOTICE": "Internal Notice",
 			"FORM": {

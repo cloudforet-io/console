@@ -2679,7 +2679,8 @@
 			"ALL_WORKSPACE": "전체 워크스페이스",
 			"DETAIL": {
 				"BACK_TO_LIST": "목록",
-				"DETAIL_TITLE": "상세 내용 확인"
+				"DETAIL_TITLE": "상세 내용 확인",
+				"SHOW_ALL_WORKSPACES": ""
 			},
 			"DOMAIN_NOTICE": "내부 공지",
 			"FORM": {
