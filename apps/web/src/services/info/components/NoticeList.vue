@@ -44,12 +44,6 @@ const state = reactive({
     ])),
     selectedToolId: undefined as string|undefined,
     selectedItems: [] as WorkspaceDropdownMenuItem[],
-    workspaceIds: computed<string[]>(() => {
-        if (state.selectedItems.length) {
-            return state.selectedItems.map((item) => item.name);
-        }
-        return ['*'];
-    }),
     queryFilter: [] as ConsoleFilter[],
 });
 
@@ -114,21 +108,29 @@ const handleClickToolButton = (value: string) => {
     else state.selectedToolId = value;
 };
 
-watch(() => state.selectedToolId, () => {
+watch(() => state.selectedToolId, (selectedToolId) => {
     state.selectedItems = [];
     state.queryFilter = [];
     state.searchText = '';
-});
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-watch([() => state.selectedItems, () => state.selectedToolId], ([_, selectedToolId]) => {
-    if (selectedToolId === 'specific') {
-        state.queryFilter = [{ k: 'workspace_id', v: state.workspaceIds, o: '=' }];
-    } else if (selectedToolId === 'all') {
+
+    if (selectedToolId === 'all') {
         state.queryFilter = [{ k: 'workspace_id', v: ['*'], o: '=' }];
     } else state.queryFilter = [];
 
     listNotice();
-}, { immediate: true });
+});
+watch(() => state.selectedItems, (selectedItems) => {
+    if (state.selectedToolId !== 'specific') return;
+
+    if (selectedItems.length > 0) {
+        const workspaceIds = selectedItems.map((item) => item.name);
+        state.queryFilter = [{ k: 'workspace_id', v: workspaceIds, o: '=' }];
+    } else {
+        state.queryFilter = [];
+    }
+
+    listNotice();
+});
 
 (async () => {
     state.loading = true;
