@@ -128,7 +128,7 @@ const state = reactive({
             icon: 'ic_db-evaluation',
         },
         {
-            key: DATA_TABLE_OPERATOR.WHERE,
+            key: DATA_TABLE_OPERATOR.QUERY,
             name: 'Where',
             description: 'Filter and extract data that meet specific conditions.',
             icon: 'ic_db-where',

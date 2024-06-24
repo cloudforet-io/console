@@ -2,7 +2,7 @@
 
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 
 import { PI, PContextMenu } from '@spaceone/design-system';
@@ -55,7 +55,7 @@ const state = reactive({
         }
         return state.baseMenuItems;
     }),
-    selected: undefined as MenuItem[]|undefined,
+    selected: props.operator === 'JOIN' || props.operator === 'CONCAT' ? props.dataTableInfo?.dataTables?.[0] : props.dataTableInfo?.dataTableId ?? undefined as string|MenuItem[]|undefined,
     secondaryDataTableMenuItems: computed<MenuItem[]>(() => {
         const alreadySelected = state.selected && state.selected.length ? [{ ...state.selected[0], disabled: true, iconColor: gray[300] }] : [];
         if (alreadySelected.length) {
@@ -66,7 +66,7 @@ const state = reactive({
         }
         return state.baseMenuItems;
     }),
-    secondarySelected: undefined as MenuItem[]|undefined,
+    secondarySelected: props.dataTableInfo?.dataTables?.[1] ?? undefined as string|MenuItem[]|undefined,
 });
 const containerRef = ref<HTMLElement|null>(null);
 const secondContainerRef = ref<HTMLElement|null>(null);
@@ -82,10 +82,27 @@ const handleClickSelectButton = (isSecondary?: boolean) => {
 const handleSelectDataTable = (item: MenuItem, isSecondary?: boolean) => {
     if (isSecondary) {
         state.secondarySelected = [item];
+        const dataTables = state.selected ? [state.selected[0].name, item.name] : [undefined, item.name];
+        state.proxyDataTableInfo = {
+            ...state.proxyDataTableInfo,
+            dataTables,
+        };
         state.secondaryVisibleMenu = false;
         return;
     }
     state.selected = [item];
+    if (state.isDualDropdown) {
+        const dataTables = state.secondarySelected ? [item.name, state.secondarySelected[0].name] : [item.name];
+        state.proxyDataTableInfo = {
+            ...state.proxyDataTableInfo,
+            dataTables,
+        };
+    } else {
+        state.proxyDataTableInfo = {
+            ...state.proxyDataTableInfo,
+            dataTableId: item.name,
+        };
+    }
     state.visibleMenu = false;
 };
 /* Utils */
@@ -100,29 +117,18 @@ const hideMenu = (isSecondary?: boolean) => {
 onClickOutside(containerRef, () => hideMenu(false));
 onClickOutside(secondContainerRef, () => hideMenu(true));
 
-watch([() => state.selected, () => state.secondarySelected], () => {
-    if (state.selected === undefined && state.secondarySelected === undefined) return;
-
-    if (state.isDualDropdown) {
-        state.proxyDataTableInfo = {
-            ...state.proxyDataTableInfo,
-            dataTables: [state.selected?.[0]?.name, state.secondarySelected?.[0]?.name],
-        };
-        return;
+watch(() => props.dataTableInfo, (newVal) => {
+    if (state.selected === undefined && state.secondarySelected === undefined) {
+        if (state.isDualDropdown) {
+            const _selected = state.dataTableMenuItems.find((item) => item.name === newVal.dataTables[0]);
+            const _secondarySelected = state.dataTableMenuItems.find((item) => item.name === newVal.dataTables[1]);
+            state.selected = _selected ? [_selected] : undefined;
+            state.secondarySelected = _secondarySelected ? [_secondarySelected] : undefined;
+            return;
+        }
+        const _selected = state.dataTableMenuItems.find((item) => item.name === newVal.dataTableId);
+        state.selected = _selected ? [_selected] : undefined;
     }
-    state.proxyDataTableInfo = {
-        ...state.proxyDataTableInfo,
-        dataTableId: state.selected?.[0]?.name,
-    };
-});
-
-onMounted(() => {
-    if (state.isDualDropdown) {
-        state.selected = props.dataTableInfo.dataTables[0] ?? undefined;
-        state.secondarySelected = props.dataTableInfo.dataTables[1] ?? undefined;
-        return;
-    }
-    state.selected = props.dataTableInfo.dataTableId ?? undefined;
 });
 
 </script>

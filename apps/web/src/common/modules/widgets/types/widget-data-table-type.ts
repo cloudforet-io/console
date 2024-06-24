@@ -49,7 +49,7 @@ export interface AdditionalLabel {
     value: string;
 }
 
-export interface WhereCondition {
+export interface QueryCondition {
     key: string;
     value: string;
 }

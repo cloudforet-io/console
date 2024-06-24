@@ -16,16 +16,16 @@ export const DATA_SOURCE_DOMAIN = {
 export const DATA_TABLE_OPERATOR = {
     CONCAT: 'CONCAT',
     JOIN: 'JOIN',
-    WHERE: 'WHERE',
+    QUERY: 'QUERY',
     // AGGREGATE: 'AGGREGATE',
     EVAL: 'EVAL',
 } as const;
 
 export const JOIN_TYPE = {
-    LEFT: 'LEFT',
-    RIGHT: 'RIGHT',
-    OUTER: 'OUTER',
-    INNER: 'INNER',
+    LEFT: 'left',
+    RIGHT: 'right',
+    OUTER: 'outer',
+    INNER: 'inner',
 } as const;
 
 // NOTE: temporary solution for the global variable

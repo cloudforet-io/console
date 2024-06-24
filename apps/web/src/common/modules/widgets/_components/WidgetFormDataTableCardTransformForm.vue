@@ -12,7 +12,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformDataTableDropdown
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformDataTableDropdown.vue';
 import { DATA_TABLE_OPERATOR, JOIN_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
-import type { WhereCondition, EvalFormula, TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { QueryCondition, EvalFormula, TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableOperator, JoinType,
 } from '@/common/modules/widgets/types/widget-model';
@@ -22,7 +22,7 @@ interface Props {
     operator: DataTableOperator;
     dataTableInfo: TransformDataTableInfo;
     joinType: JoinType|undefined;
-    conditions: WhereCondition[];
+    conditions: QueryCondition[];
     functions: EvalFormula[];
 }
 
@@ -30,7 +30,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{(e: 'update:data-table-info', value: TransformDataTableInfo): void;
     (e: 'update:join-type', value: JoinType): void;
-    (e: 'update:conditions', value: WhereCondition[]): void;
+    (e: 'update:conditions', value: QueryCondition[]): void;
     (e: 'update:functions', value: EvalFormula[]): void;
 }>();
 
@@ -38,7 +38,7 @@ const state = reactive({
     operatorMap: computed(() => {
         if (props.operator === 'CONCAT') return { name: 'Concatenate', icon: 'ic_db-concat' };
         if (props.operator === 'JOIN') return { name: 'Join', icon: 'ic_join' };
-        if (props.operator === 'WHERE') return { name: 'Where', icon: 'ic_db-where' };
+        if (props.operator === 'QUERY') return { name: 'Where', icon: 'ic_db-where' };
         if (props.operator === 'EVAL') return { name: 'Evaluate', icon: 'ic_db-evaluation' };
         return { name: '', icon: '' };
     }),
@@ -55,7 +55,7 @@ const joinState = reactive({
     ]),
 });
 
-const whereState = reactive({
+const queryState = reactive({
     proxyConditions: useProxyValue('conditions', props, emit),
 });
 
@@ -65,19 +65,19 @@ const evalState = reactive({
 
 /* Events */
 const handleChangeCondition = (key: string, value: string) => {
-    const index = whereState.proxyConditions.findIndex((condition) => condition.key === key);
+    const index = queryState.proxyConditions.findIndex((condition) => condition.key === key);
     if (index !== -1) {
-        whereState.proxyConditions[index].value = value;
+        queryState.proxyConditions[index].value = value;
     }
 };
 const handleRemoveCondition = (key: string) => {
-    const index = whereState.proxyConditions.findIndex((condition) => condition.key === key);
+    const index = queryState.proxyConditions.findIndex((condition) => condition.key === key);
     if (index !== -1) {
-        whereState.proxyConditions.splice(index, 1);
+        queryState.proxyConditions.splice(index, 1);
     }
 };
 const handleClickAddCondition = () => {
-    whereState.proxyConditions = [...whereState.proxyConditions, { key: getRandomId(), value: '' }];
+    queryState.proxyConditions = [...queryState.proxyConditions, { key: getRandomId(), value: '' }];
 };
 
 const handleClickAddFunction = () => {
@@ -142,12 +142,12 @@ const handleRemoveFunction = (key: string) => {
                     </template>
                 </p-select-dropdown>
             </p-field-group>
-            <p-field-group v-if="props.operator === DATA_TABLE_OPERATOR.WHERE"
+            <p-field-group v-if="props.operator === DATA_TABLE_OPERATOR.QUERY"
                            :label="'Condition'"
                            required
             >
                 <div class="where-type-conditions-wrapper">
-                    <div v-for="(conditionInfo, idx) in whereState.proxyConditions"
+                    <div v-for="(conditionInfo, idx) in queryState.proxyConditions"
                          :key="conditionInfo.key"
                          class="conditions-wrapper"
                     >
@@ -158,7 +158,7 @@ const handleRemoveFunction = (key: string) => {
                         />
                         <p-icon-button name="ic_delete"
                                        size="sm"
-                                       :disabled="idx === 0 && whereState.proxyConditions.length === 1"
+                                       :disabled="idx === 0 && queryState.proxyConditions.length === 1"
                                        @click="handleRemoveCondition(conditionInfo.key)"
                         />
                     </div>
