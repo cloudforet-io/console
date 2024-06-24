@@ -20,11 +20,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { _DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange, DateFieldType } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -47,7 +47,7 @@ const state = reactive({
     finalConvertedData: computed<Data|null>(() => {
         if (!state.data) return null;
         if (state.tableDataFieldType === 'staticField') return state.staticFieldSlicedData;
-        if (state.tableDataField === DATE_FIELD) return state.timeSeriesDynamicFieldSlicedData;
+        if (isDateField(state.tableDataField)) return state.timeSeriesDynamicFieldSlicedData;
         return state.noneTimeSeriedsDynamicFieldSlicedData;
     }),
     staticFieldSlicedData: computed(() => {
@@ -71,7 +71,7 @@ const state = reactive({
         return { results: [] };
     }),
     timeSeriesDynamicFieldSlicedData: computed(() => {
-        if (state.tableDataField === DATE_FIELD) {
+        if (isDateField(state.tableDataField)) {
             return {
                 results: state.data.results.map((d) => {
                     const subTotal = {
@@ -143,7 +143,7 @@ const state = reactive({
     groupByField: computed<string[]|undefined>(() => ((props.widgetOptions?.groupBy as GroupByValue)?.value as string[]) ?? []),
     dateRange: computed<DateRange>(() => {
         let subtract = 1;
-        if (state.tableDataField === DATE_FIELD || state.groupByField?.includes(DATE_FIELD)) {
+        if (isDateField(state.tableDataField) || state.groupByField?.some((groupBy) => Object.values(_DATE_FIELD).includes(groupBy))) {
             if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
             if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
             if (state.granularity === GRANULARITY.DAILY) subtract = 30;
@@ -156,7 +156,7 @@ const state = reactive({
         return { start: _start, end: _start };
     }),
     // data for optional fields
-    isComparisonEnabled: computed<boolean>(() => state.tableDataField !== DATE_FIELD && !state.groupByField?.includes(DATE_FIELD)),
+    isComparisonEnabled: computed<boolean>(() => !isDateField(state.tableDataField) && !state.groupByField?.some((groupBy) => Object.values(_DATE_FIELD).includes(groupBy))),
     comparisonInfo: computed<ComparisonValue|undefined>(() => props.widgetOptions?.comparison?.[0] as ComparisonValue),
     subTotalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.subTotal as TotalValue),
     totlaInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.total as TotalValue),
@@ -180,7 +180,7 @@ const state = reactive({
                     });
                 }
             });
-        } else if (state.tableDataField === DATE_FIELD) dataFields = getWidgetTableDateFields(state.granularity, state.dateRange, state.tableDataMaxCount);
+        } else if (isDateField(state.tableDataField)) dataFields = getWidgetTableDateFields(state.tableDataField, state.granularity, state.dateRange, state.tableDataMaxCount);
         else {
             state.slicedData?.results?.[0][state.tableDataCriteria].forEach((d) => {
                 dataFields.push({
@@ -212,7 +212,9 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Helper */
+const isDateField = (fieldName: DateFieldType) => Object.values(_DATE_FIELD).includes(fieldName);
 const getWidgetTableDateFields = (
+    dateField: DateFieldType,
     granularity: Granularity|undefined,
     dateRange: DateRange,
     limitCount: number,
@@ -226,8 +228,10 @@ const getWidgetTableDateFields = (
     if (granularity === GRANULARITY.MONTHLY) timeUnit = 'month';
     else if (granularity === GRANULARITY.YEARLY) timeUnit = 'year';
 
-    let labelDateFormat = 'YYYY-MM-DD';
-    if (timeUnit === 'month') labelDateFormat = 'YYYY-MM';
+    const isSeparateDate = dateField !== _DATE_FIELD.DATE;
+
+    let labelDateFormat = isSeparateDate ? 'DD' : 'YYYY-MM-DD';
+    if (timeUnit === 'month') labelDateFormat = isSeparateDate ? 'MM' : 'YYYY-MM';
     else if (timeUnit === 'year') labelDateFormat = 'YYYY';
 
     let now = start;
