@@ -2679,6 +2679,8 @@
 		"NOTICE": {
 			"ALL_WORKSPACE": "すべてのワークスペース",
 			"DETAIL": {
+				"ALT_S_SENDING": "",
+				"ALT_S_SEND_EMAIL": "メール送信完了",
 				"BACK_TO_LIST": "一覧に戻る",
 				"DETAIL_TITLE": "お知らせ詳細",
 				"SHOW_ALL_WORKSPACES": ""
