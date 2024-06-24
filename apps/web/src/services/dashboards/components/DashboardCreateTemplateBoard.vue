@@ -17,7 +17,7 @@ interface Props {
     templateSets: BoardSet[];
     column?: number;
     showViewLink?: boolean;
-    keyword: string;
+    keyword?: string;
 }
 
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -60,10 +60,12 @@ const handleClickBoardItem = (template: DashboardModel) => {
                         />
                     </div>
                     <div class="label-wrapper">
-                        <p-label v-for="(label, idx) in board.labels"
-                                 :key="`${label}-${idx}`"
-                                 :text="label"
-                        />
+                        <slot name="bottom">
+                            <p-label v-for="(label, idx) in board.labels"
+                                     :key="`${label}-${idx}`"
+                                     :text="label"
+                            />
+                        </slot>
                     </div>
                     <p-link v-if="props.showViewLink"
                             :action-icon="ACTION_ICON.INTERNAL_LINK"
@@ -99,9 +101,6 @@ const handleClickBoardItem = (template: DashboardModel) => {
             align-items: center;
             justify-content: center;
             display: flex;
-        }
-        .label-wrapper {
-            padding-bottom: 0.5rem;
         }
     }
 
