@@ -54,10 +54,8 @@ const state = reactive({
         });
     }),
     pageStart: 0,
-    pageMax: computed(() => {
-        const dailyUpdateCount: number = state.dailyUpdatesList.length / Math.floor(rowItemsWrapperWidth.value / (DAILY_UPDATE__DEFAULT_WIDTH + DEFAULT_PADDING) - 1);
-        return Math.ceil(dailyUpdateCount);
-    }),
+    visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_PADDING) / DAILY_UPDATE__DEFAULT_WIDTH)),
+    pageMax: computed<number>(() => Math.max(state.dailyUpdatesList.length - state.visibleCount, 0)),
 });
 
 const handleClickArrowButton = (increment: number) => {

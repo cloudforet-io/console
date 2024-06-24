@@ -32,11 +32,9 @@ const storeState = reactive({
     providers: computed<ProviderResourceDataItem[]>(() => workspaceHomePageState.providers),
 });
 const state = reactive({
+    visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_PADDING) / PROVIDER_DEFAULT_WIDTH)),
     pageStart: 0,
-    pageMax: computed(() => {
-        const providerCount: number = storeState.providers.length / Math.floor(rowItemsWrapperWidth.value / (PROVIDER_DEFAULT_WIDTH + DEFAULT_PADDING) - 1);
-        return Math.ceil(providerCount);
-    }),
+    pageMax: computed<number>(() => Math.max(storeState.providers.length - state.visibleCount, 0)),
 });
 
 const handleClickArrowButton = (increment: number) => {
