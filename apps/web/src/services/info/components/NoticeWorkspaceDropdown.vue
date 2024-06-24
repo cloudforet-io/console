@@ -24,12 +24,10 @@ import type { WorkspaceDropdownMenuItem } from '@/services/info/types/notice-typ
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 interface Props {
-    selectedRadioIdx: number;
     selectedItems: WorkspaceDropdownMenuItem[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    selectedRadioIdx: 0,
     selectedItems: () => ([]),
 });
 
@@ -82,11 +80,14 @@ const fetchListWorkspaces = async (inputText: string) => {
 const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
     state.proxySelectedItems = value;
 };
+
+(() => {
+    state.proxySelectedItems = [];
+})();
 </script>
 
 <template>
-    <p-select-dropdown v-if="props.selectedRadioIdx === 1"
-                       use-fixed-menu-style
+    <p-select-dropdown use-fixed-menu-style
                        :visible-menu.sync="state.visible"
                        :loading="state.loading"
                        :search-text.sync="state.searchText"

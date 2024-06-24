@@ -205,7 +205,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                             </span>
                         </p-radio>
                     </p-radio-group>
-                    <notice-workspace-dropdown :selected-radio-idx="workspaceState.selectedRadioIdx"
+                    <notice-workspace-dropdown v-if="workspaceState.selectedRadioIdx === 1"
                                                :selected-items.sync="workspaceState.selectedItems"
                     />
                 </p-field-group>
