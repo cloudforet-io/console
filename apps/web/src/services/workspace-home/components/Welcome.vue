@@ -39,7 +39,7 @@ const handleClickButton = () => {
     border-radius: 0.375rem;
     gap: 0.75rem;
     background-size: cover;
-    background-image: url("@/assets/images/img_blurred-background.png");
+    background-image: url("@/assets/images/img_blurred-background-min.png");
     .title {
         @apply text-display-md text-violet-700;
     }
