@@ -852,7 +852,7 @@
 			"DATA_SOURCES": {
 				"ACTUAL_COST": "Actual Cost",
 				"ALL": "All",
-				"ALT_S_DISABLED_TOGGLE": "Successfully completed.",
+				"ALT_S_CHANGE_TOGGLE": "Successfully changed access settings.",
 				"ALT_S_RESET": "Reset successfully completed.",
 				"ALT_S_UPDATE": "Update successfully completed.",
 				"CANCELED": "Canceled",
