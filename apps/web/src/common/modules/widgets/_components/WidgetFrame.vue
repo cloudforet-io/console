@@ -188,7 +188,7 @@ const handleToggleWidth = () => {
                             >
                         </template>
                         <p class="empty-text">
-                            {{ props.errorMessage }}
+                            {{ !props.dataTableId ? $t('COMMON.WIDGETS.SELECT_A_DATA_TABLE') : props.errorMessage }}
                         </p>
                     </p-empty>
                 </div>

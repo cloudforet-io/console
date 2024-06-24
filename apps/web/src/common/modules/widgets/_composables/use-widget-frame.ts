@@ -107,9 +107,10 @@ export const useWidgetFrame = (
     const widgetFrameProps = computed<WidgetFrameProps>(() => ({
         widgetId: props.widgetId,
         widgetSizes: _state.widgetConfig.meta.sizes,
+        dataTableId: props.dataTableId,
         //
         mode: props.mode ?? 'view',
-        loading: props.loading || overrides.widgetLoading?.value,
+        loading: props.loading || !!overrides.widgetLoading?.value,
         errorMessage: overrides.errorMessage?.value,
         //
         title: _state.title,
