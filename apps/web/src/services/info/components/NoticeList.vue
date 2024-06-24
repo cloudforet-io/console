@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PDataLoader, PDivider,
     PPagination, PToolbox,
-    PSelectButtonGroup,
+    PButton,
 } from '@spaceone/design-system';
 import type { ValueItem } from '@spaceone/design-system/src/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -27,7 +27,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
+import NoticeWorkspaceDropdown from '@/services/info/components/NoticeWorkspaceDropdown.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+import type { WorkspaceDropdownMenuItem } from '@/services/info/types/notice-type';
 
 const NOTICE_ITEM_LIMIT = 10;
 
@@ -40,7 +42,15 @@ const state = reactive({
         { name: 'all', label: i18n.t('INFO.NOTICE.ALL_WORKSPACE') as string },
         { name: 'specific', label: i18n.t('INFO.NOTICE.FORM.SPECIFIC_WORKSPACE') as string },
     ])),
-    selectedToolId: 'all' as string,
+    selectedToolId: undefined as string|undefined,
+    selectedItems: [] as WorkspaceDropdownMenuItem[],
+    workspaceIds: computed<string[]>(() => {
+        if (state.selectedItems.length) {
+            return state.selectedItems.map((item) => item.name);
+        }
+        return ['*'];
+    }),
+    queryFilter: [] as ConsoleFilter[],
 });
 
 const noticeStore = useNoticeStore();
@@ -48,15 +58,24 @@ const noticeGetters = noticeStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 
 /* Api */
-const initNoticeApiHelper = () => {
-    const initApiHelper = new ApiQueryHelper()
-        .setPage(1, NOTICE_ITEM_LIMIT)
-        .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
-    return initApiHelper;
-};
-let noticeApiHelper = initNoticeApiHelper();
+const noticeApiHelper = new ApiQueryHelper()
+    .setPage(1, NOTICE_ITEM_LIMIT)
+    .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+
 const listNotice = async () => {
     state.loading = true;
+
+    if (state.searchText) {
+        const titleFilter = state.queryFilter.findIndex((filter) => filter.k === 'title');
+        if (titleFilter === -1) {
+            state.queryFilter.push({ k: 'title', v: state.searchText, o: '' });
+        } else {
+            state.queryFilter[titleFilter].v = state.searchText;
+        }
+    }
+
+    noticeApiHelper.setFilters(state.queryFilter);
+
     try {
         const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
             query: noticeApiHelper.data,
@@ -73,29 +92,10 @@ const listNotice = async () => {
     }
 };
 
-/* Util */
-const getSearchFilter = () => {
-    const apiHelper = new ApiQueryHelper()
-        .setPage(1, NOTICE_ITEM_LIMIT)
-        .setSort('created_at', true);
-    const filter = [] as ConsoleFilter[];
-    if (state.searchText) filter.push({ k: 'title', v: state.searchText, o: '' });
-    apiHelper.setFilters(filter);
-    return apiHelper;
-};
-const loadSearchListSet = async () => {
-    if (!state.searchText) {
-        noticeApiHelper = initNoticeApiHelper();
-    } else {
-        noticeApiHelper = getSearchFilter();
-    }
-    await listNotice();
-};
-
 /* event */
 const handleToolboxChange = (options: ToolboxOptions = {}) => {
     if (options?.searchText !== undefined) state.searchText = options?.searchText;
-    loadSearchListSet();
+    listNotice();
 };
 const handleClickNotice = (postId: string) => {
     SpaceRouter.router.push(getProperRouteLocation({
@@ -109,27 +109,56 @@ const handlePageChange = (page: number) => {
     noticeApiHelper.setPage(getPageStart(page, NOTICE_ITEM_LIMIT), NOTICE_ITEM_LIMIT);
     listNotice();
 };
+const handleClickToolButton = (value: string) => {
+    if (value === state.selectedToolId) state.selectedToolId = undefined;
+    else state.selectedToolId = value;
+};
+
+watch(() => state.selectedToolId, () => {
+    state.selectedItems = [];
+    state.queryFilter = [];
+    state.searchText = '';
+});
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+watch([() => state.selectedItems, () => state.selectedToolId], ([_, selectedToolId]) => {
+    if (selectedToolId === 'specific') {
+        state.queryFilter = [{ k: 'workspace_id', v: state.workspaceIds, o: '=' }];
+    } else if (selectedToolId === 'all') {
+        state.queryFilter = [{ k: 'workspace_id', v: ['*'], o: '=' }];
+    } else state.queryFilter = [];
+
+    listNotice();
+}, { immediate: true });
 
 (async () => {
     state.loading = true;
     await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
     state.loading = false;
 })();
-
 </script>
 
 <template>
     <div class="notice-list">
-        <div class="notice-header">
-            <div>
-                <p-select-button-group class="workspace-buttons-wrapper"
-                                       :buttons="state.tools"
-                                       :selected.sync="state.selectedToolId"
+        <div class="notice-header-wrapper">
+            <div class="notice-header">
+                <p-button v-for="(item, idx) in state.tools"
+                          :key="idx"
+                          class="workspace-button"
+                          style-type="transparent"
+                          :class="{'active': state.selectedToolId === item.name}"
+                          @click="handleClickToolButton(item.name)"
+                >
+                    {{ item.label }}
+                </p-button>
+                <notice-workspace-dropdown v-if="state.selectedToolId === 'specific'"
+                                           :selected-items.sync="state.selectedItems"
+                                           class="dropdown"
                 />
             </div>
             <p-toolbox :pagination-visible="false"
                        :page-size-changeable="false"
                        :refreshable="false"
+                       :search-text="state.searchText"
                        @change="handleToolboxChange"
             />
         </div>
@@ -189,31 +218,33 @@ const handlePageChange = (page: number) => {
 <style lang="postcss" scoped>
 .notice-list {
     @apply border border-gray-200 bg-white rounded-lg;
-    .notice-header {
+    .notice-header-wrapper {
         @apply flex flex-col;
         padding: 0 1rem;
         margin-top: 1.5rem;
         margin-bottom: 0.5rem;
-
-        /* custom design-system component - p-select-button-group */
-        :deep(.p-select-button-group) {
-            .button-group {
-                margin-bottom: 0.75rem;
-                .select-button {
-                    @apply bg-transparent;
-                    margin: 0;
-                    border-radius: 0;
-                    &:first-child {
-                        border-top-left-radius: 0.25rem;
-                        border-bottom-left-radius: 0.25rem;
-                    }
-                    &:last-child {
-                        border-top-right-radius: 0.25rem;
-                        border-bottom-right-radius: 0.25rem;
-                    }
-                    &.active {
-                        @apply bg-secondary border-secondary;
-                    }
+        .notice-header {
+            @apply flex items-center;
+            margin-bottom: 0.75rem;
+            .workspace-button {
+                @apply border border-gray-300 font-normal;
+                border-radius: 0.25rem 0 0 0.25rem;
+                +.workspace-button {
+                    border-radius: 0 0.25rem 0.25rem 0;
+                }
+                &:hover, &:focus {
+                    @apply text-gray-900;
+                }
+                &.active {
+                    @apply bg-secondary border-secondary text-white;
+                }
+            }
+            .dropdown {
+                width: 12rem;
+                margin-top: 0;
+                margin-left: 1.25rem;
+                &.no-data {
+                    padding: 0;
                 }
             }
         }
