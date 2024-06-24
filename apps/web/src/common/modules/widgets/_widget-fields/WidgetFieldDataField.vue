@@ -80,7 +80,7 @@ watch(() => state.menuItems, (menuItems) => {
         state.selectedItem = convertToMenuItem(state.proxyValue);
     } else {
         state.proxyValue = isIncludedInMenuItems(state.proxyValue) ? state.proxyValue : state.menuItems[0]?.name;
-        state.selectedItem = state.menuItems[0]?.name;
+        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
     }
 }, { immediate: true });
 
@@ -90,7 +90,7 @@ onMounted(() => {
         state.selectedItem = convertToMenuItem(state.proxyValue);
     } else {
         state.proxyValue = props.value ?? state.menuItems[0]?.name;
-        state.selectedItem = state.menuItems[0]?.name;
+        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
     }
 });
 

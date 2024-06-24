@@ -114,20 +114,19 @@ const handleUpdateCount = (val: number) => {
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
-const isIncludedInMenuItems = (data: string[]|string):boolean => {
-    if (Array.isArray(data)) {
-        return data.every((d) => state.menuItems.some((m) => m?.name === d));
-    }
-    return state.menuItems.some((m) => m?.name === data);
-};
 const isIncludedInDataInfoMenuItems = (data: string):boolean => state.dataInfoMenuItems.some((m) => m?.name === data);
 const convertToMenuItem = (data: string[]) => data.map((d) => ({
     name: d,
     label: d,
 }));
-/* Init */
-onMounted(() => {
-    state.selectedFieldType = props.value?.fieldType ?? 'dynamicField';
+
+watch(() => state.menuItems, (menuItems) => {
+    const isIncludedInMenuItems = (data: string[]|string):boolean => {
+        if (Array.isArray(data)) {
+            return data.every((d) => menuItems.some((m) => m.name === d));
+        }
+        return menuItems.some((m) => m.name === data);
+    };
     if (state.selectedFieldType === 'staticField') {
         state.proxyValue = {
             ...state.proxyValue,
@@ -140,8 +139,27 @@ onMounted(() => {
             value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
             criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
         };
-        state.selectedItem = state.menuItems[0]?.name;
-        state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
+        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
+        state.selectedCriteria = state.proxyValue?.criteria ?? state.dataInfoMenuItems[0]?.name;
+    }
+}, { immediate: true });
+/* Init */
+onMounted(() => {
+    state.selectedFieldType = props.value?.fieldType ?? 'dynamicField';
+    if (state.selectedFieldType === 'staticField') {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: props.value?.value ?? [state.menuItems[0]?.name],
+        };
+        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+    } else {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: props.value?.value ?? state.menuItems[0]?.name,
+            criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
+        };
+        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
+        state.selectedCriteria = state.proxyValue?.criteria ?? state.dataInfoMenuItems[0]?.name;
     }
     state.proxyValue = {
         ...state.proxyValue,
