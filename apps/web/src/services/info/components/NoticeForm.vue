@@ -33,6 +33,8 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { emptyHtmlRegExp } from '@/common/components/editor/extensions/image/helper';
@@ -64,9 +66,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const router = useRouter();
 
+const storeState = reactive({
+    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+});
 const state = reactive({
     userName: computed<string>(() => store.state.user.name),
     isPinned: false,
@@ -146,7 +153,8 @@ const handleCreateNotice = async () => {
             files: data.files,
             options: data.options,
             writer: data.writer,
-            resource_group: 'DOMAIN',
+            resource_group: workspaceState.selectedRadioIdx === 0 ? 'DOMAIN' : 'WORKSPACE',
+            workspaces: workspaceState.selectedRadioIdx === 0 ? ['*'] : workspaceState.selectedItems.map((item) => item.name),
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
         await SpaceRouter.router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME, query: {} }));
@@ -158,6 +166,7 @@ const handleEditNotice = async () => {
     try {
         await noticeDetailStore.updateNoticePost({
             ...formData.value,
+            workspaces: workspaceState.selectedRadioIdx === 0 ? ['*'] : workspaceState.selectedItems.map((item) => item.name),
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
         SpaceRouter.router.back();
@@ -202,6 +211,21 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
     setForm('writerName', notice?.writer ?? store.state.user.name);
     setForm('noticeTitle', notice?.title ?? '');
     setForm('contents', notice?.contents ?? '');
+
+    if (notice?.workspaces?.includes('*')) {
+        workspaceState.selectedRadioIdx = 0;
+        workspaceState.selectedItems = [];
+    } else {
+        workspaceState.selectedRadioIdx = 1;
+        await fetchListWorkspaces('');
+        workspaceState.selectedItems = (notice?.workspaces ?? []).map((workspace) => {
+            const selectedWorkspace = storeState.workspaceList.find((w) => w.workspace_id === workspace);
+            return {
+                label: selectedWorkspace?.name || '',
+                name: selectedWorkspace?.workspace_id || '',
+            };
+        });
+    }
 });
 
 </script>
@@ -362,7 +386,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
             </p-button>
             <p-button style-type="primary"
                       size="lg"
-                      :disabled="!isAllValid"
+                      :disabled="!isAllValid || (workspaceState.selectedRadioIdx === 1 && workspaceState.selectedItems.length === 0)"
                       :loading="noticeDetailState.loadingForCUD"
                       @click="handleConfirm"
             >

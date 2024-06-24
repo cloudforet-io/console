@@ -2673,6 +2673,7 @@
 	},
 	"INFO": {
 		"NOTICE": {
+			"ALL_WORKSPACE": "すべてのワークスペース",
 			"DETAIL": {
 				"BACK_TO_LIST": "一覧に戻る",
 				"DETAIL_TITLE": "お知らせ詳細"
