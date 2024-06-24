@@ -75,7 +75,7 @@ const handleChangeDataFieldType = (value: string) => {
     if (state.selectedFieldType === 'staticField') {
         state.proxyValue = {
             ...state.proxyValue,
-            value: state.menuItems[0]?.name,
+            value: [state.menuItems[0]?.name],
             criteria: undefined,
         };
         state.selectedItem = convertToMenuItem([state.menuItems[0].name]);
@@ -89,7 +89,7 @@ const handleChangeDataFieldType = (value: string) => {
         state.selectedItem = state.menuItems[0]?.name;
         state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
     }
-    state.proxyValue = { ...state.proxyValue, value: state.menuItems[0]?.name, fieldType: value };
+    state.proxyValue = { ...state.proxyValue, fieldType: value };
 };
 const handleUpdateValue = (val: string|MenuItem[]) => {
     state.selectedItem = val;

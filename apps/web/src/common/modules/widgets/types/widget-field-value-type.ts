@@ -62,13 +62,13 @@ export interface GroupByValue {
 
 export interface TotalValue {
     toggleValue: boolean;
-    value: boolean;
+    freeze: boolean;
 }
 export interface ColorSchemaValue {
     colorName: keyof typeof COLOR_SCHEMA;
     colorValue: typeof COLOR_SCHEMA[keyof typeof COLOR_SCHEMA]
 }
 
-export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | FormatRulesValue[]
+export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue;
