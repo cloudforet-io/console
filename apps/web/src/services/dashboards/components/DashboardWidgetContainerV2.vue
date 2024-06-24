@@ -57,7 +57,7 @@ const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
-    isAllWidgetsMounted: computed<boolean>(() => Object.keys(state.mountedWidgetMap).length === state.refinedWidgetInfoList.length),
+    isAllWidgetsMounted: computed<boolean>(() => Object.values(state.mountedWidgetMap).every((d) => d)),
     refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => {
         if (!dashboardDetailState.dashboardWidgets.length) return [];
         return getRefinedWidgetInfoList();
@@ -112,7 +112,7 @@ const getWidgetLoading = (widgetId: string) => {
     if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
     // if (!state.intersectedWidgetMap[widgetId]) return true;
-    if (widgetGenerateState.widget?.widget_id === widgetId) return true;
+    if (widgetGenerateState.widgetId === widgetId) return true;
     return false;
 };
 const refreshAllWidget = debounce(async () => {
@@ -225,7 +225,7 @@ watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
         await dashboardDetailStore.listDashboardWidgets();
-        await loadAWidget(widgetGenerateState.widgetId);
+        await loadAWidget(widgetGenerateState.latestWidgetId);
     }
 });
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
