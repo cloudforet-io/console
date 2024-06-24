@@ -15,7 +15,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { _DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     getDateFormat, getTimeUnit,
     getWidgetBasedOnDate,
@@ -119,7 +119,7 @@ const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
                 granularity: state.granularity,
                 start: state.dateRange.start,
                 end: state.dateRange.end,
-                group_by: [_DATE_FIELD.DATE],
+                group_by: [DATE_FIELD.DATE],
                 fields: {
                     [state.totalField]: {
                         key: state.totalField,

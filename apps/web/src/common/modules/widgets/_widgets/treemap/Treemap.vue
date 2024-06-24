@@ -23,7 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { _DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
@@ -80,7 +80,7 @@ const state = reactive({
     categoryByField: computed<string|undefined>(() => (props.widgetOptions?.categoryBy as CategoryByValue)?.value as string),
     categoryByCount: computed<number>(() => (props.widgetOptions?.categoryBy as CategoryByValue)?.count as number),
     dateRange: computed<DateRange>(() => {
-        const _dateRangeCount = Object.values(_DATE_FIELD).includes(state.categoryByField) ? state.categoryByCount : 1;
+        const _dateRangeCount = Object.values(DATE_FIELD).includes(state.categoryByField) ? state.categoryByCount : 1;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
         return { start: _start, end: _end };
     }),
