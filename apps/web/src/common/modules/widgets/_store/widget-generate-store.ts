@@ -176,7 +176,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     data_table_id: undefined,
                     group_by: [],
                 },
-                WHERE: {
+                QUERY: {
                     data_table_id: undefined,
                     conditions: [],
                 },

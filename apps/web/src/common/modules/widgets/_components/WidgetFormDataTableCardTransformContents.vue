@@ -50,11 +50,11 @@ const state = reactive({
         const haveSavedName = !!originState.name;
         const haveRequiredConcatOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined);
         const haveRequiredJoinOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined) && joinState.joinType;
-        const haveRequiredWhereOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
+        const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
         const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.functions.filter((func) => !!func.name.trim() && !!func.value.trim()).length > 0;
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
         if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
-        if (state.operator === 'WHERE') return !haveRequiredWhereOptions;
+        if (state.operator === 'QUERY') return !haveRequiredQueryOptions;
         if (state.operator === 'EVAL') return !haveRequiredEvalOptions;
         return true;
     }),
@@ -67,7 +67,7 @@ const state = reactive({
             .filter((func) => !!func.value.trim().length && !!func.name.trim().length), originState.functions);
         if (state.operator === 'CONCAT') return dataTablesChanged;
         if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
-        if (state.operator === 'WHERE') return dataTableIdChanged || conditionsChanged;
+        if (state.operator === 'QUERY') return dataTableIdChanged || conditionsChanged;
         if (state.operator === 'EVAL') return dataTableIdChanged || functionsChanged;
         return false;
     }),
