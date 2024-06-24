@@ -401,7 +401,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         }
     };
     const addWidgetToDashboardLayouts = (widgetId: string) => {
-        const _layouts = cloneDeep(state.dashboardInfo?.layouts || []);
+        const _layouts = cloneDeep(state.dashboardLayouts || []);
         if (_layouts.length) {
             const _targetLayout = _layouts[0];
             if (_targetLayout.widgets) {
