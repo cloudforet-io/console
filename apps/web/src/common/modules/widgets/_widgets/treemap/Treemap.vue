@@ -80,7 +80,7 @@ const state = reactive({
     categoryByField: computed<string|undefined>(() => (props.widgetOptions?.categoryBy as CategoryByValue)?.value as string),
     categoryByCount: computed<number>(() => (props.widgetOptions?.categoryBy as CategoryByValue)?.count as number),
     dateRange: computed<DateRange>(() => {
-        const _dateRangeCount = state.categoryByField === DATE_FIELD ? state.categoryByCount : 1;
+        const _dateRangeCount = Object.values(DATE_FIELD).includes(state.categoryByField) ? state.categoryByCount : 1;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
         return { start: _start, end: _end };
     }),

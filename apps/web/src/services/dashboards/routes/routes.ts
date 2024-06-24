@@ -9,8 +9,6 @@ const DashboardsContainer = () => import('@/services/dashboards/DashboardsContai
 const DashboardsMainPage = () => import('@/services/dashboards/pages/DashboardsMainPage.vue');
 const DashboardCreatePage = () => import('@/services/dashboards/pages/DashboardCreatePage.vue');
 const DashboardDetailPage = () => import('@/services/dashboards/pages/DashboardDetailPage.vue');
-//
-const DashboardPlaygroundPage = () => import('@/services/dashboards/pages/DashboardPlaygroundPage.vue');
 
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
@@ -41,11 +39,6 @@ const dashboardsRoute: RouteConfig = {
             meta: { lsbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
             props: true,
             component: DashboardDetailPage,
-        },
-        {
-            path: 'playground',
-            name: DASHBOARDS_ROUTE.PLAYGROUND._NAME,
-            component: DashboardPlaygroundPage,
         },
     ],
 };

@@ -119,7 +119,7 @@ const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
                 granularity: state.granularity,
                 start: state.dateRange.start,
                 end: state.dateRange.end,
-                group_by: [DATE_FIELD],
+                group_by: [DATE_FIELD.DATE],
                 fields: {
                     [state.totalField]: {
                         key: state.totalField,

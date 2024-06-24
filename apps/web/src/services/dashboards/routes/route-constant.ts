@@ -14,7 +14,4 @@ export const DASHBOARDS_ROUTE = Object.freeze({
     CREATE: {
         _NAME: `${MENU_ID.DASHBOARDS}.create`,
     },
-    PLAYGROUND: {
-        _NAME: `${MENU_ID.DASHBOARDS}.playground`,
-    },
 });

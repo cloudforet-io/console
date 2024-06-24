@@ -81,7 +81,7 @@ const state = reactive({
             axisLabel: {
                 interval: 0,
                 formatter: (val) => {
-                    if (state.yAxisField === DATE_FIELD) {
+                    if (state.yAxisField === DATE_FIELD.DATE) {
                         return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
                     }
                     return val;
@@ -101,7 +101,7 @@ const state = reactive({
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
-        if (state.yAxisField === DATE_FIELD) {
+        if (Object.values(DATE_FIELD).includes(state.yAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.yAxisCount);
         }
         return { start: _start, end: _end };
@@ -156,7 +156,7 @@ const drawChart = (rawData?: Data|null) => {
     if (isEmpty(rawData)) return;
 
     // set yAxisData
-    if (state.yAxisField === DATE_FIELD) {
+    if (state.yAxisField === DATE_FIELD.DATE) {
         state.yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
         state.yAxisData = rawData.results?.map((d) => d[state.yAxisField] as string) ?? [];
