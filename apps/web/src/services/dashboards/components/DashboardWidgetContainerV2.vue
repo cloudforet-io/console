@@ -17,6 +17,8 @@ import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-wid
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
 
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
@@ -55,13 +57,21 @@ const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
-    isAllWidgetsMounted: computed<boolean>(() => Object.keys(state.mountedWidgetMap).length === state.refinedWidgetInfoList.length),
+    isAllWidgetsMounted: computed<boolean>(() => Object.values(state.mountedWidgetMap).every((d) => d)),
     refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => {
         if (!dashboardDetailState.dashboardWidgets.length) return [];
         return getRefinedWidgetInfoList();
     }),
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
+    vars: computed<Record<string, string[]>>(() => {
+        const _vars: Record<string, string[]> = {};
+        Object.entries(dashboardDetailState.variables).forEach(([k, v]) => {
+            const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
+            if (idKey) _vars[idKey] = v;
+        });
+        return _vars;
+    }),
 });
 const widgetDeleteState = reactive({
     visibleModal: false,
@@ -101,8 +111,8 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
 const getWidgetLoading = (widgetId: string) => {
     if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
-    if (!state.intersectedWidgetMap[widgetId]) return true;
-    if (widgetGenerateState.widget?.widget_id === widgetId) return true;
+    // if (!state.intersectedWidgetMap[widgetId]) return true;
+    if (widgetGenerateState.widgetId === widgetId) return true;
     return false;
 };
 const refreshAllWidget = debounce(async () => {
@@ -215,7 +225,7 @@ watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
         await dashboardDetailStore.listDashboardWidgets();
-        await loadAWidget(widgetGenerateState.widgetId);
+        await loadAWidget(widgetGenerateState.latestWidgetId);
     }
 });
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
@@ -273,6 +283,7 @@ defineExpose({
                                :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-variables="dashboardDetailState.variables"
+                               :vars="state.vars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
                                @mounted="handleWidgetMounted(widget.widget_id)"
                                @click-edit="handleOpenWidgetOverlay(widget, 'EDIT')"

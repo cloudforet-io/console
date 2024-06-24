@@ -275,7 +275,7 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast> 
                 field_group: _field_group,
                 fields: _fields,
             },
-            vars: props.dashboardVariables,
+            vars: props.vars,
         });
         state.errorMessage = undefined;
         return res;

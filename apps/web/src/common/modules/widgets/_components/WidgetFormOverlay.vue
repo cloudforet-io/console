@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onUnmounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -86,14 +86,12 @@ const handleCloseOverlay = () => {
 };
 
 watch(() => widgetGenerateState.showOverlay, (val) => {
-    if (!val) widgetGenerateStore.reset();
-    else if (widgetGenerateState.overlayType !== 'ADD') {
+    if (!val) {
+        widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
+        widgetGenerateStore.reset();
+    } else if (widgetGenerateState.overlayType !== 'ADD') {
         widgetGenerateStore.listDataTable();
     }
-});
-
-onUnmounted(() => {
-    widgetGenerateStore.reset();
 });
 </script>
 

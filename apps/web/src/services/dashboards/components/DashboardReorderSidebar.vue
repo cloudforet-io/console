@@ -12,11 +12,14 @@ import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
@@ -27,7 +30,7 @@ const state = reactive({
 const handleChangeWidgetOrder = () => {
     // HACK: implement widget panel
     const _widgetIdList = state.widgetList.map((w) => w.widget_id);
-    dashboardDetailStore.updateDashboard(dashboardDetailState.dashboardId, {
+    dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
         layouts: [{ widgets: _widgetIdList }],
     });
 };
