@@ -217,7 +217,7 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
     }
     .loading {
         @apply flex items-center justify-center;
-        min-height: calc(100% - 2.625rem);
+        min-height: 27.5rem;
     }
     .main-title {
         padding-left: 1rem;
