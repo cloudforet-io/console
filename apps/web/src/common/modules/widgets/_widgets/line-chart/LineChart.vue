@@ -137,7 +137,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
                 sort: [{ key: `_total_${state.dataField}`, desc: true }],
                 page: { start: 1, limit: state.xAxisCount },
             },
-            vars: props.dashboardVariables,
+            vars: props.vars,
         });
         state.errorMessage = undefined;
         return res;

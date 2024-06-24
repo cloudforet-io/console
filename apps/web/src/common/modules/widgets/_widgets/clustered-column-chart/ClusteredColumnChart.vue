@@ -129,7 +129,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
                 group_by: [state.xAxisField],
                 fields: _fields,
             },
-            vars: props.dashboardVariables,
+            vars: props.vars,
         });
         state.errorMessage = undefined;
         return res;
