@@ -23,6 +23,7 @@ import getRandomId from '@/lib/random-id-generator';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import type { JoinRestrictedMap } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { WidgetSize, WidgetOverlayType } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type {
@@ -54,6 +55,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         previewData: { results: [], total_count: 0 } as ListResponse<any>,
         dataTableUpdating: false,
         dataTableLoadLoading: false,
+        joinRestrictedMap: {} as JoinRestrictedMap, // Flag for handling Join type EXCEPTION RESTRICTION cases. (duplicated data field). Example - { '{dataTalbeId}': true, }
     });
 
     const getters = reactive({
@@ -106,6 +108,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setDataTableUpdating = (status: boolean) => {
         state.dataTableUpdating = status;
     };
+    const setJoinRestrictedMap = (value: JoinRestrictedMap) => {
+        state.joinRestrictedMap = value;
+    };
 
     const mutations = {
         setWidgetId,
@@ -121,6 +126,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setWidgetValidMap,
         setSelectedPreviewGranularity,
         setDataTableUpdating,
+        setJoinRestrictedMap,
     };
     const actions = {
         listDataTable: async () => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
-import { isEqual } from 'lodash';
+import { intersection, isEqual } from 'lodash';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -151,6 +151,23 @@ const handleUpdateDataTable = async () => {
     if (!isValidDataTableId && !isValidDataTables) {
         showErrorMessage('Unable to apply changes. Please check the form.', '');
         return;
+    }
+
+    // Duplicated Data Field Handling in 'JOIN'
+    if (state.operator === 'JOIN') {
+        const firstDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0]);
+        const secondDataTable = storeState.dataTables.find((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
+        const firstDataFields = Object.keys(firstDataTable?.data_info ?? {});
+        const secondDataFields = Object.keys(secondDataTable?.data_info ?? {});
+        const duplicatedDataFields = intersection(firstDataFields, secondDataFields);
+        if (duplicatedDataFields.length) {
+            widgetGenerateStore.setJoinRestrictedMap({
+                ...widgetGenerateState.joinRestrictedMap,
+                [state.dataTableId]: true,
+            });
+            showErrorMessage('{data02} cannot be joined with {data01} because the two data tables have one or more identical data fields.', '');
+            return;
+        }
     }
     const firstUpdating = state.isUnsaved;
     const concatOptions: ConcatOptions = {

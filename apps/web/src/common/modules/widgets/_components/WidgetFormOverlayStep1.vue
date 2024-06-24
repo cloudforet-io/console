@@ -94,6 +94,11 @@ const documentEventMount = (eventName: string, func: any) => {
 documentEventMount('mousemove', isResizing);
 documentEventMount('mouseup', endResizing);
 
+onMounted(() => {
+    // Reset Join Restricted Map at init Data Table form init
+    widgetGenerateStore.setJoinRestrictedMap({});
+});
+
 </script>
 
 <template>
