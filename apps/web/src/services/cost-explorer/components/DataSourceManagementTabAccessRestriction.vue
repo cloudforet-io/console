@@ -34,17 +34,13 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     dataType: computed<DataType[]>(() => {
-        const denyList = storeState.selectedItem.permissions?.deny || [];
         const costDataKeys = storeState.selectedItem.cost_data_keys || [];
 
-        const customDataType = costDataKeys.map((key) => {
-            const isDisabled = denyList.some((denyItem) => denyItem === `data.${key}`);
-            return {
-                label: key.replace(/([A-Z])/g, ' $1').trim(),
-                name: key,
-                disabled: isDisabled,
-            };
-        });
+        const customDataType = costDataKeys.map((key) => ({
+            label: key.replace(/([A-Z])/g, ' $1').trim(),
+            name: key,
+            disabled: false,
+        }));
 
         return [
             { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COST'), name: 'cost', disabled: true },
@@ -58,7 +54,7 @@ const state = reactive({
     },
     dataTypeEnable: computed(() => ({
         ...state.fixedDataTypeEnable,
-        ...convertDataKey(storeState.selectedItem.cost_data_keys || []),
+        ...convertDataKey(storeState.selectedItem.permissions?.deny || []),
     })),
     selectedDataType: '',
     modalVisible: false,
@@ -67,7 +63,8 @@ const state = reactive({
 const convertDataKey = (keys: string[]) => {
     const result = {};
     keys.forEach((key) => {
-        result[key] = false;
+        const [, keyName] = key.split('.');
+        result[keyName] = true;
     });
     return result;
 };
@@ -91,7 +88,7 @@ const handleChangeToggle = async (item: string, value: boolean) => {
                     deny: updatedDenyList,
                 },
             });
-            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_DISABLED_TOGGLE'), '');
+            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_CHANGE_TOGGLE'), '');
         } catch (e) {
             ErrorHandler.handleError(e);
         }
@@ -116,6 +113,7 @@ const handleConfirm = async () => {
             },
         });
         state.modalVisible = false;
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_CHANGE_TOGGLE'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
