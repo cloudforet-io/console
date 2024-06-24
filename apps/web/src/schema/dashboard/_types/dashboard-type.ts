@@ -71,10 +71,10 @@ export interface DashboardTemplate {
     name: string;
     version: number|string;
     layouts: DashboardLayout[];
-    variables: DashboardVariables;
     options: DashboardOptions;
-    variables_schema: DashboardVariablesSchema;
-    labels: string[];
+    variables?: DashboardVariables;
+    variables_schema?: DashboardVariablesSchema;
+    labels?: string[];
     template_id: string;
     template_type: TemplateType;
 }

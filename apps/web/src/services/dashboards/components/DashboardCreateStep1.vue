@@ -26,6 +26,19 @@ const dashboardGetters = dashboardStore.getters;
 
 const state = reactive({
     managedTemplates: [] as DashboardTemplate[],
+    blankTemplate: computed<DashboardTemplate[]>(() => ([{
+        name: 'Blank',
+        template_id: 'blank',
+        template_type: 'MANAGED',
+        version: '1',
+        layouts: [],
+        options: {
+            date_range: {
+                enabled: true,
+            },
+            refresh_interval_option: '5m',
+        },
+    }])),
     outOfTheBoxTemplateSets: computed<DashboardTemplate[]>(() => {
         const _templates = state.managedTemplates;
         return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
@@ -99,6 +112,16 @@ listTemplates();
                     </template>
                     No Data
                 </p-empty>
+                <dashboard-create-template-board :template-sets="state.blankTemplate"
+                                                 class="blank-board"
+                                                 @select-template="handleClickCreateTemplate"
+                >
+                    <template #bottom>
+                        <span class="blank-description">
+                            Build your own dashboard with scratch
+                        </span>
+                    </template>
+                </dashboard-create-template-board>
                 <div v-if="state.outOfTheBoxTemplateSets.length"
                      class="out-of-the-box"
                 >
@@ -148,6 +171,12 @@ listTemplates();
         .template-contents-area {
             flex-grow: 1;
 
+            .blank-board {
+                padding-bottom: 2rem;
+                .blank-description {
+                    @apply text-paragraph-sm text-gray-500;
+                }
+            }
             .empty-template {
                 padding-top: 3rem;
                 .empty-image {
@@ -160,8 +189,6 @@ listTemplates();
                 margin-bottom: 2rem;
 
                 .out-of-the-box-contents {
-                    @apply rounded-lg bg-violet-200;
-                    padding: 0.75rem 0.75rem 0.875rem 0.75rem;
                     background-color: rgba(225, 224, 250, 0.3);
                     margin-top: 0.5rem;
                 }
