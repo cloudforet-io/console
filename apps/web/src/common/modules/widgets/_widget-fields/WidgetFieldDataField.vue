@@ -68,19 +68,28 @@ const convertToMenuItem = (data: string[]|string) => {
     };
 };
 
-const isIncludedInMenuItems = (data: string[]|string):boolean => {
-    if (Array.isArray(data)) {
-        return data.every((d) => state.menuItems.some((m) => m.name === d));
-    }
-    return state.menuItems.some((m) => m.name === data);
-};
-
-onMounted(() => {
+watch(() => state.menuItems, (menuItems) => {
+    const isIncludedInMenuItems = (data: string[]|string):boolean => {
+        if (Array.isArray(data)) {
+            return data.every((d) => menuItems.some((m) => m.name === d));
+        }
+        return menuItems.some((m) => m.name === data);
+    };
     if (state.multiselectable) {
         state.proxyValue = isIncludedInMenuItems(state.proxyValue) ? state.proxyValue : [state.menuItems[0]?.name];
         state.selectedItem = convertToMenuItem(state.proxyValue);
     } else {
         state.proxyValue = isIncludedInMenuItems(state.proxyValue) ? state.proxyValue : state.menuItems[0]?.name;
+        state.selectedItem = state.menuItems[0]?.name;
+    }
+}, { immediate: true });
+
+onMounted(() => {
+    if (state.multiselectable) {
+        state.proxyValue = props.value ?? [state.menuItems[0]?.name];
+        state.selectedItem = convertToMenuItem(state.proxyValue);
+    } else {
+        state.proxyValue = props.value ?? state.menuItems[0]?.name;
         state.selectedItem = state.menuItems[0]?.name;
     }
 });
