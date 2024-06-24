@@ -16,7 +16,7 @@ export const DATA_SOURCE_DOMAIN = {
 export const DATA_TABLE_OPERATOR = {
     CONCAT: 'CONCAT',
     JOIN: 'JOIN',
-    WHERE: 'WHERE',
+    QUERY: 'QUERY',
     // AGGREGATE: 'AGGREGATE',
     EVAL: 'EVAL',
 } as const;

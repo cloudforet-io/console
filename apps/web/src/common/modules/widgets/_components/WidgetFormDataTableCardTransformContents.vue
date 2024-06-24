@@ -19,10 +19,10 @@ import WidgetFormDataTableCardTransformForm
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
-    DataTableAlertModalMode, WhereCondition, EvalFormula, TransformDataTableInfo,
+    DataTableAlertModalMode, QueryCondition, EvalFormula, TransformDataTableInfo,
 } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DataTableOperator, JoinType, ConcatOptions, JoinOptions, WhereOptions, EvalOptions,
+    DataTableOperator, JoinType, ConcatOptions, JoinOptions, QueryOptions, EvalOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -50,7 +50,7 @@ const state = reactive({
         const haveSavedName = !!originState.name;
         const haveRequiredConcatOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined);
         const haveRequiredJoinOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined) && joinState.joinType;
-        const haveRequiredWhereOptions = haveSavedName && !!state.dataTableInfo.dataTableId && whereState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
+        const haveRequiredWhereOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
         const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.functions.filter((func) => !!func.name.trim() && !!func.value.trim()).length > 0;
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
         if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
@@ -62,7 +62,7 @@ const state = reactive({
         const dataTablesChanged = !isEqual(state.dataTableInfo.dataTables, originState.dataTableInfo.dataTables);
         const dataTableIdChanged = state.dataTableInfo.dataTableId !== originState.dataTableInfo.dataTableId;
         const joinTypeChanged = joinState.joinType !== originState.joinType;
-        const conditionsChanged = !isEqual(whereState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
+        const conditionsChanged = !isEqual(queryState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
         const functionsChanged = !isEqual(evalState.functions.map((func) => ({ name: func.name, value: func.value }))
             .filter((func) => !!func.value.trim().length && !!func.name.trim().length), originState.functions);
         if (state.operator === 'CONCAT') return dataTablesChanged;
@@ -88,8 +88,8 @@ const joinState = reactive({
     joinType: undefined as JoinType | undefined,
 });
 
-const whereState = reactive({
-    conditions: [{ key: getRandomId(), value: '' }] as WhereCondition[],
+const queryState = reactive({
+    conditions: [{ key: getRandomId(), value: '' }] as QueryCondition[],
 });
 
 const evalState = reactive({
@@ -103,7 +103,7 @@ const originState = reactive({
         dataTableId: props.item.options[state.operator]?.data_table_id as string,
     })),
     joinType: computed(() => props.item.options.JOIN?.how as JoinType),
-    conditions: computed(() => (props.item.options.WHERE?.conditions ?? []).map((condition) => ({
+    conditions: computed(() => (props.item.options.QUERY?.conditions ?? []).map((condition) => ({
         value: condition,
     }))),
     functions: computed(() => (props.item.options.EVAL?.formulas ?? []).map((func) => ({
@@ -160,13 +160,13 @@ const handleUpdateDataTable = async () => {
         data_tables: state.dataTableInfo.dataTables,
         how: joinState.joinType as JoinType,
     };
-    const whereOptions: WhereOptions = {
+    const queryOptions: QueryOptions = {
         data_table_id: state.dataTableInfo.dataTableId,
-        conditions: whereState.conditions.map((conditionInfo) => conditionInfo.value),
+        conditions: queryState.conditions.map((conditionInfo) => conditionInfo.value),
     };
     const evalOptions: EvalOptions = {
         data_table_id: state.dataTableInfo.dataTableId,
-        formulas: evalState.functions.map((functionInfo) => ({
+        expressions: evalState.functions.map((functionInfo) => ({
             name: functionInfo.name,
             value: functionInfo.value,
         })),
@@ -177,8 +177,8 @@ const handleUpdateDataTable = async () => {
             return concatOptions;
         case 'JOIN':
             return joinOptions;
-        case 'WHERE':
-            return whereOptions;
+        case 'QUERY':
+            return queryOptions;
         case 'EVAL':
             return evalOptions;
         default:
@@ -207,7 +207,7 @@ const setInitialDataTableForm = () => {
     // Initial Form Setting
     state.dataTableInfo = originState.dataTableInfo;
     joinState.joinType = originState.joinType;
-    whereState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
+    queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
     evalState.functions = originState.functions.length ? originState.functions.map((func) => ({ ...func, key: getRandomId() })) : [{ key: getRandomId(), name: '', value: '' }];
 };
 
@@ -233,7 +233,7 @@ onMounted(() => {
                                                     :operator="state.operator"
                                                     :data-table-info.sync="state.dataTableInfo"
                                                     :join-type.sync="joinState.joinType"
-                                                    :conditions.sync="whereState.conditions"
+                                                    :conditions.sync="queryState.conditions"
                                                     :functions.sync="evalState.functions"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
