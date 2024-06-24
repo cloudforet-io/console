@@ -19,10 +19,12 @@ import {
     PSelectButtonGroup,
 } from '@spaceone/design-system';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
+import type { ValueItem } from '@spaceone/design-system/src/inputs/search/query-search/type';
 import { sumBy } from 'lodash';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
@@ -73,6 +75,18 @@ const state = reactive({
 
     refinedFolderList: [] as BookmarkItem[],
     refinedFolderListWidth: 0,
+
+    tools: computed<ValueItem[]>(() => ([
+        {
+            name: 'shared',
+            label: state.isMobileSize ? i18n.t('HOME.BOOKMARK_SHARED') as string : i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK') as string,
+        },
+        {
+            name: 'my',
+            label: state.isMobileSize ? i18n.t('HOME.BOOKMARK_MY') as string : i18n.t('HOME.BOOKMARK_MY_BOOKMARK') as string,
+        },
+    ])),
+    selectedToolId: 'shared',
 });
 const moreState = reactive({
     isShowMoreButton: false,
@@ -369,7 +383,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                                    class="create-folder-button"
                                    @click="handleClickFullModeButton"
                     >
-                        {{ $t('HOME.BOOKMARK_VIEW_ALL_BOOKMARKS') }}
+                        {{ state.isLaptopSize ? $t('HOME.BOOKMARK_VIEW_ALL') : $t('HOME.BOOKMARK_VIEW_ALL_BOOKMARKS') }}
                     </p-text-button>
                 </div>
             </div>
@@ -494,11 +508,6 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         }
         &:not(.full-mode) {
             @apply relative flex-col items-start;
-            .toolbox-wrapper {
-                @apply absolute;
-                top: 0.25rem;
-                right: 0;
-            }
         }
     }
 }
