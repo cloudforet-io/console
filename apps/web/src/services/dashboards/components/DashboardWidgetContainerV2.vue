@@ -111,7 +111,7 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
 const getWidgetLoading = (widgetId: string) => {
     if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
-    if (!state.intersectedWidgetMap[widgetId]) return true;
+    // if (!state.intersectedWidgetMap[widgetId]) return true;
     if (widgetGenerateState.widget?.widget_id === widgetId) return true;
     return false;
 };
