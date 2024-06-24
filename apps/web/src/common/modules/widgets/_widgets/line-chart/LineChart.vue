@@ -26,7 +26,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { _DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     getDateLabelFormat,
     getWidgetBasedOnDate,
@@ -75,7 +75,7 @@ const state = reactive({
                 interval: 0,
                 rotate: 45,
                 formatter: (val) => {
-                    if (state.xAxisField === DATE_FIELD) {
+                    if (state.xAxisField === _DATE_FIELD.DATE) {
                         return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
                     }
                     return val;
@@ -101,7 +101,7 @@ const state = reactive({
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
-        if (state.xAxisField === DATE_FIELD) {
+        if (Object.values(_DATE_FIELD).includes(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         }
         return { start: _start, end: _end };
@@ -154,7 +154,7 @@ const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
     // set xAxis data
-    if (state.xAxisField === DATE_FIELD) {
+    if (state.xAxisField === _DATE_FIELD.DATE) {
         state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
         state.xAxisData = rawData.results?.map((d) => d[state.xAxisField] as string) ?? [];
