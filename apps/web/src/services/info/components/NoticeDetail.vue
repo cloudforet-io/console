@@ -5,7 +5,7 @@ import {
 import type { Location } from 'vue-router';
 
 import {
-    PButton, PDataLoader, PDivider, PI, PPaneLayout, PBadge,
+    PButton, PDataLoader, PDivider, PI, PPaneLayout, PBadge, PPopover, PTextButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -73,6 +73,7 @@ const state = reactive({
         if (state.isAllWorkspace) return undefined;
         return storeState.workspaceList.filter((workspace) => state.noticePostData?.workspaces.includes(workspace.workspace_id));
     }),
+    popoverVisible: false,
 });
 
 const files = computed<FileModel[]>(() => state.noticePostData?.files ?? []);
@@ -200,6 +201,30 @@ watch(() => props.postId, (postId) => {
                             >
                                 + {{ state.scopedWorkspaceList?.length - 1 }}
                             </p-badge>
+                            <p-popover v-if="state.scopedWorkspaceList?.length > 1"
+                                       v-model="state.popoverVisible"
+                                       position="bottom"
+                            >
+                                <p-text-button class="show-workspaces"
+                                               style-type="highlight"
+                                               size="sm"
+                                               @click="state.popoverVisible = !state.popoverVisible"
+                                >
+                                    {{ $t('INFO.NOTICE.DETAIL.SHOW_ALL_WORKSPACES') }}
+                                </p-text-button>
+                                <template #content>
+                                    <div v-for="(item,idx) in state.scopedWorkspaceList"
+                                         :key="idx"
+                                         class="workspace-wrapper"
+                                    >
+                                        <workspace-logo-icon :text="item.name || ''"
+                                                             :theme="item.tags?.theme"
+                                                             size="xxs"
+                                        />
+                                        <span>{{ item.name }}</span>
+                                    </div>
+                                </template>
+                            </p-popover>
                         </div>
                     </div>
                 </div>
@@ -261,6 +286,14 @@ watch(() => props.postId, (postId) => {
         .workspace-wrapper {
             @apply flex items-center;
             gap: 0.25rem;
+
+            /* custom design-system component - p-popover */
+            :deep(.p-popover) {
+                .popper-content-wrapper {
+                    @apply flex-col;
+                    gap: 0.5rem;
+                }
+            }
         }
     }
     .text-editor-wrapper {
