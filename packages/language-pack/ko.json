@@ -852,7 +852,7 @@
 			"DATA_SOURCES": {
 				"ACTUAL_COST": "실 사용액",
 				"ALL": "전체",
-				"ALT_S_DISABLED_TOGGLE": "",
+				"ALT_S_CHANGE_TOGGLE": "",
 				"ALT_S_RESET": "연결된 어카운트 초기화 완료",
 				"ALT_S_UPDATE": "연결된 어카운트 수정 완료",
 				"CANCELED": "취소됨",

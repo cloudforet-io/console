@@ -852,7 +852,7 @@
 			"DATA_SOURCES": {
 				"ACTUAL_COST": "費用",
 				"ALL": "すべて",
-				"ALT_S_DISABLED_TOGGLE": "",
+				"ALT_S_CHANGE_TOGGLE": "",
 				"ALT_S_RESET": "接続されたアカウントのリセットが完了しました",
 				"ALT_S_UPDATE": "接続されたアカウントの更新が完了しました",
 				"CANCELED": "キャンセル",
