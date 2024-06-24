@@ -29,7 +29,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import type {
-    CreateDashboardParameters, DashboardModel, UpdateDashboardParameters, GetDashboardParameters,
+    CreateDashboardParameters, DashboardModel, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
@@ -159,9 +159,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setDashboardWidgetInfoList = (dashboardWidgetInfoList: DashboardLayoutWidgetInfo[]) => {
         state.dashboardWidgetInfoList = dashboardWidgetInfoList;
     };
-    const setDashboardLayouts = (dashboardLayouts: DashboardLayout[]) => {
-        state.dashboardLayouts = dashboardLayouts;
-    };
     const setLabels = (labels: string[]) => {
         state.labels = labels;
     };
@@ -272,7 +269,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             })) ?? [];
             setDashboardWidgetInfoList(_dashboardWidgetInfoList);
         } else {
-            setDashboardLayouts(_dashboardInfo.layouts);
+            state.dashboardLayouts = _dashboardInfo.layouts;
         }
         setTemplateId(_dashboardInfo.template_id);
         setTemplateType(_dashboardInfo.template_type);
@@ -310,8 +307,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         const deletedWidgetIndex = _dashboardLayouts[0]?.widgets?.findIndex((d) => d === widgetId);
         if (!deletedWidgetIndex || deletedWidgetIndex === -1) return;
         _dashboardLayouts[0]?.widgets?.splice(deletedWidgetIndex, 1);
-        setDashboardLayouts(_dashboardLayouts);
-        await updateDashboard(state.dashboardId as string, { layouts: _dashboardLayouts });
+        state.dashboardLayouts = _dashboardLayouts;
+        await dashboardStore.updateDashboard(state.dashboardId as string, { layouts: _dashboardLayouts });
     };
     const resetVariables = (originVariables?: DashboardVariables, originVariablesSchema?: DashboardVariablesSchema) => {
         const _originVariables: DashboardVariables = originVariables ?? state.dashboardInfo?.variables ?? {};
@@ -368,20 +365,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         const res = await dashboardStore.createDashboard(_dashboardType, _params);
         return res;
     };
-    const updateDashboard = async (dashboardId: string, params: Partial<UpdateDashboardParameters>) => {
-        const _params: UpdateDashboardParameters = {
-            ...params,
-            dashboard_id: dashboardId,
-        };
-        if (params.variables_schema) {
-            _params.variables_schema = {
-                order: params.variables_schema.order,
-                properties: refineSchemaProperties(params.variables_schema.properties),
-            };
-        }
-        const res = await dashboardStore.updateDashboard(dashboardId, _params);
-        _setDashboardInfoStoreState(res);
-    };
     const deleteDashboard = async (dashboardId: string) => {
         await dashboardStore.deleteDashboard(dashboardId);
     };
@@ -423,7 +406,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setIsNameValid,
         setOptions,
         setDashboardWidgetInfoList,
-        setDashboardLayouts,
         setLabels,
         setVariablesSchema,
         setVariables,
@@ -442,7 +424,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         resetVariables,
         updateWidgetValidation,
         createDashboard,
-        updateDashboard,
         deleteDashboard,
         listDashboardWidgets,
         addWidgetToDashboardLayouts,
