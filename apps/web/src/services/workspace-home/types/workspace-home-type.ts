@@ -22,6 +22,10 @@ export interface CloudServiceData {
     delete_warning?: boolean;
     display_name?: string;
 }
+export type DailyUpdatesListItem = {
+    created: CloudServiceData[],
+    deleted: CloudServiceData[],
+};
 export type ProviderResourceDataItem = ProviderItem & {
     server?: number;
     database?: number;
