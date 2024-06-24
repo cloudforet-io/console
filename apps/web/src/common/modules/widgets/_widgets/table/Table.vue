@@ -43,7 +43,7 @@ const state = reactive({
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     comparisonData: null as Data | null,
-    slicedData: computed<Data|null>(() => {
+    finalConvertedData: computed<Data|null>(() => {
         if (!state.data) return null;
         if (state.tableDataFieldType === 'staticField') return state.staticFieldSlicedData;
         if (state.tableDataField === 'Date') return state.timeSeriesDynamicFieldSlicedData;
@@ -101,7 +101,6 @@ const state = reactive({
                     if (hasComparisonOption) {
                         const comparisonItem = comparisonData.find((c) => state.groupByField.every((field) => c[field] === d[field]));
                         const comparisonValue = comparisonItem?.[state.tableDataCriteria].find((c) => c[state.tableDataField] === item[state.tableDataField])?.value ?? 0;
-                        console.debug('comparisonValue', comparisonValue, comparisonItem, item, comparisonData, state.groupByField);
                         dataWithComparison.push({
                             [state.tableDataField]: `comparison_${item[state.tableDataField]}`,
                             value: comparisonValue,
@@ -316,7 +315,7 @@ defineExpose<WidgetExpose<Data>>({
         <widget-data-table :widget-id="props.widgetId"
                            :loading="false"
                            :fields="state.tableFields"
-                           :items="state.slicedData?.results"
+                           :items="state.finalConvertedData?.results"
         />
     </widget-frame>
 </template>
