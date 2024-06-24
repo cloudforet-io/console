@@ -13,13 +13,11 @@ import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store
 interface Props {
     bookmarkFolderList: BookmarkItem[];
     bookmarkList: BookmarkItem[];
-    height?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     bookmarkFolderList: undefined,
     bookmarkList: undefined,
-    height: undefined,
 });
 
 const bookmarkStore = useBookmarkStore();
@@ -31,11 +29,24 @@ const storeState = reactive({
 });
 const state = reactive({
     folderBoardSets: computed<BookmarkItem[]>(() => {
-        const createFolderItem: BookmarkItem = {
-            name: i18n.t('HOME.BOOKMARK_CREATE_FOLDER'),
-            icon: 'ic_plus',
-        };
-        if (!storeState.isWorkspaceMember) return [createFolderItem, ...props.bookmarkFolderList];
+        const defaultFolderItem: BookmarkItem[] = [
+            {
+                name: i18n.t('HOME.BOOKMARK_CREATE_FOLDER'),
+                icon: 'ic_plus',
+                id: 'create-folder',
+            },
+            {
+                name: i18n.t('HOME.BOOKMARK_ADD_LINK'),
+                icon: 'ic_plus',
+                id: 'add-link',
+            },
+        ];
+        if (!storeState.isWorkspaceMember) {
+            return [
+                ...defaultFolderItem,
+                ...props.bookmarkFolderList,
+            ];
+        }
         return props.bookmarkFolderList;
     }),
     isFullMode: false,
@@ -43,9 +54,7 @@ const state = reactive({
 </script>
 
 <template>
-    <div class="bookmark-full-mode"
-         :style="{ maxHeight: `${props.height}px` }"
-    >
+    <div class="bookmark-full-mode">
         <bookmark-board v-if="!storeState.isWorkspaceMember && !storeState.isFileFullMode"
                         :board-list="state.folderBoardSets"
                         is-folder-board

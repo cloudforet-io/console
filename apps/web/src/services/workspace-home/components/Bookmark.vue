@@ -27,7 +27,7 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const bookmarkGetters = bookmarkStore.getters;
 
-const { height, width } = useWindowSize();
+const { width } = useWindowSize();
 
 const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkState.bookmarkFolderData),
@@ -51,7 +51,6 @@ const state = reactive({
         }
         return _bookmarkList;
     }),
-    contentHeight: computed<number|undefined>(() => height.value - 392),
 });
 
 onUnmounted(() => {
@@ -62,13 +61,11 @@ onUnmounted(() => {
 <template>
     <div class="bookmark"
          :class="{ 'full-mode': storeState.isFullMode }"
-         :style="{ maxHeight: 'calc(100vh - 20.375rem)' }"
     >
         <bookmark-header :bookmark-folder-list="storeState.bookmarkFolderList" />
         <bookmark-full-mode v-if="storeState.isFullMode"
                             :bookmark-folder-list="storeState.bookmarkFolderList"
                             :bookmark-list="storeState.bookmarkList"
-                            :height="state.contentHeight"
         />
         <bookmark-board v-else
                         :board-list="state.boardList"
