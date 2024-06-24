@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PDataLoader, PDivider,
     PPagination, PToolbox,
+    PSelectButtonGroup,
 } from '@spaceone/design-system';
+import type { ValueItem } from '@spaceone/design-system/src/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -34,6 +36,11 @@ const state = reactive({
     noticeItems: [] as PostModel[],
     noticeItemTotalCount: 0,
     searchText: undefined as undefined | string,
+    tools: computed<ValueItem[]>(() => ([
+        { name: 'all', label: i18n.t('INFO.NOTICE.ALL_WORKSPACE') as string },
+        { name: 'specific', label: i18n.t('INFO.NOTICE.FORM.SPECIFIC_WORKSPACE') as string },
+    ])),
+    selectedToolId: 'all' as string,
 });
 
 const noticeStore = useNoticeStore();
@@ -114,6 +121,12 @@ const handlePageChange = (page: number) => {
 <template>
     <div class="notice-list">
         <div class="notice-header">
+            <div>
+                <p-select-button-group class="workspace-buttons-wrapper"
+                                       :buttons="state.tools"
+                                       :selected.sync="state.selectedToolId"
+                />
+            </div>
             <p-toolbox :pagination-visible="false"
                        :page-size-changeable="false"
                        :refreshable="false"
@@ -177,9 +190,33 @@ const handlePageChange = (page: number) => {
 .notice-list {
     @apply border border-gray-200 bg-white rounded-lg;
     .notice-header {
+        @apply flex flex-col;
         padding: 0 1rem;
         margin-top: 1.5rem;
         margin-bottom: 0.5rem;
+
+        /* custom design-system component - p-select-button-group */
+        :deep(.p-select-button-group) {
+            .button-group {
+                margin-bottom: 0.75rem;
+                .select-button {
+                    @apply bg-transparent;
+                    margin: 0;
+                    border-radius: 0;
+                    &:first-child {
+                        border-top-left-radius: 0.25rem;
+                        border-bottom-left-radius: 0.25rem;
+                    }
+                    &:last-child {
+                        border-top-right-radius: 0.25rem;
+                        border-bottom-right-radius: 0.25rem;
+                    }
+                    &.active {
+                        @apply bg-secondary border-secondary;
+                    }
+                }
+            }
+        }
     }
     .list-wrapper {
         @apply rounded-none;
