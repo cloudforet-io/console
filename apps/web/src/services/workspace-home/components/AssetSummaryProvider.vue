@@ -1,32 +1,19 @@
 <script setup lang="ts">
-
 import { useElementSize } from '@vueuse/core/index';
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref,
 } from 'vue';
 
 import { PIconButton } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
-
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 import { store } from '@/store';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 import AssetSummaryProviderItem from '@/services/workspace-home/components/AssetSummaryProviderItem.vue';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import {
     DEFAULT_PADDING,
 } from '@/services/workspace-home/types/workspace-home-type';
 import type {
-    ProviderReferenceDataMap,
     ProviderResourceDataItem,
 } from '@/services/workspace-home/types/workspace-home-type';
 
@@ -35,23 +22,19 @@ const PROVIDER_DEFAULT_WIDTH = 184 + 8;
 const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const providerEl = ref<null | HTMLElement>(null);
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-const userWorkspaceStore = useUserWorkspaceStore();
-const userWorkspaceGetters = userWorkspaceStore.getters;
+const workspaceHomePageStore = useWorkspaceHomePageStore();
+const workspaceHomePageState = workspaceHomePageStore.state;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
-    providerMap: computed<ProviderReferenceDataMap>(() => allReferenceGetters.provider),
-    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
+    providers: computed<ProviderResourceDataItem[]>(() => workspaceHomePageState.providers),
 });
 const state = reactive({
-    providers: [] as ProviderResourceDataItem[],
     pageStart: 0,
     pageMax: computed(() => {
-        const providerCount: number = state.providers.length / Math.floor(rowItemsWrapperWidth.value / (PROVIDER_DEFAULT_WIDTH + DEFAULT_PADDING) - 1);
+        const providerCount: number = storeState.providers.length / Math.floor(rowItemsWrapperWidth.value / (PROVIDER_DEFAULT_WIDTH + DEFAULT_PADDING) - 1);
         return Math.ceil(providerCount);
     }),
 });
@@ -68,48 +51,6 @@ const handleClickArrowButton = (increment: number) => {
     const marginLeft = increment * state.pageStart * element.defaultWidth;
     element.el.style.marginLeft = increment === 1 ? `-${marginLeft}px` : `${marginLeft}px`;
 };
-
-const fetchCloudServiceResources = async () => {
-    const labels = ['Server', 'Database', 'Storage'];
-    try {
-        await Promise.all(labels.map(async (label) => {
-            const metricId = `metric-managed-${label.toLowerCase()}-${label !== 'Storage' ? 'count' : 'size'}`;
-            const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-            const { status, response } = await fetcher({
-                metric_id: metricId,
-                query: {
-                    granularity: 'DAILY',
-                    group_by: ['labels.Provider'],
-                    start: dayjs.tz(dayjs.utc(), storeState.timezone).subtract(5, 'days').format('YYYY-MM-DD'),
-                    end: dayjs.tz(dayjs.utc(), storeState.timezone).format('YYYY-MM-DD'),
-                    fields: {
-                        count: {
-                            key: 'value',
-                            operator: 'sum',
-                        },
-                    },
-                    sort: [{ key: '_total_count', desc: true }],
-                    field_group: ['date'],
-                },
-            });
-
-            if (status === 'succeed') {
-                (response?.results || []).forEach((i) => {
-                    storeState.providerMap[i.Provider][label.toLowerCase()] = i._total_count;
-                });
-            }
-        }));
-        state.providers = Object.keys(storeState.providerMap).map((key) => storeState.providerMap[key]);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.providers = [];
-    }
-};
-
-watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async ([currentWorkspaceId]) => {
-    if (!currentWorkspaceId) return;
-    await fetchCloudServiceResources();
-}, { immediate: true });
 </script>
 
 <template>
@@ -119,7 +60,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
         <div ref="providerEl"
              class="row-items-container"
         >
-            <asset-summary-provider-item v-for="(item, idx) in state.providers"
+            <asset-summary-provider-item v-for="(item, idx) in storeState.providers"
                                          :key="`asset-summary-item-${idx}`"
                                          :item="item"
             />

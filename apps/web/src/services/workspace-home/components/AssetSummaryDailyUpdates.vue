@@ -1,56 +1,42 @@
 <script setup lang="ts">
-
 import { useElementSize } from '@vueuse/core/index';
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref,
 } from 'vue';
 
 import { PFieldTitle, PIconButton, PEmpty } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import {
-    groupBy, map, mapKeys, sumBy,
+    groupBy, map, sumBy,
 } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
-
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
-import { store } from '@/store';
-
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 import AssetSummaryDailyUpdateItem from '@/services/workspace-home/components/AssetSummaryDailyUpdateItem.vue';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import { DEFAULT_PADDING } from '@/services/workspace-home/types/workspace-home-type';
-import type { CloudServiceData } from '@/services/workspace-home/types/workspace-home-type';
+import type { CloudServiceData, DailyUpdatesListItem } from '@/services/workspace-home/types/workspace-home-type';
 
 const DAILY_UPDATE__DEFAULT_WIDTH = 136 + 8;
 
 const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const dailyUpdateEl = ref<null | HTMLElement>(null);
 
-const userWorkspaceStore = useUserWorkspaceStore();
-const userWorkspaceGetters = userWorkspaceStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const workspaceHomePageStore = useWorkspaceHomePageStore();
+const workspaceHomePageState = workspaceHomePageStore.state;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
-    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     cloudServiceTypeMap: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloud_service_type),
+    dailyUpdatesListItems: computed<DailyUpdatesListItem>(() => workspaceHomePageState.dailyUpdatesListItems),
 });
 const state = reactive({
-    dailyUpdatesListItems: { created: [] as CloudServiceData[], deleted: [] as CloudServiceData[] },
     cloudServiceTypeList: computed<CloudServiceTypeItem[]>(() => Object.values(storeState.cloudServiceTypeMap)),
     dailyUpdatesList: computed<CloudServiceData[]>(() => {
-        const mergedArray = [...state.dailyUpdatesListItems.created, ...state.dailyUpdatesListItems.deleted];
+        const mergedArray = [...storeState.dailyUpdatesListItems.created, ...storeState.dailyUpdatesListItems.deleted];
 
         const grouped = groupBy(mergedArray, (item) => `${item.cloud_service_group}-${item.cloud_service_type}-${item.provider}`);
 
@@ -86,57 +72,6 @@ const handleClickArrowButton = (increment: number) => {
     const marginLeft = increment * state.pageStart * element.defaultWidth;
     element.el.style.marginLeft = increment === 1 ? `-${marginLeft}px` : `${marginLeft}px`;
 };
-
-const convertFormKeys = (data: MetricDataAnalyzeResult) => {
-    const convertFormKey = (key: string) => key.toLowerCase().replace(/ /g, '_');
-
-    return data.map((item) => mapKeys(item, (value, key) => convertFormKey(key)));
-};
-const fetchDailyUpdatesList = async (): Promise<void> => {
-    const labels = ['created', 'deleted'];
-    try {
-        await Promise.all(labels.map(async (label) => {
-            const metricId = `metric-managed-${label.toLowerCase()}-count`;
-            const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-            const { status, response } = await fetcher({
-                metric_id: metricId,
-                query: {
-                    granularity: 'DAILY',
-                    group_by: ['labels.Provider', 'labels.Cloud Service Group', 'labels.Cloud Service Type'],
-                    start: dayjs.tz(dayjs.utc(), storeState.timezone).format('YYYY-MM-DD'),
-                    end: dayjs.tz(dayjs.utc(), storeState.timezone).format('YYYY-MM-DD'),
-                    fields: {
-                        count: {
-                            key: 'value',
-                            operator: 'sum',
-                        },
-                    },
-                    sort: [{ key: '_total_count', desc: true }],
-                    field_group: ['date'],
-                },
-            });
-
-            if (status === 'succeed') {
-                const results = convertFormKeys(response.results || []);
-                state.dailyUpdatesListItems[label] = results.map((i) => ({
-                    cloud_service_group: i.cloud_service_group,
-                    cloud_service_type: i.cloud_service_type,
-                    total_count: i._total_count,
-                    provider: i.provider,
-                    [`${label}_count`]: i.count[0].value,
-                }));
-            }
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.dailyUpdatesListItems = { created: state.dailyUpdatesListItems.created || [], deleted: state.dailyUpdatesListItems.deleted || [] };
-    }
-};
-
-watch([() => storeState.currentWorkspaceId], async ([currentWorkspaceId]) => {
-    if (!currentWorkspaceId) return;
-    await fetchDailyUpdatesList();
-}, { immediate: true });
 </script>
 
 <template>
