@@ -38,3 +38,4 @@ export interface TransformDataTableInfo {
 
 export type DataTableAlertModalMode = 'DELETE'|'DELETE_UNABLED'|'RESET';
 
+export type JoinRestrictedMap = Record<string, boolean>; // { {id}: true }

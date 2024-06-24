@@ -30,6 +30,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
+    isJoinRestriced: computed<boolean|undefined>(() => widgetGenerateState.joinRestrictedMap[props.dataTableId]),
 });
 
 
@@ -81,15 +82,21 @@ const handleClickSelectButton = (isSecondary?: boolean) => {
 };
 const handleSelectDataTable = (item: MenuItem, isSecondary?: boolean) => {
     if (isSecondary) {
+        if (item.name === state.secondarySelected?.[0]?.name) return;
         state.secondarySelected = [item];
         const dataTables = state.selected ? [state.selected[0].name, item.name] : [undefined, item.name];
         state.proxyDataTableInfo = {
             ...state.proxyDataTableInfo,
             dataTables,
         };
+        widgetGenerateStore.setJoinRestrictedMap({
+            ...widgetGenerateState.joinRestrictedMap,
+            [props.dataTableId]: false,
+        });
         state.secondaryVisibleMenu = false;
         return;
     }
+    if (item.name === state.selected?.[0]?.name) return;
     state.selected = [item];
     if (state.isDualDropdown) {
         const dataTables = state.secondarySelected ? [item.name, state.secondarySelected[0].name] : [item.name];
@@ -180,7 +187,8 @@ watch(() => props.dataTableInfo, (newVal) => {
                 <div ref="targetRef"
                      :class="{'select-button': true,
                               selected: !!state.secondarySelected,
-                              error: state.secondarySelected && !storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.secondarySelected?.[0]?.name)
+                              error: (state.secondarySelected && !storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.secondarySelected?.[0]?.name))
+                                  || storeState.isJoinRestriced
                      }"
                      @click="handleClickSelectButton(true)"
                 >
