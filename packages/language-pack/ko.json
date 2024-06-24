@@ -1471,6 +1471,7 @@
 			"RUN_COLLECTOR_NO_RECENT_RUN": "최근 수집 작업이 없습니다. ",
 			"RUN_COLLECTOR_START_TIME": "시작 시간 ",
 			"SAVE": "저장",
+			"SELECT_A_DATA_TABLE": "",
 			"SERVICE_ACCOUNTS": "서비스 어카운트 ",
 			"SERVICE_ACCOUNTS_ACCOUNT": "계정 ",
 			"SERVICE_ACCOUNTS_ADD": "추가",

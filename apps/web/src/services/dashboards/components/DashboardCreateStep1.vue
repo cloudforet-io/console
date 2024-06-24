@@ -118,7 +118,7 @@ listTemplates();
                 >
                     <template #bottom>
                         <span class="blank-description">
-                            Build your own dashboard with scratch
+                            {{ $t('DASHBOARDS.CREATE.BLANK_DESC') }}
                         </span>
                     </template>
                 </dashboard-create-template-board>
