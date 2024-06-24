@@ -71,7 +71,6 @@ const state = reactive({
         xAxis: {
             type: 'value',
             axisLabel: {
-                interval: 0,
                 formatter: (val) => numberFormatter(val, { notation: 'compact' }),
             },
         },
@@ -79,7 +78,6 @@ const state = reactive({
             type: 'category',
             data: state.yAxisData,
             axisLabel: {
-                interval: 0,
                 formatter: (val) => {
                     if (state.yAxisField === DATE_FIELD.DATE) {
                         return dayjs.utc(val).format(getDateLabelFormat(state.granularity));

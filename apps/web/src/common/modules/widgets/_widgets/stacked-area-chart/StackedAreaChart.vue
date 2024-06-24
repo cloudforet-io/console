@@ -72,8 +72,6 @@ const state = reactive({
             boundaryGap: false,
             data: state.xAxisData,
             axisLabel: {
-                interval: 0,
-                rotate: 45,
                 formatter: (val) => {
                     if (state.xAxisField === DATE_FIELD.DATE) {
                         return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
