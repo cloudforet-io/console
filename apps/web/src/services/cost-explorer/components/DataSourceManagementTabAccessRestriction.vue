@@ -1,34 +1,125 @@
 <script setup lang="ts">
 import { reactive, computed } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { PHeading, PToggleButton, PButtonModal } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type {
+    CostDataSourceUpdatePermissionsParameters,
+} from '@/schema/cost-analysis/data-source/api-verbs/update-permissions';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
+import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
+
+
+type DataType = {
+    label: TranslateResult|string;
+    name: string;
+    disabled?: boolean;
+};
+
+const dataSourcesPageStore = useDataSourcesPageStore();
+const dataSourcesPageGetters = dataSourcesPageStore.getters;
+
+const storeState = reactive({
+    selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
+});
 const state = reactive({
-    dataType: computed(() => [
-        { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COST'), name: 'cost' },
-        { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.USAGE'), name: 'usage' },
-        { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.PAY_AS_YOU_GO'), name: 'payAsYouGo' },
-    ]),
-    dataTypeEnable: {
+    loading: false,
+    dataType: computed<DataType[]>(() => {
+        const denyList = storeState.selectedItem.permissions?.deny || [];
+        const costDataKeys = storeState.selectedItem.cost_data_keys || [];
+
+        const customDataType = costDataKeys.map((key) => {
+            const isDisabled = denyList.some((denyItem) => denyItem === `data.${key}`);
+            return {
+                label: key.replace(/([A-Z])/g, ' $1').trim(),
+                name: key,
+                disabled: isDisabled,
+            };
+        });
+
+        return [
+            { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COST'), name: 'cost', disabled: true },
+            { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.USAGE'), name: 'usage', disabled: true },
+            ...customDataType,
+        ];
+    }),
+    fixedDataTypeEnable: {
         cost: true,
-        usage: false,
-        payAsYouGo: false,
+        usage: true,
     },
+    dataTypeEnable: computed(() => ({
+        ...state.fixedDataTypeEnable,
+        ...convertDataKey(storeState.selectedItem.cost_data_keys || []),
+    })),
     selectedDataType: '',
     modalVisible: false,
 });
 
-const handleChangeToggle = (item: string, value: boolean) => {
+const convertDataKey = (keys: string[]) => {
+    const result = {};
+    keys.forEach((key) => {
+        result[key] = false;
+    });
+    return result;
+};
+const handleChangeToggle = async (item: string, value: boolean) => {
     state.selectedDataType = item as string;
     state.dataTypeEnable[item] = value;
     if (value) {
         state.modalVisible = true;
     } else {
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_DISABLED_TOGGLE'), '');
+        try {
+            const denyList = storeState.selectedItem.permissions?.deny || [];
+            const costDataKeys = storeState.selectedItem.cost_data_keys || [];
+
+            const updatedDenyList = denyList.filter((denyItem) => {
+                const key = denyItem.replace('data.', '');
+                return !costDataKeys.includes(key);
+            });
+            await SpaceConnector.clientV2.costAnalysis.dataSource.updatePermissions<CostDataSourceUpdatePermissionsParameters>({
+                data_source_id: storeState.selectedItem.data_source_id,
+                permissions: {
+                    deny: updatedDenyList,
+                },
+            });
+            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_DISABLED_TOGGLE'), '');
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        }
+    }
+};
+
+const handleClose = () => {
+    state.dataTypeEnable[state.selectedDataType] = false;
+    state.selectedDataType = '';
+};
+const handleConfirm = async () => {
+    state.loading = true;
+    try {
+        const permissions = [
+            ...storeState.selectedItem.permissions?.deny || [],
+            `data.${state.selectedDataType}`,
+        ];
+        await SpaceConnector.clientV2.costAnalysis.dataSource.updatePermissions<CostDataSourceUpdatePermissionsParameters>({
+            data_source_id: storeState.selectedItem.data_source_id,
+            permissions: {
+                deny: permissions,
+            },
+        });
+        state.modalVisible = false;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
     }
 };
 </script>
@@ -47,6 +138,7 @@ const handleChangeToggle = (item: string, value: boolean) => {
             >
                 <p-toggle-button :value="state.dataTypeEnable[item.name]"
                                  class="toggle-button"
+                                 :disabled="item.disabled"
                                  @change-toggle="handleChangeToggle(item.name, $event)"
                 />
                 <span>
@@ -66,6 +158,10 @@ const handleChangeToggle = (item: string, value: boolean) => {
             fade
             backdrop
             :visible.sync="state.modalVisible"
+            :loading="state.loading"
+            @confirm="handleConfirm"
+            @close="handleClose"
+            @cancel="handleClose"
         >
             <template #body>
                 <p class="modal-body">
