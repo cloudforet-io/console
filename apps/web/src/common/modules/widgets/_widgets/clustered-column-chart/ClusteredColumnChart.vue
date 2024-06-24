@@ -10,7 +10,9 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { isEmpty, throttle } from 'lodash';
+import {
+    isEmpty, sortBy, throttle,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -143,14 +145,31 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
+    // sort and slice Data, etc
+    const _sortedData = sortBy(rawData?.results, (v) => state.dataField.reduce((acc, field) => acc + (v[field] as number), 0)).reverse();
+    const _slicedData = _sortedData.slice(0, state.xAxisCount);
+    const _etcData = _sortedData.slice(state.xAxisCount).reduce((acc, v) => {
+        state.dataField.forEach((field) => {
+            acc[field] = (acc[field] as number) + (v[field] as number);
+        });
+        return acc;
+    }, Object.fromEntries(state.dataField.map((field) => [field, 0])));
+    if (!isEmpty(_etcData)) {
+        _slicedData.push({ [state.xAxisField]: 'ETC', ..._etcData });
+    }
+
     // get xAxis data
     let _xAxisData: string[] = [];
     if (state.xAxisField === DATE_FIELD) {
         _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
-        _xAxisData = Array.from(new Set(rawData.results?.map((v) => v[state.xAxisField] as string)));
+        _xAxisData = Array.from(new Set(_slicedData.map((v) => v[state.xAxisField] as string)));
+        _xAxisData = _xAxisData.slice(0, state.xAxisCount);
+        if (!isEmpty(_etcData)) {
+            _xAxisData.push('ETC');
+        }
     }
-    state.xAxisData = _xAxisData.slice(0, state.xAxisCount);
+    state.xAxisData = _xAxisData;
 
     // get chart data
     const _seriesData: any[] = [];
@@ -161,7 +180,7 @@ const drawChart = (rawData: Data|null) => {
             barMaxWidth: 24,
             barGap: 0,
             data: _xAxisData.map((d) => {
-                const _data = rawData.results?.find((v) => v[state.xAxisField] === d);
+                const _data = _slicedData.find((v) => v[state.xAxisField] === d);
                 return _data ? _data[field] : undefined;
             }),
         });

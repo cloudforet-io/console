@@ -9,7 +9,7 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { isEmpty, throttle } from 'lodash';
+import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -125,10 +125,17 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
 };
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
+    const _sortedData = orderBy(rawData.results, [state.dataField], ['desc']);
+    const _slicedData = _sortedData.slice(0, state.categoryByCount);
+    const _etcValue = _sortedData.slice(state.categoryByCount).reduce((acc, v) => acc + v[state.dataField], 0);
+    const _etcData = _etcValue ? {
+        [state.categoryByField]: 'ETC',
+        [state.dataField]: _etcValue,
+    } : {};
+    const _refinedData = [..._slicedData, _etcData];
 
     // get chart data
-    const _slicedData = rawData.results?.slice(0, state.categoryByCount);
-    state.chartData = _slicedData?.map((v) => ({
+    state.chartData = _refinedData?.map((v) => ({
         name: v[state.categoryByField],
         value: v[state.dataField],
     })) || [];
