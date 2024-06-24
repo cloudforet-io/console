@@ -20,6 +20,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -46,7 +47,7 @@ const state = reactive({
     finalConvertedData: computed<Data|null>(() => {
         if (!state.data) return null;
         if (state.tableDataFieldType === 'staticField') return state.staticFieldSlicedData;
-        if (state.tableDataField === 'Date') return state.timeSeriesDynamicFieldSlicedData;
+        if (state.tableDataField === DATE_FIELD) return state.timeSeriesDynamicFieldSlicedData;
         return state.noneTimeSeriedsDynamicFieldSlicedData;
     }),
     staticFieldSlicedData: computed(() => {
@@ -70,7 +71,7 @@ const state = reactive({
         return { results: [] };
     }),
     timeSeriesDynamicFieldSlicedData: computed(() => {
-        if (state.tableDataField === 'Date') {
+        if (state.tableDataField === DATE_FIELD) {
             return {
                 results: state.data.results.map((d) => {
                     const subTotal = {
@@ -142,7 +143,7 @@ const state = reactive({
     groupByField: computed<string[]|undefined>(() => ((props.widgetOptions?.groupBy as GroupByValue)?.value as string[]) ?? []),
     dateRange: computed<DateRange>(() => {
         let subtract = 1;
-        if (state.tableDataField === 'Date' || state.groupByField?.includes('Date')) {
+        if (state.tableDataField === DATE_FIELD || state.groupByField?.includes(DATE_FIELD)) {
             if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
             if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
             if (state.granularity === GRANULARITY.DAILY) subtract = 30;
@@ -155,7 +156,7 @@ const state = reactive({
         return { start: _start, end: _start };
     }),
     // data for optional fields
-    isComparisonEnabled: computed<boolean>(() => state.tableDataField !== 'Date' && !state.groupByField?.includes('Date')),
+    isComparisonEnabled: computed<boolean>(() => state.tableDataField !== DATE_FIELD && !state.groupByField?.includes(DATE_FIELD)),
     comparisonInfo: computed<ComparisonValue|undefined>(() => props.widgetOptions?.comparison?.[0] as ComparisonValue),
     subTotalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.subTotal as TotalValue),
     totlaInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.total as TotalValue),
@@ -179,7 +180,7 @@ const state = reactive({
                     });
                 }
             });
-        } else if (state.tableDataField === 'Date') dataFields = getWidgetTableDateFields(state.granularity, state.dateRange, state.tableDataMaxCount);
+        } else if (state.tableDataField === DATE_FIELD) dataFields = getWidgetTableDateFields(state.granularity, state.dateRange, state.tableDataMaxCount);
         else {
             state.slicedData?.results?.[0][state.tableDataCriteria].forEach((d) => {
                 dataFields.push({
