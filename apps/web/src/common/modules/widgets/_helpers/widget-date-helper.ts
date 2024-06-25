@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+
 
 export const getTimeUnit = (granularity: string): string => {
     if (granularity === 'DAILY') return 'day';
@@ -58,4 +60,21 @@ export const getWidgetDateRange = (granularity: string, basedOnDate: string, sub
     const start = dayjs.utc(basedOnDate).clone().subtract(subtractCount - 1, _timeUnit).format(_dateFormat);
     const end = dayjs.utc(basedOnDate).format(_dateFormat);
     return [start, end];
+};
+
+export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, field: string, val?: string) => {
+    if (!val) return '';
+    if (field === 'Workspace') {
+        return allReferenceTypeInfo.workspace.referenceMap[val]?.label ?? val;
+    }
+    if (field === 'Project') {
+        return allReferenceTypeInfo.project.referenceMap[val]?.label ?? val;
+    }
+    if (field === 'Region') {
+        return allReferenceTypeInfo.region.referenceMap[val]?.name || val;
+    }
+    if (field === 'Provider') {
+        return allReferenceTypeInfo.provider.referenceMap[val]?.label || val;
+    }
+    return val;
 };

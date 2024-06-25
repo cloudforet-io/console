@@ -34,6 +34,10 @@ import DashboardReorderSidebar from '@/services/dashboards/components/DashboardR
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+import {
+    useAllReferenceTypeInfoStore,
+} from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -50,11 +54,13 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
 const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const state = reactive({
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed<boolean>(() => Object.values(state.mountedWidgetMap).every((d) => d)),
@@ -285,6 +291,7 @@ defineExpose({
                                :dashboard-variables="dashboardDetailState.variables"
                                :vars="state.vars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
+                               :all-reference-type-info="state.allReferenceTypeInfo"
                                @mounted="handleWidgetMounted(widget.widget_id)"
                                @click-edit="handleOpenWidgetOverlay(widget, 'EDIT')"
                                @click-delete="handleClickDeleteWidget(widget)"
