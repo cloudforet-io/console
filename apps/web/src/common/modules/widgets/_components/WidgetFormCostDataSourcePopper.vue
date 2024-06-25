@@ -59,11 +59,11 @@ const state = reactive({
         const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
         const usageAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
         const additionalMenuItems: MenuItem[] = targetCostDataSource.data?.cost_data_keys?.map((key) => ({
-            type: 'item', name: key, label: key,
+            type: 'item', name: `data.${key}`, label: key,
         }));
         const dataTypeItems = [
             { type: 'item', name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },
-            { type: 'item', name: 'usage', label: usageAlias ? `Usage (${usageAlias})` : 'Usage' },
+            { type: 'item', name: 'usage_quantity', label: usageAlias ? `Usage (${usageAlias})` : 'Usage' },
             ...(additionalMenuItems || []),
         ];
         return dataTypeItems.filter((d) => d.label.toLowerCase().includes(state.dataTypeSearchText.toLowerCase()));
