@@ -105,7 +105,7 @@ watch(() => state.selectedMenuId, async (selectedMenuId) => {
 
     if (selectedMenuId === MENU_ID.COST_ANALYSIS) {
         await gnbStore.fetchCostQuerySet();
-    } else if (state.selectedMenuId === MENU_ID.ASSET_ANALYSIS) {
+    } else if (state.selectedMenuId === MENU_ID.METRIC_EXPLORER) {
         await gnbStore.fetchMetricExample();
     }
 }, { immediate: true });

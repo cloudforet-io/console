@@ -115,7 +115,7 @@ watch(() => assetAnalysisPageState.selectedGroupByList, (after) => {
             <p v-if="props.more"
                class="too-many-text"
             >
-                {{ $t('INVENTORY.ASSET_ANALYSIS.SHOWING_TOP_15') }}
+                {{ $t('INVENTORY.METRIC_EXPLORER.SHOWING_TOP_15') }}
             </p>
             <div v-for="(legend, idx) in legends"
                  :key="`legend-${legend.name}-${idx}`"
@@ -129,14 +129,14 @@ watch(() => assetAnalysisPageState.selectedGroupByList, (after) => {
                 />
             </div>
             <template #no-data>
-                <span class="text-paragraph-md">{{ $t('INVENTORY.ASSET_ANALYSIS.NO_ITEMS') }}</span>
+                <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_ITEMS') }}</span>
             </template>
         </p-data-loader>
         <p-text-button size="md"
                        :disabled="!legends.length || state.disableLegendToggle"
                        @click="handleToggleAllLegends"
         >
-            {{ state.showHideAll ? $t('INVENTORY.ASSET_ANALYSIS.HIDE_ALL') : $t('INVENTORY.ASSET_ANALYSIS.SHOW_ALL') }}
+            {{ state.showHideAll ? $t('INVENTORY.METRIC_EXPLORER.HIDE_ALL') : $t('INVENTORY.METRIC_EXPLORER.SHOW_ALL') }}
         </p-text-button>
     </div>
 </template>

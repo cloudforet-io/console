@@ -10,7 +10,7 @@ export const RECENT_TYPE = {
     CLOUD_SERVICE: 'CLOUD_SERVICE',
     CLOUD_SERVICE_TYPE: 'CLOUD_SERVICE_TYPE',
     COST_ANALYSIS: 'COST_ANALYSIS',
-    ASSET_ANALYSIS: 'ASSET_ANALYSIS',
+    METRIC_EXPLORER: 'METRIC_EXPLORER',
 } as const;
 export type RecentType = typeof RECENT_TYPE[keyof typeof RECENT_TYPE];
 export const recentNSearchTabMap = {
@@ -22,7 +22,7 @@ export const recentNSearchTabMap = {
     cloudService: RECENT_TYPE.CLOUD_SERVICE,
     cloudServiceType: RECENT_TYPE.CLOUD_SERVICE_TYPE,
     costAnalysis: RECENT_TYPE.COST_ANALYSIS,
-    assetAnalysis: RECENT_TYPE.ASSET_ANALYSIS,
+    metricExplorer: RECENT_TYPE.METRIC_EXPLORER,
 } as const;
 
 export type RecentItem = UserConfigModel<{

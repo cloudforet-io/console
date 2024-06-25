@@ -33,7 +33,7 @@ const handleSelectOperator = async (operator: Operator) => {
 <template>
     <div class="asset-analysis-operator-dropdown">
         <p-select-dropdown :menu="state.operatorItems"
-                           :selection-label="$t('INVENTORY.ASSET_ANALYSIS.OPERATOR')"
+                           :selection-label="$t('INVENTORY.METRIC_EXPLORER.OPERATOR')"
                            style-type="rounded"
                            :selected="assetAnalysisPageState.selectedOperator"
                            class="operator-dropdown"

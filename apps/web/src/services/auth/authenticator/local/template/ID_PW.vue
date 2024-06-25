@@ -5,7 +5,9 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
-import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
+import {
+    PButton, PTextInput, PFieldGroup, PTextButton,
+} from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -99,6 +101,10 @@ const signIn = async () => {
         state.password = '';
     }
 };
+
+const handleClickResetPassword = async () => {
+    await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } });
+};
 </script>
 
 <template>
@@ -131,24 +137,22 @@ const signIn = async () => {
                                   :invalid="invalid"
                                   block
                                   @update:value="checkPassword"
-                                  @keyup.enter="signIn"
+                                  @keydown.prevent.enter="signIn"
                     />
                 </template>
             </p-field-group>
         </form>
         <div class="util-wrapper">
-            <p v-if="state.smtpEnabled"
-               class="reset-pw-button"
+            <p-text-button v-if="state.smtpEnabled"
+                           style-type="highlight"
+                           class="reset-pw-button"
+                           @click="handleClickResetPassword"
             >
-                <router-link id="reset-pw-button"
-                             :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } }"
-                >
-                    {{ $t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
-                </router-link>
-            </p>
+                {{ $t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
+            </p-text-button>
             <p-button style-type="primary"
                       type="submit"
-                      size="lg"
+                      size="md"
                       class="sign-in-btn"
                       :loading="state.loading"
                       @click="signIn"
