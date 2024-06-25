@@ -119,7 +119,7 @@ const state = reactive({
         const baseData = [...state.data?.results ?? []];
         const results = baseData.map((d) => {
             const hasComparisonOption = state.comparisonInfo?.format && state.isComparisonEnabled;
-            const dynamicFieldData = [...d[state.tableDataCriteria] || []];
+            const dynamicFieldData = d[state.tableDataCriteria] ?? [];
             const dynamicFieldDataFilteredByAvailableField = dynamicFieldData.filter((item) => state.availableDataFieldsExceptDateField.includes(item[state.tableDataField]));
             const sortedAndFilteredData = sortBy(
                 dynamicFieldDataFilteredByAvailableField,
