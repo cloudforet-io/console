@@ -26,7 +26,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getDateLabelFormat,
+    getDateLabelFormat, getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
@@ -63,7 +63,7 @@ const state = reactive({
                     if (state.xAxisField === DATE_FIELD.DATE) {
                         return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
                     }
-                    return val;
+                    return getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, val);
                 },
             },
         },
@@ -73,10 +73,22 @@ const state = reactive({
             splitArea: {
                 show: true,
             },
+            axisLabel: {
+                formatter: (val) => {
+                    if (state.yAxisField === DATE_FIELD.DATE) {
+                        return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
+                    }
+                    return getReferenceLabel(props.allReferenceTypeInfo, state.yAxisField, val);
+                },
+            },
         },
         tooltip: {
             position: 'top',
-            valueFormatter: (val) => numberFormatter(val) || '',
+            formatter: (params) => {
+                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.name);
+                const _value = numberFormatter(params.value[2]) || '';
+                return `${params.marker} ${_name}: <b>${_value}</b>`;
+            },
         },
         visualMap: {
             show: state.showLegends,

@@ -24,7 +24,11 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
-import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import {
+    getReferenceLabel,
+    getWidgetBasedOnDate,
+    getWidgetDateRange,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
@@ -51,11 +55,7 @@ const state = reactive({
             valueFormatter: (val) => numberFormatter(val) || '',
         },
         legend: {
-            bottom: 0,
-            left: 0,
-            icon: 'circle',
-            itemWidth: 10,
-            itemHeight: 10,
+            show: false,
         },
         series: [
             {
@@ -136,7 +136,7 @@ const drawChart = (rawData: Data|null) => {
 
     // get chart data
     state.chartData = _refinedData?.map((v) => ({
-        name: v[state.categoryByField],
+        name: getReferenceLabel(props.allReferenceTypeInfo, state.categoryByField, v[state.categoryByField]),
         value: v[state.dataField],
     })) || [];
 

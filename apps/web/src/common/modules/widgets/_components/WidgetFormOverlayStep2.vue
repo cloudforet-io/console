@@ -24,6 +24,10 @@ import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-fi
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+import {
+    useAllReferenceTypeInfoStore,
+} from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -33,7 +37,9 @@ const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
         { label: 'Full', name: 'FULL' },
         { label: 'Actual', name: 'ACTUAL' },
@@ -138,6 +144,7 @@ onUnmounted(() => {
                            :widget-options="widgetGenerateState.widgetValueMap"
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-variables="dashboardDetailState.variables"
+                           :all-reference-type-info="state.allReferenceTypeInfo"
                            mode="overlay"
                 />
                 <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
