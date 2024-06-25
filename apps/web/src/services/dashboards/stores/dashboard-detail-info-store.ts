@@ -186,6 +186,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setProjectId = (projectId?: string) => { state.projectId = projectId; };
     const setTemplateId = (templateId: string) => { state.templateId = templateId; };
     const setTemplateType = (templateType: TemplateType) => { state.templateType = templateType; };
+    const setDashboardLayouts = (layouts: DashboardLayout[]) => { state.dashboardLayouts = layouts; };
     /* Actions */
     const reset = () => {
         // set default value of all state
@@ -415,6 +416,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setDashboardType,
         setDashboardScope,
         setProjectId,
+        setDashboardLayouts,
     };
     const actions = {
         reset,
