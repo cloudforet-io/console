@@ -16,7 +16,6 @@ import type {
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions>>(), {
     widgetFieldSchema: () => ({}),
-    value: () => ({}),
 });
 const emit = defineEmits<WidgetFieldComponentEmit<string | string[]>>();
 const state = reactive({

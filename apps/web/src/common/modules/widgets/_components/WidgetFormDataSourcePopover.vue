@@ -33,6 +33,7 @@ import {
     DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
+import { getCostDataKey } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableDataType, DataTableSourceType, DataTableOperator } from '@/common/modules/widgets/types/widget-model';
 
@@ -205,7 +206,7 @@ const handleConfirmDataSource = async () => {
             data_name: state.selectedCostDataTypeLabel,
             COST: {
                 data_source_id: state.selectedCostDataSourceId,
-                data_key: state.selectedCostDataType,
+                data_key: getCostDataKey(state.selectedCostDataType),
             },
         };
         const assetOptions = {
