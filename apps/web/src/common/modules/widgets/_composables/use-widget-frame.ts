@@ -3,8 +3,9 @@ import { computed, onMounted, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { DataTableGetParameters } from '@/schema/dashboard/public-data-table/api-verbs/get';
+import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -14,7 +15,9 @@ import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_c
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetFrameEmit, WidgetProps, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
-import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
+import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { FullDataLink, WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
@@ -28,16 +31,53 @@ interface OverridableWidgetFrameState {
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 
-const getDataTable = async (dataTableId?: string): Promise<DataTableModel|null> => {
-    if (!dataTableId) return null;
+const listDataTables = async (widgetId?: string): Promise<DataTableModel[]> => {
+    if (!widgetId) return [];
+    const _isPrivate = widgetId.startsWith('private');
+    const _fetcher = _isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<DataTableListParameters, ListResponse<DataTableModel>>
+        : SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>;
     try {
-        return await SpaceConnector.clientV2.dashboard.publicDataTable.get<DataTableGetParameters, DataTableModel>({
-            data_table_id: dataTableId,
+        const { results } = await _fetcher({
+            widget_id: widgetId,
         });
+        return results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
-        return null;
+        return [];
     }
+};
+const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>, dateRange?: DateRange): Location|undefined => {
+    if (dataTable?.source_type === DATA_SOURCE_DOMAIN.COST) {
+        const _costDataSourceId = dataTable?.options?.[DATA_SOURCE_DOMAIN.COST]?.data_source_id;
+        const _granularity = (widgetOptions?.granularity as string) || 'MONTHLY';
+        const _groupBy: string[] = dataTable?.options?.group_by?.map((d) => d.key);
+        const _filter = dataTable?.options?.filter;
+        return {
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: _costDataSourceId ?? '',
+                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+            },
+            query: {
+                granularity: primitiveToQueryString(_granularity),
+                group_by: arrayToQueryString(_groupBy),
+                period: objectToQueryString(dateRange),
+                filters: arrayToQueryString(_filter),
+            },
+        };
+    } if (dataTable?.source_type === DATA_SOURCE_DOMAIN.ASSET) {
+        const _metricId = dataTable?.options?.[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
+        if (_metricId) {
+            return {
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                params: {
+                    metricId: _metricId,
+                },
+            };
+        }
+    }
+    return undefined;
 };
 export const useWidgetFrame = (
     props: UnwrapRef<WidgetProps>,
@@ -57,51 +97,45 @@ export const useWidgetFrame = (
             if (_dateRange?.start) return `${_dateRange.start} ~ ${_dateRange.end}`;
             return _dateRange.end;
         }),
-        dataTable: undefined as DataTableModel|undefined,
+        dataTable: computed<DataTableModel|undefined>(() => _state.dataTables?.find((d) => d.data_table_id === props.dataTableId)),
+        dataTables: [] as DataTableModel[],
         unit: computed<string|undefined>(() => {
             if (!_state.dataTable) return undefined;
-            if (_state.dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) return undefined;
+            if (_state.dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
+                if (_state.dataTable.operator === 'JOIN') {
+                    const _dataTableIds = _state.dataTable?.options?.JOIN?.data_tables ?? [];
+                    const _dataTables = _state.dataTables.filter((d) => _dataTableIds.includes(d.data_table_id));
+                    const _units = _dataTables.map((d) => d.options?.data_unit).filter((d) => d);
+                    return _units.join(', ');
+                }
+                return undefined;
+            }
             return _state.dataTable.options?.data_unit;
         }),
-        fullDataLinkText: computed<string|undefined>(() => {
-            if (!_state.dataTable) return undefined;
-            if (_state.dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) return undefined;
-            return _state.dataTable?.options?.data_name;
-        }),
-        fullDataLocation: computed<Location|undefined>(() => {
-            if (!_state.dataTable) return undefined;
-            if (_state.dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) return undefined;
-            if (_state.dataTable?.source_type === DATA_SOURCE_DOMAIN.COST) {
-                const _costDataSourceId = _state.dataTable?.options?.[DATA_SOURCE_DOMAIN.COST]?.data_source_id;
-                const _granularity = (props.widgetOptions?.granularity as string) || 'MONTHLY';
-                const _period = overrides.dateRange?.value;
-                const _groupBy: string[] = _state.dataTable?.options?.group_by?.map((d) => d.key);
-                const _filter = _state.dataTable?.options?.filter;
-                return {
-                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-                    params: {
-                        dataSourceId: _costDataSourceId ?? '',
-                        costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-                    },
-                    query: {
-                        granularity: primitiveToQueryString(_granularity),
-                        group_by: arrayToQueryString(_groupBy),
-                        period: objectToQueryString(_period),
-                        filters: arrayToQueryString(_filter),
-                    },
-                };
-            } if (_state.dataTable?.source_type === DATA_SOURCE_DOMAIN.ASSET) {
-                const _metricId = _state.dataTable?.options?.[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
-                if (_metricId) {
-                    return {
-                        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-                        params: {
-                            metricId: _metricId,
-                        },
-                    };
+        fullDataLinkList: computed<FullDataLink[]>(() => {
+            if (!_state.dataTable) return [];
+            if (_state.dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
+                if (_state.dataTable.operator === 'JOIN') {
+                    const _dataTableIds = _state.dataTable?.options?.JOIN?.data_tables ?? [];
+                    const _dataTables = _state.dataTables.filter((d) => _dataTableIds.includes(d.data_table_id));
+                    const _result: FullDataLink[] = [];
+                    _dataTables.forEach((d) => {
+                        const _location = getFullDataLocation(d, props.widgetOptions, overrides.dateRange?.value);
+                        if (_location) {
+                            _result.push({
+                                name: d.options?.data_name,
+                                location: _location,
+                            });
+                        }
+                    });
+                    return _result;
                 }
+                return [];
             }
-            return undefined;
+            return [{
+                name: _state.dataTable?.options?.data_name,
+                location: getFullDataLocation(_state.dataTable, props.widgetOptions, overrides.dateRange?.value),
+            }];
         }),
     });
     const widgetFrameProps = computed<WidgetFrameProps>(() => ({
@@ -119,8 +153,7 @@ export const useWidgetFrame = (
         width: props.width,
         basedOnText: _state.basedOnText,
         unit: _state.unit,
-        fullDataLinkText: _state.fullDataLinkText,
-        fullDataLocation: _state.fullDataLocation,
+        fullDataLinkList: _state.fullDataLinkList,
     }));
 
     const widgetFrameEventHandlers = {
@@ -139,7 +172,7 @@ export const useWidgetFrame = (
     };
 
     onMounted(async () => {
-        _state.dataTable = await getDataTable(props.dataTableId);
+        _state.dataTables = await listDataTables(props.widgetId);
     });
 
     return { widgetFrameProps, widgetFrameEventHandlers };
