@@ -32,12 +32,11 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import NoticeWorkspaceDropdown from '@/services/info/components/NoticeWorkspaceDropdown.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
-import type { WorkspaceDropdownMenuItem } from '@/services/info/types/notice-type';
+import type { NoticeFormType, WorkspaceDropdownMenuItem } from '@/services/info/types/notice-type';
 
 interface Props {
     type?: NoticeFormType;
 }
-type NoticeFormType = 'CREATE' | 'EDIT';
 
 const props = withDefaults(defineProps<Props>(), {
     type: 'CREATE',
@@ -207,6 +206,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                     </p-radio-group>
                     <notice-workspace-dropdown v-if="workspaceState.selectedRadioIdx === 1"
                                                :selected-items.sync="workspaceState.selectedItems"
+                                               :type="props.type"
                     />
                 </p-field-group>
                 <p-field-group class="notice-label-wrapper"
