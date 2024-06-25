@@ -23,7 +23,7 @@ interface ParentGroupItem {
 interface UseProjectTreeDataReturnType {
     treeData: Ref<TreeNode[]>;
     treeDisplayMap: Ref<TreeDisplayMap>;
-    parentGroupitems: Ref<ParentGroupItem[]>;
+    parentGroupItems: Ref<ParentGroupItem[]>;
     fetchData: (item: TreeNode) => void;
     setSelectedNodeId: (id: string) => void;
 }
@@ -59,7 +59,7 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
         }))),
         treeData: [] as TreeNode[],
         selectedTreeNodeId: '',
-        parentGroupitems: [] as ParentGroupItem[],
+        parentGroupItems: [] as ParentGroupItem[],
     });
     const fetchProjectGroupList = (parentGroupId?: string): ProjectDataType[] => state.projectGroupData.filter((projectGroup) => projectGroup.parentGroupId === parentGroupId);
     const fetchProjectList = (parentGroupId?: string): ProjectDataType[] => state.projectData.filter((project) => project.parentGroupId === parentGroupId);
@@ -101,7 +101,7 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
         });
 
         // Set parent group paths, when selecting current group item. For breadcrumbs
-        state.parentGroupitems = openPaths.map((id) => ({
+        state.parentGroupItems = openPaths.map((id) => ({
             name: storeState.projectGroup[id].name,
             id,
         }));
@@ -173,7 +173,7 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
         await allReferenceStore.load('project');
     });
 
-    // Whenever loading, creating or changing Proejct/ProjectGroup, update initial treeData
+    // Whenever loading, creating or changing Project/ProjectGroup, update initial treeData
     watch([() => storeState.projectGroup, () => storeState.project], () => {
         init();
     }, { immediate: true });
@@ -186,7 +186,7 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
     return {
         treeData: toRef(state, 'treeData'),
         treeDisplayMap: toRef(projectTreeState, 'treeDisplayMap'),
-        parentGroupitems: toRef(state, 'parentGroupitems'),
+        parentGroupItems: toRef(state, 'parentGroupItems'),
         fetchData,
         setSelectedNodeId,
     };

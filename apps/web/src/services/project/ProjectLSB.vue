@@ -23,7 +23,7 @@ import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRoute
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
-import { gray, indigo, peacock } from '@/styles/colors';
+import { indigo, peacock } from '@/styles/colors';
 
 import ProjectMainTree from '@/services/project/components/ProjectMainTree.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
@@ -44,7 +44,6 @@ const storeState = reactive({
     favoriteItems: computed(() => favoriteGetters.favoriteMenuList.filter((favoriteMenu) => {
         if (favoriteMenu.itemType === FAVORITE_TYPE.PROJECT) return true;
         if (favoriteMenu.itemType === FAVORITE_TYPE.PROJECT_GROUP) return true;
-        if (favoriteMenu.itemType === FAVORITE_TYPE.DASHBOARD && favoriteMenu.itemId.startsWith('project-')) return true;
         return false;
     })),
     currentWorkspaceId: computed(() => workspaceStoreGetters.currentWorkspaceId as string),
@@ -54,19 +53,7 @@ const state = reactive({
     projectKeyword: '',
     currentPath: computed(() => route.fullPath),
     starredMenuItems: computed<LSBItem[]>(() => storeState.favoriteItems.map((d) => {
-        if (d.itemType === FAVORITE_TYPE.DASHBOARD) {
-            return {
-                type: MENU_ITEM_TYPE.ITEM,
-                label: d.label,
-                id: d.name,
-                icon: { name: 'ic_service_dashboard', color: gray[600] },
-                to: getProperRouteLocation({
-                    name: PROJECT_ROUTE.DETAIL._NAME,
-                    params: { id: d.itemId },
-                }),
-                favoriteOptions: { type: FAVORITE_TYPE.DASHBOARD, id: d.name },
-            };
-        } if (d.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
+        if (d.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
             return {
                 type: MENU_ITEM_TYPE.ITEM,
                 label: d.label,
@@ -85,7 +72,7 @@ const state = reactive({
             id: d.name,
             icon: { name: 'ic_document-filled', color: peacock[600] },
             to: getProperRouteLocation({
-                name: PROJECT_ROUTE.DETAIL._NAME,
+                name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
                 params: { id: d.itemId },
             }),
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: d.name },

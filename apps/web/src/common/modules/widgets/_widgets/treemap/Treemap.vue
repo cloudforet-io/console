@@ -132,7 +132,7 @@ const drawChart = (rawData: Data|null) => {
         [state.categoryByField]: 'etc',
         [state.dataField]: _etcValue,
     } : {};
-    const _refinedData = [..._slicedData, _etcData];
+    const _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
 
     // get chart data
     state.chartData = _refinedData?.map((v) => ({
