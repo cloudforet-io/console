@@ -1,8 +1,37 @@
-// Configurations
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 
+import {
+    gray, red, yellow,
+} from '@/styles/colors';
+
+export const NOTIFY_LEVEL = {
+    CRITICAL: 'CRITICAL',
+    MAJOR: 'MAJOR',
+    MODERATE: 'MODERATE',
+    MINOR: 'MINOR',
+    INFO: 'INFO',
+} as const;
+export const NOTIFY_LEVEL_MAP = {
+    CRITICAL: {
+        name: NOTIFY_LEVEL.CRITICAL, label: 'Critical', color: red[600], icon: 'ic_warning-filled',
+    },
+    MAJOR: {
+        name: NOTIFY_LEVEL.MAJOR, label: 'Major', color: red[400], icon: 'ic_warning-filled',
+    },
+    MODERATE: {
+        name: NOTIFY_LEVEL.MODERATE, label: 'Moderate', color: yellow[500], icon: 'ic_warning-filled',
+    },
+    MINOR: {
+        name: NOTIFY_LEVEL.MINOR, label: 'Minor', color: gray[400], icon: 'ic_warning-filled',
+    },
+    INFO: {
+        name: NOTIFY_LEVEL.INFO, label: 'Info', color: gray[400], icon: 'ic_error-filled',
+    },
+} as const;
+
+// Configurations
 export const DETECTION_CONFIGURATION_HANDLERS = {
     keyItemSets: [
         {
@@ -176,7 +205,7 @@ export const HISTORY_TEMP_DATA = [
         config_id: 'Configuration 14Configuration 14Configuration 14',
         policy: '급격한 변화 탐지',
         data_source: 'aws',
-        level: 'critical',
+        level: 'CRITICAL',
         detected_at: '2021-09-01 12:00:00',
     },
     {
@@ -185,7 +214,7 @@ export const HISTORY_TEMP_DATA = [
         config_id: 'Configuration 14',
         policy: '급격한 변화 탐지',
         data_source: 'google_cloud',
-        level: 'info',
+        level: 'INFO',
         detected_at: '2021-09-01 12:00:00',
     },
     {
@@ -194,7 +223,7 @@ export const HISTORY_TEMP_DATA = [
         config_id: 'Configuration 14',
         policy: '급격한 변화 탐지',
         data_source: 'google_cloud',
-        level: 'warning',
+        level: 'MAJOR',
         detected_at: '2021-09-01 12:00:00',
     },
 ];
