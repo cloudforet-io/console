@@ -75,7 +75,7 @@ const state = reactive({
     listQueryOptions: computed<Partial<Record<ManagedVariableModelKey, any>>>(() => ({
         cost_data_source: costAnalysisPageGetters.selectedDataSourceId,
     })),
-    selectedItemsMap: getInitialSelectedItemsMap() as Record<string, SelectDropdownMenuItem[]>,
+    selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
         state.enabledFilters.forEach(({ name }) => {
@@ -127,7 +127,7 @@ const initSelectedFilters = () => {
     const _filters = costAnalysisPageState.filters;
     const _selectedItemsMap = {};
     Object.keys(_filters ?? {}).forEach((groupBy) => {
-        _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d })) ?? [];
+        _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d, label: d })) ?? [];
         if (costAnalysisPageState.enabledFiltersProperties?.indexOf(groupBy) === -1) {
             costAnalysisPageStore.setEnabledFiltersProperties([
                 ...(costAnalysisPageState.enabledFiltersProperties ?? []),
