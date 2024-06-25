@@ -1,8 +1,12 @@
 <script setup lang="ts">
 
+import { computed, reactive } from 'vue';
+
 import { PI } from '@spaceone/design-system';
 
 import type { Currency } from '@/store/modules/settings/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -27,9 +31,22 @@ interface Props {
   totalInfo?: TotalValue;
 }
 const props = defineProps<Props>();
+const allReferenceStore = useAllReferenceStore();
+
+const storeState = reactive({
+    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    workspace: computed(() => allReferenceStore.getters.workspace),
+    region: computed(() => allReferenceStore.getters.region),
+});
+
+const getField = (field: TableWidgetField) => {
+    if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.reference) return storeState[field.fieldInfo.reference][field.label]?.name || '-';
+    return field.label || field.name;
+};
 
 const getValue = (item: TableDataItem, field: TableWidgetField) => {
     if (field.fieldInfo?.type === 'labelField') {
+        if (field.name === 'Project') return storeState.project[item[field.name]]?.name || '-';
         return item[field.name] || '-';
     }
     if (props.fieldType === 'staticField') {
@@ -104,7 +121,7 @@ const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): {
                               }"
                         >
                             <span class="th-text">
-                                {{ field.label ? field.label : field.name }}
+                                {{ getField(field) }}
                             </span>
                             <p-i v-if="field.fieldInfo?.additionalType === 'comparison'"
                                  class="comparison-info"
