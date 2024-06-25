@@ -127,10 +127,7 @@ watch(() => labelsMenuItem.value, (value) => {
 });
 
 watch(() => state.menuItems, (menuItems) => {
-    if (!Array.isArray(menuItems)) {
-        console.log('menuItems is not array', menuItems);
-        return;
-    }
+    if (!Array.isArray(menuItems)) return;
     const isIncludedInMenuItems = (data: string[]|string):boolean => {
         if (Array.isArray(data)) {
             return data.every((d) => menuItems.some((m) => m.name === d));
