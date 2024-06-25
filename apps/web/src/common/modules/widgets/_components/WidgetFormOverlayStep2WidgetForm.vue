@@ -14,6 +14,7 @@ import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
@@ -61,17 +62,23 @@ const updateWidget = async (dataTableId: string) => {
     const fetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
         : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
-    await fetcher({
-        widget_id: widgetGenerateState.widgetId,
-        widget_type: widgetGenerateState.selectedWidgetName,
-        data_table_id: dataTableId,
-    });
+    try {
+        await fetcher({
+            widget_id: widgetGenerateState.widgetId,
+            widget_type: widgetGenerateState.selectedWidgetName,
+            data_table_id: dataTableId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
 /* Event */
-const handleSelectDataTable = (dataTableId: string) => {
+const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    updateWidget(dataTableId);
+    await updateWidget(dataTableId);
+    widgetGenerateStore.setWidgetValueMap({});
+    widgetGenerateStore.setWidgetValidMap({});
 };
 
 const checkDefaultValidation = () => {
