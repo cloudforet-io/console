@@ -205,7 +205,11 @@ onUnmounted(() => {
         <div v-if="state.isHeaderVisible"
              class="top-wrapper"
         >
-            <p-pane-layout>
+            <p-icon-button class="back-button"
+                           name="ic_arrow-left"
+                           @click="router.go(-1)"
+            />
+            <p-pane-layout class="flex-grow">
                 <div class="header-container">
                     <div class="title-wrapper">
                         <p-i name="ic_document-filled"
@@ -291,6 +295,9 @@ onUnmounted(() => {
     margin-top: -0.25rem;
 }
 .top-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     .header-container {
         @apply flex gap-4 items-center;
         padding: 0.75rem 1rem;
