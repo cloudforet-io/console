@@ -73,7 +73,7 @@ const getAfterCallApiMap = () => ({
     '/identity/project-group/delete': () => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.load('project_group');
+        allReferenceStore.load('project_group', { force: true });
     },
     '/identity/project-group/change-parent-group': (data) => {
         useAllReferenceStore(pinia);
