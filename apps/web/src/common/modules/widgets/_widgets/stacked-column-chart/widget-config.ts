@@ -18,7 +18,7 @@ const stackedColumnChart: WidgetConfig = {
             options: {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 10,
-                max: 12,
+                max: 31,
             },
         },
         stackBy: {

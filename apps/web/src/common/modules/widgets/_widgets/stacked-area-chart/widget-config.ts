@@ -18,7 +18,7 @@ const stackedAreaChart: WidgetConfig = {
             options: {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
-                max: 10,
+                max: 31,
             },
         },
         lineBy: {

@@ -167,7 +167,7 @@ const drawChart = (rawData: Data|null) => {
             acc.value += v.value;
             return acc;
         }, { value: 0 });
-        const _values = [..._slicedData, _etcData];
+        const _values = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
         _values.forEach((v) => {
             _slicedByLineBy.push({
                 [state.xAxisField]: d[state.xAxisField],

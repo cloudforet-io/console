@@ -18,7 +18,7 @@ const clusteredColumnChart: WidgetConfig = {
             options: {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
-                max: 8,
+                max: 31,
             },
         },
     },
