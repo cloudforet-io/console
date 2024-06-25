@@ -2685,8 +2685,9 @@
 		"NOTICE": {
 			"ALL_WORKSPACE": "All Workspaces",
 			"DETAIL": {
+				"ALT_E_SEND_EMAIL": "Fail to sent email",
 				"ALT_S_SENDING": "Sending email",
-				"ALT_S_SEND_EMAIL": "An email has been sent",
+				"ALT_S_SEND_EMAIL": "Successfully sent email",
 				"BACK_TO_LIST": "Back to List",
 				"DETAIL_TITLE": "Notice Detail",
 				"SHOW_ALL_WORKSPACES": "Show All Workspaces"

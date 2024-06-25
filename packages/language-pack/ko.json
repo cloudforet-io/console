@@ -2685,8 +2685,9 @@
 		"NOTICE": {
 			"ALL_WORKSPACE": "전체 워크스페이스",
 			"DETAIL": {
+				"ALT_E_SEND_EMAIL": "",
 				"ALT_S_SENDING": "",
-				"ALT_S_SEND_EMAIL": "이메일 발송 완료",
+				"ALT_S_SEND_EMAIL": "",
 				"BACK_TO_LIST": "목록",
 				"DETAIL_TITLE": "상세 내용 확인",
 				"SHOW_ALL_WORKSPACES": ""

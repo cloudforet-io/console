@@ -12,7 +12,12 @@ import type { PostSendParameters } from '@/schema/board/post/api-verbs/send';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { hideLoadingMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import {
+    hideLoadingMessage,
+    showErrorMessage,
+    showLoadingMessage,
+    showSuccessMessage,
+} from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -83,6 +88,7 @@ const handleClickSendEmail = async () => {
         showSuccessMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SEND_EMAIL'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
+        showErrorMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_E_SEND_EMAIL'), e);
     }
 };
 
