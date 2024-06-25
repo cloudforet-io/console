@@ -1,12 +1,13 @@
 <script setup lang="ts">
 
-import { PDataLoader } from '@spaceone/design-system';
+import { PDataLoader, PI } from '@spaceone/design-system';
 
 import type { Currency } from '@/store/modules/settings/type';
 
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
-import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { TableDataFieldValue, ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 interface Props {
@@ -19,22 +20,58 @@ interface Props {
   fieldType: TableDataFieldValue['fieldType'];
   criteria?: string;
   dataField?: string|string[];
+  comparisonInfo?: ComparisonValue;
 }
 const props = defineProps<Props>();
 
-const getValue = (item: any, field: TableWidgetField) => {
+const getValue = (item: TableDataItem, field: TableWidgetField) => {
     if (field.fieldInfo?.type === 'labelField') {
         return item[field.name] || '-';
     }
     if (props.fieldType === 'staticField') {
-        return item[field.name] || '-';
+        const itemValue = item[field.name];
+        if (field.fieldInfo?.additionalType === 'comparison') {
+            const targetValue = itemValue?.target ?? 0;
+            const subjectValue = itemValue?.subject ?? 0;
+            const fixedValue = Math.abs(targetValue - subjectValue);
+            const percentageValue = fixedValue / (targetValue || 1) * 100;
+            if (props.comparisonInfo?.format === 'fixed') return fixedValue;
+            if (props.comparisonInfo?.format === 'percent') return `${percentageValue}%`;
+            if (props.comparisonInfo?.format === 'all') return `${fixedValue} (${percentageValue}%)`;
+            return '-';
+        }
+        return itemValue || '-';
     }
     if (props.fieldType === 'dynamicField') {
         const dynamicData = item[props.criteria || ''] ?? [];
         const dynamicDataItem = dynamicData.find((data) => data[props.dataField as string] === field.name);
+        if (field.fieldInfo?.additionalType === 'comparison') {
+            const targetValue = dynamicDataItem?.value?.target ?? 0;
+            const subjectValue = dynamicDataItem?.value?.subject ?? 0;
+            const fixedValue = Math.abs(targetValue - subjectValue);
+            const percentageValue = fixedValue / (targetValue || 1) * 100;
+            if (props.comparisonInfo?.format === 'fixed') return fixedValue;
+            if (props.comparisonInfo?.format === 'percent') return `${percentageValue}%`;
+            if (props.comparisonInfo?.format === 'all') return `${fixedValue} (${percentageValue}%)`;
+            return '-';
+        }
         return dynamicDataItem?.value || 0;
     }
-    return '';
+    return '-';
+};
+const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField) => {
+    if (props.fieldType === 'staticField') {
+        const subtraction = (item?.[field.name]?.target ?? 0) - (item?.[field.name]?.subject ?? 0);
+        if (subtraction > 0) return 'ic_arrow-up-bold-alt';
+        if (subtraction < 0) return 'ic_arrow-down-bold-alt';
+    } else {
+        const dynamicData = item[props.criteria || ''] ?? [];
+        const dynamicDataItem = dynamicData.find((data) => data[props.dataField as string] === field.name);
+        const subtraction = (dynamicDataItem?.value?.target ?? 0) - (dynamicDataItem?.value?.subject ?? 0);
+        if (subtraction > 0) return 'ic_arrow-up-bold-alt';
+        if (subtraction < 0) return 'ic_arrow-down-bold-alt';
+    }
+    return undefined;
 };
 </script>
 
@@ -67,6 +104,12 @@ const getValue = (item: any, field: TableWidgetField) => {
                                     <span class="th-text">
                                         {{ field.label ? field.label : field.name }}
                                     </span>
+                                    <p-i v-if="field.fieldInfo?.additionalType === 'comparison'"
+                                         class="comparison-info"
+                                         name="ic_info-circle"
+                                         width="0.875rem"
+                                         height="0.875rem"
+                                    />
                                 </span>
                             </th>
                         </tr>
@@ -91,6 +134,12 @@ const getValue = (item: any, field: TableWidgetField) => {
                                       }"
                                 >
                                     <span class="common-text-box">{{ getValue(item, field) }}</span>
+                                    <p-i v-if="field.fieldInfo?.additionalType === 'comparison' && getComparisonValueIcon(item, field)"
+                                         :name="getComparisonValueIcon(item, field)"
+                                         class="comparison-icon"
+                                         width="0.75rem"
+                                         height="0.75rem"
+                                    />
                                 </span>
                             </td>
                         </tr>
@@ -103,14 +152,15 @@ const getValue = (item: any, field: TableWidgetField) => {
 
 <style scoped lang="postcss">
 .widget-data-table {
-    @apply bg-white overflow-auto h-full w-full;
-    height: 100%;
-    overflow-y: scroll;
+    @apply bg-white h-full w-full;
+    max-width: 81.5rem;
+    overflow: scroll;
 
     table {
         @apply min-w-full;
         border-collapse: separate;
         border-spacing: 0;
+        padding: 0 1rem 1rem 0;
     }
 
     th {
@@ -118,7 +168,7 @@ const getValue = (item: any, field: TableWidgetField) => {
         border-bottom-width: 0.225rem;
         font-weight: 500;
         height: 1.75rem;
-        min-width: 8rem;
+        min-width: 7.5rem;
         padding: 0.1875rem 0.5rem;
 
         &.last-label {
@@ -126,18 +176,16 @@ const getValue = (item: any, field: TableWidgetField) => {
         }
 
         .th-contents {
-            @apply flex justify-between pl-4;
+            @apply flex items-center pl-4 gap-1;
+            .comparison-info {
+                min-width: 0.875rem;
+            }
 
             &.data-field {
                 @apply justify-end;
             }
             &.sub-total {
                 @apply font-bold text-gray-700;
-            }
-        }
-        &:last-child {
-            .th-contents:not(.has-icon) {
-                padding-right: 1rem;
             }
         }
     }
@@ -164,9 +212,10 @@ const getValue = (item: any, field: TableWidgetField) => {
     }
 
     td {
-        @apply z-0 align-middle min-w-28 text-sm;
+        @apply z-0 align-middle text-label-sm text-gray-900;
         height: 1.75rem;
         padding: 0.1875rem 0.5rem;
+        min-width: 7.5rem;
 
         &:hover {
             @apply bg-gray-200;
@@ -184,8 +233,11 @@ const getValue = (item: any, field: TableWidgetField) => {
         }
 
         .td-contents {
-            @apply flex justify-between pl-4;
+            @apply flex items-center pl-4 gap-1;
             width: 100%;
+            .comparison-icon {
+                min-width: 0.75rem;
+            }
 
             &.data-field {
                 @apply justify-end;
