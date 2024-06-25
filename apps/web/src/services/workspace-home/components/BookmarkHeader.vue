@@ -251,7 +251,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                             />
                         </div>
                     </template>
-                    <template v-if="storeState.isFileFullMode && !state.isMobileSize"
+                    <template v-if="storeState.isFileFullMode && !state.isMobileSize && !(state.selectedToolId === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)"
                               #right
                     >
                         <div class="title-right-wrapper">
@@ -356,7 +356,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                         </p-context-menu>
                     </div>
                 </div>
-                <div v-if="!state.isMobileSize"
+                <div v-if="!state.isMobileSize && !(state.selectedToolId === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)"
                      class="file-extra-wrapper"
                 >
                     <p-divider v-if="props.bookmarkFolderList.length > 0"

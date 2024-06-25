@@ -22,8 +22,10 @@ import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
 import { blue, gray } from '@/styles/colors';
 
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
+import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     boardList: BookmarkItem[];
@@ -52,6 +54,7 @@ const storeState = reactive({
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
+    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
@@ -159,7 +162,7 @@ const checkSelectedId = (id?: string) => {
                           @click="handleClickItem(item)"
             >
                 <template #content>
-                    <p-checkbox v-if="!storeState.isWorkspaceMember && (props.isFullMode && !item.icon)"
+                    <p-checkbox v-if="!(storeState.bookmarkType === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember) && (props.isFullMode && !item.icon)"
                                 :value="true"
                                 :selected="checkSelectedId(item.id)"
                                 @change="handleClickCheckBox(item)"
@@ -222,7 +225,7 @@ const checkSelectedId = (id?: string) => {
                         </p>
                     </div>
                 </template>
-                <template v-if="!storeState.isWorkspaceMember"
+                <template v-if="!(storeState.bookmarkType === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)"
                           #overlay-content
                 >
                     <p-select-dropdown v-if="!item.icon"

@@ -172,7 +172,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 });
                 if (status === 'succeed') {
                     if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE && isEmpty(response)) {
-                        console.log('default');
                         await actions.createDefaultBookmark();
                         return;
                     }
@@ -209,10 +208,13 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         createBookmarkFolder: async (name: string) => {
             try {
                 let fetcher;
+                let resource_group: undefined|string;
                 if (state.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.set);
+                    resource_group = undefined;
                 } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.set);
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.create);
+                    resource_group = 'WORKSPACE';
                 }
                 const { status } = await fetcher({
                     name: `console:bookmark:${name}`,
@@ -220,6 +222,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         workspaceId: _getters.currentWorkspaceId,
                         name,
                     },
+                    resource_group,
                 });
                 if (status === 'succeed') {
                     await actions.fetchBookmarkFolderList();

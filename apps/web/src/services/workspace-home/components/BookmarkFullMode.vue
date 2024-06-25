@@ -8,7 +8,9 @@ import { i18n } from '@/translations';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList: BookmarkItem[];
@@ -26,6 +28,7 @@ const bookmarkState = bookmarkStore.state;
 const storeState = reactive({
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
     folderBoardSets: computed<BookmarkItem[]>(() => {
@@ -41,7 +44,7 @@ const state = reactive({
                 id: 'add-link',
             },
         ];
-        if (!storeState.isWorkspaceMember) {
+        if (!(storeState.bookmarkType === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)) {
             return [
                 ...defaultFolderItem,
                 ...props.bookmarkFolderList,
@@ -55,7 +58,7 @@ const state = reactive({
 
 <template>
     <div class="bookmark-full-mode">
-        <bookmark-board v-if="!storeState.isWorkspaceMember && !storeState.isFileFullMode"
+        <bookmark-board v-if="!storeState.isFileFullMode"
                         :board-list="state.folderBoardSets"
                         is-folder-board
                         is-full-mode
