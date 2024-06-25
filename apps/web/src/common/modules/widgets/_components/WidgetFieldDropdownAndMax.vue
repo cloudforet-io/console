@@ -134,4 +134,9 @@ onMounted(() => {
         }
     }
 }
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
+}
 </style>

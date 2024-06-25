@@ -262,9 +262,14 @@ onMounted(() => {
 /* custom design-system component - p-field-group */
 :deep(.p-field-group) {
     .p-field-title {
-        .title-wrapper .title {
-            display: flex;
-            align-items: center;
+        .title-wrapper {
+            width: 100%;
+            .title {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
         }
         .toggle-button {
             margin-left: 0.25rem;
