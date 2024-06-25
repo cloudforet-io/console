@@ -13,6 +13,10 @@ import { union } from 'lodash';
 
 import type { Page } from '@/schema/_common/type';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+
+import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import { gray, white } from '@/styles/colors';
@@ -29,6 +33,7 @@ interface PreviewTableField {
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
+const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     previewData: computed(() => widgetGenerateState.previewData),
@@ -36,6 +41,10 @@ const storeState = reactive({
     selectedDataTable: computed(() => widgetGenerateGetters.selectedDataTable),
     loading: computed(() => widgetGenerateState.dataTableLoadLoading),
     dataTableUpdating: computed(() => widgetGenerateState.dataTableUpdating),
+    // reference
+    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    workspace: computed(() => allReferenceStore.getters.workspace),
+    region: computed(() => allReferenceStore.getters.region),
 });
 
 const state = reactive({
@@ -119,6 +128,15 @@ const sortFields = (fields: string[]) => {
         return union(separate, fields.filter((item) => !separate.includes(item)));
     }
     return fields;
+};
+
+const getValue = (item, field: PreviewTableField) => {
+    if (field.type === 'LABEL' && Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
+        const referenceKey = REFERENCE_FIELD_MAP[field.name];
+        const referenceValueKey = item[field.name];
+        return storeState[referenceKey][referenceValueKey]?.name ?? '-';
+    }
+    return item[field.name] ?? '-';
 };
 
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
@@ -232,7 +250,7 @@ watch(() => state.sortBy, async () => {
                             <span v-else
                                   :class="{'td-contents': true, 'data-field': field.type === 'DATA'}"
                             >
-                                {{ item[field.name] ?? '-' }}
+                                {{ getValue(item, field) }}
                             </span>
                         </td>
                     </tr>
