@@ -11,6 +11,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
@@ -18,6 +19,9 @@ const DEFAULT_COUNT = 5;
 const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions>>(), {
 });
 const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
+
+const { labelsMenuItem } = useGranularityMenuItem(props, 'tableDataField');
+
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
     fieldTypeMenuItems: computed<MenuItem[]>(() => [
@@ -36,13 +40,9 @@ const state = reactive({
     multiSelectable: computed(() => state.selectedFieldType === 'staticField'),
     menuItems: computed<MenuItem[]>(() => {
         if (!props.dataTable) return [];
-        return state.selectedFieldType === 'dynamicField' ? state.labelInfoMenuItems : state.dataInfoMenuItems;
+        return state.selectedFieldType === 'dynamicField' ? labelsMenuItem : state.dataInfoMenuItems;
     }),
     dataInfoMenuItems: computed<MenuItem[]>(() => Object.keys(props.dataTable?.data_info ?? {}).map((d) => ({
-        name: d,
-        label: d,
-    }))),
-    labelInfoMenuItems: computed<MenuItem[]>(() => Object.keys(props.dataTable?.labels_info ?? {}).map((d) => ({
         name: d,
         label: d,
     }))),
@@ -120,7 +120,14 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
     label: d,
 }));
 
+watch(() => labelsMenuItem.value, (value) => {
+    if (!(value.find((d) => d.name === state.selectedItem)) && (state.selectedFieldType === 'dynamicField')) {
+        state.selectedItem = undefined;
+    }
+});
+
 watch(() => state.menuItems, (menuItems) => {
+    if (!Array.isArray(menuItems)) return;
     const isIncludedInMenuItems = (data: string[]|string):boolean => {
         if (Array.isArray(data)) {
             return data.every((d) => menuItems.some((m) => m.name === d));
