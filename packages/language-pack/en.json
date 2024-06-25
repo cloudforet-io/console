@@ -1717,7 +1717,8 @@
 			"PERIOD_THIS_MONTH": "This month",
 			"REFRESH": "Auto Refresh",
 			"SELECT_MONTH": "Select Month",
-			"SET_HOME": "Set as Home Dashboard"
+			"SET_HOME": "Set as Home Dashboard",
+			"SHARE": "Share"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",
