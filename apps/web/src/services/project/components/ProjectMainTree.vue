@@ -23,7 +23,7 @@ import type { TreeNode } from '@/services/project/tree/type';
 const {
     treeData,
     treeDisplayMap,
-    parentGroupitems,
+    parentGroupItems,
     fetchData,
     setSelectedNodeId,
 } = useProjectTreeData();
@@ -35,7 +35,7 @@ const state = reactive({
     projectTreeData: computed<TreeNode[]>(() => treeData.value),
     selectedTreeId: undefined as string|undefined,
     projectGroupNavigation: computed<Breadcrumb[]>(() => {
-        const allPaths = parentGroupitems.value.map((item) => ({
+        const allPaths = parentGroupItems.value.map((item) => ({
             name: item.name,
             to: {
                 name: PROJECT_ROUTE._NAME,
