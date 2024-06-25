@@ -6,10 +6,14 @@ import type {
 
 export interface PrivateDashboardCreateParameters {
     name: string;
+    description?: string;
     layouts?: DashboardLayout[];
-    variables?: DashboardVariables;
     options?: DashboardOptions;
+    vars?: Record<string, any>;
+    variables?: DashboardVariables;
     variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;
+    folder_id?: string;
+    workspace_id?: string;
 }

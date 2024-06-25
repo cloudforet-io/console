@@ -7,13 +7,16 @@ import type {
 
 export interface PublicDashboardCreateParameters {
     name: string;
+    description?: string;
     layouts?: DashboardLayout[];
-    variables?: DashboardVariables;
     options?: DashboardOptions;
+    vars?: Record<string, any>;
+    variables?: DashboardVariables;
     variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;
-    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
+    folder_id?: string;
     workspace_id?: string;
+    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
     project_id?: string;
 }
