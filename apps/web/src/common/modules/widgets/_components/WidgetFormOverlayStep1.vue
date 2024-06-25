@@ -186,7 +186,7 @@ onMounted(() => {
             .gradation-top-area {
                 @apply absolute;
                 width: 100%;
-                height: 1.5rem;
+                height: 1.25rem;
                 top: 0;
                 background: linear-gradient(180deg, theme('colors.gray.150') 0%, rgba(247, 247, 247, 0) 100%);
                 z-index: 1;
