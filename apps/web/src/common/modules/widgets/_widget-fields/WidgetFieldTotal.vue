@@ -29,7 +29,7 @@ const handleUpdateValue = (value: boolean) => {
     } else {
         state.proxyValue = {
             ...state.proxyValue,
-            value,
+            freeze: value,
         };
     }
     emit('update:value', state.proxyValue);
@@ -37,7 +37,7 @@ const handleUpdateValue = (value: boolean) => {
 const handleUpdateToggle = (value: boolean) => {
     state.proxyValue = {
         toggleValue: value,
-        value: false,
+        freeze: false,
     };
     if (value) emit('update:value', state.proxyValue);
     else {
@@ -54,7 +54,7 @@ onMounted(() => {
     }
     state.proxyValue = {
         toggleValue: props.value.toggleValue ?? props.widgetFieldSchema.options?.toggle ?? false,
-        value: props.value.value ?? props.widgetFieldSchema.options?.default ?? false,
+        freeze: props.value.freeze ?? props.widgetFieldSchema.options?.default ?? false,
     };
 });
 </script>
@@ -70,7 +70,7 @@ onMounted(() => {
         <div v-if="state.proxyValue?.toggleValue"
              class="contents"
         >
-            <p-checkbox :selected="state.proxyValue?.value"
+            <p-checkbox :selected="state.proxyValue?.freeze"
                         @change="handleUpdateValue"
             >
                 {{ $t('COMMON.WIDGETS.TOTAL.DESC') }}

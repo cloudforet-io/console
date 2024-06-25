@@ -1,13 +1,14 @@
 <script setup lang="ts">
 
-import { PDataLoader, PI } from '@spaceone/design-system';
+import { PI } from '@spaceone/design-system';
 
 import type { Currency } from '@/store/modules/settings/type';
 
+import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
-import type { TableDataFieldValue, ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { TableDataFieldValue, ComparisonValue, TotalValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 interface Props {
@@ -20,7 +21,10 @@ interface Props {
   fieldType: TableDataFieldValue['fieldType'];
   criteria?: string;
   dataField?: string|string[];
+  // optional field info
   comparisonInfo?: ComparisonValue;
+  subTotalInfo?: TotalValue;
+  totalInfo?: TotalValue;
 }
 const props = defineProps<Props>();
 
@@ -35,6 +39,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const subjectValue = itemValue?.subject ?? 0;
             const fixedValue = Math.abs(targetValue - subjectValue);
             const percentageValue = fixedValue / (targetValue || 1) * 100;
+            if (fixedValue === 0) return '-';
             if (props.comparisonInfo?.format === 'fixed') return fixedValue;
             if (props.comparisonInfo?.format === 'percent') return `${percentageValue}%`;
             if (props.comparisonInfo?.format === 'all') return `${fixedValue} (${percentageValue}%)`;
@@ -50,6 +55,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const subjectValue = dynamicDataItem?.value?.subject ?? 0;
             const fixedValue = Math.abs(targetValue - subjectValue);
             const percentageValue = fixedValue / (targetValue || 1) * 100;
+            if (fixedValue === 0) return '-';
             if (props.comparisonInfo?.format === 'fixed') return fixedValue;
             if (props.comparisonInfo?.format === 'percent') return `${percentageValue}%`;
             if (props.comparisonInfo?.format === 'all') return `${fixedValue} (${percentageValue}%)`;
@@ -59,17 +65,17 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
     }
     return '-';
 };
-const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField) => {
+const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): { icon: string; color: string; }|undefined => {
     if (props.fieldType === 'staticField') {
         const subtraction = (item?.[field.name]?.target ?? 0) - (item?.[field.name]?.subject ?? 0);
-        if (subtraction > 0) return 'ic_arrow-up-bold-alt';
-        if (subtraction < 0) return 'ic_arrow-down-bold-alt';
+        if (subtraction > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.comparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
+        if (subtraction < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.comparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
     } else {
         const dynamicData = item[props.criteria || ''] ?? [];
         const dynamicDataItem = dynamicData.find((data) => data[props.dataField as string] === field.name);
         const subtraction = (dynamicDataItem?.value?.target ?? 0) - (dynamicDataItem?.value?.subject ?? 0);
-        if (subtraction > 0) return 'ic_arrow-up-bold-alt';
-        if (subtraction < 0) return 'ic_arrow-down-bold-alt';
+        if (subtraction > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.comparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
+        if (subtraction < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.comparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
     }
     return undefined;
 };
@@ -77,83 +83,82 @@ const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField) =>
 
 <template>
     <div class="widget-data-table">
-        <p-data-loader class="table-container"
-                       :loading="props.loading"
-                       :data="props.items"
-                       :loader-backdrop-opacity="1"
-                       disable-empty-case
-        >
-            <template #default>
-                <table ref="tableRef">
-                    <thead>
-                        <tr>
-                            <th v-for="(field, fieldColIndex) in props.fields"
-                                :key="`th-${props.widgetId}-${fieldColIndex}`"
-                                :style="{
-                                    minWidth: field.width || undefined,
-                                    width: field.width || undefined,
-                                }"
-                                :class="{'last-label': fieldColIndex === props.fields.filter((_field) => _field.fieldInfo?.type === 'labelField').length - 1}"
-                            >
-                                <span class="th-contents"
-                                      :class="{
-                                          'data-field': field.fieldInfo?.type === 'dataField',
-                                          'sub-total': field.fieldInfo?.additionalType === 'subTotal',
-                                      }"
-                                >
-                                    <span class="th-text">
-                                        {{ field.label ? field.label : field.name }}
-                                    </span>
-                                    <p-i v-if="field.fieldInfo?.additionalType === 'comparison'"
-                                         class="comparison-info"
-                                         name="ic_info-circle"
-                                         width="0.875rem"
-                                         height="0.875rem"
-                                    />
-                                </span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody ref="tbodyRef">
-                        <tr v-for="(item, rowIndex) in props.items"
-                            :key="`tr-${props.widgetId}-${rowIndex}`"
-                            :data-index="rowIndex"
+        <table ref="tableRef">
+            <thead>
+                <tr>
+                    <th v-for="(field, fieldColIndex) in props.fields"
+                        :key="`th-${props.widgetId}-${fieldColIndex}`"
+                        :style="{
+                            minWidth: field.width || undefined,
+                            width: field.width || undefined,
+                        }"
+                        :class="{
+                            'last-label': fieldColIndex === props.fields.filter((_field) => _field.fieldInfo?.type === 'labelField').length - 1,
+                            'sub-total-freeze': field.fieldInfo?.additionalType === 'subTotal' && props.subTotalInfo?.freeze,
+                        }"
+                    >
+                        <span class="th-contents"
+                              :class="{
+                                  'data-field': field.fieldInfo?.type === 'dataField',
+                                  'sub-total': field.fieldInfo?.additionalType === 'subTotal',
+                              }"
                         >
-                            <td v-for="(field, colIndex) in props.fields"
-                                :key="`td-${props.widgetId}-${rowIndex}-${colIndex}`"
-                                :class="{
-                                    'link-item': field?.link,
-                                    'last-label': colIndex === props.fields.filter((_field) => _field.fieldInfo?.type === 'labelField').length - 1,
-                                    'sub-total': field.fieldInfo?.additionalType === 'subTotal',
-                                }"
-                            >
-                                <span ref="labelRef"
-                                      class="td-contents"
-                                      :class="{
-                                          'data-field': field.fieldInfo?.type === 'dataField',
-                                      }"
-                                >
-                                    <span class="common-text-box">{{ getValue(item, field) }}</span>
-                                    <p-i v-if="field.fieldInfo?.additionalType === 'comparison' && getComparisonValueIcon(item, field)"
-                                         :name="getComparisonValueIcon(item, field)"
-                                         class="comparison-icon"
-                                         width="0.75rem"
-                                         height="0.75rem"
-                                    />
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </template>
-        </p-data-loader>
+                            <span class="th-text">
+                                {{ field.label ? field.label : field.name }}
+                            </span>
+                            <p-i v-if="field.fieldInfo?.additionalType === 'comparison'"
+                                 class="comparison-info"
+                                 name="ic_info-circle"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody ref="tbodyRef">
+                <tr v-for="(item, rowIndex) in props.items"
+                    :key="`tr-${props.widgetId}-${rowIndex}`"
+                    :data-index="rowIndex"
+                >
+                    <td v-for="(field, colIndex) in props.fields"
+                        :key="`td-${props.widgetId}-${rowIndex}-${colIndex}`"
+                        :class="{
+                            'link-item': field?.link,
+                            'last-label': colIndex === props.fields.filter((_field) => _field.fieldInfo?.type === 'labelField').length - 1,
+                            'sub-total': field.fieldInfo?.additionalType === 'subTotal',
+                            'sub-total-freeze': field.fieldInfo?.additionalType === 'subTotal' && props.subTotalInfo?.freeze,
+                            'total': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1,
+                            'total-freeze': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1 && props.totalInfo?.freeze,
+                        }"
+                    >
+                        <span ref="labelRef"
+                              class="td-contents"
+                              :class="{
+                                  'data-field': field.fieldInfo?.type === 'dataField',
+                              }"
+                        >
+                            <span class="common-text-box">{{ getValue(item, field) }}</span>
+                            <p-i v-if="field.fieldInfo?.additionalType === 'comparison' && getComparisonValueIcon(item, field)"
+                                 :name="getComparisonValueIcon(item, field)?.icon"
+                                 :color="getComparisonValueIcon(item, field)?.color"
+                                 class="comparison-icon"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                            />
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .widget-data-table {
-    @apply bg-white h-full w-full;
+    @apply bg-white h-full w-full relative;
     max-width: 81.5rem;
+    max-height: 100%;
     overflow: scroll;
 
     table {
@@ -173,6 +178,11 @@ const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField) =>
 
         &.last-label {
             @apply border-r;
+        }
+        &.sub-total-freeze {
+            @apply border-l border-violet-200 sticky;
+            right: 0;
+            top: 0;
         }
 
         .th-contents {
@@ -230,6 +240,18 @@ const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField) =>
             .td-contents {
                 @apply font-bold text-gray-900;
             }
+        }
+        &.sub-total-freeze {
+            @apply border-l border-violet-200 sticky;
+            right: 0;
+            top: 0;
+        }
+        &.total {
+            @apply bg-violet-100 font-bold text-gray-900 border-r-0;
+        }
+        &.total-freeze {
+            @apply border-t border-violet-200 sticky;
+            bottom: 0;
         }
 
         .td-contents {

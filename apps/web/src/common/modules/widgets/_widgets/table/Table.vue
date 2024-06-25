@@ -70,67 +70,107 @@ const state = reactive({
                 return dataItem;
             });
 
+            if (state.totalInfo?.toggleValue) {
+                const totalDataItem: TableDataItem = {};
+                if (state.groupByField) totalDataItem[state.groupByField[0]] = 'Total';
+                [...state.tableDataField, 'sub_total'].forEach((field) => {
+                    totalDataItem[field] = results.reduce((acc, cur) => acc + cur[field], 0);
+                });
+                results.push(totalDataItem);
+            }
+
             return { results };
         }
         return { results: [] };
     }),
     timeSeriesDynamicFieldSlicedData: computed(() => {
         if (isDateField(state.tableDataField)) {
+            const results = state.data.results.map((d) => {
+                const subTotal = {
+                    [state.tableDataField]: 'sub_total',
+                    value: d[state.tableDataCriteria].slice(-state.tableDataMaxCount).reduce((acc, cur) => acc + cur.value, 0),
+                };
+                return {
+                    ...d,
+                    [state.tableDataCriteria]: [...d[state.tableDataCriteria].slice(-state.tableDataMaxCount), subTotal],
+                };
+            });
+
+            if (state.totalInfo?.toggleValue) {
+                const totalDataItem: TableDataItem = {};
+                if (state.groupByField) totalDataItem[state.groupByField[0]] = 'Total';
+                totalDataItem[state.tableDataCriteria] = [...state.tableFields, 'sub_total']
+                    .filter((field) => field.fieldInfo?.type === 'dataField')
+                    .map((field) => {
+                        const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === field.name)?.value || 0), 0);
+                        return { [state.tableDataField]: field.name, value: totalValue };
+                    });
+                results.push(totalDataItem);
+            }
+
             return {
-                results: state.data.results.map((d) => {
-                    const subTotal = {
-                        [state.tableDataField]: 'sub_total',
-                        value: d[state.tableDataCriteria].slice(-state.tableDataMaxCount).reduce((acc, cur) => acc + cur.value, 0),
-                    };
-                    return {
-                        ...d,
-                        [state.tableDataCriteria]: [...d[state.tableDataCriteria].slice(-state.tableDataMaxCount), subTotal],
-                    };
-                }),
+                results,
             };
         }
         return { results: [] };
     }),
     noneTimeSeriedsDynamicFieldSlicedData: computed(() => {
-        const comparisonData = state.comparisonData?.results ?? [];
+        const comparisonData = [...state.comparisonData?.results ?? []];
+        const baseData = [...state.data?.results ?? []];
+        const results = baseData.map((d) => {
+            const hasComparisonOption = state.comparisonInfo?.format && state.isComparisonEnabled;
+            const dynamicFieldData = d[state.tableDataCriteria] ?? [];
+            const dynamicFieldDataFilteredByAvailableField = dynamicFieldData.filter((item) => state.availableDataFieldsExceptDateField.includes(item[state.tableDataField]));
+            const sortedAndFilteredData = sortBy(
+                dynamicFieldDataFilteredByAvailableField,
+                (item) => state.availableDataFieldsExceptDateField.indexOf(item[state.tableDataField]),
+            );
+            const dataWithComparison = [] as TableDataItem[];
+            sortedAndFilteredData.forEach((item) => {
+                dataWithComparison.push(item);
+                if (hasComparisonOption) {
+                    const comparisonItem = comparisonData.find((c) => (state.groupByField ?? []).every((field) => c[field] === d[field]));
+                    const comparisonDynamicFieldData = [...comparisonItem?.[state.tableDataCriteria] || []];
+                    const comparisonValue = comparisonDynamicFieldData.find((c) => c[state.tableDataField] === item[state.tableDataField])?.value ?? 0;
+                    dataWithComparison.push({
+                        [state.tableDataField]: `comparison_${item[state.tableDataField]}`,
+                        value: { target: item.value, subject: comparisonValue },
+                    });
+                }
+            });
+            const etcValue = d[`_total_${state.tableDataCriteria}`] - sortedAndFilteredData.reduce((acc, cur) => acc + cur.value, 0) ?? 0;
+            return {
+                ...d,
+                [state.tableDataCriteria]: [
+                    ...(hasComparisonOption ? dataWithComparison : sortedAndFilteredData),
+                    {
+                        [state.tableDataField]: 'etc',
+                        value: etcValue,
+                    },
+                    {
+                        [state.tableDataField]: 'sub_total',
+                        value: d[`_total_${state.tableDataCriteria}`],
+                    },
+                ],
+            };
+        });
+
+        if (state.totalInfo?.toggleValue) {
+            const totalDataItem: TableDataItem = {};
+            if (state.groupByField) totalDataItem[state.groupByField[0]] = 'Total';
+            const fieldForTotal = results[0][state.tableDataCriteria].filter((item) => !item[state.tableDataField].startsWith('comparison_'));
+            totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
+                const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === item[state.tableDataField])?.value || 0), 0);
+                return { [state.tableDataField]: item[state.tableDataField], value: totalValue };
+            });
+            results.push(totalDataItem);
+        }
+
         return {
-            results: state.data.results.map((d) => {
-                const hasComparisonOption = state.comparisonInfo?.format && state.isComparisonEnabled;
-                const sortedAndFilteredData = sortBy(
-                    d[state.tableDataCriteria].filter((item) => state.availableDataFieldsWhenDynamicFieldIsNotDate.includes(item[state.tableDataField])),
-                    (item) => state.availableDataFieldsWhenDynamicFieldIsNotDate.indexOf(item[state.tableDataField]),
-                );
-                const dataWithComparison = [] as TableDataItem[];
-                sortedAndFilteredData.forEach((item) => {
-                    dataWithComparison.push(item);
-                    if (hasComparisonOption) {
-                        const comparisonItem = comparisonData.find((c) => state.groupByField.every((field) => c[field] === d[field]));
-                        const comparisonValue = comparisonItem?.[state.tableDataCriteria].find((c) => c[state.tableDataField] === item[state.tableDataField])?.value ?? 0;
-                        dataWithComparison.push({
-                            [state.tableDataField]: `comparison_${item[state.tableDataField]}`,
-                            value: { target: item.value, subject: comparisonValue },
-                        });
-                    }
-                });
-                const etcValue = d[`_total_${state.tableDataCriteria}`] - sortedAndFilteredData.reduce((acc, cur) => acc + cur.value, 0) ?? 0;
-                return {
-                    ...d,
-                    [state.tableDataCriteria]: [
-                        ...(hasComparisonOption ? dataWithComparison : sortedAndFilteredData),
-                        {
-                            [state.tableDataField]: 'etc',
-                            value: etcValue,
-                        },
-                        {
-                            [state.tableDataField]: 'sub_total',
-                            value: d[`_total_${state.tableDataCriteria}`],
-                        },
-                    ],
-                };
-            }),
+            results,
         };
     }),
-    availableDataFieldsWhenDynamicFieldIsNotDate: computed(() => {
+    availableDataFieldsExceptDateField: computed(() => {
         if (state.tableDataFieldType === 'staticField') return [];
         const originFirstRowData = state.data?.results?.[0][state.tableDataCriteria];
         const sortedData = orderBy(originFirstRowData, ['value'], ['desc']);
@@ -163,7 +203,7 @@ const state = reactive({
     isComparisonEnabled: computed<boolean>(() => !isDateField(state.tableDataField) && !state.groupByField?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))),
     comparisonInfo: computed<ComparisonValue|undefined>(() => props.widgetOptions?.comparison?.[0] as ComparisonValue),
     subTotalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.subTotal as TotalValue),
-    totlaInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.total as TotalValue),
+    totalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.total as TotalValue),
     progressBarInfo: computed<ProgressBarValue|undefined>(() => props.widgetOptions?.progressBar as ProgressBarValue),
     // table
     tableFields: computed<TableWidgetField[]>(() => {
@@ -325,6 +365,8 @@ defineExpose<WidgetExpose<Data>>({
                                :criteria="state.tableDataCriteria"
                                :data-field="state.tableDataField"
                                :comparison-info="state.comparisonInfo"
+                               :sub-total-info="state.subTotalInfo"
+                               :total-info="state.totalInfo"
             />
         </div>
     </widget-frame>
@@ -332,7 +374,9 @@ defineExpose<WidgetExpose<Data>>({
 
 <style lang="postcss" scoped>
 .table-wrapper {
-    @apply flex justify-center;
+    @apply flex justify-center h-full;
+    max-height: 100%;
+    overflow: hidden;
     .data-table {
         height: 100%;
     }

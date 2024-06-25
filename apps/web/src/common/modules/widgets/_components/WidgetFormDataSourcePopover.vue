@@ -33,9 +33,10 @@ import {
     DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
-import { getCostDataKey } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { DataTableDataType, DataTableSourceType, DataTableOperator } from '@/common/modules/widgets/types/widget-model';
+import type {
+    DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions,
+} from '@/common/modules/widgets/types/widget-model';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -104,10 +105,10 @@ const state = reactive({
         if (state.selectedCostDataType === 'cost') {
             return costAlias ? `Cost (${costAlias})` : 'Cost';
         }
-        if (state.selectedCostDataType === 'usage') {
+        if (state.selectedCostDataType === 'usage_quantity') {
             return usageAlias ? `Usage (${usageAlias})` : 'Usage';
         }
-        return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType);
+        return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
     }),
     operatorInfoList: computed<{ key: DataTableOperator, name: string; description: string; icon: string;}[]>(() => [
         {
@@ -202,11 +203,11 @@ const handleConfirmDataSource = async () => {
             source_type: state.selectedDataSourceDomain,
             name: getDuplicatedDataTableName(dataTableBaseName),
         } as DataTableAddParameters;
-        const costOptions = {
+        const costOptions: DataTableAddOptions = {
             data_name: state.selectedCostDataTypeLabel,
             COST: {
                 data_source_id: state.selectedCostDataSourceId,
-                data_key: getCostDataKey(state.selectedCostDataType),
+                data_key: state.selectedCostDataType,
             },
         };
         const assetOptions = {

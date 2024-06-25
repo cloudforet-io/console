@@ -1717,7 +1717,8 @@
 			"PERIOD_THIS_MONTH": "이번 달",
 			"REFRESH": "자동 새로고침",
 			"SELECT_MONTH": "월 선택",
-			"SET_HOME": "홈 대시보드로 설정"
+			"SET_HOME": "홈 대시보드로 설정",
+			"SHARE": ""
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "대시보드 생성 실패",

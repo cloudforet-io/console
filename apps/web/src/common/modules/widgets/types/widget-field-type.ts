@@ -2,7 +2,7 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
 import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
-import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { FormatRulesValue, WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 export interface DataFieldOptions {
     multiSelectable?: boolean;
@@ -95,7 +95,7 @@ export interface FormatRulesOptions {
 export interface ColorSchemaOptions {
     default?: string;
 }
-type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
+export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
@@ -117,6 +117,9 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
 
 export interface WidgetFieldComponentProps<FieldOptions> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;
+    allValueMap: {
+        [key in WidgetFieldName]: WidgetFieldValues;
+    }
     widgetFieldSchema?: WidgetFieldSchema<FieldOptions>;
     isValid?: boolean;
     value?: any;

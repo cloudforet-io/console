@@ -74,7 +74,6 @@ const state = reactive({
         },
         series: [
             {
-                name: 'Access From',
                 type: 'pie',
                 radius: ['30%', '70%'],
                 center: props.size === 'full' ? ['40%', '50%'] : ['30%', '50%'],
