@@ -36,6 +36,7 @@ class Config {
             this.config = {};
             await this.load('/default.json');
             await this.load(`/${import.meta.env.MODE}.json`);
+            console.log(import.meta.env);
             if (import.meta.env?.VITE_VERCEL_EDGE_CONFIG) {
                 const edgeConfigClient = createClient(import.meta.env.VITE_VERCEL_EDGE_CONFIG);
                 const edgeConfig = await edgeConfigClient.getAll();
