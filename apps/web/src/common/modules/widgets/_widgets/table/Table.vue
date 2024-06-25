@@ -20,7 +20,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -37,6 +37,7 @@ type Data = ListResponse<TableDataItem>;
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
+
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
@@ -229,19 +230,27 @@ const state = reactive({
             state.finalConvertedData?.results?.[0][state.tableDataCriteria].forEach((d) => {
                 if (d[state.tableDataField] === 'sub_total') return;
                 const fieldName = d[state.tableDataField];
+                const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
                 if (fieldName && fieldName.startsWith('comparison_')) {
                     if (state.comparisonInfo?.format && state.isComparisonEnabled && d[state.tableDataField] !== 'etc') {
                         dataFields.push({
                             name: fieldName,
                             label: fieldName.split('_')[1],
-                            fieldInfo: { type: 'dataField', additionalType: 'comparison' },
+                            fieldInfo: {
+                                type: 'dataField',
+                                additionalType: 'comparison',
+                                reference: isReferenceField ? REFERENCE_FIELD_MAP[state.tableDataField] : undefined,
+                            },
                         });
                     }
                 } else {
                     dataFields.push({
                         name: d[state.tableDataField],
                         label: d[state.tableDataField],
-                        fieldInfo: { type: 'dataField' },
+                        fieldInfo: {
+                            type: 'dataField',
+                            reference: isReferenceField && d[state.tableDataField] !== 'etc' ? REFERENCE_FIELD_MAP[state.tableDataField] : undefined,
+                        },
                     });
                 }
             });
@@ -254,6 +263,10 @@ const state = reactive({
         return basicFields;
     }),
 });
+
+// const loadOptionState = reactive({
+//
+// });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
