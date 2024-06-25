@@ -163,7 +163,7 @@ const drawChart = (rawData: Data|null) => {
     rawData.results?.forEach((d) => {
         const _slicedData = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.lineByCount);
         const _etcData = d[state.dataField].slice(state.lineByCount).reduce((acc, v) => {
-            acc[state.lineByField] = 'ETC';
+            acc[state.lineByField] = 'etc';
             acc.value += v.value;
             return acc;
         }, { value: 0 });
