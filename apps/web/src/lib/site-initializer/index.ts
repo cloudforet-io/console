@@ -11,7 +11,6 @@ import { integralRoutes } from '@/router/integral-routes';
 
 import config from '@/lib/config';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
-import { initAmcharts } from '@/lib/site-initializer/amcharts';
 import { initAmcharts5 } from '@/lib/site-initializer/amcharts5';
 import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
 import { initApiClient } from '@/lib/site-initializer/api-client';
@@ -71,7 +70,6 @@ const init = async (store) => {
         initQueryHelper(store);
         initGtag(store, config);
         initGtm(config);
-        initAmcharts(config);
         initAmcharts5(config);
         initEcharts();
         initErrorHandler(store);
