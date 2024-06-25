@@ -12,6 +12,7 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
@@ -20,6 +21,8 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const props = withDefaults(defineProps<{
     inputText?: string;
@@ -36,6 +39,7 @@ const props = withDefaults(defineProps<{
 });
 
 const storeState = reactive({
+    isAdminMode: computed(() => appContextGetters.isAdminMode),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
 });
 const state = reactive({
@@ -117,10 +121,11 @@ const dateFormatter = (date?: string): string => {
                                                   width="1.125rem"
                     /> {{ props.post?.view_count ?? 0 }}</span>
                 </template>
-                <p-i width="0.125rem"
+                <p-i v-if="storeState.isAdminMode"
+                     width="0.125rem"
                      name="ic_dot"
                 />
-                <div>
+                <div v-if="storeState.isAdminMode">
                     <span v-if="state.isAllWorkspace">{{ $t('INFO.NOTICE.ALL_WORKSPACE') }}</span>
                     <div v-else
                          class="workspace-wrapper"

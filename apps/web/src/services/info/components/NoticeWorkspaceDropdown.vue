@@ -90,8 +90,7 @@ const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
 </script>
 
 <template>
-    <p-select-dropdown use-fixed-menu-style
-                       :visible-menu.sync="state.visible"
+    <p-select-dropdown :visible-menu.sync="state.visible"
                        :loading="state.loading"
                        :search-text.sync="state.searchText"
                        :selected="state.proxySelectedItems"
