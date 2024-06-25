@@ -25,7 +25,11 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
-import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import {
+    getReferenceLabel,
+    getWidgetBasedOnDate,
+    getWidgetDateRange,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
@@ -49,7 +53,11 @@ const state = reactive({
         tooltip: {
             trigger: 'item',
             position: 'inside',
-            valueFormatter: (val) => numberFormatter(val) || '',
+            formatter: (params) => {
+                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, params.name);
+                const _value = numberFormatter(params.value) || '';
+                return `${params.marker} ${_name}: <b>${_value}</b>`;
+            },
         },
         grid: {
             containLabel: true,
@@ -66,10 +74,11 @@ const state = reactive({
                 overflow: 'truncate',
                 width: props.size === 'full' ? 200 : 150,
             },
-            formatter: (name: string) => {
-                const series = state.chart.getOption().series[0];
-                const value = series.data.filter((row) => row.name === name)[0]?.value;
-                return `${(name.length > 10 ? `${name.slice(0, 10)}...` : name)}     ${value}`;
+            formatter: (name) => {
+                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, name);
+                const _series = state.chart.getOption().series[0];
+                const _value = _series.data.filter((row) => row.name === name)[0]?.value;
+                return `${(_name.length > 25 ? `${_name.slice(0, 25)}...` : _name)}     ${_value}`;
             },
         },
         series: [

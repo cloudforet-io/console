@@ -28,7 +28,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getDateLabelFormat,
+    getDateLabelFormat, getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
@@ -61,9 +61,17 @@ const state = reactive({
             icon: 'circle',
             itemWidth: 10,
             itemHeight: 10,
+            formatter: (val) => getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, val),
         },
         tooltip: {
-            valueFormatter: (val) => numberFormatter(val) || '',
+            formatter: (params) => {
+                const _params = Array.isArray(params) ? params : [params];
+                return _params.map((p) => {
+                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, p.seriesName);
+                    const _value = numberFormatter(p.value) || '';
+                    return `${_seriesName}<br>${p.marker} ${params.name}: <b>${_value}</b>`;
+                }).join('<br>');
+            },
         },
         xAxis: {
             type: 'category',
@@ -73,7 +81,7 @@ const state = reactive({
                     if (state.xAxisField === DATE_FIELD.DATE) {
                         return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
                     }
-                    return val;
+                    return getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, val);
                 },
             },
         },
@@ -163,7 +171,7 @@ const drawChart = (rawData?: Data|null) => {
             acc[state.stackByField] = 'etc';
             acc.value += v.value;
             return acc;
-        }, { value: 0 });
+        }, {});
         const _values = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
         _values.forEach((v) => {
             _slicedByStackBy.push({

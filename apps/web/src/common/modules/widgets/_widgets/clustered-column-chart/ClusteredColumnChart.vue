@@ -28,7 +28,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getDateLabelFormat,
+    getDateLabelFormat, getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
@@ -64,7 +64,12 @@ const state = reactive({
             itemHeight: 10,
         },
         tooltip: {
-            valueFormatter: (val) => numberFormatter(val) || '',
+            formatter: (params) => {
+                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.name);
+                const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.seriesName);
+                const _value = numberFormatter(params.value) || '';
+                return `${_name}<br/>${params.marker} ${_seriesName}: <b>${_value}</b>`;
+            },
         },
         xAxis: {
             type: 'category',
@@ -73,7 +78,7 @@ const state = reactive({
                     if (state.xAxisField === DATE_FIELD.DATE) {
                         return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
                     }
-                    return val;
+                    return getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, val);
                 },
             },
             data: state.xAxisData,
