@@ -214,6 +214,8 @@ const handleConfirmModal = async () => {
         if (beforeSelectedDataTableId === state.dataTableId) {
             const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
             widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
+            widgetGenerateStore.setWidgetValueMap({});
+            widgetGenerateStore.setWidgetValidMap({});
         }
     }
     if (modalState.mode === 'RESET') {

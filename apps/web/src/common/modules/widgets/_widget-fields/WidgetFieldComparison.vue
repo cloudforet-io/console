@@ -12,10 +12,9 @@ import { i18n } from '@/translations';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { ComparisonOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 import type { ComparisonFormat, ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
-
-import { green, red } from '@/styles/colors';
 
 
 const emit = defineEmits<WidgetFieldComponentEmit<ComparisonValue[]|undefined>>();
@@ -39,8 +38,8 @@ const state = reactive({
     // }),
     // isForTable: computed(() => props.widgetFieldSchema.options?.forTable ?? false),
     initialValue: computed<ComparisonValue>(() => ({
-        decreaseColor: green[600],
-        increaseColor: red[500],
+        decreaseColor: DEFAULT_COMPARISON_COLOR.DECREASE,
+        increaseColor: DEFAULT_COMPARISON_COLOR.INCREASE,
         format: 'all',
     })),
     formatMenu: [
