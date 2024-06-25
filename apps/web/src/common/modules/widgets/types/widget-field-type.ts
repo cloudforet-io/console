@@ -117,7 +117,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
 
 export interface WidgetFieldComponentProps<FieldOptions> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;
-    otherFieldData: {
+    allValueMap: {
         [key in WidgetFieldName]: WidgetFieldValues;
     }
     widgetFieldSchema?: WidgetFieldSchema<FieldOptions>;

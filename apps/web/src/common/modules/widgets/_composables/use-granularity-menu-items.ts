@@ -36,7 +36,7 @@ export const useGranularityMenuItem = (props: WidgetFieldComponentProps<WidgetFi
     const _state = reactive({
         usedLabelsField: computed(() => {
             const usedLabelsInfo: DateField[] = [];
-            Object.entries(props.otherFieldData ?? {}).forEach(([key, value]) => {
+            Object.entries(props.allValueMap ?? {}).forEach(([key, value]) => {
                 const fieldValue:string|string[] = get(value, labelsInfoValueRouteMap[key]);
                 if (key !== fieldName) {
                     if (Array.isArray(fieldValue)) {
@@ -55,8 +55,8 @@ export const useGranularityMenuItem = (props: WidgetFieldComponentProps<WidgetFi
     });
 
     const state = reactive<UseGranularityMenuItemState>({
-        selectedValue: computed(() => (fieldName ? props.otherFieldData[fieldName] : undefined)),
-        granularity: computed(() => props.otherFieldData?.granularity),
+        selectedValue: computed(() => (fieldName ? props.allValueMap[fieldName] : undefined)),
+        granularity: computed(() => props.allValueMap?.granularity),
         labelInfo: computed(() => props.dataTable?.labels_info ?? {}),
         isDateSeparated: computed(() => !Object.keys(state.labelInfo).includes(DATE_FIELD.DATE)),
         labelsMenuItem: computed<MenuItem[]>(() => {
