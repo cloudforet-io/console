@@ -286,7 +286,7 @@ const handleToggleWidth = () => {
         }
     }
     .body-wrapper {
-        height: 100%;
+        height: calc(100% - 1.5rem);
         .chart-loader {
             height: 100%;
         }

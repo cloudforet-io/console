@@ -90,8 +90,7 @@ const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
 </script>
 
 <template>
-    <p-select-dropdown use-fixed-menu-style
-                       :visible-menu.sync="state.visible"
+    <p-select-dropdown :visible-menu.sync="state.visible"
                        :loading="state.loading"
                        :search-text.sync="state.searchText"
                        :selected="state.proxySelectedItems"
@@ -113,7 +112,7 @@ const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
                                      :theme="state.proxySelectedItems[0].tags?.theme"
                                      size="xxs"
                 />
-                <span>{{ state.proxySelectedItems[0].label }}</span>
+                <span class="label">{{ state.proxySelectedItems[0].label }}</span>
                 <p-badge v-if="state.proxySelectedItems.length > 1"
                          style-type="blue200"
                          badge-type="subtle"

@@ -142,7 +142,7 @@ watch(() => state.sortBy, async () => {
     if (!storeState.selectedDataTableId) return;
     await widgetGenerateStore.loadDataTable({
         data_table_id: storeState.selectedDataTableId,
-        sort: [state.sortBy],
+        sort: [{ key: state.sortBy, desc: true }],
     });
     state.thisPage = 1;
 });

@@ -21,6 +21,7 @@ import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useNoticeStore } from '@/store/notice';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -33,6 +34,15 @@ import type { WorkspaceDropdownMenuItem } from '@/services/info/types/notice-typ
 
 const NOTICE_ITEM_LIMIT = 10;
 
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
+const noticeStore = useNoticeStore();
+const noticeGetters = noticeStore.getters;
+const { getProperRouteLocation } = useProperRouteLocation();
+
+const storeState = reactive({
+    isAdminMode: computed(() => appContextGetters.isAdminMode),
+});
 const state = reactive({
     loading: false,
     noticeItems: [] as PostModel[],
@@ -46,10 +56,6 @@ const state = reactive({
     selectedItems: [] as WorkspaceDropdownMenuItem[],
     queryFilter: [] as ConsoleFilter[],
 });
-
-const noticeStore = useNoticeStore();
-const noticeGetters = noticeStore.getters;
-const { getProperRouteLocation } = useProperRouteLocation();
 
 /* Api */
 const noticeApiHelper = new ApiQueryHelper()
@@ -142,7 +148,9 @@ watch(() => state.selectedItems, (selectedItems) => {
 <template>
     <div class="notice-list">
         <div class="notice-header-wrapper">
-            <div class="notice-header">
+            <div v-if="storeState.isAdminMode"
+                 class="notice-header"
+            >
                 <p-button v-for="(item, idx) in state.tools"
                           :key="idx"
                           class="workspace-button"
@@ -232,6 +240,7 @@ watch(() => state.selectedItems, (selectedItems) => {
                 @apply border border-gray-300 font-normal;
                 border-radius: 0.25rem 0 0 0.25rem;
                 +.workspace-button {
+                    border-left-width: 0;
                     border-radius: 0 0.25rem 0.25rem 0;
                 }
                 &:hover, &:focus {
@@ -242,12 +251,16 @@ watch(() => state.selectedItems, (selectedItems) => {
                 }
             }
             .dropdown {
-                width: 12rem;
+                width: 20rem;
                 margin-top: 0;
-                margin-left: 1.25rem;
+                margin-left: 0.75rem;
                 &.no-data {
                     padding: 0;
                 }
+            }
+            :deep(.notice-workspace-dropdown .label) {
+                @apply truncate;
+                max-width: 12rem;
             }
         }
     }

@@ -1996,9 +1996,14 @@
 		"BOOKMARK_MANAGED_CREATE": "Add to all workspaces",
 		"BOOKMARK_MANAGED_CREATE_DESC": "Add this to the top of all workspaces, and allow only admins to edit and delete this.",
 		"BOOKMARK_MORE": "More",
+		"BOOKMARK_MY": "My",
+		"BOOKMARK_MY_BOOKMARK": "My bookmark",
 		"BOOKMARK_SEARCH": "Search",
 		"BOOKMARK_SELECTED": "{count} selected",
+		"BOOKMARK_SHARED": "Shared",
+		"BOOKMARK_SHARED_BOOKMARK": "Shared bookmarks",
 		"BOOKMARK_VIEW_ALL": "View All",
+		"BOOKMARK_VIEW_ALL_BOOKMARKS": "View all bookmarks",
 		"BOOKMARK_WORKSPACE": "This workspace",
 		"CONFIG_RECENT_TITLE": "Recent Visits",
 		"CONFIG_STARRED_ALL": "All",
@@ -2011,6 +2016,7 @@
 		"EMPTY_LINK": "No Link",
 		"FORM_DESELECT": "Deselect",
 		"FORM_FOLDER": "Folder",
+		"FORM_LINK": "Link",
 		"FORM_NAME": "Name",
 		"FORM_NEW_FOLDER": "New Folder",
 		"FORM_SCOPE": "Scope",
@@ -2679,8 +2685,9 @@
 		"NOTICE": {
 			"ALL_WORKSPACE": "All Workspaces",
 			"DETAIL": {
+				"ALT_E_SEND_EMAIL": "Fail to sent email",
 				"ALT_S_SENDING": "Sending email",
-				"ALT_S_SEND_EMAIL": "An email has been sent",
+				"ALT_S_SEND_EMAIL": "Successfully sent email",
 				"BACK_TO_LIST": "Back to List",
 				"DETAIL_TITLE": "Notice Detail",
 				"SHOW_ALL_WORKSPACES": "Show All Workspaces"

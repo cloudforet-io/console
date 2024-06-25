@@ -77,20 +77,20 @@ const advancedOptionsState = reactive({
     proxySelectedTimeDiffDate: useProxyValue('selectedTimeDiffDate', props, emit),
     timeDiffList: computed<SelectDropdownMenuItem[]>(() => [
         { label: 'None', name: 'none' },
-        { label: 'Year', name: 'year' },
-        { label: 'Month', name: 'month' },
-        { label: 'Day', name: 'day' },
+        { label: 'Year', name: 'years' },
+        { label: 'Month', name: 'months' },
+        { label: 'Day', name: 'days' },
     ]),
     timeDiffDateMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => ({
-        year: range(3).map((i) => ({
+        years: range(3).map((i) => ({
             label: i === 0 ? 'Last 1 Year' : `Last ${i + 1} Years`,
             name: String(i + 1),
         })),
-        month: range(12).map((i) => ({
+        months: range(12).map((i) => ({
             label: i === 0 ? 'Last 1 Month' : `Last ${i + 1} Months`,
             name: String(i + 1),
         })),
-        day: range(31).map((i) => ({
+        days: range(31).map((i) => ({
             label: i === 0 ? 'Last 1 Day' : `Last ${i + 1} Days`,
             name: String(i + 1),
         })),

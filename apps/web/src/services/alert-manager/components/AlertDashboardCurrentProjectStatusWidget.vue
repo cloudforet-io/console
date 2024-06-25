@@ -3,22 +3,19 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { PieChart } from '@amcharts/amcharts4/charts';
-import {
-    create, percent, color, Label,
-} from '@amcharts/amcharts4/core';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import type { PieSeriesOption } from 'echarts/charts';
+import type { EChartsType } from 'echarts/core';
+import { init } from 'echarts/core';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import config from '@/lib/config';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
-    green, red, white, gray,
+    green, red,
 } from '@/styles/colors';
 
 
@@ -56,53 +53,47 @@ const state = reactive({
             color: green[500],
         },
     ] as ChartData[])),
-    chart: null as null | any,
-    chartRegistry: {},
+    chart: null as EChartsType | null,
+    chartData: computed(() => state.data.map((d) => ({
+        name: d.status,
+        value: d.count,
+        itemStyle: {
+            color: d.color,
+        },
+    }))),
+    chartOptions: computed<PieSeriesOption>(() => ({
+        tooltip: {
+            show: false,
+        },
+        legend: {
+            show: false,
+        },
+        series: [
+            {
+                type: 'pie',
+                radius: ['30%', '70%'],
+                center: ['60%', '50%'],
+                data: state.chartData,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)',
+                    },
+                },
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                },
+            },
+        ],
+    })),
 });
 
 /* util */
-const disposeChart = (ctx) => {
-    if (state.chartRegistry[ctx]) {
-        state.chartRegistry[ctx].dispose();
-        delete state.chartRegistry[ctx];
-    }
-};
-const drawChart = (ctx) => {
-    const createChart = () => {
-        disposeChart(ctx);
-        state.chartRegistry[ctx] = create(ctx, PieChart);
-        return state.chartRegistry[ctx];
-    };
-
-    const chart = createChart();
-    state.chart = chart;
-    if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-    chart.responsive.enabled = true;
-    chart.innerRadius = percent(62);
-    chart.data = state.data;
-
-    const series = chart.series.create();
-    series.slices.template.togglable = false;
-    series.slices.template.clickable = false;
-    series.dataFields.value = 'count';
-    series.dataFields.category = 'status';
-    series.slices.template.propertyFields.fill = 'color';
-    series.slices.template.stroke = color(white);
-    series.slices.template.strokeWidth = 2;
-    series.slices.template.strokeOpacity = 1;
-    series.slices.template.states.getKey('hover').properties.scale = 1;
-    series.tooltip.disabled = true;
-    series.ticks.template.disabled = true;
-    series.labels.template.text = '';
-
-    const label = new Label();
-    label.parent = series;
-    label.horizontalCenter = 'middle';
-    label.verticalCenter = 'middle';
-    label.fontSize = 20;
-    label.fontWeight = 'lighter';
-    label.fill = color(gray[900]);
-    label.text = '{values.value.sum}';
+const drawChart = () => {
+    state.chart = init(chartContext.value);
+    state.chart.setOption(state.chartOptions, true);
 };
 
 /* api */
@@ -128,7 +119,7 @@ const getCurrentProjectStatus = async () => {
 
 watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => {
     if (!loading && chartCtx) {
-        drawChart(chartCtx);
+        drawChart();
     }
 }, { immediate: true });
 </script>

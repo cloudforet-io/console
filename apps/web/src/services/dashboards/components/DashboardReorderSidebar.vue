@@ -27,12 +27,14 @@ const state = reactive({
 });
 
 /* Event */
-const handleChangeWidgetOrder = () => {
+const handleChangeWidgetOrder = async () => {
     // HACK: implement widget panel
     const _widgetIdList = state.widgetList.map((w) => w.widget_id);
-    dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
-        layouts: [{ widgets: _widgetIdList }],
+    const _updatedLayouts = [{ widgets: _widgetIdList }];
+    await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
+        layouts: _updatedLayouts,
     });
+    dashboardDetailStore.setDashboardLayouts(_updatedLayouts);
 };
 
 /* Util */

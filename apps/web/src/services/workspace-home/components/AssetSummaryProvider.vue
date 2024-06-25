@@ -115,7 +115,7 @@ const handleClickArrowButton = (increment: number) => {
             margin-left: auto;
             right: 0.75rem;
         }
-        &:hover {
+        &:hover, &:focus {
             @apply text-gray-900;
         }
     }

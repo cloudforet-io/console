@@ -9,6 +9,11 @@ import type { StarredServiceItem } from '@/services/workspace-home/types/workspa
 // Bookmark
 export const MAX_BOARD_SETS = 13;
 export const MAX_BOARD_SETS_TABLET = 7;
+export const BOOKMARK_TYPE = {
+    ADMIN: 'admin',
+    WORKSPACE: 'workspace',
+    USER: 'user',
+} as const;
 
 // Configs
 export const STARRED_SERVICE_ITEMS: StarredServiceItem[] = [

@@ -24,7 +24,7 @@ import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant'
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
-import type { DateRange, DateFieldType } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange, DateFieldType, TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -33,9 +33,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-type Data = ListResponse<{
-    [key: string]: string|number;
-}>;
+type Data = ListResponse<TableDataItem>;
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
@@ -53,20 +51,26 @@ const state = reactive({
     staticFieldSlicedData: computed(() => {
         if (state.tableDataFieldType === 'staticField') {
             const comparisonData = state.comparisonData?.results;
+            const hasComparisonInfo = state.comparisonInfo?.format;
+            const results = state.data.results.map((d, idx) => {
+                const dataItem = { ...d };
+                let subTotalValue = 0;
 
-            if (state.comparisonInfo?.format) {
-                return {
-                    results: state.data.results.map((d, idx) => {
-                        const results = d;
-                        state.tableDataField.forEach((field) => {
-                            const comparisonValue = comparisonData?.[idx]?.[field] ?? 0;
-                            results[`comparison_${field}`] = comparisonValue;
-                        });
-                        return results;
-                    }),
-                };
-            }
-            return state.data;
+                state.tableDataField.forEach((field) => {
+                    const fieldValue = d[field] ?? 0;
+                    subTotalValue += fieldValue;
+
+                    if (hasComparisonInfo) {
+                        const comparisonValue = comparisonData?.[idx]?.[field] ?? 0;
+                        dataItem[`comparison_${field}`] = { target: dataItem[field], subject: comparisonValue };
+                    }
+                });
+
+                dataItem.sub_total = subTotalValue;
+                return dataItem;
+            });
+
+            return { results };
         }
         return { results: [] };
     }),
@@ -96,7 +100,7 @@ const state = reactive({
                     d[state.tableDataCriteria].filter((item) => state.availableDataFieldsWhenDynamicFieldIsNotDate.includes(item[state.tableDataField])),
                     (item) => state.availableDataFieldsWhenDynamicFieldIsNotDate.indexOf(item[state.tableDataField]),
                 );
-                const dataWithComparison = [] as { [key: string]: string|number }[];
+                const dataWithComparison = [] as TableDataItem[];
                 sortedAndFilteredData.forEach((item) => {
                     dataWithComparison.push(item);
                     if (hasComparisonOption) {
@@ -104,7 +108,7 @@ const state = reactive({
                         const comparisonValue = comparisonItem?.[state.tableDataCriteria].find((c) => c[state.tableDataField] === item[state.tableDataField])?.value ?? 0;
                         dataWithComparison.push({
                             [state.tableDataField]: `comparison_${item[state.tableDataField]}`,
-                            value: comparisonValue,
+                            value: { target: item.value, subject: comparisonValue },
                         });
                     }
                 });
@@ -114,7 +118,7 @@ const state = reactive({
                     [state.tableDataCriteria]: [
                         ...(hasComparisonOption ? dataWithComparison : sortedAndFilteredData),
                         {
-                            [state.tableDataField]: 'Etc',
+                            [state.tableDataField]: 'etc',
                             value: etcValue,
                         },
                         {
@@ -175,25 +179,29 @@ const state = reactive({
                 if (state.comparisonInfo?.format && state.isComparisonEnabled) {
                     dataFields.push({
                         name: `comparison_${field}`,
-                        label: 'Comparison',
+                        label: field,
                         fieldInfo: { type: 'dataField', additionalType: 'comparison' },
                     });
                 }
             });
         } else if (isDateField(state.tableDataField)) dataFields = getWidgetTableDateFields(state.tableDataField, state.granularity, state.dateRange, state.tableDataMaxCount);
-        else {
+        else { // None Time Series Dynamic Field Case
             state.finalConvertedData?.results?.[0][state.tableDataCriteria].forEach((d) => {
                 if (d[state.tableDataField] === 'sub_total') return;
-                dataFields.push({
-                    name: d[state.tableDataField],
-                    label: d[state.tableDataField],
-                    fieldInfo: { type: 'dataField' },
-                });
-                if (state.comparisonInfo?.format && state.isComparisonEnabled && d[state.tableDataField] !== 'Etc') {
+                const fieldName = d[state.tableDataField];
+                if (fieldName && fieldName.startsWith('comparison_')) {
+                    if (state.comparisonInfo?.format && state.isComparisonEnabled && d[state.tableDataField] !== 'etc') {
+                        dataFields.push({
+                            name: fieldName,
+                            label: fieldName.split('_')[1],
+                            fieldInfo: { type: 'dataField', additionalType: 'comparison' },
+                        });
+                    }
+                } else {
                     dataFields.push({
-                        name: `comparison_${d[state.tableDataField]}`,
-                        label: 'Comparison',
-                        fieldInfo: { type: 'dataField', additionalType: 'comparison' },
+                        name: d[state.tableDataField],
+                        label: d[state.tableDataField],
+                        fieldInfo: { type: 'dataField' },
                     });
                 }
             });
@@ -307,32 +315,25 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <!--        <p-data-loader class="chart-loader"-->
-        <!--                       :loading="state.loading"-->
-        <!--                       loader-type="skeleton"-->
-        <!--                       disable-empty-case-->
-        <!--                       :loader-backdrop-opacity="1"-->
-        <!--                       show-data-from-scratch-->
-        <!--        >-->
-        <!--            <div class="chart">-->
-        <!--                {{ state.data }}-->
-        <!--            </div>-->
-        <!--        </p-data-loader>-->
-        <widget-data-table :widget-id="props.widgetId"
-                           :loading="false"
-                           :fields="state.tableFields"
-                           :items="state.finalConvertedData?.results"
-                           :field-type="state.tableDataFieldType"
-                           :criteria="state.tableDataCriteria"
-                           :data-field="state.tableDataField"
-        />
+        <div class="table-wrapper">
+            <widget-data-table class="data-table"
+                               :widget-id="props.widgetId"
+                               :loading="false"
+                               :fields="state.tableFields"
+                               :items="state.finalConvertedData?.results"
+                               :field-type="state.tableDataFieldType"
+                               :criteria="state.tableDataCriteria"
+                               :data-field="state.tableDataField"
+                               :comparison-info="state.comparisonInfo"
+            />
+        </div>
     </widget-frame>
 </template>
 
 <style lang="postcss" scoped>
-.chart-loader {
-    height: 100%;
-    .chart {
+.table-wrapper {
+    @apply flex justify-center;
+    .data-table {
         height: 100%;
     }
 }
