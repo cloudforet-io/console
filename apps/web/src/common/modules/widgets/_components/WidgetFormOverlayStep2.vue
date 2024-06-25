@@ -199,6 +199,7 @@ onUnmounted(() => {
             height: 100%;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
             &.full-size {
                 height: 100%;
                 .widget-frame {

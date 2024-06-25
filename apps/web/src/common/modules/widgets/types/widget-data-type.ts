@@ -12,3 +12,5 @@ export type WidgetLoadData = ListResponse<{
 }>;
 
 export type DateFieldType = typeof DATE_FIELD[keyof typeof DATE_FIELD];
+
+export type TableDataItem = Record<string, any>;
