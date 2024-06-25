@@ -35,6 +35,7 @@ const router = useRouter();
 const state = reactive({
     hasPermissionToEditOrDelete: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     deleteModalVisible: false,
+    sendLoading: false,
 });
 
 const handleClickEditButton = () => {
@@ -65,6 +66,7 @@ const handleDeleteNoticeConfirm = async () => {
     }
 };
 const handleClickSendEmail = async () => {
+    state.sendLoading = true;
     const loadingMessageId = showLoadingMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SENDING'), '');
 
     try {
@@ -83,6 +85,8 @@ const handleClickSendEmail = async () => {
         showSuccessMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SEND_EMAIL'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        state.sendLoading = false;
     }
 };
 
@@ -110,6 +114,7 @@ onBeforeMount(async () => {
                     </p-button>
                     <p-button style-type="tertiary"
                               icon-left="ic_paper-airplane"
+                              :loading="state.sendLoading"
                               @click="handleClickSendEmail"
                     >
                         {{ $t('INFO.NOTICE.FORM.SEND_EMAIL_MODAL_TITLE') }}
