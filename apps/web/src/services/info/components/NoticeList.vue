@@ -251,12 +251,16 @@ watch(() => state.selectedItems, (selectedItems) => {
                 }
             }
             .dropdown {
-                width: 12rem;
+                width: 20rem;
                 margin-top: 0;
                 margin-left: 0.75rem;
                 &.no-data {
                     padding: 0;
                 }
+            }
+            :deep(.notice-workspace-dropdown .label) {
+                @apply truncate;
+                max-width: 12rem;
             }
         }
     }

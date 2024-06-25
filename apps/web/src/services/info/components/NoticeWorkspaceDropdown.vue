@@ -112,7 +112,7 @@ const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
                                      :theme="state.proxySelectedItems[0].tags?.theme"
                                      size="xxs"
                 />
-                <span>{{ state.proxySelectedItems[0].label }}</span>
+                <span class="label">{{ state.proxySelectedItems[0].label }}</span>
                 <p-badge v-if="state.proxySelectedItems.length > 1"
                          style-type="blue200"
                          badge-type="subtle"
