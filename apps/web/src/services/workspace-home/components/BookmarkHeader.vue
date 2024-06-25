@@ -163,6 +163,7 @@ const handleClickAllSelection = () => {
 const handleSelectTool = async (value: BookmarkType) => {
     state.selectedToolId = value;
     bookmarkStore.setBookmarkType(value);
+    bookmarkStore.setSelectedBookmarks([]);
 
     await bookmarkStore.fetchBookmarkFolderList();
     await bookmarkStore.fetchBookmarkList();

@@ -21,6 +21,7 @@ import type { FileModel } from '@/schema/file-manager/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useNoticeStore } from '@/store/notice';
 
@@ -42,9 +43,12 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
+    isAdminMode: computed(() => appContextGetters.isAdminMode),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
 });
 const state = reactive({
@@ -182,10 +186,11 @@ watch(() => props.postId, (postId) => {
                              width="1.125rem"
                         /> {{ state.noticePostData.view_count }}
                     </span>
-                    <p-i width="0.125rem"
+                    <p-i v-if="storeState.isAdminMode"
+                         width="0.125rem"
                          name="ic_dot"
                     />
-                    <div>
+                    <div v-if="storeState.isAdminMode">
                         <span v-if="state.isAllWorkspace">{{ $t('INFO.NOTICE.ALL_WORKSPACE') }}</span>
                         <div v-else
                              class="workspace-wrapper"
@@ -289,6 +294,9 @@ watch(() => props.postId, (postId) => {
 
             /* custom design-system component - p-popover */
             :deep(.p-popover) {
+                .popper {
+                    padding-right: 2rem;
+                }
                 .popper-content-wrapper {
                     @apply flex-col;
                     gap: 0.5rem;
