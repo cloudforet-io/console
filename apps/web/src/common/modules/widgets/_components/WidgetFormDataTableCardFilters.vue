@@ -34,7 +34,7 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { DATA_SOURCE_DOMAIN, MANAGED_GLOBAL_VARIABLE } from '@/common/modules/widgets/_constants/data-table-constant';
+import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableSourceType } from '@/common/modules/widgets/types/widget-model';
 
@@ -99,7 +99,7 @@ const state = reactive({
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
         const metricLabelsInfo = storeState.metircs[props.sourceId ?? ''].data.labels_info;
-        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => !MANAGED_GLOBAL_VARIABLE.includes(labelInfo.key)) : [];
+        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => labelInfo.key !== 'workspace_id') : [];
     }),
 });
 
