@@ -121,7 +121,7 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
 }));
 
 watch(() => labelsMenuItem.value, (value) => {
-    if (!(value.find((d) => d.name === state.selectedItem))) {
+    if (!(value.find((d) => d.name === state.selectedItem)) && (state.selectedFieldType === 'dynamicField')) {
         state.selectedItem = undefined;
     }
 });
