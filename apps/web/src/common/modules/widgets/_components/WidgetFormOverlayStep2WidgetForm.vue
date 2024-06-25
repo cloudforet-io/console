@@ -61,14 +61,11 @@ const updateWidget = async (dataTableId: string) => {
     const fetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
         : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
-    if (widgetGenerateState.overlayStep === 1) {
-        await fetcher({
-            widget_id: widgetGenerateState.widgetId,
-            widget_type: widgetGenerateState.selectedWidgetName,
-            data_table_id: dataTableId,
-        });
-        widgetGenerateStore.setOverlayStep(2);
-    }
+    await fetcher({
+        widget_id: widgetGenerateState.widgetId,
+        widget_type: widgetGenerateState.selectedWidgetName,
+        data_table_id: dataTableId,
+    });
 };
 
 /* Event */
