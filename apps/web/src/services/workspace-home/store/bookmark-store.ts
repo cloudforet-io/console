@@ -1,17 +1,13 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { UserConfigDeleteParameters } from '@/schema/config/user-config/api-verbs/delete';
-import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
-import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
-import type { UserConfigUpdateParameters } from '@/schema/config/user-config/api-verbs/update';
-import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -22,6 +18,9 @@ import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookm
 import { DEFAULT_BOOKMARK } from '@/common/components/bookmark/constant/constant';
 import type { BookmarkItem, BookmarkModalStateType, BookmarkModalType } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 export const useBookmarkStore = defineStore('bookmark', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
@@ -50,6 +49,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             isEdit: undefined as boolean|undefined,
             type: undefined as BookmarkModalType|undefined,
         } as BookmarkModalStateType,
+        bookmarkType: BOOKMARK_TYPE.WORKSPACE as BookmarkType,
     });
 
     const getters = reactive({
@@ -102,6 +102,9 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         deleteSelectedId: (idx: number) => {
             state.selectedBookmarks.splice(idx, 1);
         },
+        setBookmarkType: (type: BookmarkType) => {
+            state.bookmarkType = type;
+        },
     };
 
 
@@ -118,24 +121,32 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 type: undefined,
             };
             state.selectedBookmarks = [];
+            state.bookmarkType = BOOKMARK_TYPE.WORKSPACE;
         },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
                 .setSort('created_at', false)
                 .setFilters([
-                    { k: 'user_id', v: _getters.userId, o: '=' },
                     { k: 'name', v: 'console:bookmark', o: '' },
                     { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
                     { k: 'data.link', v: null, o: '=' },
                 ]);
             try {
-                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
+                let fetcher;
+                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
+                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.list);
+                }
+                const { status, response } = await fetcher({
                     query: bookmarkListApiQuery.data,
                 });
-                state.bookmarkFolderData = (results ?? []).map((i) => ({
-                    ...i.data,
-                    id: i.name,
-                } as BookmarkItem));
+                if (status === 'succeed') {
+                    state.bookmarkFolderData = (response.results ?? []).map((i) => ({
+                        ...i.data,
+                        id: i.name,
+                    } as BookmarkItem));
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkFolderData = [];
@@ -145,29 +156,37 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
                 .setSort('created_at', true)
                 .setFilters([
-                    { k: 'user_id', v: _getters.userId, o: '=' },
                     { k: 'name', v: 'console:bookmark', o: '' },
                     { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
                     { k: 'data.link', v: null, o: '!=' },
                 ]);
             try {
-                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
+                let fetcher;
+                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
+                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.list);
+                }
+                const { status, response } = await fetcher({
                     query: bookmarkListApiQuery.data,
                 });
-                if (!results || results.length === 0) {
-                    await actions.createDefaultBookmark();
-                    return;
-                }
-                const promises: Promise<BookmarkItem>[] = (results ?? []).map(async (item) => {
-                    const imgIcon = item.data.imgIcon || await fetchFavicon(item.data.link);
-                    return {
-                        ...item.data as BookmarkItem,
-                        id: item.name,
-                        imgIcon: imgIcon || undefined,
-                    };
-                });
+                if (status === 'succeed') {
+                    if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE && isEmpty(response)) {
+                        console.log('default');
+                        await actions.createDefaultBookmark();
+                        return;
+                    }
+                    const promises: Promise<BookmarkItem>[] = (response.results ?? []).map(async (item) => {
+                        const imgIcon = item.data.imgIcon || await fetchFavicon(item.data.link);
+                        return {
+                            ...item.data as BookmarkItem,
+                            id: item.name,
+                            imgIcon: imgIcon || undefined,
+                        };
+                    });
 
-                state.bookmarkData = await Promise.all(promises);
+                    state.bookmarkData = await Promise.all(promises);
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkData = [];
@@ -180,6 +199,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         name: item.name as string || '',
                         link: item.link || '',
                         imgIcon: item.imgIcon,
+                        type: BOOKMARK_TYPE.WORKSPACE,
                     });
                 }));
             } catch (e) {
@@ -188,24 +208,41 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
         createBookmarkFolder: async (name: string) => {
             try {
-                await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
+                let fetcher;
+                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.set);
+                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.set);
+                }
+                const { status } = await fetcher({
                     name: `console:bookmark:${name}`,
                     data: {
                         workspaceId: _getters.currentWorkspaceId,
                         name,
                     },
                 });
-                await actions.fetchBookmarkFolderList();
+                if (status === 'succeed') {
+                    await actions.fetchBookmarkFolderList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
             }
         },
         createBookmarkLink: async ({
-            name, link, folder, imgIcon,
-        }: { name?: string|TranslateResult, link?: string, folder?: string, imgIcon?: string}) => {
+            name, link, folder, imgIcon, type,
+        }: { name?: string|TranslateResult, link?: string, folder?: string, imgIcon?: string, type?: BookmarkType}) => {
             try {
-                await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
+                let fetcher;
+                let resource_group: undefined|string;
+                if (type === BOOKMARK_TYPE.USER || state.bookmarkType === BOOKMARK_TYPE.USER) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.set);
+                    resource_group = undefined;
+                } else if (type === BOOKMARK_TYPE.WORKSPACE || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.create);
+                    resource_group = 'WORKSPACE';
+                }
+                const { status } = await fetcher({
                     name: `console:bookmark:${folder}:${name}-${getRandomId()}`,
                     data: {
                         workspaceId: _getters.currentWorkspaceId,
@@ -214,8 +251,11 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         link,
                         imgIcon,
                     },
+                    resource_group,
                 });
-                await actions.fetchBookmarkList();
+                if (status === 'succeed') {
+                    await actions.fetchBookmarkList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -223,23 +263,31 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
         updateBookmarkFolder: async ({ id, name }: { id?: string, name: string }) => {
             try {
-                await SpaceConnector.clientV2.config.userConfig.update<UserConfigUpdateParameters, UserConfigModel>({
+                let fetcher;
+                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.update);
+                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.update);
+                }
+                const { status } = await fetcher({
                     name: id || '',
                     data: {
                         workspaceId: _getters.currentWorkspaceId,
                         name,
                     },
                 });
-                const foldersLinkItems = state.bookmarkData.filter((i) => i.folder === id);
-                await Promise.all(foldersLinkItems.map(async (item) => {
-                    await actions.updateBookmarkLink({
-                        id: item.id || '',
-                        name: item.name as string || '',
-                        link: item.link || '',
-                        folder: item.folder,
-                    });
-                }));
-                await actions.fetchBookmarkFolderList();
+                if (status === 'succeed') {
+                    const foldersLinkItems = state.bookmarkData.filter((i) => i.folder === id);
+                    await Promise.all(foldersLinkItems.map(async (item) => {
+                        await actions.updateBookmarkLink({
+                            id: item.id || '',
+                            name: item.name as string || '',
+                            link: item.link || '',
+                            folder: item.folder,
+                        });
+                    }));
+                    await actions.fetchBookmarkFolderList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -249,7 +297,13 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             id, name, link, folder,
         }: { id: string, name?: string|TranslateResult, link?: string, folder?: string}) => {
             try {
-                await SpaceConnector.clientV2.config.userConfig.update<UserConfigUpdateParameters, UserConfigModel>({
+                let fetcher;
+                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.update);
+                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.update);
+                }
+                const { status } = await fetcher({
                     name: id,
                     data: {
                         workspaceId: _getters.currentWorkspaceId,
@@ -258,7 +312,9 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         link,
                     },
                 });
-                await actions.fetchBookmarkList();
+                if (status === 'succeed') {
+                    await actions.fetchBookmarkList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -266,14 +322,22 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
         deleteBookmarkFolder: async (id?: string) => {
             try {
-                await SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters, UserConfigModel>({
+                let fetcher;
+                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.delete);
+                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.delete);
+                }
+                const { status } = await fetcher({
                     name: id || '',
                 });
-                const foldersLinkItems = state.bookmarkData.filter((i) => i.folder === id);
-                await Promise.all(foldersLinkItems.map(async (item) => {
-                    await actions.deleteBookmarkLink(item.id || '');
-                }));
-                await actions.fetchBookmarkFolderList();
+                if (status === 'succeed') {
+                    const foldersLinkItems = state.bookmarkData.filter((i) => i.folder === id);
+                    await Promise.all(foldersLinkItems.map(async (item) => {
+                        await actions.deleteBookmarkLink(item.id || '');
+                    }));
+                    await actions.fetchBookmarkFolderList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -281,10 +345,18 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
         deleteBookmarkLink: async (id?: string) => {
             try {
-                await SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters, UserConfigModel>({
+                let fetcher;
+                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.delete);
+                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.delete);
+                }
+                const { status } = await fetcher({
                     name: id || '',
                 });
-                await actions.fetchBookmarkList();
+                if (status === 'succeed') {
+                    await actions.fetchBookmarkList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;

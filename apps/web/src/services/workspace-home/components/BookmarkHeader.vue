@@ -29,8 +29,9 @@ import { i18n } from '@/translations';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { MoreMenuItem } from '@/services/workspace-home/types/workspace-home-type';
+import type { MoreMenuItem, BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
@@ -78,15 +79,15 @@ const state = reactive({
 
     tools: computed<ValueItem[]>(() => ([
         {
-            name: 'shared',
+            name: BOOKMARK_TYPE.WORKSPACE,
             label: state.isMobileSize ? i18n.t('HOME.BOOKMARK_SHARED') as string : i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK') as string,
         },
         {
-            name: 'my',
+            name: BOOKMARK_TYPE.USER,
             label: state.isMobileSize ? i18n.t('HOME.BOOKMARK_MY') as string : i18n.t('HOME.BOOKMARK_MY_BOOKMARK') as string,
         },
     ])),
-    selectedToolId: 'shared',
+    selectedToolId: BOOKMARK_TYPE.WORKSPACE,
 });
 const moreState = reactive({
     isShowMoreButton: false,
@@ -158,6 +159,13 @@ const handleClickAllSelection = () => {
     bookmarkStore.setSelectedBookmark(undefined);
     moreState.selectedItems = [];
     hideContextMenu();
+};
+const handleSelectTool = async (value: BookmarkType) => {
+    state.selectedToolId = value;
+    bookmarkStore.setBookmarkType(value);
+
+    await bookmarkStore.fetchBookmarkFolderList();
+    await bookmarkStore.fetchBookmarkList();
 };
 
 watch([
@@ -262,7 +270,8 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                     <p-select-button-group v-if="!storeState.isFileFullMode"
                                            class="data-source-wrapper"
                                            :buttons="state.tools"
-                                           :selected.sync="state.selectedToolId"
+                                           :selected="state.selectedToolId"
+                                           @update:selected="handleSelectTool"
                     />
                     <p-icon-button v-if="storeState.isFullMode || storeState.isFileFullMode"
                                    name="ic_close"
