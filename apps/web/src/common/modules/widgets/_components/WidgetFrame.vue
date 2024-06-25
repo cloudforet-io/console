@@ -116,31 +116,34 @@ const handleToggleWidth = () => {
                     <div class="metadata-content">
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.BASED_ON') }}</span>
-                            <span class="metadata-value">{{ props.basedOnText }}</span>
+                            <span>{{ props.basedOnText }}</span>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>
-                            <span class="metadata-value">{{ props.unit || '--' }}</span>
+                            <span>{{ props.unit || '--' }}</span>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.FULL_DATA_LINK') }}</span>
-                            <template v-if="props.fullDataLocation">
-                                <p-link new-tab
-                                        highlight
-                                        action-icon="internal-link"
-                                        :to="props.fullDataLocation"
-                                        class="metadata-value"
-                                >
-                                    {{ props.fullDataLinkText }}
-                                </p-link>
+                            <template v-if="props.fullDataLinkList?.length">
+                                <div class="full-data-link-wrapper">
+                                    <p-link v-for="fullDataLink in props.fullDataLinkList"
+                                            :key="`${fullDataLink?.name}-${fullDataLink?.location}`"
+                                            new-tab
+                                            highlight
+                                            action-icon="internal-link"
+                                            :to="fullDataLink?.location"
+                                    >
+                                        {{ fullDataLink?.name }}
+                                    </p-link>
+                                </div>
                             </template>
                             <template v-else>
-                                <span class="metadata-value">--</span>
+                                <span>--</span>
                             </template>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.DESCRIPTION') }}</span>
-                            <span class="metadata-value">{{ props.description || '--' }}</span>
+                            <span>{{ props.description || '--' }}</span>
                         </div>
                     </div>
                 </template>
@@ -273,6 +276,11 @@ const handleToggleWidth = () => {
                 .metadata-title {
                     @apply text-gray-600;
                     width: 7rem;
+                }
+                .full-data-link-wrapper {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.125rem;
                 }
             }
         }

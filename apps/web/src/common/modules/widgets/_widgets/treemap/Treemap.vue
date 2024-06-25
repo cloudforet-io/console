@@ -112,7 +112,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
                     },
                 },
             },
-            vars: props.dashboardVariables,
+            vars: props.vars,
         });
         state.errorMessage = undefined;
         return res;
@@ -129,7 +129,7 @@ const drawChart = (rawData: Data|null) => {
     const _slicedData = _sortedData.slice(0, state.categoryByCount);
     const _etcValue = _sortedData.slice(state.categoryByCount).reduce((acc, v) => acc + v[state.dataField], 0);
     const _etcData = _etcValue ? {
-        [state.categoryByField]: 'ETC',
+        [state.categoryByField]: 'etc',
         [state.dataField]: _etcValue,
     } : {};
     const _refinedData = [..._slicedData, _etcData];

@@ -13,6 +13,7 @@ import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -41,6 +42,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const gnbStore = useGnbStore();
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
@@ -101,7 +103,7 @@ const handleRefresh = async () => {
 };
 const handleUpdateLabels = async (labels: string[]) => {
     try {
-        await dashboardDetailStore.updateDashboard(props.dashboardId, {
+        await dashboardStore.updateDashboard(props.dashboardId, {
             labels,
         });
     } catch (e) {
@@ -111,7 +113,7 @@ const handleUpdateLabels = async (labels: string[]) => {
 const handleUpdateDashboardVariables = async () => {
     state.dashboardVariablesLoading = true;
     try {
-        await dashboardDetailStore.updateDashboard(props.dashboardId as string, {
+        await dashboardStore.updateDashboard(props.dashboardId, {
             variables: dashboardDetailState.variables,
         });
     } catch (e) {

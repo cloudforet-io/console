@@ -134,7 +134,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
                     },
                 },
             },
-            vars: props.dashboardVariables,
+            vars: props.vars,
         });
         state.errorMessage = undefined;
         return res;
@@ -151,7 +151,7 @@ const drawChart = (rawData: Data|null) => {
     // get chart data
     const _slicedData = rawData.results?.slice(0, state.groupByCount) || [];
     const _etcData = rawData.results?.slice(state.groupByCount).reduce((acc, cur) => {
-        acc[state.groupByField] = 'ETC';
+        acc[state.groupByField] = 'etc';
         acc[state.dataField] = (acc[state.dataField] || 0) + cur[state.dataField];
         return acc;
     }, {} as Record<string, string|number>);

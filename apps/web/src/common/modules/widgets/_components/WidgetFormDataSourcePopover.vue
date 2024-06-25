@@ -181,7 +181,7 @@ const handleSelectPopperCondition = (condition: DataTableDataType) => {
 const handleConfirmDataSource = async () => {
     state.loading = true;
     // create widget
-    if (widgetGenerateState.overlayType === 'ADD' && !widgetGenerateState.widget?.widget_id) {
+    if (widgetGenerateState.overlayType === 'ADD' && !widgetGenerateState.widgetId) {
         const createdWidget = await createWidget();
         if (createdWidget) {
             dashboardDetailStore.addWidgetToDashboardLayouts(createdWidget.widget_id);

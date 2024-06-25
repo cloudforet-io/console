@@ -60,7 +60,7 @@ const state = reactive({
 
 const updateDashboard = async () => {
     try {
-        await dashboardDetailStore.updateDashboard(props.dashboardId, {
+        await dashboardStore.updateDashboard(props.dashboardId, {
             name: _name.value,
         });
     } catch (e) {

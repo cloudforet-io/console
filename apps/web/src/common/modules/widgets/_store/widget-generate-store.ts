@@ -42,6 +42,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         // Widget
         widget: undefined as undefined | WidgetModel,
         widgetId: '',
+        latestWidgetId: '',
         selectedWidgetName: 'table',
         title: '',
         description: '',
@@ -71,6 +72,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     /* Mutations */
     const setWidgetId = (widgetId: string) => {
         state.widgetId = widgetId;
+    };
+    const setLatestWidgetId = (widgetId: string) => {
+        state.latestWidgetId = widgetId;
     };
     const setShowOverlay = (showOverlay: boolean) => {
         state.showOverlay = showOverlay;
@@ -114,6 +118,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
 
     const mutations = {
         setWidgetId,
+        setLatestWidgetId,
         setShowOverlay,
         setOverlayStep,
         setOverlayType,
@@ -253,6 +258,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         /* Step 2 */
         reset: () => {
             state.widget = undefined;
+            state.widgetId = '';
             state.dataTables = [];
             state.showOverlay = false;
             state.overlayStep = 1;

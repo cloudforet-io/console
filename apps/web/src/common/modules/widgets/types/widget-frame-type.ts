@@ -1,7 +1,13 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
+import type { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 
+
+export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
+export interface FullDataLink {
+    name?: string;
+    location?: Location;
+}
 
 export interface WidgetFrameProps {
     widgetId: string;
@@ -18,6 +24,5 @@ export interface WidgetFrameProps {
     width?: number;
     basedOnText?: string;
     unit?: string;
-    fullDataLinkText?: string;
-    fullDataLocation?: Location;
+    fullDataLinkList?: FullDataLink[];
 }

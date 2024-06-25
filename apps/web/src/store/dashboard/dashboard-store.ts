@@ -187,7 +187,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
             ? SpaceConnector.clientV2.dashboard.privateDashboard.update
             : SpaceConnector.clientV2.dashboard.publicDashboard.update;
         try {
-            const result = await fetcher<UpdateDashboardParameters, DashboardModel>(params);
+            const result = await fetcher<UpdateDashboardParameters, DashboardModel>({
+                dashboard_id: dashboardId,
+                ...params,
+            });
             if (isPrivate) {
                 const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === get(params, 'dashboard_id'));
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1, result as PrivateDashboardModel);

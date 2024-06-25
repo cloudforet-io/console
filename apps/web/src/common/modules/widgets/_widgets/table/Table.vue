@@ -182,13 +182,14 @@ const state = reactive({
             });
         } else if (isDateField(state.tableDataField)) dataFields = getWidgetTableDateFields(state.tableDataField, state.granularity, state.dateRange, state.tableDataMaxCount);
         else {
-            state.slicedData?.results?.[0][state.tableDataCriteria].forEach((d) => {
+            state.finalConvertedData?.results?.[0][state.tableDataCriteria].forEach((d) => {
+                if (d[state.tableDataField] === 'sub_total') return;
                 dataFields.push({
                     name: d[state.tableDataField],
                     label: d[state.tableDataField],
                     fieldInfo: { type: 'dataField' },
                 });
-                if (state.comparisonInfo?.format && state.isComparisonEnabled) {
+                if (state.comparisonInfo?.format && state.isComparisonEnabled && d[state.tableDataField] !== 'Etc') {
                     dataFields.push({
                         name: `comparison_${d[state.tableDataField]}`,
                         label: 'Comparison',
@@ -321,6 +322,9 @@ defineExpose<WidgetExpose<Data>>({
                            :loading="false"
                            :fields="state.tableFields"
                            :items="state.finalConvertedData?.results"
+                           :field-type="state.tableDataFieldType"
+                           :criteria="state.tableDataCriteria"
+                           :data-field="state.tableDataField"
         />
     </widget-frame>
 </template>

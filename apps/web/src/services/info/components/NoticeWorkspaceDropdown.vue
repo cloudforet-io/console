@@ -20,15 +20,17 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import type { WorkspaceDropdownMenuItem } from '@/services/info/types/notice-type';
+import type { WorkspaceDropdownMenuItem, NoticeFormType } from '@/services/info/types/notice-type';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 interface Props {
     selectedItems: WorkspaceDropdownMenuItem[];
+    type?: NoticeFormType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     selectedItems: () => ([]),
+    type: undefined,
 });
 
 const router = useRouter();
@@ -82,6 +84,7 @@ const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
 };
 
 (() => {
+    if (props.type === 'EDIT') return;
     state.proxySelectedItems = [];
 })();
 </script>
@@ -183,3 +186,4 @@ const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
     }
 }
 </style>
+

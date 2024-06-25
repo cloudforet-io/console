@@ -69,8 +69,6 @@ const state = reactive({
         xAxis: {
             type: 'category',
             axisLabel: {
-                interval: 0,
-                rotate: 45,
                 formatter: (val) => {
                     if (state.xAxisField === DATE_FIELD.DATE) {
                         return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
@@ -131,7 +129,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
                 group_by: [state.xAxisField],
                 fields: _fields,
             },
-            vars: props.dashboardVariables,
+            vars: props.vars,
         });
         state.errorMessage = undefined;
         return res;
@@ -155,7 +153,7 @@ const drawChart = (rawData: Data|null) => {
         return acc;
     }, Object.fromEntries(state.dataField.map((field) => [field, 0])));
     if (!isEmpty(_etcData)) {
-        _slicedData.push({ [state.xAxisField]: 'ETC', ..._etcData });
+        _slicedData.push({ [state.xAxisField]: 'etc', ..._etcData });
     }
 
     // get xAxis data
@@ -166,7 +164,7 @@ const drawChart = (rawData: Data|null) => {
         _xAxisData = Array.from(new Set(_slicedData.map((v) => v[state.xAxisField] as string)));
         _xAxisData = _xAxisData.slice(0, state.xAxisCount);
         if (!isEmpty(_etcData)) {
-            _xAxisData.push('ETC');
+            _xAxisData.push('etc');
         }
     }
     state.xAxisData = _xAxisData;
