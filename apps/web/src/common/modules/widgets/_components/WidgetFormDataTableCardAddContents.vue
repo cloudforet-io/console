@@ -34,7 +34,6 @@ import {
     DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
-import { getCostDataKey } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { AdditionalLabel, DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { AdditionalLabels, DateFormat } from '@/common/modules/widgets/types/widget-model';
@@ -103,11 +102,11 @@ const state = reactive({
         const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
         const usageAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
         const additionalMenuItems: MenuItem[] = targetCostDataSource.data?.cost_data_keys?.map((key) => ({
-            name: key, label: key,
+            name: `data.${key}`, label: key,
         }));
         return [
             { name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },
-            { name: 'usage', label: usageAlias ? `Usage (${usageAlias})` : 'Usage' },
+            { name: 'usage_quantity', label: usageAlias ? `Usage (${usageAlias})` : 'Usage' },
             ...(additionalMenuItems || []),
         ];
     }),
@@ -237,7 +236,7 @@ const handleUpdateDataTable = async () => {
         additionalLabelsRequest[label.name] = label.value;
     });
     const domainOptions = state.sourceType === DATA_SOURCE_DOMAIN.COST
-        ? { data_source_id: state.dataSourceId, data_key: getCostDataKey(state.selectedSourceEndItem) }
+        ? { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem }
         : { metric_id: state.selectedSourceEndItem };
 
     const costGroupBy = state.selectedGroupByItems.map((group) => ({

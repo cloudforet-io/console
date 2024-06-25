@@ -40,7 +40,7 @@ const state = reactive({
         const _defaultDashboardVariables: Record<string, DashboardVariableSchemaProperty> = {
             project: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project.key],
             service_account: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.service_account.key],
-            region: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.region.key],
+            // region: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.region.key],
         };
         if (storeState.isAdminMode) {
             _defaultDashboardVariables.workspace = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key];
