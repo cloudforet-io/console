@@ -5,7 +5,7 @@ import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/t
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import type { ReferenceMap } from '@/store/reference/type';
 
-import type { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import type { SUMMARY_DATA_TYPE, BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 
 // summary
 
@@ -44,6 +44,7 @@ export interface EmptyData {
 export interface MoreMenuItem extends MenuItem {
     workspaceId?: string;
 }
+export type BookmarkType = typeof BOOKMARK_TYPE[keyof typeof BOOKMARK_TYPE];
 
 // configs
 export type StarredServiceItem = {

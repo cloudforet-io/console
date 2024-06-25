@@ -177,22 +177,6 @@ watch(() => storeState.modal.type, (type) => {
                                class="input-form"
                 >
                     <div class="folder-wrapper">
-                        <p-radio-group :direction="'vertical'">
-                            <p-radio v-for="(item, idx) in props.bookmarkFolderList"
-                                     :key="`bookmark-folder-${idx}`"
-                                     v-model="state.selectedFolderIdx"
-                                     :value="idx"
-                            >
-                                <span class="radio-item">
-                                    <p-i name="ic_folder"
-                                         color="inherit"
-                                         width="1.25rem"
-                                         height="1.25rem"
-                                    />
-                                    {{ item.name }}
-                                </span>
-                            </p-radio>
-                        </p-radio-group>
                         <div class="buttons-wrapper">
                             <p-button icon-left="ic_plus"
                                       style-type="tertiary"
@@ -209,6 +193,22 @@ watch(() => storeState.modal.type, (type) => {
                                 {{ $t('HOME.FORM_DESELECT') }}
                             </p-button>
                         </div>
+                        <p-radio-group :direction="'vertical'">
+                            <p-radio v-for="(item, idx) in props.bookmarkFolderList"
+                                     :key="`bookmark-folder-${idx}`"
+                                     v-model="state.selectedFolderIdx"
+                                     :value="idx"
+                            >
+                                <span class="radio-item">
+                                    <p-i name="ic_folder"
+                                         color="inherit"
+                                         width="1.25rem"
+                                         height="1.25rem"
+                                    />
+                                    {{ item.name }}
+                                </span>
+                            </p-radio>
+                        </p-radio-group>
                     </div>
                 </p-field-group>
             </div>

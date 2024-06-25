@@ -54,7 +54,7 @@ const state = reactive({
     },
     dataTypeEnable: computed(() => ({
         ...state.fixedDataTypeEnable,
-        ...convertDataKey(storeState.selectedItem.permissions?.deny || []),
+        ...convertDataKey(storeState.selectedItem.cost_data_keys || []),
     })),
     selectedDataType: '',
     modalVisible: false,
@@ -63,8 +63,7 @@ const state = reactive({
 const convertDataKey = (keys: string[]) => {
     const result = {};
     keys.forEach((key) => {
-        const [, keyName] = key.split('.');
-        result[keyName] = true;
+        result[key] = !storeState.selectedItem.permissions?.deny?.includes(`data.${key}`);
     });
     return result;
 };
@@ -75,17 +74,14 @@ const handleChangeToggle = async (item: string, value: boolean) => {
         state.modalVisible = true;
     } else {
         try {
-            const denyList = storeState.selectedItem.permissions?.deny || [];
-            const costDataKeys = storeState.selectedItem.cost_data_keys || [];
-
-            const updatedDenyList = denyList.filter((denyItem) => {
-                const key = denyItem.replace('data.', '');
-                return !costDataKeys.includes(key);
-            });
+            const permissions = [
+                ...storeState.selectedItem.permissions?.deny || [],
+                `data.${state.selectedDataType}`,
+            ];
             await SpaceConnector.clientV2.costAnalysis.dataSource.updatePermissions<CostDataSourceUpdatePermissionsParameters>({
                 data_source_id: storeState.selectedItem.data_source_id,
                 permissions: {
-                    deny: updatedDenyList,
+                    deny: permissions,
                 },
             });
             showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_CHANGE_TOGGLE'), '');
@@ -102,14 +98,16 @@ const handleClose = () => {
 const handleConfirm = async () => {
     state.loading = true;
     try {
-        const permissions = [
-            ...storeState.selectedItem.permissions?.deny || [],
-            `data.${state.selectedDataType}`,
-        ];
+        const denyList = storeState.selectedItem.permissions?.deny || [];
+        const costDataKeys = storeState.selectedItem.cost_data_keys || [];
+        const updatedDenyList = denyList.filter((denyItem) => {
+            const key = denyItem.replace('data.', '');
+            return !costDataKeys.includes(key);
+        });
         await SpaceConnector.clientV2.costAnalysis.dataSource.updatePermissions<CostDataSourceUpdatePermissionsParameters>({
             data_source_id: storeState.selectedItem.data_source_id,
             permissions: {
-                deny: permissions,
+                deny: updatedDenyList,
             },
         });
         state.modalVisible = false;

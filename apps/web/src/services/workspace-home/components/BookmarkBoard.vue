@@ -22,8 +22,10 @@ import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
 import { blue, gray } from '@/styles/colors';
 
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
+import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     boardList: BookmarkItem[];
@@ -52,6 +54,7 @@ const storeState = reactive({
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
+    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
@@ -109,8 +112,10 @@ const handleSelectDropdownMenu = (item: string) => {
 };
 const handleClickItem = (item) => {
     if (props.isFolderBoard) {
-        if (item.icon) {
+        if (item.id === 'create-folder') {
             bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.FOLDER);
+        } else if (item.id === 'add-link') {
+            bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK, false);
         } else {
             bookmarkStore.setFileFullMode(true, item);
         }
@@ -157,7 +162,7 @@ const checkSelectedId = (id?: string) => {
                           @click="handleClickItem(item)"
             >
                 <template #content>
-                    <p-checkbox v-if="!storeState.isWorkspaceMember && (props.isFullMode && !item.icon)"
+                    <p-checkbox v-if="!(storeState.bookmarkType === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember) && (props.isFullMode && !item.icon)"
                                 :value="true"
                                 :selected="checkSelectedId(item.id)"
                                 @change="handleClickCheckBox(item)"
@@ -165,7 +170,7 @@ const checkSelectedId = (id?: string) => {
                     <div v-if="props.isFolderBoard"
                          class="image-wrapper"
                     >
-                        <p-i v-if="item.icon"
+                        <p-i v-if="item.id === 'create-folder' || item.id === 'add-link'"
                              name="ic_plus"
                              width="1.25rem"
                              height="1.25rem"
@@ -198,9 +203,21 @@ const checkSelectedId = (id?: string) => {
                         </div>
                     </div>
                     <div class="text-wrapper">
-                        <p class="bookmark-label">
-                            {{ item.name }}
-                        </p>
+                        <div class="title-wrapper">
+                            <p-i v-if="props.isFolderBoard && item.id === 'create-folder'"
+                                 name="ic_folder"
+                                 width="1.125rem"
+                                 height="1.125rem"
+                            />
+                            <p-i v-if="props.isFolderBoard && item.id === 'add-link'"
+                                 name="ic_link"
+                                 width="1.125rem"
+                                 height="1.125rem"
+                            />
+                            <p class="bookmark-label">
+                                {{ item.name }}
+                            </p>
+                        </div>
                         <p v-if="props.isFullMode"
                            class="bookmark-link"
                         >
@@ -208,7 +225,7 @@ const checkSelectedId = (id?: string) => {
                         </p>
                     </div>
                 </template>
-                <template v-if="!storeState.isWorkspaceMember"
+                <template v-if="!(storeState.bookmarkType === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)"
                           #overlay-content
                 >
                     <p-select-dropdown v-if="!item.icon"
@@ -314,7 +331,10 @@ const checkSelectedId = (id?: string) => {
             .text-wrapper {
                 max-width: calc(100% - 2.5rem);
                 line-height: 1rem;
-
+                .title-wrapper {
+                    @apply flex items-center;
+                    gap: 0.25rem;
+                }
                 .bookmark-label {
                     @apply truncate;
                 }
@@ -462,7 +482,7 @@ const checkSelectedId = (id?: string) => {
                 }
 
                 .board-item {
-                    &:first-child {
+                    &:first-child, &:nth-child(2) {
                         .image-wrapper {
                             @apply bg-white;
                         }

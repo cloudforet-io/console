@@ -7,19 +7,31 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, PDivider, PFieldTitle, PI, PIconButton, PTextButton, screens, PContextMenu, useContextMenuController,
+    PButton,
+    PDivider,
+    PFieldTitle,
+    PI,
+    PIconButton,
+    PTextButton,
+    screens,
+    PContextMenu,
+    useContextMenuController,
+    PSelectButtonGroup,
 } from '@spaceone/design-system';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
+import type { ValueItem } from '@spaceone/design-system/src/inputs/search/query-search/type';
 import { sumBy } from 'lodash';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { MoreMenuItem } from '@/services/workspace-home/types/workspace-home-type';
+import type { MoreMenuItem, BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
@@ -30,7 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const FOLDER_DEFAULT_GAP = 4;
-const EXTRA_DEFAULT_WIDTH = 151; // title + gap + divider + create folder button
+const EXTRA_DEFAULT_WIDTH = 137; // gap + divider + create folder button
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
@@ -64,6 +76,18 @@ const state = reactive({
 
     refinedFolderList: [] as BookmarkItem[],
     refinedFolderListWidth: 0,
+
+    tools: computed<ValueItem[]>(() => ([
+        {
+            name: BOOKMARK_TYPE.WORKSPACE,
+            label: state.isMobileSize ? i18n.t('HOME.BOOKMARK_SHARED') as string : i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK') as string,
+        },
+        {
+            name: BOOKMARK_TYPE.USER,
+            label: state.isMobileSize ? i18n.t('HOME.BOOKMARK_MY') as string : i18n.t('HOME.BOOKMARK_MY_BOOKMARK') as string,
+        },
+    ])),
+    selectedToolId: BOOKMARK_TYPE.WORKSPACE,
 });
 const moreState = reactive({
     isShowMoreButton: false,
@@ -136,6 +160,13 @@ const handleClickAllSelection = () => {
     moreState.selectedItems = [];
     hideContextMenu();
 };
+const handleSelectTool = async (value: BookmarkType) => {
+    state.selectedToolId = value;
+    bookmarkStore.setBookmarkType(value);
+
+    await bookmarkStore.fetchBookmarkFolderList();
+    await bookmarkStore.fetchBookmarkList();
+};
 
 watch([
     () => storeState.language,
@@ -198,162 +229,173 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                 />
             </div>
         </div>
-        <p-field-title :label="storeState.isFileFullMode ? storeState.filterByFolder : $t('HOME.BOOKMARKS')"
-                       size="lg"
-        >
-            <template v-if="storeState.isFileFullMode"
-                      #left
-            >
-                <p-icon-button name="ic_arrow-left"
-                               style-type="transparent"
-                               size="sm"
-                               @click="handleGoBackButton"
-                />
-                <div v-if="!state.isMobileSize"
-                     class="folder-icon-wrapper"
+        <div class="bookmark-header-content">
+            <div class="title-wrapper">
+                <p-field-title :label="storeState.isFileFullMode ? storeState.filterByFolder : $t('HOME.BOOKMARKS')"
+                               size="lg"
                 >
-                    <p-i name="ic_folder-filled"
-                         width="0.875rem"
-                         height="0.875rem"
-                    />
-                </div>
-            </template>
-            <template v-if="storeState.isFileFullMode && !state.isMobileSize"
-                      #right
-            >
-                <div class="title-right-wrapper">
-                    <p-icon-button name="ic_edit-text"
-                                   size="sm"
-                                   @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER, true)"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   size="sm"
-                                   @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.DELETE_FOLDER)"
-                    />
-                </div>
-            </template>
-        </p-field-title>
-        <div v-if="!storeState.isFullMode"
-             class="bookmark-folders-wrapper"
-             :style="{ maxWidth: `${state.folderListMaxWidth}px`}"
-        >
-            <div class="bookmark-folders"
-                 :style="{ maxWidth: `${state.refinedFolderListWidth}px`}"
-            >
-                <p-button v-for="(item, idx) in props.bookmarkFolderList"
-                          ref="folderItemsRef"
-                          :key="idx"
-                          style-type="tertiary"
-                          class="folders-button"
-                          :class="{'active': storeState.filterByFolder === item.name}"
-                          @click="handleClickFolder(item)"
-                >
-                    <p-i v-if="storeState.filterByFolder === item.name"
-                         name="ic_close"
-                         width="0.875rem"
-                         height="0.875rem"
-                    />
-                    <p-i v-else
-                         name="ic_folder"
-                         width="0.875rem"
-                         height="0.875rem"
-                    />
-                    <span>{{ item.name }}</span>
-                </p-button>
-            </div>
-            <div v-if="moreState.isShowMoreButton"
-                 class="show-more-wrapper"
-            >
-                <p-button ref="moreButtonRef"
-                          style-type="tertiary"
-                          class="show-more-button"
-                          :class="{'active': visibleContextMenu || moreState.selectedItems.length > 0}"
-                          @click="handleClickAddMore"
-                >
-                    <p-i v-if="visibleContextMenu"
-                         name="ic_close"
-                         width="0.875rem"
-                         height="0.875rem"
-                    />
-                    <p-i v-else
-                         name="ic_ellipsis-horizontal"
-                         width="0.875rem"
-                         height="0.875rem"
-                    />
-                    <span>{{ $t('HOME.BOOKMARK_MORE') }}</span>
-                </p-button>
-                <p-context-menu v-if="visibleContextMenu"
-                                ref="moreContextMenuRef"
-                                :menu="moreState.menuItems"
-                                :selected="moreState.selectedItems"
-                                :style="{ ...contextMenuStyle, 'top': `${moreButtonTop + moreButtonHeight}px`} "
-                                show-select-marker
-                                show-clear-selection
-                                class="more-context-menu"
-                                @select="handleSelectAddMoreMenuItem"
-                >
-                    <template #header>
-                        <p-text-button class="clear-all-wrapper"
-                                       style-type="highlight"
-                                       size="md"
-                                       @click="handleClickAllSelection"
+                    <template v-if="storeState.isFileFullMode"
+                              #left
+                    >
+                        <p-icon-button name="ic_arrow-left"
+                                       style-type="transparent"
+                                       size="sm"
+                                       @click="handleGoBackButton"
+                        />
+                        <div v-if="!state.isMobileSize"
+                             class="folder-icon-wrapper"
                         >
-                            {{ $t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }}
-                        </p-text-button>
+                            <p-i name="ic_folder-filled"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
+                        </div>
                     </template>
-                </p-context-menu>
+                    <template v-if="storeState.isFileFullMode && !state.isMobileSize && !(state.selectedToolId === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)"
+                              #right
+                    >
+                        <div class="title-right-wrapper">
+                            <p-icon-button name="ic_edit-text"
+                                           size="sm"
+                                           @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER, true)"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           size="sm"
+                                           @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.DELETE_FOLDER)"
+                            />
+                        </div>
+                    </template>
+                </p-field-title>
+                <div class="extra-wrapper">
+                    <p-select-button-group v-if="!storeState.isFileFullMode"
+                                           class="data-source-wrapper"
+                                           :buttons="state.tools"
+                                           :selected="state.selectedToolId"
+                                           @update:selected="handleSelectTool"
+                    />
+                    <p-icon-button v-if="storeState.isFullMode || storeState.isFileFullMode"
+                                   name="ic_close"
+                                   shape="square"
+                                   size="md"
+                                   :activated="false"
+                                   @click="handleClickFullModeButton"
+                    />
+                </div>
             </div>
-        </div>
-        <div v-if="!storeState.isWorkspaceMember && (!storeState.isFullMode && !state.isMobileSize)"
-             class="file-extra-wrapper"
-        >
-            <p-divider vertical
-                       class="divider"
-            />
-            <div>
-                <p-icon-button v-if="props.bookmarkFolderList.length > 0"
-                               name="ic_plus"
-                               style-type="tertiary"
-                               shape="square"
-                               size="sm"
-                               @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER)"
-                />
-                <p-text-button v-else
-                               icon-left="ic_plus"
-                               class="create-folder-button"
-                               @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER)"
+            <div v-if="!storeState.isFullMode && !storeState.isFileFullMode"
+                 class="bookmark-folders-wrapper"
+            >
+                <div v-if="props.bookmarkFolderList.length > 0"
+                     class="bookmark-folders-container"
+                     :style="{ maxWidth: `${state.folderListMaxWidth}px`}"
                 >
-                    {{ $t('HOME.BOOKMARK_CREATE_FOLDER') }}
-                </p-text-button>
+                    <div class="bookmark-folders"
+                         :style="{ maxWidth: `${state.refinedFolderListWidth}px`}"
+                    >
+                        <p-button v-for="(item, idx) in props.bookmarkFolderList"
+                                  ref="folderItemsRef"
+                                  :key="idx"
+                                  style-type="tertiary"
+                                  class="folders-button"
+                                  :class="{'active': storeState.filterByFolder === item.name}"
+                                  @click="handleClickFolder(item)"
+                        >
+                            <p-i v-if="storeState.filterByFolder === item.name"
+                                 name="ic_close"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
+                            <p-i v-else
+                                 name="ic_folder"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
+                            <span>{{ item.name }}</span>
+                        </p-button>
+                    </div>
+                    <div v-if="moreState.isShowMoreButton"
+                         class="show-more-wrapper"
+                    >
+                        <p-button ref="moreButtonRef"
+                                  style-type="tertiary"
+                                  class="show-more-button"
+                                  :class="{'active': visibleContextMenu || moreState.selectedItems.length > 0}"
+                                  @click="handleClickAddMore"
+                        >
+                            <p-i v-if="visibleContextMenu"
+                                 name="ic_close"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
+                            <p-i v-else
+                                 name="ic_ellipsis-horizontal"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
+                            <span>{{ $t('HOME.BOOKMARK_MORE') }}</span>
+                        </p-button>
+                        <p-context-menu v-if="visibleContextMenu"
+                                        ref="moreContextMenuRef"
+                                        :menu="moreState.menuItems"
+                                        :selected="moreState.selectedItems"
+                                        :style="{ ...contextMenuStyle, 'top': `${moreButtonTop + moreButtonHeight}px`} "
+                                        show-select-marker
+                                        show-clear-selection
+                                        class="more-context-menu"
+                                        @select="handleSelectAddMoreMenuItem"
+                        >
+                            <template #header>
+                                <p-text-button class="clear-all-wrapper"
+                                               style-type="highlight"
+                                               size="md"
+                                               @click="handleClickAllSelection"
+                                >
+                                    {{ $t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }}
+                                </p-text-button>
+                            </template>
+                        </p-context-menu>
+                    </div>
+                </div>
+                <div v-if="!state.isMobileSize && !(state.selectedToolId === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)"
+                     class="file-extra-wrapper"
+                >
+                    <p-divider v-if="props.bookmarkFolderList.length > 0"
+                               vertical
+                               class="divider"
+                    />
+                    <div>
+                        <p-button v-if="!state.isMobileSize"
+                                  icon-left="ic_plus"
+                                  size="sm"
+                                  class="add-link-button"
+                                  style-type="tertiary"
+                                  @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER, false, true)"
+                        >
+                            <span>{{ $t('HOME.FORM_FOLDER') }}</span>
+                        </p-button>
+                        <p-button v-if="!state.isMobileSize"
+                                  icon-left="ic_plus"
+                                  size="sm"
+                                  class="add-link-button"
+                                  style-type="tertiary"
+                                  @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, true)"
+                        >
+                            <span>{{ $t('HOME.FORM_LINK') }}</span>
+                        </p-button>
+                    </div>
+                </div>
+                <div ref="toolboxRef"
+                     class="toolbox-wrapper"
+                >
+                    <p-text-button icon-right="ic_chevron-down"
+                                   style-type="highlight"
+                                   class="create-folder-button"
+                                   @click="handleClickFullModeButton"
+                    >
+                        {{ state.isLaptopSize ? $t('HOME.BOOKMARK_VIEW_ALL') : $t('HOME.BOOKMARK_VIEW_ALL_BOOKMARKS') }}
+                    </p-text-button>
+                </div>
             </div>
-        </div>
-        <div ref="toolboxRef"
-             class="toolbox-wrapper"
-        >
-            <p-button v-if="!storeState.isWorkspaceMember && (!state.isMobileSize || (state.isMobileSize && storeState.isFullMode))"
-                      icon-left="ic_plus"
-                      size="sm"
-                      class="add-link-button"
-                      :style-type="storeState.isFullMode ? 'substitutive' : 'tertiary'"
-                      @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, true)"
-            >
-                <span>{{ $t('HOME.BOOKMARK_ADD_LINK') }}</span>
-            </p-button>
-            <p-button v-if="!storeState.isFullMode"
-                      class="add-link-button"
-                      style-type="tertiary"
-                      size="sm"
-                      @click="handleClickFullModeButton"
-            >
-                <span>{{ $t('HOME.BOOKMARK_VIEW_ALL') }}</span>
-            </p-button>
-            <p-icon-button v-else-if="storeState.isFullMode"
-                           name="ic_close"
-                           shape="square"
-                           size="md"
-                           :activated="false"
-                           @click="handleClickFullModeButton"
-            />
         </div>
     </div>
 </template>
@@ -378,55 +420,73 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
             gap: 0.25rem;
         }
     }
-    .bookmark-folders-wrapper {
-        @apply flex items-center overflow-hidden;
-        .bookmark-folders {
-            @apply flex overflow-hidden;
-            gap: 0.25rem;
+    .bookmark-header-content {
+        @apply flex flex-col;
+        width: 100%;
+        .title-wrapper {
+            @apply flex justify-between items-center;
+            .extra-wrapper {
+                @apply flex items-center;
+                gap: 0.5rem;
+            }
         }
-        .folders-button, .show-more-button {
-            @apply flex items-center font-normal text-label-md bg-gray-150;
-            min-width: initial;
-            height: 1.625rem;
-            padding: 0.25rem 0.625rem;
-            border: none;
-            font-family: Noto Sans, Roboto, sans-serif;
-            gap: 0.25rem;
-            &.active {
-                @apply bg-blue-300;
-                &:hover {
-                    @apply bg-blue-200;
+        .bookmark-folders-wrapper {
+            @apply flex items-center;
+            width: 100%;
+            margin-top: 1.375rem;
+            .bookmark-folders-container {
+                @apply flex items-center overflow-hidden;
+                .bookmark-folders {
+                    @apply flex overflow-hidden;
+                    gap: 0.25rem;
+                }
+                .folders-button, .show-more-button {
+                    @apply flex items-center font-normal text-label-md bg-gray-150;
+                    min-width: initial;
+                    height: 1.625rem;
+                    padding: 0.25rem 0.625rem;
+                    border: none;
+                    font-family: Noto Sans, Roboto, sans-serif;
+                    gap: 0.25rem;
+                    &.active {
+                        @apply bg-blue-300;
+                        &:hover {
+                            @apply bg-blue-200;
+                        }
+                    }
+                    &:hover {
+                        @apply bg-gray-200;
+                    }
+                }
+                .show-more-wrapper {
+                    .more-context-menu {
+                        z-index: 10;
+                    }
+                    .clear-all-wrapper {
+                        @apply text-label-md;
+                        padding: 0.375rem 0.5rem 0.75rem;
+                    }
+                }
+                + .file-extra-wrapper {
+                    margin-left: 0.625rem;
                 }
             }
-            &:hover {
-                @apply bg-gray-200;
+            .file-extra-wrapper {
+                @apply flex;
+                gap: 0.625rem;
+                .divider {
+                    height: 1.25rem;
+                }
+                .add-link-button + .add-link-button {
+                    margin-left: 0.5rem;
+                }
+            }
+            .toolbox-wrapper {
+                @apply flex items-center;
+                margin-left: auto;
+                gap: 0.5rem;
             }
         }
-        .show-more-wrapper {
-            .more-context-menu {
-                z-index: 10;
-            }
-            .clear-all-wrapper {
-                @apply text-label-md;
-                padding: 0.375rem 0.5rem 0.75rem;
-            }
-        }
-    }
-    .file-extra-wrapper {
-        @apply flex;
-        margin-left: 0.125rem;
-        gap: 0.625rem;
-        .divider {
-            height: 1.25rem;
-        }
-        .create-folder-button {
-            padding-left: 0;
-        }
-    }
-    .toolbox-wrapper {
-        @apply flex items-center;
-        margin-left: auto;
-        gap: 0.5rem;
     }
 
     /* custom design-system component - p-field-title */
@@ -457,11 +517,6 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         }
         &:not(.full-mode) {
             @apply relative flex-col items-start;
-            .toolbox-wrapper {
-                @apply absolute;
-                top: 0.25rem;
-                right: 0;
-            }
         }
     }
 }
