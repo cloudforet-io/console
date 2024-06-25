@@ -6,8 +6,8 @@ import {
 import AnomalyDetectionHistoryDetail from '@/services/cost-explorer/components/AnomalyDetectionHistoryDetail.vue';
 import {
     getNotifyLevelBadgeInfo,
-    getNotifyLevelInfo,
 } from '@/services/cost-explorer/composables/anomaly-detection-handler';
+import { NOTIFY_LEVEL_MAP } from '@/services/cost-explorer/constants/anomaly-detection-constant';
 </script>
 
 <template>
@@ -24,7 +24,7 @@ import {
                     <p-i name="ic_error-filled"
                          height="1rem"
                          width="1rem"
-                         :color="getNotifyLevelInfo('critical')"
+                         :color="NOTIFY_LEVEL_MAP['CRITICAL'].color"
                          class="icon"
                     />
                     <span>critical</span>

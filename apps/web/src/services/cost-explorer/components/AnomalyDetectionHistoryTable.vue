@@ -14,9 +14,8 @@ import type { ProviderReferenceMap } from '@/store/reference/provider-reference-
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import { getNotifyLevelInfo } from '@/services/cost-explorer/composables/anomaly-detection-handler';
 import {
-    DETECTION_HISTORY_HANDLERS, HISTORY_TEMP_DATA,
+    DETECTION_HISTORY_HANDLERS, HISTORY_TEMP_DATA, NOTIFY_LEVEL_MAP,
 } from '@/services/cost-explorer/constants/anomaly-detection-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
@@ -97,10 +96,10 @@ const tableState = reactive({
             </template>
             <template #col-level-format="{value}">
                 <div class="col-level">
-                    <p-i name="ic_error-filled"
+                    <p-i :name="NOTIFY_LEVEL_MAP[value].icon"
                          height="1rem"
                          width="1rem"
-                         :color="getNotifyLevelInfo(value)"
+                         :color="NOTIFY_LEVEL_MAP[value].color"
                     />
                     <span>{{ capitalize(value) }}</span>
                 </div>
