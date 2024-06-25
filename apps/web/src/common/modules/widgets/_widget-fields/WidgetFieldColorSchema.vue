@@ -142,4 +142,9 @@ const gradientGenerator = (color: string) => `linear-gradient(90deg, ${COLOR_SCH
         }
     }
 }
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
+}
 </style>

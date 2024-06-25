@@ -88,6 +88,18 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
 }));
 watch(() => labelsMenuItem.value, (value) => {
     let isSelectedValueValid = false;
+    if (state.selectedItem === undefined) {
+        if (Array.isArray(state.selectedItem)) {
+            state.selectedItem = [value?.[0]?.name];
+        } else {
+            state.selectedItem = value?.[0]?.name;
+        }
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: state.selectedItem,
+        };
+        return;
+    }
     if (Array.isArray(state.selectedItem)) {
         isSelectedValueValid = state.selectedItem.every((item) => value.some((v) => v.name === item.name));
     } else {
@@ -117,7 +129,7 @@ watch(() => state.menuItems, (menuItems) => {
             ...state.proxyValue,
             value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
         };
-        state.selectedItem = state.proxyValue.value ?? state.menuItems[0]?.name;
+        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
     }
 }, { immediate: true });
 /* Init */
@@ -133,7 +145,7 @@ onMounted(() => {
             ...state.proxyValue,
             value: props.value?.value ?? state.menuItems[0]?.name,
         };
-        state.selectedItem = state.menuItems[0]?.name;
+        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
     }
     state.proxyValue = {
         ...state.proxyValue,
@@ -223,5 +235,10 @@ onMounted(() => {
             }
         }
     }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
 }
 </style>

@@ -162,11 +162,6 @@ onMounted(() => {
 </template>
 
 <style lang="postcss" scoped>
-/* custom design-system component - p-field-group */
-:deep(.p-field-group) {
-    margin-bottom: 0.75rem;
-    padding: 0;
-}
 
 .format-rules-wrapper {
     @apply bg-gray-100 rounded-md;
@@ -209,12 +204,14 @@ onMounted(() => {
         :deep(.p-text-input) {
             width: 100%;
         }
-
-        :deep(.p-field-group) {
-            margin-bottom: 0;
-            width: 100%;
-            flex-shrink: 1;
-        }
     }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
+    width: 100%;
+    flex-shrink: 1;
+    padding: 0;
 }
 </style>

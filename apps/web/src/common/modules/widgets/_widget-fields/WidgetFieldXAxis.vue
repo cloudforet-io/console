@@ -58,3 +58,10 @@ const handleIsValid = (isValid: boolean) => {
         </p-field-group>
     </div>
 </template>
+
+<style scoped lang="postcss">
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
+}
+</style>
