@@ -1,4 +1,3 @@
-import { createClient } from '@vercel/edge-config';
 import type { AxiosInstance } from 'axios';
 import axios from 'axios';
 import { get } from 'lodash';
@@ -36,13 +35,9 @@ class Config {
             this.config = {};
             await this.load('/default.json');
             await this.load(`/${import.meta.env.MODE}.json`);
-            console.log(import.meta.env);
-            if (import.meta.env?.VITE_VERCEL_EDGE_CONFIG) {
-                const edgeConfigClient = createClient(import.meta.env.VITE_VERCEL_EDGE_CONFIG);
-                const edgeConfig = await edgeConfigClient.getAll();
-                console.debug('edgeConfig', edgeConfig);
-                this.config = { ...this.config, ...edgeConfig };
-            }
+            const _tempVercelStorage = await axios.get('https://edge-config.vercel.com/ecfg_wus8niqoifhakctdzp4qr4ycqknt?token=c602c320-3e2a-4f3f-90c1-eaf2dff8644c');
+            const edgeConfig = _tempVercelStorage?.data?.items;
+            this.config = { ...this.config, ...edgeConfig };
         }
     }
 
