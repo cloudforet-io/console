@@ -154,6 +154,11 @@ const getValue = (item: any, field: TableWidgetField) => {
             }
             &:hover {
                 background-color: rgba(theme('colors.gray.200'), 0.7);
+                td {
+                    &.sub-total {
+                        background-color: rgba(theme('colors.violet.200'), 0.7);
+                    }
+                }
             }
         }
     }
@@ -174,10 +179,7 @@ const getValue = (item: any, field: TableWidgetField) => {
             @apply bg-violet-100;
 
             .td-contents {
-                @apply font-bold text-gray-900; }
-
-            &:hover {
-                background-color: rgba(theme('colors.violet.200'), 0.7);
+                @apply font-bold text-gray-900;
             }
         }
 
