@@ -11,8 +11,6 @@ export interface IconValue {
 
 export type ComparisonFormat = 'all'|'percent'|'fixed';
 export interface ComparisonValue {
-    // fieldName?: string;
-    // compareTarget?: string;
     decreaseColor?: string;
     increaseColor?: string;
     format?: ComparisonFormat;

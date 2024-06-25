@@ -4,6 +4,7 @@ import { PI } from '@spaceone/design-system';
 
 import type { Currency } from '@/store/modules/settings/type';
 
+import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
@@ -64,17 +65,17 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
     }
     return '-';
 };
-const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField) => {
+const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): { icon: string; color: string; }|undefined => {
     if (props.fieldType === 'staticField') {
         const subtraction = (item?.[field.name]?.target ?? 0) - (item?.[field.name]?.subject ?? 0);
-        if (subtraction > 0) return 'ic_arrow-up-bold-alt';
-        if (subtraction < 0) return 'ic_arrow-down-bold-alt';
+        if (subtraction > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.comparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
+        if (subtraction < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.comparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
     } else {
         const dynamicData = item[props.criteria || ''] ?? [];
         const dynamicDataItem = dynamicData.find((data) => data[props.dataField as string] === field.name);
         const subtraction = (dynamicDataItem?.value?.target ?? 0) - (dynamicDataItem?.value?.subject ?? 0);
-        if (subtraction > 0) return 'ic_arrow-up-bold-alt';
-        if (subtraction < 0) return 'ic_arrow-down-bold-alt';
+        if (subtraction > 0) return { icon: 'ic_arrow-up-bold-alt', color: props.comparisonInfo?.increaseColor || DEFAULT_COMPARISON_COLOR.INCREASE };
+        if (subtraction < 0) return { icon: 'ic_arrow-down-bold-alt', color: props.comparisonInfo?.decreaseColor || DEFAULT_COMPARISON_COLOR.DECREASE };
     }
     return undefined;
 };
@@ -139,7 +140,8 @@ const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField) =>
                         >
                             <span class="common-text-box">{{ getValue(item, field) }}</span>
                             <p-i v-if="field.fieldInfo?.additionalType === 'comparison' && getComparisonValueIcon(item, field)"
-                                 :name="getComparisonValueIcon(item, field)"
+                                 :name="getComparisonValueIcon(item, field)?.icon"
+                                 :color="getComparisonValueIcon(item, field)?.color"
                                  class="comparison-icon"
                                  width="0.75rem"
                                  height="0.75rem"
