@@ -59,3 +59,15 @@ export const getWidgetDateRange = (granularity: string, basedOnDate: string, sub
     const end = dayjs.utc(basedOnDate).format(_dateFormat);
     return [start, end];
 };
+
+
+export const getCostDataKey = (dataType: string): string => {
+    switch (dataType) {
+    case 'cost':
+        return 'cost';
+    case 'usage':
+        return 'usage_quantity';
+    default:
+        return `data.${dataType}`;
+    }
+};
