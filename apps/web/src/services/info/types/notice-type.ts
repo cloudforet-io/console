@@ -12,3 +12,6 @@ export interface WorkspaceDropdownMenuItem extends SelectDropdownMenuItem {
         theme?: string;
     };
 }
+
+
+export type NoticeFormType = 'CREATE' | 'EDIT';
