@@ -1691,6 +1691,8 @@
 			"AUTO": "自動",
 			"BASED_ON": "基準月",
 			"CLONE": "複製",
+			"COPIED": "",
+			"COPY": "コピー",
 			"CURRENT_MONTH": "当月分",
 			"CUSTOM": "カスタム",
 			"CUSTOMIZE": "カスタマイズ",
@@ -1718,7 +1720,9 @@
 			"REFRESH": "自動更新",
 			"SELECT_MONTH": "月を選択",
 			"SET_HOME": "ホームダッシュボードとして設定",
-			"SHARE": ""
+			"SHARE": "",
+			"SHARE_TO_ALL_WORKSPACES": "",
+			"SHARE_WITH_CODE": ""
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "ダッシュボードの作成に失敗しました",

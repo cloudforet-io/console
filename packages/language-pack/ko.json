@@ -1691,6 +1691,8 @@
 			"AUTO": "자동",
 			"BASED_ON": "기준월",
 			"CLONE": "복제",
+			"COPIED": "",
+			"COPY": "복사",
 			"CURRENT_MONTH": "최근월",
 			"CUSTOM": "커스텀",
 			"CUSTOMIZE": "편집",
@@ -1718,7 +1720,9 @@
 			"REFRESH": "자동 새로고침",
 			"SELECT_MONTH": "월 선택",
 			"SET_HOME": "홈 대시보드로 설정",
-			"SHARE": ""
+			"SHARE": "",
+			"SHARE_TO_ALL_WORKSPACES": "",
+			"SHARE_WITH_CODE": ""
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "대시보드 생성 실패",
