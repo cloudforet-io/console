@@ -7,6 +7,7 @@ import {
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { map } from 'lodash';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
@@ -20,6 +21,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const domainConfigStore = useDomainSettingsStore();
 const domainConfigGetters = domainConfigStore.getters;
+
+const storeState = reactive({
+    domainConfig: computed(() => store.state.domain.config),
+});
 const state = reactive({
     isChanged: computed(() => {
         if ([state.selectedTimezone, state.selectedLanguage,
@@ -36,6 +41,13 @@ const state = reactive({
     timezoneMenuList: map(timezoneList, (d) => ({
         type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
     })) as SelectDropdownMenuItem[],
+    config: computed(() => ({
+        ...storeState.domainConfig,
+        settings: {
+            timezone: state.selectedTimezone,
+            language: state.selectedLanguage,
+        },
+    })),
 });
 
 /* Event */
@@ -44,6 +56,9 @@ const handleSaveChanges = async () => {
         await domainConfigStore.updateDomainSettings({
             timezone: state.selectedTimezone,
             language: state.selectedLanguage,
+        });
+        await store.commit('domain/setDomainConfigs', {
+            config: state.config,
         });
         showSuccessMessage(i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE'), '');
     } catch (e) {

@@ -12,9 +12,12 @@ import type { DataTableFieldType } from '@spaceone/design-system/src/data-displa
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { cloneDeep, debounce, sum } from 'lodash';
+import {
+    cloneDeep, debounce, sum, sumBy,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -34,11 +37,14 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { white } from '@/styles/colors';
-import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { gray, white } from '@/styles/colors';
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
-import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import {
+    COST_REPORT_GROUP_BY_ITEM_MAP,
+    GROUP_BY,
+} from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
@@ -51,7 +57,6 @@ interface ChartData {
 }
 type CostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;
-    date: string;
     value_sum: number;
 };
 
@@ -63,6 +68,7 @@ const CHART_ROOT_OPTIONS: IRootSettings = {
         left: 1000,
     },
 };
+const OTHER_CATEGORY = 'Others';
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -80,10 +86,10 @@ const state = reactive({
     loading: true,
     data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     targetSelectItems: computed(() => ([
-        { name: GROUP_BY.WORKSPACE, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE') },
+        { name: GROUP_BY.WORKSPACE_NAME, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE') },
         { name: GROUP_BY.PROVIDER, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.PROVIDER') },
     ] as SelectButtonType[])),
-    selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
+    selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE_NAME : GROUP_BY.PROVIDER,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
     currentDate: undefined as Dayjs | undefined,
     currentDateRangeText: computed<string>(() => {
@@ -94,12 +100,13 @@ const state = reactive({
     //
     chartData: computed<ChartData[]>(() => state.data?.results?.map((d, idx) => {
         const _category = d[state.selectedTarget];
-        const _categoryLabel = state.selectedTarget === GROUP_BY.WORKSPACE
-            ? storeState.workspaces[_category]?.label ?? d.workspace_id
+        const _categoryLabel = state.selectedTarget === GROUP_BY.WORKSPACE_NAME
+            ? _category ?? d.workspace_name
             : storeState.providers[_category]?.name ?? d.provider;
-        const _color = state.selectedTarget === GROUP_BY.WORKSPACE
-            ? DEFAULT_CHART_COLORS[idx]
-            : storeState.providers[_category]?.color ?? DEFAULT_CHART_COLORS[idx];
+        let _color = state.selectedTarget === GROUP_BY.WORKSPACE_NAME
+            ? MASSIVE_CHART_COLORS[idx]
+            : storeState.providers[_category]?.color ?? MASSIVE_CHART_COLORS[idx];
+        if (_category === OTHER_CATEGORY) _color = gray[500];
         return {
             category: _categoryLabel,
             value: d.value_sum,
@@ -109,10 +116,42 @@ const state = reactive({
         };
     })),
     tableFields: computed<DataTableFieldType[]>(() => ([
-        { name: state.selectedTarget, label: GROUP_BY_ITEM_MAP[state.selectedTarget].label },
+        { name: state.selectedTarget, label: COST_REPORT_GROUP_BY_ITEM_MAP[state.selectedTarget].label },
         { name: 'value_sum', label: 'Amount', textAlign: 'right' },
     ])),
 });
+
+/* Util */
+const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>): AnalyzeResponse<CostReportDataAnalyzeResult> => {
+    const _results: CostReportDataAnalyzeResult[] = [];
+    const _totalAmount = sumBy(res.results, 'value_sum');
+    const _thresholdValue = _totalAmount * 0.02;
+    let _othersValueSum = 0;
+    res.results?.forEach((d) => {
+        if (d.value_sum < _thresholdValue) {
+            _othersValueSum += d.value_sum;
+        } else {
+            _results.push(d);
+        }
+    });
+    if (_othersValueSum > 0) {
+        _results.push({
+            [state.selectedTarget]: OTHER_CATEGORY,
+            value_sum: _othersValueSum,
+        });
+    }
+    return {
+        more: res.more,
+        results: _results,
+    };
+};
+const getLegendColor = (field: string, value: string, rowIndex: number) => {
+    if (value === OTHER_CATEGORY) return gray[500];
+    if (field === GROUP_BY.WORKSPACE_NAME) {
+        return MASSIVE_CHART_COLORS[rowIndex];
+    }
+    return storeState.providers[value]?.color ?? MASSIVE_CHART_COLORS[rowIndex];
+};
 
 /* Api */
 const analyzeCostReportData = debounce(async () => {
@@ -123,7 +162,7 @@ const analyzeCostReportData = debounce(async () => {
             start: state.currentDate?.format('YYYY-MM'),
             end: state.currentDate?.format('YYYY-MM'),
         };
-        state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+        const res = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
             cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id,
             is_confirmed: true,
             query: {
@@ -142,6 +181,7 @@ const analyzeCostReportData = debounce(async () => {
                 }],
             },
         });
+        state.data = getRefinedAnalyzeData(res);
     } catch (e) {
         state.data = {};
         ErrorHandler.handleError(e);
@@ -186,7 +226,8 @@ const drawChart = () => {
         templateField: 'pieSettings',
     });
     const tooltip = chartHelper.createTooltip();
-    chartHelper.setPieTooltipText(series, tooltip, costReportPageGetters.currency);
+    const valueFormatter = (val) => numberFormatter(val, { minimumFractionDigits: 2 }) as string;
+    chartHelper.setPieTooltipText(series, tooltip, valueFormatter);
     series.slices.template.set('tooltip', tooltip);
     series.data.setAll(cloneDeep(state.chartData));
     chart.series.push(series);
@@ -315,9 +356,9 @@ watch(() => state.currentDate, () => {
                                   class="summary-data-table"
                     >
                         <template #col-format="{field, value, rowIndex}">
-                            <span v-if="field.name === GROUP_BY.WORKSPACE">
+                            <span v-if="field.name === GROUP_BY.WORKSPACE_NAME">
                                 <span class="toggle-button"
-                                      :style="{ 'background-color': DEFAULT_CHART_COLORS[rowIndex] }"
+                                      :style="{ 'background-color': getLegendColor(field.name, value, rowIndex) }"
                                 />
                                 <p-tooltip :contents="storeState.workspaces[value] ? storeState.workspaces[value].label : value"
                                            position="bottom"
@@ -327,7 +368,7 @@ watch(() => state.currentDate, () => {
                             </span>
                             <span v-else-if="field.name === GROUP_BY.PROVIDER">
                                 <span class="toggle-button"
-                                      :style="{ 'background-color': storeState.providers[value]?.color ?? DEFAULT_CHART_COLORS[rowIndex] }"
+                                      :style="{ 'background-color': getLegendColor(field.name, value, rowIndex) }"
                                 />
                                 <p-tooltip :contents="storeState.providers[value] ? storeState.providers[value].name : value"
                                            position="bottom"

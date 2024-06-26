@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 

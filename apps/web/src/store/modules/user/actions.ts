@@ -54,9 +54,10 @@ const getUserInfo = async (): Promise<Partial<UserState>> => {
 };
 
 const updateUser = async (userType: string, userRequest: UpdateUserRequest): Promise<void> => {
-    const request: any = {};
+    const request: UserProfileUpdateParameters = {};
 
     if (userRequest.name) request.name = userRequest.name;
+    if (userRequest.name === '') request.name = ' '; // NOTE: discussed solution by detour way in case of name removal
     if (userRequest.password) request.password = userRequest.password;
     if (userRequest.email) request.email = userRequest.email;
     if (userRequest.language) request.language = userRequest.language;
@@ -68,14 +69,25 @@ const updateUser = async (userType: string, userRequest: UpdateUserRequest): Pro
 
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
     const domainId = signInRequest.domainId;
-    const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
-        domain_id: domainId,
-        auth_type: signInRequest.authType,
-        credentials: signInRequest.credentials,
-        verify_code: signInRequest.verify_code,
-    }, { skipAuthRefresh: true });
+    let response;
 
-    SpaceConnector.setToken(response.access_token, response.refresh_token);
+    if (signInRequest.authType === 'SAML') {
+        response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>({
+            grant_type: 'REFRESH_TOKEN',
+            scope: 'USER',
+            token: signInRequest.credentials.refreshToken,
+        }, { skipAuthRefresh: true });
+        SpaceConnector.setToken(response.access_token, signInRequest.credentials.refreshToken);
+    } else {
+        response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
+            domain_id: domainId,
+            auth_type: signInRequest.authType,
+            credentials: signInRequest.credentials,
+            verify_code: signInRequest.verify_code,
+        }, { skipAuthRefresh: true });
+        SpaceConnector.setToken(response.access_token, response.refresh_token);
+    }
+
 
     const userInfo = await getUserInfo();
     commit('setUser', userInfo);
@@ -226,7 +238,7 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
 
     const convertRequestType = (): UserState => ({
         userId: userRequest.user_id || state.userId,
-        name: userRequest.name || state.name,
+        name: userRequest.name === undefined ? state.name : userRequest.name,
         email: userRequest.email || state.email,
         language: userRequest.language || state.language,
         timezone: userRequest.timezone || state.timezone,

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
 import type { TopBarLogoIconTheme } from '@/common/modules/navigations/top-bar/types/type';
@@ -16,16 +15,33 @@ const props = withDefaults(defineProps<Props>(), {
     size: 'sm',
 });
 
+const ENGLISH_REGEX = /^[A-Za-z]/;
+const CORPORATE_REGEX = /\(([^)])\)/;
+
 const state = reactive({
     theme: computed(() => props.theme),
-    logoText: computed(() => props.text.slice(0, 1).toUpperCase()),
-    isLogoStartsWithEnglish: computed(() => /^[A-Za-z]/.test(state.logoText)),
+    logoText: computed(() => {
+        const match = props.text.match(CORPORATE_REGEX);
+        if (match) {
+            return `(${match[1]})`;
+        }
+        return props.text.replace(/\([^)]*\)/, '').trim().slice(0, 1).toUpperCase();
+    }),
+    isLogoStartsWithEnglish: computed(() => ENGLISH_REGEX.test(state.logoText)),
+    isLogoStartsWithCorporate: computed(() => CORPORATE_REGEX.test(state.logoText)),
 });
-
 </script>
 
 <template>
-    <div :class="{'workspace-logo-icon': true, [state.theme]: true, 'english-logo': state.isLogoStartsWithEnglish, [props.size]: true}">
+    <div
+        :class="{
+            'workspace-logo-icon': true,
+            [state.theme]: true,
+            'english-logo': state.isLogoStartsWithEnglish,
+            [props.size]: true,
+            'corporate-logo': state.isLogoStartsWithCorporate,
+        }"
+    >
         {{ state.logoText }}
     </div>
 </template>
@@ -43,6 +59,9 @@ const state = reactive({
             font-size: 0.625rem;
             line-height: 0.78125rem;
         }
+        .corporate-logo {
+            font-size: 0.425rem;
+        }
     }
     &.xs {
         @apply text-label-sm;
@@ -51,19 +70,32 @@ const state = reactive({
         &.english-logo {
             @apply text-label-sm;
         }
+        &.corporate-logo {
+            font-size: 0.725rem;
+        }
     }
     &.sm {
         @apply text-label-xl;
         width: 1.75rem;
         height: 1.75rem;
-    }
-    &.english-logo {
-        @apply text-display-md;
+        &.english-logo {
+            @apply text-label-xl;
+        }
+        &.corporate-logo {
+            @apply text-label-lg;
+        }
     }
     &.md {
         @apply text-display-lg;
         width: 3rem;
         height: 3rem;
+        &.english-logo {
+            @apply text-display-lg;
+        }
+    }
+    &.corporate-logo {
+        @apply text-display-md;
+        letter-spacing: -0.5px;
     }
 }
 .blue {

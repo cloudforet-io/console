@@ -22,12 +22,14 @@ export const Template = (args, {argTypes} ) => ({
     <p-icon-modal :visible.sync="modalVisible"
                     :size="size"
                     :icon-name="iconName"
+                    :icon-color="iconColor"
                     :emoji="emoji"
                     :header-title="headerTitle"
                     :header-desc="headerDesc"
                     :button-text="buttonText"
                     :button-style-type="buttonStyleType"
                     :backdrop="backdrop"
+                    :hide-button="hideButton"
                     @close="closeModal"
     />
 </div>`,

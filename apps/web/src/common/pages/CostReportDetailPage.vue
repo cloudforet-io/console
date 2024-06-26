@@ -8,15 +8,16 @@ import dayjs from 'dayjs';
 import { cloneDeep, sortBy, sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
+import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
-
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
@@ -70,6 +71,7 @@ const providerReferenceStore = useProviderReferenceStore();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => providerReferenceStore.state.items ?? {}),
+    domainName: computed<string>(() => store.state.domain.name),
 });
 
 const state = reactive({
@@ -174,7 +176,8 @@ const drawChart = () => {
         templateField: 'pieSettings',
     });
     const tooltip = chartHelper.createTooltip();
-    chartHelper.setPieTooltipText(series, tooltip, state.baseInfo?.currency);
+    const valueFormatter = (val) => numberFormatter(val, { minimumFractionDigits: 2 }) as string;
+    chartHelper.setPieTooltipText(series, tooltip, valueFormatter);
     series.slices.template.set('tooltip', tooltip);
     series.data.setAll(cloneDeep(state.chartData));
 };
@@ -299,17 +302,20 @@ const handlePrint = () => {
                 />
             </div>
             <div class="invoice-information">
-                <p class="report-name">
-                    {{ state.baseInfo?.workspace_name }}
-                </p>
                 <p class="report-info">
                     <label>{{ $t('COMMON.COST_REPORT.REPORT_NUMBER') }}:</label>{{ state.baseInfo?.report_number }}
                 </p>
                 <p class="report-info">
-                    <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.reportDateRage }})</span>
+                    <label>{{ $t('COMMON.COST_REPORT.FROM') }}:</label>{{ storeState.domainName }}
+                </p>
+                <p class="report-info">
+                    <label>{{ $t('COMMON.COST_REPORT.TO') }}:</label>{{ state.baseInfo?.workspace_name }}
                 </p>
                 <p class="report-info">
                     <label>{{ $t('COMMON.COST_REPORT.CURRENCY_REFERENCE') }}:</label> {{ state.baseInfo?.currency_date }} ({{ state.baseInfo?.bank_name }})
+                </p>
+                <p class="report-info">
+                    <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.reportDateRage }})</span>
                 </p>
             </div>
             <div class="total"
@@ -537,9 +543,6 @@ const handlePrint = () => {
                     margin-right: 0.5rem;
                 }
 
-                &:nth-child(2) {
-                    margin-top: 1.5rem;
-                }
                 &:nth-child(3) {
                     margin-bottom: 1.5rem;
                     .real-date-range {

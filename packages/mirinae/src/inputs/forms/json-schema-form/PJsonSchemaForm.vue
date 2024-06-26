@@ -26,6 +26,7 @@
             <p-field-group v-for="(schemaProperty, propertyIdx) in schemaProperties"
                            :key="`field-${schemaProperty.propertyName}`"
                            class="input-form-wrapper"
+                           :help-text="schemaProperty.description"
                            :label="schemaProperty.title"
                            :required="requiredList.includes(schemaProperty.propertyName)"
                            :invalid="getPropertyInvalidState(schemaProperty)"
@@ -117,6 +118,13 @@
                                     />
                                 </template>
                             </p-select-dropdown>
+                            <p-toggle-button v-else-if="schemaProperty.componentName === 'PToggleButton'"
+                                             :key="`PToggleButton-${schemaProperty.propertyName}`"
+                                             :value="rawFormData[schemaProperty.propertyName]"
+                                             :disabled="schemaProperty.disabled"
+                                             class="input-form"
+                                             @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                            />
                             <template v-else>
                                 <p-text-input :key="`PTextInput-${schemaProperty.propertyName}`"
                                               :value="schemaProperty.multiInputMode ? undefined : rawFormData[schemaProperty.propertyName]"
@@ -159,6 +167,7 @@ import addFormats from 'ajv-formats';
 import { isEqual } from 'lodash';
 
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
+import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import GenerateIdFormat from '@/inputs/forms/json-schema-form/components/GenerateIdFormat.vue';
@@ -200,6 +209,7 @@ export default defineComponent<JsonSchemaFormProps>({
         PMarkdown,
         PFieldGroup,
         PTextInput,
+        PToggleButton,
     },
     props: {
         schema: {

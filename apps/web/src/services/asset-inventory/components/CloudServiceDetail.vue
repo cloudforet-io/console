@@ -194,7 +194,11 @@ const setOnlyQuery = (query:ApiQueryHelper, type?: DynamicLayoutType) => {
     if (type === 'list') return;
     const fields: DynamicField[] = state.currentLayout.options?.fields ?? [];
     const only:string[] = [];
-    fields.forEach((d) => { if (d) only.push(d.key); });
+    fields.forEach((d) => {
+        if (d.type === 'more' && d.options?.sub_key) {
+            only.push(d.options.sub_key);
+        } else if (d) only.push(d.key);
+    });
     query.setOnly(...only);
 };
 const setListQuery = (options, type?:DynamicLayoutType): any => {
@@ -260,7 +264,11 @@ const fetchData = async () => {
         } else if (state.isTableTypeInDynamicLayout) {
             const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>(getListApiParams(state.currentLayout.type));
             if (res.total_count !== undefined) state.totalCount = res.total_count;
-            if (res.results) state.data = state.isTableTypeInDynamicLayout ? res.results : res.results[0];
+            if (state.isTableTypeInDynamicLayout) {
+                state.data = res.results ?? [];
+            } else {
+                state.data = res.results?.[0];
+            }
         } else {
             const res = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({ cloud_service_id: props.cloudServiceId });
             if (res) state.data = res;
@@ -377,7 +385,7 @@ watch(() => props.cloudServiceId, async (after, before) => {
                                           selectIndex:state.selectIndex,
                                           keyItemSets,
                                           valueHandlerMap,
-                                          lanuage:state.language,
+                                          language:state.language,
                                           excelVisible: layout.type !== 'raw-table',
                                       }"
                                       :field-handler="fieldHandler"

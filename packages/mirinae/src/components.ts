@@ -29,6 +29,8 @@ export { default as PTextHighlighting } from './data-display/text-highlighting/P
 export { default as PTextList } from './data-display/text-list/PTextList.vue';
 export { default as PTooltip } from './data-display/tooltips/PTooltip.vue';
 export { default as PTree } from './data-display/tree/PTree.vue';
+export { default as PTreeView } from './data-display/tree/tree-view/PTreeView.vue';
+export { default as PTreeItem } from './data-display/tree/tree-view/PTreeItem.vue';
 
 /* Feedbacks */
 export { default as PNoticeAlert } from './feedbacks/alert/notice-alert/PNoticeAlert.vue';
@@ -87,6 +89,7 @@ export { default as PSidebar } from './layouts/sidebar/PSidebar.vue';
 export { default as PVerticalLayout } from './layouts/vertical-layout/PVerticalLayout.vue';
 export { default as PCenteredLayout } from './layouts/centered-layout/PCenteredLayout.vue';
 export { default as PCenteredLayoutHeader } from './layouts/centered-layout/centered-layout-header/PCenteredLayoutHeader.vue';
+export { default as POverlayLayout } from './layouts/overlay-layout/POverlayLayout.vue';
 
 /* Navigation */
 export { default as PBreadcrumbs } from './navigation/breadcrumbs/PBreadcrumbs.vue';

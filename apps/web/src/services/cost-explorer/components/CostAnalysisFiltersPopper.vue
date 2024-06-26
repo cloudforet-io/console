@@ -50,6 +50,8 @@ const state = reactive({
     enabledFilters: computed<SelectDropdownMenuItem[]>(() => {
         if (!costAnalysisPageState.enabledFiltersProperties) return [];
         return costAnalysisPageState.enabledFiltersProperties.map((d) => {
+            // NOTE: only for project group case (not in group by but in filters)
+            if (d === GROUP_BY.PROJECT_GROUP) return { name: d, label: 'Project Group' };
             const targetItem = costAnalysisPageGetters.defaultGroupByItems.find((item) => item.name === d);
             if (targetItem) return targetItem;
             return { name: d, label: d };
@@ -73,12 +75,12 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
     try {
         let variableModels: VariableModel|VariableModel[] = GROUP_BY_TO_VAR_MODELS[groupBy];
         if (!variableModels) {
-            variableModels = new VariableModel(({
+            variableModels = new VariableModel({
                 type: 'RESOURCE_VALUE',
                 resource_type: 'cost_analysis.Cost',
                 reference_key: groupBy,
                 name: groupBy,
-            }));
+            });
         }
         const handler = getVariableModelMenuHandler(variableModels, listQueryOptions);
 

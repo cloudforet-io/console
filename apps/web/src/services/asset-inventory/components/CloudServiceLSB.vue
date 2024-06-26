@@ -102,7 +102,12 @@ const state = reactive({
     }),
     menuSet: computed<LSBMenu[]>(() => (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet)),
     favoriteOptions: computed<FavoriteOptions>(() => {
-        if (!state.isCloudServiceDetailPage) return {} as FavoriteOptions;
+        if (!state.isCloudServiceDetailPage) {
+            return {
+                type: FAVORITE_TYPE.MENU,
+                id: 'cloud_service',
+            };
+        }
         return {
             type: FAVORITE_TYPE.CLOUD_SERVICE,
             id: cloudServiceDetailPageState.selectedCloudServiceType?.cloud_service_type_key || '',
@@ -166,7 +171,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
            :top-title="state.topTitle"
            class="cloud-service-l-s-b"
     >
-        <template #collapsible-contents>
+        <template #collapsible-contents-provider>
             <p-radio-group direction="vertical"
                            class="provider-radio-group"
             >
@@ -209,7 +214,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
             gap: 0.25rem;
             padding-left: 0.25rem;
             .selected-wrapper {
-                @apply block;
+                @apply flex items-center;
             }
         }
     }

@@ -8,11 +8,13 @@ import {
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/src/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import { cloneDeep } from 'lodash';
 
 import { isTableTypeInDynamicLayoutType } from '@cloudforet/core-lib/component-util/dynamic-layout';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportOption, ExportParameter } from '@/schema/_common/api-verbs/export';
@@ -41,6 +43,7 @@ const props = defineProps<{
     cloudServiceId?: string;
     hiddenFilters: ConsoleFilter[]; // for server tab
     cloudServiceListFields: DynamicField[];
+    defaultFilter?: ApiFilter[];
 }>();
 
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
@@ -105,11 +108,14 @@ const getSubDataExcelSearchQuery = (): ExportOption[] => {
 const handleConfirm = async () => {
     state.downloadLoading = true;
     const excelExportFetcher = () => {
+        const query = cloneDeep(getCloudServiceListQuery());
+        query.filter = query.filter ? query.filter.concat(props.defaultFilter ?? []) : props.defaultFilter;
+
         const cloudServiceListSheetQuery: ExportOption|undefined = (state.selectedSubDataIds.includes('Main Table')) ? ({
             name: 'Main Table',
             query_type: QueryType.SEARCH,
             search_query: {
-                ...getCloudServiceListQuery(),
+                ...query,
                 fields: dynamicFieldsToExcelDataFields(props.cloudServiceListFields),
             },
         }) as ExportOption : undefined;

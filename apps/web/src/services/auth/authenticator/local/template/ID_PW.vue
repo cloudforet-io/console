@@ -5,7 +5,9 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
-import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
+import {
+    PButton, PTextInput, PFieldGroup, PTextButton,
+} from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -76,7 +78,7 @@ const signIn = async () => {
         await loadAuth().signIn(credentials, 'LOCAL');
         await store.dispatch('display/hideSignInErrorMessage');
         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
-            await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
+            await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME });
         } else {
             emit('sign-in', state.userId);
         }
@@ -99,6 +101,10 @@ const signIn = async () => {
         state.password = '';
     }
 };
+
+const handleClickResetPassword = async () => {
+    await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } });
+};
 </script>
 
 <template>
@@ -112,7 +118,7 @@ const signIn = async () => {
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="state.userId"
-                                  :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
+                                  :placeholder="!isMobile() ? 'Email Address' : 'User ID'"
                                   :invalid="invalid"
                                   block
                                   @update:value="checkUserId"
@@ -127,27 +133,26 @@ const signIn = async () => {
                     <p-text-input v-model="state.password"
                                   type="password"
                                   placeholder="Password"
+                                  appearance-type="masking"
                                   :invalid="invalid"
                                   block
                                   @update:value="checkPassword"
-                                  @keyup.enter="signIn"
+                                  @keydown.prevent.enter="signIn"
                     />
                 </template>
             </p-field-group>
         </form>
         <div class="util-wrapper">
-            <p v-if="state.smtpEnabled"
-               class="reset-pw-button"
+            <p-text-button v-if="state.smtpEnabled"
+                           style-type="highlight"
+                           class="reset-pw-button"
+                           @click="handleClickResetPassword"
             >
-                <router-link id="reset-pw-button"
-                             :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } }"
-                >
-                    {{ $t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
-                </router-link>
-            </p>
-            <p-button style-type="substitutive"
+                {{ $t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
+            </p-text-button>
+            <p-button style-type="primary"
                       type="submit"
-                      size="lg"
+                      size="md"
                       class="sign-in-btn"
                       :loading="state.loading"
                       @click="signIn"
@@ -191,7 +196,7 @@ const signIn = async () => {
     }
     .util-wrapper {
         @apply flex flex-col;
-        gap: 2.5rem;
+        gap: 1.5rem;
         width: 100%;
         margin-top: 1.125rem;
         .reset-pw-button {

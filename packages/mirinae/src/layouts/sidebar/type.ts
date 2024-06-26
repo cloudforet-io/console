@@ -10,6 +10,7 @@ export const SIZE = Object.freeze({
     sm: 'sm',
     md: 'md',
     lg: 'lg',
+    xl: 'xl',
 } as const);
 export type SIZE = typeof SIZE[keyof typeof SIZE];
 

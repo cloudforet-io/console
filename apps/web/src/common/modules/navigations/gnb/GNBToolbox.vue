@@ -100,15 +100,19 @@ const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
 };
 
 watch(() => state.selectedMenuId, async (selectedMenuId) => {
-    if (selectedMenuId === MENU_ID.COST_ANALYSIS) return;
     await gnbStore.initState();
     await favoriteStore.fetchFavorite();
-    await gnbStore.setFavoriteItemId(state.favoriteOptions);
+
+    if (selectedMenuId === MENU_ID.COST_ANALYSIS) {
+        await gnbStore.fetchCostQuerySet();
+    } else if (state.selectedMenuId === MENU_ID.METRIC_EXPLORER) {
+        await gnbStore.fetchMetricExample();
+    }
 }, { immediate: true });
 watch(() => state.currentMenuId, async () => {
-    if (state.selectedMenuId === MENU_ID.COST_ANALYSIS || state.selectedMenuId === MENU_ID.SECURITY) return;
+    if (state.selectedMenuId === MENU_ID.SECURITY || state.selectedMenuId === MENU_ID.COST_ANALYSIS) return;
+
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
-    await gnbStore.fetchCostQuerySet();
 }, { immediate: true });
 </script>
 

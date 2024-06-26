@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
 import {
@@ -23,6 +22,7 @@ import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
@@ -34,7 +34,6 @@ import {
 } from '@/services/preference/constants/workspace-constant';
 import type { WorkspaceTableModel } from '@/services/preference/store/workspace-page-store';
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
-
 
 interface Props {
     tableHeight?: number;
@@ -179,11 +178,17 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
                 />
             </template>
             <template #col-name-format="{value, item}">
-                <p-link :text="value"
-                        action-icon="internal-link"
-                        new-tab
-                        :to="getWorkspaceRouteLocationByWorkspaceName(item)"
-                />
+                <div class="col-name">
+                    <workspace-logo-icon :text="value"
+                                         :theme="item?.tags?.theme"
+                                         size="xs"
+                    />
+                    <p-link :text="value"
+                            action-icon="internal-link"
+                            new-tab
+                            :to="getWorkspaceRouteLocationByWorkspaceName(item)"
+                    />
+                </div>
             </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"
@@ -206,6 +211,10 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
 
 <style lang="postcss" scoped>
 .workspace-management-table {
+    .col-name {
+        @apply flex items-center;
+        gap: 0.5rem;
+    }
     .left-toolbox-item-select-dropdown {
         min-width: 6.5rem;
     }

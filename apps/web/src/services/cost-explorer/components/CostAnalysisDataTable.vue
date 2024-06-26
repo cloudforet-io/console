@@ -37,7 +37,6 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import CostAnalysisDataTableDataTypeDropdown from '@/services/cost-explorer/components/CostAnalysisDataTableDataTypeDropdown.vue';
 import {
     GRANULARITY,
     GROUP_BY,
@@ -50,7 +49,7 @@ import {
 } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type {
-    Granularity, Period, DisplayDataType,
+    Granularity, Period,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
@@ -107,7 +106,7 @@ const state = reactive({
         const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const fields = {
             value_sum: {
-                key: getValueSumKey(state.selectedDisplayDataType),
+                key: getValueSumKey(costAnalysisPageState.displayDataType),
                 operator: 'sum',
             },
         };
@@ -121,14 +120,13 @@ const state = reactive({
             field_group: ['date'],
         };
     }),
-    selectedDisplayDataType: 'cost' as DisplayDataType,
 });
 const tableState = reactive({
     loading: true,
     excelFields: computed<ExcelDataField[]>(() => {
         const fields: DataTableFieldType[] = [];
         if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
-        if (state.isIncludedUsageTypeInGroupBy && state.selectedDisplayDataType === 'usage') {
+        if (state.isIncludedUsageTypeInGroupBy && costAnalysisPageState.displayDataType === 'usage') {
             fields.push({
                 name: 'usage_unit',
                 label: 'Usage Unit',
@@ -139,6 +137,7 @@ const tableState = reactive({
         fields.push(...tableState.costFields);
         return fields.map((d) => {
             const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
+            if (d.name === GROUP_BY.WORKSPACE) field.reference = { reference_key: 'workspace_id', resource_type: 'identity.Workspace' };
             if (d.name === GROUP_BY.PROJECT) field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
             if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
             if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
@@ -164,7 +163,7 @@ const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => {
         const fields: DataTableFieldType[] = [];
         if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
-        if (state.isIncludedUsageTypeInGroupBy && state.selectedDisplayDataType === 'usage') {
+        if (state.isIncludedUsageTypeInGroupBy && costAnalysisPageState.displayDataType === 'usage') {
             fields.push({
                 name: 'usage_unit',
                 label: 'Usage Unit',
@@ -380,16 +379,12 @@ const handleUpdateThisPage = async () => {
     tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
     tableState.more = more ?? false;
 };
-const handleUpdateSelectedDisplayDataType = (selected: DisplayDataType) => {
-    state.selectedDisplayDataType = selected;
-};
 
 watch(
     [
         () => costAnalysisPageState,
         () => costAnalysisPageGetters.selectedDataSourceId,
         () => costAnalysisPageGetters.selectedQueryId,
-        () => state.selectedDisplayDataType,
     ],
     async ([, selectedDataSourceId]) => {
         if (!selectedDataSourceId) return;
@@ -427,10 +422,6 @@ watch(
                 />
             </template>
             <template #toolbox-left>
-                <cost-analysis-data-table-data-type-dropdown
-                    :data-source-id="costAnalysisPageGetters.selectedDataSourceId"
-                    @update-display-data-type="handleUpdateSelectedDisplayDataType"
-                />
                 <div class="toggle-wrapper">
                     <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ORIGINAL_DATA') }}</span>
                     <p-collapsible-toggle :toggle-type="'switch'"
@@ -531,7 +522,6 @@ watch(
     .toggle-wrapper {
         display: flex;
         align-items: center;
-        padding-left: 1rem;
         .label {
             @apply text-label-md;
             font-weight: 700;

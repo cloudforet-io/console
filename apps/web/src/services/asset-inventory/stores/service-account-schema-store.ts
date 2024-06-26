@@ -4,7 +4,6 @@ import {
 } from 'vue';
 
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { defineStore } from 'pinia';
 
 
@@ -19,23 +18,24 @@ import type { AccountType } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { UserState } from '@/store/modules/user/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { ReferenceItem } from '@/store/reference/type';
+import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getAccountFields, getCustomTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import { getDefaultDetailSchema, getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
+import type { ItemLayout, QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
 
 interface Getters {
     currentProviderSchemaList: ComputedRef<SchemaModel[]>;
-    currentProviderData: ComputedRef<ProviderModel|ReferenceItem<undefined>>;
+    currentProviderData: ComputedRef<ProviderItem>|undefined;
     generalAccountSchema: ComputedRef<Partial<SchemaModel>|undefined>;
     trustedAccountSchema: ComputedRef<Partial<SchemaModel>|undefined>;
-    trustingSecretSchema: ComputedRef<Partial<SchemaModel>|undefined>;
+    trustingSecretSchemaList: ComputedRef<Partial<SchemaModel>|undefined>;
     secretSchema: ComputedRef<Partial<SchemaModel>|undefined>;
     isSupportTrustedAccount: ComputedRef<boolean>;
     isCachedProviderSchema: ComputedRef<boolean>;
@@ -45,17 +45,19 @@ interface Getters {
 // The JSON Schema defined for each provider is used to configure the DynamicLayout on the client side.
 export const useServiceAccountSchemaStore = defineStore('service-account-schema', () => {
     const allReferenceStore = useAllReferenceStore();
+    const appContextStore = useAppContextStore();
     const _providerSchemaMap = ref<Record<string, SchemaModel[]>>({});
     const _providerItemMap = computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider);
     const _userConfigMap = computed<UserState>(() => store.state.user);
+    const _isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 
     const state = reactive({
         selectedAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
         currentProvider: undefined as string|undefined,
-        generalAccountTableSchema: undefined as DynamicLayout|undefined,
-        trustedAccountTableSchema: undefined as DynamicLayout|undefined,
-        generalAccountDetailSchema: undefined as { details: Partial<DynamicLayout>[] }|undefined,
-        trustedAccountDetailSchema: undefined as { details: Partial<DynamicLayout>[] }|undefined,
+        generalAccountTableSchema: undefined as QuerySearchTableLayout|undefined,
+        trustedAccountTableSchema: undefined as QuerySearchTableLayout|undefined,
+        generalAccountDetailSchema: undefined as ItemLayout|undefined,
+        trustedAccountDetailSchema: undefined as ItemLayout|undefined,
     });
 
     const getters = reactive<Getters>({
@@ -63,10 +65,10 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         currentProviderData: computed(() => _providerItemMap.value[state.currentProvider ?? '']),
         generalAccountSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT')),
         trustedAccountSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTED_ACCOUNT')),
-        trustingSecretSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTING_SECRET')),
+        trustingSecretSchemaList: computed(() => getters.currentProviderSchemaList.filter((schema) => schema.schema_type === 'TRUSTING_SECRET')),
         secretSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SECRET')),
         isSupportTrustedAccount: computed(() => {
-            const currentProviderData:ProviderModel = getters.currentProviderData;
+            const currentProviderData:ProviderModel = getters.currentProviderData?.data;
             return currentProviderData?.options?.support_trusted_account ?? false;
         }),
         isCachedProviderSchema: computed(() => !!_providerSchemaMap.value[state.currentProvider ?? '']),
@@ -89,7 +91,9 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         setGeneralAccountTableSchema: async () => {
             const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT');
             const fields:DynamicField[] = getAccountFields(accountSchema);
-            let schemaData = getDefaultTableSchema(fields, false);
+            let schemaData = getDefaultTableSchema(fields, {
+                isTrustedAccount: false,
+            });
             const userData = {
                 userType: _userConfigMap.value.userType ?? 'USER',
                 userId: _userConfigMap.value.userId ?? '',
@@ -105,7 +109,10 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         setTrustedAccountTableSchema: async () => {
             const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTED_ACCOUNT');
             const fields:DynamicField[] = getAccountFields(accountSchema);
-            let schemaData = getDefaultTableSchema(fields, true);
+            let schemaData = getDefaultTableSchema(fields, {
+                isTrustedAccount: true,
+                isAdminMode: _isAdminMode.value,
+            });
             const userData = {
                 userType: _userConfigMap.value.userType ?? 'USER',
                 userId: _userConfigMap.value.userId ?? '',
@@ -122,12 +129,12 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         setGeneralAccountDetailSchema: async () => {
             const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT');
             const fields:DynamicField[] = getAccountFields(accountSchema);
-            state.generalAccountDetailSchema = getDefaultDetailSchema(fields, false);
+            state.generalAccountDetailSchema = getDefaultDetailSchema(fields, { isTrustedAccount: false });
         },
         setTrustedAccountDetailSchema: async () => {
-            const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT');
+            const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTED_ACCOUNT');
             const fields:DynamicField[] = getAccountFields(accountSchema);
-            state.trustedAccountDetailSchema = getDefaultDetailSchema(fields, true);
+            state.trustedAccountDetailSchema = getDefaultDetailSchema(fields, { isTrustedAccount: true, isAdminMode: _isAdminMode.value });
         },
     };
 

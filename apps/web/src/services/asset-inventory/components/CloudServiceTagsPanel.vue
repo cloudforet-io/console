@@ -39,13 +39,15 @@ const props = withDefaults(defineProps<{
 });
 const allReferenceStore = useAllReferenceStore();
 
+const storeState = reactive({
+    providers: computed(() => allReferenceStore.getters.provider),
+});
 const state = reactive({
     tagTypeList: computed(() => [
         { name: 'all', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.ALL') },
         { name: CLOUD_SERVICE_TAG_TYPE.CUSTOM, label: CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[CLOUD_SERVICE_TAG_TYPE.CUSTOM].label },
         { name: CLOUD_SERVICE_TAG_TYPE.MANAGED, label: CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[CLOUD_SERVICE_TAG_TYPE.MANAGED].label },
     ]),
-    providers: computed(() => allReferenceStore.getters.provider),
     selectedTagType: 'all',
     fields: computed(() => [
         { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
@@ -101,10 +103,6 @@ const getCloudServiceTags = async () => {
 };
 
 const getTagTypeBadgeOption = (tagType: keyof typeof CLOUD_SERVICE_TAG_TYPE) => CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[tagType];
-const getProviderBadgeOption = (provider) => ({
-    color: state.providers[provider]?.options.background_color,
-    label: state.providers[provider]?.name,
-});
 
 watch([() => props.resourceId, () => props.resourceId], () => { getCloudServiceTags(); }, {
     immediate: true,
@@ -145,11 +143,11 @@ watch([() => props.resourceId, () => props.resourceId], () => { getCloudServiceT
             </p-badge>
         </template>
         <template #col-provider-format="{ value }">
-            <p-badge v-if="value"
-                     :background-color="getProviderBadgeOption(value).color"
+            <p-badge v-if="storeState.providers[value]"
+                     :background-color="storeState.providers[value]?.color"
                      text-color="white"
             >
-                {{ getProviderBadgeOption(value)?.label }}
+                {{ storeState.providers[value]?.label }}
             </p-badge>
         </template>
     </tags-panel>

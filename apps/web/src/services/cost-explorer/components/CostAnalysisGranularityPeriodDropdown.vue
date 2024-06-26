@@ -43,7 +43,6 @@ const state = reactive({
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
         },
     ])),
-    granularity: undefined as Granularity|undefined,
     showPeriodBadge: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
     periodBadgeText: computed<string>(() => {
         if (!costAnalysisPageState.period) return '';
@@ -62,7 +61,6 @@ const state = reactive({
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
     costAnalysisPageStore.setGranularity(granularity);
-    state.granularity = granularity;
 };
 </script>
 

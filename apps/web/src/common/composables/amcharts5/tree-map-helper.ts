@@ -2,9 +2,6 @@ import type * as am5 from '@amcharts/amcharts5';
 import { Percent } from '@amcharts/amcharts5';
 import * as am5hierarchy from '@amcharts/amcharts5/hierarchy';
 
-import type { Currency } from '@/store/modules/settings/type';
-
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 export const createTreeMapSeries = (
     root: am5.Root,
@@ -16,7 +13,7 @@ export const createTreeMapSeries = (
     ...settings,
 }));
 
-export const setTreemapTooltipText = (series: am5hierarchy.Treemap, tooltip: am5.Tooltip, currency?: Currency): void => {
+export const setTreemapTooltipText = (series: am5hierarchy.Treemap, tooltip: am5.Tooltip, valueFormatter?: (value: any, data?: any) => string): void => {
     tooltip.label.setAll({
         fontSize: 14,
     });
@@ -25,10 +22,9 @@ export const setTreemapTooltipText = (series: am5hierarchy.Treemap, tooltip: am5
 
     tooltip.label.adapters.add('text', (_, target) => {
         const colorValue = target.dataItem?.dataContext?.[colorFieldName] || 'black';
-        let value = target.dataItem?.dataContext?.[valueFieldName] || '-';
-
-        if (currency) value = currencyMoneyFormatter(value, { currency });
-        return `[${colorValue}; fontSize: 10px]●[/] {category}: [bold]${value}[/] ({valuePercentTotal.formatNumber("0.00")}%)`;
+        const value = target.dataItem?.dataContext?.[valueFieldName] || '--';
+        const formatted = valueFormatter ? valueFormatter(value, target.dataItem?.dataContext) : value;
+        return `[${colorValue}; fontSize: 10px]●[/] {category}: [bold]${formatted}[/] ({valuePercentTotal.formatNumber("0.00")}%)`;
     });
 };
 

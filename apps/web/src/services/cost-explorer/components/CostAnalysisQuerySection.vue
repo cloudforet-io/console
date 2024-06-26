@@ -23,6 +23,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import CostAnalysisDataTypeDropdown from '@/services/cost-explorer/components/CostAnalysisDataTypeDropdown.vue';
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/components/CostAnalysisFiltersPopper.vue';
 import CostAnalysisGranularityPeriodDropdown
     from '@/services/cost-explorer/components/CostAnalysisGranularityPeriodDropdown.vue';
@@ -98,6 +99,7 @@ const handleSaveQuerySet = async () => {
                 relative_period: costAnalysisPageState.relativePeriod,
                 group_by: costAnalysisPageState.groupBy,
                 filters: costAnalysisPageGetters.consoleFilters,
+                display_data_type: costAnalysisPageState.displayDataType,
                 metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
             },
         });
@@ -142,6 +144,7 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
         >
             <div class="left-part">
                 <cost-analysis-granularity-period-dropdown />
+                <cost-analysis-data-type-dropdown />
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click

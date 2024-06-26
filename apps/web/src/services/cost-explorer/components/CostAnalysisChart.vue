@@ -53,7 +53,19 @@ const state = reactive({
     chart: null as XYChart | null,
 });
 
-/* api */
+/* Util */
+const getValueSumKey = (dataType:string) => {
+    switch (dataType) {
+    case 'cost':
+        return 'cost';
+    case 'usage':
+        return 'usage_quantity';
+    default:
+        return `data.${dataType}`;
+    }
+};
+
+/* Api */
 const fetchCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<CostAnalyzeRawData>> => {
@@ -70,7 +82,7 @@ const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<Cost
                 end: dayjs.utc(period.end).format(dateFormat),
                 fields: {
                     value_sum: {
-                        key: 'cost',
+                        key: getValueSumKey(costAnalysisPageState.displayDataType),
                         operator: 'sum',
                     },
                 },

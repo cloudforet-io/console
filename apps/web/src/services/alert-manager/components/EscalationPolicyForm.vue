@@ -191,6 +191,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
             </template>
             <template #default="{invalid}">
                 <project-select-dropdown project-selectable
+                                         :project-group-selectable="false"
                                          :invalid="invalid"
                                          @select="handleSelectProject"
                 />

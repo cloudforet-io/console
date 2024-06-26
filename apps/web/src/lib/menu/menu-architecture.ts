@@ -18,6 +18,7 @@ export const MENU_LIST: Menu[] = [
             { id: MENU_ID.CLOUD_SERVICE, needPermissionByRole: true },
             { id: MENU_ID.SERVER, needPermissionByRole: true },
             { id: MENU_ID.SECURITY, needPermissionByRole: true },
+            { id: MENU_ID.METRIC_EXPLORER, needPermissionByRole: true },
             { id: MENU_ID.COLLECTOR, needPermissionByRole: true },
             { id: MENU_ID.SERVICE_ACCOUNT, needPermissionByRole: true },
         ],
@@ -82,6 +83,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
             { id: MENU_ID.SERVER },
             { id: MENU_ID.SECURITY },
             { id: MENU_ID.COLLECTOR },
+            { id: MENU_ID.SERVICE_ACCOUNT },
         ],
     },
     {
@@ -90,6 +92,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
             { id: MENU_ID.COST_ANALYSIS },
             { id: MENU_ID.BUDGET },
             { id: MENU_ID.COST_REPORT },
+            { id: MENU_ID.DATA_SOURCES },
         ],
     },
     {

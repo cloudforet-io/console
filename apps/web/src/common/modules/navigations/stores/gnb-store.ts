@@ -5,10 +5,12 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostQuerySetListParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/list';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { MetricExampleListParameters } from '@/schema/inventory/metric-example/api-verbs/list';
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -26,6 +28,7 @@ interface GnbStoreState {
     favoriteItem?: FavoriteOptions;
     isHideNavRail?: boolean;
     isMinimizeNavRail?: boolean;
+    metricExamples: MetricExampleModel[];
     costQuerySets: CostQuerySetModel[];
 }
 
@@ -44,6 +47,7 @@ export const useGnbStore = defineStore('gnb', () => {
         selectedItem: {} as Breadcrumb,
         id: '',
         favoriteItem: {} as FavoriteOptions,
+        metricExamples: [] as MetricExampleModel[],
         costQuerySets: [] as CostQuerySetModel[],
         isHideNavRail: false,
         isMinimizeNavRail: false,
@@ -54,12 +58,13 @@ export const useGnbStore = defineStore('gnb', () => {
         selectedItem: computed<Breadcrumb>(() => state.selectedItem),
         id: computed<string|undefined>(() => state.id),
         favoriteItem: computed<FavoriteOptions|undefined>(() => state.favoriteItem),
+        metricExamples: computed<MetricExampleModel[]>(() => state.metricExamples),
         costQuerySets: computed<CostQuerySetModel[]>(() => state.costQuerySets),
         isHideNavRail: computed<boolean|undefined>(() => state.isHideNavRail),
         isMinimizeNavRail: computed<boolean|undefined>(() => state.isMinimizeNavRail),
     });
 
-    const actions = {
+    const mutations = {
         setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => {
             state.breadcrumbs = breadcrumbs;
         },
@@ -72,39 +77,63 @@ export const useGnbStore = defineStore('gnb', () => {
         setFavoriteItemId: (favoriteItem?: FavoriteOptions) => {
             state.favoriteItem = favoriteItem;
         },
+    };
+
+    const actions = {
         fetchNavRailStatus: async () => {
             try {
-                const response = await SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel>({
+                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     name: 'console:gnb:navRail',
                 });
-                state.isMinimizeNavRail = response.data.isMinimizeNavRail;
-                state.isHideNavRail = response.data.isHideNavRail;
+                if (!results) {
+                    await actions.createNavRailInit();
+                } else {
+                    state.isMinimizeNavRail = results[0].data?.isMinimizeNavRail;
+                    state.isHideNavRail = results[0].data?.isHideNavRail;
+                }
+            } catch (e: any) {
+                await actions.createNavRailInit();
+            }
+        },
+        createNavRailInit: async () => {
+            try {
+                await SpaceConnector.clientV2.config.userConfig.set({
+                    name: 'console:gnb:navRail',
+                    data: { isMinimizeNavRail: false, isHideNavRail: false },
+                });
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.isMinimizeNavRail = undefined;
-                state.isHideNavRail = undefined;
             }
         },
         createMinimizeNavRail: async (isMinimizeNavRail?: boolean) => {
-            state.isMinimizeNavRail = isMinimizeNavRail;
             try {
                 await SpaceConnector.clientV2.config.userConfig.set({
                     name: 'console:gnb:navRail',
                     data: { isMinimizeNavRail },
                 });
+                state.isMinimizeNavRail = isMinimizeNavRail;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         },
         createHideNavRail: async (isHideNavRail?: boolean) => {
-            state.isHideNavRail = isHideNavRail;
             try {
                 await SpaceConnector.clientV2.config.userConfig.set({
                     name: 'console:gnb:navRail',
                     data: { isHideNavRail },
                 });
+                state.isHideNavRail = isHideNavRail;
             } catch (e) {
                 ErrorHandler.handleError(e);
+            }
+        },
+        fetchMetricExample: async () => {
+            try {
+                const res = await SpaceConnector.clientV2.inventory.metricExample.list<MetricExampleListParameters, ListResponse<MetricExampleModel>>();
+                state.metricExamples = res.results ?? [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.metricExamples = [];
             }
         },
         fetchCostQuerySet: async () => {
@@ -149,6 +178,7 @@ export const useGnbStore = defineStore('gnb', () => {
     return {
         state,
         getters,
+        ...mutations,
         ...actions,
     };
 });

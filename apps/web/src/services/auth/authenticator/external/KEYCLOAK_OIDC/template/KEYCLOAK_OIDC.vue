@@ -5,7 +5,9 @@
                   class="keycloak-btn"
                   @click="openKeycloakSignIn"
         >
-            Sign In with Keycloak
+            {{ $t('COMMON.SIGN_IN.BUTTON_LABEL', {
+                idp: 'Keycloak',
+            }) }}
         </p-button>
     </div>
 </template>

@@ -15,6 +15,9 @@ export const COST_EXPLORER_ROUTE = Object.freeze({
     COST_REPORT: {
         _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.COST_REPORT}`,
     },
+    DATA_SOURCES: {
+        _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.DATA_SOURCES}`,
+    },
     LANDING: {
         _NAME: `${MENU_ID.COST_EXPLORER}.landing`,
     },
