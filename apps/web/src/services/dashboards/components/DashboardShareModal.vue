@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { reactive, watch } from 'vue';
 
-import { PButtonModal, PTextEditor } from '@spaceone/design-system';
+import {
+    PButtonModal, PTextEditor, PButton,
+} from '@spaceone/design-system';
 import { flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -14,6 +16,8 @@ import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/m
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+
+import { copyAnyData } from '@/lib/helper/copy-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -55,6 +59,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     loading: false,
+    isCopied: false,
     sharedDashboard: {} as SharedDashboardInfo,
     widgetDataTablesMap: {} as Record<string, DataTableModel[]>,
 });
@@ -159,8 +164,20 @@ const getSharedDashboard = () => {
     state.loading = false;
 };
 
-const handleUpdateVisible = (visible) => {
+/* Event */
+const handleUpdateVisible = (visible: boolean) => {
     state.proxyVisible = visible;
+};
+const handleClickCopyButton = () => {
+    if (state.isCopied) return;
+    const _code = JSON.stringify(state.sharedDashboard, null, 2);
+    copyAnyData(_code);
+    setTimeout(() => {
+        state.isCopied = true;
+        setTimeout(() => {
+            state.isCopied = false;
+        }, 1500);
+    }, 800);
 };
 
 watch(() => props.visible, async (visible) => {
@@ -173,27 +190,44 @@ watch(() => props.visible, async (visible) => {
 
 <template>
     <p-button-modal :visible="state.proxyVisible"
-                    :header-title="$t('Share Dashboard')"
+                    :header-title="$t('DASHBOARDS.DETAIL.SHARE_WITH_CODE')"
                     size="md"
                     hide-footer-close-button
                     hide-footer-confirm-button
-                    class="dashboard-name-edit-modal"
+                    class="dashboard-share-modal"
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <p-text-editor :code="state.sharedDashboard"
-                           readonly
-                           folded
-                           :loading="state.loading"
-            />
+            <div class="code-wrapper">
+                <p-text-editor :code="state.sharedDashboard"
+                               readonly
+                               folded
+                               :loading="state.loading"
+                />
+                <p-button :class="{'copy-button': true, 'copied': state.isCopied}"
+                          style-type="tertiary"
+                          size="sm"
+                          :icon-left="state.isCopied ? 'ic_check' :'ic_copy'"
+                          @click="handleClickCopyButton"
+                >
+                    {{ state.isCopied ? $t('DASHBOARDS.DETAIL.COPIED') : $t('DASHBOARDS.DETAIL.COPY') }}
+                </p-button>
+            </div>
         </template>
     </p-button-modal>
 </template>
 
 <style lang="postcss" scoped>
-.dashboard-name-edit-modal {
-    .p-text-input {
-        @apply w-full;
+.code-wrapper {
+    position: relative;
+    .copy-button {
+        position: absolute;
+        right: 0.5rem;
+        top: 0.5rem;
+        text-align: right;
+        &.copied {
+            @apply bg-gray-200;
+        }
     }
 }
 </style>
