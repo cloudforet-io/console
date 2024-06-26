@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import { PI, PTextButton, PDivider } from '@spaceone/design-system';
 import { isEqual } from 'lodash';
 
-import type { DashboardVariables, DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVariableSchemaProperty, DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
@@ -20,11 +20,11 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 interface Props {
     loading?: boolean;
     disableSaveButton?: boolean;
-    originVariables?: DashboardVariables;
+    originVars?: DashboardVars;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update', val: { variables?: DashboardVariables }): void;
+const emit = defineEmits<{(e: 'update', val: { vars?: DashboardVars }): void;
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -52,7 +52,7 @@ const state = reactive({
         if (props.disableSaveButton) return [];
         const results: string[] = [];
         Object.entries(state.variableProperties).forEach(([k]) => {
-            if (!isEqual(dashboardDetailState.dashboardInfo?.variables?.[k], dashboardDetailState.variables?.[k])) {
+            if (!isEqual(dashboardDetailState.dashboardInfo?.vars?.[k], dashboardDetailState.vars?.[k])) {
                 results.push(k);
             }
         });
@@ -62,11 +62,12 @@ const state = reactive({
 });
 
 const handleClickSaveButton = () => {
-    emit('update', { variables: dashboardDetailState.variables });
+    emit('update', { vars: dashboardDetailState.vars });
+    dashboardDetailStore.setVars(dashboardDetailState.vars);
 };
 const handleResetVariables = () => {
-    const _originVariables = props.originVariables ?? dashboardDetailState.dashboardInfo?.variables ?? {};
-    dashboardDetailStore.setVariables(_originVariables);
+    const _originVars = props.originVars ?? dashboardDetailState.dashboardInfo?.vars ?? {};
+    dashboardDetailStore.setVars(_originVars);
 };
 </script>
 
@@ -81,7 +82,7 @@ const handleResetVariables = () => {
                                              :property="property"
                                              :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"
                                              :disabled="props.loading"
-                                             :dashboard-variables="dashboardDetailState.variables"
+                                             :dashboard-variables="dashboardDetailState.vars"
                 />
                 <span class="circle-mark"
                       :class="{'changed': state.modifiedVariablesSchemaProperties.includes(propertyName)}"

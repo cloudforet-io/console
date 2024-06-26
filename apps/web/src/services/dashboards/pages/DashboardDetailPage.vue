@@ -87,7 +87,7 @@ const state = reactive({
 
 const getDashboardData = async (dashboardId: string) => {
     try {
-        await dashboardDetailStore.getDashboardInfo(dashboardId, true);
+        await dashboardDetailStore.getDashboardInfo(dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
@@ -110,12 +110,11 @@ const handleUpdateLabels = async (labels: string[]) => {
         ErrorHandler.handleError(e);
     }
 };
-const handleUpdateDashboardVariables = async () => {
+const handleUpdateDashboardVariables = async (params) => {
     state.dashboardVariablesLoading = true;
     try {
-        await dashboardStore.updateDashboard(props.dashboardId, {
-            variables: dashboardDetailState.variables,
-        });
+        const updatedDashboard = await dashboardStore.updateDashboard(props.dashboardId, params);
+        dashboardDetailStore.setDashboardInfo(updatedDashboard);
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

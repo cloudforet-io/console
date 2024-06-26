@@ -83,7 +83,6 @@ const refineProjectDashboardVariables = (variables: DashboardVariables, projectI
 
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
     const dashboardStore = useDashboardStore();
-    const dashboardGetters = dashboardStore.getters;
 
     const state = reactive({
         dashboardInfo: null as DashboardModel|null,
@@ -93,6 +92,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         name: '',
         placeholder: '',
         options: DASHBOARD_DEFAULT.options as DashboardOptions,
+        vars: {} as Record<string, string[]>,
         variables: {} as DashboardVariables,
         variablesSchema: {
             properties: {},
@@ -162,6 +162,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setLabels = (labels: string[]) => {
         state.labels = labels;
     };
+    const setVars = (vars: Record<string, string[]>) => {
+        state.vars = vars;
+    };
     const setVariablesSchema = (variablesSchema: DashboardVariablesSchema) => {
         state.variablesSchema = variablesSchema;
     };
@@ -213,6 +216,30 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setOriginDashboardName = (name: string) => {
         if (state.dashboardInfo) state.dashboardInfo.name = name;
     };
+    const _setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel) => {
+        if (!dashboardInfo || isEmpty(dashboardInfo)) {
+            console.error('setDashboardInfo failed', dashboardInfo);
+            return;
+        }
+        const _dashboardInfo = cloneDeep(dashboardInfo);
+        const _dashboardScope = _dashboardInfo.resource_group || 'PRIVATE';
+
+        state.dashboardInfo = _dashboardInfo;
+        state.dashboardScope = _dashboardScope;
+        state.dashboardId = _dashboardInfo.dashboard_id;
+        state.name = _dashboardInfo.name;
+        state.labels = _dashboardInfo.labels ?? [];
+        state.options = {
+            date_range: {
+                start: _dashboardInfo.options?.date_range?.start,
+                end: _dashboardInfo.options?.date_range?.end,
+            },
+            refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
+        };
+        state.projectId = _dashboardInfo.project_id === '*' ? undefined : _dashboardInfo.project_id;
+        state.vars = _dashboardInfo.vars ?? {};
+        state.dashboardLayouts = _dashboardInfo.layouts;
+    };
     const _setDashboardInfoStoreState = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
             console.error('setDashboardInfo failed', dashboardInfo);
@@ -261,28 +288,17 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariablesInitMap(_variablesInitMap);
 
         // widget info states
-        const _dashboardVersion = _dashboardInfo.version;
-        if (_dashboardVersion === '1.0') {
-            const _dashboardWidget = _dashboardInfo.layouts[0].widgets as DashboardLayoutWidgetInfo[];
-            const _dashboardWidgetInfoList = _dashboardWidget.map((info) => ({
-                ...info,
-                widget_key: info.widget_key ?? getRandomId(),
-            })) ?? [];
-            setDashboardWidgetInfoList(_dashboardWidgetInfoList);
-        } else {
-            state.dashboardLayouts = _dashboardInfo.layouts;
-        }
+        const _dashboardWidget = _dashboardInfo.layouts[0].widgets as DashboardLayoutWidgetInfo[];
+        const _dashboardWidgetInfoList = _dashboardWidget.map((info) => ({
+            ...info,
+            widget_key: info.widget_key ?? getRandomId(),
+        })) ?? [];
+        setDashboardWidgetInfoList(_dashboardWidgetInfoList);
         setTemplateId(_dashboardInfo.template_id);
         setTemplateType(_dashboardInfo.template_type);
     };
-    const getDashboardInfo = async (dashboardId: undefined|string, force = false) => {
-        if (!force && (dashboardId === state.dashboardId || dashboardId === undefined)) return;
-
-        const targetDashboards = dashboardGetters.allItems.filter((dashboard) => dashboard.dashboard_id === dashboardId);
-        if (targetDashboards.length > 0) {
-            _setDashboardInfoStoreState(targetDashboards[0] as DashboardModel);
-            return;
-        }
+    const getDashboardInfo = async (dashboardId: undefined|string) => {
+        if (dashboardId === state.dashboardId || dashboardId === undefined) return;
 
         const isPrivate = dashboardId?.startsWith('private');
         const fetcher = isPrivate
@@ -294,7 +310,11 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         try {
             const params: GetDashboardParameters = { dashboard_id: dashboardId as string };
             const result = await fetcher<GetDashboardParameters, DashboardModel>(params);
-            _setDashboardInfoStoreState(result);
+            if (result.version === '1.0') {
+                _setDashboardInfoStoreState(result);
+            } else {
+                _setDashboardInfoStoreStateV2(result);
+            }
         } catch (e) {
             reset();
             throw e;
@@ -408,6 +428,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setOptions,
         setDashboardWidgetInfoList,
         setLabels,
+        setVars,
         setVariablesSchema,
         setVariables,
         setVariablesInitMap,
