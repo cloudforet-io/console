@@ -222,10 +222,10 @@ onUnmounted(() => {
                 z-index: 100;
                 .update-dot {
                     @apply absolute bg-blue-500 rounded-full border-2 border-white;
-                    width: 0.5rem;
-                    height: 0.5rem;
-                    right: -0.25rem;
-                    top: -5px;
+                    width: 0.75rem;
+                    height: 0.75rem;
+                    right: -0.375rem;
+                    top: -0.375rem;
                 }
             }
         }

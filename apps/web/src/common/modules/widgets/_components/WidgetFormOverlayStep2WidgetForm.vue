@@ -191,7 +191,7 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
                 />
                 <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.WIDGET_INFO') }}</span>
             </div>
-            <div class="form-wrapper">
+            <div class="form-wrapper no-gap">
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.TITLE')"
                                required
                 >
@@ -339,6 +339,9 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
         padding: 1rem 1.25rem 1rem 1.25rem;
         vertical-align: middle;
         cursor: pointer;
+        &.no-gap {
+            gap: 0;
+        }
     }
     &.collapsed {
         .form-wrapper {

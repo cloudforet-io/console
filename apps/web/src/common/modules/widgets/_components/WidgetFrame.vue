@@ -154,7 +154,7 @@ const handleToggleWidth = () => {
         >
             <p-icon-button ref="etcButtonRef"
                            name="ic_ellipsis-horizontal"
-                           style-type="transparent"
+                           style-type="tertiary"
                            shape="square"
                            size="sm"
                            @click="handleClickEtcButton"
