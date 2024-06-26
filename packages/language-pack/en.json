@@ -1691,6 +1691,8 @@
 			"AUTO": "Auto",
 			"BASED_ON": "Based on",
 			"CLONE": "Clone",
+			"COPIED": "Copied",
+			"COPY": "Copy",
 			"CURRENT_MONTH": "Current month",
 			"CUSTOM": "Custom",
 			"CUSTOMIZE": "Customize",
@@ -1718,7 +1720,9 @@
 			"REFRESH": "Auto Refresh",
 			"SELECT_MONTH": "Select Month",
 			"SET_HOME": "Set as Home Dashboard",
-			"SHARE": "Share"
+			"SHARE": "Share",
+			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
+			"SHARE_WITH_CODE": "Share with Code"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",
