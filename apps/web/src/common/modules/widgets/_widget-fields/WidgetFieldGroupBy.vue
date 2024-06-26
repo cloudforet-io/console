@@ -11,7 +11,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-// import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
+import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
 import type {
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions>
     value: () => ({}),
 });
 
-// const { labelsMenuItem } = useGranularityMenuItem(props, 'groupBy');
+const { labelsMenuItem } = useGranularityMenuItem(props, 'groupBy');
 
 const emit = defineEmits<WidgetFieldComponentEmit<GroupByValue>>();
 const state = reactive({
@@ -33,6 +33,7 @@ const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget ?? 'labels_info';
         if (!props.dataTable) return [];
+        if (dataTarget === 'labels_info') return labelsMenuItem.value;
         const dataInfoList = Object.keys(props.dataTable[dataTarget] ?? {}) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
@@ -84,29 +85,29 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
     name: d,
     label: d,
 }));
-// watch(() => labelsMenuItem.value, (value) => {
-//     let isSelectedValueValid = false;
-//     if (state.selectedItem === undefined) {
-//         if (Array.isArray(state.selectedItem)) {
-//             state.selectedItem = [value?.[0]?.name];
-//         } else {
-//             state.selectedItem = value?.[0]?.name;
-//         }
-//         state.proxyValue = {
-//             ...state.proxyValue,
-//             value: state.selectedItem,
-//         };
-//         return;
-//     }
-//     if (Array.isArray(state.selectedItem)) {
-//         isSelectedValueValid = state.selectedItem.every((item) => value.some((v) => v.name === item.name));
-//     } else {
-//         isSelectedValueValid = value.some((v) => v.name === state.selectedItem);
-//     }
-//     if (!isSelectedValueValid) {
-//         state.selectedItem = undefined;
-//     }
-// });
+watch(() => labelsMenuItem.value, (value) => {
+    let isSelectedValueValid = false;
+    if (state.selectedItem === undefined) {
+        if (Array.isArray(state.selectedItem)) {
+            state.selectedItem = [value?.[0]?.name];
+        } else {
+            state.selectedItem = value?.[0]?.name;
+        }
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: state.selectedItem,
+        };
+        return;
+    }
+    if (Array.isArray(state.selectedItem)) {
+        isSelectedValueValid = state.selectedItem.every((item) => value.some((v) => v.name === item.name));
+    } else {
+        isSelectedValueValid = value.some((v) => v.name === state.selectedItem);
+    }
+    if (!isSelectedValueValid) {
+        state.selectedItem = undefined;
+    }
+});
 
 watch(() => state.menuItems, (menuItems) => {
     if (!Array.isArray(menuItems)) return;
