@@ -71,9 +71,39 @@ const adminPreferenceRoutes: RouteConfig = {
             name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS._NAME),
             meta: {
                 menuId: MENU_ID.DOMAIN_SETTINGS,
+                lsbVisible: true,
                 translationId: MENU_INFO_MAP[MENU_ID.DOMAIN_SETTINGS].translationId,
             },
-            component: DomainSettingsPage,
+            redirect: () => ({
+                name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BASE_INFORMATION._NAME),
+            }),
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/base-information',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BASE_INFORMATION._NAME),
+                    meta: { lsbVisible: true },
+                    component: DomainSettingsPage,
+                },
+                {
+                    path: '/brand-assets',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BRAND_ASSETS._NAME),
+                    meta: { lsbVisible: true },
+                    component: DomainSettingsPage,
+                },
+                {
+                    path: '/timezone-and-language',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE._NAME),
+                    meta: { lsbVisible: true },
+                    component: DomainSettingsPage,
+                },
+                {
+                    path: '/auto-dormancy-configuration',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME),
+                    meta: { lsbVisible: true },
+                    component: DomainSettingsPage,
+                },
+            ],
         },
     ],
 };
