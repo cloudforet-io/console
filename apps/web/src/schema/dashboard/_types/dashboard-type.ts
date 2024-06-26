@@ -79,6 +79,8 @@ export interface DashboardTemplate {
     template_type: TemplateType;
 }
 
+export type DashboardVars = Record<string, string[]>;
+
 export interface DashboardLayout {
     name?: string;
     widgets?: Array<DashboardLayoutWidgetInfo|string>;

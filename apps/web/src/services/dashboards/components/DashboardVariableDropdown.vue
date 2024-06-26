@@ -77,6 +77,7 @@ const changeVariables = (changedSelected: MenuItem[]) => {
         variables[props.propertyName] = reconvertedSelected;
     }
     dashboardDetailStore.setVariables(variables);
+    dashboardDetailStore.setVars(variables);
 };
 
 const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> => {

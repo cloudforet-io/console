@@ -5,6 +5,7 @@ import type {
     DashboardOptions,
     DashboardVariables,
     DashboardVariablesSchema,
+    DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
@@ -14,7 +15,7 @@ export interface PublicDashboardModel {
     description: string;
     version: number|string;
     layouts: DashboardLayout[];
-    vars?: Record<string, any>;
+    vars?: DashboardVars;
     options: DashboardOptions;
     variables_schema?: DashboardVariablesSchema; // will be deprecated
     variables?: DashboardVariables; // will be deprecated

@@ -143,7 +143,7 @@ onUnmounted(() => {
                            :description="widgetGenerateState.description"
                            :widget-options="widgetGenerateState.widgetValueMap"
                            :dashboard-options="dashboardDetailState.options"
-                           :dashboard-variables="dashboardDetailState.variables"
+                           :dashboard-vars="dashboardDetailState.vars"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            mode="overlay"
                 />

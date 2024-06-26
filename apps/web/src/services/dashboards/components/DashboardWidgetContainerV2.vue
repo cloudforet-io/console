@@ -72,7 +72,7 @@ const state = reactive({
     showExpandOverlay: false,
     vars: computed<Record<string, string[]>>(() => {
         const _vars: Record<string, string[]> = {};
-        Object.entries(dashboardDetailState.variables).forEach(([k, v]) => {
+        Object.entries(dashboardDetailState.vars).forEach(([k, v]) => {
             const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
             if (idKey) _vars[idKey] = v;
         });
@@ -288,8 +288,7 @@ defineExpose({
                                :mode="store.state.display.visibleSidebar ? 'edit-layout' : 'view'"
                                :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
-                               :dashboard-variables="dashboardDetailState.variables"
-                               :vars="state.vars"
+                               :dashboard-vars="state.vars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                @mounted="handleWidgetMounted(widget.widget_id)"

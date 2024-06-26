@@ -1,5 +1,6 @@
 import type {
     DashboardOptions,
+    DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
@@ -26,7 +27,7 @@ export interface WidgetProps {
     // from dashboard
     loading?: boolean;
     dashboardOptions?: DashboardOptions;
-    vars?: Record<string, string[]>;
+    dashboardVars?: DashboardVars;
     disableRefreshOnVariableChange?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
 }
