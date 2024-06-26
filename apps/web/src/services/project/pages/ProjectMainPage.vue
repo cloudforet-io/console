@@ -17,6 +17,8 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { MENU_ID } from '@/lib/menu/config';
+
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -63,8 +65,8 @@ const state = reactive({
     ])),
     projectGroupModalVisible: false,
     favoriteOptions: computed<FavoriteOptions>(() => ({
-        type: FAVORITE_TYPE.PROJECT_GROUP,
-        id: state.currentProjectGroupId,
+        type: route.params.projectGroupId ? FAVORITE_TYPE.PROJECT_GROUP : FAVORITE_TYPE.MENU,
+        id: route.params.projectGroupId ? state.currentProjectGroupId : MENU_ID.PROJECT,
     })),
     projectGroupMemberManagementModalVisible: false,
     projectGroupMemberCount: computed<number|undefined>(() => storeState.projectGroups?.[state.currentProjectGroupIds]?.data.users?.length),
@@ -124,6 +126,9 @@ const handleRefreshTree = () => {
 
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
+    if (!route.params.projectGroupId) {
+        gnbStore.setBreadcrumbs([]);
+    }
 }, { immediate: true });
 
 onUnmounted(() => {

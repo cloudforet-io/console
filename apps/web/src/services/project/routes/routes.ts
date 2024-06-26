@@ -1,6 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
@@ -21,6 +22,7 @@ export default {
     path: 'project',
     meta: {
         menuId: MENU_ID.PROJECT,
+        translationId: MENU_INFO_MAP[MENU_ID.PROJECT].translationId,
     },
     component: ProjectContainer,
     children: [
