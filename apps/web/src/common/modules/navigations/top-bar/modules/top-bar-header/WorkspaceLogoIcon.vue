@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { EMOJI_RANGES } from '@/common/modules/navigations/top-bar/constants/constant';
 import type { TopBarLogoIconTheme } from '@/common/modules/navigations/top-bar/types/type';
 
 interface Props {
@@ -17,15 +18,25 @@ const props = withDefaults(defineProps<Props>(), {
 
 const ENGLISH_REGEX = /^[A-Za-z]/;
 const CORPORATE_REGEX = /\(([^)])\)/;
+const EMOJI_REGEX = new RegExp(`[${EMOJI_RANGES.join('')}]`);
 
 const state = reactive({
     theme: computed(() => props.theme),
     logoText: computed(() => {
-        const match = props.text.match(CORPORATE_REGEX);
-        if (match) {
-            return `(${match[1]})`;
+        const parenthesisMatch = props.text.match(CORPORATE_REGEX);
+        if (parenthesisMatch) {
+            return `(${parenthesisMatch[1]})`;
         }
-        return props.text.replace(/\([^)]*\)/, '').trim().slice(0, 1).toUpperCase();
+        const text = props.text.trim();
+        const codePoints = Array.from(text);
+        const firstChar = codePoints[0];
+
+        const emojiMatch = EMOJI_REGEX.test(text);
+        if (!emojiMatch) {
+            return firstChar;
+        }
+
+        return firstChar.toUpperCase();
     }),
     isLogoStartsWithEnglish: computed(() => ENGLISH_REGEX.test(state.logoText)),
     isLogoStartsWithCorporate: computed(() => CORPORATE_REGEX.test(state.logoText)),
