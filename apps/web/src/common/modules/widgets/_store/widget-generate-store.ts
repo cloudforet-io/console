@@ -138,8 +138,12 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             const listParams: DataTableListParameters = {
                 widget_id: state.widgetId,
             };
+            const isPrivate = state.widgetId.startsWith('private');
+            const fetcher = isPrivate
+                ? SpaceConnector.clientV2.dashboard.privateDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>
+                : SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>;
             try {
-                const { results } = await SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>(listParams);
+                const { results } = await fetcher(listParams);
                 state.dataTables = results ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -151,8 +155,12 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 widget_id: state.widgetId,
                 ...addParams,
             } as DataTableAddParameters;
+            const isPrivate = state.widgetId.startsWith('private');
+            const fetcher = isPrivate
+                ? SpaceConnector.clientV2.dashboard.privateDataTable.add<DataTableAddParameters, DataTableModel>
+                : SpaceConnector.clientV2.dashboard.publicDataTable.add<DataTableAddParameters, DataTableModel>;
             try {
-                const result = await SpaceConnector.clientV2.dashboard.publicDataTable.add<DataTableAddParameters, DataTableModel>(parameters);
+                const result = await fetcher(parameters);
                 state.dataTables.push(result);
                 if (!state.selectedDataTableId) {
                     state.selectedDataTableId = result.data_table_id;
@@ -166,8 +174,12 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 widget_id: state.widgetId,
                 ...transformParams,
             } as DataTableTransformParameters;
+            const isPrivate = state.widgetId.startsWith('private');
+            const fetcher = isPrivate
+                ? SpaceConnector.clientV2.dashboard.privateDataTable.transform<DataTableTransformParameters, DataTableModel>
+                : SpaceConnector.clientV2.dashboard.publicDataTable.transform<DataTableTransformParameters, DataTableModel>;
             try {
-                const result = await SpaceConnector.clientV2.dashboard.publicDataTable.transform<DataTableTransformParameters, DataTableModel>(parameters);
+                const result = await fetcher(parameters);
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== unsavedId);
                 state.dataTables.push(result);
             } catch (e) {
@@ -208,6 +220,10 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.dataTables.push(unsavedTransformData);
         },
         updateDataTable: async (updateParams: DataTableUpdateParameters, unsaved?: boolean) => {
+            const isPrivate = state.widgetId.startsWith('private');
+            const fetcher = isPrivate
+                ? SpaceConnector.clientV2.dashboard.privateDataTable.update<DataTableUpdateParameters, DataTableModel>
+                : SpaceConnector.clientV2.dashboard.publicDataTable.update<DataTableUpdateParameters, DataTableModel>;
             try {
                 let result: DataTableModel;
                 if (unsaved) {
@@ -217,7 +233,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                         ...updateParams,
                     };
                 } else {
-                    result = await SpaceConnector.clientV2.dashboard.publicDataTable.update<DataTableUpdateParameters, DataTableModel>(updateParams);
+                    result = await fetcher(updateParams);
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
             } catch (e) {
@@ -229,17 +245,25 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== deleteParams.data_table_id);
                 return;
             }
+            const isPrivate = state.widgetId.startsWith('private');
+            const fetcher = isPrivate
+                ? SpaceConnector.clientV2.dashboard.privateDataTable.delete<DataTableDeleteParameters, DataTableModel>
+                : SpaceConnector.clientV2.dashboard.publicDataTable.delete<DataTableDeleteParameters, DataTableModel>;
             try {
-                await SpaceConnector.clientV2.dashboard.publicDataTable.delete<DataTableDeleteParameters, DataTableModel>(deleteParams);
+                await fetcher(deleteParams);
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== deleteParams.data_table_id);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         },
         loadDataTable: async (loadParams: Omit<DataTableLoadParameters, 'granularity'>) => {
+            const isPrivate = state.widgetId.startsWith('private');
+            const fetcher = isPrivate
+                ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>
+                : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>;
             try {
                 state.dataTableLoadLoading = true;
-                const { results, total_count } = await SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>({
+                const { results, total_count } = await fetcher({
                     granularity: state.selectedPreviewGranularity || 'MONTHLY',
                     page: {
                         start: 1,
