@@ -35,7 +35,7 @@ const listDataTables = async (widgetId?: string): Promise<DataTableModel[]> => {
     if (!widgetId) return [];
     const _isPrivate = widgetId.startsWith('private');
     const _fetcher = _isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<DataTableListParameters, ListResponse<DataTableModel>>
+        ? SpaceConnector.clientV2.dashboard.privateDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>
         : SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>;
     try {
         const { results } = await _fetcher({
