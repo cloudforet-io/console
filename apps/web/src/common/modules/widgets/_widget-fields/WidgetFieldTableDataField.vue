@@ -160,12 +160,14 @@ onMounted(() => {
     if (state.selectedFieldType === 'staticField') {
         state.proxyValue = {
             ...state.proxyValue,
+            fieldType: state.selectedFieldType,
             value: props.value?.value ?? [state.menuItems[0]?.name],
         };
         state.selectedItem = convertToMenuItem(state.proxyValue?.value);
     } else {
         state.proxyValue = {
             ...state.proxyValue,
+            fieldType: state.selectedFieldType,
             value: props.value?.value ?? state.menuItems[0]?.name,
             criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
         };
