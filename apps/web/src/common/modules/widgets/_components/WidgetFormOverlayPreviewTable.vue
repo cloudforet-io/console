@@ -45,6 +45,7 @@ const storeState = reactive({
     project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     workspace: computed(() => allReferenceStore.getters.workspace),
     region: computed(() => allReferenceStore.getters.region),
+    serviceAccount: computed(() => allReferenceStore.getters.serviceAccount),
 });
 
 const state = reactive({

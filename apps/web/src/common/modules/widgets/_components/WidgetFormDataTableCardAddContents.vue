@@ -36,7 +36,9 @@ import {
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { AdditionalLabel, DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
-import type { AdditionalLabels, DateFormat } from '@/common/modules/widgets/types/widget-model';
+import type {
+    AdditionalLabels, DateFormat, DataTableAddOptions, DataTableTransformOptions,
+} from '@/common/modules/widgets/types/widget-model';
 
 interface Props {
     selected: boolean;
@@ -140,31 +142,31 @@ const advancedOptionsState = reactive({
 
 const originDataState = reactive({
     sourceKey: computed(() => (state.sourceType === DATA_SOURCE_DOMAIN.COST ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id)),
-    groupBy: computed(() => (props.item.options.group_by ?? []).map((group) => ({
+    groupBy: computed(() => ((props.item.options as DataTableAddOptions).group_by ?? []).map((group) => ({
         name: group.key,
         label: group.name,
     }))),
     filter: computed(() => {
         const _filter = {} as Record<string, string[]>;
-        (props.item.options.filter ?? []).forEach((filter) => {
+        ((props.item.options as DataTableAddOptions).filter ?? []).forEach((filter) => {
             _filter[filter.k] = filter.v;
         });
         return _filter;
     }),
-    dataName: computed(() => props.item.options.data_name ?? ''),
-    dataUnit: computed(() => props.item.options.data_unit ?? ''),
-    additionalLabels: computed(() => Object.entries((props.item.options.additional_labels ?? {})).map(([key, value]) => ({
+    dataName: computed(() => (props.item.options as DataTableAddOptions).data_name ?? ''),
+    dataUnit: computed(() => (props.item.options as DataTableAddOptions).data_unit ?? ''),
+    additionalLabels: computed(() => Object.entries(((props.item.options as DataTableAddOptions).additional_labels ?? {})).map(([key, value]) => ({
         name: key,
         value: value as string,
     }))),
-    separateDate: computed(() => props.item.options.date_format === 'SEPARATE'),
+    separateDate: computed(() => (props.item.options as DataTableAddOptions).date_format === 'SEPARATE'),
     timeDiff: computed(() => {
-        const timeDiff = props.item.options.timediff;
+        const timeDiff = (props.item.options as DataTableAddOptions).timediff;
         const timeDiffKeys = Object.keys(timeDiff || {});
         return timeDiffKeys.length ? timeDiffKeys[0] : 'none';
     }),
     timeDiffDate: computed(() => {
-        const timeDiff = props.item.options.timediff;
+        const timeDiff = (props.item.options as DataTableAddOptions).timediff;
         const timeDiffKeys = Object.keys(timeDiff || {});
         return timeDiffKeys.length ? `${-timeDiff[timeDiffKeys[0]]}` : undefined;
     }),
@@ -276,13 +278,14 @@ const handleUpdateDataTable = async () => {
     if (storeState.selectedDataTableId && storeState.selectedDataTable?.data_type === 'TRANSFORMED') {
         const referencedDataTableIds = [] as string[];
         storeState.dataTables.forEach((dataTable) => {
+            const transformDataTalbeOptions = dataTable.options as DataTableTransformOptions;
             const isReferenced = dataTable.data_type === 'TRANSFORMED'
             && !dataTable?.data_table_id?.startsWith('UNSAVED-')
             && (
-                dataTable.options?.JOIN?.data_tables?.includes(state.dataTableId)
-                || dataTable.options?.CONCAT?.data_tables?.includes(state.dataTableId)
-                || dataTable.options?.QUERY?.data_table_id === state.dataTableId
-                || dataTable.options?.EVAL?.data_table_id === state.dataTableId
+                transformDataTalbeOptions?.JOIN?.data_tables?.includes(state.dataTableId)
+                || transformDataTalbeOptions?.CONCAT?.data_tables?.includes(state.dataTableId)
+                || transformDataTalbeOptions?.QUERY?.data_table_id === state.dataTableId
+                || transformDataTalbeOptions?.EVAL?.data_table_id === state.dataTableId
             );
             if (isReferenced) referencedDataTableIds.push(dataTable.data_table_id as string);
         });
