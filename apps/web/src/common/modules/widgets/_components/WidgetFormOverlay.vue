@@ -74,7 +74,7 @@ const handleClickContinue = async () => {
         size: widgetGenerateState.size,
         widget_type: widgetGenerateState.selectedWidgetName,
         data_table_id: widgetGenerateState.selectedDataTableId,
-        options: widgetGenerateState.widgetValueMap,
+        options: widgetGenerateState.widgetFormValueMap,
     });
     widgetGenerateStore.setShowOverlay(false);
 };
