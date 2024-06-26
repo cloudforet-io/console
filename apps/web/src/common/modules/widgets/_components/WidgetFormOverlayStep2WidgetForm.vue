@@ -15,6 +15,7 @@ import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-wid
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
@@ -52,6 +53,7 @@ const state = reactive({
     selectableDataTableItems: computed(() => widgetGenerateState.dataTables.map((d) => ({
         name: d.data_table_id,
         label: d.name,
+        icon: d.data_type === DATA_TABLE_TYPE.TRANSFORMED ? 'ic_transform-data' : 'ic_service_data-sources',
     }))),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
 });
@@ -154,7 +156,16 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
                 <p-select-dropdown :menu="state.selectableDataTableItems"
                                    :selected="state.selectedDataTableId"
                                    @select="handleSelectDataTable"
-                />
+                >
+                    <template #dropdown-button="item">
+                        <p-i :name="item.icon"
+                             width="1.25rem"
+                             height="1.25rem"
+                             color="inherit"
+                        />
+                        <span>{{ item.label }}</span>
+                    </template>
+                </p-select-dropdown>
             </p-field-group>
         </div>
         <div class="basic-field-wrapper">
@@ -299,6 +310,7 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
     width: 25%;
     min-width: 2rem;
     overflow-y: auto;
+    padding-bottom: 2.5rem;
     .basic-field-wrapper {
         &.gray {
             @apply bg-gray-100 border border-gray-150 rounded-md;

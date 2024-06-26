@@ -1,4 +1,4 @@
-export const WIDGET_WIDTH_CRITERIA = 16;
+export const WIDGET_WIDTH_CRITERIA = 8;
 
 const getWidthRangeList = (n: number) => [...Array(36)].map((_, index) => n + index * WIDGET_WIDTH_CRITERIA);
 
@@ -12,7 +12,7 @@ export const WIDGET_WIDTH_RANGE_LIST = {
 export const WIDGET_CONTAINER_MIN_WIDTH = 320;
 export const WIDGET_CONTAINER_MAX_WIDTH = 1840;
 
-export const WIDGET_GAP = 16;
+export const WIDGET_GAP = 8;
 
 export const WIDGET_WIDTH_STR_MAP = {
     sm: 'Small',

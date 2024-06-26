@@ -1351,6 +1351,8 @@
 				"YESTERDAY": "어제 "
 			},
 			"CANCEL": "취소",
+			"CHANGE_DATA_MODAL_DESCRIPTION": "",
+			"CHANGE_DATA_MODAL_TITLE": "",
 			"CLOUD_SERVICE": {
 				"HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
 				"NO_DATA": "클라우드 리소스가 없습니다.",
@@ -1705,6 +1707,7 @@
 			"EDIT_DASHBOARD_NAME": "대시보드 이름 수정",
 			"EDIT_LAYOUT": "",
 			"EXPORT": "파일 저장",
+			"NO_WIDGET_TEXT": "",
 			"OTHER_MONTHS": "다른 월 선택",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "적용된 필터"
