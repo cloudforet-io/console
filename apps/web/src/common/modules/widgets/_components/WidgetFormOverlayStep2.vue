@@ -9,8 +9,7 @@ import {
 import { cloneDeep, isEqual } from 'lodash';
 
 import type {
-    DashboardVariables as IDashboardVariables,
-    DashboardOptions,
+    DashboardOptions, DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import WidgetFormOverlayStep2WidgetForm
@@ -61,18 +60,18 @@ const state = reactive({
     disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateGetters.isAllWidgetFormValid),
     //
     appliedPreviewWidgetValueMap: {} as Record<string, WidgetFieldValues>,
-    variablesSnapshot: {} as IDashboardVariables,
+    varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
 });
 
 /* Util */
 const initSnapshot = () => {
-    state.variablesSnapshot = cloneDeep(dashboardDetailState.variables);
+    state.varsSnapshot = cloneDeep(dashboardDetailState.vars);
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
     state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.previewWidgetValueMap);
 };
 const reset = () => {
-    dashboardDetailStore.setVariables(state.variablesSnapshot);
+    dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
 
