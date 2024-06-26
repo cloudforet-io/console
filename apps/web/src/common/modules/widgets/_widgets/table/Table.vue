@@ -380,6 +380,7 @@ defineExpose<WidgetExpose<Data>>({
                                :comparison-info="state.comparisonInfo"
                                :sub-total-info="state.subTotalInfo"
                                :total-info="state.totalInfo"
+                               :granularity="state.granularity"
             />
         </div>
     </widget-frame>
