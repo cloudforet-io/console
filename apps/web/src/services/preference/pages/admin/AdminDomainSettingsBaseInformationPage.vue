@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PHeading, PPaneLayout, PFieldTitle, PCopyButton, PTextInput, PButton,
+    PPaneLayout, PFieldTitle, PCopyButton, PTextInput, PButton,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -60,10 +60,7 @@ watch(() => domainConfigGetters.adminEmail, (val) => {
 </script>
 
 <template>
-    <p-pane-layout>
-        <p-heading heading-type="sub"
-                   :title="$t('IAM.DOMAIN_SETTINGS.BASE_INFORMATION')"
-        />
+    <p-pane-layout class="admin-domain-settings-base-information-page">
         <div class="content-wrapper">
             <div class="field-wrapper">
                 <p-field-title :label="$t('IAM.DOMAIN_SETTINGS.DOMAIN_ID')" />
@@ -115,20 +112,22 @@ watch(() => domainConfigGetters.adminEmail, (val) => {
 </template>
 
 <style lang="postcss" scoped>
-.content-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1rem;
-    .field-wrapper {
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding-top: 0.25rem;
-            .p-text-input {
-                max-width: 27rem;
-                width: 100%;
+.admin-domain-settings-base-information-page {
+    .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1rem;
+        .field-wrapper {
+            .input-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                padding-top: 0.25rem;
+                .p-text-input {
+                    max-width: 27rem;
+                    width: 100%;
+                }
             }
         }
     }

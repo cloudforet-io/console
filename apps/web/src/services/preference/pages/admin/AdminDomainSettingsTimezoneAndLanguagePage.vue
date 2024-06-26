@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PHeading, PPaneLayout, PFieldTitle, PButton, PSelectDropdown,
+    PPaneLayout, PFieldTitle, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { map } from 'lodash';
@@ -76,10 +76,7 @@ watch(() => domainConfigGetters.language, (val) => {
 </script>
 
 <template>
-    <p-pane-layout>
-        <p-heading heading-type="sub"
-                   :title="$t('IAM.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE')"
-        />
+    <p-pane-layout class="admin-domain-settings-timezone-and-language-page">
         <div class="content-wrapper">
             <div class="field-wrapper">
                 <p-field-title :label="$t('IAM.DOMAIN_SETTINGS.TIMEZONE')" />
@@ -110,19 +107,21 @@ watch(() => domainConfigGetters.language, (val) => {
 </template>
 
 <style lang="postcss" scoped>
-.content-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 28.75rem;
-    padding: 1rem;
-    .field-wrapper {
-        .p-field-title {
-            padding-bottom: 0.25rem;
+.admin-domain-settings-timezone-and-language-page {
+    .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        max-width: 28.75rem;
+        padding: 1rem;
+        .field-wrapper {
+            .p-field-title {
+                padding-bottom: 0.25rem;
+            }
         }
     }
-}
-.save-button {
-    margin: 1.25rem 1rem;
+    .save-button {
+        margin: 1.25rem 1rem;
+    }
 }
 </style>

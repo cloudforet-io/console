@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PHeading, PPaneLayout, PFieldTitle, PTextInput, PButton,
+    PPaneLayout, PFieldTitle, PTextInput, PButton,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -57,10 +57,7 @@ watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
 </script>
 
 <template>
-    <p-pane-layout>
-        <p-heading heading-type="sub"
-                   :title="$t('IAM.DOMAIN_SETTINGS.BRAND_ASSETS')"
-        />
+    <p-pane-layout class="admin-domain-setting-brand-assets-page">
         <div class="content-wrapper">
             <div class="field-wrapper">
                 <div class="left-part">
@@ -115,35 +112,37 @@ watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
 </template>
 
 <style lang="postcss" scoped>
-.content-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1rem;
-    .field-wrapper {
-        @apply grid grid-cols-12;
-        gap: 1rem;
-        .left-part {
-            @apply col-span-8;
-            .description {
-                @apply text-paragraph-md text-gray-500;
-                white-space: pre-line;
-                line-height: 1.5;
+.admin-domain-setting-brand-assets-page {
+    .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1rem;
+        .field-wrapper {
+            @apply grid grid-cols-12;
+            gap: 1rem;
+            .left-part {
+                @apply col-span-8;
+                .description {
+                    @apply text-paragraph-md text-gray-500;
+                    white-space: pre-line;
+                    line-height: 1.5;
+                }
+                .p-field-title {
+                    padding-bottom: 0.25rem;
+                }
+                .p-text-input {
+                    width: 100%;
+                }
             }
-            .p-field-title {
-                padding-bottom: 0.25rem;
+            .right-part {
+                @apply col-span-4 bg-gray-100 rounded-md;
+                padding: 1.25rem;
             }
-            .p-text-input {
-                width: 100%;
-            }
-        }
-        .right-part {
-            @apply col-span-4 bg-gray-100 rounded-md;
-            padding: 1.25rem;
         }
     }
-}
-.save-button {
-    margin: 1.25rem 1rem;
+    .save-button {
+        margin: 1.25rem 1rem;
+    }
 }
 </style>
