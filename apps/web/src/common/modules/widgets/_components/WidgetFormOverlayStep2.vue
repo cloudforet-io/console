@@ -9,8 +9,7 @@ import {
 import { cloneDeep, isEqual } from 'lodash';
 
 import type {
-    DashboardVariables as IDashboardVariables,
-    DashboardOptions,
+    DashboardOptions, DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import WidgetFormOverlayStep2WidgetForm
@@ -34,6 +33,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 const overlayWidgetRef = ref<HTMLElement|null>(null);
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
@@ -60,18 +60,18 @@ const state = reactive({
     disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateGetters.isAllWidgetFormValid),
     //
     appliedPreviewWidgetValueMap: {} as Record<string, WidgetFieldValues>,
-    variablesSnapshot: {} as IDashboardVariables,
+    varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
 });
 
 /* Util */
 const initSnapshot = () => {
-    state.variablesSnapshot = cloneDeep(dashboardDetailState.variables);
+    state.varsSnapshot = cloneDeep(dashboardDetailState.vars);
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
     state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.previewWidgetValueMap);
 };
 const reset = () => {
-    dashboardDetailStore.setVariables(state.variablesSnapshot);
+    dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
 
@@ -144,7 +144,7 @@ onUnmounted(() => {
                            :description="widgetGenerateState.description"
                            :widget-options="widgetGenerateState.previewWidgetValueMap"
                            :dashboard-options="dashboardDetailState.options"
-                           :dashboard-vars="dashboardDetailState.vars"
+                           :dashboard-vars="dashboardDetailGetters.refinedVars"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            mode="overlay"
                 />

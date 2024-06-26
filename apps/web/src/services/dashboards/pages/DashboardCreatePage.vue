@@ -54,7 +54,6 @@ interface Step {
 const appContextStore = useAppContextStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 const {
     forms: { dashboardTemplate },
@@ -101,8 +100,7 @@ const createDashboard = async () => {
             labels: dashboardDetailState.labels,
             options: dashboardDetailState.options,
             layouts: [dashboardDetailState.dashboardWidgetInfoList],
-            variables: dashboardDetailState.variables,
-            variables_schema: dashboardDetailGetters.refinedVariablesSchema,
+            vars: {},
             tags: { created_by: store.state.user.userId },
         };
         if (dashboardDetailState.dashboardScope !== 'PRIVATE') {

@@ -56,10 +56,8 @@ interface MultiSelectDashboardVariables {
 export type RefreshIntervalOption = keyof typeof REFRESH_INTERVAL_OPTIONS_MAP;
 // dashboard options types
 export interface DashboardOptions {
-    date_range: {
-        enabled: boolean;
-    } & DateRange;
-    refresh_interval_option: RefreshIntervalOption;
+    date_range?: DateRange;
+    refresh_interval_option?: RefreshIntervalOption;
 }
 export interface DateRange {
     start?: string;

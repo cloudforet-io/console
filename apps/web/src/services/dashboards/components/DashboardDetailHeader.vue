@@ -12,6 +12,7 @@ import DashboardCloneModal from '@/services/dashboards/components/DashboardClone
 import DashboardControlButtons from '@/services/dashboards/components/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/components/DashboardNameEditModal.vue';
+import DashboardShareModal from '@/services/dashboards/components/DashboardShareModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -28,6 +29,7 @@ const state = reactive({
     nameEditModalVisible: false,
     deleteModalVisible: false,
     cloneModalVisible: false,
+    shareModalVisible: false,
     menuItems: computed<MenuItem[]>(() => {
         const _defaultMenuItems: MenuItem[] = [
             {
@@ -38,10 +40,16 @@ const state = reactive({
             },
             {
                 type: 'item',
-                name: 'duplicate',
-                label: i18n.t('DASHBOARDS.DETAIL.DUPLICATE'),
-                icon: 'ic_duplicate',
+                name: 'share',
+                label: i18n.t('DASHBOARDS.DETAIL.SHARE'),
+                icon: 'ic_share',
             },
+            // {
+            //     type: 'item',
+            //     name: 'duplicate',
+            //     label: i18n.t('DASHBOARDS.DETAIL.DUPLICATE'),
+            //     icon: 'ic_duplicate',
+            // },
             { type: 'divider', name: '' },
             {
                 type: 'item',
@@ -60,6 +68,7 @@ const handleSelectItem = (selected: MenuItem) => {
     if (selected.name === 'edit') state.nameEditModalVisible = true;
     if (selected.name === 'duplicate') state.cloneModalVisible = true;
     if (selected.name === 'delete') state.deleteModalVisible = true;
+    if (selected.name === 'share') state.shareModalVisible = true;
 };
 const handleNameUpdate = (name: string) => {
     dashboardDetailStore.setName(name);
@@ -109,6 +118,9 @@ const handleNameUpdate = (name: string) => {
         />
         <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
                                :dashboard="dashboardDetailState.dashboardInfo"
+        />
+        <dashboard-share-modal :visible.sync="state.shareModalVisible"
+                               :dashboard-id="props.dashboardId"
         />
     </div>
 </template>
