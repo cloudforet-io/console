@@ -128,12 +128,13 @@ onUnmounted(() => {
             &:active {
                 cursor: grabbing;
             }
-            .text {
-                @apply truncate;
-            }
             .text-wrapper {
                 display: flex;
                 gap: 0.25rem;
+                .text {
+                    @apply truncate;
+                    width: 13rem;
+                }
             }
         }
         .ghost {

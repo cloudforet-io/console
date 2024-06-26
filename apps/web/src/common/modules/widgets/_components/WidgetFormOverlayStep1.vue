@@ -193,7 +193,7 @@ onMounted(() => {
             }
             .gradation-left-area {
                 @apply absolute;
-                width: 1.5rem;
+                width: 1.25rem;
                 height: 100%;
                 left: 0;
                 top: 0;

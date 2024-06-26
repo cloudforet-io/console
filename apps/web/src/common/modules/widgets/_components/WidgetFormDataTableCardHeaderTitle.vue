@@ -90,7 +90,7 @@ const handleClickNameConfirm = async () => {
                 @click="handleSelectDataTable(props.dataTableId)"
         >
             <p-i :name="props.selected ? 'ic_checkbox-circle-selected' : 'ic_radio'"
-                 :color="props.selected ? violet[500] : gray[400]"
+                 :color="`${props.selected ? violet[500] : gray[400]} white`"
                  size="md"
             />
         </button>
@@ -144,6 +144,7 @@ const handleClickNameConfirm = async () => {
     @apply flex items-center text-paragraph-sm font-bold w-full;
     gap: 0.125rem;
     .selected-radio-icon {
+        @apply text-white;
         width: 1.5rem;
         height: 1.5rem;
     }
@@ -152,6 +153,7 @@ const handleClickNameConfirm = async () => {
         overflow: hidden;
         width: auto;
         .data-table-name {
+            @apply text-paragraph-md;
             overflow: hidden;
             p {
                 @apply truncate;

@@ -48,12 +48,12 @@ const state = reactive({
         const _dateFormat = getDateFormat(state.granularity);
         const _timeUnit = getTimeUnit(state.granularity);
         const _previousDate = dayjs.utc(state.basedOnDate).subtract(1, _timeUnit).format(_dateFormat);
-        return state.data?.results.find((item) => item.Date === _previousDate)?.[state.dataField] ?? 0;
+        return state.data?.results.find((item) => item[DATE_FIELD.DATE] === _previousDate)?.[state.dataField] ?? 0;
     }),
     currentValue: computed<number>(() => {
         const _dateFormat = getDateFormat(state.granularity);
         const _currentDate = dayjs.utc(state.basedOnDate).format(_dateFormat);
-        return state.data?.results.find((item) => item.Date === _currentDate)?.[state.dataField] ?? 0;
+        return state.data?.results.find((item) => item[DATE_FIELD.DATE] === _currentDate)?.[state.dataField] ?? 0;
     }),
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
@@ -77,13 +77,16 @@ const state = reactive({
         const _target = (props.widgetOptions?.comparison as ComparisonValue[])?.[0];
         const _comparison = Math.abs(state.currentValue - state.previousValue);
         const _format = _target?.format || 'all';
-        const _percentage = _comparison / state.previousValue * 100;
+        let _percentage = '--';
+        if (state.previousValue > 0) {
+            _percentage = (_comparison / state.previousValue * 100).toFixed(2);
+        }
         const _fixedAmount = numberFormatter(_comparison, { notation: 'compact' }) || '--';
         if (_format === 'all') {
-            return `${_fixedAmount} (${_percentage.toFixed(2)}%)`;
+            return `${_fixedAmount} (${_percentage}%)`;
         }
         if (_format === 'percent') {
-            return `${_percentage.toFixed(2)}%`;
+            return `${_percentage}%`;
         }
         return _fixedAmount;
     }),

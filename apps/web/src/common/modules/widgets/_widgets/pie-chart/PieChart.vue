@@ -69,6 +69,8 @@ const state = reactive({
             right: 10,
             top: 20,
             bottom: 20,
+            itemWidth: 10,
+            itemHeight: 10,
             icon: 'circle',
             textStyle: {
                 overflow: 'truncate',
