@@ -56,10 +56,10 @@ const state = reactive({
         }
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
-    isWidgetOptionsChanged: computed<boolean>(() => !isEqual(widgetGenerateState.widgetValueMap, state.widgetValueMapSnapshot)),
+    isWidgetOptionsChanged: computed<boolean>(() => !isEqual(widgetGenerateState.widgetFormValueMap, state.appliedPreviewWidgetValueMap)),
     disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateGetters.isAllWidgetFormValid),
     //
-    widgetValueMapSnapshot: {} as Record<string, WidgetFieldValues>,
+    appliedPreviewWidgetValueMap: {} as Record<string, WidgetFieldValues>,
     variablesSnapshot: {} as IDashboardVariables,
     dashboardOptionsSnapshot: {} as DashboardOptions,
 });
@@ -68,7 +68,7 @@ const state = reactive({
 const initSnapshot = () => {
     state.variablesSnapshot = cloneDeep(dashboardDetailState.variables);
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
-    state.widgetValueMapSnapshot = cloneDeep(widgetGenerateState.widgetValueMap);
+    state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.previewWidgetValueMap);
 };
 const reset = () => {
     dashboardDetailStore.setVariables(state.variablesSnapshot);
@@ -80,7 +80,8 @@ const handleChangeWidgetSize = (widgetSize: string) => {
     state.selectedWidgetSize = widgetSize;
 };
 const handleUpdatePreview = async () => {
-    state.widgetValueMapSnapshot = cloneDeep(widgetGenerateState.widgetValueMap);
+    widgetGenerateStore.setPreviewWidgetValueMap(cloneDeep(widgetGenerateState.widgetFormValueMap));
+    state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
     const res = await overlayWidgetRef.value?.loadWidget();
     if (typeof res === 'function') {
         res('Please check the widget options.');
@@ -141,7 +142,7 @@ onUnmounted(() => {
                            :width="state.widgetWidth"
                            :title="widgetGenerateState.title"
                            :description="widgetGenerateState.description"
-                           :widget-options="widgetGenerateState.widgetValueMap"
+                           :widget-options="widgetGenerateState.previewWidgetValueMap"
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailState.vars"
                            :all-reference-type-info="state.allReferenceTypeInfo"

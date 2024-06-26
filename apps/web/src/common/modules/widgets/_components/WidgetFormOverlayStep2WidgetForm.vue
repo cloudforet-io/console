@@ -77,7 +77,7 @@ const updateWidget = async (dataTableId: string) => {
 const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
     await updateWidget(dataTableId);
-    widgetGenerateStore.setWidgetValueMap({});
+    widgetGenerateStore.setWidgetFormValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
 };
 
@@ -96,7 +96,7 @@ const handleSelectWidgetName = (widgetName: string) => {
     const _config = getWidgetConfig(widgetName);
     widgetGenerateStore.setSize(_config.meta.sizes[0]);
     widgetGenerateStore.setTitle(_config.meta.title);
-    widgetGenerateStore.setWidgetValueMap({});
+    widgetGenerateStore.setWidgetFormValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
     checkDefaultValidation();
 };
@@ -116,7 +116,7 @@ const handleClickCollapsibleTitle = (collapsedTitle: string) => {
 
 const checkFormDependencies = (changedFieldName: string):string[] => state.widgetConfigDependencies[changedFieldName] || [];
 const handleUpdateFieldValue = (fieldName: string, value: WidgetFieldValues) => {
-    const _valueMap = cloneDeep(widgetGenerateState.widgetValueMap);
+    const _valueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
     _valueMap[fieldName] = value;
     const changedOptions = checkFormDependencies(fieldName);
     if (changedOptions.length) {
@@ -124,7 +124,7 @@ const handleUpdateFieldValue = (fieldName: string, value: WidgetFieldValues) => 
             _valueMap[option] = undefined;
         });
     }
-    widgetGenerateStore.setWidgetValueMap(_valueMap);
+    widgetGenerateStore.setWidgetFormValueMap(_valueMap);
 };
 const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
     const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
@@ -133,7 +133,7 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
 };
 
 // eslint-disable-next-line max-len
-const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetValueMap[name] === undefined}`;
+const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetFormValueMap[name] === undefined}`;
 </script>
 
 <template>
@@ -227,8 +227,8 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
                                :key="keyGenerator(fieldName, 'require')"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
-                               :all-value-map="widgetGenerateState.widgetValueMap"
-                               :value="widgetGenerateState.widgetValueMap[fieldName]"
+                               :all-value-map="widgetGenerateState.widgetFormValueMap"
+                               :value="widgetGenerateState.widgetFormValueMap[fieldName]"
                                :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                @update:value="handleUpdateFieldValue(fieldName, $event)"
                                @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
@@ -258,8 +258,8 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
                                :key="keyGenerator(fieldName, 'option')"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
-                               :all-value-map="widgetGenerateState.widgetValueMap"
-                               :value="widgetGenerateState.widgetValueMap[fieldName]"
+                               :all-value-map="widgetGenerateState.widgetFormValueMap"
+                               :value="widgetGenerateState.widgetFormValueMap[fieldName]"
                                :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                @update:value="handleUpdateFieldValue(fieldName, $event)"
                                @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
