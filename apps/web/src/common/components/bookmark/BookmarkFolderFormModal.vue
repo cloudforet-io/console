@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput,
+    PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -14,6 +14,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
@@ -31,6 +32,7 @@ const storeState = reactive({
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
+    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
     loading: false,
@@ -87,7 +89,7 @@ const handleConfirm = async () => {
                 });
             }
         } else {
-            await bookmarkStore.createBookmarkFolder(name.value);
+            await bookmarkStore.createBookmarkFolder(name.value, state.scope);
         }
         await handleClose();
     } finally {
@@ -95,6 +97,13 @@ const handleConfirm = async () => {
     }
 };
 
+watch(() => storeState.bookmarkType, (bookmarkType) => {
+    if (bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+        state.selectedRadioIdx = 0;
+    } else if (bookmarkType === BOOKMARK_TYPE.USER) {
+        state.selectedRadioIdx = 1;
+    }
+}, { immediate: true });
 watch(() => storeState.modal.isEdit, (isEditModal) => {
     if (isEditModal) {
         setForm('name', state.bookmark as string || '');
