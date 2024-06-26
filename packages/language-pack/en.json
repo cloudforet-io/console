@@ -2084,6 +2084,7 @@
 		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "Admin email",
+			"ALT_E_EMPTY_COST": "Please enter cost threshold.",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "Failed to update admin email",
 			"ALT_E_UPDATE_BRAND_ASSETS": "Failed to update brand assets",
 			"ALT_E_UPDATE_DISPLAY_NAME": "Failed to update display name",
