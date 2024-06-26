@@ -116,18 +116,21 @@ const state = reactive({
             label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
             id: 'project-alert',
             to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME }),
+            hideFavorite: true,
         },
         {
             type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
             id: 'project-notification',
             to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME }),
+            hideFavorite: true,
         },
         {
             type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
             id: 'project-tag',
             to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME }),
+            hideFavorite: true,
         },
     ]),
     menuSet: computed<LSBMenu[]>(() => {
