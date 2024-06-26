@@ -17,8 +17,6 @@ import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-wid
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
 
-import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
@@ -70,14 +68,6 @@ const state = reactive({
     }),
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
-    vars: computed<Record<string, string[]>>(() => {
-        const _vars: Record<string, string[]> = {};
-        Object.entries(dashboardDetailState.vars).forEach(([k, v]) => {
-            const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
-            if (idKey) _vars[idKey] = v;
-        });
-        return _vars;
-    }),
 });
 const widgetDeleteState = reactive({
     visibleModal: false,
@@ -288,7 +278,7 @@ defineExpose({
                                :mode="store.state.display.visibleSidebar ? 'edit-layout' : 'view'"
                                :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
-                               :dashboard-vars="state.vars"
+                               :dashboard-vars="dashboardDetailGetters.refinedVars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                @mounted="handleWidgetMounted(widget.widget_id)"

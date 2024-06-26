@@ -34,6 +34,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 const overlayWidgetRef = ref<HTMLElement|null>(null);
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
@@ -144,7 +145,7 @@ onUnmounted(() => {
                            :description="widgetGenerateState.description"
                            :widget-options="widgetGenerateState.previewWidgetValueMap"
                            :dashboard-options="dashboardDetailState.options"
-                           :dashboard-vars="dashboardDetailState.vars"
+                           :dashboard-vars="dashboardDetailGetters.refinedVars"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            mode="overlay"
                 />

@@ -14,7 +14,7 @@ import type {
     DashboardVariables, DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
     TemplateType,
-    DashboardLayout,
+    DashboardLayout, DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
@@ -24,6 +24,7 @@ import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import getRandomId from '@/lib/random-id-generator';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -45,7 +46,6 @@ export const DASHBOARD_DEFAULT = Object.freeze<{ options: DashboardOptions }>({
         date_range: {
             start: undefined,
             end: undefined,
-            enabled: false,
         },
         refresh_interval_option: DEFAULT_REFRESH_INTERVAL,
     },
@@ -144,6 +144,14 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             });
             return _refinedVariablesSchema;
         }),
+        refinedVars: computed<DashboardVars>(() => {
+            const _vars: Record<string, string[]> = {};
+            Object.entries(state.vars).forEach(([k, v]) => {
+                const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
+                if (idKey) _vars[idKey] = v;
+            });
+            return _vars;
+        }),
     });
 
     /* Mutations */
@@ -187,8 +195,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.dashboardScope = dashboardScope;
     };
     const setProjectId = (projectId?: string) => { state.projectId = projectId; };
-    const setTemplateId = (templateId: string) => { state.templateId = templateId; };
-    const setTemplateType = (templateType: TemplateType) => { state.templateType = templateType; };
     const setDashboardLayouts = (layouts: DashboardLayout[]) => { state.dashboardLayouts = layouts; };
     /* Actions */
     const reset = () => {
@@ -256,7 +262,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setLabels(_dashboardInfo.labels);
         const _options = {
             date_range: {
-                enabled: _dashboardInfo.options?.date_range?.enabled ?? false,
                 start: _dashboardInfo.options?.date_range?.start,
                 end: _dashboardInfo.options?.date_range?.end,
             },
@@ -294,8 +299,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             widget_key: info.widget_key ?? getRandomId(),
         })) ?? [];
         setDashboardWidgetInfoList(_dashboardWidgetInfoList);
-        setTemplateId(_dashboardInfo.template_id);
-        setTemplateType(_dashboardInfo.template_type);
     };
     const getDashboardInfo = async (dashboardId: undefined|string) => {
         if (dashboardId === state.dashboardId || dashboardId === undefined) return;
@@ -331,6 +334,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.dashboardLayouts = _dashboardLayouts;
         await dashboardStore.updateDashboard(state.dashboardId as string, { layouts: _dashboardLayouts });
     };
+    // HACK: only for 1.0 dashboard
     const resetVariables = (originVariables?: DashboardVariables, originVariablesSchema?: DashboardVariablesSchema) => {
         const _originVariables: DashboardVariables = originVariables ?? state.dashboardInfo?.variables ?? {};
         const _originVariablesSchema: DashboardVariablesSchema = originVariablesSchema ?? state.dashboardInfo?.variables_schema ?? { properties: {}, order: [] };
