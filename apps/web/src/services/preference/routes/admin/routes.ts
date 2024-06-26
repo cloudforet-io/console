@@ -8,7 +8,11 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const PreferenceContainer = () => import('@/services/preference/PreferenceContainer.vue');
-const DomainSettingsPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsPage.vue');
+const DomainSettingsContainer = () => import('@/services/preference/components/DomainSettingsContainer.vue');
+const AdminDomainSettingsBaseInformationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsBaseInformationPage.vue');
+const AdminDomainSettingsBrandAssetsPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsBrandAssetsPage.vue');
+const AdminDomainSettingsTimezoneAndLanguagePage = () => import('@/services/preference/pages/admin/AdminDomainSettingsTimezoneAndLanguagePage.vue');
+const AdminDomainSettingsAutoDormancyConfigurationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsAutoDormancyConfigurationPage.vue');
 const WorkspacesPage = () => import('@/services/preference/pages/admin/AdminWorkspacesPage.vue');
 // const BookmarkPage = () => import('@/services/preference/pages/admin/AdminBookmarkPage.vue');
 
@@ -71,9 +75,39 @@ const adminPreferenceRoutes: RouteConfig = {
             name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS._NAME),
             meta: {
                 menuId: MENU_ID.DOMAIN_SETTINGS,
+                lsbVisible: true,
                 translationId: MENU_INFO_MAP[MENU_ID.DOMAIN_SETTINGS].translationId,
             },
-            component: DomainSettingsPage,
+            redirect: () => ({
+                name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BASE_INFORMATION._NAME),
+            }),
+            component: DomainSettingsContainer,
+            children: [
+                {
+                    path: '/base-information',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BASE_INFORMATION._NAME),
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.BASE_INFORMATION].translationId },
+                    component: AdminDomainSettingsBaseInformationPage,
+                },
+                {
+                    path: '/brand-assets',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BRAND_ASSETS._NAME),
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.BRAND_ASSETS].translationId },
+                    component: AdminDomainSettingsBrandAssetsPage,
+                },
+                {
+                    path: '/timezone-and-language',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE._NAME),
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.TIMEZONE_AND_LANGUAGE].translationId },
+                    component: AdminDomainSettingsTimezoneAndLanguagePage,
+                },
+                {
+                    path: '/auto-dormancy-configuration',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME),
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.AUTO_DORMANCY_CONFIGURATION].translationId },
+                    component: AdminDomainSettingsAutoDormancyConfigurationPage,
+                },
+            ],
         },
     ],
 };
