@@ -140,6 +140,10 @@ const advancedOptionsState = reactive({
     selectedTimeDiffDate: undefined as string|undefined,
 });
 
+const validationState = reactive({
+    dataTableApplyInvalid: false,
+});
+
 const originDataState = reactive({
     sourceKey: computed(() => (state.sourceType === DATA_SOURCE_DOMAIN.COST ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id)),
     groupBy: computed(() => ((props.item.options as DataTableAddOptions).group_by ?? []).map((group) => ({
@@ -381,8 +385,9 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                               :separate-date.sync="advancedOptionsState.separateDate"
                                               :selected-time-diff.sync="advancedOptionsState.selectedTimeDiff"
                                               :selected-time-diff-date.sync="advancedOptionsState.selectedTimeDiffDate"
+                                              :form-invalid.sync="validationState.dataTableApplyInvalid"
         />
-        <widget-form-data-table-card-footer :disabled="!state.dataFieldName.length"
+        <widget-form-data-table-card-footer :disabled="validationState.dataTableApplyInvalid"
                                             :changed="state.optionsChanged"
                                             @delete="handleClickDeleteDataTable"
                                             @reset="handleClickResetDataTable"
