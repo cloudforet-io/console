@@ -19,6 +19,7 @@ import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/b
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 
 interface Props {
@@ -39,8 +40,15 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
+    bookmarkFolderList: [] as BookmarkItem[],
     selectedFolderIdx: undefined as number|undefined,
     selectedFolder: computed<BookmarkItem|undefined>(() => (props.bookmarkFolderList ? props.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
+    radioMenuList: computed(() => ([
+        i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK'),
+        i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
+    ])),
+    selectedRadioIdx: 0,
+    scope: computed(() => (state.selectedRadioIdx === 0 ? BOOKMARK_TYPE.WORKSPACE : BOOKMARK_TYPE.USER)),
 });
 
 const {
@@ -173,6 +181,23 @@ watch(() => storeState.modal.type, (type) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
+                <p-field-group v-if="!storeState.modal.isEdit && storeState.modal.isNew"
+                               class="scope-wrapper"
+                               :label="$t('HOME.FORM_SCOPE')"
+                               required
+                >
+                    <p-radio-group>
+                        <p-radio v-for="(item, idx) in state.radioMenuList"
+                                 :key="`bookmark-scope-${idx}`"
+                                 v-model="state.selectedRadioIdx"
+                                 :value="idx"
+                        >
+                            <span class="radio-item">
+                                {{ item }}
+                            </span>
+                        </p-radio>
+                    </p-radio-group>
+                </p-field-group>
                 <p-field-group :label="$t('HOME.FORM_FOLDER')"
                                class="input-form"
                 >
@@ -194,7 +219,7 @@ watch(() => storeState.modal.type, (type) => {
                             </p-button>
                         </div>
                         <p-radio-group :direction="'vertical'">
-                            <p-radio v-for="(item, idx) in props.bookmarkFolderList"
+                            <p-radio v-for="(item, idx) in state.bookmarkFolderList"
                                      :key="`bookmark-folder-${idx}`"
                                      v-model="state.selectedFolderIdx"
                                      :value="idx"

@@ -3,12 +3,10 @@ import { computed, reactive } from 'vue';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
-import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
@@ -30,36 +28,12 @@ const storeState = reactive({
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
 });
-const state = reactive({
-    folderBoardSets: computed<BookmarkItem[]>(() => {
-        const defaultFolderItem: BookmarkItem[] = [
-            {
-                name: i18n.t('HOME.BOOKMARK_CREATE_FOLDER'),
-                icon: 'ic_plus',
-                id: 'create-folder',
-            },
-            {
-                name: i18n.t('HOME.BOOKMARK_ADD_LINK'),
-                icon: 'ic_plus',
-                id: 'add-link',
-            },
-        ];
-        if (!(storeState.bookmarkType === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)) {
-            return [
-                ...defaultFolderItem,
-                ...props.bookmarkFolderList,
-            ];
-        }
-        return props.bookmarkFolderList;
-    }),
-    isFullMode: false,
-});
 </script>
 
 <template>
     <div class="bookmark-full-mode">
-        <bookmark-board v-if="!storeState.isFileFullMode"
-                        :board-list="state.folderBoardSets"
+        <bookmark-board v-if="!storeState.isFileFullMode && props.bookmarkFolderList.length > 0"
+                        :board-list="props.bookmarkFolderList"
                         is-folder-board
                         is-full-mode
                         class="board"

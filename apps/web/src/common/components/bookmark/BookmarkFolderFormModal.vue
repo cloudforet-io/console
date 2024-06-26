@@ -12,6 +12,7 @@ import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/const
 import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/bookmark/type/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 
 interface Props {
@@ -34,6 +35,12 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     bookmark: computed<string|undefined|TranslateResult>(() => storeState.selectedBookmark?.name || storeState.filterByFolder),
+    radioMenuList: computed(() => ([
+        i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK'),
+        i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
+    ])),
+    selectedRadioIdx: 0,
+    scope: computed(() => (state.selectedRadioIdx === 0 ? BOOKMARK_TYPE.WORKSPACE : BOOKMARK_TYPE.USER)),
 });
 
 const {
@@ -122,6 +129,23 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                                   block
                                   @update:value="setForm('name', $event)"
                     />
+                </p-field-group>
+                <p-field-group v-if="!storeState.modal.isEdit"
+                               class="scope-wrapper"
+                               :label="$t('HOME.FORM_SCOPE')"
+                               required
+                >
+                    <p-radio-group>
+                        <p-radio v-for="(item, idx) in state.radioMenuList"
+                                 :key="`bookmark-scope-${idx}`"
+                                 v-model="state.selectedRadioIdx"
+                                 :value="idx"
+                        >
+                            <span class="radio-item">
+                                {{ item }}
+                            </span>
+                        </p-radio>
+                    </p-radio-group>
                 </p-field-group>
             </div>
         </template>
