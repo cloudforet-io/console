@@ -24,7 +24,7 @@ export const useWidgetInitAndRefresh = <Data = any>({
 }: UseWidgetInitAndRefreshOptions<Data>): void => {
     const initiated = ref(false);
 
-    const stopVariablesWatch = watch(() => props.vars, (after, before) => {
+    const stopVariablesWatch = watch(() => props.dashboardVars, (after, before) => {
         if (isEqual(after, before)) return;
         if (!initiated.value || props.disableRefreshOnVariableChange) return;
         loadWidget();

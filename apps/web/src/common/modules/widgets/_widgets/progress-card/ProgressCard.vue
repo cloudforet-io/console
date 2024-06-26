@@ -131,7 +131,7 @@ const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
                     },
                 },
             },
-            vars: props.vars,
+            vars: props.dashboardVars,
         });
         state.errorMessage = undefined;
         return res;
