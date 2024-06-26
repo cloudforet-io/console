@@ -26,7 +26,7 @@ interface Props {
   fieldType: TableDataFieldValue['fieldType'];
   criteria?: string;
   dataField?: string|string[];
-  granularity: string;
+  granularity?: string;
   // optional field info
   comparisonInfo?: ComparisonValue;
   subTotalInfo?: TotalValue;
@@ -42,7 +42,7 @@ const storeState = reactive({
     serviceAccount: computed(() => allReferenceStore.getters.serviceAccount),
 });
 
-const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity}`;
+const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
 const getField = (field: TableWidgetField): string => {
     if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.reference) return storeState[field.fieldInfo.reference][field.label]?.name || field.label || field.name;
     return field.label || field.name;

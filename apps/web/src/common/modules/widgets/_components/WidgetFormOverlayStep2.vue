@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onBeforeMount, onUnmounted, reactive, ref, watch,
+    computed, nextTick, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -82,6 +82,7 @@ const handleChangeWidgetSize = (widgetSize: string) => {
 const handleUpdatePreview = async () => {
     widgetGenerateStore.setPreviewWidgetValueMap(cloneDeep(widgetGenerateState.widgetFormValueMap));
     state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
+    await nextTick();
     const res = await overlayWidgetRef.value?.loadWidget();
     if (typeof res === 'function') {
         res('Please check the widget options.');

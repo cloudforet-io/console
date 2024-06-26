@@ -16,6 +16,7 @@ import {
 
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
@@ -66,8 +67,10 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;}>();
 const allReferenceStore = useAllReferenceStore();
 const widgetGenerateStore = useWidgetGenerateStore();
+const appContextStore = useAppContextStore();
 
 const storeState = reactive({
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     metircs: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     dataTable: computed(() => widgetGenerateStore.state.dataTables.find((d) => d.data_table_id === props.dataTableId)),
@@ -99,7 +102,7 @@ const state = reactive({
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
         const metricLabelsInfo = storeState.metircs[props.sourceId ?? ''].data.labels_info;
-        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => labelInfo.key !== 'workspace_id') : [];
+        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => (storeState.isAdminMode ? labelInfo.key !== 'project_id' : labelInfo.key !== 'workspace_id')) : [];
     }),
 });
 
