@@ -1351,6 +1351,8 @@
 				"YESTERDAY": "昨日"
 			},
 			"CANCEL": "キャンセル",
+			"CHANGE_DATA_MODAL_DESCRIPTION": "",
+			"CHANGE_DATA_MODAL_TITLE": "",
 			"CLOUD_SERVICE": {
 				"HELP": "サービスしている主要なクラウドサービスリストを表示します",
 				"NO_DATA": "クラウドリソースがありません。",
@@ -1705,6 +1707,7 @@
 			"EDIT_DASHBOARD_NAME": "ダッシュボード名の編集",
 			"EDIT_LAYOUT": "",
 			"EXPORT": "エクスポート",
+			"NO_WIDGET_TEXT": "",
 			"OTHER_MONTHS": "他の月",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "フィルタの適用"
