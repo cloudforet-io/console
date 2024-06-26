@@ -88,7 +88,7 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
 watch(() => labelsMenuItem.value, (value) => {
     let isSelectedValueValid = false;
     if (state.selectedItem === undefined) {
-        if (Array.isArray(state.selectedItem)) {
+        if (state.multiselectable) {
             state.selectedItem = [value?.[0]?.name];
         } else {
             state.selectedItem = value?.[0]?.name;
