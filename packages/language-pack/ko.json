@@ -2084,6 +2084,7 @@
 		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "Admin 이메일",
+			"ALT_E_EMPTY_COST": "",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "Admin 이메일 변경 실패",
 			"ALT_E_UPDATE_BRAND_ASSETS": "브랜드 에셋 수정 실패",
 			"ALT_E_UPDATE_DISPLAY_NAME": "도메인 표시 명 변경 실패",

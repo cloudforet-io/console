@@ -2084,6 +2084,7 @@
 		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "管理者Email",
+			"ALT_E_EMPTY_COST": "",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "管理者メールの更新に失敗しました",
 			"ALT_E_UPDATE_BRAND_ASSETS": "ブランドアセットの更新に失敗しました",
 			"ALT_E_UPDATE_DISPLAY_NAME": "表示名の更新に失敗しました",
