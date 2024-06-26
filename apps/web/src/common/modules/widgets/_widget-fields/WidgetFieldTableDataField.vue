@@ -11,7 +11,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
+// import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldO
 });
 const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
 
-const { labelsMenuItem } = useGranularityMenuItem(props, 'tableDataField');
+// const { labelsMenuItem } = useGranularityMenuItem(props, 'tableDataField');
 
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
@@ -40,8 +40,12 @@ const state = reactive({
     multiSelectable: computed(() => state.selectedFieldType === 'staticField'),
     menuItems: computed<MenuItem[]>(() => {
         if (!props.dataTable) return [];
-        return state.selectedFieldType === 'dynamicField' ? labelsMenuItem : state.dataInfoMenuItems;
+        return state.selectedFieldType === 'dynamicField' ? state.labelsInfoMenuItems : state.dataInfoMenuItems;
     }),
+    labelsInfoMenuItems: computed<MenuItem[]>(() => Object.keys(props.dataTable?.labels_info ?? {}).map((d) => ({
+        name: d,
+        label: d,
+    }))),
     dataInfoMenuItems: computed<MenuItem[]>(() => Object.keys(props.dataTable?.data_info ?? {}).map((d) => ({
         name: d,
         label: d,
@@ -120,11 +124,11 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
     label: d,
 }));
 
-watch(() => labelsMenuItem.value, (value) => {
-    if (!(value.find((d) => d.name === state.selectedItem)) && (state.selectedFieldType === 'dynamicField')) {
-        state.selectedItem = undefined;
-    }
-});
+// watch(() => labelsMenuItem.value, (value) => {
+//     if (!(value.find((d) => d.name === state.selectedItem)) && (state.selectedFieldType === 'dynamicField')) {
+//         state.selectedItem = undefined;
+//     }
+// });
 
 watch(() => state.menuItems, (menuItems) => {
     if (!Array.isArray(menuItems)) return;
