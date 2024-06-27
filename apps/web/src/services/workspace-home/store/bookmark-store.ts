@@ -209,10 +209,10 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             try {
                 let fetcher;
                 let resource_group: undefined|string;
-                if (type === BOOKMARK_TYPE.USER || state.bookmarkType === BOOKMARK_TYPE.USER) {
+                if (type === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.set;
                     resource_group = undefined;
-                } else if (type === BOOKMARK_TYPE.WORKSPACE || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                } else if (type === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = SpaceConnector.clientV2.config.publicConfig.create;
                     resource_group = 'WORKSPACE';
                 }
@@ -236,10 +236,10 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             try {
                 let fetcher;
                 let resource_group: undefined|string;
-                if (type === BOOKMARK_TYPE.USER || state.bookmarkType === BOOKMARK_TYPE.USER) {
+                if (type === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.set;
                     resource_group = undefined;
-                } else if (type === BOOKMARK_TYPE.WORKSPACE || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                } else if (type === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = SpaceConnector.clientV2.config.publicConfig.create;
                     resource_group = 'WORKSPACE';
                 }
