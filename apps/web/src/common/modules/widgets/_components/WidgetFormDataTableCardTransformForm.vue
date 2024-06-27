@@ -38,7 +38,7 @@ const state = reactive({
     operatorMap: computed(() => {
         if (props.operator === 'CONCAT') return { name: 'Concatenate', icon: 'ic_db-concat' };
         if (props.operator === 'JOIN') return { name: 'Join', icon: 'ic_join' };
-        if (props.operator === 'QUERY') return { name: 'Where', icon: 'ic_db-where' };
+        if (props.operator === 'QUERY') return { name: 'Query', icon: 'ic_db-where' };
         if (props.operator === 'EVAL') return { name: 'Evaluate', icon: 'ic_db-evaluation' };
         return { name: '', icon: '' };
     }),
@@ -122,7 +122,7 @@ const handleRemoveFunction = (key: string) => {
                 />
             </div>
             <p-field-group v-if="props.operator === DATA_TABLE_OPERATOR.JOIN"
-                           :label="'Join Type'"
+                           :label="'How'"
                            required
             >
                 <p-select-dropdown class="join-type-dropdown"
@@ -145,7 +145,7 @@ const handleRemoveFunction = (key: string) => {
                            :label="'Condition'"
                            required
             >
-                <div class="where-type-conditions-wrapper">
+                <div class="query-type-conditions-wrapper">
                     <div v-for="(conditionInfo, idx) in queryState.proxyConditions"
                          :key="conditionInfo.key"
                          class="conditions-wrapper"
@@ -170,7 +170,7 @@ const handleRemoveFunction = (key: string) => {
                 </div>
             </p-field-group>
             <p-field-group v-if="props.operator === DATA_TABLE_OPERATOR.EVAL"
-                           label="Expressions"
+                           label="Expression"
                            required
             >
                 <div class="eval-type-functions-wrapper">
@@ -221,7 +221,7 @@ const handleRemoveFunction = (key: string) => {
             min-width: 1rem;
         }
     }
-    .where-type-conditions-wrapper {
+    .query-type-conditions-wrapper {
         @apply bg-gray-100 rounded-lg;
         padding: 0.5rem;
         margin-top: 0.25rem;
