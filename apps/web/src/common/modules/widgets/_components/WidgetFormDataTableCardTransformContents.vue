@@ -215,12 +215,42 @@ const handleUpdateDataTable = async () => {
             options: { [state.operator]: options() },
         };
         await widgetGenerateStore.updateDataTable(updateParams);
-        if (storeState.selectedDataTableId === state.dataTableId) {
-            widgetGenerateStore.setDataTableUpdating(true);
-            await widgetGenerateStore.loadDataTable({
-                data_table_id: state.dataTableId,
+    }
+    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
+    widgetGenerateStore.setDataTableUpdating(true);
+    await widgetGenerateStore.loadDataTable({
+        data_table_id: state.dataTableId,
+    });
+
+    // Update Referenced Transformed DataTable
+    const referencedDataTableIds = [] as string[];
+    storeState.dataTables.forEach((dataTable) => {
+        const transformDataTalbeOptions = dataTable.options as DataTableTransformOptions;
+        const isReferenced = dataTable.data_type === 'TRANSFORMED'
+            && !dataTable?.data_table_id?.startsWith('UNSAVED-')
+            && (
+                transformDataTalbeOptions?.JOIN?.data_tables?.includes(state.dataTableId)
+                || transformDataTalbeOptions?.CONCAT?.data_tables?.includes(state.dataTableId)
+                || transformDataTalbeOptions?.QUERY?.data_table_id === state.dataTableId
+                || transformDataTalbeOptions?.EVAL?.data_table_id === state.dataTableId
+            );
+        if (isReferenced) referencedDataTableIds.push(dataTable.data_table_id as string);
+    });
+    if (referencedDataTableIds.length) {
+        await Promise.all(referencedDataTableIds.map((dataTableId) => {
+            const dataTable = storeState.dataTables.find((_dataTable) => _dataTable.data_table_id === dataTableId) as PublicDataTableModel|PrivateDataTableModel;
+            widgetGenerateStore.updateDataTable({
+                data_table_id: dataTable.data_table_id,
+                name: dataTable.name,
+                options: {
+                    ...dataTable.options,
+                },
             });
-        }
+            return null;
+        }));
+        // await widgetGenerateStore.loadDataTable({
+        //     data_table_id: storeState.selectedDataTableId,
+        // });
     }
 };
 
