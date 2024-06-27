@@ -17,7 +17,6 @@ import type { TableDataFieldValue, ComparisonValue, TotalValue } from '@/common/
 
 
 interface Props {
-  loading: boolean;
   fields: TableWidgetField[];
   items?: any[];
   currency?: Currency;
