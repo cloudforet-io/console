@@ -19,6 +19,7 @@ const stackedAreaChart: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
                 max: 31,
+                defaultIndex: 0,
             },
         },
         lineBy: {
@@ -26,6 +27,8 @@ const stackedAreaChart: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
                 max: 10,
+                defaultIndex: 0,
+                excludeDateField: true,
             },
         },
     },

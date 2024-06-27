@@ -12,6 +12,7 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
+import { getDefaultMenuItemIndex } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type {
     WidgetFieldComponentProps,
@@ -134,18 +135,19 @@ watch(() => state.menuItems, (menuItems) => {
 }, { immediate: true });
 /* Init */
 onMounted(() => {
+    const _defaultIndex = getDefaultMenuItemIndex(state.menuItems, props.widgetFieldSchema?.options?.defaultIndex, props.widgetFieldSchema?.options?.excludeDateField);
     if (state.multiselectable) {
         state.proxyValue = {
             ...state.proxyValue,
-            value: props.value?.value ?? [state.menuItems[0]?.name],
+            value: props.value?.value ?? [state.menuItems[_defaultIndex]?.name],
         };
         state.selectedItem = convertToMenuItem(state.proxyValue?.value);
     } else {
         state.proxyValue = {
             ...state.proxyValue,
-            value: props.value?.value ?? state.menuItems[0]?.name,
+            value: props.value?.value ?? state.menuItems[_defaultIndex]?.name,
         };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
+        state.selectedItem = state.proxyValue?.value ?? state.menuItems[_defaultIndex]?.name;
     }
     state.proxyValue = {
         ...state.proxyValue,

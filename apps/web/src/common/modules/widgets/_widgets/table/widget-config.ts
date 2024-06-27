@@ -13,7 +13,6 @@ const table: WidgetConfig = {
         granularity: {},
         tableDataField: {
             options: {
-                defaultMaxCount: 5,
                 max: 15,
             },
         },

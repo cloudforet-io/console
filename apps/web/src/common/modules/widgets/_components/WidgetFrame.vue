@@ -236,6 +236,7 @@ const handleToggleWidth = () => {
     .widget-header {
         display: flex;
         align-items: center;
+        height: 1.625rem;
         padding-bottom: 0.5rem;
         .title {
             @apply truncate text-label-md;

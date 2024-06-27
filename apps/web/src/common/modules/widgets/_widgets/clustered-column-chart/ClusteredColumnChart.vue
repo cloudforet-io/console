@@ -64,11 +64,16 @@ const state = reactive({
             itemHeight: 10,
         },
         tooltip: {
+            trigger: 'axis',
             formatter: (params) => {
-                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.name);
-                const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.seriesName);
-                const _value = numberFormatter(params.value) || '';
-                return `${_name}<br/>${params.marker} ${_seriesName}: <b>${_value}</b>`;
+                const _params = params as any[];
+                const _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
+                const _values = _params.map((p) => {
+                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
+                    const _value = numberFormatter(p.value) || '';
+                    return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
+                });
+                return [_axisValue, ..._values].join('<br/>');
             },
         },
         xAxis: {

@@ -15,8 +15,7 @@ import type {
 import type { YAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<YAxisOptions>>(), {
-});
+const props = defineProps<WidgetFieldComponentProps<YAxisOptions>>();
 const emit = defineEmits<WidgetFieldComponentEmit<YAxisValue>>();
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
@@ -48,11 +47,13 @@ const handleIsValid = (isValid: boolean) => {
         <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.Y_AXIS')"
                        required
         >
-            <widget-field-dropdown-and-max :default-count="props.widgetFieldSchema?.options?.defaultMaxCount ?? 1"
+            <widget-field-dropdown-and-max :default-count="props.widgetFieldSchema?.options?.defaultMaxCount"
                                            :value="props.value"
                                            :menu-items="state.menuItems"
                                            :max="props.widgetFieldSchema?.options?.max"
                                            :field-name="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.Y_AXIS')"
+                                           :default-index="props.widgetFieldSchema?.options?.defaultIndex"
+                                           :exclude-date-field="props.widgetFieldSchema?.options?.excludeDateField"
                                            @update:is-valid="handleIsValid"
                                            @update:value="handleUpdateSelect"
             />

@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea, PButtonModal,
@@ -24,6 +26,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
+const emit = defineEmits<{(e: 'update-preview'): void}>();
 const FORM_TITLE_MAP = {
     WIDGET_INFO: 'WIDGET_INFO',
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
@@ -45,6 +48,7 @@ const state = reactive({
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     // display
+    isPreviewInitiated: false,
     collapsedTitleMap: {
         [FORM_TITLE_MAP.WIDGET_INFO]: false,
         [FORM_TITLE_MAP.REQUIRED_FIELDS]: false,
@@ -81,6 +85,7 @@ const handleSelectDataTable = async (dataTableId: string) => {
     await updateWidget(dataTableId);
     widgetGenerateStore.setWidgetFormValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
+    state.isPreviewInitiated = false;
 };
 
 const checkDefaultValidation = () => {
@@ -101,6 +106,7 @@ const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setWidgetFormValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
     checkDefaultValidation();
+    state.isPreviewInitiated = false;
 };
 const handleUpdateWidgetTitle = (title: string) => {
     widgetGenerateStore.setTitle(title);
@@ -136,6 +142,16 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
 
 // eslint-disable-next-line max-len
 const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetFormValueMap[name] === undefined}`;
+
+/* Watcher */
+watch(() => widgetGenerateState.widgetValidMap, () => {
+    if (state.isPreviewInitiated) return;
+    const _requiredField = state.widgetRequiredFieldSchemaMap.map(([d]) => d);
+    if (_requiredField.every((d) => widgetGenerateState.widgetValidMap[d])) {
+        emit('update-preview');
+        state.isPreviewInitiated = true;
+    }
+}, { deep: true });
 </script>
 
 <template>
@@ -282,7 +298,7 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
                         :header-title="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.TITLE')"
                         theme-color="alert"
                         :visible.sync="state.widgetDefaultValidationModalVisible"
-                        @confirm="state.widgetDefaultValidationModalVisible = false"
+                        hide-footer-confirm-button
         >
             <template #body>
                 <p>

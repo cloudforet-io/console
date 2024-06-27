@@ -26,6 +26,8 @@ const stackedColumnChart: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
                 max: 10,
+                defaultIndex: 0,
+                excludeDateField: true,
             },
         },
     },
