@@ -462,11 +462,6 @@ const checkSelectedId = (id?: string) => {
                         @apply block;
                     }
                 }
-                &:first-child {
-                    .image-wrapper {
-                        @apply bg-gray-100;
-                    }
-                }
             }
 
             &:not(.folder) {
@@ -479,14 +474,6 @@ const checkSelectedId = (id?: string) => {
             &.folder {
                 .image-wrapper {
                     @apply bg-blue-200;
-                }
-
-                .board-item {
-                    &:first-child, &:nth-child(2) {
-                        .image-wrapper {
-                            @apply bg-white;
-                        }
-                    }
                 }
             }
         }

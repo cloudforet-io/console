@@ -5,7 +5,13 @@ import {
     PButton, PButtonModal, PFieldGroup, PI, PRadio, PRadioGroup, PTextInput,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
 import { i18n } from '@/translations';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -19,7 +25,9 @@ import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/b
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
@@ -31,16 +39,27 @@ const props = withDefaults(defineProps<Props>(), {
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 
 const storeState = reactive({
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     isFullMode: computed<boolean|undefined>(() => bookmarkState.isFullMode),
+    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
 });
 const state = reactive({
     loading: false,
+    bookmarkFolderList: [] as BookmarkItem[],
     selectedFolderIdx: undefined as number|undefined,
-    selectedFolder: computed<BookmarkItem|undefined>(() => (props.bookmarkFolderList ? props.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
+    selectedFolder: computed<BookmarkItem|undefined>(() => (state.bookmarkFolderList ? state.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
+    radioMenuList: computed(() => ([
+        i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK'),
+        i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
+    ])),
+    selectedRadioIdx: 0,
+    scope: computed(() => (state.selectedRadioIdx === 0 ? BOOKMARK_TYPE.WORKSPACE : BOOKMARK_TYPE.USER)),
 });
 
 const {
@@ -74,11 +93,41 @@ const handleDeselectButton = () => {
 
 const handleClickNewFolderButton = async () => {
     try {
-        const newFolder = generateNewFolderName(props.bookmarkFolderList);
-        await bookmarkStore.createBookmarkFolder(newFolder);
+        const newFolder = generateNewFolderName(state.bookmarkFolderList);
+        await bookmarkStore.createBookmarkFolder(newFolder, state.scope);
+        await fetchBookmarkFolderList();
         state.selectedFolderIdx = 0;
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
+    }
+};
+const fetchBookmarkFolderList = async () => {
+    const bookmarkListApiQuery = new ApiQueryHelper()
+        .setSort('updated_at', true)
+        .setFilters([
+            { k: 'name', v: 'console:bookmark', o: '' },
+            { k: 'data.workspaceId', v: storeState.currentWorkspaceId || '', o: '=' },
+            { k: 'data.link', v: null, o: '=' },
+        ]);
+    try {
+        let fetcher;
+        if (state.scope === BOOKMARK_TYPE.USER) {
+            fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
+        } else if (state.scope === BOOKMARK_TYPE.WORKSPACE) {
+            fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.list);
+        }
+        const { status, response } = await fetcher({
+            query: bookmarkListApiQuery.data,
+        });
+        if (status === 'succeed') {
+            state.bookmarkFolderList = (response.results ?? []).map((i) => ({
+                ...i.data,
+                id: i.name,
+            } as BookmarkItem));
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.bookmarkFolderList = [];
     }
 };
 const handleConfirm = async () => {
@@ -101,7 +150,12 @@ const handleConfirm = async () => {
                 name: name.value,
                 link: convertedLink,
                 folder: state.selectedFolder?.id,
+                type: state.scope,
             });
+            await bookmarkStore.setBookmarkType(state.scope);
+            await bookmarkStore.setSelectedBookmark(state.selectedFolder, false);
+            await bookmarkStore.fetchBookmarkFolderList();
+            await bookmarkStore.fetchBookmarkList();
             showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');
         }
         if (storeState.isFullMode && state.selectedFolder?.id) {
@@ -111,13 +165,22 @@ const handleConfirm = async () => {
                 await bookmarkStore.setFullMode(true);
             }
         }
-        await bookmarkStore.setSelectedBookmark(state.selectedFolder);
         await handleClose();
     } finally {
         state.loading = false;
     }
 };
 
+watch(() => storeState.bookmarkType, (bookmarkType) => {
+    if (bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+        state.selectedRadioIdx = 0;
+    } else if (bookmarkType === BOOKMARK_TYPE.USER) {
+        state.selectedRadioIdx = 1;
+    }
+}, { immediate: true });
+watch(() => state.selectedRadioIdx, () => {
+    fetchBookmarkFolderList();
+}, { immediate: true });
 watch(() => storeState.modal.type, (type) => {
     if (type !== BOOKMARK_MODAL_TYPE.LINK) return;
     if (storeState.modal.isEdit) {
@@ -173,6 +236,23 @@ watch(() => storeState.modal.type, (type) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
+                <p-field-group v-if="!storeState.modal.isEdit && storeState.modal.isNew"
+                               class="scope-wrapper"
+                               :label="$t('HOME.FORM_SCOPE')"
+                               required
+                >
+                    <p-radio-group>
+                        <p-radio v-for="(item, idx) in state.radioMenuList"
+                                 :key="`bookmark-scope-${idx}`"
+                                 v-model="state.selectedRadioIdx"
+                                 :value="idx"
+                        >
+                            <span class="radio-item">
+                                {{ item }}
+                            </span>
+                        </p-radio>
+                    </p-radio-group>
+                </p-field-group>
                 <p-field-group :label="$t('HOME.FORM_FOLDER')"
                                class="input-form"
                 >
@@ -194,7 +274,7 @@ watch(() => storeState.modal.type, (type) => {
                             </p-button>
                         </div>
                         <p-radio-group :direction="'vertical'">
-                            <p-radio v-for="(item, idx) in props.bookmarkFolderList"
+                            <p-radio v-for="(item, idx) in state.bookmarkFolderList"
                                      :key="`bookmark-folder-${idx}`"
                                      v-model="state.selectedFolderIdx"
                                      :value="idx"

@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput,
+    PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -12,7 +12,9 @@ import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/const
 import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/bookmark/type/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
@@ -30,10 +32,17 @@ const storeState = reactive({
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
+    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
     loading: false,
     bookmark: computed<string|undefined|TranslateResult>(() => storeState.selectedBookmark?.name || storeState.filterByFolder),
+    radioMenuList: computed(() => ([
+        i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK'),
+        i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
+    ])),
+    selectedRadioIdx: 0,
+    scope: computed(() => (state.selectedRadioIdx === 0 ? BOOKMARK_TYPE.WORKSPACE : BOOKMARK_TYPE.USER)),
 });
 
 const {
@@ -80,7 +89,7 @@ const handleConfirm = async () => {
                 });
             }
         } else {
-            await bookmarkStore.createBookmarkFolder(name.value);
+            await bookmarkStore.createBookmarkFolder(name.value, state.scope);
         }
         await handleClose();
     } finally {
@@ -88,6 +97,13 @@ const handleConfirm = async () => {
     }
 };
 
+watch(() => storeState.bookmarkType, (bookmarkType) => {
+    if (bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+        state.selectedRadioIdx = 0;
+    } else if (bookmarkType === BOOKMARK_TYPE.USER) {
+        state.selectedRadioIdx = 1;
+    }
+}, { immediate: true });
 watch(() => storeState.modal.isEdit, (isEditModal) => {
     if (isEditModal) {
         setForm('name', state.bookmark as string || '');
@@ -122,6 +138,23 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                                   block
                                   @update:value="setForm('name', $event)"
                     />
+                </p-field-group>
+                <p-field-group v-if="!storeState.modal.isEdit"
+                               class="scope-wrapper"
+                               :label="$t('HOME.FORM_SCOPE')"
+                               required
+                >
+                    <p-radio-group>
+                        <p-radio v-for="(item, idx) in state.radioMenuList"
+                                 :key="`bookmark-scope-${idx}`"
+                                 v-model="state.selectedRadioIdx"
+                                 :value="idx"
+                        >
+                            <span class="radio-item">
+                                {{ item }}
+                            </span>
+                        </p-radio>
+                    </p-radio-group>
                 </p-field-group>
             </div>
         </template>

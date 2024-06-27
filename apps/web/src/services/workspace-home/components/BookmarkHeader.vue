@@ -8,7 +8,6 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton,
-    PDivider,
     PFieldTitle,
     PI,
     PIconButton,
@@ -42,7 +41,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const FOLDER_DEFAULT_GAP = 4;
-const EXTRA_DEFAULT_WIDTH = 137; // gap + divider + create folder button
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
@@ -50,14 +48,12 @@ const bookmarkState = bookmarkStore.state;
 const { width } = useWindowSize();
 
 const componentRef = ref<HTMLElement|null>(null);
-const toolboxRef = ref<HTMLElement|null>(null);
 const folderItemsRef = ref<HTMLElement[]|null>(null);
 
 const moreButtonRef = ref<HTMLElement | null>(null);
 const moreContextMenuRef = ref<any|null>(null);
 
 const { width: containerWidth } = useElementSize(componentRef);
-const { width: toolboxWidth } = useElementSize(toolboxRef);
 const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
 
 const storeState = reactive({
@@ -68,11 +64,12 @@ const storeState = reactive({
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
+    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
     isLaptopSize: computed<boolean>(() => width.value < screens.laptop.max),
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
-    folderListMaxWidth: computed<number>(() => containerWidth.value - toolboxWidth.value - EXTRA_DEFAULT_WIDTH),
+    folderListMaxWidth: computed<number>(() => containerWidth.value),
 
     refinedFolderList: [] as BookmarkItem[],
     refinedFolderListWidth: 0,
@@ -167,6 +164,7 @@ const handleSelectTool = async (value: BookmarkType) => {
 
     await bookmarkStore.fetchBookmarkFolderList();
     await bookmarkStore.fetchBookmarkList();
+    await bookmarkStore.setSelectedBookmark(undefined);
 };
 
 watch([
@@ -189,6 +187,8 @@ watch([
                 moreState.isShowMoreButton = true;
                 return;
             }
+            moreState.isShowMoreButton = false;
+
             widthBaseline += useElementSize(el).width.value;
             _refinedFolderList.push(el);
         }
@@ -199,13 +199,23 @@ watch([
     state.refinedFolderListWidth = sumBy(_refinedFolderList, (cur) => {
         const curWidth = useElementSize(cur)?.width.value ?? 0;
         return curWidth + FOLDER_DEFAULT_GAP;
-    });
+    }) - 2;
     state.refinedFolderList = bookmarkFolderList?.slice(_refinedFolderList.length) || [];
 }, { immediate: true });
 watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
     bookmarkStore.setSelectedBookmarks([]);
     moreState.selectedItems = [];
 });
+watch(() => storeState.bookmarkType, (bookmarkType) => {
+    state.selectedToolId = bookmarkType;
+    moreState.selectedItems = [];
+}, { immediate: true });
+watch(() => storeState.filterByFolder, (filterByFolder) => {
+    const refinedFilterByFolderIdx = state.refinedFolderList.findIndex((item) => item.name === filterByFolder);
+    if (filterByFolder && refinedFilterByFolderIdx !== -1) {
+        moreState.selectedItems = [state.refinedFolderList[refinedFilterByFolderIdx]];
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -267,6 +277,27 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                         </div>
                     </template>
                 </p-field-title>
+                <div v-if="!state.isMobileSize"
+                     class="create-button-wrapper"
+                >
+                    <p-button v-if="!storeState.isFileFullMode"
+                              icon-left="ic_plus"
+                              size="sm"
+                              class="add-link-button"
+                              style-type="tertiary"
+                              @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER, false, true)"
+                    >
+                        <span>{{ $t('HOME.FORM_FOLDER') }}</span>
+                    </p-button>
+                    <p-button icon-left="ic_plus"
+                              size="sm"
+                              class="add-link-button"
+                              style-type="tertiary"
+                              @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, true)"
+                    >
+                        <span>{{ $t('HOME.FORM_LINK') }}</span>
+                    </p-button>
+                </div>
                 <div class="extra-wrapper">
                     <p-select-button-group v-if="!storeState.isFileFullMode"
                                            class="data-source-wrapper"
@@ -274,16 +305,21 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                                            :selected="state.selectedToolId"
                                            @update:selected="handleSelectTool"
                     />
+                    <p-icon-button v-if="!storeState.isFullMode && !storeState.isFileFullMode"
+                                   name="ic_edit"
+                                   size="md"
+                                   class="view-all-button"
+                                   @click="handleClickFullModeButton"
+                    />
                     <p-icon-button v-if="storeState.isFullMode || storeState.isFileFullMode"
                                    name="ic_close"
-                                   shape="square"
                                    size="md"
                                    :activated="false"
                                    @click="handleClickFullModeButton"
                     />
                 </div>
             </div>
-            <div v-if="!storeState.isFullMode && !storeState.isFileFullMode"
+            <div v-if="!storeState.isFullMode && !storeState.isFileFullMode && props.bookmarkFolderList.length > 0"
                  class="bookmark-folders-wrapper"
             >
                 <div v-if="props.bookmarkFolderList.length > 0"
@@ -357,45 +393,6 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                         </p-context-menu>
                     </div>
                 </div>
-                <div v-if="!state.isMobileSize && !(state.selectedToolId === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)"
-                     class="file-extra-wrapper"
-                >
-                    <p-divider v-if="props.bookmarkFolderList.length > 0"
-                               vertical
-                               class="divider"
-                    />
-                    <div>
-                        <p-button v-if="!state.isMobileSize"
-                                  icon-left="ic_plus"
-                                  size="sm"
-                                  class="add-link-button"
-                                  style-type="tertiary"
-                                  @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER, false, true)"
-                        >
-                            <span>{{ $t('HOME.FORM_FOLDER') }}</span>
-                        </p-button>
-                        <p-button v-if="!state.isMobileSize"
-                                  icon-left="ic_plus"
-                                  size="sm"
-                                  class="add-link-button"
-                                  style-type="tertiary"
-                                  @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, true)"
-                        >
-                            <span>{{ $t('HOME.FORM_LINK') }}</span>
-                        </p-button>
-                    </div>
-                </div>
-                <div ref="toolboxRef"
-                     class="toolbox-wrapper"
-                >
-                    <p-text-button icon-right="ic_chevron-down"
-                                   style-type="highlight"
-                                   class="create-folder-button"
-                                   @click="handleClickFullModeButton"
-                    >
-                        {{ state.isLaptopSize ? $t('HOME.BOOKMARK_VIEW_ALL') : $t('HOME.BOOKMARK_VIEW_ALL_BOOKMARKS') }}
-                    </p-text-button>
-                </div>
             </div>
         </div>
     </div>
@@ -425,10 +422,24 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         @apply flex flex-col;
         width: 100%;
         .title-wrapper {
-            @apply flex justify-between items-center;
+            @apply flex items-center;
+            .create-button-wrapper {
+                @apply flex;
+                margin-left: 0.5rem;
+                gap: 0.5rem;
+            }
             .extra-wrapper {
                 @apply flex items-center;
+                margin-left: auto;
                 gap: 0.5rem;
+                .view-all-button {
+                    &:hover {
+                        @apply text-secondary;
+                    }
+                    &:focus {
+                        @apply text-gray-900;
+                    }
+                }
             }
         }
         .bookmark-folders-wrapper {
@@ -468,24 +479,6 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                         padding: 0.375rem 0.5rem 0.75rem;
                     }
                 }
-                + .file-extra-wrapper {
-                    margin-left: 0.625rem;
-                }
-            }
-            .file-extra-wrapper {
-                @apply flex;
-                gap: 0.625rem;
-                .divider {
-                    height: 1.25rem;
-                }
-                .add-link-button + .add-link-button {
-                    margin-left: 0.5rem;
-                }
-            }
-            .toolbox-wrapper {
-                @apply flex items-center;
-                margin-left: auto;
-                gap: 0.5rem;
             }
         }
     }
