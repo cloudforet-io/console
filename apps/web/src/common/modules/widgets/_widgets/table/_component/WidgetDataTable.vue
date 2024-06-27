@@ -4,6 +4,8 @@ import { computed, reactive } from 'vue';
 
 import { PI, PTooltip } from '@spaceone/design-system';
 
+import { numberFormatter } from '@cloudforet/utils';
+
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -64,12 +66,12 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const fixedValue = Math.abs(targetValue - subjectValue);
             const percentageValue = fixedValue / (targetValue || 1) * 100;
             if (fixedValue === 0) return '-';
-            if (props.comparisonInfo?.format === 'fixed') return fixedValue;
+            if (props.comparisonInfo?.format === 'fixed') return numberFormatter(fixedValue);
             if (props.comparisonInfo?.format === 'percent') return `${percentageValue}%`;
-            if (props.comparisonInfo?.format === 'all') return `${fixedValue} (${percentageValue}%)`;
+            if (props.comparisonInfo?.format === 'all') return `${numberFormatter(fixedValue)} (${percentageValue}%)`;
             return '-';
         }
-        return itemValue || '-';
+        return numberFormatter(itemValue) || '-';
     }
     if (props.fieldType === 'dynamicField') {
         const dynamicData = item[props.criteria || ''] ?? [];
@@ -80,12 +82,12 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const fixedValue = Math.abs(targetValue - subjectValue);
             const percentageValue = fixedValue / (targetValue || 1) * 100;
             if (fixedValue === 0) return '-';
-            if (props.comparisonInfo?.format === 'fixed') return fixedValue;
+            if (props.comparisonInfo?.format === 'fixed') return numberFormatter(fixedValue);
             if (props.comparisonInfo?.format === 'percent') return `${percentageValue}%`;
-            if (props.comparisonInfo?.format === 'all') return `${fixedValue} (${percentageValue}%)`;
+            if (props.comparisonInfo?.format === 'all') return `${numberFormatter(fixedValue)} (${percentageValue}%)`;
             return '-';
         }
-        return dynamicDataItem?.value || 0;
+        return numberFormatter(dynamicDataItem?.value) || 0;
     }
     return '-';
 };
