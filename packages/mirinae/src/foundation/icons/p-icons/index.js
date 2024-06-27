@@ -1,6 +1,7 @@
 /* eslint-disable */
 import './ic_admin-icon'
 import './ic_alarm-clock'
+import './ic_anomaly_detection'
 import './ic_arrow-down-bold'
 import './ic_arrow-down'
 import './ic_arrow-left'
