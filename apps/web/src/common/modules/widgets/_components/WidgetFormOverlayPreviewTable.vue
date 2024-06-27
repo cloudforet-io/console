@@ -18,7 +18,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
-import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import { gray, white } from '@/styles/colors';
