@@ -7,6 +7,7 @@ import { PFieldGroup } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import WidgetFieldDropdownAndMax from '@/common/modules/widgets/_components/WidgetFieldDropdownAndMax.vue';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type {
     WidgetFieldComponentEmit,
     WidgetFieldComponentProps, XAxisOptions,
@@ -21,7 +22,7 @@ const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget ?? 'labels_info';
         if (!props.dataTable) return [];
-        const dataInfoList = Object.keys(props.dataTable[dataTarget] ?? {}) ?? [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(props.dataTable[dataTarget] ?? {})) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,

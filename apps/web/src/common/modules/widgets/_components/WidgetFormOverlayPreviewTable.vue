@@ -9,7 +9,8 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/src/navigation/toolbox/type';
-import { union } from 'lodash';
+
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { Page } from '@/schema/_common/type';
 
@@ -17,6 +18,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import { gray, white } from '@/styles/colors';
@@ -50,8 +52,8 @@ const storeState = reactive({
 
 const state = reactive({
     data: undefined,
-    labelFields: computed<string[]>(() => (storeState.loading ? [] : sortFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
-    dataFields: computed<string[]>(() => (storeState.loading ? [] : sortFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
+    labelFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
+    dataFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
     fields: computed<PreviewTableField[]>(() => [
         ...state.labelFields.map((key) => ({ type: 'LABEL', name: key, sortKey: key })),
         { type: 'DIVIDER', name: '' },
@@ -117,25 +119,15 @@ const handleClickSort = (sortKey: string) => {
 };
 
 /* Utils */
-const sortFields = (fields: string[]) => {
-    const single = ['Date'];
-    const separate = ['Year', 'Month', 'Day'];
-
-    const hasDate = fields.includes('Date');
-    const hasYearMonthDay = fields.includes('Year') && fields.includes('Month') && fields.includes('Day');
-    if (hasDate) {
-        return union(single, fields.filter((item) => !single.includes(item)));
-    } if (hasYearMonthDay) {
-        return union(separate, fields.filter((item) => !separate.includes(item)));
-    }
-    return fields;
-};
-
 const getValue = (item, field: PreviewTableField) => {
+    const itemValue = item[field.name];
     if (field.type === 'LABEL' && Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
         const referenceKey = REFERENCE_FIELD_MAP[field.name];
         const referenceValueKey = item[field.name];
         return storeState[referenceKey][referenceValueKey]?.name ?? '-';
+    }
+    if (field.type === 'DATA') {
+        return itemValue ? numberFormatter(itemValue) : '-';
     }
     return item[field.name] ?? '-';
 };
