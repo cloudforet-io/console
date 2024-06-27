@@ -1725,6 +1725,7 @@
 			"SET_HOME": "Set as Home Dashboard",
 			"SHARE": "Share",
 			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
+			"SHARE_TO_ALL_WORKSPACES_DESC": "Are you sure you want to share this dashboard to all workspace?",
 			"SHARE_WITH_CODE": "Share with Code"
 		},
 		"FORM": {
@@ -4250,6 +4251,8 @@
 			"STORAGE": "Storage"
 		}
 	},
+	"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
+	"SHARE_TO_ALL_WORKSPACES (2)": "Share to All Workspaces",
 	"SPACEONE_USER_DESC": "Forward to the project members' personal notification channel",
 	"TAB_MEMBER": "Member"
 }

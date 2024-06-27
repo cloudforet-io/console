@@ -1725,6 +1725,7 @@
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "",
 			"SHARE_TO_ALL_WORKSPACES": "",
+			"SHARE_TO_ALL_WORKSPACES_DESC": "",
 			"SHARE_WITH_CODE": ""
 		},
 		"FORM": {
@@ -4250,6 +4251,8 @@
 			"STORAGE": "저장소"
 		}
 	},
+	"SHARE_TO_ALL_WORKSPACES": "",
+	"SHARE_TO_ALL_WORKSPACES (2)": "",
 	"SPACEONE_USER_DESC": "프로젝트 멤버들의 개인 채널로 전파합니다.",
 	"TAB_MEMBER": "멤버"
 }

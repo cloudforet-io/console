@@ -1725,6 +1725,7 @@
 			"SET_HOME": "ホームダッシュボードとして設定",
 			"SHARE": "",
 			"SHARE_TO_ALL_WORKSPACES": "",
+			"SHARE_TO_ALL_WORKSPACES_DESC": "",
 			"SHARE_WITH_CODE": ""
 		},
 		"FORM": {
@@ -4250,6 +4251,8 @@
 			"STORAGE": "ストレージ"
 		}
 	},
+	"SHARE_TO_ALL_WORKSPACES": "",
+	"SHARE_TO_ALL_WORKSPACES (2)": "",
 	"SPACEONE_USER_DESC": "プロジェクトメンバーの個人チャンネルに送信します。",
 	"TAB_MEMBER": "メンバー"
 }
