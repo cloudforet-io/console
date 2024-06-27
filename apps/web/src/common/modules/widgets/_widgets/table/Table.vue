@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    defineExpose, reactive, computed, watch,
+    defineExpose, reactive, computed, watch, onMounted,
 } from 'vue';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
@@ -12,7 +12,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
@@ -22,16 +24,19 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
-import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import { getWidgetDataTable, sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
-import type { DateRange, DateFieldType, TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
+import type {
+    DateRange, DateFieldType, TableDataItem,
+} from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { DataTableDataKey } from '@/common/modules/widgets/types/widget-model';
 
 
 type Data = ListResponse<TableDataItem>;
@@ -44,6 +49,7 @@ const state = reactive({
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     comparisonData: null as Data | null,
+    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
     // converted data
     finalConvertedData: computed<Data|null>(() => {
         if (!state.data) return null;
@@ -139,6 +145,7 @@ const state = reactive({
         }
         return basicFields;
     }),
+    dataInfo: computed<DataTableDataKey|undefined>(() => state.dataTable?.data_info),
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -354,6 +361,10 @@ watch(() => state.data, () => {
     }
 }, { immediate: true });
 
+onMounted(async () => {
+    state.dataTable = await getWidgetDataTable(props.dataTableId);
+});
+
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
     loadWidget,
@@ -376,6 +387,7 @@ defineExpose<WidgetExpose<Data>>({
                                :sub-total-info="state.subTotalInfo"
                                :total-info="state.totalInfo"
                                :granularity="state.granularity"
+                               :data-info="state.dataInfo"
             />
         </div>
     </widget-frame>

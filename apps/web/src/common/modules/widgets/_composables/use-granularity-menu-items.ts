@@ -9,7 +9,7 @@ import { get } from 'lodash';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
-import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { WidgetFieldComponentProps, WidgetFieldOptions, WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 

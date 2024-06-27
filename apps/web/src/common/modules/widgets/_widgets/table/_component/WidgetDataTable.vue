@@ -16,6 +16,7 @@ import type { TableWidgetField } from '@/common/modules/widgets/types/widget-dat
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { TableDataFieldValue, ComparisonValue, TotalValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 
 interface Props {
@@ -24,6 +25,7 @@ interface Props {
   currency?: Currency;
   size?: WidgetSize;
   widgetId: string;
+  dataInfo: DataInfo;
   fieldType: TableDataFieldValue['fieldType'];
   criteria?: string;
   dataField?: string|string[];
@@ -105,6 +107,16 @@ const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): {
     }
     return undefined;
 };
+const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
+    if (field.fieldInfo?.type === 'labelField') return '';
+    if (props.fieldType === 'staticField') {
+        const dataInfo = props.dataInfo[field.name || ''];
+        return dataInfo.unit ? `Unit: ${dataInfo.unit}` : '';
+    }
+    const dataInfo = props.dataInfo[props.criteria || ''];
+    return dataInfo.unit ? `Unit: ${dataInfo.unit}` : '';
+};
+
 </script>
 
 <template>
@@ -168,7 +180,9 @@ const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): {
                                   'data-field': field.fieldInfo?.type === 'dataField',
                               }"
                         >
-                            <span class="common-text-box">{{ getValue(item, field) }}</span>
+                            <p-tooltip :contents="getValueTooltipText(item, field)"
+                                       position="bottom"
+                            ><span class="common-text-box">{{ getValue(item, field) }}</span></p-tooltip>
                             <p-i v-if="field.fieldInfo?.additionalType === 'comparison' && getComparisonValueIcon(item, field)"
                                  :name="getComparisonValueIcon(item, field)?.icon"
                                  :color="getComparisonValueIcon(item, field)?.color"
