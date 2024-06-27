@@ -25,7 +25,7 @@ interface Props {
   currency?: Currency;
   size?: WidgetSize;
   widgetId: string;
-  dataInfo: DataInfo;
+  dataInfo?: DataInfo;
   fieldType: TableDataFieldValue['fieldType'];
   criteria?: string;
   dataField?: string|string[];
@@ -108,13 +108,15 @@ const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): {
     return undefined;
 };
 const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
-    if (field.fieldInfo?.type === 'labelField') return '';
+    if (field.fieldInfo?.type === 'labelField' || field.fieldInfo?.additionalType === 'comparison') return '';
     if (props.fieldType === 'staticField') {
-        const dataInfo = props.dataInfo[field.name || ''];
-        return dataInfo.unit ? `Unit: ${dataInfo.unit}` : '';
+        const dataInfo = props.dataInfo?.[field.name || ''];
+        return dataInfo?.unit ? `• Unit: ${dataInfo?.unit} \n• ${field.name}: ${item[field.name]}` : '';
     }
-    const dataInfo = props.dataInfo[props.criteria || ''];
-    return dataInfo.unit ? `Unit: ${dataInfo.unit}` : '';
+    const dataInfo = props.dataInfo?.[props.criteria || ''];
+    const dynamicData = item[props.criteria || ''] ?? [];
+    const dynamicDataItem = dynamicData.find((data) => data[props.dataField as string] === field.name);
+    return dataInfo?.unit ? `• Unit: ${dataInfo?.unit} \n• ${props.criteria}: ${dynamicDataItem?.value || 0}` : '';
 };
 
 </script>
@@ -180,7 +182,8 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
                                   'data-field': field.fieldInfo?.type === 'dataField',
                               }"
                         >
-                            <p-tooltip :contents="getValueTooltipText(item, field)"
+                            <p-tooltip class="value-tooltip"
+                                       :contents="getValueTooltipText(item, field)"
                                        position="bottom"
                             ><span class="common-text-box">{{ getValue(item, field) }}</span></p-tooltip>
                             <p-i v-if="field.fieldInfo?.additionalType === 'comparison' && getComparisonValueIcon(item, field)"
@@ -301,6 +304,14 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         .td-contents {
             @apply flex items-center pl-4 gap-1;
             width: 100%;
+
+            /* custom design-system component - p-tooltip */
+            :deep(.p-tooltip) {
+                .tooltip-inner {
+                    white-space: pre;
+                }
+            }
+
             .comparison-icon {
                 min-width: 0.75rem;
             }

@@ -36,7 +36,7 @@ import type {
 import type {
     GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
-import type { DataTableDataKey } from '@/common/modules/widgets/types/widget-model';
+import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 
 type Data = ListResponse<TableDataItem>;
@@ -145,7 +145,7 @@ const state = reactive({
         }
         return basicFields;
     }),
-    dataInfo: computed<DataTableDataKey|undefined>(() => state.dataTable?.data_info),
+    dataInfo: computed<DataInfo|undefined>(() => state.dataTable?.data_info),
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
