@@ -215,6 +215,12 @@ const handleUpdateDataTable = async () => {
             options: { [state.operator]: options() },
         };
         await widgetGenerateStore.updateDataTable(updateParams);
+        if (storeState.selectedDataTableId === state.dataTableId) {
+            widgetGenerateStore.setDataTableUpdating(true);
+            await widgetGenerateStore.loadDataTable({
+                data_table_id: state.dataTableId,
+            });
+        }
     }
 };
 

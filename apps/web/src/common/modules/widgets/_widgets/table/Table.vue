@@ -292,7 +292,7 @@ watch(() => state.data, () => {
         state.timeSeriesDynamicFieldSlicedData = { results };
     } else {
         const availableDataFieldsExceptDateField: string[] = [];
-        const originFirstRowData = state.data?.results?.[0][state.tableDataCriteria];
+        const originFirstRowData = state.data?.results?.[0]?.[state.tableDataCriteria] ?? [];
         const sortedData = orderBy(originFirstRowData, ['value'], ['desc']);
         sortedData.slice(0, state.tableDataMaxCount - 1).forEach((d) => {
             availableDataFieldsExceptDateField.push(d[state.tableDataField]);
@@ -341,7 +341,7 @@ watch(() => state.data, () => {
         if (state.totalInfo?.toggleValue) {
             const totalDataItem: TableDataItem = {};
             if (state.groupByField) totalDataItem[state.groupByField[0]] = 'Total';
-            const fieldForTotal = results[0][state.tableDataCriteria].filter((item) => !item[state.tableDataField].startsWith('comparison_'));
+            const fieldForTotal = results?.[0]?.[state.tableDataCriteria]?.filter((item) => !item[state.tableDataField].startsWith('comparison_')) ?? [];
             totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
                 const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === item[state.tableDataField])?.value || 0), 0);
                 return { [state.tableDataField]: item[state.tableDataField], value: totalValue };
