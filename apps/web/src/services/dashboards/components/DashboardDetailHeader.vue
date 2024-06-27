@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PHeading, PSkeleton, PSelectDropdown,
+    PHeading, PSkeleton, PSelectDropdown, PButtonModal,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -12,7 +12,8 @@ import DashboardCloneModal from '@/services/dashboards/components/DashboardClone
 import DashboardControlButtons from '@/services/dashboards/components/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/components/DashboardNameEditModal.vue';
-import DashboardShareModal from '@/services/dashboards/components/DashboardShareModal.vue';
+import DashboardShareWithCodeModal from '@/services/dashboards/components/DashboardShareWithCodeModal.vue';
+// import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -26,19 +27,37 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
+    loading: false,
     nameEditModalVisible: false,
     deleteModalVisible: false,
     cloneModalVisible: false,
-    shareModalVisible: false,
+    shareWithCodeModalVisible: false,
+    shareToWorkspaceModalVisible: false,
     menuItems: computed<MenuItem[]>(() => {
-        const _defaultMenuItems: MenuItem[] = [
+        if (dashboardDetailGetters.isDeprecatedDashboard) {
+            return [
+                {
+                    type: 'item',
+                    name: 'edit',
+                    label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
+                    icon: 'ic_edit-text',
+                },
+                {
+                    type: 'item',
+                    name: 'delete',
+                    label: i18n.t('DASHBOARDS.DETAIL.DELETE'),
+                    icon: 'ic_delete',
+                },
+            ];
+        }
+        return [
             {
                 type: 'item',
                 name: 'edit',
                 label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
                 icon: 'ic_edit-text',
             },
-            { type: 'divider', name: '' },
+            { type: 'divider', name: 'divider' },
             {
                 type: 'item',
                 name: 'shareWithCode',
@@ -51,7 +70,7 @@ const state = reactive({
                 label: i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES'),
                 icon: 'ic_share',
             },
-            { type: 'divider', name: '' },
+            { type: 'divider', name: 'divider' },
             {
                 type: 'item',
                 name: 'delete',
@@ -59,21 +78,32 @@ const state = reactive({
                 icon: 'ic_delete',
             },
         ];
-        if (dashboardDetailGetters.isDeprecatedDashboard) return _defaultMenuItems.filter((item) => item.name !== 'duplicate');
-        return _defaultMenuItems;
     }),
 });
 
 /* Event */
 const handleSelectItem = (selected: MenuItem) => {
     if (selected.name === 'edit') state.nameEditModalVisible = true;
-    if (selected.name === 'duplicate') state.cloneModalVisible = true;
+    if (selected.name === 'shareWithCode') state.shareWithCodeModalVisible = true;
     if (selected.name === 'delete') state.deleteModalVisible = true;
-    if (selected.name === 'shareWithCode') state.shareModalVisible = true;
+    if (selected.name === 'shareToAllWorkspaces') state.shareToWorkspaceModalVisible = true;
 };
 const handleNameUpdate = (name: string) => {
     dashboardDetailStore.setName(name);
     dashboardDetailStore.setOriginDashboardName(name);
+};
+const handleConfirmShareToAllWorkspaces = async () => {
+    state.loading = true;
+    // TODO: Share to all workspaces
+    // const _sharedLayouts = await getSharedDashboardLayouts(dashboardDetailState.dashboardLayouts, dashboardDetailState.dashboardWidgets);
+    // const _sharedDashboard = {
+    //     name: dashboardDetailState.name || '',
+    //     version: dashboardDetailState.dashboardInfo?.version || '2.0',
+    //     layouts: _sharedLayouts,
+    //     options: dashboardDetailState.options || {},
+    //     labels: dashboardDetailState.labels || [],
+    // };
+    state.loading = false;
 };
 </script>
 
@@ -120,9 +150,19 @@ const handleNameUpdate = (name: string) => {
         <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
                                :dashboard="dashboardDetailState.dashboardInfo"
         />
-        <dashboard-share-modal :visible.sync="state.shareModalVisible"
-                               :dashboard-id="props.dashboardId"
+        <dashboard-share-with-code-modal :visible.sync="state.shareWithCodeModalVisible"
+                                         :dashboard-id="props.dashboardId"
         />
+        <p-button-modal :header-title="$t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES')"
+                        :visible.sync="state.shareToWorkspaceModalVisible"
+                        size="sm"
+                        :loading="state.loading"
+                        @confirm="handleConfirmShareToAllWorkspaces"
+        >
+            <template #body>
+                {{ $t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES_DESC') }}
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
