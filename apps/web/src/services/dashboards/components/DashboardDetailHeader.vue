@@ -34,14 +34,30 @@ const state = reactive({
     shareWithCodeModalVisible: false,
     shareToWorkspaceModalVisible: false,
     menuItems: computed<MenuItem[]>(() => {
-        const _defaultMenuItems: MenuItem[] = [
+        if (dashboardDetailGetters.isDeprecatedDashboard) {
+            return [
+                {
+                    type: 'item',
+                    name: 'edit',
+                    label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
+                    icon: 'ic_edit-text',
+                },
+                {
+                    type: 'item',
+                    name: 'delete',
+                    label: i18n.t('DASHBOARDS.DETAIL.DELETE'),
+                    icon: 'ic_delete',
+                },
+            ];
+        }
+        return [
             {
                 type: 'item',
                 name: 'edit',
                 label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
                 icon: 'ic_edit-text',
             },
-            { type: 'divider', name: '' },
+            { type: 'divider', name: 'divider' },
             {
                 type: 'item',
                 name: 'shareWithCode',
@@ -54,7 +70,7 @@ const state = reactive({
                 label: i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES'),
                 icon: 'ic_share',
             },
-            { type: 'divider', name: '' },
+            { type: 'divider', name: 'divider' },
             {
                 type: 'item',
                 name: 'delete',
@@ -62,8 +78,6 @@ const state = reactive({
                 icon: 'ic_delete',
             },
         ];
-        if (dashboardDetailGetters.isDeprecatedDashboard) return _defaultMenuItems.filter((item) => item.name !== 'duplicate');
-        return _defaultMenuItems;
     }),
 });
 
