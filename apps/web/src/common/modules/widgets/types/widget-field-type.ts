@@ -9,27 +9,34 @@ export interface DataFieldOptions {
 }
 export interface TableDataFieldOptions {
     max?: number;
-    default: number;
 }
 export interface XAxisOptions {
     dataTarget?: string;
     max?: number;
     defaultMaxCount: number;
+    defaultIndex?: number;
+    excludeDateField?: boolean;
 }
 export interface YAxisOptions {
     dataTarget?: string;
     max?: number;
     defaultMaxCount: number;
+    defaultIndex?: number;
+    excludeDateField?: boolean;
 }
 export interface LineByOptions {
     dataTarget?: string;
     max?: number;
     defaultMaxCount: number;
+    defaultIndex?: number;
+    excludeDateField?: boolean;
 }
 export interface StackByOptions {
     dataTarget?: string;
     max?: number;
     defaultMaxCount: number;
+    defaultIndex?: number;
+    excludeDateField?: boolean;
 }
 export interface GroupByOptions {
     dataTarget?: string;
@@ -37,11 +44,15 @@ export interface GroupByOptions {
     hideCount?: boolean;
     max?: number;
     defaultMaxCount: number;
+    defaultIndex?: number;
+    excludeDateField?: boolean;
 }
 export interface CategoryByOptions {
     dataTarget?: string;
     max?: number;
     defaultMaxCount: number;
+    defaultIndex?: number;
+    excludeDateField?: boolean;
 }
 export interface TotalFieldOptions {
     dataTarget?: string;

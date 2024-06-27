@@ -19,6 +19,7 @@ const heatmap: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 10,
                 max: 10,
+                defaultIndex: 0,
             },
         },
         yAxis: {
@@ -26,6 +27,7 @@ const heatmap: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 7,
                 max: 14,
+                defaultIndex: 1,
             },
         },
         colorSchema: {},
