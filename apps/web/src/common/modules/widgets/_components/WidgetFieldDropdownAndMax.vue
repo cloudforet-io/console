@@ -12,19 +12,24 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { getDefaultMenuItemIndex } from '@/common/modules/widgets/_helpers/widget-field-helper';
 
 
 const props = withDefaults(defineProps<{
-    defaultCount: number;
+    defaultCount?: number;
     max?: number;
     menuItems: MenuItem[];
     fieldName?:string|TranslateResult;
+    defaultIndex?: number;
+    excludeDateField?: boolean;
     value?: {value?: string; count?: number};
 }>(), {
     defaultCount: 1,
     max: undefined,
     fieldName: '',
     menuItems: () => ([]),
+    defaultIndex: 0,
+    excludeDateField: false,
     value: () => ({}),
 });
 const emit = defineEmits<{(e: 'update:is-valid', isValid:boolean): void;
@@ -57,8 +62,9 @@ watch(() => state.isAllValid, (isValid) => {
 
 /* Init */
 onMounted(() => {
+    const _defaultIndex = getDefaultMenuItemIndex(props.menuItems, props.defaultIndex, props.excludeDateField);
     state.proxyValue = {
-        value: props.value?.value ?? props.menuItems[0]?.name ?? '',
+        value: props.value?.value ?? props.menuItems[_defaultIndex]?.name ?? '',
         count: props.value?.count ?? props.defaultCount,
     };
 });
