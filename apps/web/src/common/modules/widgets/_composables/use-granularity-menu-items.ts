@@ -59,7 +59,7 @@ export const useGranularityMenuItem = (props: WidgetFieldComponentProps<WidgetFi
         selectedValue: computed(() => (fieldName ? props.allValueMap[fieldName] : undefined)),
         granularity: 'MONTHLY',
         labelInfo: computed(() => props.dataTable?.labels_info ?? {}),
-        isDateSeparated: computed(() => !Object.keys(state.labelInfo).includes(DATE_FIELD.DATE)),
+        isDateSeparated: computed(() => [DATE_FIELD.DAY, DATE_FIELD.MONTH, DATE_FIELD.YEAR].every((item) => Object.keys(state.labelInfo).includes(item))),
         labelsMenuItem: computed<MenuItem[]>(() => {
             const originLabelsMenuItem = Object.keys(state.labelInfo).map((key) => {
                 if (Object.values(DATE_FIELD).includes(key)) {
