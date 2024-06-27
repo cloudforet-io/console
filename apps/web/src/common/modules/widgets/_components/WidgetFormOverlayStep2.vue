@@ -19,7 +19,6 @@ import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-com
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
@@ -56,10 +55,14 @@ const state = reactive({
         }
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
-    isWidgetOptionsChanged: computed<boolean>(() => !isEqual(widgetGenerateState.widgetFormValueMap, state.appliedPreviewWidgetValueMap)),
+    isWidgetOptionsChanged: computed<boolean>(() => Object.entries(widgetGenerateState.widgetFormValueMap).every(([k, v]) => {
+        if (v) {
+            return !isEqual(v, widgetGenerateState.previewWidgetValueMap[k]);
+        }
+        return false;
+    })),
     disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateGetters.isAllWidgetFormValid),
     //
-    appliedPreviewWidgetValueMap: {} as Record<string, WidgetFieldValues>,
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
 });
@@ -68,7 +71,6 @@ const state = reactive({
 const initSnapshot = () => {
     state.varsSnapshot = cloneDeep(dashboardDetailState.vars);
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
-    state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.previewWidgetValueMap);
 };
 const reset = () => {
     dashboardDetailStore.setVars(state.varsSnapshot);
@@ -81,7 +83,6 @@ const handleChangeWidgetSize = (widgetSize: string) => {
 };
 const handleUpdatePreview = async () => {
     widgetGenerateStore.setPreviewWidgetValueMap(cloneDeep(widgetGenerateState.widgetFormValueMap));
-    state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
     await nextTick();
     const res = await overlayWidgetRef.value?.loadWidget();
     if (typeof res === 'function') {
@@ -147,6 +148,7 @@ onUnmounted(() => {
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailGetters.refinedVars"
                            :all-reference-type-info="state.allReferenceTypeInfo"
+                           disable-refresh-on-loading
                            mode="overlay"
                 />
                 <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
