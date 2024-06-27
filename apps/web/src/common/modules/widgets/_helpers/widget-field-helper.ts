@@ -1,5 +1,7 @@
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+
 export const sortWidgetTableFields = (fields: string[]) => {
-    const priorityFields = ['Date', 'Year', 'Month', 'Day'];
+    const priorityFields = Object.values(DATE_FIELD) as string[];
     const prioritySet = new Set(priorityFields);
 
     const priority = fields.filter((field) => prioritySet.has(field));
