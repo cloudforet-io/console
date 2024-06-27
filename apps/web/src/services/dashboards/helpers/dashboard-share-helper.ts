@@ -1,14 +1,9 @@
-<script lang="ts" setup>
-import { reactive, watch } from 'vue';
-
-import {
-    PButtonModal, PTextEditor, PButton,
-} from '@spaceone/design-system';
 import { flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { DashboardLayout } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
@@ -17,13 +12,8 @@ import type { DataTableListParameters } from '@/schema/dashboard/public-data-tab
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
-import { copyAnyData } from '@/lib/helper/copy-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
-
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
@@ -35,6 +25,10 @@ type SharedWidgetInfo =
     data_tables: SharedDataTableInfo[];
     data_table_id: number;
 };
+type SharedDashboardLayout = {
+    name?: string;
+    widgets: SharedWidgetInfo[];
+};
 type SharedDashboardInfo =
     Pick<DashboardModel, 'name' | 'version' | 'options' | 'labels'> & {
     layouts: Array<{
@@ -42,31 +36,10 @@ type SharedDashboardInfo =
         widgets: SharedWidgetInfo[];
     }>;
 };
-interface Props {
-    visible: boolean;
-    dashboardId: string;
-}
-const props = withDefaults(defineProps<Props>(), {
-    visible: false,
-    dashboardId: '',
-});
-const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'confirm', value: string): void;
-}>();
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-const state = reactive({
-    proxyVisible: useProxyValue('visible', props, emit),
-    loading: false,
-    isCopied: false,
-    sharedDashboard: {} as SharedDashboardInfo,
-    widgetDataTablesMap: {} as Record<string, DataTableModel[]>,
-});
 
-/* Api */
-const listDataTables = async (widgetId?: string) => {
-    if (!widgetId) return;
+const _listWidgetDataTables = async (widgetId?: string): Promise<[string, DataTableModel[]]|undefined> => {
+    if (!widgetId) return undefined;
     const _isPrivate = widgetId.startsWith('private');
     const _fetcher = _isPrivate
         ? SpaceConnector.clientV2.dashboard.privateDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>
@@ -75,21 +48,31 @@ const listDataTables = async (widgetId?: string) => {
         const { results } = await _fetcher({
             widget_id: widgetId,
         });
-        if (results) {
-            state.widgetDataTablesMap[widgetId] = results;
-        }
+        if (!results) return undefined;
+        return [widgetId, results || []];
     } catch (e) {
         ErrorHandler.handleError(e);
+        return undefined;
     }
 };
-
-/* Util */
-const initWidgetDataTablesMap = async () => {
-    const _dashboardWidgetIdList = flattenDeep(dashboardDetailState.dashboardLayouts?.map((layout) => layout.widgets?.map((w) => w)) || []);
-    await Promise.allSettled(_dashboardWidgetIdList.map((widgetId) => listDataTables(widgetId)));
+const _getWidgetDataTablesMap = async (dashboardLayouts: DashboardLayout[]): Promise<Record<string, DataTableModel[]>> => {
+    const _dashboardWidgetIdList = flattenDeep(dashboardLayouts?.map((layout) => layout.widgets?.map((w) => w)) || []);
+    const results = await Promise.allSettled(_dashboardWidgetIdList.map((widgetId) => _listWidgetDataTables(widgetId)));
+    const _widgetDataTablesMap: Record<string, DataTableModel[]> = {};
+    results.forEach((r) => {
+        if (r.status === 'fulfilled') {
+            if (!r.value) return;
+            const [widgetId, dataTables] = r.value;
+            if (widgetId && dataTables) {
+                _widgetDataTablesMap[widgetId] = dataTables;
+            }
+        }
+    });
+    return _widgetDataTablesMap;
 };
-const getSharedDataTableInfoList = (widgetId: string, dataTableId?: string): [SharedDataTableInfo[], number] => {
-    const _dataTables = state.widgetDataTablesMap[widgetId] || [];
+
+const _getSharedDataTableInfoList = (widgetDataTablesMap: Record<string, DataTableModel[]>, widgetId: string, dataTableId?: string): [SharedDataTableInfo[], number] => {
+    const _dataTables = widgetDataTablesMap[widgetId] || [];
     const _dataTableIndex = _dataTables.findIndex((d) => d.data_table_id === dataTableId);
     const _sharedDataTables: SharedDataTableInfo[] = [];
     _dataTables.forEach((dt) => {
@@ -113,7 +96,6 @@ const getSharedDataTableInfoList = (widgetId: string, dataTableId?: string): [Sh
                     },
                 };
             } else if (dt.operator === 'EVAL' || dt.operator === 'QUERY') {
-                console.log(dt.options);
                 const _dataTableId = dt.options[dt.operator].data_table_id;
                 const _dataTableIdx = _dataTables.findIndex((d) => d.data_table_id === _dataTableId);
                 _sharedDataTable.options = {
@@ -128,16 +110,16 @@ const getSharedDataTableInfoList = (widgetId: string, dataTableId?: string): [Sh
     });
     return [_sharedDataTables, _dataTableIndex];
 };
-const getSharedDashboard = () => {
-    state.loading = true;
+export const getSharedDashboardLayouts = async (dashboardLayouts: DashboardLayout[], dashboardWidgets: WidgetModel[]): Promise<SharedDashboardLayout[]> => {
+    const _widgetDataTablesMap = await _getWidgetDataTablesMap(dashboardLayouts);
     const _sharedLayouts: SharedDashboardInfo['layouts'] = [];
-    dashboardDetailState.dashboardLayouts.forEach((layout) => {
+    dashboardLayouts.forEach((layout) => {
         const _sharedWidgets: SharedWidgetInfo[] = [];
         layout.widgets?.forEach((widgetId) => {
-            const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
+            const _widget = dashboardWidgets.find((w) => w.widget_id === widgetId);
             if (_widget) {
                 const _dataTableId = _widget.data_table_id;
-                const [_dataTables, _dataTableIndex] = getSharedDataTableInfoList(_widget.widget_id, _dataTableId);
+                const [_dataTables, _dataTableIndex] = _getSharedDataTableInfoList(_widgetDataTablesMap, _widget.widget_id, _dataTableId);
                 const _sharedWidgetInfo: SharedWidgetInfo = {
                     name: _widget.name,
                     widget_type: _widget.widget_type,
@@ -154,80 +136,5 @@ const getSharedDashboard = () => {
             widgets: _sharedWidgets,
         });
     });
-    state.sharedDashboard = {
-        name: dashboardDetailState.name || '',
-        version: dashboardDetailState.dashboardInfo?.version || '2.0',
-        layouts: _sharedLayouts,
-        options: dashboardDetailState.options || {},
-        labels: dashboardDetailState.labels || [],
-    };
-    state.loading = false;
+    return _sharedLayouts;
 };
-
-/* Event */
-const handleUpdateVisible = (visible: boolean) => {
-    state.proxyVisible = visible;
-};
-const handleClickCopyButton = () => {
-    if (state.isCopied) return;
-    const _code = JSON.stringify(state.sharedDashboard, null, 2);
-    copyAnyData(_code);
-    setTimeout(() => {
-        state.isCopied = true;
-        setTimeout(() => {
-            state.isCopied = false;
-        }, 1500);
-    }, 800);
-};
-
-watch(() => props.visible, async (visible) => {
-    if (visible) {
-        await initWidgetDataTablesMap();
-        getSharedDashboard();
-    }
-});
-</script>
-
-<template>
-    <p-button-modal :visible="state.proxyVisible"
-                    :header-title="$t('DASHBOARDS.DETAIL.SHARE_WITH_CODE')"
-                    size="md"
-                    hide-footer-close-button
-                    hide-footer-confirm-button
-                    class="dashboard-share-modal"
-                    @update:visible="handleUpdateVisible"
-    >
-        <template #body>
-            <div class="code-wrapper">
-                <p-text-editor :code="state.sharedDashboard"
-                               readonly
-                               folded
-                               :loading="state.loading"
-                />
-                <p-button :class="{'copy-button': true, 'copied': state.isCopied}"
-                          style-type="tertiary"
-                          size="sm"
-                          :icon-left="state.isCopied ? 'ic_check' :'ic_copy'"
-                          @click="handleClickCopyButton"
-                >
-                    {{ state.isCopied ? $t('DASHBOARDS.DETAIL.COPIED') : $t('DASHBOARDS.DETAIL.COPY') }}
-                </p-button>
-            </div>
-        </template>
-    </p-button-modal>
-</template>
-
-<style lang="postcss" scoped>
-.code-wrapper {
-    position: relative;
-    .copy-button {
-        position: absolute;
-        right: 0.5rem;
-        top: 0.5rem;
-        text-align: right;
-        &.copied {
-            @apply bg-gray-200;
-        }
-    }
-}
-</style>
