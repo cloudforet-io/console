@@ -23,6 +23,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableOperator, JoinType, ConcatOptions, JoinOptions, QueryOptions, EvalOptions,
+    DataTableTransformOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -51,7 +52,7 @@ const state = reactive({
         const haveRequiredConcatOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined);
         const haveRequiredJoinOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined) && joinState.joinType;
         const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
-        const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.functions.filter((func) => !!func.name.trim() && !!func.value.trim()).length > 0;
+        const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.functions.filter((func) => !!func.value.trim()).length > 0;
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
         if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
         if (state.operator === 'QUERY') return !haveRequiredQueryOptions;
@@ -63,8 +64,8 @@ const state = reactive({
         const dataTableIdChanged = state.dataTableInfo.dataTableId !== originState.dataTableInfo.dataTableId;
         const joinTypeChanged = joinState.joinType !== originState.joinType;
         const conditionsChanged = !isEqual(queryState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
-        const functionsChanged = !isEqual(evalState.functions.map((func) => ({ name: func.name, value: func.value }))
-            .filter((func) => !!func.value.trim().length && !!func.name.trim().length), originState.functions);
+        const functionsChanged = !isEqual(evalState.functions.map((func) => ({ value: func.value }))
+            .filter((func) => !!func.value.trim().length), originState.functions);
         if (state.operator === 'CONCAT') return dataTablesChanged;
         if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
         if (state.operator === 'QUERY') return dataTableIdChanged || conditionsChanged;
@@ -93,7 +94,7 @@ const queryState = reactive({
 });
 
 const evalState = reactive({
-    functions: [{ key: getRandomId(), name: '', value: '' }] as EvalFormula[],
+    functions: [{ key: getRandomId(), value: '' }] as EvalFormula[],
 });
 
 const originState = reactive({
@@ -102,13 +103,12 @@ const originState = reactive({
         dataTables: props.item.options[state.operator]?.data_tables ?? [] as string[],
         dataTableId: props.item.options[state.operator]?.data_table_id as string,
     })),
-    joinType: computed(() => props.item.options.JOIN?.how as JoinType),
-    conditions: computed(() => (props.item.options.QUERY?.conditions ?? []).map((condition) => ({
+    joinType: computed(() => (props.item.options as DataTableTransformOptions).JOIN?.how as JoinType),
+    conditions: computed(() => ((props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []).map((condition) => ({
         value: condition,
     }))),
-    functions: computed(() => (props.item.options.EVAL?.formulas ?? []).map((func) => ({
-        name: func.name,
-        value: func.value,
+    functions: computed(() => ((props.item.options as DataTableTransformOptions).EVAL?.expressions ?? []).map((func) => ({
+        value: func,
     }))),
 });
 
@@ -185,10 +185,7 @@ const handleUpdateDataTable = async () => {
     };
     const evalOptions: EvalOptions = {
         data_table_id: state.dataTableInfo.dataTableId,
-        expressions: evalState.functions.map((functionInfo) => ({
-            name: functionInfo.name,
-            value: functionInfo.value,
-        })),
+        expressions: evalState.functions.map((functionInfo) => functionInfo.value),
     };
     const options = () => {
         switch (state.operator) {
@@ -227,7 +224,7 @@ const setInitialDataTableForm = () => {
     state.dataTableInfo = originState.dataTableInfo;
     joinState.joinType = originState.joinType;
     queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
-    evalState.functions = originState.functions.length ? originState.functions.map((func) => ({ ...func, key: getRandomId() })) : [{ key: getRandomId(), name: '', value: '' }];
+    evalState.functions = originState.functions.length ? originState.functions.map((func) => ({ ...func, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
 };
 
 onMounted(() => {

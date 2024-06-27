@@ -83,5 +83,5 @@ export interface AggregateOptions {
 
 export interface EvalOptions {
     data_table_id: string;
-    expressions: any[]; // TODO: define formula type
+    expressions: string[];
 }
