@@ -37,9 +37,16 @@ type DateField = typeof DATE_FIELD[keyof typeof DATE_FIELD];
 export const useGranularityMenuItem = (props: WidgetFieldComponentProps<WidgetFieldOptions>, fieldName?: WidgetFieldName) => {
     const _state = reactive({
         selectedValueList: [] as string[],
+        currentSelectedValue: [] as string|string[],
+        refinedSelectedValueList: computed(() => _state.selectedValueList.filter((item) => {
+            if (Array.isArray(_state.currentSelectedValue)) {
+                return !_state.currentSelectedValue.includes(item);
+            }
+            return item !== _state.currentSelectedValue;
+        })),
         usedLabelsField: computed(() => {
             const usedLabelsInfo: DateField[] = [];
-            _state.selectedValueList.forEach((item) => {
+            _state.refinedSelectedValueList.forEach((item) => {
                 if (Object.values(DATE_FIELD).includes(item)) {
                     usedLabelsInfo.push(item);
                 }
@@ -79,34 +86,30 @@ export const useGranularityMenuItem = (props: WidgetFieldComponentProps<WidgetFi
             return originLabelsMenuItem;
         }),
     });
-    watch(() => props.allValueMap, (valueMap) => {
-        const valueList:string[] = [];
-        const currentFieldValue = get(valueMap, `${fieldName}.${labelsInfoValueRouteMap[fieldName ?? '']}`);
-        Object.entries(valueMap ?? {}).forEach(([key, value]) => {
-            const fieldValue:string|string[] = get(value, labelsInfoValueRouteMap[key]);
-            if (Array.isArray(fieldValue)) {
-                fieldValue.forEach((item) => {
-                    if (Array.isArray(currentFieldValue)) {
-                        currentFieldValue.forEach((currentItem) => {
-                            if (item !== currentItem) {
-                                valueList.push(item);
-                            }
-                        });
-                    } else if (item !== currentFieldValue) {
-                        valueList.push(item);
-                    }
-                });
-            } else if (fieldValue !== currentFieldValue) {
-                valueList.push(fieldValue);
+    watch(() => props.allValueMap, (formValueMap) => {
+        const currentFieldValue: string|string[] = get(formValueMap, `${fieldName}.${labelsInfoValueRouteMap[fieldName ?? '']}`) ?? '';
+        if (Array.isArray(currentFieldValue)) {
+            // eslint-disable-next-line max-len
+            const isSameValueWithBefore = !currentFieldValue.every((item) => ((Array.isArray(_state.currentSelectedValue)) ? _state.currentSelectedValue.includes(item) : _state.currentSelectedValue === item));
+            const isSameLengthWithBefore = currentFieldValue.length === _state.currentSelectedValue.length;
+            if (!isSameValueWithBefore || !isSameLengthWithBefore) {
+                _state.currentSelectedValue = currentFieldValue;
             }
+        } else if (_state.currentSelectedValue !== currentFieldValue) {
+            _state.currentSelectedValue = currentFieldValue ?? [];
+        }
+        const newValueList:string[] = [];
+        Object.entries(formValueMap ?? {}).forEach(([key, value]) => {
+            const onlyFormValue = get(value, labelsInfoValueRouteMap[key]);
+            if (Array.isArray(onlyFormValue)) {
+                onlyFormValue.forEach((item) => {
+                    newValueList.push(item);
+                });
+            } else newValueList.push(onlyFormValue);
         });
-        const isSameValueListWithBefore = valueList.every((item) => _state.selectedValueList.includes(item));
-        if (!isSameValueListWithBefore) {
-            _state.selectedValueList = valueList;
-        }
-        if (state.granularity !== valueMap?.granularity) {
-            state.granularity = valueMap?.granularity ?? 'MONTHLY';
-        }
+        const isSameValueListWithBefore = newValueList.every((item, index) => _state.selectedValueList[index] === item);
+        if (!isSameValueListWithBefore) _state.selectedValueList = newValueList;
+        if (state.granularity !== formValueMap?.granularity) state.granularity = formValueMap?.granularity ?? 'MONTHLY';
     });
 
     return {
