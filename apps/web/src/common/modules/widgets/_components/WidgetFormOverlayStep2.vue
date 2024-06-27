@@ -163,7 +163,9 @@ onUnmounted(() => {
                 </p-button>
             </div>
         </div>
-        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'" />
+        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'"
+                                               @update-preview="handleUpdatePreview"
+        />
     </div>
 </template>
 
