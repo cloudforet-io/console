@@ -187,8 +187,10 @@ defineExpose<WidgetExpose<Data>>({
             <div v-if="props.widgetOptions?.comparison"
                  class="comparison-wrapper"
             >
-                <p-i :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
+                <p-i :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled-alt' : 'ic_caret-down-filled-alt'"
                      :color="state.comparisonColor"
+                     width="1rem"
+                     height="1rem"
                 />
                 <span :style="{ 'color': state.comparisonColor }">
                     {{ state.comparisonValue }}
