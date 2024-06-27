@@ -1351,6 +1351,8 @@
 				"YESTERDAY": "昨日"
 			},
 			"CANCEL": "キャンセル",
+			"CHANGE_DATA_MODAL_DESCRIPTION": "",
+			"CHANGE_DATA_MODAL_TITLE": "",
 			"CLOUD_SERVICE": {
 				"HELP": "サービスしている主要なクラウドサービスリストを表示します",
 				"NO_DATA": "クラウドリソースがありません。",
@@ -1691,6 +1693,8 @@
 			"AUTO": "自動",
 			"BASED_ON": "基準月",
 			"CLONE": "複製",
+			"COPIED": "",
+			"COPY": "コピー",
 			"CURRENT_MONTH": "当月分",
 			"CUSTOM": "カスタム",
 			"CUSTOMIZE": "カスタマイズ",
@@ -1703,6 +1707,7 @@
 			"EDIT_DASHBOARD_NAME": "ダッシュボード名の編集",
 			"EDIT_LAYOUT": "",
 			"EXPORT": "エクスポート",
+			"NO_WIDGET_TEXT": "",
 			"OTHER_MONTHS": "他の月",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "フィルタの適用"
@@ -1718,7 +1723,9 @@
 			"REFRESH": "自動更新",
 			"SELECT_MONTH": "月を選択",
 			"SET_HOME": "ホームダッシュボードとして設定",
-			"SHARE": ""
+			"SHARE": "",
+			"SHARE_TO_ALL_WORKSPACES": "",
+			"SHARE_WITH_CODE": ""
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "ダッシュボードの作成に失敗しました",

@@ -125,7 +125,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
-                .setSort('created_at', false)
+                .setSort('updated_at', true)
                 .setFilters([
                     { k: 'name', v: 'console:bookmark', o: '' },
                     { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
@@ -154,7 +154,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
         fetchBookmarkList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
-                .setSort('created_at', true)
+                .setSort('updated_at', true)
                 .setFilters([
                     { k: 'name', v: 'console:bookmark', o: '' },
                     { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
@@ -205,14 +205,14 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 ErrorHandler.handleError(e);
             }
         },
-        createBookmarkFolder: async (name: string) => {
+        createBookmarkFolder: async (name: string, type?: string) => {
             try {
                 let fetcher;
                 let resource_group: undefined|string;
-                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
+                if (type === BOOKMARK_TYPE.USER || state.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.set;
                     resource_group = undefined;
-                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                } else if (type === BOOKMARK_TYPE.WORKSPACE || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = SpaceConnector.clientV2.config.publicConfig.create;
                     resource_group = 'WORKSPACE';
                 }

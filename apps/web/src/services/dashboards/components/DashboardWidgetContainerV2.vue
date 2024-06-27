@@ -4,7 +4,7 @@ import {
     reactive, ref, watch, computed, onBeforeUnmount,
 } from 'vue';
 
-import { PDataLoader } from '@spaceone/design-system';
+import { PDataLoader, PEmpty, PButton } from '@spaceone/design-system';
 import { debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -16,8 +16,6 @@ import type { PublicWidgetDeleteParameters } from '@/schema/dashboard/public-wid
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
-
-import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -70,14 +68,6 @@ const state = reactive({
     }),
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
-    vars: computed<Record<string, string[]>>(() => {
-        const _vars: Record<string, string[]> = {};
-        Object.entries(dashboardDetailState.vars).forEach(([k, v]) => {
-            const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
-            if (idKey) _vars[idKey] = v;
-        });
-        return _vars;
-    }),
 });
 const widgetDeleteState = reactive({
     visibleModal: false,
@@ -222,6 +212,10 @@ const handleDeleteModalConfirm = async () => {
     widgetDeleteState.visibleModal = false;
     widgetDeleteState.targetWidget = null;
 };
+const handleClickAddWidget = () => {
+    widgetGenerateStore.setOverlayType('ADD');
+    widgetGenerateStore.setShowOverlay(true);
+};
 
 
 /* Watcher */
@@ -268,8 +262,7 @@ defineExpose({
          class="dashboard-widget-container"
     >
         <p-data-loader :loading="dashboardDetailState.loadingDashboard"
-                       :data="true"
-                       disable-empty-case
+                       :data="state.refinedWidgetInfoList"
         >
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">
@@ -288,7 +281,7 @@ defineExpose({
                                :mode="store.state.display.visibleSidebar ? 'edit-layout' : 'view'"
                                :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
-                               :dashboard-vars="state.vars"
+                               :dashboard-vars="dashboardDetailGetters.refinedVars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                @mounted="handleWidgetMounted(widget.widget_id)"
@@ -299,6 +292,26 @@ defineExpose({
                     />
                 </template>
             </div>
+            <template #no-data>
+                <div class="no-data-wrapper">
+                    <p-empty show-image
+                             image-size="sm"
+                             class="empty-wrapper"
+                             show-button
+                    >
+                        {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
+                        <template #button>
+                            <p-button style-type="substitutive"
+                                      icon-left="ic_plus_bold"
+                                      class="add-widget-button"
+                                      @click="handleClickAddWidget"
+                            >
+                                {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
+                            </p-button>
+                        </template>
+                    </p-empty>
+                </div>
+            </template>
         </p-data-loader>
         <delete-modal :visible="widgetDeleteState.visibleModal"
                       :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
@@ -319,14 +332,17 @@ defineExpose({
     max-width: 1840px;
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 0.5rem;
+    .no-data-wrapper {
+        padding-top: 3.5rem;
+    }
     .widgets-wrapper {
         display: flex;
         height: 100%;
         width: 100%;
         overflow: hidden;
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: 0.5rem;
     }
 }
 </style>

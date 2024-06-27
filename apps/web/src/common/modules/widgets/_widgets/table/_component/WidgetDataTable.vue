@@ -2,12 +2,13 @@
 
 import { computed, reactive } from 'vue';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PTooltip } from '@spaceone/design-system';
 
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
@@ -16,7 +17,6 @@ import type { TableDataFieldValue, ComparisonValue, TotalValue } from '@/common/
 
 
 interface Props {
-  loading: boolean;
   fields: TableWidgetField[];
   items?: any[];
   currency?: Currency;
@@ -25,6 +25,7 @@ interface Props {
   fieldType: TableDataFieldValue['fieldType'];
   criteria?: string;
   dataField?: string|string[];
+  granularity?: string;
   // optional field info
   comparisonInfo?: ComparisonValue;
   subTotalInfo?: TotalValue;
@@ -37,16 +38,22 @@ const storeState = reactive({
     project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     workspace: computed(() => allReferenceStore.getters.workspace),
     region: computed(() => allReferenceStore.getters.region),
+    serviceAccount: computed(() => allReferenceStore.getters.serviceAccount),
 });
 
-const getField = (field: TableWidgetField) => {
-    if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.reference) return storeState[field.fieldInfo.reference][field.label]?.name || '-';
+const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
+const getField = (field: TableWidgetField): string => {
+    if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.reference) return storeState[field.fieldInfo.reference][field.label]?.name || field.label || field.name;
     return field.label || field.name;
 };
 
 const getValue = (item: TableDataItem, field: TableWidgetField) => {
     if (field.fieldInfo?.type === 'labelField') {
-        if (field.name === 'Project') return storeState.project[item[field.name]]?.name || '-';
+        if (Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
+            const referenceKey = REFERENCE_FIELD_MAP[field.name];
+            const referenceValueKey = item[field.name];
+            return storeState[referenceKey][referenceValueKey]?.name || referenceValueKey || '-';
+        }
         return item[field.name] || '-';
     }
     if (props.fieldType === 'staticField') {
@@ -121,14 +128,18 @@ const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): {
                               }"
                         >
                             <span class="th-text">
-                                {{ getField(field) }}
+                                {{ field.fieldInfo?.additionalType === 'comparison' ? 'Δ' : "" }}{{ getField(field) }}
                             </span>
-                            <p-i v-if="field.fieldInfo?.additionalType === 'comparison'"
-                                 class="comparison-info"
-                                 name="ic_info-circle"
-                                 width="0.875rem"
-                                 height="0.875rem"
-                            />
+                            <p-tooltip v-if="field.fieldInfo?.additionalType === 'comparison'"
+                                       class="comparison-info"
+                                       position="bottom"
+                                       :contents="getComparisonInfo(getField(field))"
+                            >
+                                <p-i name="ic_info-circle"
+                                     width="0.875rem"
+                                     height="0.875rem"
+                                />
+                            </p-tooltip>
                         </span>
                     </th>
                 </tr>

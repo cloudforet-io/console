@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onBeforeMount, onUnmounted, reactive, ref, watch,
+    computed, nextTick, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -9,8 +9,7 @@ import {
 import { cloneDeep, isEqual } from 'lodash';
 
 import type {
-    DashboardVariables as IDashboardVariables,
-    DashboardOptions,
+    DashboardOptions, DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import WidgetFormOverlayStep2WidgetForm
@@ -34,6 +33,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 const overlayWidgetRef = ref<HTMLElement|null>(null);
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
@@ -56,22 +56,22 @@ const state = reactive({
         }
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
-    isWidgetOptionsChanged: computed<boolean>(() => !isEqual(widgetGenerateState.widgetValueMap, state.widgetValueMapSnapshot)),
+    isWidgetOptionsChanged: computed<boolean>(() => !isEqual(widgetGenerateState.widgetFormValueMap, state.appliedPreviewWidgetValueMap)),
     disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateGetters.isAllWidgetFormValid),
     //
-    widgetValueMapSnapshot: {} as Record<string, WidgetFieldValues>,
-    variablesSnapshot: {} as IDashboardVariables,
+    appliedPreviewWidgetValueMap: {} as Record<string, WidgetFieldValues>,
+    varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
 });
 
 /* Util */
 const initSnapshot = () => {
-    state.variablesSnapshot = cloneDeep(dashboardDetailState.variables);
+    state.varsSnapshot = cloneDeep(dashboardDetailState.vars);
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
-    state.widgetValueMapSnapshot = cloneDeep(widgetGenerateState.widgetValueMap);
+    state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.previewWidgetValueMap);
 };
 const reset = () => {
-    dashboardDetailStore.setVariables(state.variablesSnapshot);
+    dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
 
@@ -80,7 +80,9 @@ const handleChangeWidgetSize = (widgetSize: string) => {
     state.selectedWidgetSize = widgetSize;
 };
 const handleUpdatePreview = async () => {
-    state.widgetValueMapSnapshot = cloneDeep(widgetGenerateState.widgetValueMap);
+    widgetGenerateStore.setPreviewWidgetValueMap(cloneDeep(widgetGenerateState.widgetFormValueMap));
+    state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
+    await nextTick();
     const res = await overlayWidgetRef.value?.loadWidget();
     if (typeof res === 'function') {
         res('Please check the widget options.');
@@ -141,9 +143,9 @@ onUnmounted(() => {
                            :width="state.widgetWidth"
                            :title="widgetGenerateState.title"
                            :description="widgetGenerateState.description"
-                           :widget-options="widgetGenerateState.widgetValueMap"
+                           :widget-options="widgetGenerateState.previewWidgetValueMap"
                            :dashboard-options="dashboardDetailState.options"
-                           :dashboard-vars="dashboardDetailState.vars"
+                           :dashboard-vars="dashboardDetailGetters.refinedVars"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            mode="overlay"
                 />
@@ -220,10 +222,10 @@ onUnmounted(() => {
                 z-index: 100;
                 .update-dot {
                     @apply absolute bg-blue-500 rounded-full border-2 border-white;
-                    width: 0.5rem;
-                    height: 0.5rem;
-                    right: -0.25rem;
-                    top: -5px;
+                    width: 0.75rem;
+                    height: 0.75rem;
+                    right: -0.375rem;
+                    top: -0.375rem;
                 }
             }
         }

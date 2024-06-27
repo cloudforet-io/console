@@ -181,7 +181,7 @@ watch(() => props.visible, (visible) => {
                              class="background-area"
                         />
                         <workspace-logo-icon :theme="theme"
-                                             :text="state.name ? state.name[0] : 'A'"
+                                             :text="state.name ? state.name : 'A'"
                                              size="md"
                         />
                     </button>

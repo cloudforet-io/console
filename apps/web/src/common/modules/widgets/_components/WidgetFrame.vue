@@ -107,10 +107,9 @@ const handleToggleWidth = () => {
             >
                 <div class="metadata-button">
                     <p-i name="ic_info-circle"
-                         width="1rem"
-                         height="1rem"
+                         width="0.75rem"
+                         height="0.75rem"
                     />
-                    <span class="metadata-text">{{ $t('DASHBOARDS.WIDGET.METADATA') }}</span>
                 </div>
                 <template #content>
                     <div class="metadata-content">
@@ -154,7 +153,7 @@ const handleToggleWidth = () => {
         >
             <p-icon-button ref="etcButtonRef"
                            name="ic_ellipsis-horizontal"
-                           style-type="transparent"
+                           style-type="tertiary"
                            shape="square"
                            size="sm"
                            @click="handleClickEtcButton"
@@ -252,10 +251,6 @@ const handleToggleWidth = () => {
             align-items: center;
             cursor: pointer;
             padding-left: 0.75rem;
-            .metadata-text {
-                @apply text-label-sm;
-                padding-left: 0.25rem;
-            }
         }
         .metadata-content {
             @apply text-label-md;

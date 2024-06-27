@@ -1351,6 +1351,8 @@
 				"YESTERDAY": "어제 "
 			},
 			"CANCEL": "취소",
+			"CHANGE_DATA_MODAL_DESCRIPTION": "",
+			"CHANGE_DATA_MODAL_TITLE": "",
 			"CLOUD_SERVICE": {
 				"HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
 				"NO_DATA": "클라우드 리소스가 없습니다.",
@@ -1691,6 +1693,8 @@
 			"AUTO": "자동",
 			"BASED_ON": "기준월",
 			"CLONE": "복제",
+			"COPIED": "",
+			"COPY": "복사",
 			"CURRENT_MONTH": "최근월",
 			"CUSTOM": "커스텀",
 			"CUSTOMIZE": "편집",
@@ -1703,6 +1707,7 @@
 			"EDIT_DASHBOARD_NAME": "대시보드 이름 수정",
 			"EDIT_LAYOUT": "",
 			"EXPORT": "파일 저장",
+			"NO_WIDGET_TEXT": "",
 			"OTHER_MONTHS": "다른 월 선택",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "적용된 필터"
@@ -1718,7 +1723,9 @@
 			"REFRESH": "자동 새로고침",
 			"SELECT_MONTH": "월 선택",
 			"SET_HOME": "홈 대시보드로 설정",
-			"SHARE": ""
+			"SHARE": "",
+			"SHARE_TO_ALL_WORKSPACES": "",
+			"SHARE_WITH_CODE": ""
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "대시보드 생성 실패",

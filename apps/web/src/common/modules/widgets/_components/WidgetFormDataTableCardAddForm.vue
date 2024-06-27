@@ -10,6 +10,7 @@ import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/t
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 import { range, sortBy } from 'lodash';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
@@ -42,6 +43,9 @@ interface Props {
     separateDate: boolean;
     selectedTimeDiff: string;
     selectedTimeDiffDate?: string;
+
+    /* Validation */
+    formInvalid: boolean;
 }
 
 const props = defineProps<Props>();
@@ -53,11 +57,14 @@ const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>):
     (e: 'update:separate-date', value: boolean): void;
     (e: 'update:selected-time-diff', value: string): void;
     (e: 'update:selected-time-diff-date', value: string): void;
+    (e: 'update:form-invalid', value: boolean): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
 
 const storeState = reactive({
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
@@ -97,6 +104,30 @@ const advancedOptionsState = reactive({
     })),
 });
 
+const validationState = reactive({
+    proxyFormInvalid: useProxyValue('formInvalid', props, emit),
+    dataFieldNameInvalid: computed<boolean>(() => state.proxyDataFieldName.length === 0 || reservedLabelState.reservedLabelKeys.includes(state.proxyDataFieldName)),
+    dataFieldNameInvalidText: computed<string>(() => {
+        if (state.proxyDataFieldName.length === 0) return 'Please enter the name.';
+        if (reservedLabelState.reservedGroupByKeys.includes(state.proxyDataFieldName)) return 'Group by names cannot be used as field names.';
+        if (reservedLabelState.reservedDateKeys.includes(state.proxyDataFieldName)) return 'Date/Year/Month/Day cannot be usedas field names.';
+        return '';
+    }),
+    additionalFieldInvalidMap: {} as Record<string, boolean>,
+});
+
+const reservedLabelState = reactive({
+    reservedDateKeys: computed(() => ['Year', 'Month', 'Day', 'Date']),
+    reservedGroupByKeys: computed(() => [
+        ...groupByState.items.map((item) => item.label),
+        'Project', 'Workspace', 'Region', 'Service Account',
+    ]),
+    reservedLabelKeys: computed(() => [
+        ...reservedLabelState.reservedDateKeys,
+        ...reservedLabelState.reservedGroupByKeys,
+    ]),
+});
+
 const groupByState = reactive({
     loading: false,
     items: computed(() => {
@@ -111,8 +142,8 @@ const groupByState = reactive({
     }),
 });
 const costFilterState = reactive({
-    managedGroupByItems: computed(() => Object.values(GROUP_BY_ITEM_MAP).filter((item) => item.name !== 'workspace_id')),
-    additionalInfoGroupByItems: computed(() => {
+    managedGroupByItems: computed<MenuItem[]>(() => Object.values(GROUP_BY_ITEM_MAP).filter((item) => (storeState.isAdminMode ? item.name !== 'project_id' : item.name !== 'workspace_id'))),
+    additionalInfoGroupByItems: computed<MenuItem[]>(() => {
         const dataSource = storeState.costDataSources[props.sourceId ?? ''];
         return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys.map((key) => ({
             name: `additional_info.${key}`,
@@ -125,9 +156,9 @@ const costFilterState = reactive({
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
         const metricLabelsInfo = storeState.metrics[props.sourceId ?? ''].data.labels_info;
-        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => labelInfo.key !== 'workspace_id') : [];
+        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => (storeState.isAdminMode ? labelInfo.key !== 'project_id' : labelInfo.key !== 'workspace_id')) : [];
     }),
-    metricFilterItems: computed(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
+    metricFilterItems: computed<MenuItem[]>(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
 });
 
 /* Events */
@@ -148,9 +179,21 @@ const handleChangeLabel = (key: string, value: string, type: 'name' | 'value') =
     if (targetIndex !== -1) {
         advancedOptionsState.proxyAdditionalLabels[targetIndex][type] = value;
     }
+    if (type === 'name') {
+        if (reservedLabelState.reservedLabelKeys.includes(value)) {
+            validationState.additionalFieldInvalidMap = { ...validationState.additionalFieldInvalidMap, [key]: true };
+        } else if (advancedOptionsState.proxyAdditionalLabels.some((label) => label.name === value && label.key !== key)) {
+            validationState.additionalFieldInvalidMap = { ...validationState.additionalFieldInvalidMap, [key]: true };
+        } else validationState.additionalFieldInvalidMap = { ...validationState.additionalFieldInvalidMap, [key]: false };
+    }
 };
 
 const handleRemoveLabel = (key: string) => {
+    // Reset validation map
+    const copiedAdditionalFieldMap = { ...validationState.additionalFieldInvalidMap };
+    delete copiedAdditionalFieldMap[key];
+    validationState.additionalFieldInvalidMap = copiedAdditionalFieldMap;
+    // Remove label
     advancedOptionsState.proxyAdditionalLabels = [...advancedOptionsState.proxyAdditionalLabels].filter((label) => label.key !== key);
 };
 
@@ -164,6 +207,14 @@ const handleClickTimeDiffDate = (timeDiffDate: string) => {
 };
 
 /* Utils */
+const getAdditionalLabelInvalidText = (labelKey: string, labelName: string): string => {
+    const invalid = validationState.additionalFieldInvalidMap[labelKey];
+    if (!invalid) return '';
+    if (reservedLabelState.reservedGroupByKeys.includes(labelName)) return 'Group by names cannot be used as field names.';
+    if (reservedLabelState.reservedDateKeys.includes(labelName)) return 'Date/Year/Month/Day cannot be used as field names.';
+    if (advancedOptionsState.proxyAdditionalLabels.some((label) => label.name === labelName && label.key !== labelKey)) return 'This name is already being used.';
+    return '';
+};
 const setTagsResources = async (): Promise<void> => {
     try {
         groupByState.loading = true;
@@ -192,6 +243,14 @@ watch([() => props.sourceId, () => props.sourceKey], async () => {
     }
     resetAllFilter();
 });
+
+watch([
+    () => validationState.dataFieldNameInvalid,
+    () => validationState.additionalFieldInvalidMap,
+], ([dateFieldNameInvalid, additionalLabelInvalidMap]) => {
+    const additionalLabelInvalid = Object.values(additionalLabelInvalidMap).some((invalid) => invalid);
+    validationState.proxyFormInvalid = dateFieldNameInvalid || additionalLabelInvalid;
+}, { immediate: true });
 
 onMounted(async () => {
     if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
@@ -224,8 +283,8 @@ onMounted(async () => {
         />
         <p-field-group label="Data Field Name"
                        required
-                       :invalid="state.proxyDataFieldName.length === 0"
-                       :invalid-text="'Please enter the name'"
+                       :invalid="validationState.dataFieldNameInvalid"
+                       :invalid-text="validationState.dataFieldNameInvalidText"
         >
             <p-text-input v-model="state.proxyDataFieldName"
                           class="data-text-input"
@@ -276,20 +335,28 @@ onMounted(async () => {
                              :key="labelInfo.key"
                              class="label-wrapper"
                         >
-                            <p-text-input class="label-input"
-                                          block
-                                          :value="labelInfo.name"
-                                          @update:value="handleChangeLabel(labelInfo.key, $event, 'name')"
-                            />
-                            <p-text-input class="label-input"
-                                          block
-                                          :value="labelInfo.value"
-                                          @update:value="handleChangeLabel(labelInfo.key, $event, 'value')"
-                            />
-                            <p-icon-button name="ic_delete"
-                                           size="sm"
-                                           @click="handleRemoveLabel(labelInfo.key)"
-                            />
+                            <div class="label-set">
+                                <p-text-input class="label-input"
+                                              block
+                                              :invalid="validationState.additionalFieldInvalidMap[labelInfo.key]"
+                                              :value="labelInfo.name"
+                                              @update:value="handleChangeLabel(labelInfo.key, $event, 'name')"
+                                />
+                                <p-text-input class="label-input"
+                                              block
+                                              :value="labelInfo.value"
+                                              @update:value="handleChangeLabel(labelInfo.key, $event, 'value')"
+                                />
+                                <p-icon-button name="ic_delete"
+                                               size="sm"
+                                               @click="handleRemoveLabel(labelInfo.key)"
+                                />
+                            </div>
+                            <p v-if="validationState.additionalFieldInvalidMap[labelInfo.key]"
+                               class="invalid-text"
+                            >
+                                {{ getAdditionalLabelInvalidText(labelInfo.key, labelInfo.name) }}
+                            </p>
                         </div>
                         <p-button style-type="tertiary"
                                   icon-left="ic_plus_bold"
@@ -378,8 +445,14 @@ onMounted(async () => {
                     }
                 }
                 .label-wrapper {
-                    @apply flex gap-1 items-center;
                     margin-bottom: 0.5rem;
+                    .label-set {
+                        @apply flex gap-1 items-center;
+                    }
+                    .invalid-text {
+                        @apply text-label-sm text-red-500;
+                        margin-top: 0.25rem;
+                    }
                 }
             }
 

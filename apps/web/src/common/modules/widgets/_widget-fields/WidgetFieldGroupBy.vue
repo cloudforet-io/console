@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { ComputedRef } from 'vue';
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
@@ -31,10 +30,10 @@ const { labelsMenuItem } = useGranularityMenuItem(props, 'groupBy');
 const emit = defineEmits<WidgetFieldComponentEmit<GroupByValue>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
-    menuItems: computed<MenuItem[]|ComputedRef<MenuItem[]>>(() => {
+    menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget ?? 'labels_info';
         if (!props.dataTable) return [];
-        if (dataTarget === 'labels_info') return labelsMenuItem;
+        if (dataTarget === 'labels_info') return labelsMenuItem.value;
         const dataInfoList = Object.keys(props.dataTable[dataTarget] ?? {}) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
@@ -89,7 +88,7 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
 watch(() => labelsMenuItem.value, (value) => {
     let isSelectedValueValid = false;
     if (state.selectedItem === undefined) {
-        if (Array.isArray(state.selectedItem)) {
+        if (state.multiselectable) {
             state.selectedItem = [value?.[0]?.name];
         } else {
             state.selectedItem = value?.[0]?.name;

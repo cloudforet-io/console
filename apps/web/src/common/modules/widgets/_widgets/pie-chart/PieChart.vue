@@ -10,7 +10,7 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { isEmpty, throttle } from 'lodash';
+import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -69,6 +69,8 @@ const state = reactive({
             right: 10,
             top: 20,
             bottom: 20,
+            itemWidth: 10,
+            itemHeight: 10,
             icon: 'circle',
             textStyle: {
                 overflow: 'truncate',
@@ -78,7 +80,7 @@ const state = reactive({
                 const _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, name);
                 const _series = state.chart.getOption().series[0];
                 const _value = _series.data.filter((row) => row.name === name)[0]?.value;
-                return `${(_name.length > 25 ? `${_name.slice(0, 25)}...` : _name)}     ${_value}`;
+                return `${(_name.length > 25 ? `${_name.slice(0, 25)}...` : _name)}  ${numberFormatter(_value)}`;
             },
         },
         series: [
@@ -157,7 +159,7 @@ const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
     // get chart data
-    const _slicedData = rawData.results?.slice(0, state.groupByCount) || [];
+    const _slicedData = orderBy(rawData.results || [], state.dataField, 'desc')?.slice(0, state.groupByCount);
     const _etcData = rawData.results?.slice(state.groupByCount).reduce((acc, cur) => {
         acc[state.groupByField] = 'etc';
         acc[state.dataField] = (acc[state.dataField] || 0) + cur[state.dataField];

@@ -18,6 +18,7 @@ import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-t
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -47,7 +48,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         title: '',
         description: '',
         size: 'full' as WidgetSize,
-        widgetValueMap: {} as Record<string, WidgetFieldValues|undefined>,
+        previewWidgetValueMap: {} as Record<string, WidgetFieldValues|undefined>,
+        widgetFormValueMap: {} as Record<string, WidgetFieldValues|undefined>,
         widgetValidMap: {} as Record<string, boolean>,
         // Data Table
         selectedDataTableId: undefined as undefined | string,
@@ -63,7 +65,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         selectedDataTable: computed<Partial<DataTableModel>|undefined>(() => state.dataTables.find((dataTable) => dataTable.data_table_id === state.selectedDataTableId)),
         isAllWidgetFormValid: computed<boolean>(() => {
             const widgetValidMapValues = Object.values(state.widgetValidMap);
-            const widgetValueMapKeys = Object.keys(state.widgetValueMap);
+            const widgetValueMapKeys = Object.keys(state.widgetFormValueMap);
             if (widgetValidMapValues.length !== widgetValueMapKeys.length) return false;
             return widgetValidMapValues.every((valid) => valid);
         }),
@@ -100,8 +102,11 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setSize = (size: WidgetSize) => {
         state.size = size;
     };
-    const setWidgetValueMap = (widgetValueMap: Record<string, WidgetFieldValues|undefined>) => {
-        state.widgetValueMap = widgetValueMap;
+    const setWidgetFormValueMap = (widgetValueMap: Record<string, WidgetFieldValues|undefined>) => {
+        state.widgetFormValueMap = widgetValueMap;
+    };
+    const setPreviewWidgetValueMap = (widgetValueMap: Record<string, WidgetFieldValues|undefined>) => {
+        state.previewWidgetValueMap = widgetValueMap;
     };
     const setWidgetValidMap = (widgetValidMap: Record<string, boolean>) => {
         state.widgetValidMap = widgetValidMap;
@@ -127,7 +132,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setTitle,
         setDescription,
         setSize,
-        setWidgetValueMap,
+        setWidgetFormValueMap,
+        setPreviewWidgetValueMap,
         setWidgetValidMap,
         setSelectedPreviewGranularity,
         setDataTableUpdating,
@@ -182,7 +188,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 const result = await fetcher(parameters);
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== unsavedId);
                 state.dataTables.push(result);
-            } catch (e) {
+            } catch (e: any) {
+                showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
             }
         },
@@ -236,7 +243,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     result = await fetcher(updateParams);
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
-            } catch (e) {
+            } catch (e: any) {
+                showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
             }
         },
@@ -291,7 +299,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.description = '';
             state.size = 'full';
             state.widgetValidMap = {};
-            state.widgetValueMap = {};
+            state.widgetFormValueMap = {};
         },
         setWidgetForm: (widgetInfo?: WidgetModel) => {
             state.selectedWidgetName = widgetInfo?.widget_type || 'table';
@@ -302,7 +310,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.description = widgetInfo?.description || '';
             state.size = widgetInfo?.size || _widgetConfig.meta?.sizes[0];
             state.selectedDataTableId = widgetInfo?.data_table_id || undefined;
-            state.widgetValueMap = widgetInfo?.options || {};
+            state.widgetFormValueMap = widgetInfo?.options || {};
+            state.previewWidgetValueMap = widgetInfo?.options || {};
         },
     };
 

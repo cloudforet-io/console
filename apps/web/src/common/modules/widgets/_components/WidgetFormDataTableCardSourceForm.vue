@@ -9,6 +9,8 @@ import {
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 
+import { i18n } from '@/translations';
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
@@ -54,8 +56,8 @@ const state = reactive({
 });
 const modalState = reactive({
     visible: false,
-    headerTitle: computed(() => 'Do you want to change the data?'),
-    description: computed(() => 'Note that all options set below will be reset.'),
+    headerTitle: computed(() => i18n.t('COMMON.WIDGETS.CHANGE_DATA_MODAL_TITLE')),
+    description: computed(() => i18n.t('COMMON.WIDGETS.CHANGE_DATA_MODAL_DESCRIPTION')),
     beforeSelectedItem: undefined as string|undefined,
     afterSelectedItem: undefined as string|undefined,
 });
@@ -173,7 +175,11 @@ watch(() => props.selected, () => {
                             @confirm="handleConfirmModal"
                             @cancel="handleCancelModal"
             >
-                <p>{{ modalState.description }}</p>
+                <template #body>
+                    <div class="h-10">
+                        <span>{{ modalState.description }}</span>
+                    </div>
+                </template>
             </p-button-modal>
         </div>
     </div>

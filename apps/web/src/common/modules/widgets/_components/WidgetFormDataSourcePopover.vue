@@ -131,7 +131,7 @@ const state = reactive({
         },
         {
             key: DATA_TABLE_OPERATOR.QUERY,
-            name: 'Where',
+            name: 'Query',
             description: 'Filter and extract data that meet specific conditions.',
             icon: 'ic_db-where',
         },
@@ -495,7 +495,7 @@ onMounted(() => {
                     .domain-contents {
                         @apply flex items-center gap-1 w-full relative;
                         .icon-wrapper {
-                            @apply flex items-center justify-center rounded-xs bg-violet-150;
+                            @apply flex items-center justify-center rounded-md bg-violet-150;
                             width: 1.75rem;
                             height: 1.75rem;
                         }

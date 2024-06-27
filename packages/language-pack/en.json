@@ -1351,6 +1351,8 @@
 				"YESTERDAY": "Yesterday"
 			},
 			"CANCEL": "Cancel",
+			"CHANGE_DATA_MODAL_DESCRIPTION": "Note that all options set below will be reset.",
+			"CHANGE_DATA_MODAL_TITLE": "Do you want to change the data?",
 			"CLOUD_SERVICE": {
 				"HELP": "Displays only major services in cloud service.",
 				"NO_DATA": "No Cloud Resources",
@@ -1691,6 +1693,8 @@
 			"AUTO": "Auto",
 			"BASED_ON": "Based on",
 			"CLONE": "Clone",
+			"COPIED": "Copied",
+			"COPY": "Copy",
 			"CURRENT_MONTH": "Current month",
 			"CUSTOM": "Custom",
 			"CUSTOMIZE": "Customize",
@@ -1703,6 +1707,7 @@
 			"EDIT_DASHBOARD_NAME": "Edit Dashboard Name",
 			"EDIT_LAYOUT": "Edit Layout",
 			"EXPORT": "Export",
+			"NO_WIDGET_TEXT": "Add widgets with your data and design a custom dashboard tailored to your needs.",
 			"OTHER_MONTHS": "Other Months",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "Applied Filters"
@@ -1718,7 +1723,9 @@
 			"REFRESH": "Auto Refresh",
 			"SELECT_MONTH": "Select Month",
 			"SET_HOME": "Set as Home Dashboard",
-			"SHARE": "Share"
+			"SHARE": "Share",
+			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
+			"SHARE_WITH_CODE": "Share with Code"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",

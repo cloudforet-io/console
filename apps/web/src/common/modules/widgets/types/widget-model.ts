@@ -55,11 +55,11 @@ export interface CostOptions {
 
 /* TRANSFORM Data Type Options */
 export interface DataTableTransformOptions {
-    'CONCAT'?: ConcatOptions;
-    'JOIN'?: JoinOptions;
-    'AGGREGATE'?: AggregateOptions;
-    'QUERY'?: QueryOptions;
-    'EVAL'?: EvalOptions;
+    CONCAT?: ConcatOptions;
+    JOIN?: JoinOptions;
+    AGGREGATE?: AggregateOptions;
+    QUERY?: QueryOptions;
+    EVAL?: EvalOptions;
 }
 export interface ConcatOptions {
     data_tables: string[];
@@ -83,5 +83,5 @@ export interface AggregateOptions {
 
 export interface EvalOptions {
     data_table_id: string;
-    expressions: any[]; // TODO: define formula type
+    expressions: string[];
 }

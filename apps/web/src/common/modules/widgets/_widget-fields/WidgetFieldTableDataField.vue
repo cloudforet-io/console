@@ -40,7 +40,7 @@ const state = reactive({
     multiSelectable: computed(() => state.selectedFieldType === 'staticField'),
     menuItems: computed<MenuItem[]>(() => {
         if (!props.dataTable) return [];
-        return state.selectedFieldType === 'dynamicField' ? labelsMenuItem : state.dataInfoMenuItems;
+        return state.selectedFieldType === 'dynamicField' ? labelsMenuItem.value : state.dataInfoMenuItems;
     }),
     dataInfoMenuItems: computed<MenuItem[]>(() => Object.keys(props.dataTable?.data_info ?? {}).map((d) => ({
         name: d,
@@ -156,12 +156,14 @@ onMounted(() => {
     if (state.selectedFieldType === 'staticField') {
         state.proxyValue = {
             ...state.proxyValue,
+            fieldType: state.selectedFieldType,
             value: props.value?.value ?? [state.menuItems[0]?.name],
         };
         state.selectedItem = convertToMenuItem(state.proxyValue?.value);
     } else {
         state.proxyValue = {
             ...state.proxyValue,
+            fieldType: state.selectedFieldType,
             value: props.value?.value ?? state.menuItems[0]?.name,
             criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
         };
