@@ -18,6 +18,7 @@ import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-t
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -187,7 +188,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 const result = await fetcher(parameters);
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== unsavedId);
                 state.dataTables.push(result);
-            } catch (e) {
+            } catch (e: any) {
+                showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
             }
         },
@@ -241,7 +243,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     result = await fetcher(updateParams);
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
-            } catch (e) {
+            } catch (e: any) {
+                showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
             }
         },

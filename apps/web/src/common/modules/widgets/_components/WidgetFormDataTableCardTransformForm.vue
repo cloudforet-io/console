@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PI, PFieldGroup, PSelectDropdown, PTextInput, PButton, PIconButton, PFieldTitle,
+    PI, PFieldGroup, PSelectDropdown, PTextInput, PButton, PIconButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 
@@ -83,16 +83,15 @@ const handleClickAddCondition = () => {
 const handleClickAddFunction = () => {
     const newFunction = {
         key: getRandomId(),
-        name: '',
         value: '',
     };
     evalState.proxyFunctions = [...evalState.proxyFunctions, newFunction];
 };
 
-const handleChangeFunction = (key: string, value: string, type: 'name' | 'value') => {
+const handleChangeFunction = (key: string, value: string) => {
     const targetIndex = evalState.proxyFunctions.findIndex((functionInfo) => functionInfo.key === key);
     if (targetIndex !== -1) {
-        evalState.proxyFunctions[targetIndex][type] = value;
+        evalState.proxyFunctions[targetIndex].value = value;
     }
 };
 
@@ -171,37 +170,18 @@ const handleRemoveFunction = (key: string) => {
                 </div>
             </p-field-group>
             <p-field-group v-if="props.operator === DATA_TABLE_OPERATOR.EVAL"
-                           label="Function"
+                           label="Expressions"
                            required
             >
                 <div class="eval-type-functions-wrapper">
-                    <div class="field-title-wrapper">
-                        <p-field-title class="field-name-title"
-                                       label="Field Name"
-                                       size="sm"
-                                       color="gray"
-                                       inline
-                        />
-                        <p-field-title class="formula-title"
-                                       label="Formula"
-                                       size="sm"
-                                       color="gray"
-                                       inline
-                        />
-                    </div>
                     <div v-for="(functionInfo, idx) in evalState.proxyFunctions"
                          :key="functionInfo.key"
                          class="functions-wrapper"
                     >
-                        <p-text-input class="field-name-input"
-                                      block
-                                      :value="functionInfo.name"
-                                      @update:value="handleChangeFunction(functionInfo.key, $event, 'name')"
-                        />
                         <p-text-input class="formula-input"
                                       block
                                       :value="functionInfo.value"
-                                      @update:value="handleChangeFunction(functionInfo.key, $event, 'value')"
+                                      @update:value="handleChangeFunction(functionInfo.key, $event)"
                         />
                         <p-icon-button name="ic_delete"
                                        size="sm"
@@ -213,7 +193,7 @@ const handleRemoveFunction = (key: string) => {
                               icon-left="ic_plus_bold"
                               @click="handleClickAddFunction"
                     >
-                        Add Function
+                        Add Expression
                     </p-button>
                 </div>
             </p-field-group>
@@ -254,18 +234,9 @@ const handleRemoveFunction = (key: string) => {
         @apply bg-gray-100 rounded-lg;
         padding: 0.5rem;
         margin-top: 0.25rem;
-        .field-title-wrapper {
-            margin-bottom: 0.25rem;
-            .field-name-title {
-                width: 7.25rem;
-            }
-        }
         .functions-wrapper {
             @apply flex gap-1 items-center;
             margin-bottom: 0.5rem;
-            .field-name-input {
-                width: 7rem;
-            }
         }
     }
 }

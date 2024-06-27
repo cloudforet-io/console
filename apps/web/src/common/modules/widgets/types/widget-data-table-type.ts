@@ -28,7 +28,6 @@ export interface QueryCondition {
 
 export interface EvalFormula {
     key: string;
-    name: string;
     value: string;
 }
 
