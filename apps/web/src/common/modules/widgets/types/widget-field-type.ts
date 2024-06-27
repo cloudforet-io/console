@@ -139,4 +139,5 @@ export interface WidgetFieldComponentProps<FieldOptions> {
 export interface WidgetFieldComponentEmit<ValueType> {
     (e: 'update:value', value: ValueType): void;
     (e: 'update:is-valid', value: boolean): void;
+    (e: 'show-error-modal', value?: number): void;
 }

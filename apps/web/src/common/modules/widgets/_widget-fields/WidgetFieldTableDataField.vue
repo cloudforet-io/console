@@ -17,11 +17,13 @@ import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFiel
 import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 const DEFAULT_COUNT = 5;
+const DEFAULT_FIELD_TYPE = 'staticField';
 const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions>>(), {
 });
 const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
 
 const { labelsMenuItem } = useGranularityMenuItem(props, 'tableDataField');
+const MIN_LABELS_INFO_COUNT = 2;
 
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
@@ -35,7 +37,7 @@ const state = reactive({
             label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.STATIC_FIELD'),
         },
     ]),
-    selectedFieldType: 'dynamicField',
+    selectedFieldType: DEFAULT_FIELD_TYPE,
     selectedItem: undefined as undefined | MenuItem[] | string,
     selectedCriteria: undefined as undefined | MenuItem[] | string,
     multiSelectable: computed(() => state.selectedFieldType === 'staticField'),
@@ -127,6 +129,14 @@ watch(() => labelsMenuItem.value, (value) => {
     }
 });
 
+watch(() => state.selectedFieldType, (selectedFieldType) => {
+    if (selectedFieldType === 'dynamicField') {
+        if ((labelsMenuItem.value ?? []).length < 2) {
+            emit('show-error-modal', MIN_LABELS_INFO_COUNT);
+        }
+    }
+}, { immediate: true });
+
 watch(() => state.menuItems, (menuItems) => {
     if (!Array.isArray(menuItems)) return;
     const isIncludedInMenuItems = (data: string[]|string):boolean => {
@@ -153,7 +163,7 @@ watch(() => state.menuItems, (menuItems) => {
 }, { immediate: true });
 /* Init */
 onMounted(() => {
-    state.selectedFieldType = props.value?.fieldType ?? 'dynamicField';
+    state.selectedFieldType = props.value?.fieldType ?? DEFAULT_FIELD_TYPE;
     if (state.selectedFieldType === 'staticField') {
         state.proxyValue = {
             ...state.proxyValue,
@@ -165,7 +175,7 @@ onMounted(() => {
         state.proxyValue = {
             ...state.proxyValue,
             fieldType: state.selectedFieldType,
-            value: props.value?.value ?? state.menuItems[0]?.name,
+            value: props.value?.value ?? state.menuItems?.[1]?.name,
             criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
         };
         state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
