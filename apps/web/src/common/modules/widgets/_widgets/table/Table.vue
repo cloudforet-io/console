@@ -12,7 +12,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
@@ -26,7 +28,7 @@ import { getWidgetDataTable, sortWidgetTableFields } from '@/common/modules/widg
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DateRange, DateFieldType, TableDataItem, WidgetDataTableModel,
+    DateRange, DateFieldType, TableDataItem,
 } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
@@ -47,7 +49,7 @@ const state = reactive({
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     comparisonData: null as Data | null,
-    dataTable: undefined as WidgetDataTableModel|undefined,
+    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
     // converted data
     finalConvertedData: computed<Data|null>(() => {
         if (!state.data) return null;
