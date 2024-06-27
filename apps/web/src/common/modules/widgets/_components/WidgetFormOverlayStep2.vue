@@ -55,7 +55,7 @@ const state = reactive({
         }
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
-    isWidgetOptionsChanged: computed<boolean>(() => Object.entries(widgetGenerateState.widgetFormValueMap).every(([k, v]) => {
+    isWidgetOptionsChanged: computed<boolean>(() => Object.entries(widgetGenerateState.widgetFormValueMap).some(([k, v]) => {
         if (v) {
             return !isEqual(v, widgetGenerateState.previewWidgetValueMap[k]);
         }
