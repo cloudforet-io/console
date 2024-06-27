@@ -65,10 +65,10 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const subjectValue = itemValue?.subject ?? 0;
             const fixedValue = Math.abs(targetValue - subjectValue);
             const percentageValue = fixedValue / (targetValue || 1) * 100;
-            if (fixedValue === 0) return '-';
+            if (!fixedValue || fixedValue === 0) return '-';
             if (props.comparisonInfo?.format === 'fixed') return numberFormatter(fixedValue);
-            if (props.comparisonInfo?.format === 'percent') return `${percentageValue}%`;
-            if (props.comparisonInfo?.format === 'all') return `${numberFormatter(fixedValue)} (${percentageValue}%)`;
+            if (props.comparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
+            if (props.comparisonInfo?.format === 'all') return `${numberFormatter(fixedValue)} (${numberFormatter(percentageValue)}%)`;
             return '-';
         }
         return numberFormatter(itemValue) || '-';
@@ -81,10 +81,10 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const subjectValue = dynamicDataItem?.value?.subject ?? 0;
             const fixedValue = Math.abs(targetValue - subjectValue);
             const percentageValue = fixedValue / (targetValue || 1) * 100;
-            if (fixedValue === 0) return '-';
+            if (!fixedValue || fixedValue === 0) return '-';
             if (props.comparisonInfo?.format === 'fixed') return numberFormatter(fixedValue);
-            if (props.comparisonInfo?.format === 'percent') return `${percentageValue}%`;
-            if (props.comparisonInfo?.format === 'all') return `${numberFormatter(fixedValue)} (${percentageValue}%)`;
+            if (props.comparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
+            if (props.comparisonInfo?.format === 'all') return `${numberFormatter(fixedValue)} (${numberFormatter(percentageValue)}%)`;
             return '-';
         }
         return numberFormatter(dynamicDataItem?.value) || 0;
