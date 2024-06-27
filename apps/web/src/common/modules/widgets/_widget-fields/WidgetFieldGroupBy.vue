@@ -12,6 +12,7 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type {
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
@@ -34,7 +35,7 @@ const state = reactive({
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget ?? 'labels_info';
         if (!props.dataTable) return [];
         if (dataTarget === 'labels_info') return labelsMenuItem.value;
-        const dataInfoList = Object.keys(props.dataTable[dataTarget] ?? {}) ?? [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(props.dataTable[dataTarget] ?? {})) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,

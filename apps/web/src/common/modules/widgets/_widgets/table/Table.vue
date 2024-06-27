@@ -22,6 +22,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DateRange, DateFieldType, TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
@@ -84,7 +85,7 @@ const state = reactive({
     progressBarInfo: computed<ProgressBarValue|undefined>(() => props.widgetOptions?.progressBar as ProgressBarValue),
     // table
     tableFields: computed<TableWidgetField[]>(() => {
-        const labelFields: TableWidgetField[] = state.groupByField?.map((field) => ({ name: field, label: field, fieldInfo: { type: 'labelField' } })) ?? [];
+        const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map((field) => ({ name: field, label: field, fieldInfo: { type: 'labelField' } })) ?? [];
         let dataFields: TableWidgetField[] = [];
         if (state.tableDataFieldType === 'staticField') {
             state.tableDataField.forEach((field) => {
