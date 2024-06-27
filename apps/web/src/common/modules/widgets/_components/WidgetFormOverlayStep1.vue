@@ -188,7 +188,7 @@ onMounted(async () => {
                 width: 100%;
                 height: 1.5rem;
                 bottom: 0;
-                background: linear-gradient(180deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.150') 100%);
+                background: linear-gradient(180deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.100') 100%);
                 z-index: 1;
             }
             .gradation-top-area {
@@ -196,7 +196,7 @@ onMounted(async () => {
                 width: 100%;
                 height: 1.25rem;
                 top: 0;
-                background: linear-gradient(180deg, theme('colors.gray.150') 0%, rgba(247, 247, 247, 0) 100%);
+                background: linear-gradient(180deg, theme('colors.gray.100') 0%, rgba(247, 247, 247, 0) 100%);
                 z-index: 1;
             }
             .gradation-left-area {
@@ -205,16 +205,16 @@ onMounted(async () => {
                 height: 100%;
                 left: 0;
                 top: 0;
-                background: linear-gradient(90deg, theme('colors.gray.150') 0%, rgba(247, 247, 247, 0) 100%);
+                background: linear-gradient(90deg, theme('colors.gray.100') 0%, rgba(247, 247, 247, 0) 100%);
                 z-index: 1;
             }
             .gradation-right-area {
                 @apply absolute;
-                width: 1.5rem;
+                width: 1.25rem;
                 height: 100%;
                 right: 0;
                 top: 0;
-                background: linear-gradient(90deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.150') 100%);
+                background: linear-gradient(90deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.100') 100%);
                 z-index: 1;
             }
         }
@@ -290,6 +290,9 @@ onMounted(async () => {
 
                     :deep(.p-toolbox) {
                         padding: 1rem 1rem 0;
+                        .toolbox-inner {
+                            padding: 0 1rem;
+                        }
                         .toolbox-left {
                             @apply h-full;
                         }

@@ -316,7 +316,6 @@ watch(() => state.sortBy, async () => {
     .toolbox-left-wrapper {
         @apply flex items-center;
         gap: 0.75rem;
-        padding-left: 1rem;
         .view-table-title {
             @apply text-label-lg font-bold;
         }
