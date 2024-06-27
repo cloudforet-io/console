@@ -6,10 +6,12 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
 } from '@spaceone/design-system';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
-import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/bookmark/type/type';
+import type { BookmarkItem, BookmarkModalStateType, RadioType } from '@/common/components/bookmark/type/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
@@ -33,16 +35,26 @@ const storeState = reactive({
     isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
     bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     loading: false,
     bookmark: computed<string|undefined|TranslateResult>(() => storeState.selectedBookmark?.name || storeState.filterByFolder),
-    radioMenuList: computed(() => ([
-        i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK'),
-        i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
-    ])),
+    radioMenuList: computed<RadioType[]>(() => {
+        const menu: RadioType[] = [{
+            label: i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
+            name: BOOKMARK_TYPE.USER,
+        }];
+        if (!storeState.isWorkspaceMember) {
+            menu.unshift({
+                label: i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK'),
+                name: BOOKMARK_TYPE.WORKSPACE,
+            });
+        }
+        return menu;
+    }),
     selectedRadioIdx: 0,
-    scope: computed(() => (state.selectedRadioIdx === 0 ? BOOKMARK_TYPE.WORKSPACE : BOOKMARK_TYPE.USER)),
+    scope: computed(() => state.radioMenuList[state.selectedRadioIdx].name),
 });
 
 const {
@@ -151,7 +163,7 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                                  :value="idx"
                         >
                             <span class="radio-item">
-                                {{ item }}
+                                {{ item.label }}
                             </span>
                         </p-radio>
                     </p-radio-group>
