@@ -13,6 +13,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -179,6 +180,7 @@ const originDataState = reactive({
 const modalState = reactive({
     visible: false,
     mode: '' as DataTableAlertModalMode,
+    referenceDataTableName: '',
 });
 
 
@@ -186,7 +188,7 @@ const modalState = reactive({
 /* Events */
 const handleSelectSourceItem = (selectedItem: string) => {
     state.selectedSourceEndItem = selectedItem;
-    showSuccessMessage('Data successfully changed.', '');
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.SELECT_DATA_SOURCE_SUCCESS'), '');
 };
 
 const handleClickDeleteDataTable = async () => {
@@ -198,6 +200,7 @@ const handleClickDeleteDataTable = async () => {
         return isDualDataTableOperator ? operatorOptions?.data_tables.includes(state.dataTableId) : operatorOptions?.data_table_id === state.dataTableId;
     });
     if (isExistingDataTableInTransformed) {
+        modalState.referenceDataTableName = isExistingDataTableInTransformed.name || '';
         modalState.mode = 'DELETE_UNABLED';
         modalState.visible = true;
         return;
@@ -234,7 +237,7 @@ const handleCancelModal = () => {
 };
 const handleUpdateDataTable = async () => {
     if (!state.dataFieldName.length) {
-        showErrorMessage('Unable to apply changes. Please check the form.', '');
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
         return;
     }
     const additionalLabelsRequest = {} as AdditionalLabels;
@@ -308,7 +311,7 @@ const handleUpdateDataTable = async () => {
         // });
     }
 
-    showSuccessMessage('Changes have been successfully applied.', '');
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
     setInitialDataTableForm();
     state.filterFormKey = getRandomId();
 
@@ -395,6 +398,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
         />
         <widget-form-data-table-card-alert-modal :mode="modalState.mode"
                                                  :visible="modalState.visible"
+                                                 :reference-data-table-name="modalState.referenceDataTableName"
                                                  @cancel="handleCancelModal"
                                                  @confirm="handleConfirmModal"
         />

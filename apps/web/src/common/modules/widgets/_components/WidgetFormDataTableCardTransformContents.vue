@@ -5,8 +5,9 @@ import { intersection, isEqual } from 'lodash';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import { i18n } from '@/translations';
 
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
@@ -151,7 +152,7 @@ const handleUpdateDataTable = async () => {
         && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0])
         && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
     if (!isValidDataTableId && !isValidDataTables) {
-        showErrorMessage('Unable to apply changes. Please check the form.', '');
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
         return;
     }
 
@@ -167,7 +168,7 @@ const handleUpdateDataTable = async () => {
                 ...widgetGenerateState.joinRestrictedMap,
                 [state.dataTableId]: true,
             });
-            showErrorMessage('{data02} cannot be joined with {data01} because the two data tables have one or more identical data fields.', '');
+            showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_JOIN_FAIL_WARNING', { first_data: firstDataTable?.name || '', second_data: secondDataTable?.name || '' }), '');
             return;
         }
     }
@@ -260,6 +261,7 @@ const handleUpdateDataTable = async () => {
         // });
     }
 
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
     widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
 };
 
