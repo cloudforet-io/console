@@ -46,6 +46,7 @@ const state = reactive({
     selectedWidgetSize: 'ACTUAL',
     widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetSize: computed(() => {
+        if (widgetGenerateState.overlayType === 'EXPAND') return 'full';
         if (state.selectedWidgetSize === 'FULL') return 'full';
         return widgetGenerateState.size;
     }),
@@ -56,7 +57,7 @@ const state = reactive({
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
     isWidgetOptionsChanged: computed<boolean>(() => Object.entries(widgetGenerateState.widgetFormValueMap).some(([k, v]) => {
-        if (v) {
+        if (v !== undefined) {
             return !isEqual(v, widgetGenerateState.previewWidgetValueMap[k]);
         }
         return false;
