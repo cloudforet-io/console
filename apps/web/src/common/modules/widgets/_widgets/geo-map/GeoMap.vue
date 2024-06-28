@@ -71,7 +71,10 @@ const state = reactive({
         },
         tooltip: {
             trigger: 'item',
-            valueFormatter: (val) => numberFormatter(val) || '',
+            formatter: (params) => {
+                const _value = numberFormatter(params.value[2]) || '';
+                return `${params.marker} ${params.name}: <b>${_value}</b>`;
+            },
         },
         series: [
             {
@@ -138,11 +141,12 @@ const drawChart = async (rawData: WidgetLoadData|null) => {
     if (!rawData) return;
     const _seriesData: any[] = [];
     rawData.results?.forEach((result) => {
+        const _targetRegion = storeState.regions[result[REGION_FIELD]];
         _seriesData.push({
-            name: storeState.regions[result[REGION_FIELD]].label,
+            name: _targetRegion?.label || result[REGION_FIELD],
             value: [
-                storeState.regions[result[REGION_FIELD]].continent.longitude,
-                storeState.regions[result[REGION_FIELD]].continent.latitude,
+                _targetRegion?.continent.longitude,
+                _targetRegion?.continent.latitude,
                 result[state.dataField],
             ],
             label: {

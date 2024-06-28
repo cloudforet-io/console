@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, nextTick, onBeforeMount, onUnmounted, reactive, ref, watch,
+    computed, nextTick, onBeforeMount, onMounted, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -76,6 +76,12 @@ const reset = () => {
     dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
+const loadOverlayWidget = async () => {
+    const res = await overlayWidgetRef.value?.loadWidget();
+    if (typeof res === 'function') {
+        res('Please check the widget options.');
+    }
+};
 
 /* Event */
 const handleChangeWidgetSize = (widgetSize: string) => {
@@ -84,10 +90,7 @@ const handleChangeWidgetSize = (widgetSize: string) => {
 const handleUpdatePreview = async () => {
     widgetGenerateStore.setPreviewWidgetValueMap(cloneDeep(widgetGenerateState.widgetFormValueMap));
     await nextTick();
-    const res = await overlayWidgetRef.value?.loadWidget();
-    if (typeof res === 'function') {
-        res('Please check the widget options.');
-    }
+    await loadOverlayWidget();
 };
 
 /* Watcher */
@@ -99,6 +102,9 @@ watch(() => widgetGenerateState.selectedWidgetName, () => {
     }
 }, { immediate: true });
 
+onMounted(async () => {
+    if (widgetGenerateState.overlayType === 'EXPAND') await loadOverlayWidget();
+});
 onBeforeMount(() => {
     initSnapshot();
 });
