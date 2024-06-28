@@ -6,11 +6,14 @@ import {
     PButtonModal,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
 import type { DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 
 interface Props {
     visible: boolean;
     mode: DataTableAlertModalMode;
+    referenceDataTableName?: string;
 }
 
 const props = defineProps<Props>();
@@ -22,21 +25,21 @@ const emit = defineEmits<{(e: 'confirm'): void;
 const state = reactive({
     headerTitle: computed(() => {
         if (props.mode === 'DELETE') {
-            return 'Delete Data';
+            return i18n.t('COMMON.WIDGETS.DATA_TABLE.ALERT.DELETE_HEADER');
         } if (props.mode === 'DELETE_UNABLED') {
-            return 'Cannot Delete the Data';
+            return i18n.t('COMMON.WIDGETS.DATA_TABLE.ALERT.DELETE_UNABLED_HEADER');
         } if (props.mode === 'RESET') {
-            return 'Are you sure you want to reset the data options?';
+            return i18n.t('COMMON.WIDGETS.DATA_TABLE.ALERT.RESET_HEADER');
         }
         return '';
     }),
     description: computed(() => {
         if (props.mode === 'DELETE') {
-            return 'Are you sure you want to delete this data?';
+            return i18n.t('COMMON.WIDGETS.DATA_TABLE.ALERT.DELETE_DESC');
         } if (props.mode === 'DELETE_UNABLED') {
-            return 'This data is currently in use by {data_name}. \nDelete {data_name} first before deleting this data.';
+            return i18n.t('COMMON.WIDGETS.DATA_TABLE.ALERT.DELETE_UNABLED_DESC', { data_name: props.referenceDataTableName });
         } if (props.mode === 'RESET') {
-            return 'Resetting the data options will revert all inputss to their most recent values. This action cannot be undone.';
+            return i18n.t('COMMON.WIDGETS.DATA_TABLE.ALERT.RESET_DESC');
         }
         return '';
     }),

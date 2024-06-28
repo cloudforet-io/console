@@ -8,6 +8,7 @@ import {
 
 
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -48,7 +49,7 @@ const dataTableNameState = reactive({
 /* Events */
 const handleSelectDataTable = async (dataTableId: string) => {
     if (state.isUnsavedTransformed) {
-        showErrorMessage('Please save the data table first.', '');
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.SELECT_DATA_TABLE_WARNING'), '');
         return;
     }
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
@@ -72,14 +73,14 @@ const handleClickNameConfirm = async () => {
     }
     const dataTableNames = storeState.dataTables.map((dataTable) => dataTable.name);
     if (dataTableNames.includes(editedDataTableName)) {
-        showErrorMessage('A data with this name already exists.', '');
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_TABLE_NAME_WARNING'), '');
         return;
     }
     await widgetGenerateStore.updateDataTable({
         data_table_id: props.dataTableId,
         name: editedDataTableName,
     }, state.isUnsavedTransformed);
-    showSuccessMessage('Data name successfully changed.', '');
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_TABLE_NAME_SUCCESS'), '');
     dataTableNameState.editMode = false;
 };
 </script>

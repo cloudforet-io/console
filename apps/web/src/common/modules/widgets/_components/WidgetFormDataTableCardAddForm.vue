@@ -2,6 +2,7 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PFieldTitle,
@@ -9,6 +10,8 @@ import {
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 import { range, sortBy } from 'lodash';
+
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -107,10 +110,10 @@ const advancedOptionsState = reactive({
 const validationState = reactive({
     proxyFormInvalid: useProxyValue('formInvalid', props, emit),
     dataFieldNameInvalid: computed<boolean>(() => state.proxyDataFieldName.length === 0 || reservedLabelState.reservedLabelKeys.includes(state.proxyDataFieldName)),
-    dataFieldNameInvalidText: computed<string>(() => {
-        if (state.proxyDataFieldName.length === 0) return 'Please enter the name.';
-        if (reservedLabelState.reservedGroupByKeys.includes(state.proxyDataFieldName)) return 'Group by names cannot be used as field names.';
-        if (reservedLabelState.reservedDateKeys.includes(state.proxyDataFieldName)) return 'Date/Year/Month/Day cannot be usedas field names.';
+    dataFieldNameInvalidText: computed<string|TranslateResult>(() => {
+        if (state.proxyDataFieldName.length === 0) return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_FIELD_NAME_INVALID_TEXT');
+        if (reservedLabelState.reservedGroupByKeys.includes(state.proxyDataFieldName)) return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.FIELD_NAME_GROUP_BY_INVALID_TEXT');
+        if (reservedLabelState.reservedDateKeys.includes(state.proxyDataFieldName)) return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.FIELD_NAME_DATE_INVALID_TEXT');
         return '';
     }),
     additionalFieldInvalidMap: {} as Record<string, boolean>,
@@ -207,12 +210,14 @@ const handleClickTimeDiffDate = (timeDiffDate: string) => {
 };
 
 /* Utils */
-const getAdditionalLabelInvalidText = (labelKey: string, labelName: string): string => {
+const getAdditionalLabelInvalidText = (labelKey: string, labelName: string): string|TranslateResult => {
     const invalid = validationState.additionalFieldInvalidMap[labelKey];
     if (!invalid) return '';
-    if (reservedLabelState.reservedGroupByKeys.includes(labelName)) return 'Group by names cannot be used as field names.';
-    if (reservedLabelState.reservedDateKeys.includes(labelName)) return 'Date/Year/Month/Day cannot be used as field names.';
-    if (advancedOptionsState.proxyAdditionalLabels.some((label) => label.name === labelName && label.key !== labelKey)) return 'This name is already being used.';
+    if (reservedLabelState.reservedGroupByKeys.includes(labelName)) return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.FIELD_NAME_GROUP_BY_INVALID_TEXT');
+    if (reservedLabelState.reservedDateKeys.includes(labelName)) return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.FIELD_NAME_DATE_INVALID_TEXT');
+    if (advancedOptionsState.proxyAdditionalLabels.some((label) => label.name === labelName && label.key !== labelKey)) {
+        return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT');
+    }
     return '';
 };
 const setTagsResources = async (): Promise<void> => {
@@ -262,7 +267,7 @@ onMounted(async () => {
 
 <template>
     <div class="widget-form-data-table-card-add-form">
-        <p-field-group label="Group by">
+        <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.GROUP_BY')">
             <p-select-dropdown class="group-by-select-dropdown"
                                :menu="groupByState.items"
                                :selected.sync="state.proxySelectedGroupByItems"
@@ -281,7 +286,7 @@ onMounted(async () => {
                                              :filter-items="groupByState.items"
                                              :filter.sync="state.proxyFilter"
         />
-        <p-field-group label="Data Field Name"
+        <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_FIELD_NAME')"
                        required
                        :invalid="validationState.dataFieldNameInvalid"
                        :invalid-text="validationState.dataFieldNameInvalidText"
@@ -291,7 +296,7 @@ onMounted(async () => {
                           placeholder="Name"
             />
         </p-field-group>
-        <p-field-group label="Data Unit">
+        <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_UNIT')">
             <p-text-input v-model="state.proxyDataUnit"
                           class="data-text-input"
             />
@@ -310,22 +315,22 @@ onMounted(async () => {
                      color="inherit transparent"
                      class="arrow-button"
                 />
-                <span>Advanced Options</span>
+                <span>{{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.ADVANCED_OPTIONS') }}</span>
             </div>
             <div class="form-wrapper">
-                <p-field-group label="Additional Labels">
+                <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.ADDITIONAL_LABELS')">
                     <div class="additional-labels-wrapper">
                         <div v-if="advancedOptionsState.proxyAdditionalLabels.length"
                              class="field-title-wrapper"
                         >
                             <p-field-title class="field-title"
-                                           label="Name"
+                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.ADDITIONAL_LABELS_NAME')"
                                            size="sm"
                                            color="gray"
                                            inline
                             />
                             <p-field-title class="field-title"
-                                           label="Value"
+                                           :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.ADDITIONAL_LABELS_VALUE')"
                                            size="sm"
                                            color="gray"
                                            inline
@@ -362,14 +367,14 @@ onMounted(async () => {
                                   icon-left="ic_plus_bold"
                                   @click="handleClickAddLabel"
                         >
-                            Add Label
+                            {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABEL') }}
                         </p-button>
                     </div>
                 </p-field-group>
-                <p-field-group label="Separate Date">
+                <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.SEPARATE')">
                     <div class="separate-date-wrapper">
                         <p class="description">
-                            Separate date into 3 columns (Year, Month, Day)
+                            {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.SEPARATE_DESC') }}
                         </p>
                         <p-toggle-button :value.sync="advancedOptionsState.proxySeparateDate"
                                          show-state-text
@@ -377,7 +382,7 @@ onMounted(async () => {
                         />
                     </div>
                 </p-field-group>
-                <p-field-group label="Time Diff">
+                <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.TIME_DIFF')">
                     <div class="time-diff-dropdown-wrapper">
                         <p-select-dropdown class="time-diff-dropdown"
                                            use-fixed-menu-style
