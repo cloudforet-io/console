@@ -177,7 +177,7 @@ onMounted(async () => {
                 overflow: auto;
                 .data-table-contents-wrapper {
                     @apply flex gap-4;
-                    padding: 1rem 1rem 1.125rem;
+                    padding: 1.25rem;
                     height: auto;
                     width: auto;
                 }
