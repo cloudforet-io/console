@@ -175,7 +175,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 ErrorHandler.handleError(e);
             }
         },
-        createTransformDataTable: async (transformParams: Partial<DataTableTransformParameters>, unsavedId: string) => {
+        createTransformDataTable: async (transformParams: Partial<DataTableTransformParameters>, unsavedId: string): Promise<DataTableModel|undefined> => {
             const parameters = {
                 widget_id: state.widgetId,
                 ...transformParams,
@@ -188,9 +188,11 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 const result = await fetcher(parameters);
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== unsavedId);
                 state.dataTables.push(result);
+                return result;
             } catch (e: any) {
                 showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
+                return undefined;
             }
         },
         createUnsavedTransformDataTable: (operatorType: DataTableOperator) => {

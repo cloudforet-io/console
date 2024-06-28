@@ -207,7 +207,14 @@ const handleUpdateDataTable = async () => {
             operator: state.operator,
             options: { [state.operator]: options() },
         };
-        await widgetGenerateStore.createTransformDataTable(createParams, state.dataTableId);
+        const dataTable = await widgetGenerateStore.createTransformDataTable(createParams, state.dataTableId);
+        if (dataTable) {
+            widgetGenerateStore.setSelectedDataTableId(dataTable.data_table_id);
+            widgetGenerateStore.setDataTableUpdating(true);
+            await widgetGenerateStore.loadDataTable({
+                data_table_id: dataTable.data_table_id,
+            });
+        }
     } else {
         const updateParams = {
             data_table_id: state.dataTableId,
@@ -215,12 +222,12 @@ const handleUpdateDataTable = async () => {
             options: { [state.operator]: options() },
         };
         await widgetGenerateStore.updateDataTable(updateParams);
+        widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
+        widgetGenerateStore.setDataTableUpdating(true);
+        await widgetGenerateStore.loadDataTable({
+            data_table_id: state.dataTableId,
+        });
     }
-    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
-    widgetGenerateStore.setDataTableUpdating(true);
-    await widgetGenerateStore.loadDataTable({
-        data_table_id: state.dataTableId,
-    });
 
     // Update Referenced Transformed DataTable
     const referencedDataTableIds = [] as string[];
