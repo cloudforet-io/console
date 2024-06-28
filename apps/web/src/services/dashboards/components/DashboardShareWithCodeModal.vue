@@ -5,12 +5,8 @@ import {
     PButtonModal, PTextEditor, PButton,
 } from '@spaceone/design-system';
 
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
@@ -18,24 +14,10 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { SharedDashboardInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
 
-type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
-type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
-type SharedDataTableInfo = Pick<DataTableModel, 'name' | 'data_type' | 'source_type' | 'operator' | 'options' | 'labels_info' | 'data_info'>;
-type SharedWidgetInfo =
-    Pick<WidgetModel, 'name' | 'description' | 'size' | 'widget_type' | 'options'> & {
-    data_tables: SharedDataTableInfo[];
-    data_table_id: number;
-};
-type SharedDashboardInfo =
-    Pick<DashboardModel, 'name' | 'version' | 'options' | 'labels'> & {
-    layouts: Array<{
-        name?: string;
-        widgets: SharedWidgetInfo[];
-    }>;
-};
 interface Props {
     visible: boolean;
     dashboardId: string;
@@ -80,7 +62,6 @@ watch(() => props.visible, async (visible) => {
         const _sharedLayouts = await getSharedDashboardLayouts(dashboardDetailState.dashboardLayouts, dashboardDetailState.dashboardWidgets);
         state.sharedDashboard = {
             name: dashboardDetailState.name || '',
-            version: dashboardDetailState.dashboardInfo?.version || '2.0',
             layouts: _sharedLayouts,
             options: dashboardDetailState.options || {},
             labels: dashboardDetailState.labels || [],
