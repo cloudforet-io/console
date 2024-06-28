@@ -176,6 +176,7 @@ const handleConfirmShareToAllWorkspaces = async () => {
 .dashboard-detail-header {
     margin-bottom: 0.75rem;
     .p-heading {
+        align-items: center;
         margin-bottom: 0;
     }
     .template-name {

@@ -88,10 +88,12 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
             const config = getWidgetConfig(_widget.widget_type);
             if (!config) return;
             const _size = _widget.size || config.meta.sizes[0];
+            const _component = getWidgetComponent(_widget.widget_type);
+            if (!_component) return;
             _refinedWidgets.push({
                 ..._widget,
                 size: _size,
-                component: getWidgetComponent(_widget.widget_type),
+                component: _component,
             });
             _widgetSizeList.push(_size);
         });
@@ -226,6 +228,7 @@ watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
         await dashboardDetailStore.listDashboardWidgets();
         await loadAWidget(widgetGenerateState.latestWidgetId);
+        // reset widget frame metadata
     }
 });
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
