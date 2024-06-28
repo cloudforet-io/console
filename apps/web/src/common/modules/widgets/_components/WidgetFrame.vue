@@ -240,6 +240,7 @@ const handleToggleWidth = () => {
         padding-bottom: 0.5rem;
         .title {
             @apply truncate text-label-md;
+            max-width: 90%;
             overflow: hidden;
             text-overflow: ellipsis;
             display: block;

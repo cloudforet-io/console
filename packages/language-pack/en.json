@@ -1336,6 +1336,7 @@
 				"TREND_TITLE": "Trend",
 				"TYPE_TITLE": "{service} Type"
 			},
+			"APPLY": "Apply",
 			"BILLING": {
 				"DAY": "Day",
 				"HIDE": "hide",
@@ -1459,6 +1460,7 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "Upcoming and Past 7 days"
 			},
+			"RESET": "Reset",
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "Cloud Service",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "Region",
 			"RESOURCE_BY_REGION_REGIONS": "Regions",

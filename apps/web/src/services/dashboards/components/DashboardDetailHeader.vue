@@ -57,6 +57,12 @@ const state = reactive({
                 label: i18n.t('DASHBOARDS.DETAIL.EDIT_DASHBOARD_NAME'),
                 icon: 'ic_edit-text',
             },
+            {
+                type: 'item',
+                name: 'duplicate',
+                label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
+                icon: 'ic_duplicate',
+            },
             { type: 'divider', name: 'divider' },
             {
                 type: 'item',
@@ -84,6 +90,7 @@ const state = reactive({
 /* Event */
 const handleSelectItem = (selected: MenuItem) => {
     if (selected.name === 'edit') state.nameEditModalVisible = true;
+    if (selected.name === 'duplicate') state.cloneModalVisible = true;
     if (selected.name === 'shareWithCode') state.shareWithCodeModalVisible = true;
     if (selected.name === 'delete') state.deleteModalVisible = true;
     if (selected.name === 'shareToAllWorkspaces') state.shareToWorkspaceModalVisible = true;
@@ -98,7 +105,6 @@ const handleConfirmShareToAllWorkspaces = async () => {
     // const _sharedLayouts = await getSharedDashboardLayouts(dashboardDetailState.dashboardLayouts, dashboardDetailState.dashboardWidgets);
     // const _sharedDashboard = {
     //     name: dashboardDetailState.name || '',
-    //     version: dashboardDetailState.dashboardInfo?.version || '2.0',
     //     layouts: _sharedLayouts,
     //     options: dashboardDetailState.options || {},
     //     labels: dashboardDetailState.labels || [],
@@ -148,7 +154,7 @@ const handleConfirmShareToAllWorkspaces = async () => {
                                 :dashboard-id="props.dashboardId"
         />
         <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
-                               :dashboard="dashboardDetailState.dashboardInfo"
+                               :dashboard-id="props.dashboardId"
         />
         <dashboard-share-with-code-modal :visible.sync="state.shareWithCodeModalVisible"
                                          :dashboard-id="props.dashboardId"

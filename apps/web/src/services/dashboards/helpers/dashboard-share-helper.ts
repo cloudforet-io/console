@@ -4,10 +4,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DashboardLayout } from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
@@ -15,28 +13,13 @@ import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 
+import type {
+    SharedDashboardInfo, SharedDashboardLayout, SharedDataTableInfo, SharedWidgetInfo,
+} from '@/services/dashboards/types/shared-dashboard-type';
 
-type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
+
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
-type SharedDataTableInfo = Pick<DataTableModel, 'name' | 'data_type' | 'source_type' | 'operator' | 'options' | 'labels_info' | 'data_info'>;
-type SharedWidgetInfo =
-    Pick<WidgetModel, 'name' | 'description' | 'size' | 'widget_type' | 'options'> & {
-    data_tables: SharedDataTableInfo[];
-    data_table_id: number;
-};
-type SharedDashboardLayout = {
-    name?: string;
-    widgets: SharedWidgetInfo[];
-};
-type SharedDashboardInfo =
-    Pick<DashboardModel, 'name' | 'version' | 'options' | 'labels'> & {
-    layouts: Array<{
-        name?: string;
-        widgets: SharedWidgetInfo[];
-    }>;
-};
-
 
 const _listWidgetDataTables = async (widgetId?: string): Promise<[string, DataTableModel[]]|undefined> => {
     if (!widgetId) return undefined;
