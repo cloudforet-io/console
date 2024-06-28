@@ -45,6 +45,7 @@ const state = reactive({
     widgetConfigDependencies: computed<{[key:string]: string[]}>(() => state.widgetConfig.dependencies || {}),
     defaultValidationConfig: computed(() => state.widgetConfig.meta?.defaultValidationConfig),
     widgetDefaultValidationModalVisible: false,
+    formErrorModalValue: undefined as number|undefined,
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     // display
@@ -95,6 +96,11 @@ const checkDefaultValidation = () => {
             state.widgetDefaultValidationModalVisible = true;
         }
     }
+};
+
+const handleShowErrorModal = (value:number|undefined) => {
+    state.widgetDefaultValidationModalVisible = true;
+    state.formErrorModalValue = value;
 };
 
 const handleSelectWidgetName = (widgetName: string) => {
@@ -259,6 +265,7 @@ watch(() => widgetGenerateState.widgetValidMap, () => {
                                :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                @update:value="handleUpdateFieldValue(fieldName, $event)"
                                @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
+                               @show-error-modal="handleShowErrorModal"
                     />
                 </template>
             </div>
@@ -303,7 +310,7 @@ watch(() => widgetGenerateState.widgetValidMap, () => {
             <template #body>
                 <p>
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.DESC', {
-                        count: state.defaultValidationConfig?.defaultMaxCount,
+                        number: state.formErrorModalValue ?? state.defaultValidationConfig?.defaultMaxCount,
                     }) }}
                 </p>
                 <p-button style-type="tertiary"
