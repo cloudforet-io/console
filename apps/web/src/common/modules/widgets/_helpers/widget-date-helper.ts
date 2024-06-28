@@ -76,5 +76,8 @@ export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, fi
     if (field === 'Provider') {
         return allReferenceTypeInfo.provider.referenceMap[val]?.label || val;
     }
+    if (field === 'Service Account') {
+        return allReferenceTypeInfo.service_account.referenceMap[val]?.label || val;
+    }
     return val;
 };

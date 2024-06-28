@@ -48,9 +48,13 @@ interface VariableOption {
 }
 
 const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
+    [GROUP_BY.WORKSPACE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
+    [GROUP_BY.PROJECT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
     [GROUP_BY.PROJECT_GROUP]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group },
     [GROUP_BY.PRODUCT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'product' },
     [GROUP_BY.PROVIDER]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
+    [GROUP_BY.SERVICE_ACCOUNT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
+    [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.region },
     [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
 };
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({});
@@ -71,7 +75,7 @@ const appContextStore = useAppContextStore();
 
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
-    metircs: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     dataTable: computed(() => widgetGenerateStore.state.dataTables.find((d) => d.data_table_id === props.dataTableId)),
 });
@@ -101,7 +105,7 @@ const state = reactive({
 });
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
-        const metricLabelsInfo = storeState.metircs[props.sourceId ?? ''].data.labels_info;
+        const metricLabelsInfo = storeState.metrics[props.sourceId ?? ''].data.labels_info;
         return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => (storeState.isAdminMode ? labelInfo.key !== 'project_id' : labelInfo.key !== 'workspace_id')) : [];
     }),
 });
