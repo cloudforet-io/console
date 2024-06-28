@@ -142,7 +142,9 @@ const handleToggleWidth = () => {
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.DESCRIPTION') }}</span>
-                            <span>{{ props.description || '--' }}</span>
+                            <div class="description">
+                                {{ props.description || '--' }}
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -270,7 +272,6 @@ const handleToggleWidth = () => {
             .metadata-item-row {
                 display: flex;
                 justify-content: flex-start;
-                gap: 2rem;
                 .metadata-title {
                     @apply text-gray-600;
                     width: 7rem;
@@ -279,6 +280,11 @@ const handleToggleWidth = () => {
                     display: flex;
                     flex-direction: column;
                     gap: 0.125rem;
+                }
+                .description {
+                    @apply text-gray-700;
+                    max-width: 18rem;
+                    display: block;
                 }
             }
         }
