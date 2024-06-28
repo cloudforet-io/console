@@ -15,7 +15,7 @@ const _getTitle = (modelInfo: VariableModelMenuHandlerInfo) => {
     return _dataKey ? modelInfo.variableModel[_dataKey].name : modelInfo.variableModel._meta?.name;
 };
 
-export const getVariableModelMenuHandler = (variableModelInfoList: VariableModelMenuHandlerInfo[], options?: Record<string, any>): AutocompleteHandler => {
+export const getVariableModelMenuHandler = (variableModelInfoList: VariableModelMenuHandlerInfo[], options: Record<string, any> = {}, primaryOptions?: Record<string, any>): AutocompleteHandler => {
     const _variableModelInfoList = variableModelInfoList;
     return async (inputText: string, pageStart, pageLimit, filters, resultIndex) => {
         const _query = {
@@ -24,6 +24,7 @@ export const getVariableModelMenuHandler = (variableModelInfoList: VariableModel
             search: inputText,
             filters: filters?.length ? filters.map((f) => f.name as string) : undefined,
             options,
+            primaryOptions,
         };
 
         // if resultIndex is empty, it means that the handler is called for the first time. so, we need to call all variableModels' list().
