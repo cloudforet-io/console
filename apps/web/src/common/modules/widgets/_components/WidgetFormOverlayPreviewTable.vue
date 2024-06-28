@@ -251,9 +251,7 @@ watch(() => state.sortBy, async () => {
                 <tr v-else
                     class="no-data-wrapper"
                 >
-                    <p-empty class="preview-empty-contents"
-                             show-image
-                    >
+                    <p-empty class="preview-empty-contents">
                         <template #image>
                             <img src="@/assets/images/img_jellyocto-with-a-telescope.png"
                                  alt="image-preview-data-empty"
@@ -281,7 +279,7 @@ watch(() => state.sortBy, async () => {
     overflow-y: scroll;
 
     .preview-toolbox {
-        padding-top: 1rem;
+        padding: 1rem 1rem 0 1rem;
     }
 
     table {
