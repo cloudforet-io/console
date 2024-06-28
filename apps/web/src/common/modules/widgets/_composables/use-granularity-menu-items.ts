@@ -12,13 +12,14 @@ import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant'
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { WidgetFieldComponentProps, WidgetFieldOptions, WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { LabelsInfo } from '@/common/modules/widgets/types/widget-model';
 
 interface UseGranularityMenuItemState {
     selectedValue: ComputedRef<WidgetFieldValues|undefined>;
     granularity: UnwrapRef<Granularity>;
-    labelInfo: ComputedRef<Record<string, string>>;
+    labelInfo: ComputedRef<LabelsInfo>;
     isDateSeparated: ComputedRef<boolean>;
-    labelsMenuItem: ComputedRef<MenuItem[]>;
+    labelsMenuItem: ComputedRef<MenuItem[]|undefined>;
 }
 
 const labelsInfoValueRouteMap: {
@@ -61,13 +62,14 @@ export const useGranularityMenuItem = (props: WidgetFieldComponentProps<WidgetFi
         granularity: 'MONTHLY',
         labelInfo: computed(() => props.dataTable?.labels_info ?? {}),
         isDateSeparated: computed(() => [DATE_FIELD.DAY, DATE_FIELD.MONTH, DATE_FIELD.YEAR].every((item) => Object.keys(state.labelInfo).includes(item))),
-        labelsMenuItem: computed<MenuItem[]>(() => {
+        labelsMenuItem: computed(() => {
+            if (!state.labelInfo) return undefined;
             const originLabelsMenuItem = sortWidgetTableFields(Object.keys(state.labelInfo)).map((key) => {
                 if (Object.values(DATE_FIELD).includes(key)) {
                     return ({
                         name: key,
                         label: key,
-                        disabled: _state.usedLabelsField.includes(key),
+                        // disabled: _state.usedLabelsField.includes(key),
                     });
                 }
                 return ({

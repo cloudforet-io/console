@@ -21,6 +21,7 @@ const table: WidgetConfig = {
                 dataTarget: 'labels_info',
                 multiSelectable: true,
                 hideCount: false,
+                defaultIndex: 0,
             },
         },
     },

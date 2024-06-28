@@ -128,17 +128,22 @@ watch(() => labelsMenuItem.value, (value) => {
         state.selectedItem = undefined;
         return;
     }
-    state.proxyValue = {
-        ...state.proxyValue,
-        value: state.menuItems[DEFAULT_INDEX]?.name,
-        criteria: state.dataInfoMenuItems[0]?.name,
-    };
+    if ((labelsMenuItem.value ?? []).length >= 2) {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: state.menuItems[DEFAULT_INDEX]?.name,
+            criteria: state.dataInfoMenuItems[0]?.name,
+        };
+    }
 });
 
 watch(() => state.selectedFieldType, (selectedFieldType) => {
     if (selectedFieldType === 'dynamicField') {
-        if ((labelsMenuItem.value ?? []).length < 2) {
+        const labelsInfo = props.dataTable?.labels_info;
+        if (!labelsInfo) return;
+        if (Object.keys(labelsInfo).length < 2) {
             emit('show-error-modal', MIN_LABELS_INFO_COUNT);
+            return;
         }
         state.proxyValue = {
             ...state.proxyValue,
