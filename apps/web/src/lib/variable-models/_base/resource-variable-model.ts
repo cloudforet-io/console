@@ -93,9 +93,19 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
     protected _getStatParams(query: ListQuery = {}, dataKey: string): Record<string, any> {
         const apiQueryHelper = new ApiQueryHelper();
 
-        apiQueryHelper.setFilters([
-            { k: dataKey, v: [null, ''], o: '!=' },
-        ]);
+        // Additional Filter (ex. data_source_id)
+        if (query.primaryOptions) {
+            apiQueryHelper.setFilters([]);
+            Object.entries(query.primaryOptions).forEach(([key, value]) => {
+                apiQueryHelper.addFilter({ k: key, v: value, o: '=' });
+            });
+            apiQueryHelper.addFilter({ k: dataKey, v: [null, ''], o: '!=' });
+        } else {
+            apiQueryHelper.setFilters([
+                { k: dataKey, v: [null, ''], o: '!=' },
+            ]);
+        }
+
 
         if (query.search) {
             apiQueryHelper.addFilter({ k: dataKey, v: query.search, o: '' });
@@ -103,6 +113,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         if (query.filters) {
             apiQueryHelper.addFilter({ k: dataKey, v: query.filters, o: '=' });
         }
+
         this.#properties?.forEach((key) => {
             if (this[key]?.fixedValue) {
                 apiQueryHelper.addFilter({ k: key, v: this[key].fixedValue, o: '=' });
