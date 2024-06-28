@@ -7,6 +7,7 @@ import { PFieldGroup } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import WidgetFieldDropdownAndMax from '@/common/modules/widgets/_components/WidgetFieldDropdownAndMax.vue';
+import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type {
     CategoryByOptions,
@@ -18,10 +19,12 @@ import type { CategoryByValue } from '@/common/modules/widgets/types/widget-fiel
 
 const props = defineProps<WidgetFieldComponentProps<CategoryByOptions>>();
 const emit = defineEmits<WidgetFieldComponentEmit<CategoryByValue>>();
+const { labelsMenuItem } = useGranularityMenuItem(props, 'groupBy');
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget ?? 'labels_info';
         if (!props.dataTable) return [];
+        if (dataTarget === 'labels_info') return labelsMenuItem.value;
         const dataInfoList = sortWidgetTableFields(Object.keys(props.dataTable[dataTarget] ?? {})) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
