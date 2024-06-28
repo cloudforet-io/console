@@ -29,21 +29,21 @@ const handleUpdateDataTable = () => {
                   icon-left="ic_delete"
                   @click="handleClickDeleteDataTable"
         >
-            Delete
+            {{ $t('COMMON.WIDGETS.DELETE') }}
         </p-button>
         <div class="form-button-wrapper">
             <p-button style-type="transparent"
                       icon-left="ic_refresh"
                       @click="handleClickResetDataTable"
             >
-                Reset
+                {{ $t('COMMON.WIDGETS.RESET') }}
             </p-button>
             <p-button style-type="secondary"
                       class="apply-button"
                       :disabled="props.disabled"
                       @click="handleUpdateDataTable"
             >
-                Apply
+                {{ $t('COMMON.WIDGETS.APPLY') }}
                 <div v-if="props.changed"
                      class="update-dot"
                 />

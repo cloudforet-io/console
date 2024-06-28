@@ -311,6 +311,8 @@ const handleUpdateDataTable = async () => {
     showSuccessMessage('Changes have been successfully applied.', '');
     setInitialDataTableForm();
     state.filterFormKey = getRandomId();
+
+    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
 };
 
 /* Utils */
@@ -406,6 +408,10 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     padding-top: 0.125rem;
     margin-bottom: 2rem;
 
+    &:hover {
+        @apply border border-primary2;
+        box-shadow: 0 0 0 3px theme('colors.violet.200');
+    }
     &.selected {
         @apply border-violet-600;
         box-shadow: 0 0 0 0.1875rem rgba(137, 124, 214, 0.6);

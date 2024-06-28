@@ -1336,6 +1336,7 @@
 				"TREND_TITLE": "트렌드",
 				"TYPE_TITLE": "{service} 타입 "
 			},
+			"APPLY": "",
 			"BILLING": {
 				"DAY": "일",
 				"HIDE": "숨기기",
@@ -1459,6 +1460,7 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "지난 7일 ~ 예정 일정"
 			},
+			"RESET": "초기화",
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "클라우드 서비스 ",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "지역",
 			"RESOURCE_BY_REGION_REGIONS": "리전 ",

@@ -1336,6 +1336,7 @@
 				"TREND_TITLE": "トレンド",
 				"TYPE_TITLE": "{service}タイプ"
 			},
+			"APPLY": "",
 			"BILLING": {
 				"DAY": "日",
 				"HIDE": "隠す",
@@ -1459,6 +1460,7 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "過去7日〜予定日程"
 			},
+			"RESET": "初期化",
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "クラウドサービス",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "リージョン",
 			"RESOURCE_BY_REGION_REGIONS": "リージョン",

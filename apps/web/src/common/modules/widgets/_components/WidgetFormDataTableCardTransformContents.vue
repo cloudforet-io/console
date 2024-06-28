@@ -259,6 +259,8 @@ const handleUpdateDataTable = async () => {
         //     data_table_id: storeState.selectedDataTableId,
         // });
     }
+
+    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
 };
 
 /* Utils */
@@ -316,6 +318,10 @@ onMounted(() => {
     padding-top: 0.125rem;
     margin-bottom: 2rem;
 
+    &:hover {
+        @apply border border-primary2;
+        box-shadow: 0 0 0 3px theme('colors.violet.200');
+    }
     &.selected {
         @apply border-violet-600;
         box-shadow: 0 0 0 0.1875rem rgba(137, 124, 214, 0.6);
