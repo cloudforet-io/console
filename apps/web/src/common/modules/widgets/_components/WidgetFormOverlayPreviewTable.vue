@@ -184,7 +184,7 @@ watch(() => state.sortBy, async () => {
                                  width="1rem"
                                  height="1rem"
                             />
-                            <span>{{ storeState.selectedDataTable.name }}</span>
+                            <span>{{ storeState.selectedDataTable?.name }}</span>
                         </div>
                         <p-select-dropdown class="granularity-dropdown"
                                            :menu="state.granularityItems"
