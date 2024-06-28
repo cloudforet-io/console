@@ -24,7 +24,7 @@ const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
 
 const { labelsMenuItem } = useGranularityMenuItem(props, 'tableDataField');
 const MIN_LABELS_INFO_COUNT = 2;
-
+const DEFAULT_INDEX = 1;
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
     fieldTypeMenuItems: computed<MenuItem[]>(() => [
@@ -126,7 +126,13 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
 watch(() => labelsMenuItem.value, (value) => {
     if (!(value.find((d) => d.name === state.selectedItem)) && (state.selectedFieldType === 'dynamicField')) {
         state.selectedItem = undefined;
+        return;
     }
+    state.proxyValue = {
+        ...state.proxyValue,
+        value: state.menuItems[DEFAULT_INDEX]?.name,
+        criteria: state.dataInfoMenuItems[0]?.name,
+    };
 });
 
 watch(() => state.selectedFieldType, (selectedFieldType) => {
@@ -134,6 +140,11 @@ watch(() => state.selectedFieldType, (selectedFieldType) => {
         if ((labelsMenuItem.value ?? []).length < 2) {
             emit('show-error-modal', MIN_LABELS_INFO_COUNT);
         }
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: state.menuItems[DEFAULT_INDEX]?.name,
+            criteria: state.dataInfoMenuItems[0]?.name,
+        };
     }
 }, { immediate: true });
 
