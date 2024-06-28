@@ -110,6 +110,10 @@ const handleConfirm = async () => {
 };
 
 watch(() => storeState.bookmarkType, (bookmarkType) => {
+    if (storeState.isWorkspaceMember) {
+        state.selectedRadioIdx = 0;
+        return;
+    }
     if (bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
         state.selectedRadioIdx = 0;
     } else if (bookmarkType === BOOKMARK_TYPE.USER) {
