@@ -133,7 +133,8 @@ const handleUpdateFieldValue = (fieldName: string, value: WidgetFieldValues) => 
     const _valueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
     _valueMap[fieldName] = value;
     const changedOptions = checkFormDependencies(fieldName);
-    if (changedOptions.length) {
+    const isValueChanged = (JSON.stringify(value) !== JSON.stringify(widgetGenerateState.widgetFormValueMap[fieldName]));
+    if (changedOptions.length && isValueChanged) {
         changedOptions.forEach((option) => {
             _valueMap[option] = undefined;
         });
