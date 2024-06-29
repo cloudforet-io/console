@@ -18,7 +18,6 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
-import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -62,32 +61,15 @@ const deleteModalState = reactive({
     selectedId: undefined as string|undefined,
 });
 
-const cloneModalState = reactive({
-    visible: false,
-    dashboardConfig: {} as Partial<DashboardModel>,
-});
-
 const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
     const dashboardId = dashboardItem.dashboard_id || '';
-    const manageButtonSet = [
-        // {
-        //     iconName: 'ic_duplicate',
-        //     tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
-        //     eventAction: () => {
-        //         cloneModalState.dashboardConfig = { ...dashboardItem };
-        //         cloneModalState.visible = true;
-        //     },
-        // },
-    ];
-    const defaultButtonSet = [
+    return [
         {
             iconName: 'ic_delete',
             tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
             eventAction: () => handleClickDeleteDashboard(dashboardId),
         },
     ];
-    if (dashboardItem.version === '1.0') return defaultButtonSet;
-    return manageButtonSet.concat(defaultButtonSet);
 };
 
 /* EVENT */
@@ -98,10 +80,6 @@ const handleClickBoardItem = (item: DashboardModel) => {
             dashboardId: item.dashboard_id || '',
         },
     }));
-};
-const handleUpdateCloneModal = (visible: boolean) => {
-    if (visible) return;
-    cloneModalState.dashboardConfig = {};
 };
 
 const handleClickDeleteDashboard = (dashboardId: string) => {
@@ -199,10 +177,6 @@ watch(() => props.dashboardList, () => {
         <dashboard-delete-modal
             :visible.sync="deleteModalState.visible"
             :dashboard-id="deleteModalState.selectedId"
-        />
-        <dashboard-clone-modal :visible.sync="cloneModalState.visible"
-                               :dashboard="cloneModalState.dashboardConfig"
-                               @update:visible="handleUpdateCloneModal"
         />
     </div>
 </template>

@@ -153,9 +153,7 @@ const handleConfirmShareToAllWorkspaces = async () => {
         <dashboard-delete-modal :visible.sync="state.deleteModalVisible"
                                 :dashboard-id="props.dashboardId"
         />
-        <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
-                               :dashboard-id="props.dashboardId"
-        />
+        <dashboard-clone-modal :visible.sync="state.cloneModalVisible" />
         <dashboard-share-with-code-modal :visible.sync="state.shareWithCodeModalVisible"
                                          :dashboard-id="props.dashboardId"
         />
