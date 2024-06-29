@@ -68,6 +68,7 @@ const state = reactive({
     }),
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
+    remountWidgetId: undefined as string|undefined,
 });
 const widgetDeleteState = reactive({
     visibleModal: false,
@@ -226,9 +227,10 @@ watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
 }, { immediate: true });
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
+        state.remountWidgetId = widgetGenerateState.latestWidgetId;
         await dashboardDetailStore.listDashboardWidgets();
+        state.remountWidgetId = undefined;
         await loadAWidget(widgetGenerateState.latestWidgetId);
-        // reset widget frame metadata
     }
 });
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
@@ -270,6 +272,7 @@ defineExpose({
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">
                     <component :is="widget.component"
+                               v-if="widget.widget_id !== state.remountWidgetId"
                                :id="widget.widget_id"
                                :key="widget.widget_id"
                                ref="widgetRef"
