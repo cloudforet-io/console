@@ -110,7 +110,7 @@ const state = reactive({
             });
         } else if (isDateField(state.tableDataField)) dataFields = getWidgetTableDateFields(state.tableDataField, state.granularity, state.dateRange, state.tableDataMaxCount);
         else { // None Time Series Dynamic Field Case
-            state.finalConvertedData?.results?.[0][state.tableDataCriteria].forEach((d) => {
+            state.finalConvertedData?.results?.[0]?.[state.tableDataCriteria].forEach((d) => {
                 if (d[state.tableDataField] === 'sub_total') return;
                 const fieldName = d[state.tableDataField];
                 const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
