@@ -66,8 +66,12 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
+    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
-    dashboardType: 'PRIVATE' as DashboardType,
+    dashboardType: computed<DashboardType>(() => {
+        if (state.isPrivate) return 'PRIVATE';
+        return 'PUBLIC';
+    }),
     isPrivate: true,
     targetDashboard: computed(() => dashboardDetailState.dashboardInfo),
     dashboardNameList: computed<string[]>(() => {
@@ -82,6 +86,7 @@ const handleUpdateVisible = (visible) => {
 
 const cloneDashboard = async (): Promise<string|undefined> => {
     try {
+        state.loading = true;
         const _sharedLayouts = await getSharedDashboardLayouts(dashboardDetailState.dashboardLayouts, dashboardDetailState.dashboardWidgets);
         const _sharedDashboard: CreateDashboardParameters = {
             name: name.value,
@@ -100,6 +105,8 @@ const cloneDashboard = async (): Promise<string|undefined> => {
         return res.dashboard_id;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
+    } finally {
+        state.loading = false;
     }
     return undefined;
 };
@@ -107,7 +114,6 @@ const cloneDashboard = async (): Promise<string|undefined> => {
 /* Event */
 const handleChangePrivate = (val: boolean) => {
     state.isPrivate = val;
-    state.dashboardType = val ? 'PRIVATE' : 'PUBLIC';
 };
 const handleConfirm = async () => {
     if (!isAllValid) return;
@@ -137,6 +143,7 @@ watch(() => props.visible, (visible) => {
                     :header-title="$t('DASHBOARDS.FORM.CLONE_TITLE')"
                     size="sm"
                     :disabled="!isAllValid"
+                    :loading="state.loading"
                     class="dashboard-clone-modal"
                     @confirm="handleConfirm"
                     @update:visible="handleUpdateVisible"
