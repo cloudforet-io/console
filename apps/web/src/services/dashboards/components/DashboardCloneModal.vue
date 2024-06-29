@@ -28,7 +28,6 @@ import type { CreateDashboardParameters } from '@/services/dashboards/types/dash
 
 interface Props {
     visible: boolean;
-    dashboardId: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,

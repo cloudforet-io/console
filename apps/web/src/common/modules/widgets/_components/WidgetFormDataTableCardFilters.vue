@@ -312,7 +312,7 @@ onMounted(() => {
                                            appearance-type="badge"
                                            show-select-marker
                                            use-fixed-menu-style
-                                           :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name]"
+                                           :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
                                            :show-delete-all-button="false"
                                            :page-size="10"
                                            @update:selected="handleUpdateFilterDropdown(item.name, $event)"

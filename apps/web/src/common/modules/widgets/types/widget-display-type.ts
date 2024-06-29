@@ -16,7 +16,7 @@ export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export interface WidgetProps {
     widgetName: string;
     widgetId: string;
-    dataTableId: string;
+    dataTableId?: string;
     title?: string;
     description?: string;
     size?: WidgetSize;

@@ -362,6 +362,7 @@ watch(() => state.data, () => {
 }, { immediate: true });
 
 onMounted(async () => {
+    if (!props.dataTableId) return;
     state.dataTable = await getWidgetDataTable(props.dataTableId);
 });
 
