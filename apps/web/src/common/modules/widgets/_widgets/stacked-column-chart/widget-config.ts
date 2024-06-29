@@ -7,8 +7,7 @@ const stackedColumnChart: WidgetConfig = {
         title: 'Stacked Column Chart',
         sizes: ['md', 'full'],
         defaultValidationConfig: {
-            dataTarget: 'labels_info',
-            defaultMaxCount: 2,
+            defaultMaxCount: 1,
         },
     },
     requiredFieldsSchema: {

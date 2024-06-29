@@ -20,6 +20,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -90,9 +91,18 @@ const handleSelectDataTable = async (dataTableId: string) => {
 };
 
 const checkDefaultValidation = () => {
+    const removeDateField = (labelsInfo: Record<string, object>) => {
+        const _labelsInfo = cloneDeep(labelsInfo);
+        Object.values(DATE_FIELD).forEach((d) => {
+            delete _labelsInfo[d];
+        });
+        return _labelsInfo;
+    };
     if (state.defaultValidationConfig) {
-        const targetCount = Object.keys((widgetGenerateGetters.selectedDataTable ?? {})[state.defaultValidationConfig.dataTarget]).length;
-        if (targetCount < state.defaultValidationConfig.defaultMaxCount) {
+        const labelsInfo = cloneDeep(widgetGenerateGetters.selectedDataTable?.labels_info ?? {});
+        const labelsInfoWithDateFieldRemoved = removeDateField(labelsInfo);
+        const targetCount = Object.keys(labelsInfoWithDateFieldRemoved).length;
+        if (targetCount < state.defaultValidationConfig?.defaultMaxCount) {
             state.widgetDefaultValidationModalVisible = true;
         }
     }
