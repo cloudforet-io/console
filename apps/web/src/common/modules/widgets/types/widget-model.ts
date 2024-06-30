@@ -20,7 +20,7 @@ export type JoinType = typeof JOIN_TYPE[keyof typeof JOIN_TYPE];
 export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;
     'COST'?: CostOptions;
-    group_by?: string[];
+    group_by?: {key:string; name: string; reference?: object; search_key?: string }[];
     data_name: string;
     data_unit?: string;
     date_format?: DateFormat;

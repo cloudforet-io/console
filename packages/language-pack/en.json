@@ -1967,8 +1967,10 @@
 					"TOTAL_FIELD": "Total Field",
 					"UPDATE_PREVIEW": "Update Preview",
 					"VALIDATION_MODAL": {
-						"DESC": "To illustrate this chart properly, the data requires at least {number} label fields (or data fields).",
+						"DESC": "To illustrate this chart properly, the data requires at least {number} group-by selection or additional labels.",
 						"EDIT_DATA": "Go to Edit Data",
+						"GEO_MAP_DESC": "To illustrate this chart properly, the data requires 'Region' group-by selection.",
+						"PROGRESS_CARD_DESC": "To illustrate this chart properly, the data requires at least 2 data fields.",
 						"TITLE": "Additional fields are required"
 					},
 					"WIDGET_INFO": "Widget Info",

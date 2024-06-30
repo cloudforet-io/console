@@ -6,6 +6,9 @@ const pieChart: WidgetConfig = {
     meta: {
         title: 'Pie Chart',
         sizes: ['md'],
+        defaultValidationConfig: {
+            defaultMaxCount: 1,
+        },
     },
     requiredFieldsSchema: {
         granularity: {},

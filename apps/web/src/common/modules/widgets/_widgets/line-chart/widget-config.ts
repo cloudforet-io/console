@@ -7,8 +7,7 @@ const lineChart: WidgetConfig = {
         title: 'Line Chart',
         sizes: ['md', 'full'],
         defaultValidationConfig: {
-            dataTarget: 'labels_info',
-            defaultMaxCount: 2,
+            defaultMaxCount: 1,
         },
     },
     requiredFieldsSchema: {

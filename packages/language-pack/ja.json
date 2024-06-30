@@ -1967,8 +1967,10 @@
 					"TOTAL_FIELD": "総合フィールド",
 					"UPDATE_PREVIEW": "プレビューを更新する",
 					"VALIDATION_MODAL": {
-						"DESC": "このチャートを適切に表現するために、データには少なくとも{number}個のラベルフィールド（またはデータフィールド）が必要です。",
+						"DESC": "",
 						"EDIT_DATA": "データを編集する",
+						"GEO_MAP_DESC": "",
+						"PROGRESS_CARD_DESC": "",
 						"TITLE": "追加のフィールドが必要です。"
 					},
 					"WIDGET_INFO": "ウィジェット情報",

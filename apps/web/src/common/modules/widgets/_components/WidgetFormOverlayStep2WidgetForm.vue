@@ -20,10 +20,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-model';
 
 
 const emit = defineEmits<{(e: 'update-preview'): void}>();
@@ -61,6 +63,7 @@ const state = reactive({
         icon: d.data_type === DATA_TABLE_TYPE.TRANSFORMED ? 'ic_transform-data' : 'ic_service_data-sources',
     }))),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
+    errorModalCurrentType: undefined as 'default'|'geoMap'| 'progressCard'|undefined,
 });
 
 /* Api */
@@ -90,10 +93,41 @@ const handleSelectDataTable = async (dataTableId: string) => {
 };
 
 const checkDefaultValidation = () => {
-    if (state.defaultValidationConfig) {
-        const targetCount = Object.keys((widgetGenerateGetters.selectedDataTable ?? {})[state.defaultValidationConfig.dataTarget]).length;
-        if (targetCount < state.defaultValidationConfig.defaultMaxCount) {
+    const selectedChartType = widgetGenerateState.selectedWidgetName;
+    const selectedDataTable = widgetGenerateGetters.selectedDataTable ?? {};
+    const removeDateField = (labelsInfo: Record<string, object>) => {
+        const _labelsInfo = cloneDeep(labelsInfo);
+        Object.values(DATE_FIELD).forEach((d) => {
+            delete _labelsInfo[d];
+        });
+        return _labelsInfo;
+    };
+    switch (selectedChartType) {
+    case 'geoMap': {
+        const groupBySelection = (selectedDataTable?.options as DataTableAddOptions)?.group_by ?? [];
+        const filteredSelection = groupBySelection.filter((item) => (item?.name === 'Region'));
+        if (filteredSelection.length === 0) {
+            state.errorModalCurrentType = 'geoMap';
             state.widgetDefaultValidationModalVisible = true;
+        }
+        break;
+    }
+    case 'progressCard': {
+        const dataInfo = selectedDataTable.data_info ?? {};
+        if (Object.keys(dataInfo).length < 2) {
+            state.errorModalCurrentType = 'progressCard';
+            state.widgetDefaultValidationModalVisible = true;
+        }
+        break;
+    }
+    default:
+        if (state.defaultValidationConfig) {
+            const labelsInfo = cloneDeep(selectedDataTable.labels_info ?? {});
+            const labelsInfoWithoutDateField = removeDateField(labelsInfo);
+            const targetCount = Object.keys(labelsInfoWithoutDateField).length;
+            if (targetCount < state.defaultValidationConfig?.defaultMaxCount) {
+                state.widgetDefaultValidationModalVisible = true;
+            }
         }
     }
 };
@@ -309,7 +343,13 @@ watch(() => widgetGenerateState.widgetValidMap, () => {
                         hide-footer-confirm-button
         >
             <template #body>
-                <p>
+                <p v-if="state.errorModalCurrentType === 'geoMap'">
+                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.GEO_MAP_DESC') }}
+                </p>
+                <p v-else-if="state.errorModalCurrentType === 'progressCard'">
+                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.PROGRESS_CARD_DESC') }}
+                </p>
+                <p v-else>
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.DESC', {
                         number: state.formErrorModalValue ?? state.defaultValidationConfig?.defaultMaxCount,
                     }) }}

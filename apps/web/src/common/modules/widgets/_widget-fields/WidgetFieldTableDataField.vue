@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldO
 const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
 
 const { labelsMenuItem } = useGranularityMenuItem(props, 'tableDataField');
-const MIN_LABELS_INFO_COUNT = 2;
+const MIN_LABELS_INFO_COUNT = 1;
 const DEFAULT_INDEX = 1;
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),

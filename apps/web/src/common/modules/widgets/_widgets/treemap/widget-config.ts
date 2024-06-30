@@ -6,6 +6,9 @@ const treemap: WidgetConfig = {
     meta: {
         title: 'Treemap',
         sizes: ['md', 'full'],
+        defaultValidationConfig: {
+            defaultMaxCount: 1,
+        },
     },
     requiredFieldsSchema: {
         granularity: {},

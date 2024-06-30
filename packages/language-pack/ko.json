@@ -1967,8 +1967,10 @@
 					"TOTAL_FIELD": "총합 필드",
 					"UPDATE_PREVIEW": "미리보기 업데이트",
 					"VALIDATION_MODAL": {
-						"DESC": "이 차트를 올바르게 표현하기 위해 데이터는 적어도 {number}개의 레이블 필드(또는 데이터 필드)가 필요합니다.",
+						"DESC": "",
 						"EDIT_DATA": "데이터 편집으로 이동",
+						"GEO_MAP_DESC": "",
+						"PROGRESS_CARD_DESC": "",
 						"TITLE": "추가 필드가 필요합니다."
 					},
 					"WIDGET_INFO": "위젯 기본 정보",
