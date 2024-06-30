@@ -1726,6 +1726,8 @@
 		},
 		"DETAIL": {
 			"ADD_WIDGET": "Add Widget",
+			"ALT_S_SHARE_DASHBOARD": "Dashboard successfully shared",
+			"ALT_S_UNSHARE_DASHBOARD": "Dashboard successfully unshared",
 			"APPLY": "Confirm",
 			"AUTO": "Auto",
 			"BASED_ON": "Based on",
@@ -1763,7 +1765,8 @@
 			"SHARE": "Share",
 			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "Are you sure you want to share this dashboard to all workspace?",
-			"SHARE_WITH_CODE": "Share with Code"
+			"SHARE_WITH_CODE": "Share with Code",
+			"UNSHARE_TO_ALL_WORKSPACES": "Unshare to All Workspaces"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",
