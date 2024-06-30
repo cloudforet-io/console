@@ -14,6 +14,8 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -24,6 +26,7 @@ import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboa
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { CreateDashboardParameters } from '@/services/dashboards/types/dashboard-api-schema-type';
+
 
 
 interface Props {
@@ -37,11 +40,11 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
+const allReferenceStore = useAllReferenceStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-
 const {
     forms: {
         name,
@@ -63,6 +66,7 @@ const {
 });
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
     loading: false,
@@ -86,7 +90,7 @@ const handleUpdateVisible = (visible) => {
 const cloneDashboard = async (): Promise<string|undefined> => {
     try {
         state.loading = true;
-        const _sharedLayouts = await getSharedDashboardLayouts(dashboardDetailState.dashboardLayouts, dashboardDetailState.dashboardWidgets);
+        const _sharedLayouts = await getSharedDashboardLayouts(dashboardDetailState.dashboardLayouts, dashboardDetailState.dashboardWidgets, storeState.costDataSource);
         const _sharedDashboard: CreateDashboardParameters = {
             name: name.value,
             layouts: _sharedLayouts,
