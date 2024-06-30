@@ -59,7 +59,7 @@ const state = reactive({
         { type: 'DIVIDER', name: '' },
         ...state.dataFields.map((key) => ({ type: 'DATA', name: key })),
     ]),
-    sortBy: '',
+    sortBy: [] as { key: string; desc: boolean }[],
     granularityItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -107,15 +107,24 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
     await widgetGenerateStore.loadDataTable({
         data_table_id: storeState.selectedDataTableId,
         page,
+        sort: state.sortBy,
     });
 };
 
-const handleClickSort = (sortKey: string) => {
-    if (state.sortBy === sortKey) {
-        state.sortBy = '';
-        return;
+const handleClickSort = async (sortKey: string) => {
+    let resultSortBy: { key: string; desc: boolean }[];
+    if (state.sortBy.length && state.sortBy[0].key === sortKey) {
+        resultSortBy = [{ key: sortKey, desc: !state.sortBy[0].desc }];
+    } else {
+        resultSortBy = [{ key: sortKey, desc: true }];
     }
-    state.sortBy = sortKey;
+    state.sortBy = resultSortBy;
+    if (!storeState.selectedDataTableId) return;
+    await widgetGenerateStore.loadDataTable({
+        data_table_id: storeState.selectedDataTableId,
+        sort: resultSortBy,
+    });
+    state.thisPage = 1;
 };
 
 /* Utils */
@@ -132,30 +141,28 @@ const getValue = (item, field: PreviewTableField) => {
     return item[field.name] ?? '-';
 };
 
+const getSortIcon = (field: PreviewTableField) => {
+    if (field.type === 'LABEL') {
+        if (!state.sortBy.some((d) => d.key === field.sortKey || d.key === field.name)) {
+            return 'ic_caret-down';
+        }
+        return state.sortBy[0]?.desc ? 'ic_caret-down-filled' : 'ic_caret-up-filled';
+    }
+    return '';
+};
+
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
     if (dataTableId) {
-        await widgetGenerateStore.loadDataTable({
-            data_table_id: dataTableId,
-        });
         state.thisPage = 1;
-        state.sortBy = '';
+        state.sortBy = [];
     }
 });
 
 watch(() => storeState.dataTableUpdating, () => {
     if (storeState.dataTableUpdating) {
         state.thisPage = 1;
-        state.sortBy = '';
+        state.sortBy = [];
     }
-});
-
-watch(() => state.sortBy, async () => {
-    if (!storeState.selectedDataTableId) return;
-    await widgetGenerateStore.loadDataTable({
-        data_table_id: storeState.selectedDataTableId,
-        sort: [{ key: state.sortBy, desc: true }],
-    });
-    state.thisPage = 1;
 });
 
 </script>
@@ -209,7 +216,7 @@ watch(() => state.sortBy, async () => {
                         >
                             {{ field.name }}
                             <p-i v-if="field.type === 'LABEL'"
-                                 :name="(field.sortKey|| field.name) === state.sortBy ? 'ic_caret-down-filled' : 'ic_caret-down'"
+                                 :name="getSortIcon(field)"
                                  class="sort-icon"
                                  @click="handleClickSort(field.name)"
                             />
