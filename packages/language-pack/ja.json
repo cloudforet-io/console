@@ -1726,6 +1726,8 @@
 		},
 		"DETAIL": {
 			"ADD_WIDGET": "ウィジェットを追加する",
+			"ALT_S_SHARE_DASHBOARD": "",
+			"ALT_S_UNSHARE_DASHBOARD": "",
 			"APPLY": "確認",
 			"AUTO": "自動",
 			"BASED_ON": "基準月",
@@ -1763,7 +1765,8 @@
 			"SHARE": "共有",
 			"SHARE_TO_ALL_WORKSPACES": "すべてのワークスペースに共有する",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "このダッシュボードをすべてのワークスペースと共有しますか？",
-			"SHARE_WITH_CODE": "コードで共有"
+			"SHARE_WITH_CODE": "コードで共有",
+			"UNSHARE_TO_ALL_WORKSPACES": ""
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "ダッシュボードの作成に失敗しました",
