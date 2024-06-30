@@ -131,7 +131,7 @@ watch(() => labelsMenuItem.value, (value) => {
     if ((labelsMenuItem.value ?? []).length >= 2) {
         state.proxyValue = {
             ...state.proxyValue,
-            value: state.menuItems[DEFAULT_INDEX]?.name,
+            value: props.value?.value ?? state.menuItems[DEFAULT_INDEX]?.name,
             criteria: state.dataInfoMenuItems[0]?.name,
         };
     }
@@ -147,7 +147,7 @@ watch(() => state.selectedFieldType, (selectedFieldType) => {
         }
         state.proxyValue = {
             ...state.proxyValue,
-            value: state.menuItems[DEFAULT_INDEX]?.name,
+            value: props.value?.value ?? state.menuItems[DEFAULT_INDEX]?.name,
             criteria: state.dataInfoMenuItems[0]?.name,
         };
     }
@@ -194,7 +194,7 @@ onMounted(() => {
             value: props.value?.value ?? state.menuItems?.[1]?.name,
             criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
         };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
+        state.selectedItem = state.proxyValue?.value ?? state.menuItems[1]?.name;
         state.selectedCriteria = state.proxyValue?.criteria ?? state.dataInfoMenuItems[0]?.name;
     }
     state.proxyValue = {

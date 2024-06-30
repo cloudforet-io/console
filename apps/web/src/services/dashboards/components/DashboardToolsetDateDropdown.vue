@@ -42,7 +42,7 @@ const state = reactive({
             {
                 type: 'item',
                 name: 'current',
-                label: i18n.t('DASHBOARDS.DETAIL.CURRENT_MONTH'),
+                label: `${i18n.t('DASHBOARDS.DETAIL.CURRENT_MONTH')} (${dayjs.utc().format('YYYY-MM')})`,
             },
             ...monthData,
             { type: 'divider' },
