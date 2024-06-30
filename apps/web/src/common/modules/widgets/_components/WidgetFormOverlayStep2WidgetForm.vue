@@ -95,6 +95,7 @@ const handleSelectDataTable = async (dataTableId: string) => {
 const checkDefaultValidation = () => {
     const selectedChartType = widgetGenerateState.selectedWidgetName;
     const selectedDataTable = widgetGenerateGetters.selectedDataTable ?? {};
+    if (!selectedDataTable?.options) return;
     const removeDateField = (labelsInfo: Record<string, object>) => {
         const _labelsInfo = cloneDeep(labelsInfo);
         Object.values(DATE_FIELD).forEach((d) => {
