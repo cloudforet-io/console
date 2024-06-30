@@ -273,6 +273,7 @@ onMounted(async () => {
             height: 20%;
             max-height: calc(100% - 2rem);
             padding: 0 0.125rem 0.125rem 0.125rem;
+            margin-top: 0.75rem;
 
             &.transition {
                 transition: height 0.2s;
