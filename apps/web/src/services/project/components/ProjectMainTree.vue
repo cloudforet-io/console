@@ -6,9 +6,15 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import { PI, PTreeView } from '@spaceone/design-system';
+import { isEqual } from 'lodash';
 
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -16,48 +22,163 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { indigo, peacock } from '@/styles/colors';
 
-import { useProjectTreeData } from '@/services/project/composables/use-project-tree-data';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-import type { TreeNode } from '@/services/project/tree/type';
+import { useProjectTreeStore } from '@/services/project/stores/project-tree-store';
+import type { TreeNode, TreeDisplayMap, TreeData } from '@/services/project/tree/type';
 
-const {
-    treeData,
-    treeDisplayMap,
-    parentGroupItems,
-    fetchData,
-    setSelectedNodeId,
-} = useProjectTreeData();
+interface ProjectDataType extends TreeData {
+    name: string;
+    type: 'PROJECT'|'PROJECT_GROUP';
+    id: string;
+    parentGroupId?: string;
+}
 
 const route = useRoute();
 const gnbStore = useGnbStore();
 
+const allReferenceStore = useAllReferenceStore();
+const { getProperRouteLocation } = useProperRouteLocation();
+const projectTreeStore = useProjectTreeStore();
+const projectTreeState = projectTreeStore.state;
+
+const storeState = reactive({
+    projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    treeDisplayMap: computed(() => projectTreeState.treeDisplayMap),
+});
+
 const state = reactive({
-    projectTreeData: computed<TreeNode[]>(() => treeData.value),
-    selectedTreeId: undefined as string|undefined,
+    currentParentPathIds: [] as string[],
     projectGroupNavigation: computed<Breadcrumb[]>(() => {
-        const allPaths = parentGroupItems.value.map((item) => ({
-            name: item.name,
+        const allPaths = state.currentParentPathIds.map((id) => ({
+            name: storeState.projectGroup[id].name,
             to: {
                 name: PROJECT_ROUTE._NAME,
                 params: {
-                    projectGroupId: item.id,
+                    projectGroupId: id,
                 },
             },
         }));
+        return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...allPaths];
+    }),
+    selectedTreeId: undefined as string|undefined,
+    projectTreeData: computed<TreeNode<ProjectDataType>[]>(() => {
+        const nodes: Record<string, TreeNode<ProjectDataType>> = {};
+        Object.keys(storeState.projectGroup).forEach((key) => {
+            const projectGroup = storeState.projectGroup[key];
+            nodes[key] = {
+                id: key,
+                depth: 0,
+                data: {
+                    name: projectGroup.name,
+                    type: 'PROJECT_GROUP',
+                    id: key,
+                    parentGroupId: projectGroup.data.parentGroupInfo?.id,
+                    to: getProperRouteLocation({
+                        name: PROJECT_ROUTE._NAME,
+                        params: {
+                            projectGroupId: key,
+                        },
+                    }),
+                },
+                children: [],
+            };
+        });
+        Object.keys(storeState.project).forEach((key) => {
+            const project = storeState.project[key];
+            nodes[key] = {
+                id: key,
+                depth: 0,
+                data: {
+                    name: project.name,
+                    type: 'PROJECT',
+                    id: key,
+                    parentGroupId: project.data.groupInfo?.id,
+                    to: getProperRouteLocation({
+                        name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+                        params: {
+                            id: key,
+                        },
+                    }),
+                },
+            };
+        });
 
-        return [{ name: i18n.t('MENU.PROJECT') as string, data: null }, ...allPaths];
+        const rootNodes: TreeNode<ProjectDataType>[] = [];
+        const setDepth = (node, depth) => {
+            node.depth = depth;
+            if (!node.children) return;
+            node.children.forEach((child) => {
+                setDepth(child, depth + 1);
+            });
+        };
+        Object.values(nodes).forEach((node) => {
+            const parentGroupId = node.data?.parentGroupId;
+            if (!parentGroupId) {
+                rootNodes.push(node);
+                setDepth(node, 0);
+            } else {
+                const parentNode = nodes[parentGroupId];
+                if (parentNode) {
+                    parentNode.children = parentNode.children || [];
+                    parentNode.children.push(node);
+                    setDepth(node, parentNode.depth + 1);
+                }
+            }
+        });
+
+        return rootNodes;
     }),
 });
+
 
 watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
     gnbStore.setBreadcrumbs(projectGroupNavigation);
 });
 
+/* Event */
+const handleUpdateTreeDisplayMap = (treeDisplayMap: TreeDisplayMap) => {
+    if (isEqual(treeDisplayMap, storeState.treeDisplayMap)) return;
+    projectTreeStore.setTreeDisplayMap(treeDisplayMap);
+};
+
+/* Helper */
+const updateTreeDisplayMap = (selectedTreeId: string) => {
+    const displayMap = { ...storeState.treeDisplayMap };
+    const parentPathIds: string[] = [];
+    let currentId = selectedTreeId;
+
+    while (currentId) {
+        displayMap[currentId] = { isOpen: true };
+        parentPathIds.unshift(currentId);
+        const currentNode = storeState.projectGroup[currentId] || storeState.project[currentId];
+        if (currentNode?.data?.parentGroupInfo?.id) {
+            currentId = currentNode.data.parentGroupInfo.id;
+        } else if (currentNode?.data?.groupInfo?.id) {
+            currentId = currentNode.data?.groupInfo.id;
+        } else {
+            break;
+        }
+    }
+
+    state.currentParentPathIds = parentPathIds;
+    projectTreeStore.setTreeDisplayMap(displayMap);
+};
+
+
+
 onMounted(() => {
-    const selectedTreeId = (route.params.projectGroupId || route.params.id) as string|undefined;
-    if (selectedTreeId) {
-        state.selectedTreeId = selectedTreeId as string;
-        setSelectedNodeId(selectedTreeId);
+    const selectedProjectGroupId = route.params.projectGroupId as string|undefined;
+    if (selectedProjectGroupId) {
+        state.selectedTreeId = selectedProjectGroupId as string;
+        updateTreeDisplayMap(selectedProjectGroupId);
+    }
+});
+
+watch(() => route.params.projectGroupId, (groupId) => {
+    if (groupId) {
+        state.selectedTreeId = groupId as string;
+        updateTreeDisplayMap(groupId);
     }
 });
 
@@ -66,9 +187,9 @@ onMounted(() => {
 <template>
     <div class="project-main-tree">
         <p-tree-view :tree-data="state.projectTreeData"
-                     :tree-display-map.sync="treeDisplayMap"
+                     :tree-display-map="storeState.treeDisplayMap"
                      :selected-id="state.selectedTreeId"
-                     @click-toggle="fetchData"
+                     @update:tree-display-map="handleUpdateTreeDisplayMap"
         >
             <template #content="{ node }">
                 <div class="project-menu-item-content">
