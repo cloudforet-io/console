@@ -26,7 +26,11 @@ export const getDateLabelFormat = (granularity: string): string => {
  */
 export const getWidgetBasedOnDate = (granularity: string, end?: string): string => {
     const _dateFormat = getDateFormat(granularity);
-    if (end) return dayjs.utc(end).format(_dateFormat);
+    if (end) {
+        if (granularity === 'DAILY') return dayjs.utc(end).endOf('month').format(_dateFormat);
+        if (granularity === 'MONTHLY') return dayjs.utc(end).endOf('year').format(_dateFormat);
+        return dayjs.utc(end).format(_dateFormat);
+    }
     return dayjs.utc().format(_dateFormat);
 };
 
