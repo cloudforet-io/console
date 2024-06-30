@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 
 import {
@@ -193,6 +193,10 @@ watch(() => widgetGenerateState.widgetValidMap, () => {
         state.isPreviewInitiated = true;
     }
 }, { deep: true });
+
+onMounted(() => {
+    checkDefaultValidation();
+});
 </script>
 
 <template>
