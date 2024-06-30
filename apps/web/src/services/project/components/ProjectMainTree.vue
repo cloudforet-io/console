@@ -59,7 +59,7 @@ const state = reactive({
                 },
             },
         }));
-        return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...allPaths];
+        return [{ name: i18n.t('MENU.PROJECT'), to: { name: PROJECT_ROUTE._NAME } }, ...allPaths];
     }),
     selectedTreeId: undefined as string|undefined,
     projectTreeData: computed<TreeNode<ProjectDataType>[]>(() => {
@@ -131,11 +131,6 @@ const state = reactive({
     }),
 });
 
-
-watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
-    gnbStore.setBreadcrumbs(projectGroupNavigation);
-});
-
 /* Event */
 const handleUpdateTreeDisplayMap = (treeDisplayMap: TreeDisplayMap) => {
     if (isEqual(treeDisplayMap, storeState.treeDisplayMap)) return;
@@ -181,6 +176,10 @@ watch(() => route.params.projectGroupId, (groupId) => {
         updateTreeDisplayMap(groupId);
     }
 });
+watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
+    gnbStore.setBreadcrumbs(projectGroupNavigation);
+});
+
 
 </script>
 

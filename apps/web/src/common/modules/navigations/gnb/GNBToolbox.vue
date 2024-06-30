@@ -73,7 +73,7 @@ const state = reactive({
                 },
             });
         }
-        if (gnbGetters.breadcrumbs.length === 0) {
+        if (gnbGetters.breadcrumbs?.length === 0) {
             routes = [...routes, ...breadcrumbs.value];
         }
         routes = [...routes, ...gnbGetters.breadcrumbs];
