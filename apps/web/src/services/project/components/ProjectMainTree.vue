@@ -1,40 +1,32 @@
 <script setup lang="ts">
 
-import { asyncComputed } from '@vueuse/core';
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
-import type { Location } from 'vue-router';
 import { useRoute } from 'vue-router/composables';
 
 import { PI, PTreeView } from '@spaceone/design-system';
 import { isEqual } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
-import type { ProjectModel } from '@/schema/identity/project/model';
-// import { i18n } from '@/translations';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-// import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
-// import type { Breadcrumb } from '@/common/modules/page-layouts/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { indigo, peacock } from '@/styles/colors';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectTreeStore } from '@/services/project/stores/project-tree-store';
-import type { TreeNode, TreeDisplayMap } from '@/services/project/tree/type';
+import type { TreeNode, TreeDisplayMap, TreeData } from '@/services/project/tree/type';
 
-interface ProjectDataType {
+interface ProjectDataType extends TreeData {
     name: string;
     type: 'PROJECT'|'PROJECT_GROUP';
     id: string;
@@ -42,7 +34,7 @@ interface ProjectDataType {
 }
 
 const route = useRoute();
-// const gnbStore = useGnbStore();
+const gnbStore = useGnbStore();
 
 const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -56,27 +48,93 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    currentParentPathIds: [] as string[],
+    projectGroupNavigation: computed<Breadcrumb[]>(() => {
+        const allPaths = state.currentParentPathIds.map((id) => ({
+            name: storeState.projectGroup[id].name,
+            to: {
+                name: PROJECT_ROUTE._NAME,
+                params: {
+                    projectGroupId: id,
+                },
+            },
+        }));
+        return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...allPaths];
+    }),
     selectedTreeId: undefined as string|undefined,
-    proejctGroupData: computed<ProjectDataType[]>(() => Object.entries(storeState.projectGroup).map(([key, value]) => ({
-        name: value.name,
-        type: 'PROJECT_GROUP',
-        id: key,
-        parentGroupId: value.data.parentGroupInfo?.id,
-    }))),
-    projectTreeData: asyncComputed<TreeNode[]>(async () => {
-        if (!state.proejctGroupData.length) return [];
-        const initialProjectGroupData: ProjectDataType[] = getProjectGroupListDataById();
-        const initialProjectData: ProjectDataType[] = await getProjectData();
-        const initialData = [...initialProjectGroupData, ...initialProjectData];
-        const result = await convertItemsToTreeData(initialData, 0, storeState.treeDisplayMap);
-        return result;
-    }, [], { lazy: true }),
+    projectTreeData: computed<TreeNode<ProjectDataType>[]>(() => {
+        const nodes: Record<string, TreeNode<ProjectDataType>> = {};
+        Object.keys(storeState.projectGroup).forEach((key) => {
+            const projectGroup = storeState.projectGroup[key];
+            nodes[key] = {
+                id: key,
+                depth: 0,
+                data: {
+                    name: projectGroup.name,
+                    type: 'PROJECT_GROUP',
+                    id: key,
+                    parentGroupId: projectGroup.data.parentGroupInfo?.id,
+                    to: getProperRouteLocation({
+                        name: PROJECT_ROUTE._NAME,
+                        params: {
+                            projectGroupId: key,
+                        },
+                    }),
+                },
+                children: [],
+            };
+        });
+        Object.keys(storeState.project).forEach((key) => {
+            const project = storeState.project[key];
+            nodes[key] = {
+                id: key,
+                depth: 0,
+                data: {
+                    name: project.name,
+                    type: 'PROJECT',
+                    id: key,
+                    parentGroupId: project.data.groupInfo?.id,
+                    to: getProperRouteLocation({
+                        name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+                        params: {
+                            id: key,
+                        },
+                    }),
+                },
+            };
+        });
+
+        const rootNodes: TreeNode<ProjectDataType>[] = [];
+        const setDepth = (node, depth) => {
+            node.depth = depth;
+            if (!node.children) return;
+            node.children.forEach((child) => {
+                setDepth(child, depth + 1);
+            });
+        };
+        Object.values(nodes).forEach((node) => {
+            const parentGroupId = node.data?.parentGroupId;
+            if (!parentGroupId) {
+                rootNodes.push(node);
+                setDepth(node, 0);
+            } else {
+                const parentNode = nodes[parentGroupId];
+                if (parentNode) {
+                    parentNode.children = parentNode.children || [];
+                    parentNode.children.push(node);
+                    setDepth(node, parentNode.depth + 1);
+                }
+            }
+        });
+
+        return rootNodes;
+    }),
 });
 
-//
-// watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
-//     gnbStore.setBreadcrumbs(projectGroupNavigation);
-// });
+
+watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
+    gnbStore.setBreadcrumbs(projectGroupNavigation);
+});
 
 /* Event */
 const handleUpdateTreeDisplayMap = (treeDisplayMap: TreeDisplayMap) => {
@@ -85,74 +143,43 @@ const handleUpdateTreeDisplayMap = (treeDisplayMap: TreeDisplayMap) => {
 };
 
 /* Helper */
-const getProjectGroupListDataById = (id?: string): ProjectDataType[] => state.proejctGroupData.filter((item) => item.parentGroupId === id);
-const convertItemsToTreeData = async (items: ProjectDataType[], depth: number, treeDisplayMap: Record<string, { isOpen: boolean }>): Promise<TreeNode[]> => {
-    const result = await Promise.all(items.map(async (item) => {
-        let childrensData: ProjectDataType[] = [];
-        const loadChild = treeDisplayMap[item.id] ? treeDisplayMap[item.id].isOpen : false;
-        if (loadChild) {
-            const childProjectGroupItems = getProjectGroupListDataById(item.id);
-            const childProjectItems = await getProjectData(item.id);
-            childrensData = [...childProjectGroupItems, ...childProjectItems];
+const updateTreeDisplayMap = (selectedTreeId: string) => {
+    const displayMap = { ...storeState.treeDisplayMap };
+    const parentPathIds: string[] = [];
+    let currentId = selectedTreeId;
+
+    while (currentId) {
+        displayMap[currentId] = { isOpen: true };
+        parentPathIds.unshift(currentId);
+        const currentNode = storeState.projectGroup[currentId] || storeState.project[currentId];
+        if (currentNode?.data?.parentGroupInfo?.id) {
+            currentId = currentNode.data.parentGroupInfo.id;
+        } else if (currentNode?.data?.groupInfo?.id) {
+            currentId = currentNode.data?.groupInfo.id;
+        } else {
+            break;
         }
-
-        const treeItem = {
-            id: item.id,
-            depth,
-            isOpen: false,
-            data: {
-                ...item,
-                to: getProperRouteLocation(convertProjectTreeNodeToLocation(item)),
-            },
-            children: item.type === 'PROJECT' ? undefined : await convertItemsToTreeData(childrensData, depth + 1, treeDisplayMap),
-        };
-        return treeItem;
-    }));
-    return result;
-};
-
-
-const convertProjectTreeNodeToLocation = (item: ProjectDataType): Location => (item.type === 'PROJECT' ? {
-    name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
-    params: {
-        id: item.id,
-    },
-} : {
-    name: PROJECT_ROUTE._NAME,
-    params: {
-        projectGroupId: item.id,
-    },
-});
-
-const getProjectData = async (projectGroupId?: string): Promise<ProjectDataType[]> => {
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>({
-            project_group_id: projectGroupId,
-        });
-        const convertedData = (results ?? []).filter((item) => (projectGroupId ? true : !item.project_group_id)).map((project) => ({
-            name: project.name,
-            type: 'PROJECT' as ProjectDataType['type'],
-            id: project.project_id,
-            parentGroupId: project.project_group_id,
-        }));
-
-        return convertedData;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
     }
+
+    state.currentParentPathIds = parentPathIds;
+    projectTreeStore.setTreeDisplayMap(displayMap);
 };
+
+
 
 onMounted(() => {
-    const selectedTreeId = (route.params.projectGroupId || route.params.id) as string|undefined;
-    if (selectedTreeId) {
-        state.selectedTreeId = selectedTreeId as string;
-        // setSelectedNodeId(selectedTreeId);
+    const selectedProjectGroupId = route.params.projectGroupId as string|undefined;
+    if (selectedProjectGroupId) {
+        state.selectedTreeId = selectedProjectGroupId as string;
+        updateTreeDisplayMap(selectedProjectGroupId);
     }
 });
 
-watch(() => state.projectTreeData, (projectTreeData) => {
-    console.debug('[ASYNC] watch projectTreeData', projectTreeData);
+watch(() => route.params.projectGroupId, (groupId) => {
+    if (groupId) {
+        state.selectedTreeId = groupId as string;
+        updateTreeDisplayMap(groupId);
+    }
 });
 
 </script>
