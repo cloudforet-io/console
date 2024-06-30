@@ -11,6 +11,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -44,6 +45,10 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
+const appContextStore = useAppContextStore();
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     thisPage: 1,
     dashboardTotalCount: computed<number>(() => props.dashboardList.length ?? 0),
@@ -62,6 +67,7 @@ const deleteModalState = reactive({
 });
 
 const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
+    if (!storeState.isAdminMode && dashboardItem.resource_group === 'DOMAIN') return [];
     const dashboardId = dashboardItem.dashboard_id || '';
     return [
         {
