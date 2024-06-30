@@ -123,8 +123,8 @@ const checkDefaultValidation = () => {
     default:
         if (state.defaultValidationConfig) {
             const labelsInfo = cloneDeep(selectedDataTable.labels_info ?? {});
-            const labelsInfoWithDateFieldRemoved = removeDateField(labelsInfo);
-            const targetCount = Object.keys(labelsInfoWithDateFieldRemoved).length;
+            const labelsInfoWithoutDateField = removeDateField(labelsInfo);
+            const targetCount = Object.keys(labelsInfoWithoutDateField).length;
             if (targetCount < state.defaultValidationConfig?.defaultMaxCount) {
                 state.widgetDefaultValidationModalVisible = true;
             }
