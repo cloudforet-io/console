@@ -216,19 +216,20 @@ const handleUpdateDataTable = async () => {
                 data_table_id: dataTable.data_table_id,
             });
         }
-    } else {
-        const updateParams = {
-            data_table_id: state.dataTableId,
-            name: state.dataTableName,
-            options: { [state.operator]: options() },
-        };
-        await widgetGenerateStore.updateDataTable(updateParams);
-        widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
-        widgetGenerateStore.setDataTableUpdating(true);
-        await widgetGenerateStore.loadDataTable({
-            data_table_id: state.dataTableId,
-        });
+        return;
     }
+    const updateParams = {
+        data_table_id: state.dataTableId,
+        name: state.dataTableName,
+        options: { [state.operator]: options() },
+    };
+    await widgetGenerateStore.updateDataTable(updateParams);
+    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
+    widgetGenerateStore.setDataTableUpdating(true);
+    await widgetGenerateStore.loadDataTable({
+        data_table_id: state.dataTableId,
+    });
+
 
     // Update Referenced Transformed DataTable
     const referencedDataTableIds = [] as string[];
@@ -256,13 +257,9 @@ const handleUpdateDataTable = async () => {
             });
             return null;
         }));
-        // await widgetGenerateStore.loadDataTable({
-        //     data_table_id: storeState.selectedDataTableId,
-        // });
     }
 
     showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
-    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
 };
 
 /* Utils */

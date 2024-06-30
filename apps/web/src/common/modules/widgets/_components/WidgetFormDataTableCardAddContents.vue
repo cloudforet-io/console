@@ -306,16 +306,11 @@ const handleUpdateDataTable = async () => {
             });
             return null;
         }));
-        // await widgetGenerateStore.loadDataTable({
-        //     data_table_id: storeState.selectedDataTableId,
-        // });
     }
 
     showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
     setInitialDataTableForm();
     state.filterFormKey = getRandomId();
-
-    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
 };
 
 /* Utils */

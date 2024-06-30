@@ -322,4 +322,8 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         }
     }
 }
+.widget-data-table::-webkit-scrollbar {
+    display: none;
+}
+
 </style>
