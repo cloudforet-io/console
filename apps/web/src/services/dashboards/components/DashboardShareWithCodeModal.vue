@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButtonModal, PTextEditor, PButton,
@@ -7,6 +7,9 @@ import {
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
@@ -30,8 +33,12 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', value: string): void;
 }>();
 
+const allReferenceStore = useAllReferenceStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const storeState = reactive({
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+});
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     loading: false,
@@ -59,7 +66,7 @@ const handleClickCopyButton = () => {
 watch(() => props.visible, async (visible) => {
     if (visible) {
         state.loading = true;
-        const _sharedLayouts = await getSharedDashboardLayouts(dashboardDetailState.dashboardLayouts, dashboardDetailState.dashboardWidgets);
+        const _sharedLayouts = await getSharedDashboardLayouts(dashboardDetailState.dashboardLayouts, dashboardDetailState.dashboardWidgets, storeState.costDataSource);
         state.sharedDashboard = {
             name: dashboardDetailState.name || '',
             layouts: _sharedLayouts,

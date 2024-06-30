@@ -1,4 +1,4 @@
-import { flattenDeep } from 'lodash';
+import { cloneDeep, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -9,6 +9,8 @@ import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -21,7 +23,7 @@ import type {
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 
-const _listWidgetDataTables = async (widgetId?: string): Promise<[string, DataTableModel[]]|undefined> => {
+const _listWidgetDataTables = async (widgetId?: string, costDataSource: CostDataSourceReferenceMap): Promise<[string, DataTableModel[]]|undefined> => {
     if (!widgetId) return undefined;
     const _isPrivate = widgetId.startsWith('private');
     const _fetcher = _isPrivate
@@ -32,15 +34,22 @@ const _listWidgetDataTables = async (widgetId?: string): Promise<[string, DataTa
             widget_id: widgetId,
         });
         if (!results) return undefined;
-        return [widgetId, results || []];
+        const _refinedResults = cloneDeep(results);
+        results.forEach((r, idx) => {
+            if (r.data_type === DATA_TABLE_TYPE.ADDED && r.source_type === 'COST') {
+                const _dataSourceId = r.options.COST?.data_source_id;
+                _refinedResults[idx].options.COST.plugin_id = costDataSource[_dataSourceId]?.data?.plugin_info?.plugin_id;
+            }
+        });
+        return [widgetId, _refinedResults || []];
     } catch (e) {
         ErrorHandler.handleError(e);
         return undefined;
     }
 };
-const _getWidgetDataTablesMap = async (dashboardLayouts: DashboardLayout[]): Promise<Record<string, DataTableModel[]>> => {
+const _getWidgetDataTablesMap = async (dashboardLayouts: DashboardLayout[], costDataSource: CostDataSourceReferenceMap): Promise<Record<string, DataTableModel[]>> => {
     const _dashboardWidgetIdList = flattenDeep(dashboardLayouts?.map((layout) => layout.widgets?.map((w) => w)) || []);
-    const results = await Promise.allSettled(_dashboardWidgetIdList.map((widgetId) => _listWidgetDataTables(widgetId)));
+    const results = await Promise.allSettled(_dashboardWidgetIdList.map((widgetId) => _listWidgetDataTables(widgetId, costDataSource)));
     const _widgetDataTablesMap: Record<string, DataTableModel[]> = {};
     results.forEach((r) => {
         if (r.status === 'fulfilled') {
@@ -93,8 +102,12 @@ const _getSharedDataTableInfoList = (widgetDataTablesMap: Record<string, DataTab
     });
     return [_sharedDataTables, _dataTableIndex];
 };
-export const getSharedDashboardLayouts = async (dashboardLayouts: DashboardLayout[], dashboardWidgets: WidgetModel[]): Promise<SharedDashboardLayout[]> => {
-    const _widgetDataTablesMap = await _getWidgetDataTablesMap(dashboardLayouts);
+export const getSharedDashboardLayouts = async (
+    dashboardLayouts: DashboardLayout[],
+    dashboardWidgets: WidgetModel[],
+    costDataSource: CostDataSourceReferenceMap,
+): Promise<SharedDashboardLayout[]> => {
+    const _widgetDataTablesMap = await _getWidgetDataTablesMap(dashboardLayouts, costDataSource);
     const _sharedLayouts: SharedDashboardInfo['layouts'] = [];
     dashboardLayouts.forEach((layout) => {
         const _sharedWidgets: SharedWidgetInfo[] = [];
