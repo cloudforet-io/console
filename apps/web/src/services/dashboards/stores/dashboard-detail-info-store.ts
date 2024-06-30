@@ -413,7 +413,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         if (_layouts.length) {
             const _targetLayout = _layouts[0];
             if (_targetLayout.widgets) {
-                _targetLayout.widgets.unshift(widgetId);
+                _targetLayout.widgets.push(widgetId);
             } else {
                 _targetLayout.widgets = [widgetId];
             }
