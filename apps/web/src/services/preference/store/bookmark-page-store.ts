@@ -1,5 +1,6 @@
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
+import { sortBy } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -17,10 +18,22 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     const state = reactive({
         bookmarkFolderList: [] as BookmarkItem[],
         bookmarkList: [] as BookmarkItem[],
+        bookmarkTotalCount: 0,
         pageStart: 0,
         pageLimit: 15,
         searchFilter: [] as ConsoleFilter[],
         selectedIndices: [] as number[],
+    });
+
+    const getters = reactive({
+        bookmarkList: computed<BookmarkItem[]>(() => {
+            const globalBookmark = state.bookmarkList.filter((i) => i.isGlobal);
+            const sortedGlobalBookmark = sortBy(globalBookmark, (i) => !i.link).reverse();
+            const workspaceBookmark = state.bookmarkList.filter((i) => !i.isGlobal);
+            const sortedWorkspaceBookmark = sortBy(workspaceBookmark, (i) => !i.link).reverse();
+            const combinedBookmarkList = [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
+            return combinedBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit);
+        }),
     });
 
     const mutation = {
@@ -69,14 +82,13 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         },
         fetchBookmarkList: async () => {
             const BookmarkListApiQueryHelper = new ApiQueryHelper()
-                .setPage(state.pageStart, state.pageLimit)
                 .setSort('updated_at', true)
                 .setFilters([
                     ...state.searchFilter,
                     { k: 'name', v: 'console:bookmark:', o: '' },
                 ]);
             try {
-                const { results } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
+                const { results, total_count } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
                     query: BookmarkListApiQueryHelper.data,
                 });
                 state.bookmarkList = (results ?? []).map((i) => ({
@@ -84,6 +96,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     workspace_id: i.data.workspaceId,
                     id: i.name,
                 } as BookmarkItem));
+                state.bookmarkTotalCount = total_count;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkList = [];
@@ -93,6 +106,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
 
     return {
         state,
+        getters,
         ...mutation,
         ...actions,
     };

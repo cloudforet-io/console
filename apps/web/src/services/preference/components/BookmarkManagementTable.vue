@@ -22,12 +22,14 @@ import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-
 
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
+const bookmarkPageGetters = bookmarkPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    dataSourceList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkList),
+    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
+    bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
@@ -90,11 +92,12 @@ const handleUpdateSelectIndex = async (indices: number[]) => {
     bookmarkPageStore.setSelectedBookmarkIndices(indices);
 };
 const handleChange = (options: any = {}) => {
+    console.log({ options });
     bookmarkListApiQuery = getApiQueryWithToolboxOptions(BookmarkListApiQueryHelper, options) ?? bookmarkListApiQuery;
     if (options.queryTags !== undefined) {
         bookmarkPageStore.setBookmarkListSearchFilters(BookmarkListApiQueryHelper.filters);
     }
-    if (options.pageStart !== undefined) bookmarkPageStore.setBookmarkListPageStart(options.pageStart);
+    if (options.pageStart !== undefined) bookmarkPageStore.setBookmarkListPageStart(options.pageStart - 1);
     if (options.pageLimit !== undefined) bookmarkPageStore.setBookmarkListPageLimit(options.pageLimit);
     fetchBookmarkList();
 };
@@ -119,7 +122,8 @@ onMounted(async () => {
                          :sort-desc="true"
                          :select-index="storeState.selectedIndices"
                          :fields="tableState.fields"
-                         :items="storeState.dataSourceList"
+                         :total-count="storeState.bookmarkTotalCount"
+                         :items="storeState.bookmarkList"
                          :key-item-sets="tableState.keyItemSets"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
