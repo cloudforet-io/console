@@ -14,6 +14,8 @@ import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
+import config from '@/lib/config';
+
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFrameEmit } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
@@ -22,6 +24,7 @@ import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-fra
 const props = defineProps<WidgetFrameProps>();
 const emit = defineEmits<WidgetFrameEmit>();
 
+const isDashboardEditDisabled = config.get('DASHBOARD_EDIT_DISABLE');
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     showWidthToggleButton: computed(() => props.widgetSizes.length > 1 && !props.loading && props.mode === 'edit-layout'),
@@ -32,20 +35,19 @@ const state = reactive({
             label: i18n.t('COMMON.WIDGETS.EXPAND'),
             icon: 'ic_arrows-expand-all',
         },
-        {
+        ...(isDashboardEditDisabled ? [] : [{
             type: 'item',
             name: 'edit',
             label: i18n.t('COMMON.WIDGETS.EDIT'),
             icon: 'ic_edit',
-        },
+        } as MenuItem]),
         { type: 'divider', name: '' },
         {
             type: 'item',
             name: 'delete',
             label: i18n.t('COMMON.WIDGETS.DELETE'),
             icon: 'ic_delete',
-        },
-    ])),
+        }])),
     sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
         type: 'item',
         name: size,
