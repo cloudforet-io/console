@@ -20,6 +20,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { gray } from '@/styles/colors';
 
+import { getWorkspaceInfo } from '@/services/preference/composables/bookmark-data-helper';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
 const bookmarkPageStore = useBookmarkPageStore();
@@ -79,10 +80,6 @@ const tableState = reactive({
     })),
 });
 
-const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
-    if (!id) return undefined;
-    return storeState.workspaceList.find((i) => i.workspace_id === id);
-};
 const getFolderInfo = (id: string): BookmarkItem|undefined => {
     if (!id) return undefined;
     return storeState.bookmarkFolderList.find((i) => i.id === id);
@@ -171,11 +168,11 @@ onMounted(async () => {
                         <div v-else
                              class="workspace"
                         >
-                            <workspace-logo-icon :text="getWorkspaceInfo(value)?.name || ''"
-                                                 :theme="getWorkspaceInfo(value)?.tags?.theme"
+                            <workspace-logo-icon :text="getWorkspaceInfo(value, storeState.workspaceList)?.name || ''"
+                                                 :theme="getWorkspaceInfo(value, storeState.workspaceList)?.tags?.theme"
                                                  size="xs"
                             />
-                            <span class="text">{{ getWorkspaceInfo(value)?.name }}</span>
+                            <span class="text">{{ getWorkspaceInfo(value, storeState.workspaceList)?.name }}</span>
                         </div>
                         <div v-if="item.folder"
                              class="folder-wrapper"

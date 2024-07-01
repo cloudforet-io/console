@@ -10,7 +10,9 @@ import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 const PreferenceContainer = () => import('@/services/preference/PreferenceContainer.vue');
 const DomainSettingsPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsPage.vue');
 const WorkspacesPage = () => import('@/services/preference/pages/admin/AdminWorkspacesPage.vue');
+const BookmarkContainer = () => import('@/services/preference/components/BookmarkContainer.vue');
 const BookmarkPage = () => import('@/services/preference/pages/admin/AdminBookmarkPage.vue');
+// const BookmarkDetailPage = () => import('@/services/preference/pages/admin/AdminBookmarkDetailPage.vue');
 
 const adminPreferenceRoutes: RouteConfig = {
     path: 'preference',
@@ -41,27 +43,28 @@ const adminPreferenceRoutes: RouteConfig = {
                 menuId: MENU_ID.BOOKMARK,
                 translationId: MENU_INFO_MAP[MENU_ID.BOOKMARK].translationId,
             },
-            component: BookmarkPage,
+            component: BookmarkContainer,
             children: [
                 {
-                    path: ':group?',
+                    path: '/',
                     name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
-                    meta: {
-                        menuId: MENU_ID.BOOKMARK,
-                        lsbVisible: true,
-                    },
+                    meta: { lsbVisible: true, menuId: MENU_ID.BOOKMARK },
                     props: true,
                     component: BookmarkPage,
                 },
                 {
-                    path: ':folder?',
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
-                    meta: {
-                        menuId: MENU_ID.BOOKMARK,
-                        lsbVisible: true,
-                    },
+                    path: ':group',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP._NAME),
+                    meta: { lsbVisible: true },
                     props: true,
-                    component: BookmarkPage,
+                    // component: BookmarkDetailPage,
+                },
+                {
+                    path: ':folder',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL._NAME),
+                    meta: { lsbVisible: true },
+                    props: true,
+                    // component: BookmarkDetailPage,
                 },
             ],
         },

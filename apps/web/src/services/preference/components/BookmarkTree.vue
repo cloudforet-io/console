@@ -18,6 +18,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { gray } from '@/styles/colors';
 
+import { getWorkspaceInfo } from '@/services/preference/composables/bookmark-data-helper';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 import type { TreeNode } from '@/services/project/tree/type';
@@ -56,11 +57,6 @@ const state = reactive({
     // }),
 });
 
-const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
-    if (!id) return undefined;
-    return storeState.workspaceList.find((i) => i.workspace_id === id);
-};
-
 const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[]): TreeNode[] => {
     const workspaceMap: { [key: string]: TreeNode } = {};
     const globalChildren: TreeNode[] = [];
@@ -73,9 +69,9 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
                 id: item.id,
                 name: item.name,
                 to: {
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL._NAME),
                     params: {
-                        folder: item.id,
+                        folder: item.name,
                     },
                 },
             },
@@ -91,7 +87,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
                         id: item.workspaceId,
                         name: item.workspaceId,
                         to: {
-                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP._NAME),
                             params: {
                                 group: item.workspaceId,
                             },
@@ -113,9 +109,9 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
         depth: 0,
         data: {
             id: 'global',
-            name: i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARKS'),
+            name: i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARK'),
             to: {
-                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP._NAME),
                 params: {
                     group: 'global',
                 },
@@ -161,11 +157,11 @@ watch(() => route.params, (params) => {
                                  height="0.875rem"
                             />
                             <workspace-logo-icon v-else
-                                                 :text="getWorkspaceInfo(node.data.id)?.name || ''"
-                                                 :theme="getWorkspaceInfo(node.data.id)?.tags?.theme"
+                                                 :text="getWorkspaceInfo(node.data.id, storeState.workspaceList)?.name || ''"
+                                                 :theme="getWorkspaceInfo(node.data.id, storeState.workspaceList)?.tags?.theme"
                                                  size="xxs"
                             />
-                            <span class="text">{{ node.id === 'global' ? $t('IAM.BOOKMARK.GLOBAL_BOOKMARKS') : getWorkspaceInfo(node.data.name)?.name || '' }}</span>
+                            <span class="text">{{ node.id === 'global' ? $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : getWorkspaceInfo(node.data.name, storeState.workspaceList)?.name || '' }}</span>
                         </div>
                         <div v-else
                              class="bookmark"
