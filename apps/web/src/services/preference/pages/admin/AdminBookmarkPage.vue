@@ -52,6 +52,10 @@ const handleSelectMenuItem = (value: MenuItem) => {
     }
     state.visibleMenu = false;
 };
+const handleCreateFolder = () => {
+    bookmarkPageStore.fetchBookmarkFolderList();
+    bookmarkPageStore.fetchBookmarkList();
+};
 
 onUnmounted(() => {
     bookmarkPageStore.resetState();
@@ -95,9 +99,11 @@ onMounted(() => {
         <bookmark-management-table />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
                                     :bookmark-folder-list="storeState.bookmarkFolderList"
+                                    @confirm="handleCreateFolder"
         />
         <bookmark-link-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.LINK"
                                   :bookmark-folder-list="storeState.bookmarkFolderList"
+                                  @confirm="bookmarkPageStore.fetchBookmarkList()"
         />
     </div>
 </template>

@@ -10,6 +10,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -25,8 +26,11 @@ import type { BookmarkType } from '@/services/workspace-home/types/workspace-hom
 export const useBookmarkStore = defineStore('bookmark', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
     const userWorkspaceStoreGetters = userWorkspaceStore.getters;
+    const appContextStore = useAppContextStore();
+    const appContextGetters = appContextStore.getters;
 
     const _getters = reactive({
+        isAdminMode: computed(() => appContextGetters.isAdminMode),
         userId: computed<string>(() => store.state.user.userId),
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     });
@@ -212,19 +216,22 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 if (type === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.set;
                     resource_group = undefined;
-                } else if (type === BOOKMARK_TYPE.WORKSPACE) {
+                } else if (_getters.isAdminMode || type === BOOKMARK_TYPE.WORKSPACE || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = SpaceConnector.clientV2.config.publicConfig.create;
-                    resource_group = 'WORKSPACE';
+                    resource_group = _getters.isAdminMode ? 'DOMAIN' : 'WORKSPACE';
                 }
                 await fetcher({
                     name: `console:bookmark:${name}`,
                     data: {
                         workspaceId: _getters.currentWorkspaceId,
                         name,
+                        isGlobal: _getters.isAdminMode,
                     },
                     resource_group,
                 });
-                await actions.fetchBookmarkFolderList();
+                if (!_getters.isAdminMode) {
+                    await actions.fetchBookmarkFolderList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -239,9 +246,9 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 if (type === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.set;
                     resource_group = undefined;
-                } else if (type === BOOKMARK_TYPE.WORKSPACE) {
+                } else if (_getters.isAdminMode || type === BOOKMARK_TYPE.WORKSPACE || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = SpaceConnector.clientV2.config.publicConfig.create;
-                    resource_group = 'WORKSPACE';
+                    resource_group = _getters.isAdminMode ? 'DOMAIN' : 'WORKSPACE';
                 }
                 await fetcher({
                     name: `console:bookmark:${folder}:${name}-${getRandomId()}`,
@@ -251,10 +258,13 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         folder,
                         link,
                         imgIcon,
+                        isGlobal: _getters.isAdminMode,
                     },
                     resource_group,
                 });
-                await actions.fetchBookmarkList();
+                if (!_getters.isAdminMode) {
+                    await actions.fetchBookmarkList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -265,7 +275,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 let fetcher;
                 if (state.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.update;
-                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = SpaceConnector.clientV2.config.publicConfig.update;
                 }
                 await fetcher({
@@ -273,6 +283,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                     data: {
                         workspaceId: _getters.currentWorkspaceId,
                         name,
+                        isGlobal: _getters.isAdminMode,
                     },
                 });
                 const foldersLinkItems = state.bookmarkData.filter((i) => i.folder === id);
@@ -284,7 +295,9 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         folder: item.folder,
                     });
                 }));
-                await actions.fetchBookmarkFolderList();
+                if (!_getters.isAdminMode) {
+                    await actions.fetchBookmarkFolderList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -297,7 +310,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 let fetcher;
                 if (state.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.update;
-                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = SpaceConnector.clientV2.config.publicConfig.update;
                 }
                 await fetcher({
@@ -307,9 +320,12 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         name,
                         folder,
                         link,
+                        isGlobal: _getters.isAdminMode,
                     },
                 });
-                await actions.fetchBookmarkList();
+                if (!_getters.isAdminMode) {
+                    await actions.fetchBookmarkList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -320,7 +336,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 let fetcher;
                 if (state.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.delete;
-                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = SpaceConnector.clientV2.config.publicConfig.delete;
                 }
                 await fetcher({
@@ -330,7 +346,9 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 await Promise.all(foldersLinkItems.map(async (item) => {
                     await actions.deleteBookmarkLink(item.id || '');
                 }));
-                await actions.fetchBookmarkFolderList();
+                if (!_getters.isAdminMode) {
+                    await actions.fetchBookmarkFolderList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -341,13 +359,15 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 let fetcher;
                 if (state.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = SpaceConnector.clientV2.config.userConfig.delete;
-                } else if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = SpaceConnector.clientV2.config.publicConfig.delete;
                 }
                 await fetcher({
                     name: id || '',
                 });
-                await actions.fetchBookmarkList();
+                if (!_getters.isAdminMode) {
+                    await actions.fetchBookmarkList();
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
