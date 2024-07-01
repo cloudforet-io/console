@@ -2,16 +2,19 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PDivider,
 } from '@spaceone/design-system';
+import { isEmpty } from 'lodash';
 
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
+
+import { queryStringToArray, queryStringToObject, queryStringToString } from '@/lib/router-query-string';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
@@ -25,11 +28,14 @@ import MetricExplorerHeader from '@/services/asset-inventory/components/MetricEx
 import MetricExplorerQuerySection from '@/services/asset-inventory/components/MetricExplorerQuerySection.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+import type { Granularity } from '@/services/asset-inventory/types/asset-analysis-type';
+import type { MetricExplorerPageUrlQuery } from '@/services/asset-inventory/types/metric-explorer-url-query-type';
 
 
 const gnbStore = useGnbStore();
 const { breadcrumbs } = useBreadcrumbs();
 const route = useRoute();
+const router = useRouter();
 
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
@@ -63,6 +69,18 @@ const state = reactive({
     })),
 });
 
+/* Util */
+const setQueryOptions = (urlQuery: MetricExplorerPageUrlQuery) => {
+    const _granularity = queryStringToString(urlQuery.granularity);
+    const _groupBy = queryStringToArray(urlQuery.group_by);
+    const _period = queryStringToObject(urlQuery.period);
+    const _filters = queryStringToObject(urlQuery.filters);
+
+    if (_granularity) metricExplorerPageStore.setGranularity(_granularity as Granularity);
+    if (_groupBy?.length) metricExplorerPageStore.setSelectedGroupByList(_groupBy);
+    if (!isEmpty(_period)) metricExplorerPageStore.setPeriod(_period);
+    if (!isEmpty(_filters)) metricExplorerPageStore.setFilters(_filters);
+};
 
 watch(() => route.params, async (params) => {
     if (!params.metricId) return;
@@ -75,12 +93,18 @@ watch(() => route.params, async (params) => {
     } else if (metricExplorerPageGetters.defaultMetricGroupByList) {
         metricExplorerPageStore.setSelectedGroupByList(metricExplorerPageGetters.defaultMetricGroupByList);
     }
+
+    // case for Home landing page
     if (params.groupBy && metricExplorerPageState.metric?.labels_info?.find((d) => d.key === 'labels.Provider')) {
         const defaultFilters = { 'labels.Provider': [params.groupBy] };
         if (params.group) defaultFilters['labels.Cloud Service Group'] = [params.group];
         if (params.type) defaultFilters['labels.Cloud Service Type'] = [params.type];
         metricExplorerPageStore.setFilters(defaultFilters);
     }
+
+    // set query options from url query
+    const currentQuery = router.currentRoute.query;
+    setQueryOptions(currentQuery);
 
     metricExplorerPageStore.setMetricInitiated(true);
     gnbStore.setBreadcrumbs(state.breadCrumbs);

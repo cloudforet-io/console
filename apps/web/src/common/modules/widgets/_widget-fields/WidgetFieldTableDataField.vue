@@ -7,6 +7,7 @@ import {
     PSelectDropdown, PFieldGroup, PTextInput, PSelectButton, PTooltip, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { cloneDeep } from 'lodash';
 
 import { i18n } from '@/translations';
 
@@ -184,7 +185,7 @@ onMounted(() => {
         state.proxyValue = {
             ...state.proxyValue,
             fieldType: state.selectedFieldType,
-            value: props.value?.value ?? [state.menuItems[0]?.name],
+            value: props.value?.value ?? cloneDeep(state.menuItems ?? []).map((d) => d.name),
         };
         state.selectedItem = convertToMenuItem(state.proxyValue?.value);
     } else {
