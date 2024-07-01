@@ -35,6 +35,7 @@ const storeState = reactive({
     modalVisible: computed<boolean>(() => dataSourcesPageState.modal.visible),
     type: computed<CostLinkedAccountModalType|undefined>(() => dataSourcesPageState.modal.type),
 
+    dataSourceList: computed<DataSourceItem[]>(() => dataSourcesPageGetters.dataSourceList),
     dataSourceListPageStart: computed<number>(() => dataSourcesPageState.dataSourceListPageStart),
     dataSourceListPageLimit: computed<number>(() => dataSourcesPageState.dataSourceListPageLimit),
     dataSourceListSearchFilters: computed<ConsoleFilter[]>(() => dataSourcesPageState.dataSourceListSearchFilters),
@@ -105,9 +106,11 @@ const fetchLinkedAccountList = async () => {
     linkedAccountListApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
         .addFilter(...storeState.linkedAccountsSearchFilters);
 
+    if (storeState.selectedDataSourceIndices === undefined) return;
+
     try {
         await dataSourcesPageStore.fetchLinkedAccount({
-            data_source_id: storeState.selectedDataSourceItem?.data_source_id || '',
+            data_source_id: storeState.dataSourceList[storeState.selectedDataSourceIndices]?.data_source_id || '',
             query: linkedAccountListApiQueryHelper.data,
         });
     } finally {
@@ -181,7 +184,6 @@ onUnmounted(() => {
 .data-source-management-tab-linked-account {
     .title {
         @apply items-center;
-        margin-top: 2.25rem;
         margin-bottom: 0;
         .extra-wrapper {
             @apply flex;

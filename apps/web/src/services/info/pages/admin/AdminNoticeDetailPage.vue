@@ -6,10 +6,18 @@ import { useRouter } from 'vue-router/composables';
 
 import { PButton, PHeading } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { PostSendParameters } from '@/schema/board/post/api-verbs/send';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import {
+    hideLoadingMessage,
+    showErrorMessage,
+    showLoadingMessage,
+    showSuccessMessage,
+} from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -32,6 +40,7 @@ const router = useRouter();
 const state = reactive({
     hasPermissionToEditOrDelete: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     deleteModalVisible: false,
+    sendLoading: false,
 });
 
 const handleClickEditButton = () => {
@@ -61,6 +70,31 @@ const handleDeleteNoticeConfirm = async () => {
         state.deleteModalVisible = false;
     }
 };
+const handleClickSendEmail = async () => {
+    state.sendLoading = true;
+    const loadingMessageId = showLoadingMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SENDING'), '');
+
+    try {
+        const delayHideLoadingMessage = new Promise((resolve) => {
+            setTimeout(resolve, 1500);
+        });
+
+        await Promise.all([
+            SpaceConnector.clientV2.board.post.send<PostSendParameters>({
+                post_id: props.postId,
+            }),
+            delayHideLoadingMessage,
+        ]);
+
+        hideLoadingMessage(loadingMessageId);
+        showSuccessMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SEND_EMAIL'), '');
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        showErrorMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_E_SEND_EMAIL'), e);
+    } finally {
+        state.sendLoading = false;
+    }
+};
 
 onBeforeMount(async () => {
     noticeDetailStore.reset(); // do not reset on unmounted for the case of moving to update page
@@ -83,6 +117,13 @@ onBeforeMount(async () => {
                               @click="handleClickEditButton"
                     >
                         {{ $t('INFO.NOTICE.FORM.EDIT') }}
+                    </p-button>
+                    <p-button style-type="tertiary"
+                              icon-left="ic_paper-airplane"
+                              :loading="state.sendLoading"
+                              @click="handleClickSendEmail"
+                    >
+                        {{ $t('INFO.NOTICE.FORM.SEND_EMAIL_MODAL_TITLE') }}
                     </p-button>
                     <p-button style-type="negative-secondary"
                               @click="handleDeleteModalOpen"

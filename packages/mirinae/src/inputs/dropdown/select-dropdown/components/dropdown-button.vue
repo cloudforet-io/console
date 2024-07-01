@@ -93,7 +93,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                  width="1.5rem"
                  height="1.5rem"
                  class="dropdown-icon-button"
-                 @click="emit('click-dropdown-button')"
+                 @click.stop="emit('click-dropdown-button')"
                  @keydown.down="emit('enter-key')"
             />
         </span>

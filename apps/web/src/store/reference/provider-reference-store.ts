@@ -12,11 +12,11 @@ import type { ProviderModel } from '@/schema/identity/provider/model';
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -41,9 +41,9 @@ export const useProviderReferenceStore = defineStore('reference-provider', () =>
             return state.items ?? {};
         }, {}, { lazy: true }),
         providerTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
+            type: MANAGED_VARIABLE_MODELS.provider.meta.key,
+            key: MANAGED_VARIABLE_MODELS.provider.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.provider.meta.name,
             referenceMap: getters.providerItems,
         })),
     });

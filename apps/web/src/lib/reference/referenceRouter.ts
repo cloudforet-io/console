@@ -40,12 +40,11 @@ const projectLinkFormatter: LinkFormatter = (name, data, reference, query) => {
     } return {};
 };
 
-const projectGroupLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+const projectGroupLinkFormatter: LinkFormatter = (name, data) => {
     const location = {
         name,
-        query: {
-            ...query,
-            select_pg: data,
+        params: {
+            projectGroupId: data,
         },
     };
     return location;

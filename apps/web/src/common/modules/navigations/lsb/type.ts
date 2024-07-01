@@ -10,14 +10,14 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 
 
 export const MENU_ITEM_TYPE = {
-    TITLE: 'title',
     TOP_TITLE: 'top-title',
-    ITEM: 'item',
-    DIVIDER: 'divider',
-    FAVORITE_ONLY: 'favorite-only',
+    BUTTON_TITLE: 'button-title',
     DROPDOWN: 'dropdown',
-    SLOT: 'slot',
+    STARRED: 'starred',
+    DIVIDER: 'divider',
+    ITEM: 'item',
     COLLAPSIBLE: 'collapsible',
+    SLOT: 'slot',
 } as const;
 type MenuItemType = typeof MENU_ITEM_TYPE[keyof typeof MENU_ITEM_TYPE];
 
@@ -39,8 +39,13 @@ export interface LSBItem {
     hideFavorite?: boolean;
     favoriteOptions?: FavoriteOptions;
     icon?: LSBIcon;
+    imgIcon?: string;
     titleIcon?: string;
     selectOptions?: SelectOptions;
+    childItems?: LSBItem[];
+    currentPath?: string;
+    isBackLink?: boolean;
+    isSub?: boolean;
 }
 
 export interface LSBCollapsibleItem<T = any> extends LSBItem {

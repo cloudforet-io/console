@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 
 import {
-    PFieldGroup, PHeading, PSkeleton, PTextInput,
+    PFieldGroup, PHeading, PSkeleton, PTextInput, PI,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -13,6 +13,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -32,8 +33,10 @@ const state = reactive({
         if (!props.dashboardId) return false;
         return !dashboardDetailState.name;
     }),
+    templateName: computed(() => DASHBOARD_TEMPLATES[dashboardDetailState.templateId]?.name),
     placeHolder: dashboardDetailState.placeholder,
     dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType)),
+    isTextInputFocused: false,
 });
 const {
     forms: {
@@ -55,8 +58,15 @@ const {
     },
 });
 
-const isTextInputFocused = ref(false);
-
+const getDashboardNamePlaceholder = (): string => {
+    let _placeholder = dashboardDetailState.placeholder;
+    const _dashboardNameList = dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType);
+    let _count = 0;
+    while (_dashboardNameList.includes(_placeholder)) {
+        _placeholder = `${dashboardDetailState.placeholder} (${++_count})`; // e.g. AWS Monthly Cost Summary (1)
+    }
+    return _placeholder;
+};
 const updateName = (name: string) => {
     setForm('nameInput', name);
     emit('update:name', name);
@@ -80,66 +90,95 @@ watch(() => invalidState.nameInput, (invalid) => {
 });
 
 onMounted(() => {
-    if (nameInput.value?.length) dashboardDetailStore.setIsNameValid(true);
-    else dashboardDetailStore.setIsNameValid(false);
+    if (nameInput.value?.length) {
+        dashboardDetailStore.setIsNameValid(true);
+    } else {
+        dashboardDetailStore.setIsNameValid(false);
+        setForm('nameInput', getDashboardNamePlaceholder());
+    }
 });
 </script>
 
 <template>
-    <p-heading show-back-button
-               @click-back-button="handleClickBackButton"
-    >
-        <p-skeleton v-if="state.loading"
-                    width="20rem"
-                    height="1.5rem"
-        />
-        <p-field-group v-else
-                       :invalid="invalidState.nameInput"
-                       :invalid-text="invalidTexts.nameInput"
+    <div class="dashboard-customize-page-name">
+        <p-heading show-back-button
+                   @click-back-button="handleClickBackButton"
         >
-            <template #default="{invalid}">
-                <p-text-input :value="nameInput"
-                              :invalid="invalid"
-                              :placeholder="state.placeHolder"
-                              :is-focused.sync="isTextInputFocused"
-                              @update:value="handleInput"
+            <template v-if="dashboardDetailStore.getters.displayInfo?.icon"
+                      #title-left-extra
+            >
+                <p-i width="2rem"
+                     height="2rem"
+                     :name="dashboardDetailStore.getters.displayInfo?.icon"
                 />
             </template>
-        </p-field-group>
-    </p-heading>
+            <p-skeleton v-if="state.loading"
+                        width="20rem"
+                        height="1.5rem"
+            />
+            <p-field-group v-else
+                           :invalid="invalidState.nameInput"
+                           :invalid-text="invalidTexts.nameInput"
+            >
+                <template #default="{invalid}">
+                    <p-text-input :value="nameInput"
+                                  :invalid="invalid"
+                                  :placeholder="state.placeHolder"
+                                  :is-focused.sync="state.isTextInputFocused"
+                                  @update:value="handleInput"
+                    />
+                </template>
+            </p-field-group>
+        </p-heading>
+        <p v-if="state.templateName"
+           class="template-name"
+        >
+            {{ state.templateName }}
+        </p>
+    </div>
 </template>
 
 <style scoped lang="postcss">
-.title-area {
-    cursor: pointer;
-}
-.title-area:hover {
-    text-decoration: underline;
-}
-.p-text-input {
-    @apply font-normal;
-    width: 100%;
-}
-
-.p-heading {
-    margin-bottom: 0;
-    :deep(.heading-wrapper) {
-        display: flex;
+.dashboard-customize-page-name {
+    margin-bottom: 0.75rem;
+    .template-name {
+        @apply text-paragraph-sm text-gray-500;
+        margin-left: 4.75rem;
+    }
+    .title-area {
+        cursor: pointer;
+    }
+    .title-area:hover {
+        text-decoration: underline;
+    }
+    .p-text-input {
+        @apply font-normal;
         width: 100%;
-        & h2 {
-            width: calc(100% - 2.25rem);
+    }
+
+    .p-heading {
+        margin-bottom: 0;
+        :deep(.heading-wrapper) {
+            display: flex;
+            width: 100%;
+            & h2 {
+                width: calc(100% - 2.25rem);
+            }
+            .p-field-group {
+                margin-bottom: 0.25rem;
+            }
+            .back-button {
+                margin-top: 0.75rem;
+            }
         }
-        .p-field-group {
-            margin-bottom: 0.75rem;
+    }
+    .p-field-group {
+        :deep(.invalid-feedback) {
+            font-weight: normal;
         }
         .back-button {
             margin-bottom: 0.75rem;
         }
-    }
-}
-.p-field-group {
-    :deep(.invalid-feedback) {
-        font-weight: normal;
     }
 }
 </style>

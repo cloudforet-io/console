@@ -75,6 +75,12 @@ watch(() => route.params, async (params) => {
     } else if (assetAnalysisPageGetters.defaultMetricGroupByList) {
         assetAnalysisPageStore.setSelectedGroupByList(assetAnalysisPageGetters.defaultMetricGroupByList);
     }
+    if (params.groupBy && assetAnalysisPageState.metric?.labels_info?.find((d) => d.key === 'labels.Provider')) {
+        const defaultFilters = { 'labels.Provider': [params.groupBy] };
+        if (params.group) defaultFilters['labels.Cloud Service Group'] = [params.group];
+        if (params.type) defaultFilters['labels.Cloud Service Type'] = [params.type];
+        assetAnalysisPageStore.setFilters(defaultFilters);
+    }
 
     assetAnalysisPageStore.setMetricInitiated(true);
     gnbStore.setBreadcrumbs(state.breadCrumbs);

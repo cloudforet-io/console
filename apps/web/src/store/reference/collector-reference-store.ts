@@ -12,14 +12,13 @@ import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 export type CollectorItem = Required<Pick<ReferenceItem<CollectorModel>, 'key'|'label'|'name'|'icon'>>;
 export type CollectorReferenceMap = ReferenceMap<CollectorItem>;
@@ -39,9 +38,9 @@ export const useCollectorReferenceStore = defineStore('reference-collector', () 
             return state.items ?? {};
         }, {}, { lazy: true }),
         collectorTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.collector.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.collector.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.collector.name,
+            type: MANAGED_VARIABLE_MODELS.collector.meta.key,
+            key: MANAGED_VARIABLE_MODELS.collector.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.collector.meta.name,
             referenceMap: getters.collectorItems,
         })),
     });

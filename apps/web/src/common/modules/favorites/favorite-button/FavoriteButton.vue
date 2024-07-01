@@ -6,6 +6,7 @@ import {
 import { PI } from '@spaceone/design-system';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { store } from '@/store';
 
@@ -29,6 +30,7 @@ import {
     convertMetricExampleConfigToReferenceData,
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
+    convertWorkspaceConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
 
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
@@ -52,6 +54,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetters = userWorkspaceStore.getters;
 const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
 const favoriteStoreGetters = favoriteStore.getters;
@@ -60,11 +63,16 @@ const dashboardGetters = dashboardStore.getters;
 const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
 
+const emit = defineEmits<{(e: 'click-favorite'): void;
+}>();
+
 const storeState = reactive({
     favoriteMenuList: computed(() => favoriteStoreGetters.favoriteMenuList),
+    favoriteWorkspaceMenuList: computed(() => favoriteStoreGetters.workspaceItems),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId as string),
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+    currentWorkspaceId: computed(() => workspaceStoreGetters.currentWorkspaceId as string),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
@@ -74,7 +82,8 @@ const storeState = reactive({
 });
 const state = reactive({
     active: computed(() => {
-        const favoriteItem = storeState.favoriteMenuList.findIndex((d) => (d.itemId === props.itemId
+        const targetList = props.favoriteType === FAVORITE_TYPE.WORKSPACE ? storeState.favoriteWorkspaceMenuList : storeState.favoriteMenuList;
+        const favoriteItem = targetList.findIndex((d) => (d.itemId === props.itemId
             && (d.itemType === props.favoriteType)));
         return favoriteItem > -1;
     }),
@@ -98,11 +107,12 @@ const handleClickFavoriteButton = async (event: MouseEvent) => {
         };
         await favoriteStore.createFavorite(convertFavoriteToReferenceData(params as ConfigData));
     }
+    emit('click-favorite');
 };
 const convertFavoriteToReferenceData = (favoriteConfig: ConfigData) => {
     const { itemType } = favoriteConfig;
     if (itemType === FAVORITE_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([favoriteConfig], [...dashboardGetters.workspaceItems, ...dashboardGetters.projectItems, ...dashboardGetters.privateItems])[0];
+        return convertDashboardConfigToReferenceData([favoriteConfig], [...dashboardGetters.workspaceItems, ...dashboardGetters.privateItems])[0];
     }
     if (itemType === FAVORITE_TYPE.PROJECT) {
         return convertProjectConfigToReferenceData([favoriteConfig], storeState.projects)[0];
@@ -121,6 +131,9 @@ const convertFavoriteToReferenceData = (favoriteConfig: ConfigData) => {
     }
     if (itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         return convertCostAnalysisConfigToReferenceData([favoriteConfig], storeState.costQuerySets, storeState.costDataSource)[0];
+    }
+    if (itemType === FAVORITE_TYPE.WORKSPACE) {
+        return convertWorkspaceConfigToReferenceData([favoriteConfig], storeState.workspaceList)[0];
     }
     return convertMenuConfigToReferenceData([favoriteConfig], store.getters['display/allMenuList'])[0];
 };

@@ -19,7 +19,9 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { MetricReferenceItem, MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { ReferenceMap } from '@/store/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+// import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import { CHART_TYPE, GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/asset-analysis-period-helper';
@@ -85,8 +87,8 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
             const _storeMap: Record<string, ReferenceMap> = {};
             Object.values(_labelKeysMap).forEach((labelKey) => {
                 const _resourceType = labelKey.reference?.resource_type;
-                const targetModelConfig = Object.values(MANAGED_VARIABLE_MODEL_CONFIGS)
-                    .find((d) => (d.resourceType === _resourceType));
+                const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS)
+                    .find((d) => (d.meta?.resourceType === _resourceType));
                 if (targetModelConfig) {
                     const _refinedKey = labelKey.key.replace('labels.', '');
                     _storeMap[_refinedKey] = allReferenceStore.getters[targetModelConfig.key];

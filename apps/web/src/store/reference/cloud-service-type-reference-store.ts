@@ -12,11 +12,11 @@ import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-typ
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -40,9 +40,9 @@ export const useCloudServiceTypeReferenceStore = defineStore('reference-cloud-se
             return state.items ?? {};
         }, {}, { lazy: true }),
         cloudServiceTypeTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_type.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_type.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_type.name,
+            type: MANAGED_VARIABLE_MODELS.cloud_service_type.meta.key,
+            key: MANAGED_VARIABLE_MODELS.cloud_service_type.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.cloud_service_type.meta.name,
             referenceMap: getters.cloudServiceTypeItems,
         })),
     });

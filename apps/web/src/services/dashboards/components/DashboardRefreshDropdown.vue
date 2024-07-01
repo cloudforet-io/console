@@ -12,6 +12,8 @@ import { REFRESH_INTERVAL_OPTIONS_MAP } from '@/schema/dashboard/_constants/dash
 import type { RefreshIntervalOption } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 const REFRESH_INTERVAL_OPTIONS = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP);
@@ -31,6 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'refresh'): void;
 }>();
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
@@ -51,8 +54,9 @@ const state = reactive({
         label: interval.label,
     }))),
     intervalDuration: computed<number|undefined>(() => {
-        if (!REFRESH_INTERVAL_OPTIONS.includes(dashboardDetailState.settings.refresh_interval_option)) return undefined;
-        return REFRESH_INTERVAL_OPTIONS_MAP[dashboardDetailState.settings.refresh_interval_option];
+        if (!dashboardDetailState.options?.refresh_interval_option) return undefined;
+        if (!REFRESH_INTERVAL_OPTIONS.includes(dashboardDetailState.options.refresh_interval_option)) return undefined;
+        return REFRESH_INTERVAL_OPTIONS_MAP[dashboardDetailState.options.refresh_interval_option];
     }),
 });
 
@@ -80,13 +84,20 @@ const executeRefreshInterval = () => {
 };
 
 const handleSelectRefreshIntervalOption = (option) => {
-    dashboardDetailStore.setSettings({
-        ...dashboardDetailState.settings,
+    dashboardDetailStore.setOptions({
+        ...dashboardDetailState.options,
         refresh_interval_option: option,
     });
     if (props.refreshDisabled) return;
     clearRefreshInterval();
     executeRefreshInterval();
+
+    dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
+        options: {
+            ...dashboardDetailState.dashboardInfo?.options || {},
+            refresh_interval_option: option,
+        },
+    });
 };
 
 watch([() => props.dashboardId, () => props.loading], ([dashboardId, loading], prev) => {
@@ -133,7 +144,7 @@ const handleRefresh = () => {
         />
         <p-select-dropdown class="currency-select-dropdown"
                            :menu="state.intervalOptionItems"
-                           :selected="dashboardDetailState.settings.refresh_interval_option"
+                           :selected="dashboardDetailState.options.refresh_interval_option"
                            :read-only="props.loading"
                            :class="{ loading: props.loading }"
                            menu-position="right"

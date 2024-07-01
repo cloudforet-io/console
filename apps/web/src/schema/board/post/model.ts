@@ -20,4 +20,5 @@ export interface PostModel {
     user_id: string;
     created_at: string;
     updated_at: string;
+    workspaces: string[];
 }

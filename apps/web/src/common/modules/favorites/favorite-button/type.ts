@@ -1,8 +1,11 @@
 import type { TranslateResult } from 'vue-i18n';
 
+import type { MenuId } from '@/lib/menu/config';
+
 export const FAVORITE_TYPE = {
     MENU: 'MENU',
     CLOUD_SERVICE: 'CLOUD_SERVICE',
+    CLOUD_SERVICE_TYPE: 'CLOUD_SERVICE_TYPE',
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
     DASHBOARD: 'DASHBOARD',
@@ -10,17 +13,18 @@ export const FAVORITE_TYPE = {
     SECURITY: 'SECURITY',
     METRIC: 'METRIC',
     METRIC_EXAMPLE: 'METRIC_EXAMPLE',
+    WORKSPACE: 'WORKSPACE',
 } as const;
 export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];
 
 export interface FavoriteOptions {
     type: FavoriteType;
-    id?: string;
+    id?: MenuId | string;
 }
 
 export interface FavoriteConfig {
     itemType: FavoriteType;
-    workspace_id: string;
+    workspaceId: string;
     itemId: string;
 }
 
@@ -30,6 +34,7 @@ export interface FavoriteItem extends FavoriteConfig {
     icon?: string;
     provider?: string;
     parents?: { name?: string; label?: TranslateResult }[];
+    isDeleted?: boolean;
 }
 
 export interface FavoriteHasLoaded {

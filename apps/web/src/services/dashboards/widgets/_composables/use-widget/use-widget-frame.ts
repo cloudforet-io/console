@@ -48,7 +48,7 @@ export const useWidgetFrame = (
         widgetConfigId: props.widgetConfigId,
         title: title.value,
         size: size.value,
-        dateRange: widgetState.dateRange ?? widgetState.settings?.date_range,
+        dateRange: widgetState.dateRange ?? widgetState.dashboardOptions?.date_range,
         granularity: widgetState.granularity,
         currency: widgetState.currency,
         disableFullSize: !widgetState.widgetConfig?.sizes.includes(WIDGET_SIZE.full),

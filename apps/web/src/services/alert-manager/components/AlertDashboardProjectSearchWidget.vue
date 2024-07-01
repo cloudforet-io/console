@@ -98,7 +98,7 @@ const onChange = async (options?: any) => {
     await listAlertByProject();
 };
 const onClickProjectBox = (item) => {
-    vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME, params: { id: item.project_id } });
+    vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: item.project_id } });
 };
 
 /* init */

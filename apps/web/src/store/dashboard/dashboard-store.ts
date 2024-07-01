@@ -26,24 +26,6 @@ import type {
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
-// const getItems = (items: DashboardModel[], filters: ConsoleFilter[]): DashboardModel[] => {
-//     let result = items;
-//     filters.forEach((d) => {
-//         if (d.k === 'label' && Array.isArray(d.v)) {
-//             d.v.forEach((value) => {
-//                 if (typeof value === 'string') {
-//                     result = result.filter((item) => item.labels.includes(value));
-//                 }
-//             });
-//         } else if (!d.k && d.v) {
-//             if (typeof d.v === 'string') {
-//                 const regex = getTextHighlightRegex(d.v);
-//                 result = result.filter((item) => regex.test(item.name));
-//             }
-//         }
-//     });
-//     return result;
-// };
 
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
@@ -70,8 +52,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const getters = reactive({
         allItems: computed<Array<DashboardModel>>(() => [...state.privateDashboardItems, ...state.publicDashboardItems] as DashboardModel[]),
         domainItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'DOMAIN')),
-        workspaceItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'WORKSPACE')),
-        projectItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'PROJECT')),
+        workspaceItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))),
         privateItems: computed<PrivateDashboardModel[]>(() => state.privateDashboardItems),
     });
 
@@ -187,13 +168,16 @@ export const useDashboardStore = defineStore('dashboard', () => {
             ? SpaceConnector.clientV2.dashboard.privateDashboard.update
             : SpaceConnector.clientV2.dashboard.publicDashboard.update;
         try {
-            const result = await fetcher<UpdateDashboardParameters, DashboardModel>(params);
+            const result = await fetcher<UpdateDashboardParameters, DashboardModel>({
+                dashboard_id: dashboardId,
+                ...params,
+            });
             if (isPrivate) {
-                const targetIndex = state.privateDashboardItems.findIndex((item) => item.private_dashboard_id === get(params, 'private_dashboard_id'));
+                const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === get(params, 'dashboard_id'));
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1, result as PrivateDashboardModel);
                 state.privateDashboardItems = cloneDeep(state.privateDashboardItems);
             } else {
-                const targetIndex = state.publicDashboardItems.findIndex((item) => item.public_dashboard_id === get(params, 'public_dashboard_id'));
+                const targetIndex = state.publicDashboardItems.findIndex((item) => item.dashboard_id === get(params, 'dashboard_id'));
                 if (targetIndex !== -1) state.publicDashboardItems.splice(targetIndex, 1, result as PublicDashboardModel);
                 state.publicDashboardItems = cloneDeep(state.publicDashboardItems);
             }
@@ -208,15 +192,15 @@ export const useDashboardStore = defineStore('dashboard', () => {
         const fetcher = isPrivate
             ? SpaceConnector.clientV2.dashboard.privateDashboard.delete
             : SpaceConnector.clientV2.dashboard.publicDashboard.delete;
-        const params: DeleteDashboardParameters = isPrivate ? { private_dashboard_id: dashboardId } : { public_dashboard_id: dashboardId };
+        const params: DeleteDashboardParameters = { dashboard_id: dashboardId };
         try {
             await fetcher<DeleteDashboardParameters>(params);
             if (isPrivate) {
-                const targetIndex = state.privateDashboardItems.findIndex((item) => item.private_dashboard_id === dashboardId);
+                const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1);
                 state.privateDashboardItems = cloneDeep(state.privateDashboardItems);
             } else {
-                const targetIndex = state.publicDashboardItems.findIndex((item) => item.public_dashboard_id === dashboardId);
+                const targetIndex = state.publicDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.publicDashboardItems.splice(targetIndex, 1);
                 state.publicDashboardItems = cloneDeep(state.publicDashboardItems);
             }

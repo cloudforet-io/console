@@ -38,7 +38,7 @@ export function useBaseWidgetState(props: WidgetProps): UnwrapRef<BaseWidgetStat
         inheritOptions: toRef(props, 'inheritOptions'),
         widgetOptions: toRef(props, 'options'),
         widgetName: toRef(props, 'widgetConfigId'),
-        dashboardSettings: toRef(props, 'dashboardSettings'),
+        dashboardOptions: toRef(props, 'dashboardOptions'),
         dashboardVariablesSchema: toRef(props, 'dashboardVariablesSchema'),
         dashboardVariables: toRef(props, 'dashboardVariables'),
         title: toRef(props, 'title'),

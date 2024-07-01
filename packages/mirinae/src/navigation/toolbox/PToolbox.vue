@@ -11,10 +11,12 @@
             >
                 <p-search v-if="searchType === SEARCH_TYPES.plain"
                           v-model="proxyState.searchText"
+                          :placeholder="placeholder"
                           @search="onSearch"
                           @delete="onSearch()"
                 />
                 <p-query-search v-else-if="searchType === SEARCH_TYPES.query"
+                                :placeholder="placeholder"
                                 :key-item-sets="keyItemSets"
                                 :value-handler-map="valueHandlerMap"
                                 @search="onSearch"
@@ -138,6 +140,10 @@ export default defineComponent<ToolboxProps>({
         pageSizeChangeable: {
             type: Boolean,
             default: true,
+        },
+        placeholder: {
+            type: String,
+            default: undefined,
         },
         settingsVisible: {
             type: Boolean,

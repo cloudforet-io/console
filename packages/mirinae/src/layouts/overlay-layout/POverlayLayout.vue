@@ -10,7 +10,7 @@ interface Props {
     visible: boolean;
     title?: string;
     styleType?: 'primary' | 'secondary';
-    size?: 'md' | 'lg';
+    size?: 'md' | 'lg' | 'full';
     isFixedSize?: boolean;
 }
 
@@ -87,13 +87,13 @@ const handleClose = () => {
     height: 0;
     z-index: 1001;
 
-    .layout {
+    >.layout {
         @apply fixed flex flex-col;
         height: 100vh;
         top: 0;
         right: 0;
 
-        .header {
+        >.header {
             @apply flex justify-between items-center;
             flex-shrink: 0;
             padding: 1.5rem 1.5rem 1rem 1.5rem;
@@ -122,6 +122,9 @@ const handleClose = () => {
         &.lg {
             width: 90%;
         }
+        &.full {
+            width: 100%;
+        }
 
         &.primary {
             @apply bg-white;
@@ -136,6 +139,9 @@ const handleClose = () => {
                 width: 100%;
             }
             &.lg {
+                width: 100%;
+            }
+            &.full {
                 width: 100%;
             }
         }

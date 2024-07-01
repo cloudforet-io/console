@@ -1,17 +1,23 @@
 <script setup lang="ts">
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
-    PPaneLayout, PFieldGroup, PTextInput, PCheckbox, PButton, PDataLoader,
+    PButton,
+    PCheckbox,
+    PDataLoader,
+    PFieldGroup,
+    PPaneLayout, PRadio, PRadioGroup,
+    PTextInput,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -23,13 +29,14 @@ import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import NoticeWorkspaceDropdown from '@/services/info/components/NoticeWorkspaceDropdown.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
+import type { NoticeFormType, WorkspaceDropdownMenuItem } from '@/services/info/types/notice-type';
 
 interface Props {
     type?: NoticeFormType;
 }
-type NoticeFormType = 'CREATE' | 'EDIT';
 
 const props = withDefaults(defineProps<Props>(), {
     type: 'CREATE',
@@ -37,12 +44,25 @@ const props = withDefaults(defineProps<Props>(), {
 
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 
+const storeState = reactive({
+    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+});
 const state = reactive({
     userName: computed<string>(() => store.state.user.name),
     isPinned: false,
     isPopup: false,
     attachments: [] as Attachment[],
+});
+const workspaceState = reactive({
+    selectedItems: [] as WorkspaceDropdownMenuItem[],
+    radioMenuList: computed(() => ([
+        i18n.t('INFO.NOTICE.FORM.ALL'),
+        i18n.t('INFO.NOTICE.FORM.SPECIFIC_WORKSPACE'),
+    ])),
+    selectedRadioIdx: 0,
 });
 
 const {
@@ -81,10 +101,12 @@ const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
 const { fileUploader } = useFileUploader();
 const { getProperRouteLocation } = useProperRouteLocation();
 
+
 const handleConfirm = () => {
     if (props.type === 'CREATE') handleCreateNotice();
     else if (props.type === 'EDIT') handleEditNotice();
 };
+
 
 const handleCreateNotice = async () => {
     try {
@@ -98,7 +120,8 @@ const handleCreateNotice = async () => {
             files: data.files,
             options: data.options,
             writer: data.writer,
-            resource_group: 'DOMAIN',
+            resource_group: workspaceState.selectedRadioIdx === 0 ? 'DOMAIN' : 'WORKSPACE',
+            workspaces: workspaceState.selectedRadioIdx === 0 ? ['*'] : workspaceState.selectedItems.map((item) => item.name),
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
         await SpaceRouter.router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME, query: {} }));
@@ -110,6 +133,7 @@ const handleEditNotice = async () => {
     try {
         await noticeDetailStore.updateNoticePost({
             ...formData.value,
+            workspaces: workspaceState.selectedRadioIdx === 0 ? ['*'] : workspaceState.selectedItems.map((item) => item.name),
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
         SpaceRouter.router.back();
@@ -117,7 +141,6 @@ const handleEditNotice = async () => {
         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_UPDATE_NOTICE'));
     }
 };
-
 
 watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([notice, loading]) => {
     if (loading) return;
@@ -129,6 +152,21 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
     setForm('writerName', notice?.writer ?? store.state.user.name);
     setForm('noticeTitle', notice?.title ?? '');
     setForm('contents', notice?.contents ?? '');
+
+    if (notice?.workspaces?.includes('*')) {
+        workspaceState.selectedRadioIdx = 0;
+        workspaceState.selectedItems = [];
+    } else {
+        workspaceState.selectedRadioIdx = 1;
+        workspaceState.selectedItems = (notice?.workspaces ?? []).map((workspace) => {
+            const selectedWorkspace = storeState.workspaceList.find((w) => w.workspace_id === workspace);
+            return {
+                label: selectedWorkspace?.name || '',
+                name: selectedWorkspace?.workspace_id || '',
+                tags: selectedWorkspace?.tags,
+            };
+        });
+    }
 });
 
 </script>
@@ -150,6 +188,26 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                                       @update:value="setForm('writerName', $event)"
                         />
                     </template>
+                </p-field-group>
+                <p-field-group class="notice-label-wrapper"
+                               :label="$t('INFO.NOTICE.FORM.WORKSPACE')"
+                               required
+                >
+                    <p-radio-group>
+                        <p-radio v-for="(item, idx) in workspaceState.radioMenuList"
+                                 :key="`workspace-scope-${idx}`"
+                                 v-model="workspaceState.selectedRadioIdx"
+                                 :value="idx"
+                        >
+                            <span class="radio-item">
+                                {{ item }}
+                            </span>
+                        </p-radio>
+                    </p-radio-group>
+                    <notice-workspace-dropdown v-if="workspaceState.selectedRadioIdx === 1"
+                                               :selected-items.sync="workspaceState.selectedItems"
+                                               :type="props.type"
+                    />
                 </p-field-group>
                 <p-field-group class="notice-label-wrapper"
                                :label="$t('INFO.NOTICE.FORM.LABEL_TITLE')"
@@ -200,7 +258,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
             </p-button>
             <p-button style-type="primary"
                       size="lg"
-                      :disabled="!isAllValid"
+                      :disabled="!isAllValid || (workspaceState.selectedRadioIdx === 1 && workspaceState.selectedItems.length === 0)"
                       :loading="noticeDetailState.loadingForCUD"
                       @click="handleConfirm"
             >

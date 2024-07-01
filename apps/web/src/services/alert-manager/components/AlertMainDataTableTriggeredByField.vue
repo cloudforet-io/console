@@ -35,11 +35,12 @@ const state = reactive({
         if (props.disableLink) return undefined;
         if (props.webhookReference) {
             return {
-                name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME,
+                name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                 params: {
                     id: props.projectId ?? '',
                 },
                 query: {
+                    tab: 'webhook',
                     filters: queryHelper.setFilters([{ k: 'webhook_id', v: props.value ?? '', o: '=' }]).rawQueryStrings,
                 },
             };

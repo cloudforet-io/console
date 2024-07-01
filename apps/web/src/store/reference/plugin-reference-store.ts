@@ -10,7 +10,7 @@ import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/
 import type { PluginModel } from '@/schema/repository/plugin/model';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

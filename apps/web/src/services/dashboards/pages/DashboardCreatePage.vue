@@ -18,210 +18,131 @@ export default defineComponent({
 
 <script setup lang="ts">
 /* eslint-disable import/first */
-// eslint-disable-next-line import/order,import/no-duplicates
-import { computed, defineExpose, reactive } from 'vue';
+import {
+    computed, defineExpose, onUnmounted, reactive,
+// eslint-disable-next-line import/no-duplicates
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton, PCenteredLayoutHeader,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFormValidator } from '@/common/composables/form-validator';
-import { useGoBack } from '@/common/composables/go-back';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import DashboardCustomize from '@/services/dashboards/components/DashboardCustomize.vue';
-import DashboardScopeForm from '@/services/dashboards/components/DashboardScopeForm.vue';
-import DashboardTemplateForm from '@/services/dashboards/components/DashboardTemplateForm.vue';
+import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
+import { useGoBack } from '@/common/composables/go-back';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
+import DashboardCreateStep1 from '@/services/dashboards/components/DashboardCreateStep1.vue';
+import DashboardCreateStep2 from '@/services/dashboards/components/DashboardCreateStep2.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { CreateDashboardParameters, DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
-import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
+import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 
 
 interface Step {
     step: number;
-    description?: string;
+    description?: TranslateResult;
 }
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-const {
-    forms: { dashboardTemplate, dashboardProject },
-    setForm,
-    isAllValid,
-} = useFormValidator({
-    dashboardTemplate: {} as DashboardModel,
-    dashboardProject: undefined as undefined|ProjectTreeNodeData,
-}, {
-    dashboardTemplate(value: DashboardModel) {
-        return !Object.keys(value).length ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
-    },
-    dashboardProject(value: ProjectTreeNodeData|undefined) {
-        return !value && dashboardDetailState.dashboardScope === 'PROJECT'
-            ? i18n.t('DASHBOARDS.CREATE.VALIDATION_PROJECT') : '';
-    },
-});
-
+const appContextStore = useAppContextStore();
+const dashboardCreatePageStore = useDashboardCreatePageStore();
+const dashboardCreatePageState = dashboardCreatePageStore.state;
+const { getProperRouteLocation } = useProperRouteLocation();
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: false,
     steps: computed<Step[]>(() => [
-        { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') as string },
-        { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') as string },
-        { step: 3 },
+        {
+            step: 1,
+            description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC'),
+        },
+        {
+            step: 2,
+            description: state.isAdminMode ? i18n.t('DASHBOARDS.CREATE.STEP2_DESC_FOR_ADMIN') : i18n.t('DASHBOARDS.CREATE.STEP2_DESC'),
+        },
     ]),
-    currentStep: 1,
-    isValid: computed(() => {
-        if (dashboardDetailState.dashboardScope === 'PROJECT') return !!dashboardProject.value?.id;
-        return true;
-    }),
+    isStep2Valid: false,
     closeConfirmModalVisible: false,
+    disableCreateButton: computed<boolean>(() => {
+        if (!dashboardCreatePageState.selectedDashboardId && !dashboardCreatePageState.selectedTemplateId) return true;
+        return !state.isStep2Valid;
+    }),
 });
 
 const goStep = (direction: 'prev'|'next') => {
-    if (state.currentStep === 2 && direction === 'next') {
-        saveCurrentStateToStore();
+    if (direction === 'prev') {
+        dashboardCreatePageStore.reset();
+        dashboardCreatePageStore.setCurrentStep(dashboardCreatePageState.currentStep - 1);
+    } else {
+        dashboardCreatePageStore.setCurrentStep(dashboardCreatePageState.currentStep + 1);
     }
-    if (direction === 'prev') state.currentStep--;
-    else state.currentStep++;
 };
 
-const saveCurrentStateToStore = () => {
-    dashboardDetailStore.setProjectId(dashboardDetailState.dashboardScope === 'PROJECT' ? dashboardProject.value?.id : undefined);
-    dashboardDetailStore.setDashboardTemplate(dashboardTemplate.value);
-};
-
-const createDashboard = async () => {
-    try {
-        state.loading = true;
-
-        const apiParam: CreateDashboardParameters = {
-            name: dashboardDetailState.name,
-            // HACK: get dynamic template_id, template_type after implementing template feature
-            template_id: 'blank',
-            template_type: 'MANAGED',
-            labels: dashboardDetailState.labels,
-            settings: dashboardDetailState.settings,
-            layouts: [dashboardDetailState.dashboardWidgetInfoList],
-            variables: dashboardDetailState.variables,
-            variables_schema: dashboardDetailState.variablesSchema,
-            tags: { created_by: store.state.user.userId },
-        };
-        if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
-            (apiParam as PublicDashboardCreateParameters).resource_group = dashboardDetailState.dashboardScope;
-        }
-        if (dashboardDetailState.dashboardScope === 'PROJECT') {
-            (apiParam as PublicDashboardCreateParameters).project_id = dashboardDetailState.projectId;
-        }
-
-        const createdDashboard = await dashboardDetailStore.createDashboard(apiParam);
-        await SpaceRouter.router.push({
+const handleCreateDashboard = async () => {
+    const createdDashboardId = await dashboardCreatePageStore.createDashboard();
+    if (createdDashboardId) {
+        await SpaceRouter.router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: createdDashboard.public_dashboard_id || createdDashboard.private_dashboard_id || '',
+                dashboardId: createdDashboardId,
             },
-        });
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
-    } finally {
-        state.loading = false;
+        })).catch(() => {});
     }
 };
 
+/* Event */
 const handleClickClose = () => {
     state.closeConfirmModalVisible = true;
 };
-
-const { setPathFrom, handleClickBackButton } = useGoBack({
+const { setPathFrom, handleClickBackButton } = useGoBack(getProperRouteLocation({
     name: DASHBOARDS_ROUTE._NAME,
-});
+}));
 
 defineExpose({ setPathFrom });
+
+onUnmounted(() => {
+    dashboardCreatePageStore.setCurrentStep(1);
+    dashboardCreatePageStore.reset();
+});
 </script>
 
 <template>
     <div class="dashboard-create-page"
-         :class="`step-${state.currentStep}`"
+         :class="[`step-${dashboardCreatePageState.currentStep}`]"
     >
-        <div v-if="state.currentStep === state.steps[0].step">
-            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="state.steps[state.currentStep - 1].description"
-                                      :total-steps="state.steps.length"
-                                      :current-step="state.currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
-            <dashboard-scope-form @set-project="setForm('dashboardProject', $event)" />
+        <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                  :description="state.steps?.[dashboardCreatePageState.currentStep - 1]?.description"
+                                  :total-steps="state.steps.length"
+                                  :current-step="dashboardCreatePageState.currentStep"
+                                  show-step
+                                  show-close-button
+                                  @close="handleClickClose"
+        />
+        <dashboard-create-step1 v-if="dashboardCreatePageState.currentStep === 1" />
+        <template v-else-if="dashboardCreatePageState.currentStep === 2">
+            <dashboard-create-step2 :is-valid.sync="state.isStep2Valid" />
             <div class="button-area">
-                <p-button
-                    style-type="transparent"
-                    size="lg"
-                    @click="$router.go(-1)"
-                >
-                    {{ $t('DASHBOARDS.CREATE.CANCEL') }}
-                </p-button>
-                <p-button
-                    style-type="primary"
-                    size="lg"
-                    :disabled="!state.isValid"
-                    @click="goStep('next')"
-                >
-                    {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
-                </p-button>
-            </div>
-        </div>
-        <div v-if="state.currentStep === state.steps[1].step">
-            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="state.steps[state.currentStep - 1].description"
-                                      :total-steps="state.steps.length"
-                                      :current-step="state.currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
-            <dashboard-template-form
-                :dashboard-scope="dashboardDetailState.dashboardScope"
-                @set-template="setForm('dashboardTemplate', $event)"
-            />
-            <div class="button-area">
-                <p-button
-                    style-type="transparent"
-                    size="lg"
-                    icon-left="ic_arrow-left"
-                    @click="goStep('prev')"
+                <p-button style-type="transparent"
+                          size="lg"
+                          icon-left="ic_arrow-left"
+                          :disabled="dashboardCreatePageState.loading"
+                          @click="goStep('prev')"
                 >
                     {{ $t('DASHBOARDS.CREATE.GO_BACK') }}
                 </p-button>
-                <p-button
-                    style-type="primary"
-                    size="lg"
-                    :disabled="!isAllValid"
-                    @click="goStep('next')"
+                <p-button style-type="primary"
+                          size="lg"
+                          :disabled="state.disableCreateButton"
+                          :loading="dashboardCreatePageState.loading"
+                          @click="handleCreateDashboard"
                 >
-                    {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
+                    {{ $t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD') }}
                 </p-button>
             </div>
-        </div>
-        <div v-if="state.currentStep === state.steps[2].step">
-            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                      :total-steps="state.steps.length"
-                                      :current-step="state.currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
-            <dashboard-customize :loading="state.loading"
-                                 :save-button-text="$t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
-                                 hide-cancel-button
-                                 @go-back="goStep('prev')"
-                                 @save="createDashboard"
-            />
-        </div>
+        </template>
         <confirm-back-modal :visible.sync="state.closeConfirmModalVisible"
                             @confirm="handleClickBackButton"
         />
@@ -230,12 +151,11 @@ defineExpose({ setPathFrom });
 
 <style lang="postcss" scoped>
 .dashboard-create-page {
-    min-width: 25rem;
+    &.step-1 {
+        width: 60rem;
+    }
     &.step-2 {
-        @apply absolute;
-        top: 2rem;
-        width: 100%;
-        max-width: 1000px;
+        width: 45rem;
     }
     &.step-3 {
         width: 100%;

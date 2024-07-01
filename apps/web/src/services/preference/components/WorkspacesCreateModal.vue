@@ -112,13 +112,13 @@ const handleConfirm = async () => {
                     theme: state.selectedTheme ?? 'blue',
                 },
             });
-            await userWorkspaceStore.load();
             showSuccessMessage(i18n.t('Workspace successfully created'), '');
             emit('confirm', {
                 id: response.workspace_id,
                 name: response.name,
             });
         }
+        await userWorkspaceStore.load();
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -168,7 +168,9 @@ watch(() => props.visible, (visible) => {
                             :placeholder="$t('IAM.WORKSPACES.FORM.PLACEHOLDER_DESC')"
                 />
             </p-field-group>
-            <p-field-group :label="$t('IAM.WORKSPACES.FORM.LABEL_THEME')">
+            <p-field-group :label="$t('IAM.WORKSPACES.FORM.LABEL_THEME')"
+                           required
+            >
                 <div class="theme-wrapper">
                     <button v-for="(theme, idx) in state.themes"
                             :key="`${theme}-${idx}`"
@@ -179,7 +181,7 @@ watch(() => props.visible, (visible) => {
                              class="background-area"
                         />
                         <workspace-logo-icon :theme="theme"
-                                             text="A"
+                                             :text="state.name ? state.name : 'A'"
                                              size="md"
                         />
                     </button>
@@ -187,7 +189,7 @@ watch(() => props.visible, (visible) => {
             </p-field-group>
         </template>
         <template #confirm-button>
-            <span>{{ $t('IAM.WORKSPACES.CREATE') }}</span>
+            <span v-if="props.createType === 'CREATE'">{{ $t('IAM.WORKSPACES.CREATE') }}</span>
         </template>
     </p-button-modal>
 </template>

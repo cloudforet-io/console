@@ -57,11 +57,10 @@ const tableState = reactive({
 
 <style lang="postcss" scoped>
 .data-source-management-tab-detail-base-information {
-    .title {
-        margin-top: 2.25rem;
-    }
     .data-source-definition-table {
+        min-height: unset;
         padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
         .col-name {
             @apply inline-flex items-center;
             gap: 0.5rem;

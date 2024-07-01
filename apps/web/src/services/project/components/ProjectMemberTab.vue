@@ -66,9 +66,9 @@ const state = reactive({
         const fields: DataTableFieldType[] = [
             { label: 'User ID', name: 'user_id' },
             { label: 'User Name', name: 'user_name' },
-            { label: 'Role', name: 'role_type' },
         ];
         if (projectDetailPageGetters.projectType === 'PRIVATE') {
+            fields.push({ label: 'Role', name: 'role_type' });
             fields.push({ label: ' ', name: 'delete', sortable: false });
         }
         return fields;
@@ -222,7 +222,7 @@ watch(() => projectDetailPageGetters.projectType, () => {
                                 {{ $t('PROJECT.DETAIL.MEMBER.REMOVE') }}
                             </p-button>
                             <p-button style-type="primary"
-                                      class="mr-4 add-btn"
+                                      class="add-btn"
                                       @click="handleClickInviteMember"
                             >
                                 {{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}

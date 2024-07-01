@@ -12,10 +12,10 @@ import type { SecretModel } from '@/schema/secret/secret/model';
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -38,9 +38,9 @@ export const useSecretReferenceStore = defineStore('reference-secret', () => {
             return state.items ?? {};
         }, {}, { lazy: true }),
         secretTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.secret.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.secret.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.secret.name,
+            type: MANAGED_VARIABLE_MODELS.secret.meta.key,
+            key: MANAGED_VARIABLE_MODELS.secret.meta.idKey as string,
+            name: MANAGED_VARIABLE_MODELS.secret.meta.name,
             referenceMap: getters.secretItems,
         })),
     });

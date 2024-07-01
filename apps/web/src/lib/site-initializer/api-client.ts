@@ -73,7 +73,7 @@ const getAfterCallApiMap = () => ({
     '/identity/project-group/delete': () => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.load('project_group');
+        allReferenceStore.load('project_group', { force: true });
     },
     '/identity/project-group/change-parent-group': (data) => {
         useAllReferenceStore(pinia);
@@ -191,6 +191,16 @@ const getAfterCallApiMap = () => ({
         allReferenceStore.sync('public_dashboard', data);
     },
     '/dashboard/public-dashboard/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_dashboard', data);
+    },
+    '/dashboard/public-dashboard/share': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_dashboard', data);
+    },
+    '/dashboard/public-dashboard/unshare': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('public_dashboard', data);

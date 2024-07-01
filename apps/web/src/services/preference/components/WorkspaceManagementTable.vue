@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PSelectDropdown, PStatus, PToolboxTable, PLink,
@@ -24,7 +25,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import {
@@ -34,6 +34,7 @@ import {
 } from '@/services/preference/constants/workspace-constant';
 import type { WorkspaceTableModel } from '@/services/preference/store/workspace-page-store';
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 interface Props {
     tableHeight?: number;
@@ -48,19 +49,45 @@ const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
+const route = useRoute();
+
 const workspaceListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(workspacePageState.pageStart).setPageLimit(workspacePageState.pageLimit)
     .setSort('name', true);
 let workspaceListApiQuery = workspaceListApiQueryHelper.data;
+
 const queryTagsHelper = useQueryTags({ keyItemSets: WORKSPACE_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagsHelper;
+if (route.query.selectedWorkspaceId) {
+    queryTagsHelper.setFilters([
+        {
+            k: 'workspace_id',
+            v: route.query.selectedWorkspaceId,
+            o: '=',
+        },
+    ]);
+}
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 
-
 const dropdownMenu = computed<MenuItem[]>(() => ([
+    {
+        type: 'item',
+        name: 'enable',
+        label: i18n.t('IAM.WORKSPACES.ENABLE'),
+        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0]?.state === 'ENABLED'),
+    },
+    {
+        type: 'item',
+        name: 'disable',
+        label: i18n.t('IAM.WORKSPACES.DISABLE'),
+        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0]?.state === 'DISABLED'),
+    },
+    {
+        type: 'divider',
+    },
     {
         type: 'item',
         name: 'edit',
@@ -72,21 +99,6 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         name: 'delete',
         label: i18n.t('IAM.WORKSPACES.DELETE'),
         disabled: workspacePageState.selectedIndices.length !== 1,
-    },
-    {
-        type: 'divider',
-    },
-    {
-        type: 'item',
-        name: 'enable',
-        label: i18n.t('IAM.WORKSPACES.ENABLE'),
-        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0].state === 'ENABLED'),
-    },
-    {
-        type: 'item',
-        name: 'disable',
-        label: i18n.t('IAM.WORKSPACES.DISABLE'),
-        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0].state === 'DISABLED'),
     },
 ]));
 
@@ -127,7 +139,7 @@ const handleExport = async () => {
 };
 
 const getWorkspaceRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
-    name: HOME_DASHBOARD_ROUTE._NAME,
+    name: WORKSPACE_HOME_ROUTE._NAME,
     params: {
         workspaceId: item?.workspace_id,
     },
@@ -139,8 +151,6 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
         workspaceId: item?.workspace_id,
     },
 });
-
-
 </script>
 
 <template>
