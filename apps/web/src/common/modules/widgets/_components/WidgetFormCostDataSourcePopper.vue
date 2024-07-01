@@ -56,14 +56,19 @@ const state = reactive({
     dataTypeMenuItems: computed<MenuItem[]>(() => {
         if (!state.selectedDataSource.length) return [];
         const targetCostDataSource = storeState.costDataSource[state.selectedDataSource[0].name];
-        const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
-        const usageAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
-        const additionalMenuItems: MenuItem[] = targetCostDataSource.data?.cost_data_keys?.map((key) => ({
-            type: 'item', name: `data.${key}`, label: key,
-        }));
+        const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.cost_info?.name;
+        const dataInfo = targetCostDataSource?.data?.plugin_info?.metadata?.data_info ?? {};
+        const additionalMenuItems: MenuItem[] = targetCostDataSource.data?.cost_data_keys?.map((key) => {
+            const alias = dataInfo[key]?.name;
+            return {
+                type: 'item',
+                name: `data.${key}`,
+                label: alias ? `${key} (${alias})` : key,
+            };
+        });
         const dataTypeItems = [
             { type: 'item', name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },
-            { type: 'item', name: 'usage_quantity', label: usageAlias ? `Usage (${usageAlias})` : 'Usage' },
+            { type: 'item', name: 'usage_quantity', label: 'Usage' },
             ...(additionalMenuItems || []),
         ];
         return dataTypeItems.filter((d) => d.label.toLowerCase().includes(state.dataTypeSearchText.toLowerCase()));

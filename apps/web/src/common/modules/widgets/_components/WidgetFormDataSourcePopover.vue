@@ -100,13 +100,13 @@ const state = reactive({
     selectedCostDataTypeLabel: computed(() => {
         if (!state.selectedCostDataSourceId || !state.selectedCostDataType) return '';
         const targetCostDataSource = storeState.costDataSources[state.selectedCostDataSourceId];
-        const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
-        const usageAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
+        const costAlias: string|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.name;
         if (state.selectedCostDataType === 'cost') {
             return costAlias ? `Cost (${costAlias})` : 'Cost';
         }
         if (state.selectedCostDataType === 'usage_quantity') {
-            return usageAlias ? `Usage (${usageAlias})` : 'Usage';
+            // return usageAlias ? `Usage (${usageAlias})` : 'Usage';
+            return 'Usage';
         }
         return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
     }),
@@ -203,8 +203,19 @@ const handleConfirmDataSource = async () => {
             source_type: state.selectedDataSourceDomain,
             name: getDuplicatedDataTableName(dataTableBaseName),
         } as DataTableAddParameters;
+        const dataKey = state.selectedCostDataType.replace('data.', '');
+        const costUnit: string|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.unit;
+        const additionalDataInfo: Record<string, { name: string, unit: string }>|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.data_info;
+        const additionalDataUnit = dataKey !== 'cost' && additionalDataInfo ? additionalDataInfo[dataKey]?.unit : undefined;
+        let dataUnit: string|undefined;
+        if (dataKey === 'cost') {
+            dataUnit = costUnit;
+        } else {
+            dataUnit = additionalDataUnit;
+        }
         const costOptions: DataTableAddOptions = {
             data_name: state.selectedCostDataTypeLabel,
+            data_unit: dataUnit,
             COST: {
                 data_source_id: state.selectedCostDataSourceId,
                 data_key: state.selectedCostDataType,
