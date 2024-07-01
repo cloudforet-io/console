@@ -33,6 +33,8 @@ const bookmarkState = bookmarkStore.state;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 
+const emit = defineEmits<{(e: 'confirm'): void; }>();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
@@ -108,6 +110,7 @@ const handleConfirm = async () => {
         } else {
             await bookmarkStore.createBookmarkFolder(name.value, state.scope);
         }
+        emit('confirm');
         await handleClose();
     } finally {
         state.loading = false;

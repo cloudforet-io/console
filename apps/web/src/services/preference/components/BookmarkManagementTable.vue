@@ -16,6 +16,8 @@ import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import { useQueryTags } from '@/common/composables/query-tags';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { gray } from '@/styles/colors';
+
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
 const bookmarkPageStore = useBookmarkPageStore();
@@ -143,8 +145,20 @@ onMounted(async () => {
                     <span class="name">{{ value }}</span>
                 </div>
             </template>
-            <template #col-workspace_id-format="{value}">
-                <div class="col-workspace">
+            <template #col-workspace_id-format="{value, item}">
+                <div v-if="item.isGlobal"
+                     class="col-workspace"
+                >
+                    <p-i name="ic_globe-filled"
+                         :color="gray[500]"
+                         width="1rem"
+                         height="1rem"
+                    />
+                    <span class="global">{{ $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') }}</span>
+                </div>
+                <div v-else
+                     class="col-workspace"
+                >
                     <workspace-logo-icon :text="getWorkspaceInfo(value)?.name || ''"
                                          :theme="getWorkspaceInfo(value)?.tags?.theme"
                                          size="xs"

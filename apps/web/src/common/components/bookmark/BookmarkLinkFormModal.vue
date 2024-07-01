@@ -48,6 +48,8 @@ const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 
+const emit = defineEmits<{(e: 'confirm'): void; }>();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
@@ -185,6 +187,7 @@ const handleConfirm = async () => {
                 await bookmarkStore.setFullMode(true);
             }
         }
+        emit('confirm');
         await handleClose();
     } finally {
         state.loading = false;
