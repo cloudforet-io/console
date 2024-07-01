@@ -18,7 +18,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 
@@ -30,8 +30,8 @@ interface BoardSet {
     iconButtonSets?: IconSet[];
 }
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const dashboardCreatePageStore = useDashboardCreatePageStore();
+const dashboardCreatePageState = dashboardCreatePageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceState = userWorkspaceStore.$state;
 const storeState = reactive({
@@ -62,14 +62,12 @@ const state = reactive({
 
 /* Event */
 const handleSelectDashboardScope = (scopeType: DashboardScope) => {
-    dashboardDetailStore.setDashboardScope(scopeType);
-    dashboardDetailStore.setDashboardType(scopeType === 'PRIVATE' ? 'PRIVATE' : 'PUBLIC');
+    dashboardCreatePageStore.setDashboardScope(scopeType);
 };
 
 onMounted(() => {
     if (!storeState.isWorkspaceOwner) {
-        dashboardDetailStore.setDashboardScope('PRIVATE');
-        dashboardDetailStore.setDashboardType('PRIVATE');
+        dashboardCreatePageStore.setDashboardScope('PRIVATE');
     }
 });
 </script>
@@ -85,13 +83,13 @@ onMounted(() => {
                               :key="`dashboard-scope-${dashboardScopeItem.value}`"
                               class="dashboard-scope-board-item"
                               :class="{
-                                  'selected': dashboardDetailState.dashboardScope === dashboardScopeItem.value,
+                                  'selected': dashboardCreatePageState.dashboardScope === dashboardScopeItem.value,
                               }"
                               :left-icon="dashboardScopeItem.leftIcon"
                               :icon-button-sets="dashboardScopeItem.iconButtonSets"
                               :value="dashboardScopeItem.value"
                               rounded
-                              :selected="dashboardDetailState.dashboardScope"
+                              :selected="dashboardCreatePageState.dashboardScope"
                               @click="handleSelectDashboardScope(dashboardScopeItem.value)"
                 >
                     <template #left-content>

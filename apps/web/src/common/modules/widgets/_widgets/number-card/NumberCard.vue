@@ -182,13 +182,17 @@ defineExpose<WidgetExpose<Data>>({
                          :color="state.iconColor"
                     />
                 </div>
-                <span class="value-text">{{ numberFormatter(state.currentValue, { notation: 'compact' }) }}</span>
+                <span class="value-text"
+                      :class="[props.size]"
+                >{{ numberFormatter(state.currentValue, { notation: 'compact' }) }}</span>
             </div>
             <div v-if="props.widgetOptions?.comparison"
                  class="comparison-wrapper"
             >
-                <p-i :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
+                <p-i :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled-alt' : 'ic_caret-down-filled-alt'"
                      :color="state.comparisonColor"
+                     width="1rem"
+                     height="1rem"
                 />
                 <span :style="{ 'color': state.comparisonColor }">
                     {{ state.comparisonValue }}
@@ -208,6 +212,9 @@ defineExpose<WidgetExpose<Data>>({
         gap: 0.5rem;
         .value-text {
             @apply text-display-xl;
+            &.full {
+                font-size: 8rem;
+            }
         }
     }
     .comparison-wrapper {

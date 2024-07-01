@@ -244,7 +244,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         };
         state.projectId = _dashboardInfo.project_id === '*' ? undefined : _dashboardInfo.project_id;
         state.vars = _dashboardInfo.vars ?? {};
-        state.dashboardLayouts = _dashboardInfo.layouts;
+        state.dashboardLayouts = _dashboardInfo.layouts ?? [];
     };
     const _setDashboardInfoStoreState = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
@@ -413,7 +413,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         if (_layouts.length) {
             const _targetLayout = _layouts[0];
             if (_targetLayout.widgets) {
-                _targetLayout.widgets.unshift(widgetId);
+                _targetLayout.widgets.push(widgetId);
             } else {
                 _targetLayout.widgets = [widgetId];
             }

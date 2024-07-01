@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {
-    computed, onMounted, reactive, useSlots, watch,
+    computed, reactive, useSlots,
 } from 'vue';
 import type { SetupContext } from 'vue/types/v3-setup-context';
 
@@ -55,18 +55,18 @@ const handleClickItem = () => {
 };
 
 
-watch(() => state.proxyIsOpen, async (isOpen) => {
-    if (!props.node.id) return;
-    if (isOpen) {
-        await emit('click-toggle', props.node);
-    } else state.proxyIsOpen = false;
-}, { immediate: true });
-
-onMounted(() => {
-    if (state.proxyIsOpen) {
-        openToggle();
-    }
-});
+// watch(() => state.proxyIsOpen, async (isOpen) => {
+//     if (!props.node.id) return;
+//     if (isOpen) {
+//         await emit('click-toggle', props.node);
+//     } else state.proxyIsOpen = false;
+// }, { immediate: true });
+//
+// onMounted(() => {
+//     if (state.proxyIsOpen) {
+//         openToggle();
+//     }
+// });
 
 </script>
 

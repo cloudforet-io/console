@@ -293,7 +293,7 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                               size="sm"
                               class="add-link-button"
                               style-type="tertiary"
-                              @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, true)"
+                              @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, !(storeState.isFileFullMode && !!storeState.selectedBookmark))"
                     >
                         <span>{{ $t('HOME.FORM_LINK') }}</span>
                     </p-button>

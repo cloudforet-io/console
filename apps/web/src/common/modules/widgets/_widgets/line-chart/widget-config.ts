@@ -6,10 +6,6 @@ const lineChart: WidgetConfig = {
     meta: {
         title: 'Line Chart',
         sizes: ['md', 'full'],
-        defaultValidationConfig: {
-            dataTarget: 'labels_info',
-            defaultMaxCount: 2,
-        },
     },
     requiredFieldsSchema: {
         granularity: {},
@@ -21,18 +17,20 @@ const lineChart: WidgetConfig = {
                 max: 31,
             },
         },
-        lineBy: {
-            options: {
-                dataTarget: 'labels_info',
-                defaultMaxCount: 5,
-                max: 10,
-            },
-        },
     },
     optionalFieldsSchema: {
         legend: {
             options: {
                 default: true,
+            },
+        },
+        lineBy: {
+            options: {
+                dataTarget: 'labels_info',
+                defaultMaxCount: 5,
+                max: 10,
+                defaultIndex: 0,
+                excludeDateField: true,
             },
         },
     },

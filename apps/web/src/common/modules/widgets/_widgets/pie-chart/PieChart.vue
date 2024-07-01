@@ -68,19 +68,17 @@ const state = reactive({
             type: 'scroll',
             right: 10,
             top: 20,
-            bottom: 20,
             itemWidth: 10,
             itemHeight: 10,
             icon: 'circle',
-            textStyle: {
-                overflow: 'truncate',
-                width: props.size === 'full' ? 200 : 150,
-            },
             formatter: (name) => {
                 const _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, name);
                 const _series = state.chart.getOption().series[0];
                 const _value = _series.data.filter((row) => row.name === name)[0]?.value;
-                return `${(_name.length > 25 ? `${_name.slice(0, 25)}...` : _name)}  ${numberFormatter(_value)}`;
+                if (props.size === 'full') {
+                    return `${_name}  ${numberFormatter(_value)}`;
+                }
+                return `${(_name.length > 15 ? `${_name.slice(0, 15)}...` : _name)}  ${numberFormatter(_value)}`;
             },
         },
         series: [

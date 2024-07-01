@@ -8,7 +8,6 @@ export interface WidgetConfig {
         title: string;
         sizes: WidgetSize[];
         defaultValidationConfig?: {
-            dataTarget: 'labels_info' | 'data_info',
             defaultMaxCount: number,
         };
     };

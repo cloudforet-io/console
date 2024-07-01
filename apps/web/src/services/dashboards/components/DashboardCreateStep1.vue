@@ -1,95 +1,82 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
-import {
-    PSearch, PFieldTitle, PEmpty,
-} from '@spaceone/design-system';
+import { PEmpty, PFieldTitle, PSearch } from '@spaceone/design-system';
+import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
-import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
-import type {
-    FilterLabelItem,
-} from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
+import type { FilterLabelItem } from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateTemplateBoard from '@/services/dashboards/components/DashboardCreateTemplateBoard.vue';
-import {
-    generateDashboardTemplateList,
-} from '@/services/dashboards/dashboard-template/template-list';
+import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
-const emit = defineEmits<{(e: 'select-template', value: DashboardModel)}>();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
-
+const dashboardCreatePageStore = useDashboardCreatePageStore();
+const dashboardCreatePageState = dashboardCreatePageStore.state;
 const state = reactive({
-    managedTemplates: [] as DashboardTemplate[],
-    blankTemplate: computed<DashboardTemplate[]>(() => ([{
-        name: 'Blank',
+    templates: [] as DashboardTemplateModel[],
+    blankTemplate: computed<BoardSet[]>(() => ([{
         template_id: 'blank',
-        template_type: 'MANAGED',
-        version: '1',
-        layouts: [],
-        options: {
-            date_range: {
-                enabled: true,
-            },
-            refresh_interval_option: '5m',
-        },
+        name: 'Blank',
     }])),
-    outOfTheBoxTemplateSets: computed<DashboardTemplate[]>(() => {
-        const _templates = state.managedTemplates;
-        return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
+    outOfTheBoxTemplateSets: computed<BoardSet[]>(() => {
+        const _filteredTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
+        return _filteredTemplates.map((d) => ({
+            template_id: d.template_id,
+            name: d.name,
+            labels: d.labels,
+        }));
     }),
-    existingTemplateSets: computed<DashboardTemplate[]>(() => {
-        const _templates = dashboardGetters.allItems;
-        const _filteredTemplates = _templates.filter((d) => d.version !== '1.0');
-        return getFilteredTemplates(_filteredTemplates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
+    existingTemplateSets: computed<BoardSet[]>(() => {
+        const _filteredDashboards = getFilteredTemplates(dashboardGetters.allItems, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
+        return _filteredDashboards.map((d) => ({
+            dashboard_id: d.dashboard_id,
+            name: d.name,
+            labels: d.labels,
+        }));
     }),
 });
 
 const filterState = reactive({
     inputValue: '',
-    selectedLabels: [] as FilterLabelItem[],
-    selectedProviders: [] as FilterLabelItem[],
+    selectedLabels: [] as string[],
+    selectedProviders: [] as string[],
 });
 
 /* Util */
 const getFilteredTemplates = (
-    templates: DashboardTemplate[],
+    dashboards: Array<DashboardModel|DashboardTemplateModel>,
     inputValue: string,
     selectedLabels: FilterLabelItem[],
     selectedProviders: FilterLabelItem[],
-): DashboardTemplate[] => {
+): Array<DashboardModel|DashboardTemplateModel> => {
     const _inputValue = inputValue.toLowerCase();
-    return templates.filter((template) => (!selectedLabels.length || template.labels.some((label) => selectedLabels.map((sel) => sel.label).includes(label)))
-        && (!selectedProviders.length || selectedProviders.some((provider) => template.variables_schema.fixed_options?.provider === provider.name))
-        && (_inputValue === '' || template.name.toLowerCase().includes(_inputValue)));
+    const _selectedLabels = selectedLabels;
+    const _selectedProviders = selectedProviders;
+    return dashboards
+        .filter((d) => d?.version !== '1.0')
+        .filter((d) => (!_selectedLabels.length || d.labels?.some((label) => _selectedLabels.includes(label.toLowerCase()))))
+        .filter((d) => (!_selectedProviders.length || d.labels?.some((label) => _selectedProviders.includes(label.toLowerCase()))))
+        .filter((d) => (_inputValue === '' || d.name.toLowerCase().includes(_inputValue.toLowerCase())));
 };
 
 /* Event */
 const handleSelectLabels = (labels: FilterLabelItem[]) => {
-    filterState.selectedLabels = labels;
+    filterState.selectedLabels = labels.map((d) => d.name.toLowerCase());
 };
-
 const handleSelectProvider = (providers: FilterLabelItem[]) => {
-    filterState.selectedProviders = providers;
+    filterState.selectedProviders = providers.map((d) => d.label.toLowerCase());
 };
 
-const handleClickCreateTemplate = (template: DashboardModel) => {
-    emit('select-template', template);
-};
-
-const listTemplates = async () => {
-    state.managedTemplates = await generateDashboardTemplateList();
-};
-
-listTemplates();
-
-
-
+onMounted(() => {
+    dashboardCreatePageStore.listDashboardTemplates();
+});
 </script>
 
 <template>
@@ -114,7 +101,6 @@ listTemplates();
                 </p-empty>
                 <dashboard-create-template-board :template-sets="state.blankTemplate"
                                                  class="blank-board"
-                                                 @select-template="handleClickCreateTemplate"
                 >
                     <template #bottom>
                         <span class="blank-description">
@@ -132,7 +118,6 @@ listTemplates();
                         <dashboard-create-template-board :template-sets="state.outOfTheBoxTemplateSets"
                                                          :column="2"
                                                          :keyword="filterState.inputValue"
-                                                         @select-template="handleClickCreateTemplate"
                         />
                     </div>
                 </div>
@@ -146,7 +131,6 @@ listTemplates();
                         <dashboard-create-template-board :template-sets="state.existingTemplateSets"
                                                          show-view-link
                                                          :keyword="filterState.inputValue"
-                                                         @select-template="handleClickCreateTemplate"
                         />
                     </div>
                 </div>
@@ -189,7 +173,6 @@ listTemplates();
                 margin-bottom: 2rem;
 
                 .out-of-the-box-contents {
-                    background-color: rgba(225, 224, 250, 0.3);
                     margin-top: 0.5rem;
                 }
             }

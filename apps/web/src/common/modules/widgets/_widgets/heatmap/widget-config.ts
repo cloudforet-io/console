@@ -7,8 +7,7 @@ const heatmap: WidgetConfig = {
         title: 'Heatmap',
         sizes: ['md', 'full'],
         defaultValidationConfig: {
-            dataTarget: 'labels_info',
-            defaultMaxCount: 2,
+            defaultMaxCount: 1,
         },
     },
     requiredFieldsSchema: {
@@ -19,6 +18,7 @@ const heatmap: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 10,
                 max: 10,
+                defaultIndex: 0,
             },
         },
         yAxis: {
@@ -26,6 +26,7 @@ const heatmap: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 7,
                 max: 14,
+                defaultIndex: 1,
             },
         },
         colorSchema: {},

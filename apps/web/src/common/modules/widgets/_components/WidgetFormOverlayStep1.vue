@@ -23,7 +23,7 @@ const storeState = reactive({
 
 const displayState = reactive({
     dataTableAreaOpen: true,
-    tableAreaHeight: (dataTableContentsRef.value?.clientHeight || 1000) / 4,
+    tableAreaHeight: (dataTableContentsRef.value?.clientHeight || 1000) / 4.5,
     minHeight: 32,
     resizerStyle: computed(() => ({
         bottom: `${displayState.tableAreaHeight}px`,
@@ -94,9 +94,17 @@ const documentEventMount = (eventName: string, func: any) => {
 documentEventMount('mousemove', isResizing);
 documentEventMount('mouseup', endResizing);
 
-onMounted(() => {
+onMounted(async () => {
     // Reset Join Restricted Map at init Data Table form init
     widgetGenerateStore.setJoinRestrictedMap({});
+
+    // Initial Load
+    if (widgetGenerateState.selectedDataTableId) {
+        widgetGenerateStore.setDataTableUpdating(true);
+        await widgetGenerateStore.loadDataTable({
+            data_table_id: widgetGenerateState.selectedDataTableId,
+        });
+    }
 });
 
 </script>
@@ -169,7 +177,7 @@ onMounted(() => {
                 overflow: auto;
                 .data-table-contents-wrapper {
                     @apply flex gap-4;
-                    padding: 1rem 1rem 1.125rem;
+                    padding: 1.25rem;
                     height: auto;
                     width: auto;
                 }
@@ -180,16 +188,18 @@ onMounted(() => {
                 width: 100%;
                 height: 1.5rem;
                 bottom: 0;
-                background: linear-gradient(180deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.150') 100%);
+                background: linear-gradient(180deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.100') 100%);
                 z-index: 1;
+                pointer-events: none;
             }
             .gradation-top-area {
                 @apply absolute;
                 width: 100%;
                 height: 1.25rem;
                 top: 0;
-                background: linear-gradient(180deg, theme('colors.gray.150') 0%, rgba(247, 247, 247, 0) 100%);
+                background: linear-gradient(180deg, theme('colors.gray.100') 0%, rgba(247, 247, 247, 0) 100%);
                 z-index: 1;
+                pointer-events: none;
             }
             .gradation-left-area {
                 @apply absolute;
@@ -197,17 +207,19 @@ onMounted(() => {
                 height: 100%;
                 left: 0;
                 top: 0;
-                background: linear-gradient(90deg, theme('colors.gray.150') 0%, rgba(247, 247, 247, 0) 100%);
+                background: linear-gradient(90deg, theme('colors.gray.100') 0%, rgba(247, 247, 247, 0) 100%);
                 z-index: 1;
+                pointer-events: none;
             }
             .gradation-right-area {
                 @apply absolute;
-                width: 1.5rem;
+                width: 1.25rem;
                 height: 100%;
                 right: 0;
                 top: 0;
-                background: linear-gradient(90deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.150') 100%);
+                background: linear-gradient(90deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.100') 100%);
                 z-index: 1;
+                pointer-events: none;
             }
         }
         .resizer-area {
@@ -265,6 +277,7 @@ onMounted(() => {
             height: 20%;
             max-height: calc(100% - 2rem);
             padding: 0 0.125rem 0.125rem 0.125rem;
+            margin-top: 0.75rem;
 
             &.transition {
                 transition: height 0.2s;
@@ -282,6 +295,9 @@ onMounted(() => {
 
                     :deep(.p-toolbox) {
                         padding: 1rem 1rem 0;
+                        .toolbox-inner {
+                            padding: 0 1rem;
+                        }
                         .toolbox-left {
                             @apply h-full;
                         }

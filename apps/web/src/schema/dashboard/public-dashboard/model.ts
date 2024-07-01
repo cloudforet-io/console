@@ -20,6 +20,7 @@ export interface PublicDashboardModel {
     variables_schema?: DashboardVariablesSchema; // will be deprecated
     variables?: DashboardVariables; // will be deprecated
     labels?: string[];
+    shared: boolean;
     //
     tags: Tags;
     folder_id: string;

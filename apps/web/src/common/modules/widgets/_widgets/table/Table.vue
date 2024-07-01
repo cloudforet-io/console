@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    defineExpose, reactive, computed, watch,
+    defineExpose, reactive, computed, watch, onMounted,
 } from 'vue';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
@@ -12,7 +12,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
@@ -22,15 +24,19 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getWidgetDataTable, sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
-import type { DateRange, DateFieldType, TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
+import type {
+    DateRange, DateFieldType, TableDataItem,
+} from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 
 type Data = ListResponse<TableDataItem>;
@@ -43,6 +49,7 @@ const state = reactive({
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     comparisonData: null as Data | null,
+    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
     // converted data
     finalConvertedData: computed<Data|null>(() => {
         if (!state.data) return null;
@@ -84,26 +91,33 @@ const state = reactive({
     progressBarInfo: computed<ProgressBarValue|undefined>(() => props.widgetOptions?.progressBar as ProgressBarValue),
     // table
     tableFields: computed<TableWidgetField[]>(() => {
-        const labelFields: TableWidgetField[] = state.groupByField?.map((field) => ({ name: field, label: field, fieldInfo: { type: 'labelField' } })) ?? [];
+        const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map((field) => ({ name: field, label: field, fieldInfo: { type: 'labelField' } })) ?? [];
         let dataFields: TableWidgetField[] = [];
         if (state.tableDataFieldType === 'staticField') {
             state.tableDataField.forEach((field) => {
                 dataFields.push({
                     name: field,
                     label: field,
-                    fieldInfo: { type: 'dataField' },
+                    fieldInfo: {
+                        type: 'dataField',
+                        unit: state.dataInfo?.[field]?.unit,
+                    },
                 });
                 if (state.comparisonInfo?.format && state.isComparisonEnabled) {
                     dataFields.push({
                         name: `comparison_${field}`,
                         label: field,
-                        fieldInfo: { type: 'dataField', additionalType: 'comparison' },
+                        fieldInfo: {
+                            type: 'dataField',
+                            additionalType: 'comparison',
+                            unit: state.dataInfo?.[field]?.unit,
+                        },
                     });
                 }
             });
-        } else if (isDateField(state.tableDataField)) dataFields = getWidgetTableDateFields(state.tableDataField, state.granularity, state.dateRange, state.tableDataMaxCount);
+        } else if (isDateField(state.tableDataField)) dataFields = getWidgetTableDateFields(state.tableDataField, state.granularity, state.dateRange, state.tableDataMaxCount, state.tableDataCriteria);
         else { // None Time Series Dynamic Field Case
-            state.finalConvertedData?.results?.[0][state.tableDataCriteria].forEach((d) => {
+            state.finalConvertedData?.results?.[0]?.[state.tableDataCriteria].forEach((d) => {
                 if (d[state.tableDataField] === 'sub_total') return;
                 const fieldName = d[state.tableDataField];
                 const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
@@ -116,6 +130,7 @@ const state = reactive({
                                 type: 'dataField',
                                 additionalType: 'comparison',
                                 reference: isReferenceField ? REFERENCE_FIELD_MAP[state.tableDataField] : undefined,
+                                unit: state.dataInfo?.[state.tableDataCriteria]?.unit,
                             },
                         });
                     }
@@ -126,6 +141,7 @@ const state = reactive({
                         fieldInfo: {
                             type: 'dataField',
                             reference: isReferenceField && d[state.tableDataField] !== 'etc' ? REFERENCE_FIELD_MAP[state.tableDataField] : undefined,
+                            unit: state.dataInfo?.[state.tableDataCriteria]?.unit,
                         },
                     });
                 }
@@ -133,11 +149,16 @@ const state = reactive({
         }
         const basicFields = [...labelFields, ...dataFields];
         if (state.subTotalInfo?.toggleValue) {
-            const subTotalField: TableWidgetField = { name: 'sub_total', label: 'Sub Total', fieldInfo: { type: 'dataField', additionalType: 'subTotal' } };
+            const subTotalField: TableWidgetField = {
+                name: 'sub_total',
+                label: 'Sub Total',
+                fieldInfo: { type: 'dataField', additionalType: 'subTotal', unit: state.dataInfo?.[state.tableDataCriteria]?.unit },
+            };
             return [...basicFields, subTotalField];
         }
         return basicFields;
     }),
+    dataInfo: computed<DataInfo|undefined>(() => state.dataTable?.data_info),
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -153,6 +174,7 @@ const getWidgetTableDateFields = (
     granularity: Granularity|undefined,
     dateRange: DateRange,
     limitCount: number,
+    criteria: string,
 ): TableWidgetField[] => {
     if (!granularity || !dateRange?.end) return [];
     const dateFields: TableWidgetField[] = [];
@@ -174,7 +196,7 @@ const getWidgetTableDateFields = (
         dateFields.push({
             name: now.format(labelDateFormat),
             label: now.format(labelDateFormat),
-            fieldInfo: { type: 'dataField' },
+            fieldInfo: { type: 'dataField', unit: state.dataInfo?.[criteria]?.unit },
         });
         now = now.add(1, timeUnit);
     }
@@ -292,7 +314,7 @@ watch(() => state.data, () => {
         state.timeSeriesDynamicFieldSlicedData = { results };
     } else {
         const availableDataFieldsExceptDateField: string[] = [];
-        const originFirstRowData = state.data?.results?.[0][state.tableDataCriteria];
+        const originFirstRowData = state.data?.results?.[0]?.[state.tableDataCriteria] ?? [];
         const sortedData = orderBy(originFirstRowData, ['value'], ['desc']);
         sortedData.slice(0, state.tableDataMaxCount - 1).forEach((d) => {
             availableDataFieldsExceptDateField.push(d[state.tableDataField]);
@@ -341,7 +363,7 @@ watch(() => state.data, () => {
         if (state.totalInfo?.toggleValue) {
             const totalDataItem: TableDataItem = {};
             if (state.groupByField) totalDataItem[state.groupByField[0]] = 'Total';
-            const fieldForTotal = results[0][state.tableDataCriteria].filter((item) => !item[state.tableDataField].startsWith('comparison_'));
+            const fieldForTotal = results?.[0]?.[state.tableDataCriteria]?.filter((item) => !item[state.tableDataField].startsWith('comparison_')) ?? [];
             totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
                 const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === item[state.tableDataField])?.value || 0), 0);
                 return { [state.tableDataField]: item[state.tableDataField], value: totalValue };
@@ -352,6 +374,11 @@ watch(() => state.data, () => {
         state.noneTimeSeriedsDynamicFieldSlicedData = { results };
     }
 }, { immediate: true });
+
+onMounted(async () => {
+    if (!props.dataTableId) return;
+    state.dataTable = await getWidgetDataTable(props.dataTableId);
+});
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
@@ -375,6 +402,7 @@ defineExpose<WidgetExpose<Data>>({
                                :sub-total-info="state.subTotalInfo"
                                :total-info="state.totalInfo"
                                :granularity="state.granularity"
+                               :data-info="state.dataInfo"
             />
         </div>
     </widget-frame>

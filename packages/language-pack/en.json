@@ -1336,6 +1336,7 @@
 				"TREND_TITLE": "Trend",
 				"TYPE_TITLE": "{service} Type"
 			},
+			"APPLY": "Apply",
 			"BILLING": {
 				"DAY": "Day",
 				"HIDE": "hide",
@@ -1397,6 +1398,41 @@
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
 			"DAILY_UPDATE_NO_DATA": "No Daily Update",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
+			"DATA_TABLE": {
+				"ALERT": {
+					"DELETE_DESC": "Are you sure you want to delete this data?",
+					"DELETE_HEADER": "Delete Data",
+					"DELETE_UNABLED_DESC": "This data is currently in use by {data_name}. \nDelete {data_name} first before deleting this data.",
+					"DELETE_UNABLED_HEADER": "Cannot Delete the Data",
+					"RESET_DESC": "Resetting the data options will revert all inputss to their most recent values. This action cannot be undone.",
+					"RESET_HEADER": "Are you sure you want to reset the data options?"
+				},
+				"FORM": {
+					"ADDITIONAL_LABELS": "Additional Labels",
+					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "This name is already being used.",
+					"ADDITIONAL_LABELS_NAME": "Name",
+					"ADDITIONAL_LABELS_VALUE": "Value",
+					"ADD_LABEL": "Add Label",
+					"ADVANCED_OPTIONS": "Advanced Options",
+					"DATA_FIELD_NAME": "Data Field Name",
+					"DATA_FIELD_NAME_GROUP_BY_INVALID_TEXT": "Please enter the name.",
+					"DATA_FIELD_NAME_INVALID_TEXT": "Please enter the name.",
+					"DATA_TABLE_NAME_SUCCESS": "Data name successfully changed.",
+					"DATA_TABLE_NAME_WARNING": "A data with this name already exists.",
+					"DATA_UNIT": "Data Unit",
+					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day cannot be used as field names.",
+					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "Group by names cannot be used as field names.",
+					"GROUP_BY": "Group by",
+					"SELECT_DATA_SOURCE_SUCCESS": "Data successfully changed.",
+					"SELECT_DATA_TABLE_WARNING": "Please save the data table first.",
+					"SEPARATE": "Separate Date",
+					"SEPARATE_DESC": "Separate date into 3 columns (Year, Month, Day)",
+					"TIME_DIFF": "Time Diff",
+					"UPDATE_DATA_TALBE_INVALID_SUCCESS": "Changes have been successfully applied.",
+					"UPDATE_DATA_TALBE_INVALID_WARNING": "Unable to apply changes. Please check the form.",
+					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "{first_data} cannot be joined with {second_data} because the two data tables have one or more identical data fields."
+				}
+			},
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
 			"EDIT": "Edit",
@@ -1459,6 +1495,7 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "Upcoming and Past 7 days"
 			},
+			"RESET": "Reset",
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "Cloud Service",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "Region",
 			"RESOURCE_BY_REGION_REGIONS": "Regions",
@@ -1689,6 +1726,8 @@
 		},
 		"DETAIL": {
 			"ADD_WIDGET": "Add Widget",
+			"ALT_S_SHARE_DASHBOARD": "Dashboard successfully shared",
+			"ALT_S_UNSHARE_DASHBOARD": "Dashboard successfully unshared",
 			"APPLY": "Confirm",
 			"AUTO": "Auto",
 			"BASED_ON": "Based on",
@@ -1725,7 +1764,9 @@
 			"SET_HOME": "Set as Home Dashboard",
 			"SHARE": "Share",
 			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
-			"SHARE_WITH_CODE": "Share with Code"
+			"SHARE_TO_ALL_WORKSPACES_DESC": "Are you sure you want to share this dashboard to all workspace?",
+			"SHARE_WITH_CODE": "Share with Code",
+			"UNSHARE_TO_ALL_WORKSPACES": "Unshare to All Workspaces"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",
@@ -1929,8 +1970,10 @@
 					"TOTAL_FIELD": "Total Field",
 					"UPDATE_PREVIEW": "Update Preview",
 					"VALIDATION_MODAL": {
-						"DESC": "To illustrate this chart properly, the data requires at least {number} label fields (or data fields).",
+						"DESC": "To illustrate this chart properly, the data requires at least {number} group-by selection or additional labels.",
 						"EDIT_DATA": "Go to Edit Data",
+						"GEO_MAP_DESC": "To illustrate this chart properly, the data requires 'Region' group-by selection.",
+						"PROGRESS_CARD_DESC": "To illustrate this chart properly, the data requires at least 2 data fields.",
 						"TITLE": "Additional fields are required"
 					},
 					"WIDGET_INFO": "Widget Info",
@@ -4254,6 +4297,8 @@
 			"STORAGE": "Storage"
 		}
 	},
+	"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
+	"SHARE_TO_ALL_WORKSPACES (2)": "Share to All Workspaces",
 	"SPACEONE_USER_DESC": "Forward to the project members' personal notification channel",
 	"TAB_MEMBER": "Member"
 }

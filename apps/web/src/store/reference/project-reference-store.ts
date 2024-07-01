@@ -39,18 +39,11 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 
-const _listProjectGroup = async (projectGroupIdList: string[]): Promise<ProjectGroupModel[]> => {
+const _listProjectGroup = async (): Promise<ProjectGroupModel[]> => {
     try {
         const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
             query: {
                 only: ['project_group_id', 'name'],
-                filter: [
-                    {
-                        k: 'project_group_id',
-                        v: projectGroupIdList,
-                        o: 'in',
-                    },
-                ],
             },
         });
         return res?.results ?? [];
@@ -97,8 +90,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
         };
         const res = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>(params);
 
-        const projectGroupIdList = res.results?.map((d) => d.project_group_id) ?? [];
-        _state.projectGroupList = await _listProjectGroup(projectGroupIdList);
+        _state.projectGroupList = await _listProjectGroup();
         const projectReferenceMap: ProjectReferenceMap = {};
 
         // eslint-disable-next-line no-restricted-syntax

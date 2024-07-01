@@ -27,6 +27,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
@@ -61,6 +62,7 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const recentStore = useRecentStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
@@ -169,6 +171,9 @@ const handleConfirmProjectForm = (data: ProjectModel) => {
 const handleConfirmProjectGroupMoveModal = () => {
     projectDetailPageStore.getProject();
 };
+const handleGoBackProjectLanding = () => {
+    router.push(getProperRouteLocation({ name: PROJECT_ROUTE._NAME, params: { projectGroupId: state.projectGroupId } }));
+};
 
 /* Watchers */
 watch(() => projectDetailPageState.projectId, async (projectId) => {
@@ -207,7 +212,7 @@ onUnmounted(() => {
         >
             <p-icon-button class="back-button"
                            name="ic_arrow-left"
-                           @click="router.go(-1)"
+                           @click="handleGoBackProjectLanding"
             />
             <p-pane-layout class="flex-grow">
                 <div class="header-container">

@@ -10,6 +10,12 @@ export const useProjectTreeStore = defineStore('project-tree', () => {
         treeDisplayMap: {} as TreeDisplayMap,
     });
 
+    const mutations = {
+        setTreeDisplayMap(treeDisplayMap: TreeDisplayMap) {
+            state.treeDisplayMap = treeDisplayMap;
+        },
+    };
+
     const actions = {
         async refreshProjectTree() {
             const copiedMap = cloneDeep(state.treeDisplayMap);
@@ -24,6 +30,7 @@ export const useProjectTreeStore = defineStore('project-tree', () => {
 
     return {
         state,
+        ...mutations,
         ...actions,
     };
 });

@@ -234,6 +234,7 @@ const checkSelectedId = (id?: string) => {
                                        button-icon="ic_ellipsis-horizontal"
                                        use-fixed-menu-style
                                        class="overlay"
+                                       reset-selected-on-unmounted
                                        menu-position="right"
                                        @select="handleSelectDropdownMenu"
                                        @update:visible-menu="handleUpdateVisibleMenu(item, $event)"
@@ -348,6 +349,16 @@ const checkSelectedId = (id?: string) => {
                 @apply rounded-full;
                 width: 2rem;
                 height: 2rem;
+            }
+
+            /* custom design-system component - p-select-dropdown */
+            :deep(.p-select-dropdown) {
+                .p-context-menu-item.selected {
+                    @apply bg-white;
+                    &:hover {
+                        @apply bg-blue-100;
+                    }
+                }
             }
         }
     }

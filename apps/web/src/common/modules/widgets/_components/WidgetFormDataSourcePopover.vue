@@ -423,6 +423,7 @@ onMounted(() => {
         @apply flex items-center justify-center bg-violet-400 border border-violet-500 text-white rounded-md;
         width: 2.5rem;
         height: 2.5rem;
+        box-shadow: 0 0.02rem 0.04rem rgba(0, 0, 0, 0.06);
         .icon {
             transition: transform 0.2s ease;
         }

@@ -30,7 +30,7 @@ export interface ListDashboardParameters extends PublicDashboardListParameters, 
     dashboard_id?: string;
 }
 export interface CreateDashboardParameters extends PublicDashboardCreateParameters, PrivateDashboardCreateParameters {
-    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
+    resource_group?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
     project_id?: string;
 }
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

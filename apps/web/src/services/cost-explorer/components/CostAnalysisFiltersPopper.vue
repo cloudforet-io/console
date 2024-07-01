@@ -72,21 +72,21 @@ const state = reactive({
             return { name: d, label: d };
         });
     }),
-    listQueryOptions: computed<Partial<Record<ManagedVariableModelKey, any>>>(() => ({
-        cost_data_source: costAnalysisPageGetters.selectedDataSourceId,
+    primaryCostStatOptions: computed<Record<string, any>>(() => ({
+        data_source_id: costAnalysisPageGetters.selectedDataSourceId,
     })),
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
         state.enabledFilters.forEach(({ name }) => {
-            handlerMaps[name] = getMenuHandler(name, state.listQueryOptions);
+            handlerMaps[name] = getMenuHandler(name, {}, state.primaryCostStatOptions);
         });
         return handlerMaps;
     }),
 });
 
 /* Util */
-const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
+const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>, primaryOptions: Record<string, any>): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
         const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
@@ -103,7 +103,7 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
                 dataKey: groupBy,
             };
         }
-        const handler = getVariableModelMenuHandler([variableModelInfo], listQueryOptions);
+        const handler = getVariableModelMenuHandler([variableModelInfo], listQueryOptions, primaryOptions);
 
         return async (...args) => {
             if (!groupBy) return { results: [] };

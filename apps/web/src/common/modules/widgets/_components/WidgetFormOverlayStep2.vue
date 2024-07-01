@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, nextTick, onBeforeMount, onUnmounted, reactive, ref, watch,
+    computed, nextTick, onBeforeMount, onMounted, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -19,7 +19,6 @@ import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-com
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
@@ -39,6 +38,8 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
+    readyToMounted: false,
+    mountedWidgetId: undefined as string|undefined,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
         { label: 'Full', name: 'FULL' },
@@ -47,6 +48,7 @@ const state = reactive({
     selectedWidgetSize: 'ACTUAL',
     widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetSize: computed(() => {
+        if (widgetGenerateState.overlayType === 'EXPAND') return 'full';
         if (state.selectedWidgetSize === 'FULL') return 'full';
         return widgetGenerateState.size;
     }),
@@ -56,10 +58,14 @@ const state = reactive({
         }
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
-    isWidgetOptionsChanged: computed<boolean>(() => !isEqual(widgetGenerateState.widgetFormValueMap, state.appliedPreviewWidgetValueMap)),
+    isWidgetOptionsChanged: computed<boolean>(() => Object.entries(widgetGenerateState.widgetFormValueMap).some(([k, v]) => {
+        if (v !== undefined) {
+            return !isEqual(v, widgetGenerateState.previewWidgetValueMap[k]);
+        }
+        return false;
+    })),
     disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateGetters.isAllWidgetFormValid),
     //
-    appliedPreviewWidgetValueMap: {} as Record<string, WidgetFieldValues>,
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
 });
@@ -68,11 +74,16 @@ const state = reactive({
 const initSnapshot = () => {
     state.varsSnapshot = cloneDeep(dashboardDetailState.vars);
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
-    state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.previewWidgetValueMap);
 };
 const reset = () => {
     dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
+};
+const loadOverlayWidget = async () => {
+    const res = await overlayWidgetRef.value?.loadWidget();
+    if (typeof res === 'function') {
+        res('Please check the widget options.');
+    }
 };
 
 /* Event */
@@ -81,12 +92,16 @@ const handleChangeWidgetSize = (widgetSize: string) => {
 };
 const handleUpdatePreview = async () => {
     widgetGenerateStore.setPreviewWidgetValueMap(cloneDeep(widgetGenerateState.widgetFormValueMap));
-    state.appliedPreviewWidgetValueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
     await nextTick();
-    const res = await overlayWidgetRef.value?.loadWidget();
-    if (typeof res === 'function') {
-        res('Please check the widget options.');
-    }
+    await loadOverlayWidget();
+};
+const handleReadyToPreview = async () => {
+    widgetGenerateStore.setPreviewWidgetValueMap(cloneDeep(widgetGenerateState.widgetFormValueMap));
+    await nextTick();
+    state.readyToMounted = true;
+};
+const handleMountWidget = (widgetId: string) => {
+    state.mountedWidgetId = widgetId;
 };
 
 /* Watcher */
@@ -97,7 +112,17 @@ watch(() => widgetGenerateState.selectedWidgetName, () => {
         state.selectedWidgetSize = 'FULL';
     }
 }, { immediate: true });
+watch([() => state.mountedWidgetId, () => state.readyToMounted], ([mountedWidgetId, readyToMounted]) => {
+    if (mountedWidgetId && readyToMounted) {
+        loadOverlayWidget();
+        state.mountedWidgetId = undefined;
+        state.readyToMounted = false;
+    }
+});
 
+onMounted(async () => {
+    if (widgetGenerateState.overlayType === 'EXPAND') await loadOverlayWidget();
+});
 onBeforeMount(() => {
     initSnapshot();
 });
@@ -147,7 +172,9 @@ onUnmounted(() => {
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailGetters.refinedVars"
                            :all-reference-type-info="state.allReferenceTypeInfo"
+                           disable-refresh-on-loading
                            mode="overlay"
+                           @mounted="handleMountWidget"
                 />
                 <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
                           style-type="substitutive"
@@ -163,7 +190,9 @@ onUnmounted(() => {
                 </p-button>
             </div>
         </div>
-        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'" />
+        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'"
+                                               @ready-to-preview="handleReadyToPreview"
+        />
     </div>
 </template>
 

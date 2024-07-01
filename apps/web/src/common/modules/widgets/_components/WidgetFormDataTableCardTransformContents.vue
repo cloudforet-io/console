@@ -5,8 +5,9 @@ import { intersection, isEqual } from 'lodash';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import { i18n } from '@/translations';
 
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
@@ -151,7 +152,7 @@ const handleUpdateDataTable = async () => {
         && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[0])
         && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
     if (!isValidDataTableId && !isValidDataTables) {
-        showErrorMessage('Unable to apply changes. Please check the form.', '');
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
         return;
     }
 
@@ -167,7 +168,7 @@ const handleUpdateDataTable = async () => {
                 ...widgetGenerateState.joinRestrictedMap,
                 [state.dataTableId]: true,
             });
-            showErrorMessage('{data02} cannot be joined with {data01} because the two data tables have one or more identical data fields.', '');
+            showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_JOIN_FAIL_WARNING', { first_data: firstDataTable?.name || '', second_data: secondDataTable?.name || '' }), '');
             return;
         }
     }
@@ -207,15 +208,58 @@ const handleUpdateDataTable = async () => {
             operator: state.operator,
             options: { [state.operator]: options() },
         };
-        await widgetGenerateStore.createTransformDataTable(createParams, state.dataTableId);
-    } else {
-        const updateParams = {
-            data_table_id: state.dataTableId,
-            name: state.dataTableName,
-            options: { [state.operator]: options() },
-        };
-        await widgetGenerateStore.updateDataTable(updateParams);
+        const dataTable = await widgetGenerateStore.createTransformDataTable(createParams, state.dataTableId);
+        if (dataTable) {
+            widgetGenerateStore.setSelectedDataTableId(dataTable.data_table_id);
+            widgetGenerateStore.setDataTableUpdating(true);
+            await widgetGenerateStore.loadDataTable({
+                data_table_id: dataTable.data_table_id,
+            });
+        }
+        return;
     }
+    const updateParams = {
+        data_table_id: state.dataTableId,
+        name: state.dataTableName,
+        options: { [state.operator]: options() },
+    };
+    await widgetGenerateStore.updateDataTable(updateParams);
+    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
+    widgetGenerateStore.setDataTableUpdating(true);
+    await widgetGenerateStore.loadDataTable({
+        data_table_id: state.dataTableId,
+    });
+
+
+    // Update Referenced Transformed DataTable
+    const referencedDataTableIds = [] as string[];
+    storeState.dataTables.forEach((dataTable) => {
+        const transformDataTalbeOptions = dataTable.options as DataTableTransformOptions;
+        const isReferenced = dataTable.data_type === 'TRANSFORMED'
+            && !dataTable?.data_table_id?.startsWith('UNSAVED-')
+            && (
+                transformDataTalbeOptions?.JOIN?.data_tables?.includes(state.dataTableId)
+                || transformDataTalbeOptions?.CONCAT?.data_tables?.includes(state.dataTableId)
+                || transformDataTalbeOptions?.QUERY?.data_table_id === state.dataTableId
+                || transformDataTalbeOptions?.EVAL?.data_table_id === state.dataTableId
+            );
+        if (isReferenced) referencedDataTableIds.push(dataTable.data_table_id as string);
+    });
+    if (referencedDataTableIds.length) {
+        await Promise.all(referencedDataTableIds.map((dataTableId) => {
+            const dataTable = storeState.dataTables.find((_dataTable) => _dataTable.data_table_id === dataTableId) as PublicDataTableModel|PrivateDataTableModel;
+            widgetGenerateStore.updateDataTable({
+                data_table_id: dataTable.data_table_id,
+                name: dataTable.name,
+                options: {
+                    ...dataTable.options,
+                },
+            });
+            return null;
+        }));
+    }
+
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
 };
 
 /* Utils */
@@ -273,6 +317,10 @@ onMounted(() => {
     padding-top: 0.125rem;
     margin-bottom: 2rem;
 
+    &:hover {
+        @apply border border-primary2;
+        box-shadow: 0 0 0 3px theme('colors.violet.200');
+    }
     &.selected {
         @apply border-violet-600;
         box-shadow: 0 0 0 0.1875rem rgba(137, 124, 214, 0.6);

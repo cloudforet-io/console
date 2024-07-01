@@ -11,6 +11,8 @@ import { cloneDeep, range } from 'lodash';
 import type { DateRange, DashboardOptions } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import DashboardToolsetDateCustomModal from '@/services/dashboards/components/DashboardToolsetDateCustomModal.vue';
@@ -25,6 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { i18nDayjs } = useI18nDayjs();
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
@@ -42,7 +45,7 @@ const state = reactive({
             {
                 type: 'item',
                 name: 'current',
-                label: i18n.t('DASHBOARDS.DETAIL.CURRENT_MONTH'),
+                label: `${i18n.t('DASHBOARDS.DETAIL.CURRENT_MONTH')} (${dayjs.utc().format('YYYY-MM')})`,
             },
             ...monthData,
             { type: 'divider' },
@@ -92,6 +95,13 @@ const handleSelectMonthMenuItem = (selected: string) => {
         setSelectedDateRange(state.selectedMonthMenuItem.name, state.selectedMonthMenuItem.name);
         updateDashboardDateRange(state.selectedDateRange);
     }
+
+    dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
+        options: {
+            ...dashboardDetailState.dashboardInfo?.options || {},
+            date_range: state.selectedDateRange,
+        },
+    });
 };
 const handleCustomRangeModalConfirm = (dateRange: DateRange) => {
     const { start, end } = dateRange;

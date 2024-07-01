@@ -18,13 +18,13 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
-import AssetAnalysisChart from '@/services/asset-inventory/components/AssetAnalysisChart.vue';
-import AssetAnalysisDataTable from '@/services/asset-inventory/components/AssetAnalysisDataTable.vue';
-import AssetAnalysisGroupBy from '@/services/asset-inventory/components/AssetAnalysisGroupBy.vue';
-import AssetAnalysisHeader from '@/services/asset-inventory/components/AssetAnalysisHeader.vue';
-import AssetAnalysisQuerySection from '@/services/asset-inventory/components/AssetAnalysisQuerySection.vue';
+import MetricExplorerChart from '@/services/asset-inventory/components/MetricExplorerChart.vue';
+import MetricExplorerDataTable from '@/services/asset-inventory/components/MetricExplorerDataTable.vue';
+import MetricExplorerGroupBy from '@/services/asset-inventory/components/MetricExplorerGroupBy.vue';
+import MetricExplorerHeader from '@/services/asset-inventory/components/MetricExplorerHeader.vue';
+import MetricExplorerQuerySection from '@/services/asset-inventory/components/MetricExplorerQuerySection.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 const gnbStore = useGnbStore();
@@ -32,19 +32,19 @@ const { breadcrumbs } = useBreadcrumbs();
 const route = useRoute();
 
 const allReferenceStore = useAllReferenceStore();
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
-const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 const storeState = reactive({
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
 });
 const state = reactive({
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => assetAnalysisPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     breadCrumbs: computed(() => {
-        const targetNamespace = storeState.namespaces[assetAnalysisPageGetters.namespaceId];
-        const _targetMetric = assetAnalysisPageState.metric;
+        const targetNamespace = storeState.namespaces[metricExplorerPageGetters.namespaceId];
+        const _targetMetric = metricExplorerPageState.metric;
         return [
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
@@ -55,7 +55,7 @@ const state = reactive({
     }),
     metricFavoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.METRIC,
-        id: assetAnalysisPageState.metric?.metric_id,
+        id: metricExplorerPageState.metric?.metric_id,
     })),
     metricExampleFavoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.METRIC_EXAMPLE,
@@ -66,23 +66,23 @@ const state = reactive({
 
 watch(() => route.params, async (params) => {
     if (!params.metricId) return;
-    assetAnalysisPageStore.reset();
-    await assetAnalysisPageStore.loadMetric(params.metricId);
+    metricExplorerPageStore.reset();
+    await metricExplorerPageStore.loadMetric(params.metricId);
     if (params.metricExampleId) {
-        await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
-        const targetMetricExample = assetAnalysisPageState.metricExamples.find((d) => d.example_id === params.metricExampleId);
-        assetAnalysisPageStore.initMetricExampleOptions(targetMetricExample);
-    } else if (assetAnalysisPageGetters.defaultMetricGroupByList) {
-        assetAnalysisPageStore.setSelectedGroupByList(assetAnalysisPageGetters.defaultMetricGroupByList);
+        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
+        const targetMetricExample = metricExplorerPageState.metricExamples.find((d) => d.example_id === params.metricExampleId);
+        metricExplorerPageStore.initMetricExampleOptions(targetMetricExample);
+    } else if (metricExplorerPageGetters.defaultMetricGroupByList) {
+        metricExplorerPageStore.setSelectedGroupByList(metricExplorerPageGetters.defaultMetricGroupByList);
     }
-    if (params.groupBy && assetAnalysisPageState.metric?.labels_info?.find((d) => d.key === 'labels.Provider')) {
+    if (params.groupBy && metricExplorerPageState.metric?.labels_info?.find((d) => d.key === 'labels.Provider')) {
         const defaultFilters = { 'labels.Provider': [params.groupBy] };
         if (params.group) defaultFilters['labels.Cloud Service Group'] = [params.group];
         if (params.type) defaultFilters['labels.Cloud Service Type'] = [params.type];
-        assetAnalysisPageStore.setFilters(defaultFilters);
+        metricExplorerPageStore.setFilters(defaultFilters);
     }
 
-    assetAnalysisPageStore.setMetricInitiated(true);
+    metricExplorerPageStore.setMetricInitiated(true);
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
 
@@ -100,16 +100,16 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="asset-analysis-content">
-        <asset-analysis-header />
+    <div class="metric-explorer-content">
+        <metric-explorer-header />
         <p-divider />
         <div class="content-wrapper">
             <div class="overflow-wrapper">
-                <asset-analysis-query-section />
+                <metric-explorer-query-section />
                 <div class="contents-wrapper">
-                    <asset-analysis-group-by />
-                    <asset-analysis-chart />
-                    <asset-analysis-data-table />
+                    <metric-explorer-group-by />
+                    <metric-explorer-chart />
+                    <metric-explorer-data-table />
                 </div>
             </div>
         </div>
@@ -117,7 +117,7 @@ onUnmounted(() => {
 </template>
 
 <style lang="postcss" scoped>
-.asset-analysis-content {
+.metric-explorer-content {
     .content-wrapper {
         overflow-x: auto;
         padding-bottom: 1.625rem;

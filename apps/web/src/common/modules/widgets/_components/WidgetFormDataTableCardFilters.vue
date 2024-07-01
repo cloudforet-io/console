@@ -48,9 +48,13 @@ interface VariableOption {
 }
 
 const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
+    [GROUP_BY.WORKSPACE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
+    [GROUP_BY.PROJECT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
     [GROUP_BY.PROJECT_GROUP]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group },
     [GROUP_BY.PRODUCT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'product' },
     [GROUP_BY.PROVIDER]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
+    [GROUP_BY.SERVICE_ACCOUNT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
+    [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.region },
     [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
 };
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({});
@@ -71,7 +75,7 @@ const appContextStore = useAppContextStore();
 
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
-    metircs: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     dataTable: computed(() => widgetGenerateStore.state.dataTables.find((d) => d.data_table_id === props.dataTableId)),
 });
@@ -85,7 +89,7 @@ const state = reactive({
         const handlerMaps = {};
         if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
             state.selectedItems.forEach(({ name }) => {
-                handlerMaps[name] = getCostMenuHandler(name, state.listQueryOptions);
+                handlerMaps[name] = getCostMenuHandler(name, {}, state.primaryCostStatOptions);
             });
         } else {
             assetFilterState.refinedLabelKeys.forEach((labelInfo) => {
@@ -94,14 +98,14 @@ const state = reactive({
         }
         return handlerMaps;
     }),
-    listQueryOptions: computed<Partial<Record<ManagedVariableModelKey, any>>>(() => ({
-        cost_data_source: props.sourceId,
+    primaryCostStatOptions: computed<Record<string, any>>(() => ({
+        data_source_id: props.sourceId,
     })),
     selectedItemsMap: getInitialSelectedItemsMap() as Record<string, SelectDropdownMenuItem[]>,
 });
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
-        const metricLabelsInfo = storeState.metircs[props.sourceId ?? ''].data.labels_info;
+        const metricLabelsInfo = storeState.metrics[props.sourceId ?? ''].data.labels_info;
         return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => (storeState.isAdminMode ? labelInfo.key !== 'project_id' : labelInfo.key !== 'workspace_id')) : [];
     }),
 });
@@ -184,7 +188,7 @@ const resetFilterByKey = (key: string) => {
     state.proxyFilter = { ...state.proxyFilter };
     state.selectedItemsMap = { ...state.selectedItemsMap };
 };
-const getCostMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
+const getCostMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>, primaryOptions: Record<string, any>): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
         const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
@@ -201,7 +205,7 @@ const getCostMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Ma
                 dataKey: groupBy,
             };
         }
-        const handler = getVariableModelMenuHandler([variableModelInfo], listQueryOptions);
+        const handler = getVariableModelMenuHandler([variableModelInfo], listQueryOptions, primaryOptions);
 
         return async (...args) => {
             if (!groupBy) return { results: [] };
@@ -308,7 +312,7 @@ onMounted(() => {
                                            appearance-type="badge"
                                            show-select-marker
                                            use-fixed-menu-style
-                                           :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name]"
+                                           :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
                                            :show-delete-all-button="false"
                                            :page-size="10"
                                            @update:selected="handleUpdateFilterDropdown(item.name, $event)"

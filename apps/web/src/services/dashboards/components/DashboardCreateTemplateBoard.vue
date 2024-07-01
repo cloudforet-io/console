@@ -10,7 +10,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 
 
 interface Props {
@@ -20,6 +20,7 @@ interface Props {
     keyword?: string;
 }
 
+const dashboardCreatePageStore = useDashboardCreatePageStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const props = withDefaults(defineProps<Props>(), {
     templateSets: () => [],
@@ -27,16 +28,24 @@ const props = withDefaults(defineProps<Props>(), {
     showViewLink: false,
     keyword: '',
 });
-const emit = defineEmits<{(e: 'select-template', value: any)}>();
 
 /* Event */
-const getDashboardViewLink = (template: DashboardModel): Location|undefined => {
-    const dashboardId = template.dashboard_id;
+const getDashboardViewLink = (boardItem: BoardSet): Location|undefined => {
+    const dashboardId = boardItem.dashboard_id;
     if (!dashboardId) return undefined;
     return getProperRouteLocation({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId } });
 };
-const handleClickBoardItem = (template: DashboardModel) => {
-    emit('select-template', template);
+const handleClickBoardItem = (boardItem: BoardSet) => {
+    if (boardItem.dashboard_id) {
+        dashboardCreatePageStore.setSelectedDashboardId(boardItem.dashboard_id);
+        dashboardCreatePageStore.setSelectedTemplateId(undefined);
+    } else if (boardItem.template_id) {
+        dashboardCreatePageStore.setSelectedDashboardId(undefined);
+        dashboardCreatePageStore.setSelectedTemplateId(boardItem.template_id);
+    }
+    dashboardCreatePageStore.setTemplateName(boardItem.name);
+    dashboardCreatePageStore.setTemplateLabels(boardItem.labels);
+    dashboardCreatePageStore.setCurrentStep(2);
 };
 </script>
 

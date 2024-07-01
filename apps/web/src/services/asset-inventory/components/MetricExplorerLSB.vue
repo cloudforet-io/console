@@ -33,10 +33,10 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, yellow } from '@/styles/colors';
 
-import AssetAnalysisLSBMetric from '@/services/asset-inventory/components/AssetAnalysisLSBMetric.vue';
+import MetricExplorerLSBMetric from '@/services/asset-inventory/components/MetricExplorerLSBMetric.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 
 const lsbRef = ref<HTMLElement|null>(null);
@@ -51,8 +51,8 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
@@ -63,7 +63,7 @@ const storeState = reactive({
         ...favoriteGetters.metricItems,
         ...favoriteGetters.metricExampleItems,
     ]),
-    selectedNamespace: computed(() => assetAnalysisPageState.selectedNamespace),
+    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
 });
 
 const state = reactive({
@@ -83,7 +83,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.DIVIDER,
             },
         ];
-        if (!assetAnalysisPageState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
+        if (!metricExplorerPageState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
         return [...baseMenuSet, state.metricMenu];
     }),
     starredMenuSet: computed<LSBItem[]>(() => {
@@ -247,7 +247,7 @@ const handleSearchNamespace = (keyword: string) => {
     namespaceState.inputValue = keyword;
 };
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
-    assetAnalysisPageStore.setSelectedNamespace(namespace);
+    metricExplorerPageStore.setSelectedNamespace(namespace);
 };
 const handleConfirmMetricGuide = () => {
     if (guidePopoverState.noMore) {
@@ -262,7 +262,7 @@ watch(() => route.params, async () => {
     await allReferenceStore.load('metric');
     if (state.currentMetricIdByUrl) {
         const targetNamespace = namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id);
-        assetAnalysisPageStore.setSelectedNamespace({
+        metricExplorerPageStore.setSelectedNamespace({
             label: targetNamespace?.name,
             name: namespaceState.selectedMetric.data.namespace_id,
             group: targetNamespace?.data.group,
@@ -270,7 +270,7 @@ watch(() => route.params, async () => {
             icon: targetNamespace.data.group === 'common' ? 'COMMON' : targetNamespace.data.icon,
             resourceType: targetNamespace.data.resource_type,
         });
-    } else assetAnalysisPageStore.setSelectedNamespace(undefined);
+    } else metricExplorerPageStore.setSelectedNamespace(undefined);
     state.loading = false;
 }, { immediate: true });
 
@@ -288,7 +288,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 </script>
 
 <template>
-    <div class="asset-analysis-l-s-b">
+    <div class="metric-explorer-l-s-b">
         <l-s-b ref="lsbRef"
                :menu-set="state.menuSet"
         >
@@ -397,8 +397,8 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                 </p-data-loader>
             </template>
             <template #slot-metric>
-                <asset-analysis-l-s-b-metric :is-detail-page="state.isDetailPage"
-                                             :metrics="state.currentMetrics"
+                <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage"
+                                              :metrics="state.currentMetrics"
                 />
             </template>
         </l-s-b>
@@ -435,7 +435,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 </template>
 
 <style scoped lang="postcss">
-.asset-analysis-l-s-b {
+.metric-explorer-l-s-b {
     .namespace-data-loader {
         min-height: 15rem;
 

@@ -17,17 +17,17 @@ import type { MetricRunParameters } from '@/schema/inventory/metric/api-verbs/ru
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import AssetAnalysisFiltersPopper from '@/services/asset-inventory/components/AssetAnalysisFiltersPopper.vue';
-import AssetAnalysisGranularityDropdown from '@/services/asset-inventory/components/AssetAnalysisGranularityDropdown.vue';
-import AssetAnalysisOperatorDropdown from '@/services/asset-inventory/components/AssetAnalysisOperatorDropdown.vue';
-import AssetAnalysisPeriodDropdown from '@/services/asset-inventory/components/AssetAnalysisPeriodDropdown.vue';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import MetricExplorerFiltersPopper from '@/services/asset-inventory/components/MetricExplorerFiltersPopper.vue';
+import MetricExplorerGranularityDropdown from '@/services/asset-inventory/components/MetricExplorerGranularityDropdown.vue';
+import MetricExplorerOperatorDropdown from '@/services/asset-inventory/components/MetricExplorerOperatorDropdown.vue';
+import MetricExplorerPeriodDropdown from '@/services/asset-inventory/components/MetricExplorerPeriodDropdown.vue';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Granularity } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 const route = useRoute();
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 
 const filtersPopperRef = ref<any|null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
@@ -39,7 +39,7 @@ const state = reactive({
     granularity: undefined as Granularity|undefined,
     selectedFiltersCount: computed(() => {
         let count = 0;
-        Object.values(assetAnalysisPageState.filters ?? {}).forEach((filterItems) => {
+        Object.values(metricExplorerPageState.filters ?? {}).forEach((filterItems) => {
             count += filterItems.length;
         });
         return count;
@@ -61,7 +61,7 @@ const handleClickRun = async () => {
     try {
         state.refreshing = true;
         await runMetric();
-        assetAnalysisPageStore.setRefreshMetricData(true);
+        metricExplorerPageStore.setRefreshMetricData(true);
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -76,14 +76,14 @@ watch(() => route.params, async () => {
 </script>
 
 <template>
-    <div class="asset-analysis-query-section">
+    <div class="metric-explorer-query-section">
         <div class="filter-wrapper"
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40 + 16: 16}px` }"
         >
             <div class="left-part">
-                <asset-analysis-operator-dropdown />
-                <asset-analysis-granularity-dropdown />
-                <asset-analysis-period-dropdown />
+                <metric-explorer-operator-dropdown />
+                <metric-explorer-granularity-dropdown />
+                <metric-explorer-period-dropdown />
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
@@ -107,15 +107,15 @@ watch(() => route.params, async () => {
                         </p-badge>
                     </p-button>
                     <template #content>
-                        <asset-analysis-filters-popper ref="filtersPopperRef"
-                                                       :visible="state.filtersPopoverVisible"
+                        <metric-explorer-filters-popper ref="filtersPopperRef"
+                                                        :visible="state.filtersPopoverVisible"
                         />
                     </template>
                 </p-popover>
             </div>
             <div class="right-part">
                 <span class="period-text">
-                    {{ assetAnalysisPageState.periodText }}
+                    {{ metricExplorerPageState.periodText }}
                 </span>
                 <p-tooltip :contents="$t('INVENTORY.METRIC_EXPLORER.UPDATE_WITH_THE_LATEST_DATA')"
                            position="bottom"
@@ -133,7 +133,7 @@ watch(() => route.params, async () => {
 </template>
 
 <style lang="postcss" scoped>
-.asset-analysis-query-section {
+.metric-explorer-query-section {
     margin-top: 1.5rem;
     .filter-wrapper {
         @apply relative flex items-center justify-between;

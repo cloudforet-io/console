@@ -96,7 +96,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
             />
             <welcome
                 v-if="!state.loading
-                    && ((state.isNoCollectors || state.isNoServiceAccounts) && storeState.dataSource.length === 0)"
+                    && (state.isNoCollectors || state.isNoServiceAccounts || storeState.dataSource.length === 0)"
             />
             <bookmark />
             <user-configs v-if="storeState.recentList.length !== 0"

@@ -19,17 +19,17 @@ import { useRecentStore } from '@/common/modules/navigations/stores/recent-store
 import type { RecentItem } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import AssetAnalysisQueryFormSidebar from '@/services/asset-inventory/components/AssetAnalysisQueryFormSidebar.vue';
+import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/components/MetricExplorerQueryFormSidebar.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 const recentStore = useRecentStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const allReferenceStore = useAllReferenceStore();
 const router = useRouter();
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
     language: computed(() => store.state.user.language),
@@ -102,7 +102,7 @@ const fetchRecentList = async () => {
 </script>
 
 <template>
-    <div class="asset-analysis-content">
+    <div class="metric-explorer-content">
         <p-heading :title="$t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER')" />
         <p-pane-layout>
             <div class="contents">
@@ -180,14 +180,14 @@ const fetchRecentList = async () => {
                         </p-card>
                     </div>
                 </div>
-                <asset-analysis-query-form-sidebar v-show="assetAnalysisPageState.showMetricQueryFormSidebar" />
+                <metric-explorer-query-form-sidebar v-show="metricExplorerPageState.showMetricQueryFormSidebar" />
             </div>
         </p-pane-layout>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.asset-analysis-content {
+.metric-explorer-content {
     @apply text-gray-900;
     width: 100%;
 
@@ -287,7 +287,7 @@ const fetchRecentList = async () => {
 }
 
 @screen tablet {
-    .asset-analysis-content {
+    .metric-explorer-content {
         .contents {
             .card-group {
                 @apply flex gap-4 justify-center flex-wrap;
@@ -297,7 +297,7 @@ const fetchRecentList = async () => {
 }
 
 @screen mobile {
-    .asset-analysis-content {
+    .metric-explorer-content {
         .contents {
             .card-group {
                 @apply flex-col gap-4;

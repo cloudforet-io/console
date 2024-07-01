@@ -68,6 +68,7 @@ const state = reactive({
     }),
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
+    remountWidgetId: undefined as string|undefined,
 });
 const widgetDeleteState = reactive({
     visibleModal: false,
@@ -88,10 +89,12 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
             const config = getWidgetConfig(_widget.widget_type);
             if (!config) return;
             const _size = _widget.size || config.meta.sizes[0];
+            const _component = getWidgetComponent(_widget.widget_type);
+            if (!_component) return;
             _refinedWidgets.push({
                 ..._widget,
                 size: _size,
-                component: getWidgetComponent(_widget.widget_type),
+                component: _component,
             });
             _widgetSizeList.push(_size);
         });
@@ -224,7 +227,9 @@ watch(() => dashboardDetailState.dashboardId, (dashboardId) => {
 }, { immediate: true });
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
+        state.remountWidgetId = widgetGenerateState.latestWidgetId;
         await dashboardDetailStore.listDashboardWidgets();
+        state.remountWidgetId = undefined;
         await loadAWidget(widgetGenerateState.latestWidgetId);
     }
 });
@@ -267,6 +272,7 @@ defineExpose({
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">
                     <component :is="widget.component"
+                               v-if="widget.widget_id !== state.remountWidgetId"
                                :id="widget.widget_id"
                                :key="widget.widget_id"
                                ref="widgetRef"

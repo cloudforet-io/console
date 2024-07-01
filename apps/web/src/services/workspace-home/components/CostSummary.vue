@@ -5,7 +5,7 @@ import {
     PDivider, PFieldTitle, PLink, PSpinner,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { isEmpty, sum } from 'lodash';
+import { isEmpty, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -37,7 +37,7 @@ import CostSummaryChart from '@/services/workspace-home/components/CostSummaryCh
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
-import type { EmptyData } from '@/services/workspace-home/types/workspace-home-type';
+import type { EmptyData, CostReportChartDataType } from '@/services/workspace-home/types/workspace-home-type';
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const workspaceHomePageStore = useWorkspaceHomePageStore();
@@ -57,11 +57,15 @@ const state = reactive({
     currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency || CURRENCY.USD),
     isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     chartData: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
-    totalAmount: computed(() => sum(state.chartData?.results[0]?.value_sum.map((d) => d.value))),
-    recentReportMonth: computed(() => dayjs().utc().subtract(1, 'month')),
+    currentMonthValue: computed<CostReportChartDataType>(() => {
+        const data = state.chartData?.results[0]?.value_sum;
+        const sortedData = sortBy(data, 'date');
+        return sortedData[sortedData.length - 1];
+    }),
     period: computed(() => {
-        const start = dayjs(state.recentReportMonth).utc().subtract(5, 'month').format('YYYY-MM');
-        const end = state.recentReportMonth.format('YYYY-MM');
+        const reportMonth = dayjs().utc().subtract(1, 'month');
+        const start = dayjs(reportMonth).utc().subtract(5, 'month').format('YYYY-MM');
+        const end = reportMonth.format('YYYY-MM');
         return { start, end };
     }),
     emptyData: computed<EmptyData>(() => {
@@ -114,10 +118,6 @@ const analyzeCostReportData = async () => {
                 },
                 granularity: GRANULARITY.MONTHLY,
                 field_group: ['date'],
-                sort: [{
-                    key: '_total_value_sum',
-                    desc: true,
-                }],
                 filter: state.isWorkspaceMember ? [
                     { k: 'project_id', v: state.selectedProjects[0], o: 'eq' },
                 ] : undefined,
@@ -173,10 +173,10 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                 <div class="content-wrapper">
                     <div class="price-wrapper">
                         <div>
-                            <p>{{ $t('HOME.COST_SUMMARY_RECENT', { date: state.recentReportMonth.format('YYYY-MM') }) }}</p>
+                            <p>{{ $t('HOME.COST_SUMMARY_RECENT', { date: state.currentMonthValue.date }) }}</p>
                             <p class="price">
                                 <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
-                                <span>{{ currencyMoneyFormatter(state.totalAmount, { currency: state.currency, style: 'decimal' }) }}</span>
+                                <span>{{ currencyMoneyFormatter(state.currentMonthValue.value, { currency: state.currency, style: 'decimal' }) }}</span>
                             </p>
                         </div>
                     </div>

@@ -7,7 +7,6 @@ const stackedHorizontalBarChart: WidgetConfig = {
         title: 'Stacked Horizontal Bar Chart',
         sizes: ['md', 'full'],
         defaultValidationConfig: {
-            dataTarget: 'labels_info',
             defaultMaxCount: 2,
         },
     },
@@ -19,6 +18,8 @@ const stackedHorizontalBarChart: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 4,
                 max: 8,
+                defaultIndex: 0,
+                excludeDateField: true,
             },
         },
         stackBy: {
@@ -26,6 +27,8 @@ const stackedHorizontalBarChart: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
                 max: 10,
+                defaultIndex: 1,
+                excludeDateField: true,
             },
         },
     },

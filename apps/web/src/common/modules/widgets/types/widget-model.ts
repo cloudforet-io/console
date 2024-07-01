@@ -11,31 +11,16 @@ export type AdditionalLabels = Record<string, string>;
 export type DateFormat = 'SINGLE' | 'SEPARATE';
 export type TimeDiff = Record<string, any>; // years|months|days
 export type TimeSeriesAnalyzeQuery = Record<string, any>;
-export type LabelsInfo = DataTableLabelKey[];
-export type DataInfo = DataTableDataKey[];
+export type LabelsInfo = Record<string, object>;
+export type DataInfo = Record<string, { unit: string }>;
 export type DataTableOptions = DataTableAddOptions | DataTableTransformOptions;
 export type JoinType = typeof JOIN_TYPE[keyof typeof JOIN_TYPE];
 
-export interface DataTableLabelKey {
-    key: string;
-    name: string;
-    search_key?: string;
-    default?: boolean;
-    reference?: {
-        resource_type: string;
-        reference_key: string;
-    }
-}
-export interface DataTableDataKey {
-    key: string;
-    name: string;
-    unit: string;
-}
 /* ADD Data Type Options */
 export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;
     'COST'?: CostOptions;
-    group_by?: string[];
+    group_by?: {key:string; name: string; reference?: object; search_key?: string }[];
     data_name: string;
     data_unit?: string;
     date_format?: DateFormat;
