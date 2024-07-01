@@ -56,8 +56,8 @@ const getField = (field: TableWidgetField): string => {
 
 const valueFormatter = (value, field: TableWidgetField) => {
     const _unit = field.fieldInfo?.unit;
-    const _originalVal = bytes.parse(`${value}${_unit}`);
     if (_unit && SIZE_UNITS.includes(_unit)) {
+        const _originalVal = bytes.parse(`${value}${_unit}`);
         return byteFormatter(_originalVal);
     }
     return numberFormatter(value);
