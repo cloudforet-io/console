@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, onMounted, reactive,
 } from 'vue';
 
 import { PHeading, PButton, PContextMenu } from '@spaceone/design-system';
@@ -8,8 +8,6 @@ import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/t
 
 import { i18n } from '@/translations';
 
-import BookmarkFolderFormModal from '@/common/components/bookmark/BookmarkFolderFormModal.vue';
-import BookmarkLinkFormModal from '@/common/components/bookmark/BookmarkLinkFormModal.vue';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
@@ -52,14 +50,6 @@ const handleSelectMenuItem = (value: MenuItem) => {
     }
     state.visibleMenu = false;
 };
-const handleCreateFolder = () => {
-    bookmarkPageStore.fetchBookmarkFolderList();
-    bookmarkPageStore.fetchBookmarkList();
-};
-
-onUnmounted(() => {
-    bookmarkPageStore.resetState();
-});
 
 onMounted(() => {
     bookmarkPageStore.fetchBookmarkFolderList();
@@ -97,14 +87,6 @@ onMounted(() => {
             </template>
         </p-heading>
         <bookmark-management-table />
-        <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
-                                    :bookmark-folder-list="storeState.bookmarkFolderList"
-                                    @confirm="handleCreateFolder"
-        />
-        <bookmark-link-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.LINK"
-                                  :bookmark-folder-list="storeState.bookmarkFolderList"
-                                  @confirm="bookmarkPageStore.fetchBookmarkList()"
-        />
     </div>
 </template>
 
