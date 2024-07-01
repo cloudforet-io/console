@@ -2135,6 +2135,7 @@
 			"CREATE_FOLDER": "フォルダーを作成する",
 			"DELETE": "削除",
 			"GLOBAL_BOOKMARK": "グローバルブックマーク"
+			"GLOBAL_BOOKMARKS": ""
 		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "管理者Email",

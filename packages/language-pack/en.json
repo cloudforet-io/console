@@ -2134,7 +2134,8 @@
 			"ALL_BOOKMARK": "All Bookmarks",
 			"CREATE_FOLDER": "Create Folder",
 			"DELETE": "Delete",
-			"GLOBAL_BOOKMARK": "Global Bookmark"
+			"GLOBAL_BOOKMARK": "Global Bookmark",
+			"GLOBAL_BOOKMARKS": "Global Bookmarks"
 		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "Admin email",

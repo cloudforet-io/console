@@ -2135,6 +2135,7 @@
 			"CREATE_FOLDER": "폴더 생성",
 			"DELETE": "삭제",
 			"GLOBAL_BOOKMARK": "글로벌 북마크"
+			"GLOBAL_BOOKMARKS": ""
 		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "Admin 이메일",
