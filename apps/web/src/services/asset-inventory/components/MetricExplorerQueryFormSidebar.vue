@@ -23,31 +23,31 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 const router = useRouter();
 const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
-const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 const storeState = reactive({
-    metricNameList: computed(() => assetAnalysisPageGetters.metrics.map((metric) => metric.name)),
+    metricNameList: computed(() => metricExplorerPageGetters.metrics.map((metric) => metric.name)),
 });
 
 const state = reactive({
     loading: false,
     currentMetricId: computed<string>(() => route.params.metricId),
     sidebarTitle: computed<TranslateResult>(() => {
-        if (assetAnalysisPageState.metricQueryFormMode === 'CREATE') return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ADD_TITLE');
-        if (assetAnalysisPageState.metricQueryFormMode === 'UPDATE') return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UPDATE_TITLE');
+        if (metricExplorerPageState.metricQueryFormMode === 'CREATE') return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ADD_TITLE');
+        if (metricExplorerPageState.metricQueryFormMode === 'UPDATE') return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UPDATE_TITLE');
         return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.VIEW_TITLE');
     }),
     disableConfirmButton: computed<boolean>(() => {
         if (state.loading) return true;
-        if (assetAnalysisPageState.metricQueryFormMode === 'CREATE') {
+        if (metricExplorerPageState.metricQueryFormMode === 'CREATE') {
             return !isAllValid.value;
         }
         return !!invalidState.name;
@@ -108,11 +108,11 @@ const createCustomMetric = async () => {
             metric_type: METRIC_TYPE.GAUGE,
             resource_group: RESOURCE_GROUP.WORKSPACE,
             query_options: jsonParsedQuery,
-            namespace_id: assetAnalysisPageState.selectedNamespace?.name || '',
+            namespace_id: metricExplorerPageState.selectedNamespace?.name || '',
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
-        assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
-        await assetAnalysisPageStore.loadMetric(state.currentMetricId);
+        metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
+        await metricExplorerPageStore.loadMetric(state.currentMetricId);
         await router.replace(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: {
@@ -135,9 +135,9 @@ const updateCustomMetric = async () => {
             query_options: jsonParsedQuery,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
-        assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
-        await assetAnalysisPageStore.loadMetric(state.currentMetricId);
-        assetAnalysisPageStore.setRefreshMetricData(true);
+        metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
+        await metricExplorerPageStore.loadMetric(state.currentMetricId);
+        metricExplorerPageStore.setRefreshMetricData(true);
     } catch (e) {
         showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);
     } finally {
@@ -147,7 +147,7 @@ const updateCustomMetric = async () => {
 
 /* Event */
 const handleClose = () => {
-    assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
+    metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
 };
 const handleCreateCustomMetric = async () => {
     await createCustomMetric();
@@ -157,11 +157,11 @@ const handleSaveCustomMetric = async () => {
     state.visibleSaveModal = false;
 };
 
-watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
+watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
     if (visible) {
-        if (assetAnalysisPageState.metricQueryFormMode !== 'CREATE') {
-            setForm('code', JSON.stringify(assetAnalysisPageState.metric?.query_options));
-            setForm('unit', assetAnalysisPageState.metric?.unit);
+        if (metricExplorerPageState.metricQueryFormMode !== 'CREATE') {
+            setForm('code', JSON.stringify(metricExplorerPageState.metric?.query_options));
+            setForm('unit', metricExplorerPageState.metric?.unit);
         }
     } else {
         initForm();
@@ -170,15 +170,15 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
 </script>
 
 <template>
-    <div class="asset-analysis-query-form-overlay">
-        <p-overlay-layout :visible="assetAnalysisPageState.showMetricQueryFormSidebar"
+    <div class="metric-explorer-query-form-overlay">
+        <p-overlay-layout :visible="metricExplorerPageState.showMetricQueryFormSidebar"
                           style-type="primary"
                           size="lg"
                           :title="state.sidebarTitle"
                           @update:visible="handleClose"
         >
             <div class="sidebar-contents">
-                <p-field-group v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'"
+                <p-field-group v-if="metricExplorerPageState.metricQueryFormMode === 'CREATE'"
                                :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.NAME')"
                                required
                                :invalid="invalidState.name"
@@ -209,10 +209,10 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                 <!--                    </p>-->
                 <!--                </p-field-group>-->
                 <p-field-group :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UNIT')"
-                               :required="assetAnalysisPageState.metricQueryFormMode === 'VIEW'"
+                               :required="metricExplorerPageState.metricQueryFormMode === 'VIEW'"
                                class="col-span-8"
                 >
-                    <p-text-input v-if="assetAnalysisPageState.metricQueryFormMode !== 'VIEW'"
+                    <p-text-input v-if="metricExplorerPageState.metricQueryFormMode !== 'VIEW'"
                                   :value="unit"
                                   placeholder="Count"
                                   @update:value="setForm('unit', $event)"
@@ -220,7 +220,7 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                     <p v-else
                        class="text-label-md"
                     >
-                        {{ assetAnalysisPageState.metric?.unit }}
+                        {{ metricExplorerPageState.metric?.unit }}
                     </p>
                 </p-field-group>
                 <p-field-group class="query-field"
@@ -228,12 +228,12 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                                required
                 >
                     <p-text-editor :code="code"
-                                   :read-only="assetAnalysisPageState.metricQueryFormMode === 'VIEW'"
+                                   :read-only="metricExplorerPageState.metricQueryFormMode === 'VIEW'"
                                    @update:code="setForm('code', $event)"
                     />
                 </p-field-group>
             </div>
-            <template v-if="assetAnalysisPageState.metricQueryFormMode !== 'VIEW'"
+            <template v-if="metricExplorerPageState.metricQueryFormMode !== 'VIEW'"
                       #footer
             >
                 <div class="footer-wrapper">
@@ -242,7 +242,7 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                     >
                         {{ $t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.CANCEL') }}
                     </p-button>
-                    <template v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'">
+                    <template v-if="metricExplorerPageState.metricQueryFormMode === 'CREATE'">
                         <p-button style-type="primary"
                                   :disabled="state.disableConfirmButton"
                                   @click="handleCreateCustomMetric"
@@ -272,7 +272,7 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
 </template>
 
 <style scoped lang="postcss">
-.asset-analysis-query-form-overlay {
+.metric-explorer-query-form-overlay {
     .sidebar-contents {
         display: flex;
         flex-direction: column;

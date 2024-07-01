@@ -33,7 +33,7 @@ import {
     getRefinedAssetAnalysisTableData,
 } from '@/services/asset-inventory/helpers/asset-analysis-data-table-helper';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
@@ -46,23 +46,23 @@ const DATE_FORMAT_MAP = {
 const router = useRouter();
 const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
-const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: false,
     currentMetricId: computed<string>(() => route.params.metricId),
     realtimeDate: undefined as string|undefined,
     groupByFields: computed<DataTableFieldType[]>(() => {
-        const filteredLabelKeys = assetAnalysisPageGetters.refinedMetricLabelKeys.filter((d) => assetAnalysisPageState.selectedGroupByList.includes(d.key));
+        const filteredLabelKeys = metricExplorerPageGetters.refinedMetricLabelKeys.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key));
         return filteredLabelKeys.map((d) => ({
             name: d.key.replace('labels.', ''), label: d.name,
         }));
     }),
     dateFields: computed<DataTableFieldType[]>(() => getAssetAnalysisDataTableDateFields(
-        assetAnalysisPageState.granularity,
-        assetAnalysisPageState.period ?? {},
-        !!assetAnalysisPageState.selectedGroupByList.length,
+        metricExplorerPageState.granularity,
+        metricExplorerPageState.period ?? {},
+        !!metricExplorerPageState.selectedGroupByList.length,
         state.realtimeDate,
     )),
     fields: computed<DataTableFieldType[]>(() => [
@@ -71,7 +71,7 @@ const state = reactive({
     ]),
     excelFields: computed<ExcelDataField[]>(() => {
         const fields: DataTableFieldType[] = [];
-        if (assetAnalysisPageState.selectedGroupByList.length) fields.push(...state.groupByFields);
+        if (metricExplorerPageState.selectedGroupByList.length) fields.push(...state.groupByFields);
         fields.push(...state.dateFields);
         return fields.map((d) => {
             const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
@@ -82,27 +82,27 @@ const state = reactive({
     thisPage: 1,
     pageSize: 15,
     more: false,
-    metricResourceType: computed<string|undefined>(() => assetAnalysisPageState.metric?.resource_type),
-    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => assetAnalysisPageState.metric?.labels_info.filter((d) => !!d.search_key?.length) ?? []),
-    metricAdditionalFilter: computed(() => (assetAnalysisPageState.metric?.query_options?.filter ?? []).map((d) => ({ k: d.key ?? d.k, v: d.value ?? d.v, o: d.operator ?? d.o })) ?? []),
+    metricResourceType: computed<string|undefined>(() => metricExplorerPageState.metric?.resource_type),
+    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => metricExplorerPageState.metric?.labels_info.filter((d) => !!d.search_key?.length) ?? []),
+    metricAdditionalFilter: computed(() => (metricExplorerPageState.metric?.query_options?.filter ?? []).map((d) => ({ k: d.key ?? d.k, v: d.value ?? d.v, o: d.operator ?? d.o })) ?? []),
 });
 
 /* Util */
 const getRefinedColumnValue = (field, value) => {
     if (field.name?.startsWith('count.') && field.name?.endsWith('.value')) {
         if (typeof value !== 'number') {
-            const _dateFormat = DATE_FORMAT_MAP[assetAnalysisPageState.granularity];
+            const _dateFormat = DATE_FORMAT_MAP[metricExplorerPageState.granularity];
             if (dayjs.utc().format(_dateFormat) === field.label) return '--';
             return 0;
         }
-        const _unit = assetAnalysisPageState.metric?.unit;
+        const _unit = metricExplorerPageState.metric?.unit;
         const _originalVal = bytes.parse(`${value}${_unit}`);
         if (_unit && UNITS.includes(_unit)) {
             return byteFormatter(_originalVal);
         }
         return numberFormatter(value, { notation: 'compact' }) || 0;
     }
-    return assetAnalysisPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
+    return metricExplorerPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
 };
 
 /* Api */
@@ -111,21 +111,21 @@ const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeRespon
 const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<MetricDataAnalyzeResult>|undefined> => {
     try {
         analyzeApiQueryHelper
-            .setFilters(assetAnalysisPageGetters.consoleFilters)
+            .setFilters(metricExplorerPageGetters.consoleFilters)
             .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const _sort = assetAnalysisPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
-        const _fieldGroup = assetAnalysisPageGetters.isRealtimeChart ? [] : ['date'];
+        const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
+        const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
             metric_id: state.currentMetricId,
             query: {
-                granularity: assetAnalysisPageState.granularity,
-                group_by: assetAnalysisPageState.selectedGroupByList,
-                start: assetAnalysisPageState.period?.start,
-                end: assetAnalysisPageState.period?.end,
+                granularity: metricExplorerPageState.granularity,
+                group_by: metricExplorerPageState.selectedGroupByList,
+                start: metricExplorerPageState.period?.start,
+                end: metricExplorerPageState.period?.end,
                 fields: {
                     count: {
                         key: 'value',
-                        operator: assetAnalysisPageState.selectedOperator,
+                        operator: metricExplorerPageState.selectedOperator,
                     },
                 },
                 sort: _sort,
@@ -134,7 +134,7 @@ const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<Metric
             },
         });
         if (status === 'succeed') {
-            if (assetAnalysisPageGetters.isRealtimeChart) {
+            if (metricExplorerPageGetters.isRealtimeChart) {
                 state.realtimeDate = response.results?.[0]?.date;
             } else {
                 state.realtimeDate = undefined;
@@ -150,7 +150,7 @@ const setDataTableData = async () => {
     state.loading = true;
     const res = await analyzeMetricData();
     if (!res) return;
-    state.items = getRefinedAssetAnalysisTableData(res.results, assetAnalysisPageState.granularity, assetAnalysisPageState.period ?? {}, state.realtimeDate);
+    state.items = getRefinedAssetAnalysisTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, state.realtimeDate);
     state.more = res.more;
     state.loading = false;
 };
@@ -167,7 +167,7 @@ const handleExport = async () => {
     try {
         const res = await analyzeMetricData(false);
         if (!res) return;
-        const refinedData = getRefinedAssetAnalysisTableData(res.results, assetAnalysisPageState.granularity, assetAnalysisPageState.period ?? {}, state.realtimeDate);
+        const refinedData = getRefinedAssetAnalysisTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, state.realtimeDate);
         await downloadExcel({
             data: refinedData,
             fields: state.excelFields,
@@ -182,7 +182,7 @@ const handleClickRow = (item) => {
     const _filters: ConsoleFilter[] = [];
 
     // set filters from groupBy
-    assetAnalysisPageState.selectedGroupByList.forEach((d) => {
+    metricExplorerPageState.selectedGroupByList.forEach((d) => {
         const _targetLabelKey = state.hasSearchKeyLabelKeys.find((k) => k.key === d);
         if (_targetLabelKey) {
             const _fieldName = _targetLabelKey.key.replace('labels.', '');
@@ -193,8 +193,8 @@ const handleClickRow = (item) => {
     });
 
     // set filters from popper
-    Object.entries(assetAnalysisPageState.filters)
-        .filter(([key]) => !assetAnalysisPageState.selectedGroupByList.includes(key))
+    Object.entries(metricExplorerPageState.filters)
+        .filter(([key]) => !metricExplorerPageState.selectedGroupByList.includes(key))
         .forEach(([key, value]) => {
             const _targetLabelKey = state.hasSearchKeyLabelKeys.find((k) => k.key === key);
             if (_targetLabelKey && value?.length) {
@@ -234,11 +234,11 @@ const handleClickRow = (item) => {
 watch(
     [
         () => state.currentMetricId,
-        () => assetAnalysisPageState.metricInitiated,
-        () => assetAnalysisPageState.period,
-        () => assetAnalysisPageState.selectedOperator,
-        () => assetAnalysisPageState.selectedGroupByList,
-        () => assetAnalysisPageGetters.consoleFilters,
+        () => metricExplorerPageState.metricInitiated,
+        () => metricExplorerPageState.period,
+        () => metricExplorerPageState.selectedOperator,
+        () => metricExplorerPageState.selectedGroupByList,
+        () => metricExplorerPageGetters.consoleFilters,
     ],
     async ([metricId, metricInitiated]) => {
         if (!metricId || !metricInitiated) return;
@@ -247,13 +247,13 @@ watch(
     },
     { immediate: true, deep: true },
 );
-watch(() => assetAnalysisPageGetters.isRealtimeChart, async () => {
+watch(() => metricExplorerPageGetters.isRealtimeChart, async () => {
     await setDataTableData();
 });
-watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
+watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
     if (refresh) {
         await setDataTableData();
-        assetAnalysisPageStore.setRefreshMetricData(false);
+        metricExplorerPageStore.setRefreshMetricData(false);
     }
 }, { immediate: false });
 </script>
