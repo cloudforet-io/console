@@ -98,17 +98,24 @@ const state = reactive({
                 dataFields.push({
                     name: field,
                     label: field,
-                    fieldInfo: { type: 'dataField' },
+                    fieldInfo: {
+                        type: 'dataField',
+                        unit: state.dataInfo?.[field]?.unit,
+                    },
                 });
                 if (state.comparisonInfo?.format && state.isComparisonEnabled) {
                     dataFields.push({
                         name: `comparison_${field}`,
                         label: field,
-                        fieldInfo: { type: 'dataField', additionalType: 'comparison' },
+                        fieldInfo: {
+                            type: 'dataField',
+                            additionalType: 'comparison',
+                            unit: state.dataInfo?.[field]?.unit,
+                        },
                     });
                 }
             });
-        } else if (isDateField(state.tableDataField)) dataFields = getWidgetTableDateFields(state.tableDataField, state.granularity, state.dateRange, state.tableDataMaxCount);
+        } else if (isDateField(state.tableDataField)) dataFields = getWidgetTableDateFields(state.tableDataField, state.granularity, state.dateRange, state.tableDataMaxCount, state.tableDataCriteria);
         else { // None Time Series Dynamic Field Case
             state.finalConvertedData?.results?.[0]?.[state.tableDataCriteria].forEach((d) => {
                 if (d[state.tableDataField] === 'sub_total') return;
@@ -123,6 +130,7 @@ const state = reactive({
                                 type: 'dataField',
                                 additionalType: 'comparison',
                                 reference: isReferenceField ? REFERENCE_FIELD_MAP[state.tableDataField] : undefined,
+                                unit: state.dataInfo?.[state.tableDataCriteria]?.unit,
                             },
                         });
                     }
@@ -133,6 +141,7 @@ const state = reactive({
                         fieldInfo: {
                             type: 'dataField',
                             reference: isReferenceField && d[state.tableDataField] !== 'etc' ? REFERENCE_FIELD_MAP[state.tableDataField] : undefined,
+                            unit: state.dataInfo?.[state.tableDataCriteria]?.unit,
                         },
                     });
                 }
@@ -140,7 +149,11 @@ const state = reactive({
         }
         const basicFields = [...labelFields, ...dataFields];
         if (state.subTotalInfo?.toggleValue) {
-            const subTotalField: TableWidgetField = { name: 'sub_total', label: 'Sub Total', fieldInfo: { type: 'dataField', additionalType: 'subTotal' } };
+            const subTotalField: TableWidgetField = {
+                name: 'sub_total',
+                label: 'Sub Total',
+                fieldInfo: { type: 'dataField', additionalType: 'subTotal', unit: state.dataInfo?.[state.tableDataCriteria]?.unit },
+            };
             return [...basicFields, subTotalField];
         }
         return basicFields;
@@ -161,6 +174,7 @@ const getWidgetTableDateFields = (
     granularity: Granularity|undefined,
     dateRange: DateRange,
     limitCount: number,
+    criteria: string,
 ): TableWidgetField[] => {
     if (!granularity || !dateRange?.end) return [];
     const dateFields: TableWidgetField[] = [];
@@ -182,7 +196,7 @@ const getWidgetTableDateFields = (
         dateFields.push({
             name: now.format(labelDateFormat),
             label: now.format(labelDateFormat),
-            fieldInfo: { type: 'dataField' },
+            fieldInfo: { type: 'dataField', unit: state.dataInfo?.[criteria]?.unit },
         });
         now = now.add(1, timeUnit);
     }
