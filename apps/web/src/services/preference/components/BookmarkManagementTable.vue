@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
-import { PToolboxTable, PLazyImg, PI } from '@spaceone/design-system';
+import {
+    PToolboxTable, PLazyImg, PI, PDataLoader,
+} from '@spaceone/design-system';
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -34,9 +36,7 @@ const storeState = reactive({
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
-});
-const state = reactive({
-    loading: false,
+    loading: computed<boolean>(() => bookmarkPageState.loading),
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -111,84 +111,88 @@ const fetchBookmarkList = async () => {
 };
 
 onMounted(async () => {
-    await bookmarkPageStore.fetchBookmarkList();
+    await fetchBookmarkList();
 });
 </script>
 
 <template>
     <section class="data-source-management-table">
-        <p-toolbox-table class="table"
-                         search-type="query"
-                         searchable
-                         selectable
-                         sortable
-                         sort-by="name"
-                         :sort-desc="true"
-                         :select-index="storeState.selectedIndices"
-                         :fields="tableState.fields"
-                         :total-count="storeState.bookmarkTotalCount"
-                         :items="storeState.bookmarkList"
-                         :key-item-sets="tableState.keyItemSets"
-                         :value-handler-map="tableState.valueHandlerMap"
-                         :query-tags="queryTags"
-                         :loading="state.loading"
-                         @change="handleChange"
-                         @refresh="fetchBookmarkList"
-                         @update:select-index="handleUpdateSelectIndex"
+        <p-data-loader :loading="storeState.loading"
+                       class="data-loader-wrapper"
+                       :data="true"
         >
-            <template #col-name-format="{value, item}">
-                <div class="col-name">
-                    <p-lazy-img v-if="item.link"
-                                class="left-icon"
-                                :src="item.imgIcon"
-                                width="1.5rem"
-                                height="1.5rem"
-                    />
-                    <p-i v-else
-                         name="ic_folder"
-                         color="inherit"
-                         width="1.25rem"
-                         height="1.25rem"
-                    />
-                    <span class="name">{{ value }}</span>
-                </div>
-            </template>
-            <template #col-workspace_id-format="{value, item}">
-                <div class="col-workspace">
-                    <div v-if="item.isGlobal"
-                         class="workspace"
-                    >
-                        <p-i name="ic_globe-filled"
-                             :color="gray[500]"
-                             width="1rem"
-                             height="1rem"
+            <p-toolbox-table class="table"
+                             search-type="query"
+                             searchable
+                             selectable
+                             sortable
+                             sort-by="name"
+                             :sort-desc="true"
+                             :select-index="storeState.selectedIndices"
+                             :fields="tableState.fields"
+                             :total-count="storeState.bookmarkTotalCount"
+                             :items="storeState.bookmarkList"
+                             :key-item-sets="tableState.keyItemSets"
+                             :value-handler-map="tableState.valueHandlerMap"
+                             :query-tags="queryTags"
+                             @change="handleChange"
+                             @refresh="fetchBookmarkList"
+                             @update:select-index="handleUpdateSelectIndex"
+            >
+                <template #col-name-format="{value, item}">
+                    <div class="col-name">
+                        <p-lazy-img v-if="item.link"
+                                    class="left-icon"
+                                    :src="item.imgIcon"
+                                    width="1.5rem"
+                                    height="1.5rem"
                         />
-                        <span class="global">{{ $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') }}</span>
-                    </div>
-                    <div v-else
-                         class="workspace"
-                    >
-                        <workspace-logo-icon :text="getWorkspaceInfo(value)?.name || ''"
-                                             :theme="getWorkspaceInfo(value)?.tags?.theme"
-                                             size="xs"
+                        <p-i v-else
+                             name="ic_folder"
+                             color="inherit"
+                             width="1.25rem"
+                             height="1.25rem"
                         />
-                        <span class="text">{{ getWorkspaceInfo(value)?.name }}</span>
+                        <span class="name">{{ value }}</span>
                     </div>
-                    <div v-if="item.folder"
-                         class="folder-wrapper"
-                    >
-                        <p-i name="ic_chevron-right-thin"
-                             width="1rem"
-                             height="1rem"
-                        />
-                        <span class="text">{{ getFolderInfo(item.folder)?.name }}</span>
+                </template>
+                <template #col-workspace_id-format="{value, item}">
+                    <div class="col-workspace">
+                        <div v-if="item.isGlobal"
+                             class="workspace"
+                        >
+                            <p-i name="ic_globe-filled"
+                                 :color="gray[500]"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                            <span class="global">{{ $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') }}</span>
+                        </div>
+                        <div v-else
+                             class="workspace"
+                        >
+                            <workspace-logo-icon :text="getWorkspaceInfo(value)?.name || ''"
+                                                 :theme="getWorkspaceInfo(value)?.tags?.theme"
+                                                 size="xs"
+                            />
+                            <span class="text">{{ getWorkspaceInfo(value)?.name }}</span>
+                        </div>
+                        <div v-if="item.folder"
+                             class="folder-wrapper"
+                        >
+                            <p-i name="ic_chevron-right-thin"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                            <span class="text">{{ getFolderInfo(item.folder)?.name }}</span>
+                        </div>
                     </div>
-                </div>
-            </template>
-            <template #col-link-format="{value}">
-                <span class="col-link">{{ value ?? '-' }}</span>
-            </template>
-        </p-toolbox-table>
+                </template>
+                <template #col-link-format="{value}">
+                    <span class="col-link">{{ value ?? '-' }}</span>
+                </template>
+            </p-toolbox-table>
+        </p-data-loader>
     </section>
 </template>
 

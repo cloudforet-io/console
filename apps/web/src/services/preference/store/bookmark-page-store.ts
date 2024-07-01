@@ -17,6 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     const state = reactive({
+        loading: false,
         bookmarkFolderList: [] as BookmarkItem[],
         bookmarkList: [] as BookmarkItem[],
         bookmarkTotalCount: 0,
@@ -88,6 +89,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     ...state.searchFilter,
                     { k: 'name', v: 'console:bookmark:', o: '' },
                 ]);
+            state.loading = true;
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
                     query: BookmarkListApiQueryHelper.data,
@@ -110,10 +112,12 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     };
                 });
                 state.bookmarkList = await Promise.all(promises);
-                state.bookmarkTotalCount = total_count;
+                state.bookmarkTotalCount = total_count || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkList = [];
+            } finally {
+                state.loading = false;
             }
         },
     };
