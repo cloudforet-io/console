@@ -104,6 +104,7 @@ const { setPathFrom, handleClickBackButton } = useGoBack(getProperRouteLocation(
 defineExpose({ setPathFrom });
 
 onUnmounted(() => {
+    dashboardCreatePageStore.setCurrentStep(1);
     dashboardCreatePageStore.reset();
 });
 </script>
@@ -113,7 +114,7 @@ onUnmounted(() => {
          :class="[`step-${dashboardCreatePageState.currentStep}`]"
     >
         <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                  :description="state.steps[dashboardCreatePageState.currentStep - 1].description"
+                                  :description="state.steps?.[dashboardCreatePageState.currentStep - 1]?.description"
                                   :total-steps="state.steps.length"
                                   :current-step="dashboardCreatePageState.currentStep"
                                   show-step

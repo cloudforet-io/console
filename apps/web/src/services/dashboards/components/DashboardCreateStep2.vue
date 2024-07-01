@@ -32,10 +32,11 @@ const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void
 const dashboardStore = useDashboardStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
+const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
 const state = reactive({
     proxyIsValid: useProxyValue('isValid', props, emit),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardCreatePageState.dashboardType)),
+    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardCreatePageGetters.dashboardType)),
     labels: [] as InputItem[],
 });
 const {
@@ -97,6 +98,7 @@ watch(() => isAllValid.value, (value) => {
                            required
                            :invalid="invalidState.dashboardName"
                            :invalid-text="invalidTexts.dashboardName"
+                           :disalbed="dashboardCreatePageState.dashboardCreated"
             >
                 <template #default="{invalid}">
                     <p-text-input :value="dashboardName"

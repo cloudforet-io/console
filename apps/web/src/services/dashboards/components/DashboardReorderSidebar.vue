@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+    computed,
     onUnmounted, reactive, watch,
 } from 'vue';
 import draggable from 'vuedraggable';
@@ -15,20 +16,33 @@ import { store } from '@/store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
+import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
+type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
-    widgetList: [] as Array<PublicWidgetModel|PrivateWidgetModel>,
+    widgetList: computed<WidgetModel[]>(() => {
+        const results: WidgetModel[] = [];
+        dashboardDetailState.dashboardLayouts.forEach((d) => {
+            const _widgetIdList = d.widgets;
+            _widgetIdList?.forEach((widgetId) => {
+                const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
+                const _config = getWidgetConfig(_widget?.widget_type);
+                if (!_widget || !_config) return;
+                results.push(_widget);
+            });
+        });
+        return results;
+    }),
 });
 
 /* Event */
 const handleChangeWidgetOrder = async () => {
-    // HACK: implement widget panel
     const _widgetIdList = state.widgetList.map((w) => w.widget_id);
     const _updatedLayouts = [{ widgets: _widgetIdList }];
     await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
@@ -37,26 +51,6 @@ const handleChangeWidgetOrder = async () => {
     dashboardDetailStore.setDashboardLayouts(_updatedLayouts);
 };
 
-/* Util */
-const getDashboardWidgetList = (): Array<PublicWidgetModel|PrivateWidgetModel> => {
-    const widgetList: Array<PublicWidgetModel|PrivateWidgetModel> = [];
-    dashboardDetailState.dashboardLayouts.forEach((d) => {
-        const _widgetIdList = d.widgets;
-        _widgetIdList?.forEach((widgetId) => {
-            const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
-            if (_widget) {
-                widgetList.push(_widget as PublicWidgetModel | PrivateWidgetModel);
-            }
-        });
-    });
-    return widgetList;
-};
-
-watch(() => store.state.display.visibleSidebar, (visible) => {
-    if (visible) {
-        state.widgetList = getDashboardWidgetList();
-    }
-});
 watch(() => dashboardDetailState.dashboardId, (after, before) => {
     if (after !== before) {
         store.dispatch('display/hideSidebar');
