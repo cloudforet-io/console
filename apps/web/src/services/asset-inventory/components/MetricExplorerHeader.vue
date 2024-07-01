@@ -30,11 +30,11 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import { gray } from '@/styles/colors';
 
-import AssetAnalysisNameFormModal from '@/services/asset-inventory/components/AssetAnalysisNameFormModal.vue';
-import AssetAnalysisQueryFormSidebar from '@/services/asset-inventory/components/AssetAnalysisQueryFormSidebar.vue';
+import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
+import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/components/MetricExplorerQueryFormSidebar.vue';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 const contextMenuRef = ref<any|null>(null);
@@ -44,22 +44,22 @@ const router = useRouter();
 const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
 
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
-const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     namespaces: computed(() => allReferenceStore.getters.namespace),
-    currentMetric: computed(() => assetAnalysisPageState.metric),
+    currentMetric: computed(() => metricExplorerPageState.metric),
 });
 
 const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     isDuplicateEnabled: computed<boolean>(() => Object.values(storeState.namespaces).find((d) => d.key === storeState.currentMetric?.namespace_id)?.data.group !== 'common'),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => assetAnalysisPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
-    isManagedMetric: computed<boolean>(() => (assetAnalysisPageState.metric?.is_managed && !state.currentMetricExampleId) || false),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
+    isManagedMetric: computed<boolean>(() => (metricExplorerPageState.metric?.is_managed && !state.currentMetricExampleId) || false),
     metricNameFormModalVisible: false,
     metricDeleteModalVisible: false,
     loadingDuplicate: false,
@@ -73,9 +73,9 @@ const state = reactive({
         },
     ])),
     pageTitle: computed<string|TranslateResult>(() => {
-        if (assetAnalysisPageState.metricLoading) return '';
-        if (assetAnalysisPageState.metric) {
-            return state.currentMetricExample?.name || assetAnalysisPageState.metric.name;
+        if (metricExplorerPageState.metricLoading) return '';
+        if (metricExplorerPageState.metric) {
+            return state.currentMetricExample?.name || metricExplorerPageState.metric.name;
         }
         return i18n.t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER');
     }),
@@ -97,7 +97,7 @@ const state = reactive({
         }
         return 'ic_edit';
     }),
-    existingMetricNameList: computed<string[]>(() => assetAnalysisPageGetters.metrics
+    existingMetricNameList: computed<string[]>(() => metricExplorerPageGetters.metrics
         .map((metric) => metric.name)),
 });
 
@@ -139,16 +139,16 @@ const getDuplicatedMetricName = (name: string): string => {
 
 /* Api */
 const duplicateMetric = async () => {
-    if (!assetAnalysisPageState.metric) return;
+    if (!metricExplorerPageState.metric) return;
     state.loadingDuplicate = true;
     try {
         const duplicatedMetric = await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
-            name: getDuplicatedMetricName(assetAnalysisPageState.metric.name),
-            namespace_id: assetAnalysisPageState.metric.namespace_id || '',
-            unit: assetAnalysisPageState.metric.unit,
-            metric_type: assetAnalysisPageState.metric.metric_type,
+            name: getDuplicatedMetricName(metricExplorerPageState.metric.name),
+            namespace_id: metricExplorerPageState.metric.namespace_id || '',
+            unit: metricExplorerPageState.metric.unit,
+            metric_type: metricExplorerPageState.metric.metric_type,
             resource_group: RESOURCE_GROUP.WORKSPACE,
-            query_options: assetAnalysisPageState.metric.query_options,
+            query_options: metricExplorerPageState.metric.query_options,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
         await router.replace(getProperRouteLocation({
@@ -162,13 +162,13 @@ const duplicateMetric = async () => {
     }
 };
 const deleteCustomMetric = async () => {
-    if (!assetAnalysisPageState.metric) return;
+    if (!metricExplorerPageState.metric) return;
     try {
         await SpaceConnector.clientV2.inventory.metric.delete<MetricDeleteParameters>({
-            metric_id: assetAnalysisPageState.metric.metric_id,
+            metric_id: metricExplorerPageState.metric.metric_id,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
-        const otherMetricId = assetAnalysisPageGetters.metrics[0]?.key;
+        const otherMetricId = metricExplorerPageGetters.metrics[0]?.key;
         if (otherMetricId) {
             await router.replace(getProperRouteLocation({
                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
@@ -188,7 +188,7 @@ const deleteMetricExample = async () => {
         await SpaceConnector.clientV2.inventory.metricExample.delete<MetricExampleDeleteParameters>({
             example_id: state.currentMetricExampleId as string,
         });
-        await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
+        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
         await router.replace(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
@@ -203,12 +203,12 @@ const updateMetricExample = async () => {
         await SpaceConnector.clientV2.inventory.metricExample.update<MetricExampleUpdateParameters, MetricExampleModel>({
             example_id: state.currentMetricExampleId as string,
             options: {
-                granularity: assetAnalysisPageState.granularity,
-                period: assetAnalysisPageState.period,
-                relative_period: assetAnalysisPageState.relativePeriod,
-                group_by: assetAnalysisPageState.selectedGroupByList,
-                filters: assetAnalysisPageState.filters,
-                operator: assetAnalysisPageState.selectedOperator,
+                granularity: metricExplorerPageState.granularity,
+                period: metricExplorerPageState.period,
+                relative_period: metricExplorerPageState.relativePeriod,
+                group_by: metricExplorerPageState.selectedGroupByList,
+                filters: metricExplorerPageState.filters,
+                operator: metricExplorerPageState.selectedOperator,
             },
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_EXAMPLE'), '');
@@ -250,16 +250,16 @@ const handleClickMoreMenuButton = () => {
 };
 const handleOpenEditQuery = () => {
     if (state.isManagedMetric || state.currentMetricExampleId) {
-        assetAnalysisPageStore.openMetricQueryFormSidebar('VIEW');
+        metricExplorerPageStore.openMetricQueryFormSidebar('VIEW');
     } else {
-        assetAnalysisPageStore.openMetricQueryFormSidebar('UPDATE');
+        metricExplorerPageStore.openMetricQueryFormSidebar('UPDATE');
     }
 };
 </script>
 
 <template>
     <p-heading :title="state.pageTitle">
-        <template v-if="!assetAnalysisPageState.metricLoading"
+        <template v-if="!metricExplorerPageState.metricLoading"
                   #title-left-extra
         >
             <p-i v-if="state.currentMetricExampleId"
@@ -275,7 +275,7 @@ const handleOpenEditQuery = () => {
                  :color="gray[500]"
             />
         </template>
-        <template v-if="!assetAnalysisPageState.metricLoading"
+        <template v-if="!metricExplorerPageState.metricLoading"
                   #title-right-extra
         >
             <div v-if="!state.isManagedMetric"
@@ -297,7 +297,7 @@ const handleOpenEditQuery = () => {
                           @confirm="handleDeleteMetric"
             />
         </template>
-        <template v-if="!assetAnalysisPageState.metricLoading"
+        <template v-if="!metricExplorerPageState.metricLoading"
                   #extra
         >
             <div ref="rightPartRef"
@@ -354,10 +354,10 @@ const handleOpenEditQuery = () => {
                     />
                 </template>
             </div>
-            <asset-analysis-name-form-modal :visible.sync="state.metricNameFormModalVisible"
-                                            :type="state.selectedNameFormModalType"
+            <metric-explorer-name-form-modal :visible.sync="state.metricNameFormModalVisible"
+                                             :type="state.selectedNameFormModalType"
             />
-            <asset-analysis-query-form-sidebar />
+            <metric-explorer-query-form-sidebar />
         </template>
     </p-heading>
 </template>

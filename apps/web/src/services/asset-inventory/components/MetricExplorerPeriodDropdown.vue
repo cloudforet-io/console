@@ -21,15 +21,15 @@ import {
 import {
     convertRelativePeriodToPeriod, getRefinedDailyPeriod,
 } from '@/services/asset-inventory/helpers/asset-analysis-period-helper';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
     MetricPeriodMenu,
     RelativePeriod,
 } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 const state = reactive({
     dailyPeriodMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const locale = i18n.locale;
@@ -90,8 +90,8 @@ const state = reactive({
     ])),
     periodMenuItems: computed<MenuItem[]>(() => {
         const menuItems = [
-            ...((assetAnalysisPageState.granularity === GRANULARITY.DAILY) ? state.dailyPeriodMenuItems : []),
-            ...((assetAnalysisPageState.granularity === GRANULARITY.MONTHLY) ? state.monthlyPeriodMenuItems : []),
+            ...((metricExplorerPageState.granularity === GRANULARITY.DAILY) ? state.dailyPeriodMenuItems : []),
+            ...((metricExplorerPageState.granularity === GRANULARITY.MONTHLY) ? state.monthlyPeriodMenuItems : []),
         ];
         const customItem = [{
             type: 'divider',
@@ -112,15 +112,15 @@ const state = reactive({
 /* Util */
 const getPeriodItemNameByRelativePeriod = (relativePeriod: RelativePeriod) => Object.values(METRIC_PERIOD_MENU_ITEM_MAP).find((item) => isEqual(item.relativePeriod, relativePeriod))?.name;
 const initSelectedPeriod = () => {
-    if (assetAnalysisPageState.relativePeriod) {
-        state.selectedPeriod = getPeriodItemNameByRelativePeriod(assetAnalysisPageState.relativePeriod);
-    } else if (assetAnalysisPageState.granularity === GRANULARITY.DAILY) {
-        const selectedPeriodItem = state.dailyPeriodMenuItems.find((item) => isEqual(item.name, assetAnalysisPageState.period));
+    if (metricExplorerPageState.relativePeriod) {
+        state.selectedPeriod = getPeriodItemNameByRelativePeriod(metricExplorerPageState.relativePeriod);
+    } else if (metricExplorerPageState.granularity === GRANULARITY.DAILY) {
+        const selectedPeriodItem = state.dailyPeriodMenuItems.find((item) => isEqual(item.name, metricExplorerPageState.period));
         state.selectedPeriod = selectedPeriodItem?.name;
     } else {
         state.selectedPeriod = 'custom';
     }
-    assetAnalysisPageStore.setRefreshMetricPeriodDropdown(false);
+    metricExplorerPageStore.setRefreshMetricPeriodDropdown(false);
 };
 
 /* Event */
@@ -134,24 +134,24 @@ const handleSelectPeriod = (periodMenuName: string) => {
     const _selectedPeriodItem = METRIC_PERIOD_MENU_ITEM_MAP[periodMenuName];
     if (_selectedPeriodItem) {
         const _relativePeriod = _selectedPeriodItem.relativePeriod;
-        const _period = convertRelativePeriodToPeriod(assetAnalysisPageState.granularity, _relativePeriod);
-        assetAnalysisPageStore.setPeriod(_period);
-        assetAnalysisPageStore.setRelativePeriod(_relativePeriod);
+        const _period = convertRelativePeriodToPeriod(metricExplorerPageState.granularity, _relativePeriod);
+        metricExplorerPageStore.setPeriod(_period);
+        metricExplorerPageStore.setRelativePeriod(_relativePeriod);
     } else {
         const _period = getRefinedDailyPeriod(periodMenuName);
-        assetAnalysisPageStore.setPeriod(_period);
-        assetAnalysisPageStore.setRelativePeriod(undefined);
+        metricExplorerPageStore.setPeriod(_period);
+        metricExplorerPageStore.setRelativePeriod(undefined);
     }
 };
 const handleCustomRangeModalConfirm = (start: string, end: string) => {
-    assetAnalysisPageStore.setPeriod({ start, end });
-    assetAnalysisPageStore.setRelativePeriod(undefined);
+    metricExplorerPageStore.setPeriod({ start, end });
+    metricExplorerPageStore.setRelativePeriod(undefined);
     state.selectedPeriod = 'custom';
     state.customDateModalVisible = false;
 };
 
 /* Watcher */
-watch(() => assetAnalysisPageState.refreshMetricPeriodDropdown, (refresh) => {
+watch(() => metricExplorerPageState.refreshMetricPeriodDropdown, (refresh) => {
     if (refresh) initSelectedPeriod();
 }, { immediate: true });
 </script>
@@ -168,9 +168,9 @@ watch(() => assetAnalysisPageState.refreshMetricPeriodDropdown, (refresh) => {
         />
         <custom-date-modal
             :visible.sync="state.customDateModalVisible"
-            :start="assetAnalysisPageState.period?.start"
-            :end="assetAnalysisPageState.period?.end"
-            :datetime-picker-data-type="assetAnalysisPageState.granularity === GRANULARITY.DAILY ? 'yearToDate' : 'yearToMonth'"
+            :start="metricExplorerPageState.period?.start"
+            :end="metricExplorerPageState.period?.end"
+            :datetime-picker-data-type="metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'yearToDate' : 'yearToMonth'"
             use-restricted-mode
             @confirm="handleCustomRangeModalConfirm"
         />

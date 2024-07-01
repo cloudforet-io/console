@@ -22,7 +22,7 @@ const props = defineProps<Props>();
                  :selected-id="props.selectedId"
                  :tree-display-map="props.treeDisplayMap"
                  use-default-indent
-                 class="asset-analysis-l-s-b-metric-tree"
+                 class="metric-explorer-l-s-b-metric-tree"
     >
         <template #content="{ node }">
             <div class="tree-menu-item-content">
@@ -52,7 +52,7 @@ const props = defineProps<Props>();
 </template>
 
 <style scoped lang="postcss">
-.asset-analysis-l-s-b-metric-tree {
+.metric-explorer-l-s-b-metric-tree {
     .tree-menu-item-content {
         @apply flex items-center justify-between w-full;
         height: 2rem;
