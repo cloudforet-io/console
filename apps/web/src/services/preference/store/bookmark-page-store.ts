@@ -3,14 +3,15 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { defineStore } from 'pinia';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DomainConfigCreateParameters } from '@/schema/config/domain-config/api-verbs/create';
-import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
-import { store } from '@/store';
+import type { PublicConfigListParameters } from '@/schema/config/public-config/api-verbs/list';
+import type { PublicConfigModel } from '@/schema/config/public-config/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -25,48 +26,89 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 
     const _getters = reactive({
-        domainId: computed<string>(() => store.state.domain.domainId),
-        userId: computed<string>(() => store.state.user.userId),
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     });
 
     const state = reactive({
-        publicBookmarkData: [] as BookmarkItem[],
+        bookmarkFolderList: [] as BookmarkItem[],
+        bookmarkList: [] as BookmarkItem[],
+        pageStart: 0,
+        pageLimit: 15,
+        searchFilter: [] as ConsoleFilter[],
+        selectedIndices: [] as number[],
     });
 
     const getters = reactive({
         allBookmarkFolderItems: computed<BookmarkItem[]>(() => ([
             ...getters.publicBookmarkFolderData,
         ])),
-        publicBookmarkFolderData: computed<BookmarkItem[]>(() => state.publicBookmarkData.filter((f) => !f.link) || []),
+        publicBookmarkFolderData: computed<BookmarkItem[]>(() => state.bookmarkList.filter((f) => !f.link) || []),
     });
 
+    const mutation = {
+        setBookmarkListPageStart: (pageStart: number) => {
+            state.pageStart = pageStart;
+        },
+        setBookmarkListPageLimit: (pageLimit: number) => {
+            state.pageLimit = pageLimit;
+        },
+        setBookmarkListSearchFilters: (filters: ConsoleFilter[]) => {
+            state.searchFilter = filters;
+        },
+        setSelectedBookmarkIndices: (indices: number[]) => {
+            state.selectedIndices = indices;
+        },
+    };
     const actions = {
         resetState: () => {
-            state.publicBookmarkData = [];
+            state.bookmarkFolderList = [];
+            state.bookmarkList = [];
+            state.pageStart = 0;
+            state.pageLimit = 15;
+            state.searchFilter = [] as ConsoleFilter[];
+            state.selectedIndices = [] as number[];
         },
-        fetchPublicBookmarkList: async () => {
+        fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
-                .setSort('created_at', false)
+                .setSort('updated_at', true)
                 .setFilters([
-                    { k: 'domain_id', v: _getters.domainId, o: '=' },
-                    { k: 'name', v: 'console:bookmark:global', o: '' },
+                    { k: 'name', v: 'console:bookmark', o: '' },
+                    { k: 'data.link', v: null, o: '=' },
                 ]);
             try {
-                const { results } = await SpaceConnector.clientV2.config.domainConfig.list<DomainConfigListParameters, ListResponse<DomainConfigModel>>({
+                const { results } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
-                state.publicBookmarkData = (results ?? []).map((i) => ({
+                state.bookmarkFolderList = (results ?? []).map((i) => ({
                     ...i.data,
+                    workspace_id: i.data.workspaceId,
                     id: i.name,
                 } as BookmarkItem));
-                if (state.publicBookmarkData.length === 0) {
-                    await actions.createDefaultBookmark();
-                    return;
-                }
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.publicBookmarkData = [];
+                state.bookmarkFolderList = [];
+            }
+        },
+        fetchBookmarkList: async () => {
+            const BookmarkListApiQueryHelper = new ApiQueryHelper()
+                .setPage(state.pageStart, state.pageLimit)
+                .setSort('updated_at', true)
+                .setFilters([
+                    ...state.searchFilter,
+                    { k: 'name', v: 'console:bookmark:', o: '' },
+                ]);
+            try {
+                const { results } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
+                    query: BookmarkListApiQueryHelper.data,
+                });
+                state.bookmarkList = (results ?? []).map((i) => ({
+                    ...i.data,
+                    workspace_id: i.data.workspaceId,
+                    id: i.name,
+                } as BookmarkItem));
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.bookmarkList = [];
             }
         },
         createDefaultBookmark: async () => {
@@ -110,6 +152,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     return {
         state,
         getters,
+        ...mutation,
         ...actions,
     };
 });
