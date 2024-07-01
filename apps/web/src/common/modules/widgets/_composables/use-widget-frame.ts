@@ -31,6 +31,7 @@ interface OverridableWidgetFrameState {
     dateRange?: DateRange | ComputedRef<DateRange>;
     errorMessage?: string | ComputedRef<string>;
     widgetLoading?: boolean | ComputedRef<boolean>;
+    noData?: boolean | ComputedRef<boolean>;
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 
@@ -167,6 +168,10 @@ export const useWidgetFrame = (
                 location: getFullDataLocation(_state.dataTable, props.widgetOptions, overrides.dateRange?.value, props.dashboardVars),
             }];
         }),
+        noData: computed(() => {
+            if (props.loading || overrides.widgetLoading?.value) return false;
+            return overrides.noData?.value || false;
+        }),
     });
     const widgetFrameProps = computed<WidgetFrameProps>(() => ({
         widgetId: props.widgetId,
@@ -176,6 +181,7 @@ export const useWidgetFrame = (
         mode: props.mode ?? 'view',
         loading: props.loading || !!overrides.widgetLoading?.value,
         errorMessage: overrides.errorMessage?.value,
+        noData: _state.noData,
         //
         title: _state.title,
         description: props.description,
