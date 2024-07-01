@@ -174,10 +174,12 @@ const handleConfirm = async () => {
                 folder: state.selectedFolder?.id,
                 type: state.scope,
             });
-            await bookmarkStore.setBookmarkType(state.scope);
-            await bookmarkStore.setSelectedBookmark(state.selectedFolder, false);
-            await bookmarkStore.fetchBookmarkFolderList();
-            await bookmarkStore.fetchBookmarkList();
+            if (!storeState.isAdminMode) {
+                await bookmarkStore.setBookmarkType(state.scope);
+                await bookmarkStore.setSelectedBookmark(state.selectedFolder, false);
+                await bookmarkStore.fetchBookmarkFolderList();
+                await bookmarkStore.fetchBookmarkList();
+            }
             showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');
         }
         if (storeState.isFullMode && state.selectedFolder?.id) {
