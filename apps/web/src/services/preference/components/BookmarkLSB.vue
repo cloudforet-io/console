@@ -25,12 +25,12 @@ import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
 const bookmarkPageStore = useBookmarkPageStore();
-const bookmarkPageGetters = bookmarkPageStore.getters;
+const bookmarkPageState = bookmarkPageStore.state;
 
 const route = useRoute();
 
 const storeState = reactive({
-    allBookmarkFolderItems: computed<BookmarkItem[]>(() => bookmarkPageGetters.allBookmarkFolderItems),
+    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
 });
 
 const state = reactive({
@@ -60,7 +60,7 @@ const state = reactive({
             id: 'bookmark',
         },
     ]),
-    bookmarkFilteredByKeyword: computed<LSBItem[]>(() => storeState.allBookmarkFolderItems.filter((folder) => (folder.name as string)?.includes(state.bookmarkKeyword))
+    bookmarkFilteredByKeyword: computed<LSBItem[]>(() => storeState.bookmarkFolderList.filter((folder) => (folder.name as string)?.includes(state.bookmarkKeyword))
         .map((folder) => ({
             type: MENU_ITEM_TYPE.ITEM,
             label: folder.name,

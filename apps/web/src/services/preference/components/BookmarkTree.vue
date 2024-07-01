@@ -6,9 +6,15 @@ import { useRoute } from 'vue-router/composables';
 
 import { PI, PTreeView } from '@spaceone/design-system';
 
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import { i18n } from '@/translations';
+
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
 
@@ -17,16 +23,19 @@ import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-
 import type { TreeNode } from '@/services/project/tree/type';
 
 const bookmarkPageStore = useBookmarkPageStore();
-const bookmarkPageGetters = bookmarkPageStore.getters;
-
-const storeState = reactive({
-    allBookmarkFolderItems: computed<BookmarkItem[]>(() => bookmarkPageGetters.allBookmarkFolderItems),
-});
+const bookmarkPageState = bookmarkPageStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const route = useRoute();
 
+const storeState = reactive({
+    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
+});
+
 const state = reactive({
-    bookmarkTreeData: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(storeState.allBookmarkFolderItems)),
+    bookmarkTreeData: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(storeState.bookmarkFolderList)),
     selectedTreeId: undefined as string|undefined,
     // bookmarkGroupNavigation: computed<Breadcrumb[]>(() => {
     //     const allPaths = parentGroupitems.value.map((item) => ({
@@ -46,6 +55,12 @@ const state = reactive({
     //     ];
     // }),
 });
+
+const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
+    if (!id) return undefined;
+    return storeState.workspaceList.find((i) => i.workspace_id === id);
+};
+
 const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[]): TreeNode[] => {
     const workspaceMap: { [key: string]: TreeNode } = {};
     const globalChildren: TreeNode[] = [];
@@ -64,7 +79,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
                     },
                 },
             },
-            children: [],
+            children: undefined,
         };
 
         if (item.workspaceId) {
@@ -93,13 +108,12 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
 
     const result: TreeNode[] = Object.values(workspaceMap);
 
-    // TODO: translation
-    result.push({
+    result.unshift({
         id: 'global',
         depth: 0,
         data: {
             id: 'global',
-            name: 'Global Bookmark',
+            name: i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARKS'),
             to: {
                 name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
                 params: {
@@ -136,14 +150,34 @@ watch(() => route.params, (params) => {
             <template #content="{ node }">
                 <div class="bookmark-menu-item-content">
                     <div class="contents-wrapper">
-                        <p-i v-if="Array.isArray(node.children)"
-                             class="bookmark-icon"
-                             :name="node.id === 'global' ? 'ic_globe-filled' : 'ic_folder'"
-                             :color="node.id === 'global' ? gray[500] : gray[900]"
-                             width="0.875rem"
-                             height="0.875rem"
-                        />
-                        <span class="text">{{ node.data.name }}</span>
+                        <div v-if="node.depth === 0"
+                             class="bookmark"
+                        >
+                            <p-i v-if="node.id === 'global'"
+                                 class="bookmark-icon"
+                                 name="ic_globe-filled"
+                                 :color="gray[500]"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
+                            <workspace-logo-icon v-else
+                                                 :text="getWorkspaceInfo(node.data.id)?.name || ''"
+                                                 :theme="getWorkspaceInfo(node.data.id)?.tags?.theme"
+                                                 size="xxs"
+                            />
+                            <span class="text">{{ node.id === 'global' ? $t('IAM.BOOKMARK.GLOBAL_BOOKMARKS') : getWorkspaceInfo(node.data.name)?.name || '' }}</span>
+                        </div>
+                        <div v-else
+                             class="bookmark"
+                        >
+                            <p-i class="bookmark-icon"
+                                 name="ic_folder"
+                                 :color="gray[900]"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
+                            <span class="text">{{ node.data.name }}</span>
+                        </div>
                     </div>
                 </div>
             </template>
@@ -158,7 +192,10 @@ watch(() => route.params, (params) => {
         @apply flex items-center justify-between w-full;
         height: 2rem;
         .contents-wrapper {
-            @apply flex items-center gap-1 w-full;
+            @apply w-full;
+            .bookmark {
+                @apply flex items-center gap-1;
+            }
 
             .bookmark-icon {
                 min-width: 0.875rem;
