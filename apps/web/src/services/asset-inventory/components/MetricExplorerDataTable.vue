@@ -253,7 +253,7 @@ watch(() => metricExplorerPageGetters.isRealtimeChart, async () => {
 watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
     if (refresh) {
         await setDataTableData();
-        metricExplorerPageState.setRefreshMetricData(false);
+        metricExplorerPageStore.setRefreshMetricData(false);
     }
 }, { immediate: false });
 </script>
