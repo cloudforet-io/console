@@ -2086,7 +2086,9 @@
 			"TITLE": "App"
 		},
 		"BOOKMARK": {
+			"ADD_GLOBAL_BOOKMARK": "Add Global Bookmark",
 			"ALL_BOOKMARK": "All Bookmarks",
+			"DELETE": "Delete",
 			"GLOBAL_BOOKMARK": "Global Bookmark"
 		},
 		"DOMAIN_SETTINGS": {

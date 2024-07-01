@@ -2086,7 +2086,9 @@
 			"TITLE": "アプリ"
 		},
 		"BOOKMARK": {
+			"ADD_GLOBAL_BOOKMARK": "",
 			"ALL_BOOKMARK": "",
+			"DELETE": "削除",
 			"GLOBAL_BOOKMARK": ""
 		},
 		"DOMAIN_SETTINGS": {
