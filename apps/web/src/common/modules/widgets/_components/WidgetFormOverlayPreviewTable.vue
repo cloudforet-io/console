@@ -137,7 +137,7 @@ const valueFormatter = (value, field: PreviewTableField) => {
         const _originalVal = bytes.parse(`${value}${_unit}`);
         return byteFormatter(_originalVal);
     }
-    return numberFormatter(value);
+    return numberFormatter(value, { notation: 'compact' });
 };
 
 const getValue = (item, field: PreviewTableField) => {
