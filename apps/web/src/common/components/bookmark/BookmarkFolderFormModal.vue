@@ -8,6 +8,8 @@ import {
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/bookmark/type/type';
@@ -26,8 +28,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const storeState = reactive({
+    isAdminMode: computed(() => appContextGetters.isAdminMode),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
@@ -139,7 +144,7 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
-                <p-field-group v-if="!storeState.modal.isEdit"
+                <p-field-group v-if="!storeState.isAdminMode && !storeState.modal.isEdit"
                                class="scope-wrapper"
                                :label="$t('HOME.FORM_SCOPE')"
                                required
