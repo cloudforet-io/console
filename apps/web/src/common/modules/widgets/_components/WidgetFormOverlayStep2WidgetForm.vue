@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea, PButtonModal,
@@ -18,12 +20,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-model';
 
 
+const emit = defineEmits<{(e: 'ready-to-preview'): void}>();
 const FORM_TITLE_MAP = {
     WIDGET_INFO: 'WIDGET_INFO',
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
@@ -42,9 +47,11 @@ const state = reactive({
     widgetConfigDependencies: computed<{[key:string]: string[]}>(() => state.widgetConfig.dependencies || {}),
     defaultValidationConfig: computed(() => state.widgetConfig.meta?.defaultValidationConfig),
     widgetDefaultValidationModalVisible: false,
+    formErrorModalValue: undefined as number|undefined,
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     // display
+    isPreviewInitiated: false,
     collapsedTitleMap: {
         [FORM_TITLE_MAP.WIDGET_INFO]: false,
         [FORM_TITLE_MAP.REQUIRED_FIELDS]: false,
@@ -56,6 +63,7 @@ const state = reactive({
         icon: d.data_type === DATA_TABLE_TYPE.TRANSFORMED ? 'ic_transform-data' : 'ic_service_data-sources',
     }))),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
+    errorModalCurrentType: undefined as 'default'|'geoMap'| 'progressCard'|undefined,
 });
 
 /* Api */
@@ -81,15 +89,53 @@ const handleSelectDataTable = async (dataTableId: string) => {
     await updateWidget(dataTableId);
     widgetGenerateStore.setWidgetFormValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
+    state.isPreviewInitiated = false;
 };
 
 const checkDefaultValidation = () => {
-    if (state.defaultValidationConfig) {
-        const targetCount = Object.keys((widgetGenerateGetters.selectedDataTable ?? {})[state.defaultValidationConfig.dataTarget]).length;
-        if (targetCount < state.defaultValidationConfig.defaultMaxCount) {
+    const selectedChartType = widgetGenerateState.selectedWidgetName;
+    const selectedDataTable = widgetGenerateGetters.selectedDataTable ?? {};
+    if (!selectedDataTable?.options) return;
+    const removeDateField = (labelsInfo: Record<string, object>) => {
+        const _labelsInfo = cloneDeep(labelsInfo);
+        Object.values(DATE_FIELD).forEach((d) => {
+            delete _labelsInfo[d];
+        });
+        return _labelsInfo;
+    };
+    switch (selectedChartType) {
+    case 'geoMap': {
+        const groupBySelection = (selectedDataTable?.options as DataTableAddOptions)?.group_by ?? [];
+        const filteredSelection = groupBySelection.filter((item) => (item?.name === 'Region'));
+        if (filteredSelection.length === 0) {
+            state.errorModalCurrentType = 'geoMap';
             state.widgetDefaultValidationModalVisible = true;
         }
+        break;
     }
+    case 'progressCard': {
+        const dataInfo = selectedDataTable.data_info ?? {};
+        if (Object.keys(dataInfo).length < 2) {
+            state.errorModalCurrentType = 'progressCard';
+            state.widgetDefaultValidationModalVisible = true;
+        }
+        break;
+    }
+    default:
+        if (state.defaultValidationConfig) {
+            const labelsInfo = cloneDeep(selectedDataTable.labels_info ?? {});
+            const labelsInfoWithoutDateField = removeDateField(labelsInfo);
+            const targetCount = Object.keys(labelsInfoWithoutDateField).length;
+            if (targetCount < state.defaultValidationConfig?.defaultMaxCount) {
+                state.widgetDefaultValidationModalVisible = true;
+            }
+        }
+    }
+};
+
+const handleShowErrorModal = (value:number|undefined) => {
+    state.widgetDefaultValidationModalVisible = true;
+    state.formErrorModalValue = value;
 };
 
 const handleSelectWidgetName = (widgetName: string) => {
@@ -101,6 +147,7 @@ const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setWidgetFormValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
     checkDefaultValidation();
+    state.isPreviewInitiated = false;
 };
 const handleUpdateWidgetTitle = (title: string) => {
     widgetGenerateStore.setTitle(title);
@@ -121,7 +168,8 @@ const handleUpdateFieldValue = (fieldName: string, value: WidgetFieldValues) => 
     const _valueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
     _valueMap[fieldName] = value;
     const changedOptions = checkFormDependencies(fieldName);
-    if (changedOptions.length) {
+    const isValueChanged = (JSON.stringify(value) !== JSON.stringify(widgetGenerateState.widgetFormValueMap[fieldName]));
+    if (changedOptions.length && isValueChanged) {
         changedOptions.forEach((option) => {
             _valueMap[option] = undefined;
         });
@@ -136,6 +184,20 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
 
 // eslint-disable-next-line max-len
 const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetFormValueMap[name] === undefined}`;
+
+/* Watcher */
+watch(() => widgetGenerateState.widgetValidMap, () => {
+    if (state.isPreviewInitiated) return;
+    const _requiredField = state.widgetRequiredFieldSchemaMap.map(([d]) => d);
+    if (_requiredField.every((d) => widgetGenerateState.widgetValidMap[d])) {
+        emit('ready-to-preview');
+        state.isPreviewInitiated = true;
+    }
+}, { deep: true });
+
+onMounted(() => {
+    checkDefaultValidation();
+});
 </script>
 
 <template>
@@ -243,6 +305,7 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
                                :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
                                @update:value="handleUpdateFieldValue(fieldName, $event)"
                                @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
+                               @show-error-modal="handleShowErrorModal"
                     />
                 </template>
             </div>
@@ -282,12 +345,18 @@ const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerat
                         :header-title="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.TITLE')"
                         theme-color="alert"
                         :visible.sync="state.widgetDefaultValidationModalVisible"
-                        @confirm="state.widgetDefaultValidationModalVisible = false"
+                        hide-footer-confirm-button
         >
             <template #body>
-                <p>
+                <p v-if="state.errorModalCurrentType === 'geoMap'">
+                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.GEO_MAP_DESC') }}
+                </p>
+                <p v-else-if="state.errorModalCurrentType === 'progressCard'">
+                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.PROGRESS_CARD_DESC') }}
+                </p>
+                <p v-else>
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.VALIDATION_MODAL.DESC', {
-                        count: state.defaultValidationConfig?.defaultMaxCount,
+                        number: state.formErrorModalValue ?? state.defaultValidationConfig?.defaultMaxCount,
                     }) }}
                 </p>
                 <p-button style-type="tertiary"

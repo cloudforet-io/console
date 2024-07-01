@@ -80,7 +80,7 @@ watch(() => state.value, (value) => {
 });
 
 onMounted(() => {
-    state.baseColor = props.value[0].color ?? props.widgetFieldSchema.options?.baseColor ?? DEFAULT_BASE_COLOR;
+    state.baseColor = props.value?.[0].color ?? props.widgetFieldSchema.options?.baseColor ?? DEFAULT_BASE_COLOR;
     const baseRemovedValue = (props.value ?? props.widgetFieldSchema.options?.default ?? []).filter((fm) => fm.threshold !== BASE_THRESHOLD);
     state.customValue = baseRemovedValue;
     state.fieldNameValidationList = (state.customValue ?? []).map((fm) => {

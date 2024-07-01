@@ -6,10 +6,6 @@ const stackedAreaChart: WidgetConfig = {
     meta: {
         title: 'Stacked Area Chart',
         sizes: ['md', 'full'],
-        defaultValidationConfig: {
-            dataTarget: 'labels_info',
-            defaultMaxCount: 2,
-        },
     },
     requiredFieldsSchema: {
         granularity: {},
@@ -19,13 +15,7 @@ const stackedAreaChart: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
                 max: 31,
-            },
-        },
-        lineBy: {
-            options: {
-                dataTarget: 'labels_info',
-                defaultMaxCount: 5,
-                max: 10,
+                defaultIndex: 0,
             },
         },
     },
@@ -33,6 +23,15 @@ const stackedAreaChart: WidgetConfig = {
         legend: {
             options: {
                 default: true,
+            },
+        },
+        lineBy: {
+            options: {
+                dataTarget: 'labels_info',
+                defaultMaxCount: 5,
+                max: 10,
+                defaultIndex: 0,
+                excludeDateField: true,
             },
         },
         // formatRules: {

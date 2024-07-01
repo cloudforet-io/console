@@ -70,7 +70,7 @@ const state = reactive({
     z-index: 10000;
 }
 .vue-notification-wrapper {
-    margin: 1rem 0;
+    margin-top: 1rem;
     overflow: visible;
 }
 </style>

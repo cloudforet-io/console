@@ -21,9 +21,9 @@ import type { MetricReferenceItem } from '@/store/reference/metric-reference-sto
 
 import { gray } from '@/styles/colors';
 
-import AssetAnalysisLSBMetricTree from '@/services/asset-inventory/components/AssetAnalysisLSBMetricTree.vue';
+import MetricExplorerLSBMetricTree from '@/services/asset-inventory/components/MetricExplorerLSBMetricTree.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
@@ -35,8 +35,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const allReferenceStore = useAllReferenceStore();
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 const route = useRoute();
 
 
@@ -49,7 +49,7 @@ const storeState = reactive({
         });
         return res;
     }),
-    selectedNamespace: computed<NamespaceSubItemType|undefined>(() => assetAnalysisPageState.selectedNamespace),
+    selectedNamespace: computed<NamespaceSubItemType|undefined>(() => metricExplorerPageState.selectedNamespace),
 });
 const state = reactive({
     selectedId: computed<string|undefined>(() => {
@@ -107,7 +107,7 @@ const state = reactive({
         const keyword = state.inputValue.toLowerCase();
         return state.metricItems.filter((metric) => metric.data.name.toLowerCase().includes(keyword) || metric.children?.some((example) => example.data.name.toLowerCase().includes(keyword)));
     }),
-    metricExamples: computed(() => assetAnalysisPageState.metricExamples),
+    metricExamples: computed(() => metricExplorerPageState.metricExamples),
     metricTreeDisplayMap: undefined,
     metricTreeDisplayMapWithSearchKeyword: computed<TreeDisplayMap|undefined>(() => {
         if (!state.inputValue) return undefined;
@@ -123,10 +123,10 @@ const state = reactive({
 
 /* Event */
 const handleClickBackToNamespace = () => {
-    assetAnalysisPageStore.setSelectedNamespace(undefined);
+    metricExplorerPageStore.setSelectedNamespace(undefined);
 };
 const handleOpenAddCustomMetricModal = () => {
-    assetAnalysisPageStore.openMetricQueryFormSidebar('CREATE');
+    metricExplorerPageStore.openMetricQueryFormSidebar('CREATE');
 };
 const handleSearchMetricAndExample = (keyword: string) => {
     state.inputValue = keyword;
@@ -144,7 +144,7 @@ watch(() => route.params, () => {
 
 /* Watcher */
 watch(() => storeState.selectedNamespace, (selectedNamespace) => {
-    if (!isEmpty(selectedNamespace)) assetAnalysisPageStore.loadMetricExamples(selectedNamespace?.name);
+    if (!isEmpty(selectedNamespace)) metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
 }, { immediate: true });
 </script>
 
@@ -152,7 +152,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
     <p-data-loader :loading="false"
                    :loader-backdrop-opacity="0.5"
                    :loader-backdrop-color="gray[100]"
-                   class="asset-analysis-l-s-b-metric-menu"
+                   class="metric-explorer-l-s-b-metric-menu"
     >
         <div class="metric-wrapper">
             <div class="metric-title-item">
@@ -193,18 +193,18 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                       :value="state.inputValue"
                       @update:value="handleSearchMetricAndExample"
             />
-            <asset-analysis-l-s-b-metric-tree v-show="!state.inputValue"
-                                              class="base-metric-tree-menu"
-                                              :metric-items="state.metricItems"
-                                              :tree-display-map="state.metricTreeDisplayMap"
-                                              :selected-id="state.selectedId"
+            <metric-explorer-l-s-b-metric-tree v-show="!state.inputValue"
+                                               class="base-metric-tree-menu"
+                                               :metric-items="state.metricItems"
+                                               :tree-display-map="state.metricTreeDisplayMap"
+                                               :selected-id="state.selectedId"
             />
-            <asset-analysis-l-s-b-metric-tree v-if="state.inputValue"
-                                              class="search-metric-tree-menu"
-                                              :metric-items="state.metricItemsFilterByInput"
-                                              :tree-display-map="state.metricTreeDisplayMapWithSearchKeyword"
-                                              :selected-id="state.selectedId"
-                                              :keyword="state.inputValue"
+            <metric-explorer-l-s-b-metric-tree v-if="state.inputValue"
+                                               class="search-metric-tree-menu"
+                                               :metric-items="state.metricItemsFilterByInput"
+                                               :tree-display-map="state.metricTreeDisplayMapWithSearchKeyword"
+                                               :selected-id="state.selectedId"
+                                               :keyword="state.inputValue"
             />
             <p-empty v-if="state.inputValue && !state.metricItemsFilterByInput.length"
                      class="keyword-search-empty"
@@ -225,7 +225,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 </template>
 
 <style scoped lang="postcss">
-.asset-analysis-l-s-b-metric-menu {
+.metric-explorer-l-s-b-metric-menu {
     min-height: 15rem;
 
     .metric-wrapper {

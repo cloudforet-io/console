@@ -14,6 +14,8 @@ import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
+import config from '@/lib/config';
+
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFrameEmit } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
@@ -22,6 +24,7 @@ import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-fra
 const props = defineProps<WidgetFrameProps>();
 const emit = defineEmits<WidgetFrameEmit>();
 
+const isDashboardEditDisabled = config.get('DASHBOARD_EDIT_DISABLE');
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     showWidthToggleButton: computed(() => props.widgetSizes.length > 1 && !props.loading && props.mode === 'edit-layout'),
@@ -32,20 +35,19 @@ const state = reactive({
             label: i18n.t('COMMON.WIDGETS.EXPAND'),
             icon: 'ic_arrows-expand-all',
         },
-        {
+        ...(isDashboardEditDisabled ? [] : [{
             type: 'item',
             name: 'edit',
             label: i18n.t('COMMON.WIDGETS.EDIT'),
             icon: 'ic_edit',
-        },
+        } as MenuItem]),
         { type: 'divider', name: '' },
         {
             type: 'item',
             name: 'delete',
             label: i18n.t('COMMON.WIDGETS.DELETE'),
             icon: 'ic_delete',
-        },
-    ])),
+        }])),
     sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
         type: 'item',
         name: size,
@@ -142,7 +144,9 @@ const handleToggleWidth = () => {
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.DESCRIPTION') }}</span>
-                            <span>{{ props.description || '--' }}</span>
+                            <div class="description">
+                                {{ props.description || '--' }}
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -236,9 +240,11 @@ const handleToggleWidth = () => {
     .widget-header {
         display: flex;
         align-items: center;
+        height: 1.625rem;
         padding-bottom: 0.5rem;
         .title {
             @apply truncate text-label-md;
+            max-width: 90%;
             overflow: hidden;
             text-overflow: ellipsis;
             display: block;
@@ -255,6 +261,7 @@ const handleToggleWidth = () => {
         .metadata-content {
             @apply text-label-md;
             display: flex;
+            line-height: unset;
             flex-direction: column;
             gap: 0.5rem;
             min-height: 6.25rem;
@@ -267,7 +274,6 @@ const handleToggleWidth = () => {
             .metadata-item-row {
                 display: flex;
                 justify-content: flex-start;
-                gap: 2rem;
                 .metadata-title {
                     @apply text-gray-600;
                     width: 7rem;
@@ -276,6 +282,11 @@ const handleToggleWidth = () => {
                     display: flex;
                     flex-direction: column;
                     gap: 0.125rem;
+                }
+                .description {
+                    @apply text-gray-700;
+                    max-width: 18rem;
+                    display: block;
                 }
             }
         }

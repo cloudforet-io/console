@@ -39,6 +39,7 @@ export interface CostDataSourceModel {
     cost_tag_keys: string[];
     cost_additional_info_keys: string[];
     cost_data_keys: string[];
+    permissions: { deny: string[] };
     resource_group: Extract<ResourceGroupType, 'PROJECT'|'WORKSPACE'>
     workspace_id: string;
     domain_id: string;

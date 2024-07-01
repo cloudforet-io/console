@@ -13,6 +13,7 @@ interface TableFieldInfo {
     type: 'labelField' | 'dataField';
     additionalType?: 'comparison' | 'subTotal' | 'total' | 'progressBar';
     reference?: string;
+    unit?: string;
 }
 
 export interface AdditionalLabel {

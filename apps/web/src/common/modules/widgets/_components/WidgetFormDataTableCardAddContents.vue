@@ -13,6 +13,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -179,6 +180,7 @@ const originDataState = reactive({
 const modalState = reactive({
     visible: false,
     mode: '' as DataTableAlertModalMode,
+    referenceDataTableName: '',
 });
 
 
@@ -186,7 +188,7 @@ const modalState = reactive({
 /* Events */
 const handleSelectSourceItem = (selectedItem: string) => {
     state.selectedSourceEndItem = selectedItem;
-    showSuccessMessage('Data successfully changed.', '');
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.SELECT_DATA_SOURCE_SUCCESS'), '');
 };
 
 const handleClickDeleteDataTable = async () => {
@@ -198,6 +200,7 @@ const handleClickDeleteDataTable = async () => {
         return isDualDataTableOperator ? operatorOptions?.data_tables.includes(state.dataTableId) : operatorOptions?.data_table_id === state.dataTableId;
     });
     if (isExistingDataTableInTransformed) {
+        modalState.referenceDataTableName = isExistingDataTableInTransformed.name || '';
         modalState.mode = 'DELETE_UNABLED';
         modalState.visible = true;
         return;
@@ -234,7 +237,7 @@ const handleCancelModal = () => {
 };
 const handleUpdateDataTable = async () => {
     if (!state.dataFieldName.length) {
-        showErrorMessage('Unable to apply changes. Please check the form.', '');
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
         return;
     }
     const additionalLabelsRequest = {} as AdditionalLabels;
@@ -271,19 +274,17 @@ const handleUpdateDataTable = async () => {
         },
     };
     await widgetGenerateStore.updateDataTable(updateParams);
-    if (storeState.selectedDataTableId === state.dataTableId) {
-        widgetGenerateStore.setDataTableUpdating(true);
-        await widgetGenerateStore.loadDataTable({
-            data_table_id: state.dataTableId,
-        });
-    }
+    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
+    widgetGenerateStore.setDataTableUpdating(true);
+    await widgetGenerateStore.loadDataTable({
+        data_table_id: state.dataTableId,
+    });
 
     // Update Referenced Transformed DataTable
-    if (storeState.selectedDataTableId && storeState.selectedDataTable?.data_type === 'TRANSFORMED') {
-        const referencedDataTableIds = [] as string[];
-        storeState.dataTables.forEach((dataTable) => {
-            const transformDataTalbeOptions = dataTable.options as DataTableTransformOptions;
-            const isReferenced = dataTable.data_type === 'TRANSFORMED'
+    const referencedDataTableIds = [] as string[];
+    storeState.dataTables.forEach((dataTable) => {
+        const transformDataTalbeOptions = dataTable.options as DataTableTransformOptions;
+        const isReferenced = dataTable.data_type === 'TRANSFORMED'
             && !dataTable?.data_table_id?.startsWith('UNSAVED-')
             && (
                 transformDataTalbeOptions?.JOIN?.data_tables?.includes(state.dataTableId)
@@ -291,26 +292,23 @@ const handleUpdateDataTable = async () => {
                 || transformDataTalbeOptions?.QUERY?.data_table_id === state.dataTableId
                 || transformDataTalbeOptions?.EVAL?.data_table_id === state.dataTableId
             );
-            if (isReferenced) referencedDataTableIds.push(dataTable.data_table_id as string);
-        });
-        if (referencedDataTableIds.length && referencedDataTableIds.includes(storeState.selectedDataTableId)) {
-            await Promise.all(referencedDataTableIds.map((dataTableId) => {
-                const dataTable = storeState.dataTables.find((_dataTable) => _dataTable.data_table_id === dataTableId) as PublicDataTableModel|PrivateDataTableModel;
-                widgetGenerateStore.updateDataTable({
-                    data_table_id: dataTable.data_table_id,
-                    name: dataTable.name,
-                    options: {
-                        ...dataTable.options,
-                    },
-                });
-                return null;
-            }));
-            await widgetGenerateStore.loadDataTable({
-                data_table_id: storeState.selectedDataTableId,
+        if (isReferenced) referencedDataTableIds.push(dataTable.data_table_id as string);
+    });
+    if (referencedDataTableIds.length) {
+        await Promise.all(referencedDataTableIds.map((dataTableId) => {
+            const dataTable = storeState.dataTables.find((_dataTable) => _dataTable.data_table_id === dataTableId) as PublicDataTableModel|PrivateDataTableModel;
+            widgetGenerateStore.updateDataTable({
+                data_table_id: dataTable.data_table_id,
+                name: dataTable.name,
+                options: {
+                    ...dataTable.options,
+                },
             });
-        }
+            return null;
+        }));
     }
-    showSuccessMessage('Changes have been successfully applied.', '');
+
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
     setInitialDataTableForm();
     state.filterFormKey = getRandomId();
 };
@@ -395,6 +393,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
         />
         <widget-form-data-table-card-alert-modal :mode="modalState.mode"
                                                  :visible="modalState.visible"
+                                                 :reference-data-table-name="modalState.referenceDataTableName"
                                                  @cancel="handleCancelModal"
                                                  @confirm="handleConfirmModal"
         />
@@ -408,6 +407,10 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     padding-top: 0.125rem;
     margin-bottom: 2rem;
 
+    &:hover {
+        @apply border border-primary2;
+        box-shadow: 0 0 0 3px theme('colors.violet.200');
+    }
     &.selected {
         @apply border-violet-600;
         box-shadow: 0 0 0 0.1875rem rgba(137, 124, 214, 0.6);

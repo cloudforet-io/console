@@ -9,7 +9,9 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/src/navigation/toolbox/type';
-import { union } from 'lodash';
+import bytes from 'bytes';
+
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Page } from '@/schema/_common/type';
 
@@ -17,10 +19,12 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import { gray, white } from '@/styles/colors';
 
+import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
@@ -50,14 +54,15 @@ const storeState = reactive({
 
 const state = reactive({
     data: undefined,
-    labelFields: computed<string[]>(() => (storeState.loading ? [] : sortFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
-    dataFields: computed<string[]>(() => (storeState.loading ? [] : sortFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
+    labelFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
+    dataFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
+    dataInfo: computed(() => storeState.selectedDataTable?.data_info),
     fields: computed<PreviewTableField[]>(() => [
         ...state.labelFields.map((key) => ({ type: 'LABEL', name: key, sortKey: key })),
         { type: 'DIVIDER', name: '' },
         ...state.dataFields.map((key) => ({ type: 'DATA', name: key })),
     ]),
-    sortBy: '',
+    sortBy: [] as { key: string; desc: boolean }[],
     granularityItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -105,65 +110,71 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
     await widgetGenerateStore.loadDataTable({
         data_table_id: storeState.selectedDataTableId,
         page,
+        sort: state.sortBy,
     });
 };
 
-const handleClickSort = (sortKey: string) => {
-    if (state.sortBy === sortKey) {
-        state.sortBy = '';
-        return;
+const handleClickSort = async (sortKey: string) => {
+    let resultSortBy: { key: string; desc: boolean }[];
+    if (state.sortBy.length && state.sortBy[0].key === sortKey) {
+        resultSortBy = [{ key: sortKey, desc: !state.sortBy[0].desc }];
+    } else {
+        resultSortBy = [{ key: sortKey, desc: true }];
     }
-    state.sortBy = sortKey;
+    state.sortBy = resultSortBy;
+    if (!storeState.selectedDataTableId) return;
+    await widgetGenerateStore.loadDataTable({
+        data_table_id: storeState.selectedDataTableId,
+        sort: resultSortBy,
+    });
+    state.thisPage = 1;
 };
 
 /* Utils */
-const sortFields = (fields: string[]) => {
-    const single = ['Date'];
-    const separate = ['Year', 'Month', 'Day'];
-
-    const hasDate = fields.includes('Date');
-    const hasYearMonthDay = fields.includes('Year') && fields.includes('Month') && fields.includes('Day');
-    if (hasDate) {
-        return union(single, fields.filter((item) => !single.includes(item)));
-    } if (hasYearMonthDay) {
-        return union(separate, fields.filter((item) => !separate.includes(item)));
+const valueFormatter = (value, field: PreviewTableField) => {
+    const _unit = state.dataInfo?.[field.name]?.unit;
+    if (_unit && SIZE_UNITS.includes(_unit)) {
+        const _originalVal = bytes.parse(`${value}${_unit}`);
+        return byteFormatter(_originalVal);
     }
-    return fields;
+    return numberFormatter(value);
 };
 
 const getValue = (item, field: PreviewTableField) => {
+    const itemValue = item[field.name];
     if (field.type === 'LABEL' && Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
         const referenceKey = REFERENCE_FIELD_MAP[field.name];
         const referenceValueKey = item[field.name];
         return storeState[referenceKey][referenceValueKey]?.name ?? '-';
     }
+    if (field.type === 'DATA') {
+        return itemValue ? valueFormatter(itemValue, field) : '-';
+    }
     return item[field.name] ?? '-';
+};
+
+const getSortIcon = (field: PreviewTableField) => {
+    if (field.type === 'LABEL') {
+        if (!state.sortBy.some((d) => d.key === field.sortKey || d.key === field.name)) {
+            return 'ic_caret-down';
+        }
+        return state.sortBy[0]?.desc ? 'ic_caret-down-filled' : 'ic_caret-up-filled';
+    }
+    return '';
 };
 
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
     if (dataTableId) {
-        await widgetGenerateStore.loadDataTable({
-            data_table_id: dataTableId,
-        });
         state.thisPage = 1;
-        state.sortBy = '';
+        state.sortBy = [];
     }
 });
 
 watch(() => storeState.dataTableUpdating, () => {
     if (storeState.dataTableUpdating) {
         state.thisPage = 1;
-        state.sortBy = '';
+        state.sortBy = [];
     }
-});
-
-watch(() => state.sortBy, async () => {
-    if (!storeState.selectedDataTableId) return;
-    await widgetGenerateStore.loadDataTable({
-        data_table_id: storeState.selectedDataTableId,
-        sort: [{ key: state.sortBy, desc: true }],
-    });
-    state.thisPage = 1;
 });
 
 </script>
@@ -192,7 +203,7 @@ watch(() => state.sortBy, async () => {
                                  width="1rem"
                                  height="1rem"
                             />
-                            <span>{{ storeState.selectedDataTable.name }}</span>
+                            <span>{{ storeState.selectedDataTable?.name }}</span>
                         </div>
                         <p-select-dropdown class="granularity-dropdown"
                                            :menu="state.granularityItems"
@@ -217,7 +228,7 @@ watch(() => state.sortBy, async () => {
                         >
                             {{ field.name }}
                             <p-i v-if="field.type === 'LABEL'"
-                                 :name="(field.sortKey|| field.name) === state.sortBy ? 'ic_caret-down-filled' : 'ic_caret-down'"
+                                 :name="getSortIcon(field)"
                                  class="sort-icon"
                                  @click="handleClickSort(field.name)"
                             />
@@ -259,9 +270,7 @@ watch(() => state.sortBy, async () => {
                 <tr v-else
                     class="no-data-wrapper"
                 >
-                    <p-empty class="preview-empty-contents"
-                             show-image
-                    >
+                    <p-empty class="preview-empty-contents">
                         <template #image>
                             <img src="@/assets/images/img_jellyocto-with-a-telescope.png"
                                  alt="image-preview-data-empty"
@@ -289,7 +298,7 @@ watch(() => state.sortBy, async () => {
     overflow-y: scroll;
 
     .preview-toolbox {
-        padding-top: 1rem;
+        padding: 1rem 1rem 0 1rem;
     }
 
     table {
@@ -324,7 +333,6 @@ watch(() => state.sortBy, async () => {
     .toolbox-left-wrapper {
         @apply flex items-center;
         gap: 0.75rem;
-        padding-left: 1rem;
         .view-table-title {
             @apply text-label-lg font-bold;
         }

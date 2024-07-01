@@ -15,31 +15,28 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardCreateScopeForm from '@/services/dashboards/components/DashboardCreateScopeForm.vue';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 
 
 const appContextStore = useAppContextStore();
 
 
 interface Props {
-    selectedTemplate: DashboardModel;
     isValid: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    selectedTemplate: undefined,
-});
+const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void
 }>();
 
 const dashboardStore = useDashboardStore();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const dashboardCreatePageStore = useDashboardCreatePageStore();
+const dashboardCreatePageState = dashboardCreatePageStore.state;
+const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
 const state = reactive({
     proxyIsValid: useProxyValue('isValid', props, emit),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType)),
+    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardCreatePageGetters.dashboardType)),
     labels: [] as InputItem[],
 });
 const {
@@ -64,11 +61,11 @@ const {
 /* Event */
 const handleUpdateDashboardName = (value: string) => {
     setForm('dashboardName', value);
-    dashboardDetailStore.setName(value);
+    dashboardCreatePageStore.setDashboardName(value);
 };
 const handleUpdateLabels = (items: InputItem[]) => {
     state.labels = items;
-    dashboardDetailStore.setLabels(items.map((item) => item.name));
+    dashboardCreatePageStore.setDashboardLabels(items.map((item) => item.name));
 };
 
 /* Watcher */
@@ -86,10 +83,10 @@ watch(() => isAllValid.value, (value) => {
             />
             <div class="description-wrapper">
                 <p class="description-title">
-                    {{ props.selectedTemplate.name }}
+                    {{ dashboardCreatePageState.templateName }}
                 </p>
                 <div class="label-wrapper">
-                    <p-label v-for="(label, idx) in props.selectedTemplate.labels"
+                    <p-label v-for="(label, idx) in dashboardCreatePageState.templateLabels"
                              :key="`${label}-${idx}`"
                              :text="label"
                     />
@@ -101,6 +98,7 @@ watch(() => isAllValid.value, (value) => {
                            required
                            :invalid="invalidState.dashboardName"
                            :invalid-text="invalidTexts.dashboardName"
+                           :disalbed="dashboardCreatePageState.dashboardCreated"
             >
                 <template #default="{invalid}">
                     <p-text-input :value="dashboardName"

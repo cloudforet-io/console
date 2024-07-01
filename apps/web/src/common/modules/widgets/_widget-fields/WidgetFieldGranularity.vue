@@ -16,8 +16,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<undefined>>(), {
-});
+const props = defineProps<WidgetFieldComponentProps<undefined>>();
 const emit = defineEmits<WidgetFieldComponentEmit<string>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
@@ -44,7 +43,7 @@ onMounted(() => {
     if (props.value) {
         state.proxyValue = props.value;
     } else {
-        state.proxyValue = 'DAILY';
+        state.proxyValue = 'MONTHLY';
     }
 });
 </script>

@@ -12,16 +12,19 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
+import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 const DEFAULT_COUNT = 5;
+const DEFAULT_FIELD_TYPE = 'staticField';
 const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions>>(), {
 });
 const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
 
 const { labelsMenuItem } = useGranularityMenuItem(props, 'tableDataField');
-
+const MIN_LABELS_INFO_COUNT = 1;
+const DEFAULT_INDEX = 1;
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
     fieldTypeMenuItems: computed<MenuItem[]>(() => [
@@ -34,7 +37,7 @@ const state = reactive({
             label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.STATIC_FIELD'),
         },
     ]),
-    selectedFieldType: 'dynamicField',
+    selectedFieldType: DEFAULT_FIELD_TYPE,
     selectedItem: undefined as undefined | MenuItem[] | string,
     selectedCriteria: undefined as undefined | MenuItem[] | string,
     multiSelectable: computed(() => state.selectedFieldType === 'staticField'),
@@ -42,7 +45,7 @@ const state = reactive({
         if (!props.dataTable) return [];
         return state.selectedFieldType === 'dynamicField' ? labelsMenuItem.value : state.dataInfoMenuItems;
     }),
-    dataInfoMenuItems: computed<MenuItem[]>(() => Object.keys(props.dataTable?.data_info ?? {}).map((d) => ({
+    dataInfoMenuItems: computed<MenuItem[]>(() => sortWidgetTableFields(Object.keys(props.dataTable?.data_info ?? {})).map((d) => ({
         name: d,
         label: d,
     }))),
@@ -123,8 +126,32 @@ const convertToMenuItem = (data: string[]) => data.map((d) => ({
 watch(() => labelsMenuItem.value, (value) => {
     if (!(value.find((d) => d.name === state.selectedItem)) && (state.selectedFieldType === 'dynamicField')) {
         state.selectedItem = undefined;
+        return;
+    }
+    if ((labelsMenuItem.value ?? []).length >= 2) {
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: props.value?.value ?? state.menuItems[DEFAULT_INDEX]?.name,
+            criteria: state.dataInfoMenuItems[0]?.name,
+        };
     }
 });
+
+watch(() => state.selectedFieldType, (selectedFieldType) => {
+    if (selectedFieldType === 'dynamicField') {
+        const labelsInfo = props.dataTable?.labels_info;
+        if (!labelsInfo) return;
+        if (Object.keys(labelsInfo).length < 2) {
+            emit('show-error-modal', MIN_LABELS_INFO_COUNT);
+            return;
+        }
+        state.proxyValue = {
+            ...state.proxyValue,
+            value: props.value?.value ?? state.menuItems[DEFAULT_INDEX]?.name,
+            criteria: state.dataInfoMenuItems[0]?.name,
+        };
+    }
+}, { immediate: true });
 
 watch(() => state.menuItems, (menuItems) => {
     if (!Array.isArray(menuItems)) return;
@@ -152,7 +179,7 @@ watch(() => state.menuItems, (menuItems) => {
 }, { immediate: true });
 /* Init */
 onMounted(() => {
-    state.selectedFieldType = props.value?.fieldType ?? 'dynamicField';
+    state.selectedFieldType = props.value?.fieldType ?? DEFAULT_FIELD_TYPE;
     if (state.selectedFieldType === 'staticField') {
         state.proxyValue = {
             ...state.proxyValue,
@@ -164,10 +191,10 @@ onMounted(() => {
         state.proxyValue = {
             ...state.proxyValue,
             fieldType: state.selectedFieldType,
-            value: props.value?.value ?? state.menuItems[0]?.name,
+            value: props.value?.value ?? state.menuItems?.[1]?.name,
             criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
         };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
+        state.selectedItem = state.proxyValue?.value ?? state.menuItems[1]?.name;
         state.selectedCriteria = state.proxyValue?.criteria ?? state.dataInfoMenuItems[0]?.name;
     }
     state.proxyValue = {

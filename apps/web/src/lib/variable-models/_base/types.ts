@@ -75,6 +75,7 @@ export interface ListQuery {
     limit?: number;
     filters?: string[]; // to filter selected items
     options?: Record<string, any>; // for custom options by config
+    primaryOptions?: Record<string, any>; // for primary filter options
 }
 export interface ListResponse {
     results: Value[];

@@ -6,6 +6,9 @@ const pieChart: WidgetConfig = {
     meta: {
         title: 'Pie Chart',
         sizes: ['md'],
+        defaultValidationConfig: {
+            defaultMaxCount: 1,
+        },
     },
     requiredFieldsSchema: {
         granularity: {},
@@ -15,6 +18,8 @@ const pieChart: WidgetConfig = {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 10,
                 max: 15,
+                defaultIndex: 0,
+                excludeDateField: true,
             },
         },
     },

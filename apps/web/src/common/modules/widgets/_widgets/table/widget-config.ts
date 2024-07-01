@@ -13,7 +13,6 @@ const table: WidgetConfig = {
         granularity: {},
         tableDataField: {
             options: {
-                defaultMaxCount: 5,
                 max: 15,
             },
         },
@@ -22,6 +21,7 @@ const table: WidgetConfig = {
                 dataTarget: 'labels_info',
                 multiSelectable: true,
                 hideCount: false,
+                defaultIndex: 0,
             },
         },
     },

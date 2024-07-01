@@ -9,6 +9,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -21,7 +23,7 @@ import {
     generateNewFolderName,
 } from '@/common/components/bookmark/composables/use-bookmark';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
-import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/bookmark/type/type';
+import type { BookmarkItem, BookmarkModalStateType, RadioType } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -48,18 +50,28 @@ const storeState = reactive({
     isFullMode: computed<boolean|undefined>(() => bookmarkState.isFullMode),
     bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     loading: false,
     bookmarkFolderList: [] as BookmarkItem[],
     selectedFolderIdx: undefined as number|undefined,
     selectedFolder: computed<BookmarkItem|undefined>(() => (state.bookmarkFolderList ? state.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
-    radioMenuList: computed(() => ([
-        i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK'),
-        i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
-    ])),
+    radioMenuList: computed<RadioType[]>(() => {
+        const menu: RadioType[] = [{
+            label: i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
+            name: BOOKMARK_TYPE.USER,
+        }];
+        if (!storeState.isWorkspaceMember) {
+            menu.unshift({
+                label: i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK'),
+                name: BOOKMARK_TYPE.WORKSPACE,
+            });
+        }
+        return menu;
+    }),
     selectedRadioIdx: 0,
-    scope: computed(() => (state.selectedRadioIdx === 0 ? BOOKMARK_TYPE.WORKSPACE : BOOKMARK_TYPE.USER)),
+    scope: computed(() => state.radioMenuList[state.selectedRadioIdx].name),
 });
 
 const {
@@ -172,6 +184,10 @@ const handleConfirm = async () => {
 };
 
 watch(() => storeState.bookmarkType, (bookmarkType) => {
+    if (storeState.isWorkspaceMember) {
+        state.selectedRadioIdx = 0;
+        return;
+    }
     if (bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
         state.selectedRadioIdx = 0;
     } else if (bookmarkType === BOOKMARK_TYPE.USER) {
@@ -248,7 +264,7 @@ watch(() => storeState.modal.type, (type) => {
                                  :value="idx"
                         >
                             <span class="radio-item">
-                                {{ item }}
+                                {{ item.label }}
                             </span>
                         </p-radio>
                     </p-radio-group>

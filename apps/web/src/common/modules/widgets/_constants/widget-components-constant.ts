@@ -28,9 +28,9 @@ export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     heatmap: () => ({
         component: import('@/common/modules/widgets/_widgets/heatmap/Heatmap.vue'),
     }),
-    geoMap: () => ({
-        component: import('@/common/modules/widgets/_widgets/geo-map/GeoMap.vue'),
-    }),
+    // geoMap: () => ({
+    //     component: import('@/common/modules/widgets/_widgets/geo-map/GeoMap.vue'),
+    // }),
     table: () => ({
         component: import('@/common/modules/widgets/_widgets/table/Table.vue'),
     }),
@@ -40,9 +40,9 @@ export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     gauge: () => ({
         component: import('@/common/modules/widgets/_widgets/gauge/Gauge.vue'),
     }),
-    progressCard: () => ({
-        component: import('@/common/modules/widgets/_widgets/progress-card/ProgressCard.vue'),
-    }),
+    // progressCard: () => ({
+    //     component: import('@/common/modules/widgets/_widgets/progress-card/ProgressCard.vue'),
+    // }),
 };
 
 export const WIDGET_COMPONENT_ICON_MAP: Record<WidgetConfigKey, string> = {
@@ -54,9 +54,9 @@ export const WIDGET_COMPONENT_ICON_MAP: Record<WidgetConfigKey, string> = {
     pieChart: 'ic_chart-pie',
     treemap: 'ic_chart-treemap',
     heatmap: 'ic_chart-heatmap',
-    geoMap: 'ic_chart-geomap',
+    // geoMap: 'ic_chart-geomap',
     table: 'ic_chart-table',
     stackedAreaChart: 'ic_chart-area',
     gauge: 'ic_chart-gauge',
-    progressCard: 'ic_chart-progress-card',
+    // progressCard: 'ic_chart-progress-card',
 };
