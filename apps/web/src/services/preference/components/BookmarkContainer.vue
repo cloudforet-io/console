@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import BookmarkFolderFormModal from '@/common/components/bookmark/BookmarkFolderFormModal.vue';
 import BookmarkLinkFormModal from '@/common/components/bookmark/BookmarkLinkFormModal.vue';
@@ -16,6 +17,8 @@ const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 
+const route = useRoute();
+
 const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
@@ -25,6 +28,18 @@ const handleCreateFolder = () => {
     bookmarkPageStore.fetchBookmarkFolderList();
     bookmarkPageStore.fetchBookmarkList();
 };
+
+watch(() => route.params, () => {
+    bookmarkPageStore.setParams(route.params);
+}, { immediate: true });
+
+onUnmounted(() => {
+    bookmarkPageStore.resetState();
+});
+
+onMounted(() => {
+    bookmarkPageStore.fetchBookmarkFolderList();
+});
 </script>
 
 <template>

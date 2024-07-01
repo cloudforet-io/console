@@ -12,6 +12,7 @@ import type { PublicConfigListParameters } from '@/schema/config/public-config/a
 import type { PublicConfigModel } from '@/schema/config/public-config/model';
 
 import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
+import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -25,6 +26,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         pageLimit: 15,
         searchFilter: [] as ConsoleFilter[],
         selectedIndices: [] as number[],
+        params: undefined as Record<string, string>|undefined,
     });
 
     const getters = reactive({
@@ -50,6 +52,9 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         },
         setSelectedBookmarkIndices: (indices: number[]) => {
             state.selectedIndices = indices;
+        },
+        setParams: (params: Record<string, string>) => {
+            state.params = params;
         },
     };
     const actions = {
@@ -82,13 +87,30 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                 state.bookmarkFolderList = [];
             }
         },
-        fetchBookmarkList: async () => {
+        fetchBookmarkList: async (selectedType?: string) => {
+            const defaultFilters: ConsoleFilter[] = [
+                ...state.searchFilter,
+                { k: 'name', v: 'console:bookmark:', o: '' },
+            ];
+            if (state.params) {
+                if (state.params.group) {
+                    if (state.params.group === 'global') {
+                        defaultFilters.push({ k: 'data.isGlobal', v: true, o: '=' });
+                    } else {
+                        defaultFilters.push({ k: 'data.workspaceId', v: state.params.group, o: '=' });
+                    }
+                } else if (state.params.folder) {
+                    defaultFilters.push({ k: 'data.folder', v: state.params.folder, o: '=' });
+                }
+            }
+            if (selectedType === BOOKMARK_MODAL_TYPE.LINK) {
+                defaultFilters.push({ k: 'data.link', v: null, o: '!=' });
+            } else if (selectedType === BOOKMARK_MODAL_TYPE.FOLDER) {
+                defaultFilters.push({ k: 'data.link', v: null, o: '=' });
+            }
             const BookmarkListApiQueryHelper = new ApiQueryHelper()
                 .setSort('updated_at', true)
-                .setFilters([
-                    ...state.searchFilter,
-                    { k: 'name', v: 'console:bookmark:', o: '' },
-                ]);
+                .setFilters(defaultFilters);
             state.loading = true;
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
