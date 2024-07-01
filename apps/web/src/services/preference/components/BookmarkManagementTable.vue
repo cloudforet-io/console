@@ -29,6 +29,7 @@ const userWorkspaceGetters = userWorkspaceStore.getters;
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
+    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
@@ -82,6 +83,10 @@ const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
     if (!id) return undefined;
     return storeState.workspaceList.find((i) => i.workspace_id === id);
 };
+const getFolderInfo = (id: string): BookmarkItem|undefined => {
+    if (!id) return undefined;
+    return storeState.bookmarkFolderList.find((i) => i.id === id);
+};
 
 const BookmarkListApiQueryHelper = new ApiQueryHelper();
 let bookmarkListApiQuery = BookmarkListApiQueryHelper.data;
@@ -92,7 +97,6 @@ const handleUpdateSelectIndex = async (indices: number[]) => {
     bookmarkPageStore.setSelectedBookmarkIndices(indices);
 };
 const handleChange = (options: any = {}) => {
-    console.log({ options });
     bookmarkListApiQuery = getApiQueryWithToolboxOptions(BookmarkListApiQueryHelper, options) ?? bookmarkListApiQuery;
     if (options.queryTags !== undefined) {
         bookmarkPageStore.setBookmarkListSearchFilters(BookmarkListApiQueryHelper.filters);
@@ -136,7 +140,7 @@ onMounted(async () => {
                 <div class="col-name">
                     <p-lazy-img v-if="item.link"
                                 class="left-icon"
-                                :src="item.icon"
+                                :src="item.imgIcon"
                                 width="1.5rem"
                                 height="1.5rem"
                     />
@@ -150,24 +154,35 @@ onMounted(async () => {
                 </div>
             </template>
             <template #col-workspace_id-format="{value, item}">
-                <div v-if="item.isGlobal"
-                     class="col-workspace"
-                >
-                    <p-i name="ic_globe-filled"
-                         :color="gray[500]"
-                         width="1rem"
-                         height="1rem"
-                    />
-                    <span class="global">{{ $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') }}</span>
-                </div>
-                <div v-else
-                     class="col-workspace"
-                >
-                    <workspace-logo-icon :text="getWorkspaceInfo(value)?.name || ''"
-                                         :theme="getWorkspaceInfo(value)?.tags?.theme"
-                                         size="xs"
-                    />
-                    <span class="workspace">{{ getWorkspaceInfo(value)?.name }}</span>
+                <div class="col-workspace">
+                    <div v-if="item.isGlobal"
+                         class="workspace"
+                    >
+                        <p-i name="ic_globe-filled"
+                             :color="gray[500]"
+                             width="1rem"
+                             height="1rem"
+                        />
+                        <span class="global">{{ $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') }}</span>
+                    </div>
+                    <div v-else
+                         class="workspace"
+                    >
+                        <workspace-logo-icon :text="getWorkspaceInfo(value)?.name || ''"
+                                             :theme="getWorkspaceInfo(value)?.tags?.theme"
+                                             size="xs"
+                        />
+                        <span class="text">{{ getWorkspaceInfo(value)?.name }}</span>
+                    </div>
+                    <div v-if="item.folder"
+                         class="folder-wrapper"
+                    >
+                        <p-i name="ic_chevron-right-thin"
+                             width="1rem"
+                             height="1rem"
+                        />
+                        <span class="text">{{ getFolderInfo(item.folder)?.name }}</span>
+                    </div>
                 </div>
             </template>
             <template #col-link-format="{value}">
@@ -190,8 +205,14 @@ onMounted(async () => {
         }
         .col-workspace {
             @apply flex items-center;
-            gap: 0.25rem;
             .workspace {
+                @apply flex items-center;
+                gap: 0.25rem;
+            }
+            .folder-wrapper {
+                @apply flex items-center;
+            }
+            .text {
                 @apply truncate;
                 max-width: 10rem;
             }
