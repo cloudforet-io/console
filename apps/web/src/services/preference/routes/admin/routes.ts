@@ -11,6 +11,7 @@ const PreferenceContainer = () => import('@/services/preference/PreferenceContai
 const DomainSettingsPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsPage.vue');
 const WorkspacesPage = () => import('@/services/preference/pages/admin/AdminWorkspacesPage.vue');
 const BookmarkPage = () => import('@/services/preference/pages/admin/AdminBookmarkPage.vue');
+const BookmarkDetailPage = () => import('@/services/preference/pages/admin/AdminBookmarkDetailPage.vue');
 
 const adminPreferenceRoutes: RouteConfig = {
     path: 'preference',
@@ -44,24 +45,18 @@ const adminPreferenceRoutes: RouteConfig = {
             component: BookmarkPage,
             children: [
                 {
-                    path: ':group?',
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
-                    meta: {
-                        menuId: MENU_ID.BOOKMARK,
-                        lsbVisible: true,
-                    },
+                    path: ':group',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP._NAME),
+                    meta: { lsbVisible: true },
                     props: true,
-                    component: BookmarkPage,
+                    component: BookmarkDetailPage,
                 },
                 {
-                    path: ':folder?',
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
-                    meta: {
-                        menuId: MENU_ID.BOOKMARK,
-                        lsbVisible: true,
-                    },
+                    path: ':folder',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL._NAME),
+                    meta: { lsbVisible: true },
                     props: true,
-                    component: BookmarkPage,
+                    component: BookmarkDetailPage,
                 },
             ],
         },
