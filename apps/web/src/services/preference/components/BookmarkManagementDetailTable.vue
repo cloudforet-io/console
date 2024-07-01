@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectStatus,
@@ -25,6 +26,8 @@ import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
+
+const route = useRoute();
 
 const storeState = reactive({
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
@@ -102,6 +105,11 @@ const handleChange = (options: any = {}) => {
     if (options.pageLimit !== undefined) bookmarkPageStore.setBookmarkListPageLimit(options.pageLimit);
     fetchBookmarkList();
 };
+
+watch(() => route.params, () => {
+    bookmarkPageStore.fetchBookmarkList();
+    tableState.selectedType = 'All';
+}, { immediate: true });
 </script>
 
 <template>
