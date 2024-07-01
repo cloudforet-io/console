@@ -107,7 +107,7 @@ const state = reactive({
         let _formatRules = props.widgetOptions?.formatRules as FormatRulesValue[];
         let _color = gray[200];
         _formatRules = _formatRules?.sort((a, b) => (a?.threshold || 0) - (b?.threshold || 0));
-        _formatRules.forEach((d) => {
+        _formatRules?.forEach((d) => {
             if (state.chartData >= (d.threshold || 0)) {
                 _color = d.color;
             }
