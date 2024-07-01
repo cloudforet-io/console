@@ -34,7 +34,7 @@ export interface WidgetProps {
 }
 
 export interface WidgetEmit {
-    (event: 'mounted'): void;
+    (event: 'mounted', widgetName: string): void;
     (event: 'click-expand'): void;
     (event: 'click-delete'): void;
     (event: 'click-edit'): void;

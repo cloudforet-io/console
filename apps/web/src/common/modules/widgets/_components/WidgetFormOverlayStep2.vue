@@ -38,6 +38,8 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
+    readyToMounted: false,
+    mountedWidgetId: undefined as string|undefined,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
         { label: 'Full', name: 'FULL' },
@@ -93,6 +95,14 @@ const handleUpdatePreview = async () => {
     await nextTick();
     await loadOverlayWidget();
 };
+const handleReadyToPreview = async () => {
+    widgetGenerateStore.setPreviewWidgetValueMap(cloneDeep(widgetGenerateState.widgetFormValueMap));
+    await nextTick();
+    state.readyToMounted = true;
+};
+const handleMountWidget = (widgetId: string) => {
+    state.mountedWidgetId = widgetId;
+};
 
 /* Watcher */
 watch(() => widgetGenerateState.selectedWidgetName, () => {
@@ -102,6 +112,13 @@ watch(() => widgetGenerateState.selectedWidgetName, () => {
         state.selectedWidgetSize = 'FULL';
     }
 }, { immediate: true });
+watch([() => state.mountedWidgetId, () => state.readyToMounted], ([mountedWidgetId, readyToMounted]) => {
+    if (mountedWidgetId && readyToMounted) {
+        loadOverlayWidget();
+        state.mountedWidgetId = undefined;
+        state.readyToMounted = false;
+    }
+});
 
 onMounted(async () => {
     if (widgetGenerateState.overlayType === 'EXPAND') await loadOverlayWidget();
@@ -157,6 +174,7 @@ onUnmounted(() => {
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            disable-refresh-on-loading
                            mode="overlay"
+                           @mounted="handleMountWidget"
                 />
                 <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
                           style-type="substitutive"
@@ -173,7 +191,7 @@ onUnmounted(() => {
             </div>
         </div>
         <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'"
-                                               @update-preview="handleUpdatePreview"
+                                               @ready-to-preview="handleReadyToPreview"
         />
     </div>
 </template>
