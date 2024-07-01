@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -73,15 +73,6 @@ const state = reactive({
                 },
             },
         }))),
-});
-
-
-onUnmounted(() => {
-    bookmarkPageStore.resetState();
-});
-
-onMounted(async () => {
-    await bookmarkPageStore.fetchPublicBookmarkList();
 });
 </script>
 

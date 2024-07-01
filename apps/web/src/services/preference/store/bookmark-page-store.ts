@@ -30,11 +30,12 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     });
 
     const state = reactive({
+        bookmarkFolderList: [] as BookmarkItem[],
         bookmarkList: [] as BookmarkItem[],
         pageStart: 0,
         pageLimit: 15,
         searchFilter: [] as ConsoleFilter[],
-        selectedIndices: undefined as number|undefined,
+        selectedIndices: [] as number[],
     });
 
     const getters = reactive({
@@ -54,25 +55,47 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         setBookmarkListSearchFilters: (filters: ConsoleFilter[]) => {
             state.searchFilter = filters;
         },
-        setSelectedBookmarkIndices: (indices: number) => {
+        setSelectedBookmarkIndices: (indices: number[]) => {
             state.selectedIndices = indices;
         },
     };
     const actions = {
         resetState: () => {
+            state.bookmarkFolderList = [];
             state.bookmarkList = [];
             state.pageStart = 0;
             state.pageLimit = 15;
             state.searchFilter = [] as ConsoleFilter[];
-            state.selectedIndices = undefined as number|undefined;
+            state.selectedIndices = [] as number[];
         },
-        fetchPublicBookmarkList: async () => {
+        fetchBookmarkFolderList: async () => {
+            const bookmarkListApiQuery = new ApiQueryHelper()
+                .setSort('updated_at', true)
+                .setFilters([
+                    { k: 'name', v: 'console:bookmark', o: '' },
+                    { k: 'data.link', v: null, o: '=' },
+                ]);
+            try {
+                const { results } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
+                    query: bookmarkListApiQuery.data,
+                });
+                state.bookmarkFolderList = (results ?? []).map((i) => ({
+                    ...i.data,
+                    workspace_id: i.data.workspaceId,
+                    id: i.name,
+                } as BookmarkItem));
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.bookmarkFolderList = [];
+            }
+        },
+        fetchBookmarkList: async () => {
             const BookmarkListApiQueryHelper = new ApiQueryHelper()
                 .setPage(state.pageStart, state.pageLimit)
                 .setSort('updated_at', true)
                 .setFilters([
                     ...state.searchFilter,
-                    { k: 'name', v: 'console:bookmark', o: '' },
+                    { k: 'name', v: 'console:bookmark:', o: '' },
                 ]);
             try {
                 const { results } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({

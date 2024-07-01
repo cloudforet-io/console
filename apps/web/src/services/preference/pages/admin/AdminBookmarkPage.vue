@@ -1,7 +1,27 @@
 <script setup lang="ts">
+import {
+    computed, onMounted, onUnmounted, reactive,
+} from 'vue';
+
 import { PHeading, PButton } from '@spaceone/design-system';
 
 import BookmarkManagementTable from '@/services/preference/components/BookmarkManagementTable.vue';
+import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
+
+const bookmarkPageStore = useBookmarkPageStore();
+const bookmarkPageState = bookmarkPageStore.state;
+
+const storeState = reactive({
+    selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
+});
+
+onUnmounted(() => {
+    bookmarkPageStore.resetState();
+});
+
+onMounted(async () => {
+    await bookmarkPageStore.fetchBookmarkFolderList();
+});
 </script>
 
 <template>
@@ -13,6 +33,7 @@ import BookmarkManagementTable from '@/services/preference/components/BookmarkMa
                 <div class="extra">
                     <p-button style-type="tertiary"
                               icon-left="ic_delete"
+                              :disabled="storeState.selectedIndices.length === 0"
                     >
                         {{ $t('IAM.BOOKMARK.DELETE') }}
                     </p-button>
