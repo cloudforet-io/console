@@ -109,6 +109,8 @@ const state = reactive({
         let _end = state.basedOnDate;
         if (Object.values(DATE_FIELD).includes(state.yAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.yAxisCount);
+        } else if (Object.values(DATE_FIELD).includes(state.stackByField)) {
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.stackByCount);
         }
         return { start: _start, end: _end };
     }),
