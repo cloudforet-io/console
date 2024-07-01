@@ -14,14 +14,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { RecentItem, RecentType } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-
 const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
-
-
 
 interface RecentState {
     recentMenuList: RecentItem[];
     totalCount: number;
+    type?: RecentType;
 }
 
 export const useRecentStore = defineStore('recent', () => {
@@ -35,17 +33,20 @@ export const useRecentStore = defineStore('recent', () => {
     const state = reactive<RecentState>({
         recentMenuList: [],
         totalCount: 0,
+        type: undefined,
     });
 
     const actions = {
         fetchRecent: async ({
-            type, workspaceIds = [], limit = 15, searchText,
-        }:{type: RecentType, workspaceIds:string[], limit?:number, searchText?:string}) => {
+            type, workspaceIds, limit = 15, searchText,
+        }:{type: RecentType, workspaceIds?:string[], limit?:number, searchText?:string}) => {
             recentListApiQuery.setFilters([
                 { k: 'name', v: `console:recent:${type}:`, o: '' },
-                { k: 'data.workspace_id', v: workspaceIds, o: '=' },
                 { k: 'user_id', v: _getters.userId, o: '=' },
             ]).setPageLimit(limit);
+            if (workspaceIds) {
+                recentListApiQuery.addFilter({ k: 'data.workspace_id', v: workspaceIds, o: '=' });
+            }
             if (searchText?.length) recentListApiQuery.addFilter({ k: 'data.label', v: searchText, o: '' });
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.config.userConfig.list({
@@ -58,6 +59,7 @@ export const useRecentStore = defineStore('recent', () => {
                 state.recentMenuList = [];
                 return [];
             }
+            state.type = type;
             return state.recentMenuList;
         },
         createRecent: async ({
@@ -97,6 +99,7 @@ export const useRecentStore = defineStore('recent', () => {
     };
 
     watch(() => _getters.currentWorkspaceId, (workspaceId) => {
+        if (state.type === RECENT_TYPE.WORKSPACE) return;
         state.recentMenuList = [];
         if (workspaceId) {
             actions.fetchRecent({ type: RECENT_TYPE.SERVICE, workspaceIds: [workspaceId] });

@@ -10,14 +10,16 @@ import type { ProjectGroupListParameters } from '@/schema/identity/project-group
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectType } from '@/schema/identity/project/type';
 // eslint-disable-next-line import/no-cycle
 import { store } from '@/store';
+
 
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -28,6 +30,7 @@ interface ProjectResourceItemData {
         name: string;
     };
     users: string[];
+    projectType: ProjectType;
 }
 export type ProjectReferenceItem = Required<Pick<ReferenceItem<ProjectResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>;
@@ -36,18 +39,11 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 
-const _listProjectGroup = async (projectGroupIdList: string[]): Promise<ProjectGroupModel[]> => {
+const _listProjectGroup = async (): Promise<ProjectGroupModel[]> => {
     try {
         const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
             query: {
                 only: ['project_group_id', 'name'],
-                filter: [
-                    {
-                        k: 'project_group_id',
-                        v: projectGroupIdList,
-                        o: 'in',
-                    },
-                ],
             },
         });
         return res?.results ?? [];
@@ -71,9 +67,9 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
             return state.items ?? {};
         }, {}, { lazy: true }),
         projectTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.project.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,
+            type: MANAGED_VARIABLE_MODELS.project.meta.key,
+            key: MANAGED_VARIABLE_MODELS.project.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.project.meta.name,
             referenceMap: getters.projectItems,
         })),
     });
@@ -89,13 +85,12 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
 
         const params: ProjectListParameters = {
             query: {
-                only: ['project_id', 'name', 'project_group_id', 'users'],
+                only: ['project_id', 'name', 'project_group_id', 'users', 'project_type'],
             },
         };
         const res = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>(params);
 
-        const projectGroupIdList = res.results?.map((d) => d.project_group_id) ?? [];
-        _state.projectGroupList = await _listProjectGroup(projectGroupIdList);
+        _state.projectGroupList = await _listProjectGroup();
         const projectReferenceMap: ProjectReferenceMap = {};
 
         // eslint-disable-next-line no-restricted-syntax
@@ -112,6 +107,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                         name: projectGroup.name,
                     } : undefined,
                     users: projectInfo.users || [],
+                    projectType: projectInfo.project_type,
                 },
             };
         });
@@ -135,6 +131,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                         name: projectGroup.name,
                     } : undefined,
                     users: project.users || [],
+                    projectType: project.project_type,
                 },
             },
         };

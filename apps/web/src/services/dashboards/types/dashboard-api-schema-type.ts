@@ -16,8 +16,7 @@ import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/m
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export interface DashboardModel extends PublicDashboardModel, PrivateDashboardModel {
-    public_dashboard_id?: string;
-    private_dashboard_id?: string;
+    dashboard_id?: string;
     project_id?: string;
     workspace_id?: string;
     user_id?: string;
@@ -25,26 +24,22 @@ export interface DashboardModel extends PublicDashboardModel, PrivateDashboardMo
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export interface GetDashboardParameters extends PublicDashboardGetParameters, PrivateDashboardGetParameters {
-    public_dashboard_id?: string;
-    private_dashboard_id?: string;
+    dashboard_id?: string;
 }
 export interface ListDashboardParameters extends PublicDashboardListParameters, PrivateDashboardListParameters {
-    public_dashboard_id?: string;
-    private_dashboard_id?: string;
+    dashboard_id?: string;
 }
 export interface CreateDashboardParameters extends PublicDashboardCreateParameters, PrivateDashboardCreateParameters {
-    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
+    resource_group?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
     project_id?: string;
 }
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export interface UpdateDashboardParameters extends PublicDashboardUpdateParameters, PrivateDashboardUpdateParameters {
-    public_dashboard_id?: string;
-    private_dashboard_id?: string;
+    dashboard_id?: string;
 }
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export interface DeleteDashboardParameters extends PublicDashboardDeleteParameters, PrivateDashboardDeleteParameters {
-    public_dashboard_id?: string;
-    private_dashboard_id?: string;
+    dashboard_id?: string;
 }

@@ -37,7 +37,7 @@ const apiQueryForPostIdList = new ApiQueryHelper().setFilters([{
 }, {
     k: 'data.show_popup',
     v: false,
-    o: '!=',
+    o: '=',
 }]).data;
 const postListQueryHelper = new ApiQueryHelper()
     .setSort('created_at', false)
@@ -48,7 +48,7 @@ const postListQueryHelper = new ApiQueryHelper()
     }]);
 
 // API
-const getUserConfigBoardPostIdList = async (): Promise<Array<string>> => {
+const getUserConfigBoardPostExcludedIdList = async (): Promise<Array<string>> => {
     try {
         const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<NoticeConfigData>>>({
             query: apiQueryForPostIdList,
@@ -66,8 +66,8 @@ const getPostList = async (): Promise<void> => {
             query: postListQueryHelper.data,
             board_type: POST_BOARD_TYPE.NOTICE,
         });
-        const postIdList = await getUserConfigBoardPostIdList();
-        state.popupList = results?.filter((d) => postIdList.includes(d.post_id)) ?? [];
+        const excludedPostIdList = await getUserConfigBoardPostExcludedIdList();
+        state.popupList = results?.filter((d) => !excludedPostIdList.includes(d.post_id)) ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.popupList = [];

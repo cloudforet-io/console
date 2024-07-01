@@ -177,6 +177,7 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return am5.LinearGradient.new(state.root as Root, settings);
         },
+        verticalScrollbarSetting: (settings: am5.IScrollbarSettings): am5.Scrollbar => am5.Scrollbar.new(state.root as Root, settings),
         setXYSharedTooltipText,
         setXYSharedTooltipTextByUsage,
         setXYSharedTooltipTextWithRate,

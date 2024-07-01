@@ -21,7 +21,7 @@ import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
 export type ReferenceType = Extract<ManagedVariableModelKey,

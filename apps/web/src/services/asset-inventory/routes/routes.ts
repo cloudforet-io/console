@@ -23,8 +23,8 @@ const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 const ServerPage = () => import('@/services/asset-inventory/pages/ServerPage.vue');
 const SecurityPage = () => import('@/services/asset-inventory/pages/SecurityPage.vue');
 
-const AssetAnalysisMainPage = () => import('@/services/asset-inventory/pages/AssetAnalysisMainPage.vue');
-const AssetAnalysisDetailPage = () => import('@/services/asset-inventory/pages/AssetAnalysisDetailPage.vue');
+const MetricExplorerMainPage = () => import('@/services/asset-inventory/pages/MetricExplorerMainPage.vue');
+const MetricExplorerDetailPage = () => import('@/services/asset-inventory/pages/MetricExplorerDetailPage.vue');
 
 const CollectorMainPage = () => import('@/services/asset-inventory/pages/CollectorMainPage.vue');
 const CreateCollectorPage = () => import('@/services/asset-inventory/pages/CollectorCreatePage.vue');
@@ -213,7 +213,7 @@ const assetInventoryRoute: RouteConfig = {
                     path: '/',
                     name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
                     meta: { menuId: MENU_ID.METRIC_EXPLORER, lsbVisible: true },
-                    component: AssetAnalysisMainPage as any,
+                    component: MetricExplorerMainPage as any,
                 },
                 {
                     path: ':metricId',
@@ -227,14 +227,14 @@ const assetInventoryRoute: RouteConfig = {
                             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                             meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
                             props: true,
-                            component: AssetAnalysisDetailPage as any,
+                            component: MetricExplorerDetailPage as any,
                         },
                         {
                             path: ':metricExampleId',
                             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                             meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
                             props: true,
-                            component: AssetAnalysisDetailPage as any,
+                            component: MetricExplorerDetailPage as any,
                         },
                     ],
                 },

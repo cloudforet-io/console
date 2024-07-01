@@ -8,8 +8,10 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import dayjs from 'dayjs';
 import { cloneDeep, range } from 'lodash';
 
-import type { DateRange, DashboardSettings } from '@/schema/dashboard/_types/dashboard-type';
+import type { DateRange, DashboardOptions } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
@@ -25,6 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { i18nDayjs } = useI18nDayjs();
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
@@ -42,7 +45,7 @@ const state = reactive({
             {
                 type: 'item',
                 name: 'current',
-                label: i18n.t('DASHBOARDS.DETAIL.CURRENT_MONTH'),
+                label: `${i18n.t('DASHBOARDS.DETAIL.CURRENT_MONTH')} (${dayjs.utc().format('YYYY-MM')})`,
             },
             ...monthData,
             { type: 'divider' },
@@ -70,11 +73,11 @@ const setSelectedDateRange = (start, end) => {
     const _end = dayjs.utc(end).endOf('month').format('YYYY-MM');
     state.selectedDateRange = { start: _start, end: _end };
 };
-const updateDashboardDateRange = (dateRange: DashboardSettings['date_range']) => {
-    const _settings = cloneDeep(dashboardDetailState.settings);
-    _settings.date_range.start = dateRange.start;
-    _settings.date_range.end = dateRange.end;
-    dashboardDetailStore.setSettings(_settings);
+const updateDashboardDateRange = (dateRange: DashboardOptions['date_range']) => {
+    const _options = cloneDeep(dashboardDetailState.options);
+    _options.date_range.start = dateRange.start;
+    _options.date_range.end = dateRange.end;
+    dashboardDetailStore.setOptions(_options);
 };
 
 /* Event */
@@ -92,6 +95,13 @@ const handleSelectMonthMenuItem = (selected: string) => {
         setSelectedDateRange(state.selectedMonthMenuItem.name, state.selectedMonthMenuItem.name);
         updateDashboardDateRange(state.selectedDateRange);
     }
+
+    dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
+        options: {
+            ...dashboardDetailState.dashboardInfo?.options || {},
+            date_range: state.selectedDateRange,
+        },
+    });
 };
 const handleCustomRangeModalConfirm = (dateRange: DateRange) => {
     const { start, end } = dateRange;

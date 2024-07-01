@@ -16,6 +16,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import type { SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 import type { MenuInfo } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -29,7 +30,6 @@ import type { FocusingDirection } from '@/common/modules/navigations/top-bar/mod
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
 import type { RecentItem } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-
 
 interface Props {
     searchLimit: number;
@@ -85,11 +85,15 @@ const state = reactive({
         }
         return results;
     }),
-    recentMenuList: computed(() => recentStore.state.recentMenuList.map((r: RecentItem) => ({
-        id: r.data.id,
-        label: state.allMenuMap.get(r.data.id)?.fullLabel ?? r.data.label,
-        icon: state.allMenuMap.get(r.data.id)?.icon,
-    }))),
+    recentMenuList: computed(() => recentStore.state.recentMenuList.map((r: RecentItem) => {
+        // NOTE: Code corresponding to data stored as 'home-dashboard'
+        const id = r.data.id === 'home-dashboard' ? MENU_ID.WORKSPACE_HOME : r.data.id;
+        return {
+            id,
+            label: state.allMenuMap.get(id)?.fullLabel ?? r.data.label,
+            icon: state.allMenuMap.get(id)?.icon,
+        };
+    })),
     recentMenuItems: computed(() => {
         let results: SuggestionItem[] = [];
         if (state.recentMenuList?.length) {

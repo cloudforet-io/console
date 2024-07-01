@@ -2,7 +2,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type {
     DashboardLayoutWidgetInfo,
-    DashboardSettings,
+    DashboardOptions,
     DashboardVariables,
     DashboardVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
@@ -15,7 +15,6 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 
 export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inherit_options'|'widget_options'|'schema_properties'>;
 
-// TODO: replace with NewWidgetProps
 export interface WidgetProps<T = any> {
     widgetConfigId: string;
     title?: string;
@@ -31,25 +30,11 @@ export interface WidgetProps<T = any> {
     allReferenceTypeInfo: AllReferenceTypeInfo;
     disableFullMode?: boolean;
     disableRefreshOnVariableChange?: boolean;
-    dashboardSettings?: DashboardSettings;
+    dashboardOptions?: DashboardOptions;
     dashboardVariablesSchema?: DashboardVariablesSchema;
     dashboardVariables?: DashboardVariables;
     loading?: boolean;
     data?: T;
-}
-
-// TODO: remove this after replacing WidgetProps with NewWidgetProps
-export interface NewWidgetProps {
-    widgetConfigId: string;
-    widgetInfo: DashboardLayoutWidgetInfo;
-    editMode?: boolean;
-    errorMode?: boolean;
-    disableFullMode?: boolean;
-    disableRefreshOnVariableChange?: boolean;
-    allReferenceTypeInfo: AllReferenceTypeInfo;
-    settings?: DashboardSettings;
-    variablesSchema?: DashboardVariablesSchema;
-    variables?: DashboardVariables;
 }
 
 export interface WidgetEmit {
@@ -65,13 +50,13 @@ export interface WidgetEmit {
 
 export interface WidgetExpose<Data = any> {
     initWidget: (data?: Data) => Promise<Data>;
-    refreshWidget: () => Promise<Data>;
+    refreshWidget?: () => Promise<Data>;
 }
 
 
 export interface Legend {
     name: string;
-    label?: TranslateResult;
+    label?: TranslateResult|string;
     color?: string;
     disabled?: boolean; // this is used only in widget data table
 }

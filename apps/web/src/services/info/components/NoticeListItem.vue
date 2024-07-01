@@ -4,16 +4,25 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PI, PSkeleton } from '@spaceone/design-system';
+import { PI, PSkeleton, PBadge } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import type { PostModel } from '@/schema/board/post/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const props = withDefaults(defineProps<{
     inputText?: string;
@@ -28,6 +37,11 @@ const props = withDefaults(defineProps<{
     post: undefined,
     loading: true,
 });
+
+const storeState = reactive({
+    isAdminMode: computed(() => appContextGetters.isAdminMode),
+    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+});
 const state = reactive({
     hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     postDirectionLabel: computed<TranslateResult>(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
@@ -38,6 +52,11 @@ const state = reactive({
     writer: computed<string>(() => {
         if (!props.post) return '';
         return props.post.writer;
+    }),
+    isAllWorkspace: computed<boolean>(() => (!props.post?.workspaces || props.post?.workspaces?.includes('*')) ?? true),
+    scopedWorkspaceList: computed<WorkspaceModel[]|undefined>(() => {
+        if (state.isAllWorkspace) return undefined;
+        return storeState.workspaceList.filter((workspace) => props.post?.workspaces.includes(workspace.workspace_id));
     }),
 });
 
@@ -90,10 +109,11 @@ const dateFormatter = (date?: string): string => {
             <div class="info">
                 <span>{{ state.date }}</span>
                 <template v-if="state.hasDomainRoleUser">
-                    <p-i width="0.125rem"
+                    <p-i v-if="state.writer"
+                         width="0.125rem"
                          name="ic_dot"
                     />
-                    <span>{{ state.writer }}</span>
+                    <span v-if="state.writer">{{ state.writer }}</span>
                     <p-i width="0.125rem"
                          name="ic_dot"
                     />
@@ -101,6 +121,28 @@ const dateFormatter = (date?: string): string => {
                                                   width="1.125rem"
                     /> {{ props.post?.view_count ?? 0 }}</span>
                 </template>
+                <p-i v-if="storeState.isAdminMode"
+                     width="0.125rem"
+                     name="ic_dot"
+                />
+                <div v-if="storeState.isAdminMode">
+                    <span v-if="state.isAllWorkspace">{{ $t('INFO.NOTICE.ALL_WORKSPACE') }}</span>
+                    <div v-else
+                         class="workspace-wrapper"
+                    >
+                        <workspace-logo-icon :text="state.scopedWorkspaceList[0].name || ''"
+                                             :theme="state.scopedWorkspaceList[0].tags?.theme"
+                                             size="xxs"
+                        />
+                        <span>{{ state.scopedWorkspaceList[0].name }}</span>
+                        <p-badge v-if="state.scopedWorkspaceList?.length > 1"
+                                 style-type="blue200"
+                                 badge-type="subtle"
+                        >
+                            + {{ state.scopedWorkspaceList?.length - 1 }}
+                        </p-badge>
+                    </div>
+                </div>
             </div>
         </div>
         <div v-else
@@ -152,6 +194,10 @@ const dateFormatter = (date?: string): string => {
         .view-count {
             @apply flex items-center;
             gap: 0.125rem;
+        }
+        .workspace-wrapper {
+            @apply flex items-center;
+            gap: 0.25rem;
         }
     }
 

@@ -72,9 +72,6 @@ watch(() => state.data.mfa?.state, (value) => {
         @apply flex items-center;
         gap: 0.25rem;
     }
-    .toggle-button {
-        margin-right: 0.25rem;
-    }
     .mfa-tooltip {
         margin-top: -0.25rem;
         .icon-info {

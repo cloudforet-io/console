@@ -22,7 +22,6 @@ const state = reactive({
         const results = [
             { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: 'ALL' },
             { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'), name: 'WORKSPACE' },
-            { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_SINGLE_PROJECT'), name: 'PROJECT' },
             { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PRIVATE'), name: 'PRIVATE' },
         ];
         if (!storeState.isWorkspaceOwner) {
@@ -65,7 +64,7 @@ const handleChangeScope = (selected) => {
 .dashboard-main-select-filter {
     @apply flex items-center;
     height: 2rem;
-    margin: 1.125rem 0 0.625rem 0;
+    margin-bottom: 0.625rem;
     gap: 1rem;
 
     .filter-header {

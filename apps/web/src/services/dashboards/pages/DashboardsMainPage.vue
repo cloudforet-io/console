@@ -19,7 +19,7 @@ import { SpaceRouter } from '@/router';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
-
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
@@ -33,11 +33,13 @@ import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-s
 
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
 const router = useRouter();
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: computed(() => dashboardState.loading),
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     workspaceDashboardList: computed<DashboardModel[]>(() => {
@@ -46,28 +48,25 @@ const state = reactive({
         if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
         return target as DashboardModel[];
     }),
-    projectDashboardList: computed<DashboardModel[]>(() => {
-        if (dashboardState.scope && dashboardState.scope !== 'PROJECT') return [];
-        let target = dashboardGetters.projectItems || [];
-        if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
-        return target as DashboardModel[];
-    }),
     privateDashboardList: computed<DashboardModel[]>(() => {
         if (dashboardState.scope && dashboardState.scope !== 'PRIVATE') return [];
         return dashboardGetters.privateItems as DashboardModel[] || [];
     }),
-    dashboardTotalCount: computed<number>(() => state.workspaceDashboardList.length + state.projectDashboardList.length + state.privateDashboardList.length),
+    dashboardTotalCount: computed<number>(() => {
+        if (state.isAdminMode) return dashboardGetters.domainItems.length;
+        return state.workspaceDashboardList.length + state.privateDashboardList.length;
+    }),
     filteredDashboardStatus: computed(() => {
+        if (state.isAdminMode) {
+            return !!(dashboardGetters.domainItems.length);
+        }
         if (dashboardState.scope === 'WORKSPACE') {
             return !!(state.workspaceDashboardList.length);
-        }
-        if (dashboardState.scope === 'PROJECT') {
-            return !!(state.projectDashboardList.length);
         }
         if (dashboardState.scope === 'PRIVATE') {
             return !!(state.privateDashboardList.length);
         }
-        return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length || state.privateDashboardList.length));
+        return !!(state.dashboardTotalCount && (state.workspaceDashboardList.length || state.privateDashboardList.length));
     }),
 });
 
@@ -81,11 +80,11 @@ const queryState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
         items: [
-            { name: 'label', label: 'Label' },
+            { name: 'labels', label: 'Label' },
         ],
     }]),
     valueHandlerMap: computed(() => ({
-        label: getDashboardValueHandler(),
+        labels: getDashboardValueHandler(),
     })),
     queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(dashboardState.searchFilters).queryTags),
 });
@@ -164,16 +163,15 @@ onUnmounted(() => {
                    :total-count="state.dashboardTotalCount"
         >
             <template #extra>
-                <p-button v-if="state.workspaceDashboardList || state.projectDashboardList"
-                          icon-left="ic_plus_bold"
+                <p-button icon-left="ic_plus_bold"
                           @click="handleCreateDashboard"
                 >
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREATE') }}
                 </p-button>
             </template>
         </p-heading>
-        <p-divider class="dashboards-divider" />
-        <dashboard-main-select-filter />
+        <p-divider class="dashboard-divider" />
+        <dashboard-main-select-filter v-if="!state.isAdminMode" />
         <p-toolbox filters-visible
                    search-type="query"
                    :pagination-visible="false"
@@ -209,27 +207,26 @@ onUnmounted(() => {
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
                 </p-empty>
             </template>
-            <dashboard-main-board-list v-if="state.workspaceDashboardList.length"
-                                       scope-type="WORKSPACE"
-                                       class="dashboard-list"
-                                       :class="{'full-mode': dashboardState.scope === 'WORKSPACE'}"
-                                       :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')"
-                                       :dashboard-list="state.workspaceDashboardList"
+            <dashboard-main-board-list v-if="state.isAdminMode"
+                                       class="dashboard-list full-mode"
+                                       :dashboard-list="dashboardGetters.domainItems"
             />
-            <dashboard-main-board-list v-if="state.projectDashboardList.length"
-                                       scope-type="PROJECT"
-                                       class="dashboard-list"
-                                       :class="{'full-mode': dashboardState.scope === 'PROJECT'}"
-                                       :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT')"
-                                       :dashboard-list="state.projectDashboardList"
-            />
-            <dashboard-main-board-list v-if="state.privateDashboardList.length"
-                                       scope-type="PRIVATE"
-                                       class="dashboard-list"
-                                       :class="{'full-mode': dashboardState.scope === 'PRIVATE'}"
-                                       :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
-                                       :dashboard-list="state.privateDashboardList"
-            />
+            <template v-else>
+                <dashboard-main-board-list v-if="state.workspaceDashboardList.length"
+                                           scope-type="WORKSPACE"
+                                           class="dashboard-list"
+                                           :class="{'full-mode': dashboardState.scope === 'WORKSPACE'}"
+                                           :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')"
+                                           :dashboard-list="state.workspaceDashboardList"
+                />
+                <dashboard-main-board-list v-if="state.privateDashboardList.length"
+                                           scope-type="PRIVATE"
+                                           class="dashboard-list"
+                                           :class="{'full-mode': dashboardState.scope === 'PRIVATE'}"
+                                           :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
+                                           :dashboard-list="state.privateDashboardList"
+                />
+            </template>
         </p-data-loader>
     </div>
 </template>
@@ -238,6 +235,9 @@ onUnmounted(() => {
 .dashboards-main-page {
     @apply w-full;
 
+    .dashboard-divider {
+        margin-bottom: 1.125rem;
+    }
     .dashboard-list-wrapper {
         @apply flex w-full;
         gap: 0.5rem;

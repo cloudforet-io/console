@@ -90,8 +90,12 @@ let datasourceListApiQuery = datasourceListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
-const handleUpdateSelectIndex = (indices: number[]) => {
+const handleUpdateSelectIndex = async (indices: number[]) => {
     dataSourcesPageStore.setSelectedDataSourceIndices(indices[0]);
+    const item = storeState.dataSourceList[indices[0]];
+    await dataSourcesPageStore.fetchDataSourceItem({
+        data_source_id: item.data_source_id,
+    });
 };
 const handleChange = (options: any = {}) => {
     datasourceListApiQuery = getApiQueryWithToolboxOptions(datasourceListApiQueryHelper, options) ?? datasourceListApiQuery;

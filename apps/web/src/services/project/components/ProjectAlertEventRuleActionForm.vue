@@ -11,7 +11,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EventRuleActions, EventRuleOptions } from '@/schema/monitoring/event-rule/type';
-import { i18n, i18n as _i18n } from '@/translations';
+import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
@@ -76,8 +76,8 @@ const state = reactive({
             }));
     }),
     resourceGroups: computed<Record<EscalationPolicyModel['resource_group'], TranslateResult>>(() => ({
-        WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.WORKSPACE'),
-        PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.PROJECT'),
+        WORKSPACE: _i18n.t('MONITORING.ALERT.ESCALATION_POLICY.WORKSPACE'),
+        PROJECT: _i18n.t('MONITORING.ALERT.ESCALATION_POLICY.PROJECT'),
     })),
     proxyActions: useProxyValue<EventRuleActions>('actions', props, emit),
     proxyOptions: useProxyValue<EventRuleOptions>('options', props, emit),

@@ -1,0 +1,181 @@
+<script setup lang="ts">
+import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+
+import {
+    PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
+} from '@spaceone/design-system';
+
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import type { BookmarkItem, BookmarkModalStateType, RadioType } from '@/common/components/bookmark/type/type';
+import { useFormValidator } from '@/common/composables/form-validator';
+
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
+
+interface Props {
+    bookmarkFolderList?: BookmarkItem[],
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    bookmarkFolderList: undefined,
+});
+
+const bookmarkStore = useBookmarkStore();
+const bookmarkState = bookmarkStore.state;
+
+const storeState = reactive({
+    filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
+    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
+    isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
+    modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
+    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+});
+const state = reactive({
+    loading: false,
+    bookmark: computed<string|undefined|TranslateResult>(() => storeState.selectedBookmark?.name || storeState.filterByFolder),
+    radioMenuList: computed<RadioType[]>(() => {
+        const menu: RadioType[] = [{
+            label: i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
+            name: BOOKMARK_TYPE.USER,
+        }];
+        if (!storeState.isWorkspaceMember) {
+            menu.unshift({
+                label: i18n.t('HOME.BOOKMARK_SHARED_BOOKMARK'),
+                name: BOOKMARK_TYPE.WORKSPACE,
+            });
+        }
+        return menu;
+    }),
+    selectedRadioIdx: 0,
+    scope: computed(() => state.radioMenuList[state.selectedRadioIdx].name),
+});
+
+const {
+    forms: {
+        name,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+    initForm,
+} = useFormValidator({
+    name: '',
+}, {
+    name(value: string) {
+        if (state.bookmark === value) return '';
+        const duplicatedName = props.bookmarkFolderList?.find((item) => item.name === value);
+        if (duplicatedName) {
+            return i18n.t('HOME.ALT_E_DUPLICATED_NAME');
+        }
+        if (value.length > 16) {
+            return i18n.t('HOME.ALT_E_MAX_LENGTH_INVALID', { max: 16 });
+        }
+        return '';
+    },
+});
+
+const handleClose = () => {
+    bookmarkStore.setModalType(undefined, false, false);
+    initForm();
+};
+
+const handleConfirm = async () => {
+    state.loading = true;
+    try {
+        if (storeState.modal.isEdit) {
+            await bookmarkStore.updateBookmarkFolder({
+                id: storeState.selectedBookmark?.id,
+                name: name.value,
+            });
+            if (storeState.isFileFullMode) {
+                await bookmarkStore.setSelectedBookmark({
+                    ...storeState.selectedBookmark,
+                    name: name.value,
+                });
+            }
+        } else {
+            await bookmarkStore.createBookmarkFolder(name.value, state.scope);
+        }
+        await handleClose();
+    } finally {
+        state.loading = false;
+    }
+};
+
+watch(() => storeState.bookmarkType, (bookmarkType) => {
+    if (storeState.isWorkspaceMember) {
+        state.selectedRadioIdx = 0;
+        return;
+    }
+    if (bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+        state.selectedRadioIdx = 0;
+    } else if (bookmarkType === BOOKMARK_TYPE.USER) {
+        state.selectedRadioIdx = 1;
+    }
+}, { immediate: true });
+watch(() => storeState.modal.isEdit, (isEditModal) => {
+    if (isEditModal) {
+        setForm('name', state.bookmark as string || '');
+    }
+}, { immediate: true });
+</script>
+
+<template>
+    <p-button-modal class="bookmark-folder-form-modal"
+                    :header-title="storeState.modal.isEdit ? $t('HOME.BOOKMARK_EDIT_FOLDER') : $t('HOME.BOOKMARK_CREATE_FOLDER')"
+                    size="sm"
+                    :fade="true"
+                    :backdrop="true"
+                    :visible="storeState.modal.type === BOOKMARK_MODAL_TYPE.FOLDER"
+                    :disabled="(name === '' || invalidState.name)"
+                    :loading="state.loading"
+                    @confirm="handleConfirm"
+                    @cancel="handleClose"
+                    @close="handleClose"
+    >
+        <template #body>
+            <div class="form-contents">
+                <p-field-group :label="$t('HOME.FORM_NAME')"
+                               :invalid="invalidState.name"
+                               :invalid-text="invalidTexts.name"
+                               class="input-form"
+                               required
+                >
+                    <p-text-input :value="name"
+                                  :invalid="invalidState.name"
+                                  class="text-input"
+                                  block
+                                  @update:value="setForm('name', $event)"
+                    />
+                </p-field-group>
+                <p-field-group v-if="!storeState.modal.isEdit"
+                               class="scope-wrapper"
+                               :label="$t('HOME.FORM_SCOPE')"
+                               required
+                >
+                    <p-radio-group>
+                        <p-radio v-for="(item, idx) in state.radioMenuList"
+                                 :key="`bookmark-scope-${idx}`"
+                                 v-model="state.selectedRadioIdx"
+                                 :value="idx"
+                        >
+                            <span class="radio-item">
+                                {{ item.label }}
+                            </span>
+                        </p-radio>
+                    </p-radio-group>
+                </p-field-group>
+            </div>
+        </template>
+        <template #confirm-button>
+            <span v-if="!storeState.modal.isEdit">{{ $t('HOME.BOOKMARK_CREATE') }}</span>
+        </template>
+    </p-button-modal>
+</template>

@@ -5,6 +5,9 @@ export const PREFERENCE_ROUTE = {
     DOMAIN_SETTINGS: {
         _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.DOMAIN_SETTINGS}`,
     },
+    BOOKMARK: {
+        _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.BOOKMARK}`,
+    },
     WORKSPACES: {
         _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.WORKSPACES}`,
     },

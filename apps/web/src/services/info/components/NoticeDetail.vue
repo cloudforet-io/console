@@ -5,7 +5,7 @@ import {
 import type { Location } from 'vue-router';
 
 import {
-    PButton, PDataLoader, PDivider, PI, PPaneLayout,
+    PButton, PDataLoader, PDivider, PI, PPaneLayout, PBadge, PPopover, PTextButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -18,14 +18,18 @@ import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
 import type { FileModel } from '@/schema/file-manager/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useNoticeStore } from '@/store/notice';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
@@ -35,10 +39,18 @@ const props = defineProps<{
     postId?: string;
 }>();
 
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 
+const storeState = reactive({
+    isAdminMode: computed(() => appContextGetters.isAdminMode),
+    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+});
 const state = reactive({
     timezone: computed(() => store.state.user.timezone),
     loading: false,
@@ -60,6 +72,12 @@ const state = reactive({
         };
     }),
     hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    isAllWorkspace: computed<boolean>(() => (!state.noticePostData?.workspaces || state.noticePostData?.workspaces?.includes('*')) ?? true),
+    scopedWorkspaceList: computed<WorkspaceModel[]|undefined>(() => {
+        if (state.isAllWorkspace) return undefined;
+        return storeState.workspaceList.filter((workspace) => state.noticePostData?.workspaces.includes(workspace.workspace_id));
+    }),
+    popoverVisible: false,
 });
 
 const files = computed<FileModel[]>(() => state.noticePostData?.files ?? []);
@@ -149,11 +167,14 @@ watch(() => props.postId, (postId) => {
                 <div v-if="state.noticePostData"
                      class="post-title"
                 >
-                    <span>{{ iso8601Formatter(state.noticePostData.created_at, state.timezone) }}
-                    </span><p-i width="0.125rem"
-                                name="ic_dot"
+                    <span>
+                        {{ iso8601Formatter(state.noticePostData.created_at, state.timezone) }}
+                    </span>
+                    <p-i v-if="state.noticePostData.writer"
+                         width="0.125rem"
+                         name="ic_dot"
                     />
-                    <span> {{ state.noticePostData.writer }}</span>
+                    <span v-if="state.noticePostData.writer"> {{ state.noticePostData.writer }}</span>
                     <p-i v-if="state.hasDomainRoleUser"
                          width="0.125rem"
                          name="ic_dot"
@@ -165,6 +186,52 @@ watch(() => props.postId, (postId) => {
                              width="1.125rem"
                         /> {{ state.noticePostData.view_count }}
                     </span>
+                    <p-i v-if="storeState.isAdminMode"
+                         width="0.125rem"
+                         name="ic_dot"
+                    />
+                    <div v-if="storeState.isAdminMode">
+                        <span v-if="state.isAllWorkspace">{{ $t('INFO.NOTICE.ALL_WORKSPACE') }}</span>
+                        <div v-else
+                             class="workspace-wrapper"
+                        >
+                            <workspace-logo-icon :text="state.scopedWorkspaceList[0].name || ''"
+                                                 :theme="state.scopedWorkspaceList[0].tags?.theme"
+                                                 size="xxs"
+                            />
+                            <span>{{ state.scopedWorkspaceList[0].name }}</span>
+                            <p-badge v-if="state.scopedWorkspaceList?.length > 1"
+                                     style-type="blue200"
+                                     badge-type="subtle"
+                            >
+                                + {{ state.scopedWorkspaceList?.length - 1 }}
+                            </p-badge>
+                            <p-popover v-if="state.scopedWorkspaceList?.length > 1"
+                                       v-model="state.popoverVisible"
+                                       position="bottom"
+                            >
+                                <p-text-button class="show-workspaces"
+                                               style-type="highlight"
+                                               size="sm"
+                                               @click="state.popoverVisible = !state.popoverVisible"
+                                >
+                                    {{ $t('INFO.NOTICE.DETAIL.SHOW_ALL_WORKSPACES') }}
+                                </p-text-button>
+                                <template #content>
+                                    <div v-for="(item,idx) in state.scopedWorkspaceList"
+                                         :key="idx"
+                                         class="workspace-wrapper"
+                                    >
+                                        <workspace-logo-icon :text="item.name || ''"
+                                                             :theme="item.tags?.theme"
+                                                             size="xxs"
+                                        />
+                                        <span>{{ item.name }}</span>
+                                    </div>
+                                </template>
+                            </p-popover>
+                        </div>
+                    </div>
                 </div>
                 <p-divider />
                 <div v-if="state.noticePostData"
@@ -220,6 +287,21 @@ watch(() => props.postId, (postId) => {
         .view-count {
             @apply flex items-center;
             gap: 0.125rem;
+        }
+        .workspace-wrapper {
+            @apply flex items-center;
+            gap: 0.25rem;
+
+            /* custom design-system component - p-popover */
+            :deep(.p-popover) {
+                .popper {
+                    padding-right: 2rem;
+                }
+                .popper-content-wrapper {
+                    @apply flex-col;
+                    gap: 0.5rem;
+                }
+            }
         }
     }
     .text-editor-wrapper {

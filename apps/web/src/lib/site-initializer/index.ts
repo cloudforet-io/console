@@ -11,13 +11,13 @@ import { integralRoutes } from '@/router/integral-routes';
 
 import config from '@/lib/config';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
-import { initAmcharts } from '@/lib/site-initializer/amcharts';
 import { initAmcharts5 } from '@/lib/site-initializer/amcharts5';
 import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
 import { initApiClient } from '@/lib/site-initializer/api-client';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initDomain } from '@/lib/site-initializer/domain';
 import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
+import { initEcharts } from '@/lib/site-initializer/echarts';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 // import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
@@ -70,8 +70,8 @@ const init = async (store) => {
         initQueryHelper(store);
         initGtag(store, config);
         initGtm(config);
-        initAmcharts(config);
         initAmcharts5(config);
+        initEcharts();
         initErrorHandler(store);
         initRequestIdleCallback();
         await checkSsoAccessToken(store);

@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PBoard, PFieldTitle, PI, PLabel, PPagination,
+    PBadge, PBoard, PFieldTitle, PI, PLabel, PPagination,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
@@ -13,7 +11,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -21,7 +19,6 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
-import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -44,13 +41,13 @@ type DashboardBoardSet = BoardSet & DashboardModel;
 
 const router = useRouter();
 
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
-const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
+const appContextStore = useAppContextStore();
 const storeState = reactive({
-    currentWorkspace: computed(() => userWorkspaceStore.getters.currentWorkspace),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     thisPage: 1,
@@ -58,21 +55,10 @@ const state = reactive({
     projectItems: computed(() => allReferenceStore.getters.project),
     dashboardListByBoardSets: computed<DashboardBoardSet[]>(() => props.dashboardList
         .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
-        .map((d) => {
-            const dashboardWithBoardSet = {
-                ...d,
-                iconButtonSets: convertBoardItemButtonSet(d),
-            };
-            if (d.project_id) {
-                return (
-                    {
-                        ...dashboardWithBoardSet,
-                        label: state.projectItems[d.project_id]?.label || d.project_id,
-                    }
-                );
-            }
-            return dashboardWithBoardSet;
-        })),
+        .map((d) => ({
+            ...d,
+            iconButtonSets: convertBoardItemButtonSet(d),
+        }))),
 });
 
 const deleteModalState = reactive({
@@ -80,51 +66,26 @@ const deleteModalState = reactive({
     selectedId: undefined as string|undefined,
 });
 
-const cloneModalState = reactive({
-    visible: false,
-    dashboardConfig: {} as Partial<DashboardModel>,
-});
-
-const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
-    {
-        iconName: 'ic_edit',
-        tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
-        eventAction: () => {
-            router.push(getProperRouteLocation({
-                name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-                params: {
-                    dashboardId: dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || '',
-                },
-            }));
+const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
+    if (!storeState.isAdminMode && dashboardItem.resource_group === 'DOMAIN') return [];
+    const dashboardId = dashboardItem.dashboard_id || '';
+    return [
+        {
+            iconName: 'ic_delete',
+            tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
+            eventAction: () => handleClickDeleteDashboard(dashboardId),
         },
-    },
-    {
-        iconName: 'ic_duplicate',
-        tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
-        eventAction: () => {
-            cloneModalState.dashboardConfig = { ...dashboardItem };
-            cloneModalState.visible = true;
-        },
-    },
-    {
-        iconName: 'ic_delete',
-        tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
-        eventAction: () => handleClickDeleteDashboard(dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || ''),
-    },
-];
+    ];
+};
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
-    router.push(getProperRouteLocation(getProperRouteLocation({
+    router.push(getProperRouteLocation({
         name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
-            dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
+            dashboardId: item.dashboard_id || '',
         },
-    })));
-};
-const handleUpdateCloneModal = (visible: boolean) => {
-    if (visible) return;
-    cloneModalState.dashboardConfig = {};
+    }));
 };
 
 const handleClickDeleteDashboard = (dashboardId: string) => {
@@ -135,7 +96,7 @@ const handleClickDeleteDashboard = (dashboardId: string) => {
 const labelQueryHelper = new QueryHelper();
 const handleSetQuery = (selectedLabel: string | string[]) => {
     labelQueryHelper.setFilters(dashboardState.searchFilters)
-        .addFilter({ k: 'label', o: '=', v: selectedLabel });
+        .addFilter({ k: 'labels', o: '=', v: selectedLabel });
     dashboardStore.setSearchFilters(labelQueryHelper.filters);
 };
 const handlePage = (page: number) => {
@@ -163,49 +124,50 @@ watch(() => props.dashboardList, () => {
                  @item-click="handleClickBoardItem"
         >
             <template #item-content="{board}">
-                <div class="board-item-title-wrapper">
-                    <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
-                                     :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                     scale="0.666"
-                                     class="favorite-button"
-                    />
-                    <p class="board-item-title">
-                        {{ board.name }}
-                        <p-i v-if="scopeType === 'PRIVATE'"
-                             name="ic_lock-filled"
-                             width="0.75rem"
-                             height="0.75rem"
-                             color="gray900"
-                             class="private-icon"
+                <div class="content-wrapper">
+                    <div class="board-item-title-wrapper">
+                        <div class="left-part">
+                            <favorite-button :item-id="board.dashboard_id"
+                                             :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                             scale="0.8"
+                                             class="favorite-button"
+                            />
+                            <span class="board-item-title">
+                                {{ board.name }}
+                            </span>
+                        </div>
+                        <div class="right-part">
+                            <p-i v-if="scopeType === 'PRIVATE'"
+                                 name="ic_lock-filled"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                                 color="gray900"
+                                 class="private-icon"
+                            />
+                            <span v-if="board.tags?.created_by"
+                                  class="board-item-title-sub-text"
+                            >{{ board.tags?.created_by }}</span>
+                            <span v-if="board.tags?.created_by && props.scopeType === 'PROJECT'"
+                                  class="board-item-title-sub-text"
+                            >•</span>
+                            <span class="board-item-title-sub-text">{{ props.scopeType === 'PROJECT' ? board.label : '' }}</span>
+                        </div>
+                    </div>
+                    <div class="labels-wrapper">
+                        <p-badge v-if="board.version === '1.0'"
+                                 shape="square"
+                                 badge-type="subtle"
+                                 style-type="red100"
+                        >
+                            {{ $t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED') }}
+                        </p-badge>
+                        <p-label v-for="(label, idx) in board.labels"
+                                 :key="`${board.name}-label-${idx}`"
+                                 :text="label"
+                                 clickable
+                                 @item-click="handleSetQuery(label)"
                         />
-                    </p>
-                </div>
-                <div class="board-item-description">
-                    <template v-if="board.tags.created_by">
-                        <span>{{ board.tags.created_by }}</span>
-                    </template>
-                    <template v-if="!isAdminMode">
-                        <p-i name="ic_dot"
-                             width="0.125rem"
-                             height="0.125rem"
-                        />
-                        <span v-if="props.scopeType !== 'PROJECT'">{{ storeState.currentWorkspace?.name }}</span>
-                        <span v-else>{{ board.label }}</span>
-                    </template>
-                </div>
-                <div class="label-wrapper">
-                    <p-label v-if="!isAdminMode"
-                             :class="{'item-label': true, 'viewers-label': true, 'private-label': !!board.private_dashboard_id}"
-                             :text="!!board.private_dashboard_id ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC')"
-                             :left-icon="!!board.private_dashboard_id ? 'ic_lock-filled' : 'ic_globe-filled'"
-                    />
-                    <p-label v-for="(label, idx) in board.labels"
-                             :key="`${board.name}-label-${idx}`"
-                             class="item-label"
-                             :text="label"
-                             clickable
-                             @item-click="handleSetQuery(label)"
-                    />
+                    </div>
                 </div>
             </template>
         </p-board>
@@ -222,10 +184,6 @@ watch(() => props.dashboardList, () => {
             :visible.sync="deleteModalState.visible"
             :dashboard-id="deleteModalState.selectedId"
         />
-        <dashboard-clone-modal :visible.sync="cloneModalState.visible"
-                               :dashboard="cloneModalState.dashboardConfig"
-                               @update:visible="handleUpdateCloneModal"
-        />
     </div>
 </template>
 
@@ -233,6 +191,7 @@ watch(() => props.dashboardList, () => {
 .dashboard-board-list {
     @apply w-full flex-grow;
     margin-top: 0.5rem;
+    margin-bottom: 1.25rem;
 
     .p-field-title {
         margin-bottom: 0.5rem;
@@ -242,42 +201,47 @@ watch(() => props.dashboardList, () => {
         margin-left: 0.5rem;
     }
     .board {
-        .board-item-title-wrapper {
-            @apply flex w-full;
-            align-items: center;
-            min-height: 1.25rem;
-            .favorite-button {
-                margin-right: 0.25rem;
+        /* custom p-board-item */
+        &:deep(.p-board-item) {
+            .content-area {
+                overflow: unset;
+                .right-overlay-wrapper {
+                    top: calc(50% - 1rem);
+                }
             }
-            .board-item-title {
-                @apply flex-grow w-full;
-                margin-left: 0.125rem;
-                font-size: 1rem;
-                font-weight: bold;
-                line-height: 1.25;
-                word-break: break-all;
-            }
-        }
-        .board-item-description {
-            @apply flex items-center flex-wrap;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            line-height: 1.25;
-            color: gray;
-            margin: 0.25rem 0 0.75rem;
         }
 
-        .label-wrapper {
-            @apply flex items-center flex-wrap;
-            row-gap: 0.375rem;
-        }
-
-        .item-label {
-            &.viewers-label {
-                @apply border-0 bg-violet-200;
+        .content-wrapper {
+            @apply flex flex-col gap-2;
+            .board-item-title-wrapper {
+                @apply flex w-full items-center;
+                gap: 0.375rem;
+                .left-part, .right-part {
+                    @apply flex items-center;
+                    gap: 0.375rem;
+                }
+                .board-item-title {
+                    @apply text-label-md text-gray-900;
+                }
+                .board-item-title-sub-text {
+                    @apply text-label-sm text-gray-500;
+                }
             }
-            &.private-label {
-                @apply bg-gray-200;
+
+            @screen tablet {
+                .board-item-title-wrapper {
+                    display: block;
+                    .right-part {
+                        @apply text-gray-500 flex items-center;
+                        gap: 0.25rem;
+                        padding-top: 0.25rem;
+                    }
+                }
+            }
+
+            .labels-wrapper {
+                @apply flex items-center flex-wrap;
+                gap: 0.375rem;
             }
         }
     }

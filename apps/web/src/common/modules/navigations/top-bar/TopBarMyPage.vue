@@ -40,6 +40,10 @@ const handleBackToWorkspace = () => {
         router.push({ name: ROOT_ROUTE.ADMIN._NAME });
         return;
     }
+    if (state.beforeWorkspace === 'landing') {
+        router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
+        return;
+    }
     if (state.beforeWorkspace) {
         router.push({ name: ROOT_ROUTE.WORKSPACE._NAME, params: { workspaceId: state.beforeWorkspace } });
         return;

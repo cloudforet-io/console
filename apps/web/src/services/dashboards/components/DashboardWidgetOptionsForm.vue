@@ -18,6 +18,7 @@ const props = defineProps<{
     projectId?: string;
     variablesSchema?: DashboardVariablesSchema;
     variables?: DashboardVariables;
+    templateId?: string;
 }>();
 
 const widgetFormStore = useWidgetFormStore();
@@ -62,7 +63,8 @@ const handleDeleteProperty = (propertyName: string) => {
 
 <template>
     <div class="dashboard-widget-options-form">
-        <p-text-button icon-left="ic_refresh"
+        <p-text-button v-if="props.templateId !== 'blank'"
+                       icon-left="ic_refresh"
                        style-type="highlight"
                        class="return-to-initial-settings-button"
                        @click="handleReturnToInitialSettings"

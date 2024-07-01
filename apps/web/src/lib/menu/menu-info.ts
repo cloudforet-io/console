@@ -5,18 +5,18 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-const
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
-    [MENU_ID.HOME_DASHBOARD]: {
-        menuId: MENU_ID.HOME_DASHBOARD,
-        routeName: HOME_DASHBOARD_ROUTE._NAME,
-        translationId: 'MENU.HOME_DASHBOARD',
+    [MENU_ID.WORKSPACE_HOME]: {
+        menuId: MENU_ID.WORKSPACE_HOME,
+        routeName: WORKSPACE_HOME_ROUTE._NAME,
+        translationId: 'MENU.WORKSPACE_HOME',
         icon: 'ic_service_home',
     },
     [MENU_ID.DASHBOARDS]: {
@@ -78,7 +78,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.COST_ANALYSIS,
         routeName: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
-        icon: 'ic_service_cost-anlaysis',
+        icon: 'ic_service_cost-analysis',
     },
     [MENU_ID.ANOMALY_DETECTION]: {
         menuId: MENU_ID.ANOMALY_DETECTION,
@@ -171,6 +171,13 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: PREFERENCE_ROUTE.WORKSPACES._NAME,
         translationId: 'MENU.ADMINISTRATION_WORKSPACES',
         icon: 'ic_service_workspaces',
+    },
+    [MENU_ID.BOOKMARK]: {
+        menuId: MENU_ID.BOOKMARK,
+        routeName: PREFERENCE_ROUTE.BOOKMARK._NAME,
+        translationId: 'MENU.ADMINISTRATION_BOOKMARK',
+        highlightTag: 'new',
+        icon: 'ic_service_bookmark',
     },
     [MENU_ID.MY_PAGE]: {
         menuId: MENU_ID.MY_PAGE,

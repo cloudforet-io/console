@@ -7,9 +7,6 @@ import {
 import { PDataLoader } from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-
-import DashboardWidgetEditModal from '@/services/dashboards/components/DashboardWidgetEditModal.vue';
 import WidgetFullModeModal from '@/services/dashboards/components/WidgetFullModeModal.vue';
 import {
     useDashboardContainerWidth,
@@ -22,19 +19,11 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type {
-    UpdatableWidgetInfo,
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
-
-const props = withDefaults(defineProps<{
-    editMode?: boolean;
-}>(), {
-    editMode: false,
-});
-
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -45,6 +34,7 @@ const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
+    initiatedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed(() => Object.values(state.mountedWidgetMap).every((d) => d)),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
 });
@@ -107,27 +97,9 @@ const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isInt
 const handleWidgetMounted = (widgetKey: string) => {
     state.mountedWidgetMap[widgetKey] = true;
 };
-const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: UpdatableWidgetInfo) => {
-    dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
-};
-const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
-    dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
-};
-const handleClickWidgetEdit = (widget: ReformedWidgetInfo) => {
-    widgetEditState.targetWidget = widget;
-    widgetEditState.visibleModal = true;
-};
-const handleClickDeleteWidget = (widget: ReformedWidgetInfo) => {
-    widgetDeleteState.targetWidget = widget;
-    widgetDeleteState.visibleModal = true;
-};
 const handleClickWidgetExpand = (widget: ReformedWidgetInfo) => {
-    if (props.editMode) {
-        dashboardDetailStore.toggleWidgetSize(widget.widget_key);
-    } else {
-        widgetFullModeState.targetWidget = widget;
-        widgetFullModeState.visibleFullMode = true;
-    }
+    widgetFullModeState.targetWidget = widget;
+    widgetFullModeState.visibleFullMode = true;
 };
 
 /* init states */
@@ -169,38 +141,6 @@ const refreshAllWidget = debounce(async () => {
 defineExpose({
     refreshAllWidget,
 });
-
-/* widget edit modal */
-const widgetEditState = reactive({
-    visibleModal: false,
-    targetWidget: null as ReformedWidgetInfo|null,
-});
-const handleWidgetEditModalCancel = () => {
-    widgetEditState.visibleModal = false;
-};
-const handleWidgetEditModalConfirm = async (widgetInfo: UpdatableWidgetInfo) => {
-    const widgetKey = widgetEditState.targetWidget?.widget_key;
-    if (!widgetKey || !widgetInfo) return;
-    dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
-    dashboardDetailStore.updateWidgetValidation(true, widgetKey);
-    widgetEditState.visibleModal = false;
-    widgetEditState.targetWidget = null;
-    await nextTick(); // wait for updated widget info to be applied to the widget component's states
-    widgetRef.value.find((comp) => comp?.$el.id === widgetKey)?.refreshWidget();
-};
-
-/* widget delete modal */
-const widgetDeleteState = reactive({
-    visibleModal: false,
-    targetWidget: null as ReformedWidgetInfo|null,
-});
-const handleDeleteModalConfirm = () => {
-    const target = widgetDeleteState.targetWidget;
-    if (!target) return;
-    dashboardDetailStore.deleteWidget(target.widget_key);
-    widgetDeleteState.visibleModal = false;
-    widgetDeleteState.targetWidget = null;
-};
 
 /* widget full mode */
 const widgetFullModeState = reactive({
@@ -244,19 +184,13 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                                :size="widget.size"
                                :width="widget.width"
                                :theme="widget.theme"
-                               :edit-mode="props.editMode"
-                               :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-refresh-on-variable-change="widgetFullModeState.visibleFullMode"
-                               :dashboard-settings="dashboardDetailState.settings"
-                               :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                               :dashboard-options="dashboardDetailState.options"
+                               :dashboard-variables-schema="dashboardDetailGetters.refinedVariablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="getWidgetLoading(widget.widget_key)"
                                @mounted="handleWidgetMounted(widget.widget_key)"
-                               @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
-                               @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
-                               @click-edit="handleClickWidgetEdit(widget)"
-                               @click-delete="handleClickDeleteWidget(widget)"
                                @click-expand="handleClickWidgetExpand(widget)"
                     />
                 </template>
@@ -268,19 +202,6 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                                 :size="widgetFullModeState.targetWidget?.size"
                                 :theme="widgetFullModeState.targetWidget?.theme"
                                 @update:visible="handleUpdateViewModalVisible"
-        />
-        <dashboard-widget-edit-modal v-if="widgetEditState.targetWidget"
-                                     :widget-config-id="widgetEditState.targetWidget.widget_name"
-                                     :visible="widgetEditState.visibleModal"
-                                     :widget-key="widgetEditState.targetWidget.widget_key"
-                                     @cancel="handleWidgetEditModalCancel"
-                                     @confirm="handleWidgetEditModalConfirm"
-        />
-        <delete-modal :visible="widgetDeleteState.visibleModal"
-                      :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
-                      :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
-                      @update:visible="widgetDeleteState.visibleModal = $event"
-                      @confirm="handleDeleteModalConfirm"
         />
     </div>
 </template>

@@ -7,30 +7,29 @@ import { isEqual, xor } from 'lodash';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import DashboardManageVariableOverlay
     from '@/services/dashboards/components/DashboardManageVariableOverlay.vue';
 import DashboardVariableDropdown from '@/services/dashboards/components/DashboardVariableDropdown.vue';
-import DashboardVariablesMoreButton
-    from '@/services/dashboards/components/DashboardVariablesMoreButton.vue';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
+
 interface Props {
-    isManageable?: boolean;
-    disableSaveButton?: boolean;
+    loading?: boolean;
     originVariables?: DashboardVariables;
     originVariablesSchema?: DashboardVariablesSchema;
-    dashboardId?: string;
-    disableMoreButton?: boolean;
+    disableSaveButton?: boolean;
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update', val: { variables?: DashboardVariables, variables_schema?: DashboardVariablesSchema }): void;
+}>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
@@ -38,14 +37,14 @@ const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
-    variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
-    order: computed(() => dashboardDetailState.variablesSchema.order),
+    variableProperties: computed(() => dashboardDetailGetters.refinedVariablesSchema.properties),
+    order: computed(() => dashboardDetailGetters.refinedVariablesSchema.order),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];
         const prevUsedProperties = Object.entries(dashboardDetailState.dashboardInfo?.variables_schema.properties ?? {}).filter(([, v]) => v.use);
-        const currUsedProperties = Object.entries(dashboardDetailState.variablesSchema.properties).filter(([, v]) => v.use);
+        const currUsedProperties = Object.entries(dashboardDetailGetters.refinedVariablesSchema.properties).filter(([, v]) => v.use);
         // check variables changed
         currUsedProperties.forEach(([k]) => {
             if (!isEqual(dashboardDetailState.dashboardInfo?.variables?.[k], dashboardDetailState.variables?.[k])) {
@@ -56,30 +55,19 @@ const state = reactive({
         results.push(...xor(prevUsedProperties.map(([k]) => k), currUsedProperties.map(([k]) => k)));
         return results;
     }),
-    saveLoading: false,
+    showSaveButton: computed<boolean>(() => !props.disableSaveButton && state.modifiedVariablesSchemaProperties.length > 0),
 });
 
-const updateDashboardVariables = async () => {
-    state.saveLoading = true;
-    try {
-        await dashboardDetailStore.updateDashboard(props.dashboardId as string, {
-            variables: dashboardDetailState.variables,
-            variables_schema: dashboardDetailState.variablesSchema,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.saveLoading = false;
-    }
-};
 const handleClickSaveButton = () => {
-    updateDashboardVariables();
+    emit('update', {
+        variables: dashboardDetailState.variables,
+        variables_schema: dashboardDetailState.variablesSchema,
+    });
 };
 const handleResetVariables = () => {
-    dashboardDetailStore.resetVariables(
-        props.originVariables ?? dashboardDetailState.dashboardInfo?.variables,
-        props.originVariablesSchema ?? dashboardDetailState.dashboardInfo?.variables_schema,
-    );
+    const _originVariables = props.originVariables ?? dashboardDetailState.dashboardInfo?.variables ?? DASHBOARD_TEMPLATES[dashboardDetailState.templateId].variables;
+    const _originVariablesSchema = props.originVariablesSchema ?? dashboardDetailState.dashboardInfo?.variables_schema ?? DASHBOARD_TEMPLATES[dashboardDetailState.templateId].variables_schema;
+    dashboardDetailStore.resetVariables(_originVariables, _originVariablesSchema);
 };
 
 </script>
@@ -92,21 +80,20 @@ const handleResetVariables = () => {
                  class="variable-selector-box"
             >
                 <dashboard-variable-dropdown :property-name="propertyName"
+                                             :property-label="state.variableProperties[propertyName]?.name"
+                                             :property="state.variableProperties[propertyName]"
                                              :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"
-                                             :disabled="state.saveLoading"
+                                             :disabled="props.loading"
+                                             :dashboard-variables="dashboardDetailState.variables"
                 />
                 <span class="circle-mark"
                       :class="{'changed': state.modifiedVariablesSchemaProperties.includes(propertyName)}"
                 />
             </div>
         </template>
-        <dashboard-variables-more-button v-if="!props.disableMoreButton"
-                                         :is-manageable="props.isManageable"
-                                         :disabled="state.saveLoading"
-        />
         <p-text-button style-type="highlight"
                        class="reset-button"
-                       :disabled="state.saveLoading"
+                       :disabled="props.loading"
                        @click="handleResetVariables"
         >
             <p-i name="ic_refresh"
@@ -116,13 +103,13 @@ const handleResetVariables = () => {
             />
             <span>{{ $t('DASHBOARDS.CUSTOMIZE.RESET') }}</span>
         </p-text-button>
-        <p-divider v-if="state.modifiedVariablesSchemaProperties.length"
+        <p-divider v-if="state.showSaveButton"
                    :vertical="true"
         />
-        <p-text-button v-if="state.modifiedVariablesSchemaProperties.length"
+        <p-text-button v-if="state.showSaveButton"
                        style-type="highlight"
-                       :loading="state.saveLoading"
-                       :disabled="state.saveLoading"
+                       :loading="props.loading"
+                       :disabled="props.loading"
                        @click.stop="handleClickSaveButton"
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}

@@ -24,6 +24,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -36,6 +37,7 @@ interface GNBMenuType extends DisplayMenu {
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const { getProperRouteLocation } = useProperRouteLocation();
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -84,7 +86,7 @@ const state = reactive({
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
         if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
             return '';
         }
@@ -99,9 +101,9 @@ const handleMouseEvent = (value: boolean) => {
 const handleMenuDescription = (value?: boolean) => {
     state.isMenuDescription = value;
     if (value) {
-        router.push({
+        router.push(getProperRouteLocation({
             name: COST_EXPLORER_ROUTE.LANDING._NAME,
-        });
+        }));
     }
 };
 const handleMinimizedGnbRail = () => {
@@ -364,6 +366,9 @@ onMounted(async () => {
         }
         .service-menu {
             width: 2.25rem;
+            .learn-more-button {
+                @apply hidden;
+            }
             &:hover:not(.is-only-label) {
                 @apply bg-violet-200;
             }
@@ -382,6 +387,9 @@ onMounted(async () => {
             }
             .service-menu {
                 width: 100%;
+                .learn-more-button {
+                    @apply block;
+                }
                 &:hover:not(.is-only-label) {
                     @apply bg-violet-100;
                 }
@@ -389,6 +397,12 @@ onMounted(async () => {
                     @apply bg-violet-100;
                 }
             }
+            .menu-description {
+                @apply flex;
+            }
+        }
+        .menu-description {
+            @apply hidden;
         }
     }
     .menu-description {

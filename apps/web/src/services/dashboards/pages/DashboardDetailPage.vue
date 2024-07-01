@@ -6,14 +6,18 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PDivider,
+    PDivider, PI,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -23,8 +27,11 @@ import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vu
 import DashboardRefreshDropdown from '@/services/dashboards/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
+import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
+import DashboardWidgetContainerV2 from '@/services/dashboards/components/DashboardWidgetContainerV2.vue';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/constants/dashboard-constant';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -35,15 +42,21 @@ interface Props {
 const props = defineProps<Props>();
 
 const gnbStore = useGnbStore();
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const { breadcrumbs } = useBreadcrumbs();
 const router = useRouter();
 const route = useRoute();
 
+const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    templateName: computed(() => DASHBOARD_TEMPLATES[dashboardDetailState.templateId]?.name),
     dashboardScope: computed(() => dashboardDetailState.dashboardScope),
     dashboardMiddleRouteLabel: computed(() => {
         if (state.dashboardScope === DASHBOARD_SCOPE.WORKSPACE) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
@@ -58,6 +71,7 @@ const state = reactive({
             params: { workspaceId: route.params.workspaceId },
             query: { scope: state.dashboardScope },
         });
+        if (state.isAdminMode) return _breadcrumbs;
         const dashboardMiddleRoute = {
             name: state.dashboardMiddleRouteLabel,
             to: { path: customMiddleRoute.fullPath },
@@ -68,30 +82,43 @@ const state = reactive({
         type: FAVORITE_TYPE.DASHBOARD,
         id: props.dashboardId,
     })),
+    dashboardVariablesLoading: false,
 });
 
 const getDashboardData = async (dashboardId: string) => {
     try {
-        await dashboardDetailStore.getDashboardInfo(dashboardId, true);
+        await dashboardDetailStore.getDashboardInfo(dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE._NAME });
+        await SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
     }
 };
 
 // else
-const handleRefresh = () => {
+const handleRefresh = async () => {
+    if (dashboardDetailState.dashboardInfo?.version === '2.0') await dashboardDetailStore.listDashboardWidgets();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
 };
 const handleUpdateLabels = async (labels: string[]) => {
     try {
-        await dashboardDetailStore.updateDashboard(props.dashboardId, {
+        await dashboardStore.updateDashboard(props.dashboardId, {
             labels,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
+    }
+};
+const handleUpdateDashboardVariables = async (params) => {
+    state.dashboardVariablesLoading = true;
+    try {
+        const updatedDashboard = await dashboardStore.updateDashboard(props.dashboardId, params);
+        dashboardDetailStore.setDashboardInfo(updatedDashboard);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.dashboardVariablesLoading = false;
     }
 };
 
@@ -118,32 +145,79 @@ onUnmounted(() => {
 
 <template>
     <div class="dashboard-detail-page">
-        <dashboard-detail-header :dashboard-id="props.dashboardId" />
+        <div v-if="dashboardDetailGetters.isDeprecatedDashboard"
+             class="deprecated-banner"
+        >
+            <p-i name="ic_limit-filled"
+                 width="1.25rem"
+                 height="1.25rem"
+                 color="inherit"
+            />
+            <div class="banner-content-wrapper">
+                <p class="title">
+                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED') }}
+                </p>
+                <p class="description">
+                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED_DESCRIPTION') }}
+                </p>
+            </div>
+        </div>
+        <dashboard-detail-header :dashboard-id="props.dashboardId"
+                                 :template-name="state.templateName"
+        />
         <div class="filter-box">
-            <dashboard-labels editable
+            <dashboard-labels :editable="!dashboardDetailGetters.isDeprecatedDashboard"
                               @update-labels="handleUpdateLabels"
             />
-            <dashboard-toolset-date-dropdown v-show="dashboardDetailState.settings.date_range.enabled"
-                                             :date-range="dashboardDetailState.settings.date_range"
-            />
+            <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
         </div>
         <p-divider class="divider" />
         <div class="dashboard-selectors">
-            <dashboard-variables class="variable-selector-wrapper"
-                                 :dashboard-id="props.dashboardId"
-                                 is-manageable
+            <dashboard-variables v-if="dashboardDetailGetters.isDeprecatedDashboard"
+                                 class="variable-selector-wrapper"
+                                 :loading="state.dashboardVariablesLoading"
+                                 @update="handleUpdateDashboardVariables"
+            />
+            <dashboard-variables-v2 v-else
+                                    class="variable-selector-wrapper"
+                                    :loading="state.dashboardVariablesLoading"
+                                    @update="handleUpdateDashboardVariables"
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         :loading="dashboardDetailState.loadingWidgets"
                                         @refresh="handleRefresh"
             />
         </div>
-        <dashboard-widget-container ref="widgetContainerRef" />
+        <dashboard-widget-container v-if="dashboardDetailGetters.isDeprecatedDashboard"
+                                    ref="widgetContainerRef"
+        />
+        <dashboard-widget-container-v2 v-else
+                                       ref="widgetContainerRef"
+        />
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .dashboard-detail-page {
+    .deprecated-banner {
+        @apply bg-red-100 text-red-500;
+        top: 0;
+        width: 105%;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1.125rem 1.5rem;
+        margin: -1.5rem 0 1.5rem -1.5rem;
+        .banner-content-wrapper {
+            .title {
+                @apply text-label-lg text-red-500 font-bold;
+                padding-bottom: 0.25rem;
+            }
+            .description {
+                @apply text-paragraph-md text-gray-900;
+            }
+        }
+    }
     .divider {
         @apply mb-6;
     }

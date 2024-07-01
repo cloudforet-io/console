@@ -95,12 +95,12 @@ const state = reactive({
     z-index: 10000 !important;
 }
 .vue-notification-wrapper {
-    margin: 1rem 0 !important;
+    margin-top: 1rem;
     overflow: visible !important;
 }
 
 .p-toast-alert {
-    margin-top: 4.5rem;
+    margin-top: 2.25rem;
     margin-left: 0;
     margin-right: 0;
     overflow-y: hidden;

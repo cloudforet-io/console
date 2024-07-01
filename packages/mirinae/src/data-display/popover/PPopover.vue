@@ -11,18 +11,20 @@
         </span>
         <div ref="contentRef"
              class="popper"
-             :class="{ 'visible': proxyIsVisible }"
+             :class="{ 'visible': proxyIsVisible, 'hide-padding': hidePadding }"
         >
             <div class="popper-content-wrapper">
                 <slot name="content" />
-                <p-icon-button name="ic_close"
+                <p-icon-button v-if="!hideCloseButton"
+                               name="ic_close"
                                color="inherit"
                                size="sm"
                                class="close-icon"
                                @click="handleClickCloseIcon"
                 />
             </div>
-            <div class="arrow"
+            <div v-if="!hideArrow"
+                 class="arrow"
                  data-popper-arrow
             />
         </div>
@@ -51,6 +53,9 @@ interface PopoverProps {
     trigger?: PopoverTrigger;
     ignoreTargetClick?: boolean;
     ignoreOutsideClick?: boolean;
+    hidePadding?: boolean;
+    hideCloseButton?: boolean;
+    hideArrow?: boolean
 }
 
 export default defineComponent<PopoverProps>({
@@ -98,6 +103,18 @@ export default defineComponent<PopoverProps>({
             type: Boolean,
             default: false,
         },
+        hidePadding: {
+            type: Boolean,
+            default: false,
+        },
+        hideCloseButton: {
+            type: Boolean,
+            default: false,
+        },
+        hideArrow: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         let popperObject: Instance|undefined;
@@ -111,7 +128,7 @@ export default defineComponent<PopoverProps>({
                     {
                         name: 'offset',
                         options: {
-                            offset: [0, 21],
+                            offset: [0, props.hideArrow ? 11 : 21],
                         },
                     },
                 ],
@@ -165,11 +182,18 @@ export default defineComponent<PopoverProps>({
                 bindEventToTargetRef('blur', handleTargetHideEvent, true);
             }
         };
+        const handleEscKey = (event) => {
+            if (event.key === 'Escape') {
+                hidePopover();
+            }
+        };
 
         onMounted(() => {
             if (state.targetRef && state.contentRef) {
                 popperObject = createPopper(state.targetRef, state.contentRef, state.popperOptions);
                 addEvent();
+
+                document.addEventListener('keydown', handleEscKey);
 
                 watch(() => props.isVisible, (value) => {
                     if (state.proxyIsVisible === value) return;
@@ -180,8 +204,10 @@ export default defineComponent<PopoverProps>({
             }
         });
 
-        onUnmounted(() => popperObject?.destroy());
-
+        onUnmounted(() => {
+            popperObject?.destroy();
+            document.removeEventListener('keydown', handleEscKey);
+        });
 
         return {
             ...toRefs(state),
@@ -197,19 +223,26 @@ export default defineComponent<PopoverProps>({
 <style lang="postcss">
 .p-popover {
     > .popper {
-        @apply bg-white border rounded-md border-gray-300 py-3 pl-4 pr-2;
+        @apply bg-white border rounded-md border-gray-300;
         display: none;
         filter: drop-shadow(0 0 0.5rem rgba(0, 0, 0, 0.08));
         z-index: 99;
+        padding: 1rem;
 
         &[data-show] {
             display: block;
+        }
+        &.hide-padding {
+            padding: 0;
         }
         > .popper-content-wrapper {
             @apply flex w-full;
 
             .close-icon {
-                margin: 0.5rem;
+                position: absolute;
+                right: 0.25rem;
+                top: 0.25rem;
+                z-index: 100;
             }
         }
 

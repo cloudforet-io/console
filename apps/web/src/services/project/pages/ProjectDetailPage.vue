@@ -6,19 +6,17 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PBadge, PButtonModal, PDataLoader, PHeading, PIconButton, PTab, PI, PLink,
+    PBadge, PButtonModal, PPaneLayout, PIconButton, PI,
 } from '@spaceone/design-system';
 import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { numberFormatter } from '@cloudforet/utils';
 
 import type { ProjectDeleteParameters } from '@/schema/identity/project/api-verbs/delete';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import { i18n as _i18n } from '@/translations';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -28,7 +26,6 @@ import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/stor
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
@@ -38,9 +35,8 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import { BACKGROUND_COLOR } from '@/styles/colorsets';
+import { peacock } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
@@ -53,7 +49,6 @@ interface Props {
 const props = defineProps<Props>();
 const route = useRoute();
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const gnbStore = useGnbStore();
 const appContextStore = useAppContextStore();
@@ -67,19 +62,19 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const recentStore = useRecentStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-    trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
 });
 const state = reactive({
-    item: computed<ProjectModel|null>(() => projectDetailPageState.currentProject),
+    item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
     projectGroupId: computed<string|undefined>(() => state.item?.project_group_id),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
         let results: Route[] = [
-            { name: _i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
+            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
         ];
         if (!isEmpty(state.projectGroupInfo)) {
             results.push({
@@ -90,12 +85,12 @@ const state = reactive({
         if (route.name === PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME) {
             results = results.concat([
                 { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
-                { name: _i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
+                { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
             ]);
         } else if (route.name === PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME) {
             results = results.concat([
                 { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
-                { name: _i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: route.query.protocolLabel }) as string },
+                { name: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: route.query.protocolLabel }) as string },
             ]);
         } else {
             results.push({ name: state.item?.name });
@@ -110,36 +105,13 @@ const state = reactive({
         type: FAVORITE_TYPE.PROJECT,
         id: projectDetailPageState.projectId,
     })),
-    relatedTrustedAccount: computed(() => storeState.trustedAccounts[state.item?.trusted_account_id]?.data ?? {}),
-    isSyncedAccount: computed(() => state.item?.is_managed && state.relatedTrustedAccount?.schedule?.state === 'ENABLED'),
-});
-
-/** Tabs */
-const singleItemTabState = reactive({
-    tabs: computed<TabItem[]>(() => [
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
-            label: _i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
-            keepAlive: true,
-        },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-            label: _i18n.t('PROJECT.DETAIL.TAB_PROEJCT_MEMBER'),
-        },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
-            label: _i18n.t('PROJECT.DETAIL.TAB_ALERT'),
-        },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-            label: _i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
-        },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
-            label: _i18n.t('PROJECT.DETAIL.TAB_TAG'),
-        },
-    ]),
-    activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+    isHeaderVisible: computed<boolean>(() => {
+        const excludeRoutes = [
+            PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
+            PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
+        ];
+        return route.name ? !excludeRoutes.includes(route.name) : true;
+    }),
 });
 
 // Member modal
@@ -154,9 +126,9 @@ const formState = reactive({
 
 const openProjectDeleteForm = () => {
     formState.projectDeleteFormVisible = true;
-    formState.headerTitle = _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_TITLE');
+    formState.headerTitle = i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_TITLE');
     formState.themeColor = 'alert';
-    formState.modalContent = _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT');
+    formState.modalContent = i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT');
 };
 const handleOpenProjectGroupMoveModal = () => {
     state.projectGroupMoveModalVisible = true;
@@ -174,8 +146,8 @@ const projectDeleteFormConfirm = async () => {
             type: RECENT_TYPE.PROJECT,
             itemId: projectDetailPageState.projectId as string,
         });
-        showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
-        router.go(-1);
+        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
+        router.push({ name: PROJECT_ROUTE._NAME });
         const isFavoriteItem = favoriteGetters.projectItems.find((item) => item.itemId === projectDetailPageState.projectId);
         if (isFavoriteItem) {
             await favoriteStore.deleteFavorite({
@@ -185,7 +157,7 @@ const projectDeleteFormConfirm = async () => {
             });
         }
     } catch (e) {
-        ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'));
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'));
     } finally {
         formState.modalLoading = false;
         formState.projectDeleteFormVisible = false;
@@ -199,10 +171,8 @@ const handleConfirmProjectForm = (data: ProjectModel) => {
 const handleConfirmProjectGroupMoveModal = () => {
     projectDetailPageStore.getProject();
 };
-
-const onChangeTab = (activeTab) => {
-    if (activeTab === route.name) return;
-    router.replace(getProperRouteLocation({ name: activeTab }));
+const handleGoBackProjectLanding = () => {
+    router.push(getProperRouteLocation({ name: PROJECT_ROUTE._NAME, params: { projectGroupId: state.projectGroupId } }));
 };
 
 /* Watchers */
@@ -215,10 +185,6 @@ watch(() => projectDetailPageState.projectId, async (projectId) => {
     }
 });
 
-watch(() => route.name, () => {
-    const exactRoute = route.matched.find((d) => singleItemTabState.tabs.find((tab) => tab.name === d.name));
-    singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
-}, { immediate: true });
 
 watch([
     () => props.id,
@@ -227,9 +193,6 @@ watch([
     if (!globalGrantLoading) projectDetailPageStore.setProjectId(id);
 }, { immediate: true });
 
-watch([() => singleItemTabState.activeTab, () => state.item], () => {
-    gnbStore.setBreadcrumbs(state.pageNavigation);
-});
 watch(() => projectDetailPageState.projectId, (projectId) => {
     gnbStore.setId(projectId);
 }, { immediate: true });
@@ -244,75 +207,60 @@ onUnmounted(() => {
 
 <template>
     <div class="project-detail-page">
-        <p-data-loader class="page-inner"
-                       :loading="projectDetailPageState.loading"
-                       :loader-backdrop-color="BACKGROUND_COLOR"
+        <div v-if="state.isHeaderVisible"
+             class="top-wrapper"
         >
-            <div v-if="state.item"
-                 class="top-wrapper"
-            >
-                <p-heading :title="state.item?.name"
-                           show-back-button
-                           @click-back-button="$router.go(-1)"
-                >
-                    <template #title-right-extra>
-                        <div class="button-wrapper">
-                            <template v-if="projectPageState.isWorkspaceOwner">
-                                <p-icon-button name="ic_settings"
-                                               class="edit-btn"
-                                               size="md"
-                                               @click="projectPageStore.openProjectFormModal()"
+            <p-icon-button class="back-button"
+                           name="ic_arrow-left"
+                           @click="handleGoBackProjectLanding"
+            />
+            <p-pane-layout class="flex-grow">
+                <div class="header-container">
+                    <div class="title-wrapper">
+                        <p-i name="ic_document-filled"
+                             :color="peacock[600]"
+                             width="1.25rem"
+                             height="1.25rem"
+                        /><span class="title-text">{{ state.item?.name }}</span>
+                    </div>
+                    <div class="button-wrapper">
+                        <template v-if="projectPageState.isWorkspaceOwner">
+                            <p-icon-button name="ic_settings"
+                                           class="edit-btn"
+                                           size="sm"
+                                           @click="projectPageStore.openProjectFormModal()"
+                            />
+                            <p-icon-button name="ic_move"
+                                           size="sm"
+                                           style-type="transparent"
+                                           @click="handleOpenProjectGroupMoveModal"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           class="delete-btn"
+                                           size="sm"
+                                           @click="openProjectDeleteForm"
+                            />
+                        </template>
+                        <p-badge v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
+                                 class="ml-4 flex-shrink-0"
+                                 style-type="gray100"
+                                 badge-type="subtle"
+                        >
+                            <div class="badge-content-wrapper">
+                                <p-i name="ic_lock-filled"
+                                     width="0.75rem"
+                                     height="0.75rem"
+                                     color="inherit"
                                 />
-                                <p-icon-button name="ic_move"
-                                               style-type="transparent"
-                                               @click="handleOpenProjectGroupMoveModal"
-                                />
-                                <p-icon-button name="ic_delete"
-                                               class="delete-btn"
-                                               size="md"
-                                               @click="openProjectDeleteForm"
-                                />
-                            </template>
-                            <p-badge v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
-                                     style-type="gray200"
-                                     badge-type="subtle"
-                            >
-                                <div class="badge-content-wrapper">
-                                    <p-i name="ic_lock-filled"
-                                         width="0.75rem"
-                                         height="0.75rem"
-                                         color="inherit"
-                                    />
-                                    <span>{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
-                                </div>
-                            </p-badge>
-                        </div>
-                    </template>
-                </p-heading>
-            </div>
-
-            <p-tab v-if="state.item"
-                   :tabs="singleItemTabState.tabs"
-                   :active-tab.sync="singleItemTabState.activeTab"
-                   @change="onChangeTab"
-            >
-                <keep-alive>
-                    <router-view />
-                </keep-alive>
-                <template #extra="tab">
-                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && state.counts[ALERT_STATE.TRIGGERED] !== 0"
-                             style-type="primary3"
-                             badge-type="subtle"
-                    >
-                        {{ numberFormatter(state.counts[ALERT_STATE.TRIGGERED]) }}
-                    </p-badge>
-                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications'" />
-                </template>
-            </p-tab>
-        </p-data-loader>
-
-        <p-button-modal v-if="formState.projectDeleteFormVisible && !state.isSyncedAccount"
-                        :header-title="formState.headerTitle"
+                                <span class="truncate">{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
+                            </div>
+                        </p-badge>
+                    </div>
+                </div>
+            </p-pane-layout>
+        </div>
+        <router-view />
+        <p-button-modal :header-title="formState.headerTitle"
                         :centered="true"
                         size="sm"
                         :fade="true"
@@ -326,33 +274,6 @@ onUnmounted(() => {
                 <p class="delete-modal-content">
                     {{ formState.modalContent }}
                 </p>
-            </template>
-        </p-button-modal>
-        <p-button-modal v-else-if="formState.projectDeleteFormVisible && state.isSyncedAccount"
-                        :visible.sync="formState.projectDeleteFormVisible"
-                        :header-title="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.DELETE_CHECK_MODAL.TITLE')"
-                        theme-color="alert"
-                        size="sm"
-                        :hide-footer-close-button="true"
-                        @confirm="() => formState.projectDeleteFormVisible = false"
-        >
-            <template #body>
-                <i18n path="IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.DELETE_CHECK_MODAL.DESC"
-                      tag="p"
-                >
-                    <template #serviceAccountName>
-                        <p-link new-tab
-                                highlight
-                                action-icon="external-link"
-                                :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.relatedTrustedAccount.trusted_account_id }}"
-                        >
-                            {{ state.relatedTrustedAccount.name }}
-                        </p-link>
-                    </template>
-                </i18n>
-            </template>
-            <template #confirm-button>
-                {{ $t('APP.MAIN.OK') }}
             </template>
         </p-button-modal>
 
@@ -378,35 +299,31 @@ onUnmounted(() => {
     height: 100%;
     margin-top: -0.25rem;
 }
-.page-inner {
-    height: 100%;
-    max-width: 1368px;
-}
-.p-heading {
-    margin-top: 0.25rem;
-    margin-bottom: 0;
-}
 .top-wrapper {
-    @apply mb-8 flex flex-wrap items-center;
-    .button-wrapper {
-        @apply inline-flex items-center;
-        .badge-content-wrapper {
-            @apply text-gray-900;
-            display: flex;
-            align-content: center;
-            gap: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    .header-container {
+        @apply flex gap-4 items-center;
+        padding: 0.75rem 1rem;
+        .title-wrapper {
+            @apply text-label-lg font-bold text-peacock-800 truncate;
+
+            .title-text {
+                margin-left: 0.375rem;
+                line-height: 1.25rem;
+            }
         }
-    }
-}
 
-.p-tab {
-    @apply rounded-lg;
-}
-
-/* custom design-system component - p-data-loader */
-:deep(.p-data-loader) {
-    .data-wrapper {
-        overflow-y: unset;
+        .button-wrapper {
+            @apply inline-flex items-center;
+            .badge-content-wrapper {
+                @apply text-gray-700;
+                display: flex;
+                align-content: center;
+                gap: 0.25rem;
+            }
+        }
     }
 }
 </style>

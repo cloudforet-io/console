@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import Vue, { computed, reactive } from 'vue';
+import Vue, {
+    computed, onMounted, reactive, ref, watch,
+} from 'vue';
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
 import {
     PSelectDropdown, PTooltip, PI, PButton, PDivider, PTextHighlighting, PEmpty,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { clone } from 'lodash';
+import { clone, sortBy } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
@@ -20,15 +21,25 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import { convertWorkspaceConfigToReferenceData } from '@/lib/helper/config-data-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { gray, violet } from '@/styles/colors';
 
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
+
+const PAGE_SIZE = 9;
 
 interface Props {
     isAdminMode: boolean;
@@ -40,69 +51,51 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
-const workspaceStoreState = userWorkspaceStore.$state;
+const workspaceStoreGetters = userWorkspaceStore.getters;
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
+const recentStore = useRecentStore();
 
 const router = useRouter();
 
-const state = reactive({
-    visibleDropdown: false,
-    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
+const selectDropdownRef = ref<PSelectDropdown|null>(null);
+
+const storeState = reactive({
     isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
-    workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
-    selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
-    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
-        const menuList: SelectDropdownMenuItem[] = [
-            // TODO: will be applied after API completion
-            // { type: 'header', name: 'starred_header', label: i18n.t('COMMON.STARRED') } as SelectDropdownMenuItem,
-            { type: 'header', name: 'workspace_header', label: `${i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES')} (${state.workspaceList.length})` } as SelectDropdownMenuItem,
-        ];
-        state.workspaceList.forEach((_workspace) => {
-            // TODO: will be applied after API completion
-            // if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
-            //     menuList.push({
-            //         name: _workspace.workspace_id,
-            //         label: _workspace.name,
-            //         headerName: 'starred_header',
-            //         tags: _workspace.tags,
-            //     } as SelectDropdownMenuItem);
-            // } else {
-            //     menuList.push({
-            //         name: _workspace.workspace_id,
-            //         label: _workspace.name,
-            //         headerName: 'workspace_header',
-            //         tags: _workspace.tags,
-            //     } as SelectDropdownMenuItem);
-            // }
-            menuList.push({
-                name: _workspace.workspace_id,
-                label: _workspace.name,
-                headerName: 'workspace_header',
-                tags: _workspace.tags,
-            } as SelectDropdownMenuItem);
-            return menuList;
-        });
-        return [...menuList];
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+    selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreGetters.currentWorkspace),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+    favoriteItems: computed<FavoriteItem[]>(() => {
+        const sortedList = sortBy(favoriteGetters.workspaceItems, 'label');
+        return convertWorkspaceConfigToReferenceData(
+            sortedList ?? [],
+            storeState.workspaceList,
+        );
     }),
+});
+const state = reactive({
     searchText: '',
 });
 
 const selectWorkspace = (name: string): void => {
     const workspaceId = name;
-    if (!workspaceId || workspaceId === userWorkspaceStore.getters.currentWorkspaceId) return;
+    if (!workspaceId || workspaceId === storeState.currentWorkspaceId) return;
 
     appContextStore.setGlobalGrantLoading(true);
     const reversedMatched = clone(router.currentRoute.matched).reverse();
     const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-    const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+    const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
     userWorkspaceStore.setCurrentWorkspace(workspaceId);
     router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } }).catch(() => {});
 };
 const handleClickButton = (hasNoWorkspace?: string) => {
+    const selectedWorkspaceId = !hasNoWorkspace && storeState.selectedWorkspace?.workspace_id || '';
     appContextStore.enterAdminMode();
     router.push({
         name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
         query: {
-            hasNoWorkpspace: hasNoWorkspace,
+            hasNoWorkspace,
+            selectedWorkspaceId: !hasNoWorkspace ? selectedWorkspaceId : undefined,
         },
     });
     Vue.notify({
@@ -115,7 +108,7 @@ const handleClickButton = (hasNoWorkspace?: string) => {
 };
 const formatMenuItems = (menuItems: WorkspaceModel[] = []): MenuItem[] => {
     const result = menuItems.length > 0 ? [
-        { type: CONTEXT_MENU_TYPE.header, name: 'workspace_header', label: `${i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES')} (${state.workspaceList.length})` },
+        { type: CONTEXT_MENU_TYPE.header, name: 'workspace_header', label: `${i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES')} (${storeState.workspaceList.length})` },
     ] : [] as MenuItem[];
     menuItems.forEach((d) => {
         result.push({
@@ -125,14 +118,61 @@ const formatMenuItems = (menuItems: WorkspaceModel[] = []): MenuItem[] => {
             label: d.name as string,
         });
     });
+    return result.slice(0, PAGE_SIZE);
+};
+const filterStarredItems = (menuItems: FavoriteItem[] = []): MenuItem[] => {
+    if (storeState.favoriteItems.length === 0) return [];
+    const result: MenuItem[] = [
+        { type: CONTEXT_MENU_TYPE.header, name: 'starred_header', label: i18n.t('COMMON.STARRED') },
+    ];
+    menuItems.forEach((d) => {
+        const item = storeState.workspaceList.find((w) => w.workspace_id === d.itemId);
+        if (item) {
+            result.push({
+                ...item,
+                type: CONTEXT_MENU_TYPE.item,
+                name: d.itemId || '',
+                label: d.label as string,
+            });
+        }
+    });
     return result;
 };
+const handleClickAllWorkspaceButton = () => {
+    router.push({
+        name: LANDING_ROUTE._NAME,
+    });
+};
+const checkFavoriteItem = (id: string) => {
+    const item = storeState.favoriteItems.find((i) => i.name === id);
+    return !!item;
+};
 const menuHandler = async (inputText: string) => {
-    const _workspaceList = state.workspaceList.filter((w) => w.name.toLowerCase()?.includes(inputText.toLowerCase()));
+    const _workspaceList = storeState.workspaceList.filter((w) => w.name.toLowerCase()?.includes(inputText.toLowerCase()));
     return {
-        results: formatMenuItems(_workspaceList),
+        results: inputText ? formatMenuItems(_workspaceList) : [
+            ...filterStarredItems(storeState.favoriteItems),
+            ...formatMenuItems(_workspaceList),
+        ],
     };
 };
+
+watch(() => storeState.favoriteItems, async () => {
+    if (!selectDropdownRef.value) return;
+    await selectDropdownRef.value?.reloadMenu();
+});
+watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
+    if (!selectedWorkspace) return;
+    recentStore.createRecent({
+        type: RECENT_TYPE.WORKSPACE,
+        workspaceId: selectedWorkspace?.workspace_id || '',
+        id: selectedWorkspace?.workspace_id || '',
+    });
+}, { immediate: true });
+
+onMounted(() => {
+    favoriteStore.fetchWorkspaceFavorite();
+});
 </script>
 
 <template>
@@ -153,14 +193,15 @@ const menuHandler = async (inputText: string) => {
             </span>
         </div>
         <p-select-dropdown v-if="!props.isAdminMode"
-                           :class="{'workspace-dropdown': true, 'is-domain-admin': state.isDomainAdmin}"
+                           ref="selectDropdownRef"
+                           :class="{'workspace-dropdown': true, 'is-domain-admin': storeState.isDomainAdmin}"
                            style-type="transparent"
                            :handler="menuHandler"
                            :search-text.sync="state.searchText"
                            is-filterable
                            hide-header-without-items
                            show-delete-all-button
-                           :selected="state.selectedWorkspace?.workspace_id"
+                           :selected="storeState.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
         >
             <template #dropdown-button-icon>
@@ -171,12 +212,12 @@ const menuHandler = async (inputText: string) => {
                 />
             </template>
             <template #dropdown-button>
-                <workspace-logo-icon :text="state.selectedWorkspace?.name || ''"
-                                     :theme="state.selectedWorkspace?.tags?.theme"
+                <workspace-logo-icon :text="storeState.selectedWorkspace?.name || ''"
+                                     :theme="storeState.selectedWorkspace?.tags?.theme"
                 />
                 <div>
                     <span class="selected-workspace">
-                        {{ state.selectedWorkspace?.name }}
+                        {{ storeState.selectedWorkspace?.name }}
                     </span>
                     <span class="tablet-selected">
                         ...
@@ -186,14 +227,14 @@ const menuHandler = async (inputText: string) => {
             <template #menu-header>
                 <p-tooltip class="menu-header-selected-workspace"
                            position="bottom"
-                           :contents="state.selectedWorkspace?.name || ''"
+                           :contents="storeState.selectedWorkspace?.name || ''"
                 >
                     <div class="workspace-wrapper">
-                        <workspace-logo-icon :text="state.selectedWorkspace?.name || ''"
-                                             :theme="state.selectedWorkspace?.tags?.theme"
+                        <workspace-logo-icon :text="storeState.selectedWorkspace?.name || ''"
+                                             :theme="storeState.selectedWorkspace?.tags?.theme"
                                              size="xs"
                         />
-                        <span class="workspace-name">{{ state.selectedWorkspace?.name }}</span>
+                        <span class="workspace-name">{{ storeState.selectedWorkspace?.name }}</span>
                     </div>
                     <p-i name="ic_check"
                          :color="violet[600]"
@@ -203,7 +244,9 @@ const menuHandler = async (inputText: string) => {
                 </p-tooltip>
             </template>
             <template #menu-item--format="{item}">
-                <div class="menu-item-wrapper">
+                <div class="menu-item-wrapper"
+                     :class="{ 'is-starred': checkFavoriteItem(item.name)}"
+                >
                     <div class="label">
                         <workspace-logo-icon :text="item?.label || ''"
                                              :theme="item?.tags?.theme"
@@ -214,21 +257,27 @@ const menuHandler = async (inputText: string) => {
                                              :term="state.searchText"
                         />
                     </div>
-
-                    <!--                    TODO: will be applied after API completion-->
-                    <!--                    <favorite-button :item-id="item.name"-->
-                    <!--                                     :favorite-type="FAVORITE_TYPE.MENU"-->
-                    <!--                                     scale="0.875"-->
-                    <!--                                     class="favorite-button"-->
-                    <!--                    />-->
+                    <favorite-button :item-id="item.name"
+                                     :favorite-type="FAVORITE_TYPE.WORKSPACE"
+                                     scale="0.875"
+                                     class="favorite-button"
+                    />
                 </div>
             </template>
-            <template v-if="state.isDomainAdmin"
-                      #menu-bottom
-            >
+            <template #menu-bottom>
                 <div class="workspace-toolbox-wrapper">
-                    <p-divider />
-                    <div class="workspace-toolbox">
+                    <p-button style-type="transparent"
+                              size="md"
+                              class="view-all-workspace-button tool"
+                              icon-right="ic_arrow-right"
+                              @click="handleClickAllWorkspaceButton"
+                    >
+                        {{ $t("COMMON.GNB.WORKSPACE.VIEW_WORKSPACES") }}
+                    </p-button>
+                    <div v-if="storeState.isDomainAdmin"
+                         class="workspace-toolbox"
+                    >
+                        <p-divider />
                         <p-button style-type="substitutive"
                                   size="sm"
                                   class="create-new-button tool"
@@ -237,6 +286,7 @@ const menuHandler = async (inputText: string) => {
                         >
                             {{ $t("COMMON.GNB.WORKSPACE.CREATE_WORKSPACE") }}
                         </p-button>
+                        <p-divider class="tools-divider" />
                         <p-button style-type="tertiary"
                                   size="sm"
                                   class="manage-button tool"
@@ -252,7 +302,7 @@ const menuHandler = async (inputText: string) => {
                 <div class="no-data-wrapper">
                     <p class="title-wrapper">
                         <span class="title">{{ $t('COMMON.GNB.WORKSPACE.WORKSPACES') }} </span>
-                        <span>({{ state.workspaceList.length }})</span>
+                        <span>({{ storeState.workspaceList.length }})</span>
                     </p>
                     <p-empty class="empty">
                         {{ $t('COMMON.GNB.WORKSPACE.NO_RESULTS_FOUND') }}
@@ -345,7 +395,16 @@ const menuHandler = async (inputText: string) => {
         .menu-item-wrapper {
             @apply flex justify-between;
             max-width: 18rem;
-
+            &.is-starred {
+                .label-text {
+                    max-width: 15rem;
+                }
+            }
+            &:hover {
+                .label-text {
+                    max-width: 15rem;
+                }
+            }
             .label {
                 @apply flex items-center gap-2;
             }
@@ -356,25 +415,20 @@ const menuHandler = async (inputText: string) => {
         }
 
         .workspace-toolbox-wrapper {
-            @apply flex flex-col absolute bg-white;
-            padding: 0.5rem 1rem;
-            bottom: 0;
-            left: 0;
+            @apply flex flex-col bg-white;
+            padding: 0.25rem 1rem 0.5rem;
             width: 100%;
-            gap: 0.5rem;
+            gap: 0.625rem;
             .workspace-toolbox {
                 @apply relative flex flex-col;
-                gap: 1.25rem;
-                &::before {
-                    @apply absolute;
-                    content: "";
-                    top: 50%;
-                    left: -1rem;
-                    width: calc(100% + 2rem);
-                    border-bottom: 3px solid #dddddf;
-                }
+                gap: 0.5rem;
                 .tool {
                     height: 1.5rem;
+                }
+                .tools-divider {
+                    width: calc(100% + 2rem);
+                    height: 0.125rem;
+                    margin-left: -1rem;
                 }
             }
         }
@@ -400,7 +454,7 @@ const menuHandler = async (inputText: string) => {
             .menu-container {
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
-                max-height: calc(100vh - $top-bar-height - 4.35rem) !important;
+                max-height: calc(100vh - $top-bar-height - 7.1rem) !important;
             }
             .p-context-menu-item {
                 .favorite-button {
@@ -415,14 +469,20 @@ const menuHandler = async (inputText: string) => {
                     }
                 }
             }
+            .bottom-slot-area {
+                padding: 0;
+            }
         }
+
         &.is-domain-admin {
+            .workspace-toolbox-wrapper {
+                padding-bottom: 1rem;
+            }
+
+            /* custom design-system component - p-context-menu */
             :deep(.p-context-menu) {
                 .menu-container {
-                    padding-bottom: 5.75rem;
-                }
-                .bottom-slot-area {
-                    padding: 0;
+                    max-height: calc(100vh - $top-bar-height - 12.85rem) !important;
                 }
             }
         }

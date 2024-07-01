@@ -24,6 +24,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 interface Props {
@@ -114,7 +115,10 @@ const handleLanguageDropdownClick = () => {
 
 const handleClickGoToMyPage = () => {
     appContextStore.setGlobalGrantLoading(true);
-    const currentWorkspace = route.params?.workspaceId ?? 'admin';
+    let currentWorkspace:string|undefined;
+    if (route.name === LANDING_ROUTE.DOMAIN._NAME || route.name === LANDING_ROUTE.WORKSPACE._NAME) {
+        currentWorkspace = 'landing';
+    } else currentWorkspace = route.params?.workspaceId ?? 'admin';
     router.push({
         name: MY_PAGE_ROUTE._NAME,
         ...(currentWorkspace && {
@@ -122,6 +126,16 @@ const handleClickGoToMyPage = () => {
                 beforeWorkspace: currentWorkspace,
             },
         }),
+    }).catch(() => {});
+    hideProfileMenu();
+};
+const handleClickGoToConsoleHome = () => {
+    appContextStore.setGlobalGrantLoading(true);
+    router.push({
+        name: LANDING_ROUTE.DOMAIN._NAME,
+        params: {
+            force: 'true',
+        },
     }).catch(() => {});
     hideProfileMenu();
 };
@@ -257,6 +271,17 @@ const handleClickSignOut = async () => {
                     <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
                     <span class="value">{{ state.timezone }}</span>
                 </div>
+                <div v-if="!route.path.includes('landing')"
+                     class="info-menu"
+                >
+                    <p-button style-type="tertiary"
+                              size="sm"
+                              class="console-home-button"
+                              @click="handleClickGoToConsoleHome"
+                    >
+                        {{ $t('COMMON.GNB.ACCOUNT.GO_TO_CONSOLE_HOME') }}
+                    </p-button>
+                </div>
                 <div v-if="!route.path.includes('my-page')"
                      class="info-menu"
                 >
@@ -370,6 +395,11 @@ const handleClickSignOut = async () => {
                 .label {
                     @apply text-gray-500 font-bold;
                     padding-right: 0.5rem;
+                }
+
+                .console-home-button {
+                    @apply w-full;
+                    margin-top: 0.75rem;
                 }
 
                 .my-page-button {
