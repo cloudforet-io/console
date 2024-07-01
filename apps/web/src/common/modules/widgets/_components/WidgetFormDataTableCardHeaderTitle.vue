@@ -53,6 +53,9 @@ const handleSelectDataTable = async (dataTableId: string) => {
         return;
     }
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
+    await widgetGenerateStore.loadDataTable({
+        data_table_id: dataTableId,
+    });
     widgetGenerateStore.setSelectedPreviewGranularity(GRANULARITY.MONTHLY);
     widgetGenerateStore.setWidgetFormValueMap({});
     widgetGenerateStore.setWidgetValidMap({});

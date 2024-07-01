@@ -9,8 +9,9 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/src/navigation/toolbox/type';
+import bytes from 'bytes';
 
-import { numberFormatter } from '@cloudforet/utils';
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Page } from '@/schema/_common/type';
 
@@ -23,6 +24,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 
 import { gray, white } from '@/styles/colors';
 
+import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
@@ -54,6 +56,7 @@ const state = reactive({
     data: undefined,
     labelFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
     dataFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
+    dataInfo: computed(() => storeState.selectedDataTable?.data_info),
     fields: computed<PreviewTableField[]>(() => [
         ...state.labelFields.map((key) => ({ type: 'LABEL', name: key, sortKey: key })),
         { type: 'DIVIDER', name: '' },
@@ -128,6 +131,15 @@ const handleClickSort = async (sortKey: string) => {
 };
 
 /* Utils */
+const valueFormatter = (value, field: PreviewTableField) => {
+    const _unit = state.dataInfo?.[field.name]?.unit;
+    if (_unit && SIZE_UNITS.includes(_unit)) {
+        const _originalVal = bytes.parse(`${value}${_unit}`);
+        return byteFormatter(_originalVal);
+    }
+    return numberFormatter(value);
+};
+
 const getValue = (item, field: PreviewTableField) => {
     const itemValue = item[field.name];
     if (field.type === 'LABEL' && Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
@@ -136,7 +148,7 @@ const getValue = (item, field: PreviewTableField) => {
         return storeState[referenceKey][referenceValueKey]?.name ?? '-';
     }
     if (field.type === 'DATA') {
-        return itemValue ? numberFormatter(itemValue) : '-';
+        return itemValue ? valueFormatter(itemValue, field) : '-';
     }
     return item[field.name] ?? '-';
 };

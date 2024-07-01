@@ -27,7 +27,7 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { GRANULARITY } from '@/services/asset-inventory/constants/asset-analysis-constant';
+import { GRANULARITY, SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import {
     getAssetAnalysisDataTableDateFields,
     getRefinedAssetAnalysisTableData,
@@ -37,7 +37,6 @@ import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/me
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
-const UNITS = ['bytes', 'Bytes', 'b', 'gb', 'kb', 'mb', 'pb', 'tb', 'B', 'GB', 'KB', 'MB', 'PB', 'TB'];
 const DATE_FORMAT_MAP = {
     [GRANULARITY.DAILY]: 'M/D',
     [GRANULARITY.MONTHLY]: 'MMM',
@@ -97,7 +96,7 @@ const getRefinedColumnValue = (field, value) => {
         }
         const _unit = metricExplorerPageState.metric?.unit;
         const _originalVal = bytes.parse(`${value}${_unit}`);
-        if (_unit && UNITS.includes(_unit)) {
+        if (_unit && SIZE_UNITS.includes(_unit)) {
             return byteFormatter(_originalVal);
         }
         return numberFormatter(value, { notation: 'compact' }) || 0;

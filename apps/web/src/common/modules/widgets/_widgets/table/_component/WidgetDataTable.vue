@@ -19,7 +19,7 @@ import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-t
 import type { TableDataFieldValue, ComparisonValue, TotalValue } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
-const SIZE_UNITS = ['bytes', 'Bytes', 'b', 'gb', 'kb', 'mb', 'pb', 'tb', 'B', 'GB', 'KB', 'MB', 'PB', 'TB'];
+import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 
 
 interface Props {
