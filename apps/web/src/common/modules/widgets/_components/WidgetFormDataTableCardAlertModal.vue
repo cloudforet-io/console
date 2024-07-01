@@ -63,6 +63,7 @@ const handleConfirmModal = () => {
                     :hide-footer-close-button="props.mode === 'DELETE_UNABLED'"
                     @confirm="handleConfirmModal"
                     @cancel="handleCancelModal"
+                    @close="handleCancelModal"
     >
         <template #body>
             <p>{{ state.description }}</p>

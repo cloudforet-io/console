@@ -1461,6 +1461,7 @@
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"MAX_ITEMS": "最大アイテム数",
 			"MAX_ITEMS_DESC": "{fieldName} の最大値は {max} です。",
+			"NO_DATA_TO_DISPLAY": "",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "前日よりも少ない",
 				"LESS_THAN_PREVIOUS_MONTH": "前月よりも少ない",
