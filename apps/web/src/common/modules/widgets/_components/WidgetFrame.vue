@@ -173,6 +173,11 @@ const handleToggleWidth = () => {
             />
         </div>
         <div class="body-wrapper">
+            <div v-if="props.noData"
+                 class="no-data-content"
+            >
+                <span>{{ $t('COMMON.WIDGETS.NO_DATA_TO_DISPLAY') }}</span>
+            </div>
             <p-data-loader class="chart-loader"
                            :loading="props.loading"
                            loader-type="skeleton"
@@ -181,8 +186,8 @@ const handleToggleWidth = () => {
                            show-data-from-scratch
             >
                 <div class="h-full">
-                    <slot v-if="!props.errorMessage" />
-                    <p-empty v-else
+                    <slot v-if="!props.errorMessage && !props.noData" />
+                    <p-empty v-else-if="!props.noData"
                              class="empty-content"
                              :title="$t('COMMON.WIDGETS.UNABLE_TO_LOAD_WIDGET')"
                              :show-image="props.size !== WIDGET_SIZE.sm"
@@ -295,6 +300,13 @@ const handleToggleWidth = () => {
         height: calc(100% - 1.5rem);
         .chart-loader {
             height: 100%;
+        }
+        .no-data-content {
+            @apply text-paragraph-md text-gray-300;
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
         }
     }
     .widget-toggle-button-wrapper {
