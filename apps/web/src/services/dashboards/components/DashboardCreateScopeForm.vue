@@ -63,13 +63,11 @@ const state = reactive({
 /* Event */
 const handleSelectDashboardScope = (scopeType: DashboardScope) => {
     dashboardCreatePageStore.setDashboardScope(scopeType);
-    dashboardCreatePageStore.setDashboardType(scopeType === 'PRIVATE' ? 'PRIVATE' : 'PUBLIC');
 };
 
 onMounted(() => {
     if (!storeState.isWorkspaceOwner) {
         dashboardCreatePageStore.setDashboardScope('PRIVATE');
-        dashboardCreatePageStore.setDashboardType('PRIVATE');
     }
 });
 </script>

@@ -58,6 +58,7 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
     const state = reactive({
         loading: false as boolean,
         currentStep: 1 as number,
+        dashboardCreated: false as boolean,
         dashboardTemplates: [] as DashboardTemplateModel[],
         templateLabels: [] as string[],
         templateName: '' as string,
@@ -66,8 +67,10 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         selectedTemplateId: undefined as string | undefined,
         dashboardName: '' as string,
         dashboardLabels: [] as string[],
-        dashboardType: 'PUBLIC' as DashboardType,
         dashboardScope: 'WORKSPACE' as DashboardScope,
+    });
+    const getters = reactive({
+        dashboardType: computed<DashboardType>(() => (state.dashboardScope === 'PRIVATE' ? 'PRIVATE' : 'PUBLIC')),
     });
 
     /* Mutations */
@@ -76,7 +79,6 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
     const setSelectedTemplateId = (templateId?: string) => { state.selectedTemplateId = templateId; };
     const setTemplateName = (name: string) => { state.templateName = name; };
     const setTemplateLabels = (labels: string[]) => { state.templateLabels = labels; };
-    const setDashboardType = (dashboardType: DashboardType) => { state.dashboardType = dashboardType; };
     const setDashboardScope = (dashboardScope: DashboardScope) => { state.dashboardScope = dashboardScope; };
     const setDashboardName = (name: string) => { state.dashboardName = name; };
     const setDashboardLabels = (labels: string[]) => { state.dashboardLabels = labels; };
@@ -86,7 +88,6 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         setSelectedTemplateId,
         setTemplateName,
         setTemplateLabels,
-        setDashboardType,
         setDashboardScope,
         setDashboardName,
         setDashboardLabels,
@@ -98,11 +99,10 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         setSelectedTemplateId();
         setTemplateName('');
         setTemplateLabels([]);
-        setCurrentStep(1);
-        setDashboardType('PUBLIC');
         setDashboardScope('WORKSPACE');
         setDashboardName('');
         setDashboardLabels([]);
+        state.dashboardCreated = false;
     };
     const listDashboardTemplates = async () => {
         try {
@@ -162,10 +162,11 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         try {
             if (storeState.isAdminMode) {
                 _dashboardParams.resource_group = RESOURCE_GROUP.DOMAIN;
-            } else if (state.dashboardType !== 'PRIVATE') {
+            } else if (getters.dashboardType !== 'PRIVATE') {
                 _dashboardParams.resource_group = state.dashboardScope || RESOURCE_GROUP.WORKSPACE;
             }
-            const res = await dashboardStore.createDashboard(state.dashboardType, _dashboardParams);
+            const res = await dashboardStore.createDashboard(getters.dashboardType, _dashboardParams);
+            state.dashboardCreated = true;
             return res.dashboard_id;
         } catch (e) {
             ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
@@ -182,6 +183,7 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
 
     return {
         state,
+        getters,
         ...mutations,
         ...actions,
     };
