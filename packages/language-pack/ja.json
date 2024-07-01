@@ -2087,7 +2087,9 @@
 		},
 		"BOOKMARK": {
 			"ADD_GLOBAL_BOOKMARK": "",
+			"ADD_LINK": "リンク 追加",
 			"ALL_BOOKMARK": "",
+			"CREATE_FOLDER": "フォルダーを作成する",
 			"DELETE": "削除",
 			"GLOBAL_BOOKMARK": ""
 		},
