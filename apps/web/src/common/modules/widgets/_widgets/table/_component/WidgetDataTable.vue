@@ -3,8 +3,9 @@
 import { computed, reactive } from 'vue';
 
 import { PI, PTooltip } from '@spaceone/design-system';
+import bytes from 'bytes';
 
-import { numberFormatter } from '@cloudforet/utils';
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -17,6 +18,8 @@ import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-t
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { TableDataFieldValue, ComparisonValue, TotalValue } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
+
+const SIZE_UNITS = ['bytes', 'Bytes', 'b', 'gb', 'kb', 'mb', 'pb', 'tb', 'B', 'GB', 'KB', 'MB', 'PB', 'TB'];
 
 
 interface Props {
@@ -51,6 +54,15 @@ const getField = (field: TableWidgetField): string => {
     return field.label || field.name;
 };
 
+const valueFormatter = (value, field: TableWidgetField) => {
+    const _unit = field.fieldInfo?.unit;
+    if (_unit && SIZE_UNITS.includes(_unit)) {
+        const _originalVal = bytes.parse(`${value}${_unit}`);
+        return byteFormatter(_originalVal);
+    }
+    return numberFormatter(value);
+};
+
 const getValue = (item: TableDataItem, field: TableWidgetField) => {
     if (field.fieldInfo?.type === 'labelField') {
         if (Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
@@ -68,12 +80,12 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const fixedValue = Math.abs(targetValue - subjectValue);
             const percentageValue = fixedValue / (targetValue || 1) * 100;
             if (!fixedValue || fixedValue === 0) return '-';
-            if (props.comparisonInfo?.format === 'fixed') return numberFormatter(fixedValue);
+            if (props.comparisonInfo?.format === 'fixed') return valueFormatter(fixedValue, field);
             if (props.comparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
-            if (props.comparisonInfo?.format === 'all') return `${numberFormatter(fixedValue)} (${numberFormatter(percentageValue)}%)`;
+            if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
             return '-';
         }
-        return numberFormatter(itemValue) || '-';
+        return valueFormatter(itemValue, field) || '-';
     }
     if (props.fieldType === 'dynamicField') {
         const dynamicData = item[props.criteria || ''] ?? [];
@@ -84,12 +96,12 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const fixedValue = Math.abs(targetValue - subjectValue);
             const percentageValue = fixedValue / (targetValue || 1) * 100;
             if (!fixedValue || fixedValue === 0) return '-';
-            if (props.comparisonInfo?.format === 'fixed') return numberFormatter(fixedValue);
+            if (props.comparisonInfo?.format === 'fixed') return valueFormatter(fixedValue, field);
             if (props.comparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
-            if (props.comparisonInfo?.format === 'all') return `${numberFormatter(fixedValue)} (${numberFormatter(percentageValue)}%)`;
+            if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
             return '-';
         }
-        return numberFormatter(dynamicDataItem?.value) || 0;
+        return valueFormatter(dynamicDataItem?.value, field) || 0;
     }
     return '-';
 };
