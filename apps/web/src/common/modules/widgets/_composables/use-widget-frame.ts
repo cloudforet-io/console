@@ -31,6 +31,7 @@ interface OverridableWidgetFrameState {
     dateRange?: DateRange | ComputedRef<DateRange>;
     errorMessage?: string | ComputedRef<string>;
     widgetLoading?: boolean | ComputedRef<boolean>;
+    noData?: boolean | ComputedRef<boolean>;
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 
@@ -176,6 +177,7 @@ export const useWidgetFrame = (
         mode: props.mode ?? 'view',
         loading: props.loading || !!overrides.widgetLoading?.value,
         errorMessage: overrides.errorMessage?.value,
+        noData: overrides.noData?.value || false,
         //
         title: _state.title,
         description: props.description,
