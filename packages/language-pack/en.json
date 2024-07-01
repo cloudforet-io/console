@@ -2087,7 +2087,9 @@
 		},
 		"BOOKMARK": {
 			"ADD_GLOBAL_BOOKMARK": "Add Global Bookmark",
+			"ADD_LINK": "Add Link",
 			"ALL_BOOKMARK": "All Bookmarks",
+			"CREATE_FOLDER": "Create Folder",
 			"DELETE": "Delete",
 			"GLOBAL_BOOKMARK": "Global Bookmark"
 		},

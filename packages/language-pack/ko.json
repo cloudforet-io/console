@@ -2087,7 +2087,9 @@
 		},
 		"BOOKMARK": {
 			"ADD_GLOBAL_BOOKMARK": "",
+			"ADD_LINK": "링크 추가",
 			"ALL_BOOKMARK": "",
+			"CREATE_FOLDER": "폴더 생성",
 			"DELETE": "삭제",
 			"GLOBAL_BOOKMARK": ""
 		},

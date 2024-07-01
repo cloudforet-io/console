@@ -5,12 +5,14 @@ import {
     PButton, PButtonModal, PFieldGroup, PI, PRadio, PRadioGroup, PTextInput,
 } from '@spaceone/design-system';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,12 +23,12 @@ import {
     generateNewFolderName,
 } from '@/common/components/bookmark/composables/use-bookmark';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
-import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
@@ -41,8 +43,11 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const storeState = reactive({
+    isAdminMode: computed(() => appContextGetters.isAdminMode),
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     isFullMode: computed<boolean|undefined>(() => bookmarkState.isFullMode),
@@ -102,18 +107,21 @@ const handleClickNewFolderButton = async () => {
     }
 };
 const fetchBookmarkFolderList = async () => {
+    const defaultFilter: ConsoleFilter[] = [
+        { k: 'name', v: 'console:bookmark', o: '' },
+        { k: 'data.link', v: null, o: '=' },
+    ];
+    if (!storeState.isAdminMode) {
+        defaultFilter.push({ k: 'data.workspaceId', v: storeState.currentWorkspaceId || '', o: '=' });
+    }
     const bookmarkListApiQuery = new ApiQueryHelper()
         .setSort('updated_at', true)
-        .setFilters([
-            { k: 'name', v: 'console:bookmark', o: '' },
-            { k: 'data.workspaceId', v: storeState.currentWorkspaceId || '', o: '=' },
-            { k: 'data.link', v: null, o: '=' },
-        ]);
+        .setFilters(defaultFilter);
     try {
         let fetcher;
         if (state.scope === BOOKMARK_TYPE.USER) {
             fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
-        } else if (state.scope === BOOKMARK_TYPE.WORKSPACE) {
+        } else if (storeState.isAdminMode || state.scope === BOOKMARK_TYPE.WORKSPACE) {
             fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.list);
         }
         const { status, response } = await fetcher({
@@ -236,7 +244,7 @@ watch(() => storeState.modal.type, (type) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
-                <p-field-group v-if="!storeState.modal.isEdit && storeState.modal.isNew"
+                <p-field-group v-if="!storeState.isAdminMode && (!storeState.modal.isEdit && storeState.modal.isNew)"
                                class="scope-wrapper"
                                :label="$t('HOME.FORM_SCOPE')"
                                required
@@ -273,7 +281,9 @@ watch(() => storeState.modal.type, (type) => {
                                 {{ $t('HOME.FORM_DESELECT') }}
                             </p-button>
                         </div>
-                        <p-radio-group :direction="'vertical'">
+                        <p-radio-group :direction="'vertical'"
+                                       class="radio-group"
+                        >
                             <p-radio v-for="(item, idx) in state.bookmarkFolderList"
                                      :key="`bookmark-folder-${idx}`"
                                      v-model="state.selectedFolderIdx"
@@ -309,6 +319,10 @@ watch(() => storeState.modal.type, (type) => {
             @apply flex items-center;
             margin-left: 0.25rem;
             gap: 0.25rem;
+        }
+        .radio-group {
+            @apply overflow-y-auto;
+            max-height: 12.5rem;
         }
 
         /* custom design-system component - p-radio */

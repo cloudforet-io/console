@@ -145,11 +145,11 @@ onMounted(async () => {
             </template>
             <template #col-workspace_id-format="{value}">
                 <div class="col-workspace">
-                    <workspace-logo-icon :text="getWorkspaceInfo(value).name || ''"
+                    <workspace-logo-icon :text="getWorkspaceInfo(value)?.name || ''"
                                          :theme="getWorkspaceInfo(value)?.tags?.theme"
                                          size="xs"
                     />
-                    <span class="workspace">{{ getWorkspaceInfo(value).name }}</span>
+                    <span class="workspace">{{ getWorkspaceInfo(value)?.name }}</span>
                 </div>
             </template>
             <template #col-link-format="{value}">
