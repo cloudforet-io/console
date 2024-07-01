@@ -181,7 +181,7 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                         query: {
                             granularity: 'DAILY',
                             group_by: ['labels.Provider'],
-                            start: dayjs.tz(dayjs.utc(), _getters.timezone).subtract(5, 'days').format('YYYY-MM-DD'),
+                            start: dayjs.tz(dayjs.utc(), _getters.timezone).format('YYYY-MM-DD'),
                             end: dayjs.tz(dayjs.utc(), _getters.timezone).format('YYYY-MM-DD'),
                             fields: {
                                 count: {
