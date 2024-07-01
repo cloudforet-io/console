@@ -18,12 +18,12 @@ import { i18n } from '@/translations';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
 import { blue, gray } from '@/styles/colors';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
-import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 

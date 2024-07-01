@@ -10,11 +10,11 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 
 import { gray } from '@/styles/colors';
 
-import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;

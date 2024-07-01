@@ -14,6 +14,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
@@ -22,7 +23,6 @@ import Summaries from '@/services/workspace-home/components/Summaries.vue';
 import UserConfigs from '@/services/workspace-home/components/UserConfigs.vue';
 import Welcome from '@/services/workspace-home/components/Welcome.vue';
 import WorkspaceInfo from '@/services/workspace-home/components/WorkspaceInfo.vue';
-import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
 const userWorkspaceStore = useUserWorkspaceStore();

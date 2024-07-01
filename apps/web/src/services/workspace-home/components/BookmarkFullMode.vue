@@ -4,10 +4,10 @@ import { computed, reactive } from 'vue';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
-import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {

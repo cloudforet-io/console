@@ -21,12 +21,12 @@ import {
     generateNewFolderName,
 } from '@/common/components/bookmark/composables/use-bookmark';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
-import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {

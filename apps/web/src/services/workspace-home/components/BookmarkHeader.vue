@@ -26,10 +26,10 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
-import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { MoreMenuItem, BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
