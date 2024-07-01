@@ -13,6 +13,7 @@ export interface BookmarkItem {
     link?: string;
     isShowMore?: boolean;
     workspaceId?: string;
+    isGlobal?: boolean;
 }
 
 export type BookmarkModalType = typeof BOOKMARK_MODAL_TYPE[keyof typeof BOOKMARK_MODAL_TYPE];
