@@ -39,6 +39,7 @@ const _listWidgetDataTables = async (widgetId?: string, costDataSource: CostData
             if (r.data_type === DATA_TABLE_TYPE.ADDED && r.source_type === 'COST') {
                 const _dataSourceId = r.options.COST?.data_source_id;
                 _refinedResults[idx].options.COST.plugin_id = costDataSource[_dataSourceId]?.data?.plugin_info?.plugin_id;
+                _refinedResults[idx].options.COST.data_source_id = undefined;
             }
         });
         return [widgetId, _refinedResults || []];

@@ -28,7 +28,7 @@ import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-fi
 import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-model';
 
 
-const emit = defineEmits<{(e: 'update-preview'): void}>();
+const emit = defineEmits<{(e: 'ready-to-preview'): void}>();
 const FORM_TITLE_MAP = {
     WIDGET_INFO: 'WIDGET_INFO',
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
@@ -190,7 +190,7 @@ watch(() => widgetGenerateState.widgetValidMap, () => {
     if (state.isPreviewInitiated) return;
     const _requiredField = state.widgetRequiredFieldSchemaMap.map(([d]) => d);
     if (_requiredField.every((d) => widgetGenerateState.widgetValidMap[d])) {
-        emit('update-preview');
+        emit('ready-to-preview');
         state.isPreviewInitiated = true;
     }
 }, { deep: true });

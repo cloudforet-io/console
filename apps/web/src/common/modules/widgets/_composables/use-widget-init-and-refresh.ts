@@ -56,6 +56,6 @@ export const useWidgetInitAndRefresh = <Data = any>({
     });
 
     onMounted(() => {
-        emit('mounted');
+        emit('mounted', props.widgetName);
     });
 };
