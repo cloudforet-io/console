@@ -11,11 +11,13 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PublicConfigListParameters } from '@/schema/config/public-config/api-verbs/list';
 import type { PublicConfigModel } from '@/schema/config/public-config/model';
 
+import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     const state = reactive({
+        loading: false,
         bookmarkFolderList: [] as BookmarkItem[],
         bookmarkList: [] as BookmarkItem[],
         bookmarkTotalCount: 0,
@@ -87,19 +89,35 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     ...state.searchFilter,
                     { k: 'name', v: 'console:bookmark:', o: '' },
                 ]);
+            state.loading = true;
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
                     query: BookmarkListApiQueryHelper.data,
                 });
-                state.bookmarkList = (results ?? []).map((i) => ({
-                    ...i.data,
-                    workspace_id: i.data.workspaceId,
-                    id: i.name,
-                } as BookmarkItem));
-                state.bookmarkTotalCount = total_count;
+
+                const promises: Promise<BookmarkItem>[] = (results ?? []).map(async (item) => {
+                    if (!item.data.link) {
+                        return {
+                            ...item.data as BookmarkItem,
+                            id: item.name,
+                            workspace_id: item.data.workspaceId,
+                        };
+                    }
+                    const imgIcon = item.data.imgIcon || await fetchFavicon(item.data.link);
+                    return {
+                        ...item.data as BookmarkItem,
+                        id: item.name,
+                        workspace_id: item.data.workspaceId,
+                        imgIcon: imgIcon || undefined,
+                    };
+                });
+                state.bookmarkList = await Promise.all(promises);
+                state.bookmarkTotalCount = total_count || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkList = [];
+            } finally {
+                state.loading = false;
             }
         },
     };
