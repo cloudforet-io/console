@@ -31,7 +31,7 @@ import type {
 } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
-export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () => {
+export const useMetricExplorerPageStore = defineStore('page-asset-analysis', () => {
     const appContextStore = useAppContextStore();
     const allReferenceStore = useAllReferenceStore();
     const _state = reactive({

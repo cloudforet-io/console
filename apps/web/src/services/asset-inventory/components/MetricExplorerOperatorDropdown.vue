@@ -9,12 +9,12 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { OPERATOR } from '@/services/asset-inventory/constants/asset-analysis-constant';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Operator } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 const state = reactive({
     operatorItems: computed<MenuItem[]>(() => ([
         { type: 'item', name: OPERATOR.SUM, label: 'Sum' },
@@ -26,16 +26,16 @@ const state = reactive({
 
 /* Event */
 const handleSelectOperator = async (operator: Operator) => {
-    assetAnalysisPageStore.setSelectedOperator(operator);
+    metricExplorerPageStore.setSelectedOperator(operator);
 };
 </script>
 
 <template>
-    <div class="asset-analysis-operator-dropdown">
+    <div class="metric-explorer-operator-dropdown">
         <p-select-dropdown :menu="state.operatorItems"
                            :selection-label="$t('INVENTORY.METRIC_EXPLORER.OPERATOR')"
                            style-type="rounded"
-                           :selected="assetAnalysisPageState.selectedOperator"
+                           :selected="metricExplorerPageState.selectedOperator"
                            class="operator-dropdown"
                            @select="handleSelectOperator"
         />
@@ -43,7 +43,7 @@ const handleSelectOperator = async (operator: Operator) => {
 </template>
 
 <style lang="postcss" scoped>
-.asset-analysis-operator-dropdown {
+.metric-explorer-operator-dropdown {
     display: flex;
     align-items: center;
     gap: 0.5rem;

@@ -12,12 +12,12 @@ import { i18n } from '@/translations';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/asset-analysis-period-helper';
-import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Granularity } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
-const assetAnalysisPageStore = useAssetAnalysisPageStore();
-const assetAnalysisPageState = assetAnalysisPageStore.state;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 const state = reactive({
     granularityItems: computed<MenuItem[]>(() => ([
         {
@@ -36,21 +36,21 @@ const state = reactive({
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
-    assetAnalysisPageStore.setGranularity(granularity);
+    metricExplorerPageStore.setGranularity(granularity);
     // set period
     const [_period, _relativePeriod] = getInitialPeriodByGranularity(granularity);
-    assetAnalysisPageStore.setPeriod(_period);
-    assetAnalysisPageStore.setRelativePeriod(_relativePeriod);
-    assetAnalysisPageStore.setRefreshMetricPeriodDropdown(true);
+    metricExplorerPageStore.setPeriod(_period);
+    metricExplorerPageStore.setRelativePeriod(_relativePeriod);
+    metricExplorerPageStore.setRefreshMetricPeriodDropdown(true);
 };
 </script>
 
 <template>
-    <div class="asset-analysis-granularity-dropdown">
+    <div class="metric-explorer-granularity-dropdown">
         <p-select-dropdown :menu="state.granularityItems"
                            :selection-label="$t('INVENTORY.METRIC_EXPLORER.GRANULARITY')"
                            style-type="rounded"
-                           :selected="assetAnalysisPageState.granularity"
+                           :selected="metricExplorerPageState.granularity"
                            class="granularity-dropdown"
                            reset-selection-on-menu-close
                            @select="handleSelectGranularity"
@@ -59,7 +59,7 @@ const handleSelectGranularity = async (granularity: Granularity) => {
 </template>
 
 <style lang="postcss" scoped>
-.asset-analysis-granularity-dropdown {
+.metric-explorer-granularity-dropdown {
     display: flex;
     align-items: center;
     gap: 0.5rem;
