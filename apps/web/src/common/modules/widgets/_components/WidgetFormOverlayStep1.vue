@@ -190,6 +190,7 @@ onMounted(async () => {
                 bottom: 0;
                 background: linear-gradient(180deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.100') 100%);
                 z-index: 1;
+                pointer-events: none;
             }
             .gradation-top-area {
                 @apply absolute;
@@ -198,6 +199,7 @@ onMounted(async () => {
                 top: 0;
                 background: linear-gradient(180deg, theme('colors.gray.100') 0%, rgba(247, 247, 247, 0) 100%);
                 z-index: 1;
+                pointer-events: none;
             }
             .gradation-left-area {
                 @apply absolute;
@@ -207,6 +209,7 @@ onMounted(async () => {
                 top: 0;
                 background: linear-gradient(90deg, theme('colors.gray.100') 0%, rgba(247, 247, 247, 0) 100%);
                 z-index: 1;
+                pointer-events: none;
             }
             .gradation-right-area {
                 @apply absolute;
@@ -216,6 +219,7 @@ onMounted(async () => {
                 top: 0;
                 background: linear-gradient(90deg, rgba(247, 247, 247, 0) 0%, theme('colors.gray.100') 100%);
                 z-index: 1;
+                pointer-events: none;
             }
         }
         .resizer-area {
