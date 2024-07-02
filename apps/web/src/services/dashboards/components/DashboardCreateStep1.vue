@@ -87,6 +87,15 @@ onMounted(() => {
                                                   @select-provider="handleSelectProvider"
             />
             <div class="template-contents-area">
+                <dashboard-create-template-board :template-sets="state.blankTemplate"
+                                                 class="blank-board"
+                >
+                    <template #bottom>
+                        <span class="blank-description">
+                            {{ $t('DASHBOARDS.CREATE.BLANK_DESC') }}
+                        </span>
+                    </template>
+                </dashboard-create-template-board>
                 <p-empty v-if="!state.outOfTheBoxTemplateSets.length && !state.existingTemplateSets.length"
                          show-image
                          class="empty-template"
@@ -99,15 +108,6 @@ onMounted(() => {
                     </template>
                     No Data
                 </p-empty>
-                <dashboard-create-template-board :template-sets="state.blankTemplate"
-                                                 class="blank-board"
-                >
-                    <template #bottom>
-                        <span class="blank-description">
-                            {{ $t('DASHBOARDS.CREATE.BLANK_DESC') }}
-                        </span>
-                    </template>
-                </dashboard-create-template-board>
                 <div v-if="state.outOfTheBoxTemplateSets.length"
                      class="out-of-the-box"
                 >
