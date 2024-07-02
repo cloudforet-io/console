@@ -1376,7 +1376,7 @@
 				"ALL": "All",
 				"COMPARE_TARGET": "Compare target",
 				"COMPARE_WITH": "Compare With",
-				"COMPARISON": "Comparison",
+				"COMPARISON": "Comparison(Δ)",
 				"DECREASE": "Decrease",
 				"FIELD_NAME": "Field Name",
 				"FIXED": "Fixed Amount",
@@ -1386,7 +1386,7 @@
 				"PERCENT": "Percentage",
 				"PREVIOUS_DAY": "Previous Day",
 				"PREVIOUS_MONTH": "Previous Month",
-				"PREVIOUS_PERIOD": "Previous Period",
+				"PREVIOUS_PERIOD": "Previous Day/Month/Year",
 				"PREVIOUS_YEAR": "Previous Year"
 			},
 			"CONFIGURE_WIDGET": "Configure Widget",
@@ -1402,15 +1402,15 @@
 				"ALERT": {
 					"DELETE_DESC": "Are you sure you want to delete this data?",
 					"DELETE_HEADER": "Delete Data",
-					"DELETE_UNABLED_DESC": "This data is currently in use by {data_name}. \nDelete {data_name} first before deleting this data.",
+					"DELETE_UNABLED_DESC": "This data is currently in use by '{data_name}'. Please remove it from '{data_name}' before attempting to delete it.",
 					"DELETE_UNABLED_HEADER": "Cannot Delete the Data",
-					"RESET_DESC": "Resetting the data options will revert all inputss to their most recent values. This action cannot be undone.",
+					"RESET_DESC": "Resetting the data options will revert all inputs to their most recent values. This action cannot be undone.",
 					"RESET_HEADER": "Are you sure you want to reset the data options?"
 				},
 				"FORM": {
 					"ADDITIONAL_LABELS": "Additional Labels",
 					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "This name is already being used.",
-					"ADDITIONAL_LABELS_NAME": "Name",
+					"ADDITIONAL_LABELS_NAME": "Field Name",
 					"ADDITIONAL_LABELS_VALUE": "Value",
 					"ADD_LABEL": "Add Label",
 					"ADVANCED_OPTIONS": "Advanced Options",
@@ -1430,7 +1430,7 @@
 					"TIME_DIFF": "Time Diff",
 					"UPDATE_DATA_TALBE_INVALID_SUCCESS": "Changes have been successfully applied.",
 					"UPDATE_DATA_TALBE_INVALID_WARNING": "Unable to apply changes. Please check the form.",
-					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "{first_data} cannot be joined with {second_data} because the two data tables have one or more identical data fields."
+					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "'{first_data}' cannot be joined with '{second_data}' because the two data tables have one or more identical data fields."
 				}
 			},
 			"DEFAULT_WIDTH": "Default Width",
@@ -1438,7 +1438,7 @@
 			"EDIT": "Edit",
 			"EDIT_WIDGET": "Edit Widget",
 			"EXPAND": "Expand",
-			"EXPAND_WIDGET": "Expand Widget",
+			"EXPAND_WIDGET": "Full Screen View",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "Cloud Service",
 				"LABEL_PROJECT": "Project",
@@ -1767,7 +1767,7 @@
 			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "Are you sure you want to share this dashboard to all workspace?",
 			"SHARE_WITH_CODE": "Share with Code",
-			"UNSHARE_TO_ALL_WORKSPACES": "Unshare to All Workspaces"
+			"UNSHARE_TO_ALL_WORKSPACES": "Unshare from All Workspaces"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",
