@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute } from 'vue-router/composables';
@@ -17,7 +17,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
-import type { BookmarkModalType } from '@/common/components/bookmark/type/type';
+import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
@@ -38,6 +38,7 @@ const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
+    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
 });
 const state = reactive({
     visibleMenu: false,
@@ -70,15 +71,17 @@ const handleClickCreateButton = () => {
 const handleSelectMenuItem = (value: MenuItem) => {
     if (value.name === BOOKMARK_MODAL_TYPE.LINK) {
         bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK);
+        if (state.folder) {
+            const selectedFolder = storeState.bookmarkFolderList.find((item) => item.name === state.folder);
+            if (selectedFolder) {
+                bookmarkStore.setSelectedBookmark(selectedFolder);
+            }
+        }
     } else if (value.name === BOOKMARK_MODAL_TYPE.FOLDER) {
         bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.FOLDER);
     }
     state.visibleMenu = false;
 };
-
-watch(() => route.params, () => {
-    bookmarkPageStore.fetchBookmarkList();
-}, { immediate: true });
 </script>
 
 <template>
@@ -104,7 +107,9 @@ watch(() => route.params, () => {
                 </div>
             </template>
             <template #extra>
-                <div class="extra">
+                <div v-if="state.group === 'global'"
+                     class="extra"
+                >
                     <p-button style-type="tertiary"
                               icon-left="ic_delete"
                               :disabled="storeState.selectedIndices.length === 0"
@@ -126,6 +131,12 @@ watch(() => route.params, () => {
                         />
                     </div>
                 </div>
+                <p-button v-else
+                          style-type="tertiary"
+                          icon-right="ic_arrow-right-up"
+                >
+                    {{ $t('IAM.BOOKMARK.GO_TO_WORKSPACE') }}
+                </p-button>
             </template>
         </p-heading>
         <router-view />
