@@ -242,7 +242,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        state.projectId = _dashboardInfo.project_id === '*' ? undefined : _dashboardInfo.project_id;
+        state.projectId = _dashboardInfo.project_id;
         state.vars = _dashboardInfo.vars ?? {};
         state.dashboardLayouts = _dashboardInfo.layouts ?? [];
     };
