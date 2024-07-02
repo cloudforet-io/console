@@ -17,20 +17,35 @@ import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-st
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+interface BookmarkPageState {
+    loading: boolean;
+    bookmarkFolderList: BookmarkItem[];
+    bookmarkList: BookmarkItem[];
+    bookmarkTotalCount: number;
+    pageStart: number;
+    pageLimit: number;
+    searchFilter: ConsoleFilter[];
+    selectedIndices: number[];
+    params?: Record<string, string>;
+    selectedType: string;
+    isTableItem: boolean;
+}
+
 export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     const bookmarkStore = useBookmarkStore();
 
-    const state = reactive({
+    const state = reactive<BookmarkPageState>({
         loading: false,
-        bookmarkFolderList: [] as BookmarkItem[],
-        bookmarkList: [] as BookmarkItem[],
+        bookmarkFolderList: [],
+        bookmarkList: [],
         bookmarkTotalCount: 0,
         pageStart: 0,
         pageLimit: 15,
-        searchFilter: [] as ConsoleFilter[],
-        selectedIndices: [] as number[],
-        params: undefined as Record<string, string>|undefined,
-        selectedType: 'All' as string,
+        searchFilter: [],
+        selectedIndices: [],
+        params: undefined,
+        selectedType: 'All',
+        isTableItem: false,
     });
 
     const getters = reactive({
@@ -68,14 +83,14 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         resetState: () => {
             state.loading = false;
             state.bookmarkTotalCount = 0;
-            state.params = undefined as Record<string, string>|undefined;
-            state.selectedType = 'All' as string;
+            state.params = undefined;
+            state.selectedType = 'All';
             state.bookmarkFolderList = [];
             state.bookmarkList = [];
             state.pageStart = 0;
             state.pageLimit = 15;
-            state.searchFilter = [] as ConsoleFilter[];
-            state.selectedIndices = [] as number[];
+            state.searchFilter = [];
+            state.selectedIndices = [];
         },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
