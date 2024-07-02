@@ -17,6 +17,8 @@ import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-wid
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
 
+import config from '@/lib/config';
+
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
@@ -53,6 +55,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+const isDashboardEditDisabled = config.get('DASHBOARD_EDIT_DISABLE');
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
@@ -86,9 +89,9 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
         _widgetIdList?.forEach((widgetId) => {
             const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
             if (!_widget) return;
-            const config = getWidgetConfig(_widget.widget_type);
-            if (!config) return;
-            const _size = _widget.size || config.meta.sizes[0];
+            const _config = getWidgetConfig(_widget.widget_type);
+            if (!_config) return;
+            const _size = _widget.size || _config.meta.sizes[0];
             const _component = getWidgetComponent(_widget.widget_type);
             if (!_component) return;
             _refinedWidgets.push({
@@ -310,6 +313,7 @@ defineExpose({
                             <p-button style-type="substitutive"
                                       icon-left="ic_plus_bold"
                                       class="add-widget-button"
+                                      :disabled="isDashboardEditDisabled"
                                       @click="handleClickAddWidget"
                             >
                                 {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
