@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown,
@@ -14,6 +15,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
@@ -25,6 +28,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo } from '@/services/preference/composables/bookmark-data-helper';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
 const bookmarkStore = useBookmarkStore();
@@ -33,6 +37,8 @@ const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
+
+const router = useRouter();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
@@ -139,6 +145,20 @@ const handleUpdateVisibleMenu = (item: BookmarkItem, visibleMenu: boolean) => {
         bookmarkStore.setSelectedBookmark(item, true);
     }
 };
+const getRowSelectable = (item) => !item.isGlobal;
+const handleClickName = (item: BookmarkItem) => {
+    if (item.link) {
+        window.open(item.link, '_blank');
+        return;
+    }
+    router.push({
+        name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+        params: {
+            group: item.workspaceId || 'global',
+            folder: item.name as string || '',
+        },
+    });
+};
 
 const fetchBookmarkList = async () => {
     await bookmarkPageStore.fetchBookmarkList();
@@ -170,12 +190,15 @@ const fetchBookmarkList = async () => {
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              :query-tags="queryTags"
+                             :get-row-selectable="getRowSelectable"
                              @change="handleChange"
                              @refresh="fetchBookmarkList"
                              @update:select-index="handleUpdateSelectIndex"
             >
                 <template #col-name-format="{value, item}">
-                    <div class="col-name">
+                    <div class="col-name"
+                         @click="handleClickName(item)"
+                    >
                         <p-lazy-img v-if="item.link"
                                     class="left-icon"
                                     :src="item.imgIcon"
@@ -253,6 +276,9 @@ const fetchBookmarkList = async () => {
             .name {
                 @apply truncate;
                 max-width: 20.625rem;
+            }
+            &:hover {
+                @apply cursor-pointer underline;
             }
         }
         .col-workspace {
