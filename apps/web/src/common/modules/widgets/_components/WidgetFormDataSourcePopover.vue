@@ -33,6 +33,7 @@ import {
     DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
+import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
     DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions,
@@ -201,7 +202,7 @@ const handleConfirmDataSource = async () => {
             : `${state.selectedNamespace.name} - ${storeState.metrics[state.selectedMetricId]?.label}`;
         const addParameters = {
             source_type: state.selectedDataSourceDomain,
-            name: getDuplicatedDataTableName(dataTableBaseName),
+            name: getDuplicatedDataTableName(dataTableBaseName, widgetGenerateState.dataTables),
         } as DataTableAddParameters;
         const dataKey = state.selectedCostDataType.replace('data.', '');
         const costUnit: string|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.unit;
@@ -237,26 +238,6 @@ const handleConfirmDataSource = async () => {
     }
     state.showPopover = false;
     state.loading = false;
-};
-
-/* Utils */
-const getDuplicatedDataTableName = (name: string): string => {
-    let _name = name;
-    const _regex = /^(.*?)\s*\((\d+)\)$/i;
-    const dataTableNames = widgetGenerateStore.state.dataTables.map((dataTable) => dataTable.name);
-
-    while (dataTableNames.includes(_name)) {
-        const match = _regex.exec(_name);
-        if (match) {
-            const baseName = match[1];
-            const numberStr = match[2];
-            const newNumber = numberStr ? parseInt(numberStr) + 1 : 2;
-            _name = `${baseName} (${newNumber})`;
-        } else {
-            _name = `${_name} (2)`;
-        }
-    }
-    return _name;
 };
 
 watch(() => state.showPopover, (val) => {
