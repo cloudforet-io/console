@@ -90,6 +90,7 @@ const handleClickSendEmail = async () => {
         showSuccessMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SEND_EMAIL'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
+        hideLoadingMessage(loadingMessageId);
         showErrorMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_E_SEND_EMAIL'), e);
     } finally {
         state.sendLoading = false;
