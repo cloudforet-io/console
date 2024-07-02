@@ -158,8 +158,14 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
 watch(() => state.bookmarkGroupNavigation, async (bookmarkGroupNavigation) => {
     gnbStore.setBreadcrumbs(bookmarkGroupNavigation);
 }, { immediate: true });
-watch(() => route.params, (params) => {
-    const selectedTreeId = (params.group || params.id) as string|undefined;
+watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookmarkFolderList]) => {
+    let selectedTreeId: string|undefined = '';
+    if (params.folder) {
+        const selectedFolder = bookmarkFolderList.find((item) => item.name === params.folder);
+        selectedTreeId = selectedFolder?.id || '';
+    } else if (params.group) {
+        selectedTreeId = params.group;
+    }
     if (selectedTreeId) {
         state.selectedTreeId = selectedTreeId as string;
     } else {
