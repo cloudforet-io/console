@@ -23,7 +23,11 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
-import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import {
+    getAllRequiredFieldsFilled,
+    getWidgetBasedOnDate,
+    getWidgetDateRange,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getWidgetDataTable, sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -47,6 +51,7 @@ const emit = defineEmits<WidgetEmit>();
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
+    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as Data | null,
     comparisonData: null as Data | null,
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
@@ -55,11 +60,11 @@ const state = reactive({
         if (!state.data) return null;
         if (state.tableDataFieldType === 'staticField') return state.staticFieldSlicedData;
         if (isDateField(state.tableDataField)) return state.timeSeriesDynamicFieldSlicedData;
-        return state.noneTimeSeriedsDynamicFieldSlicedData;
+        return state.noneTimeSeriesDynamicFieldSlicedData;
     }),
     staticFieldSlicedData: null as Data | null,
     timeSeriesDynamicFieldSlicedData: null as Data | null,
-    noneTimeSeriedsDynamicFieldSlicedData: null as Data | null,
+    noneTimeSeriesDynamicFieldSlicedData: null as Data | null,
     // data fetch options
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
@@ -204,7 +209,8 @@ const getWidgetTableDateFields = (
     return dateFields.slice(-limitCount);
 };
 
-const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast> => {
+const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|undefined> => {
+    if (!state.allRequiredFieldsFilled) return undefined;
     try {
         state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
@@ -372,7 +378,7 @@ watch(() => state.data, () => {
             results.push(totalDataItem);
         }
 
-        state.noneTimeSeriedsDynamicFieldSlicedData = { results };
+        state.noneTimeSeriesDynamicFieldSlicedData = { results };
     }
 }, { immediate: true });
 
@@ -380,7 +386,6 @@ onMounted(async () => {
     if (!props.dataTableId) return;
     state.dataTable = await getWidgetDataTable(props.dataTableId);
 });
-
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
     loadWidget,
@@ -391,20 +396,23 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div class="table-wrapper">
-            <widget-data-table class="data-table"
-                               :widget-id="props.widgetId"
-                               :fields="state.tableFields"
-                               :items="state.finalConvertedData?.results"
-                               :field-type="state.tableDataFieldType"
-                               :criteria="state.tableDataCriteria"
-                               :data-field="state.tableDataField"
-                               :comparison-info="state.comparisonInfo"
-                               :sub-total-info="state.subTotalInfo"
-                               :total-info="state.totalInfo"
-                               :granularity="state.granularity"
-                               :data-info="state.dataInfo"
-            />
+        <!--Do not delete div element below. It's defense code for redraw-->
+        <div class="h-full">
+            <div class="table-wrapper">
+                <widget-data-table class="data-table"
+                                   :widget-id="props.widgetId"
+                                   :fields="state.tableFields"
+                                   :items="state.finalConvertedData?.results"
+                                   :field-type="state.tableDataFieldType"
+                                   :criteria="state.tableDataCriteria"
+                                   :data-field="state.tableDataField"
+                                   :comparison-info="state.comparisonInfo"
+                                   :sub-total-info="state.subTotalInfo"
+                                   :total-info="state.totalInfo"
+                                   :granularity="state.granularity"
+                                   :data-info="state.dataInfo"
+                />
+            </div>
         </div>
     </widget-frame>
 </template>

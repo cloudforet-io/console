@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue';
 
-import { cloneDeep, get } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -173,11 +173,11 @@ export const useDashboardStore = defineStore('dashboard', () => {
                 ...params,
             });
             if (isPrivate) {
-                const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === get(params, 'dashboard_id'));
+                const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1, result as PrivateDashboardModel);
                 state.privateDashboardItems = cloneDeep(state.privateDashboardItems);
             } else {
-                const targetIndex = state.publicDashboardItems.findIndex((item) => item.dashboard_id === get(params, 'dashboard_id'));
+                const targetIndex = state.publicDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.publicDashboardItems.splice(targetIndex, 1, result as PublicDashboardModel);
                 state.publicDashboardItems = cloneDeep(state.publicDashboardItems);
             }
@@ -220,8 +220,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     };
     //
     const getDashboardNameList = (dashboardType: DashboardType) => {
-        if (dashboardType === 'PRIVATE') return state.privateDashboardItems.map((item) => item.name);
-        return state.publicDashboardItems.map((item) => item.name);
+        if (dashboardType === 'PRIVATE') return (state.privateDashboardItems.filter((i) => i.version === '2.0')).map((item) => item.name);
+        return state.publicDashboardItems.filter((i) => i.version === '2.0').map((item) => item.name);
     };
 
 
@@ -245,4 +245,3 @@ export const useDashboardStore = defineStore('dashboard', () => {
         ...mutations,
     };
 });
-
