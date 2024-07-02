@@ -92,5 +92,5 @@ export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, fi
 export const getAllRequiredFieldsFilled = (widgetName: string, widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>): boolean => {
     const widgetConfig = getWidgetConfig(widgetName);
     const requiredFields = Object.keys(widgetConfig?.requiredFieldsSchema || {});
-    return requiredFields.every((d) => !!widgetOptions?.[d]);
+    return requiredFields.every((d) => widgetOptions?.[d] !== null && widgetOptions?.[d] !== undefined && widgetOptions?.[d] !== '');
 };

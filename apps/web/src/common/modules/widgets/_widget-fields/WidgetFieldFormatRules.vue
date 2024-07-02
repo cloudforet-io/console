@@ -87,6 +87,7 @@ onMounted(() => {
         if (fm.threshold === undefined) return undefined;
         return !!fm.threshold;
     }) ?? [];
+    emit('update:value', state.value);
 });
 
 </script>
