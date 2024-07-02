@@ -1497,6 +1497,10 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "過去7日〜予定日程"
 			},
+			"PREVIEW_TABLE_EMPTY_DESC": "プレビューがここに表示されます。",
+			"PREVIEW_TABLE_EMPTY_TITLE": "データを追加してください。",
+			"REQUIRED_FIELDS_ARE_MISSING": "必須フィールドが欠落しています。",
+			"REQUIRED_FIELDS_ARE_MISSING_DESC": "ウィジェットの設定を完了してください。",
 			"RESET": "初期化",
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "クラウドサービス",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "リージョン",

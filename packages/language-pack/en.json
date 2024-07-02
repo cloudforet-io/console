@@ -1497,6 +1497,10 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "Upcoming and Past 7 days"
 			},
+			"PREVIEW_TABLE_EMPTY_DESC": "The preview will be displayed here.",
+			"PREVIEW_TABLE_EMPTY_TITLE": "To get started, add your data.",
+			"REQUIRED_FIELDS_ARE_MISSING": "Required fields are missing.",
+			"REQUIRED_FIELDS_ARE_MISSING_DESC": "Complete your widget settings.",
 			"RESET": "Reset",
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "Cloud Service",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "Region",

@@ -175,6 +175,11 @@ export const useWidgetFrame = (
             if (props.loading || overrides.widgetLoading?.value) return false;
             return overrides.noData?.value || false;
         }),
+        allRequiredFieldsFilled: computed<boolean>(() => {
+            const widgetConfig = getWidgetConfig(props.widgetName);
+            const requiredFields = Object.keys(widgetConfig?.requiredFieldsSchema || {});
+            return requiredFields.every((d) => !!props.widgetOptions?.[d]);
+        }),
     });
     const widgetFrameProps = computed<WidgetFrameProps>(() => ({
         widgetId: props.widgetId,
@@ -185,6 +190,7 @@ export const useWidgetFrame = (
         loading: props.loading || !!overrides.widgetLoading?.value,
         errorMessage: overrides.errorMessage?.value,
         noData: _state.noData,
+        allRequiredFieldsFilled: _state.allRequiredFieldsFilled,
         //
         title: _state.title,
         description: props.description,

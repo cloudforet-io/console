@@ -224,7 +224,7 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         @apply min-w-full;
         border-collapse: separate;
         border-spacing: 0;
-        padding: 0 1rem 1rem 0;
+        padding: 0;
     }
 
     th {
