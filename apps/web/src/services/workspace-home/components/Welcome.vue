@@ -11,7 +11,7 @@ const storeState = reactive({
 });
 
 const handleClickButton = () => {
-    window.open(`https://cloudforet.io/${storeState.language}/docs/guides/getting-started/`, '_blank');
+    window.open(storeState.language === 'en' ? 'https://cloudforet.io/docs/guides/getting-started/' : `https://cloudforet.io/${storeState.language}/docs/guides/getting-started/`, '_blank');
 };
 </script>
 
