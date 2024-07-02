@@ -54,25 +54,25 @@ const adminPreferenceRoutes: RouteConfig = {
                     component: BookmarkPage,
                 },
                 {
-                    path: ':group',
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP._NAME),
-                    meta: { lsbVisible: true },
+                    path: 'detail',
                     props: true,
                     component: BookmarkDetailContainer,
                     children: [
                         {
-                            path: '/',
-                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP._NAME),
+                            path: ':group?',
+                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
                             meta: { lsbVisible: true },
                             props: true,
                             component: BookmarkDetailPage,
-                        },
-                        {
-                            path: ':folder',
-                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP.DETAIL._NAME),
-                            meta: { lsbVisible: true },
-                            props: true,
-                            component: BookmarkDetailPage,
+                            children: [
+                                {
+                                    path: ':folder?',
+                                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+                                    meta: { lsbVisible: true },
+                                    props: true,
+                                    component: BookmarkDetailPage,
+                                },
+                            ],
                         },
                     ],
                 },

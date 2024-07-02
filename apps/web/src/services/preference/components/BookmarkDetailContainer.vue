@@ -23,7 +23,6 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo } from '@/services/preference/composables/bookmark-data-helper';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
 const bookmarkPageStore = useBookmarkPageStore();
@@ -52,16 +51,16 @@ const state = reactive({
             name: BOOKMARK_MODAL_TYPE.FOLDER,
         },
     ])),
-    selectedItem: computed<string>(() => route.params.group || route.params.folder),
-    isFolderDetailPage: computed<boolean>(() => route.name === PREFERENCE_ROUTE.BOOKMARK.GROUP.DETAIL._NAME),
+    group: computed<string>(() => route.params.group),
+    folder: computed<string>(() => route.params.folder),
     headingTitle: computed<TranslateResult|string>(() => {
-        if (state.isFolderDetailPage) {
-            return i18n.t('IAM.BOOKMARK.FOLDER_DETAIL');
+        if (state.folder) {
+            return state.folder;
         }
-        if (state.selectedItem === 'global') {
+        if (state.group === 'global') {
             return i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARK');
         }
-        return getWorkspaceInfo(state.selectedItem, storeState.workspaceList)?.name || '';
+        return getWorkspaceInfo(state.group, storeState.workspaceList)?.name || '';
     }),
 });
 
@@ -88,18 +87,18 @@ watch(() => route.params, () => {
                    class="title"
         >
             <template #title-left-extra>
-                <div v-if="!state.isFolderDetailPage"
+                <div v-if="state.group"
                      class="title-left-extra"
                 >
-                    <p-i v-if="state.selectedItem === 'global'"
+                    <p-i v-if="state.group === 'global'"
                          name="ic_globe-filled"
                          :color="gray[500]"
                          width="1.5rem"
                          height="1.5rem"
                     />
                     <workspace-logo-icon v-else
-                                         :text="getWorkspaceInfo(state.selectedItem, storeState.workspaceList)?.name || ''"
-                                         :theme="getWorkspaceInfo(state.selectedItem, storeState.workspaceList)?.tags?.theme"
+                                         :text="getWorkspaceInfo(state.group, storeState.workspaceList)?.name || ''"
+                                         :theme="getWorkspaceInfo(state.group, storeState.workspaceList)?.tags?.theme"
                                          size="sm"
                     />
                 </div>

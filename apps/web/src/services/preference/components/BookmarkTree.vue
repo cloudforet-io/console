@@ -69,8 +69,9 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
                 id: item.id,
                 name: item.name,
                 to: {
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP.DETAIL._NAME),
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
                     params: {
+                        group: item.workspaceId || 'global',
                         folder: item.name,
                     },
                 },
@@ -87,7 +88,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
                         id: item.workspaceId,
                         name: item.workspaceId,
                         to: {
-                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP._NAME),
+                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
                             params: {
                                 group: item.workspaceId,
                             },
@@ -111,7 +112,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
             id: 'global',
             name: i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARK'),
             to: {
-                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP._NAME),
+                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
                 params: {
                     group: 'global',
                 },
