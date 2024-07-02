@@ -60,7 +60,7 @@ const valueFormatter = (value, field: TableWidgetField) => {
         const _originalVal = bytes.parse(`${value}${_unit}`);
         return byteFormatter(_originalVal);
     }
-    return numberFormatter(value);
+    return numberFormatter(value, { notation: 'compact' });
 };
 
 const getValue = (item: TableDataItem, field: TableWidgetField) => {
@@ -316,13 +316,6 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         .td-contents {
             @apply flex items-center pl-4 gap-1;
             width: 100%;
-
-            /* custom design-system component - p-tooltip */
-            :deep(.p-tooltip) {
-                .tooltip-inner {
-                    white-space: pre;
-                }
-            }
 
             .comparison-icon {
                 min-width: 0.75rem;

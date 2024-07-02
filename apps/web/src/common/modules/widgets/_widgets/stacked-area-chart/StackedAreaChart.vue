@@ -123,6 +123,7 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     dateRange: computed(() => state.dateRange),
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
+    noData: computed(() => (state.data ? !state.data.results?.length : false)),
 });
 
 /* Util */
@@ -189,6 +190,8 @@ const getLineByData = (rawData: Data) => {
         _seriesData.push({
             name: key,
             type: 'line',
+            stack: true,
+            areaStyle: {},
             data: state.xAxisData.map((date) => {
                 const _data = value.find((v) => v[state.xAxisField] === date);
                 return _data ? _data.value : 0;
@@ -200,6 +203,8 @@ const getLineByData = (rawData: Data) => {
 const getTotalData = (rawData: Data) => ({
     name: state.dataField,
     type: 'line',
+    stack: true,
+    areaStyle: {},
     data: state.xAxisData.map((d) => {
         const _data = rawData.results?.find((v) => v[state.xAxisField] === d);
         return _data ? _data[state.dataField] : 0;
