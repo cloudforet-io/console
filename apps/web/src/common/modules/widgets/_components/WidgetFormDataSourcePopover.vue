@@ -204,7 +204,7 @@ const handleConfirmDataSource = async () => {
             source_type: state.selectedDataSourceDomain,
             name: getDuplicatedDataTableName(dataTableBaseName, widgetGenerateState.dataTables),
         } as DataTableAddParameters;
-        const dataKey = state.selectedCostDataType.replace('data.', '');
+        const dataKey = state.selectedCostDataType?.replace('data.', '');
         const costUnit: string|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.unit;
         const additionalDataInfo: Record<string, { name: string, unit: string }>|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.data_info;
         const additionalDataUnit = dataKey !== 'cost' && additionalDataInfo ? additionalDataInfo[dataKey]?.unit : undefined;

@@ -17,6 +17,7 @@ import type { NamespaceReferenceMap } from '@/store/reference/namespace-referenc
 import { queryStringToArray, queryStringToObject, queryStringToString } from '@/lib/router-query-string';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -34,6 +35,7 @@ import type { MetricExplorerPageUrlQuery } from '@/services/asset-inventory/type
 
 const gnbStore = useGnbStore();
 const { breadcrumbs } = useBreadcrumbs();
+const { getProperRouteLocation } = useProperRouteLocation();
 const route = useRoute();
 const router = useRouter();
 
@@ -53,10 +55,10 @@ const state = reactive({
         const _targetMetric = metricExplorerPageState.metric;
         return [
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
-            {
+            getProperRouteLocation({
                 name: `[${targetNamespace?.name}] ${state.currentMetricExample?.name ?? _targetMetric?.name}`,
                 path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            },
+            }),
         ];
     }),
     metricFavoriteOptions: computed<FavoriteOptions>(() => ({

@@ -21,6 +21,9 @@ const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 const ServerPage = () => import('@/services/asset-inventory/pages/ServerPage.vue');
 const SecurityPage = () => import('@/services/asset-inventory/pages/SecurityPage.vue');
 
+const MetricExplorerMainPage = () => import('@/services/asset-inventory/pages/MetricExplorerMainPage.vue');
+const MetricExplorerDetailPage = () => import('@/services/asset-inventory/pages/MetricExplorerDetailPage.vue');
+
 const AdminCollectorMainPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorMainPage.vue');
 const AdminCollectorCreatePage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorCreatePage.vue');
 const AdminCollectorHistoryPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorHistoryPage.vue');
@@ -195,6 +198,42 @@ const adminAssetInventoryRoute: RouteConfig = {
                     },
                     props: true,
                     component: ServiceAccountAddPage as any,
+                },
+            ],
+        },
+        {
+            path: 'metric-explorer',
+            meta: { menuId: MENU_ID.METRIC_EXPLORER, translationId: MENU_INFO_MAP[MENU_ID.METRIC_EXPLORER].translationId },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME),
+                    meta: { menuId: MENU_ID.METRIC_EXPLORER, lsbVisible: true },
+                    component: MetricExplorerMainPage as any,
+                },
+                {
+                    path: ':metricId',
+                    name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME),
+                    meta: { label: ({ params }) => params.metricId, lsbVisible: true },
+                    props: true,
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: '/',
+                            name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME),
+                            meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
+                            props: true,
+                            component: MetricExplorerDetailPage as any,
+                        },
+                        {
+                            path: ':metricExampleId',
+                            name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME),
+                            meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
+                            props: true,
+                            component: MetricExplorerDetailPage as any,
+                        },
+                    ],
                 },
             ],
         },

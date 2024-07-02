@@ -1,5 +1,6 @@
 import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, onMounted, reactive } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -13,6 +14,7 @@ import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
@@ -34,6 +36,7 @@ interface OverridableWidgetFrameState {
     noData?: boolean | ComputedRef<boolean>;
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const listDataTables = async (widgetId?: string): Promise<DataTableModel[]> => {
     if (!widgetId) return [];
@@ -88,24 +91,24 @@ const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: Record<W
     };
     if (dataTable?.source_type === DATA_SOURCE_DOMAIN.COST) {
         const _costDataSourceId = dataTable?.options?.[DATA_SOURCE_DOMAIN.COST]?.data_source_id;
-        return {
+        return getProperRouteLocation({
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
                 dataSourceId: _costDataSourceId ?? '',
                 costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
             },
             query: _query,
-        };
+        });
     } if (dataTable?.source_type === DATA_SOURCE_DOMAIN.ASSET) {
         const _metricId = dataTable?.options?.[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
         if (_metricId) {
-            return {
+            return getProperRouteLocation({
                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                 params: {
                     metricId: _metricId,
                 },
                 query: _query,
-            };
+            });
         }
     }
     return undefined;
