@@ -69,7 +69,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
                 id: item.id,
                 name: item.name,
                 to: {
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL._NAME),
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP.DETAIL._NAME),
                     params: {
                         folder: item.name,
                     },

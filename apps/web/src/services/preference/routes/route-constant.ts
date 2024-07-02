@@ -7,8 +7,10 @@ export const PREFERENCE_ROUTE = {
     },
     BOOKMARK: {
         _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.BOOKMARK}`,
-        GROUP: { _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.BOOKMARK}.group` },
-        DETAIL: { _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.BOOKMARK}.detail` },
+        GROUP: {
+            _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.BOOKMARK}.group`,
+            DETAIL: { _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.BOOKMARK}.group.detail` },
+        },
     },
     WORKSPACES: {
         _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.WORKSPACES}`,

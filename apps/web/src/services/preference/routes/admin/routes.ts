@@ -12,6 +12,7 @@ const DomainSettingsPage = () => import('@/services/preference/pages/admin/Admin
 const WorkspacesPage = () => import('@/services/preference/pages/admin/AdminWorkspacesPage.vue');
 const BookmarkContainer = () => import('@/services/preference/components/BookmarkContainer.vue');
 const BookmarkPage = () => import('@/services/preference/pages/admin/AdminBookmarkPage.vue');
+const BookmarkDetailContainer = () => import('@/services/preference/components/BookmarkDetailContainer.vue');
 const BookmarkDetailPage = () => import('@/services/preference/pages/admin/AdminBookmarkDetailPage.vue');
 
 const adminPreferenceRoutes: RouteConfig = {
@@ -57,14 +58,23 @@ const adminPreferenceRoutes: RouteConfig = {
                     name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP._NAME),
                     meta: { lsbVisible: true },
                     props: true,
-                    component: BookmarkDetailPage,
-                },
-                {
-                    path: ':folder',
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL._NAME),
-                    meta: { lsbVisible: true },
-                    props: true,
-                    component: BookmarkDetailPage,
+                    component: BookmarkDetailContainer,
+                    children: [
+                        {
+                            path: '/',
+                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP._NAME),
+                            meta: { lsbVisible: true },
+                            props: true,
+                            component: BookmarkDetailPage,
+                        },
+                        {
+                            path: ':folder',
+                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.GROUP.DETAIL._NAME),
+                            meta: { lsbVisible: true },
+                            props: true,
+                            component: BookmarkDetailPage,
+                        },
+                    ],
                 },
             ],
         },
