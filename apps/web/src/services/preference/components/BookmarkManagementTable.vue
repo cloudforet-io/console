@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PToolboxTable, PLazyImg, PI, PDataLoader,
+    PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -11,9 +13,14 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import { useQueryTags } from '@/common/composables/query-tags';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -21,13 +28,17 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo } from '@/services/preference/composables/bookmark-data-helper';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
+const bookmarkStore = useBookmarkStore();
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
+
+const router = useRouter();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
@@ -60,7 +71,7 @@ const tableState = reactive({
         {
             name: 'action_button',
             label: ' ',
-            type: 'item',
+            width: '2rem',
             sortable: false,
         },
     ]),
@@ -78,6 +89,20 @@ const tableState = reactive({
         scope: makeDistinctValueHandler('config.PublicConfig', 'scope'),
         link: makeDistinctValueHandler('config.PublicConfig', 'link'),
     })),
+});
+const dropdownState = reactive({
+    menuItems: computed<MenuItem[]>(() => ([
+        {
+            icon: 'ic_edit',
+            name: 'edit',
+            label: i18n.t('IAM.BOOKMARK.EDIT'),
+        },
+        {
+            icon: 'ic_delete',
+            name: 'delete',
+            label: i18n.t('IAM.BOOKMARK.DELETE'),
+        },
+    ])),
 });
 
 const getFolderInfo = (id: string): BookmarkItem|undefined => {
@@ -101,6 +126,38 @@ const handleChange = (options: any = {}) => {
     if (options.pageStart !== undefined) bookmarkPageStore.setBookmarkListPageStart(options.pageStart - 1);
     if (options.pageLimit !== undefined) bookmarkPageStore.setBookmarkListPageLimit(options.pageLimit);
     fetchBookmarkList();
+};
+const handleSelectDropdownMenu = (item: BookmarkItem, menu: string) => {
+    bookmarkPageStore.setIsTableItem(true);
+    if (menu === 'edit') {
+        bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, true);
+        return;
+    }
+    if (menu === 'delete') {
+        bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.DELETE_LINK : BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
+        return;
+    }
+
+    bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, false);
+};
+const handleUpdateVisibleMenu = (item: BookmarkItem, visibleMenu: boolean) => {
+    if (visibleMenu) {
+        bookmarkStore.setSelectedBookmark(item, true);
+    }
+};
+const getRowSelectable = (item) => !item.isGlobal;
+const handleClickName = (item: BookmarkItem) => {
+    if (item.link) {
+        window.open(item.link, '_blank');
+        return;
+    }
+    router.push({
+        name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+        params: {
+            group: item.workspaceId || 'global',
+            folder: item.name as string || '',
+        },
+    });
 };
 
 const fetchBookmarkList = async () => {
@@ -133,12 +190,15 @@ const fetchBookmarkList = async () => {
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              :query-tags="queryTags"
+                             :get-row-selectable="getRowSelectable"
                              @change="handleChange"
                              @refresh="fetchBookmarkList"
                              @update:select-index="handleUpdateSelectIndex"
             >
                 <template #col-name-format="{value, item}">
-                    <div class="col-name">
+                    <div class="col-name"
+                         @click="handleClickName(item)"
+                    >
                         <p-lazy-img v-if="item.link"
                                     class="left-icon"
                                     :src="item.imgIcon"
@@ -189,6 +249,19 @@ const fetchBookmarkList = async () => {
                 <template #col-link-format="{value}">
                     <span class="col-link">{{ value ?? '-' }}</span>
                 </template>
+                <template #col-action_button-format="{item}">
+                    <p-select-dropdown v-if="item.isGlobal"
+                                       :menu="dropdownState.menuItems"
+                                       style-type="icon-button"
+                                       button-icon="ic_ellipsis-horizontal"
+                                       use-fixed-menu-style
+                                       class="overlay"
+                                       reset-selected-on-unmounted
+                                       menu-position="right"
+                                       @select="handleSelectDropdownMenu(item, $event)"
+                                       @update:visible-menu="handleUpdateVisibleMenu(item, $event)"
+                    />
+                </template>
             </p-toolbox-table>
         </p-data-loader>
     </section>
@@ -203,6 +276,9 @@ const fetchBookmarkList = async () => {
             .name {
                 @apply truncate;
                 max-width: 20.625rem;
+            }
+            &:hover {
+                @apply cursor-pointer underline;
             }
         }
         .col-workspace {
@@ -222,6 +298,24 @@ const fetchBookmarkList = async () => {
         .col-link {
             @apply block truncate;
             max-width: 12rem;
+        }
+
+        /* custom design-system component - p-select-dropdown */
+        :deep(.p-select-dropdown) {
+            .dropdown-context-menu {
+                min-width: 7.25rem !important;
+                margin-top: 0;
+                margin-left: -5.25rem;
+            }
+        }
+    }
+
+    /* custom design-system component - p-toolbox-table */
+    :deep(.p-toolbox-table) {
+        td.has-width {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+            min-width: unset;
         }
     }
 }

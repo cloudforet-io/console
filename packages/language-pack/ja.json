@@ -2135,9 +2135,11 @@
 			"ALL_BOOKMARK": "すべてのブックマーク",
 			"CREATE_FOLDER": "フォルダーを作成する",
 			"DELETE": "削除",
+			"EDIT": "編集",
 			"FOLDER": "フォルダ",
 			"GLOBAL_BOOKMARK": "グローバルブックマーク",
 			"GLOBAL_NOTIFICATION": "",
+			"GO_TO_WORKSPACE": "",
 			"LINK": "リンク",
 			"TYPE": "タイプ"
 		},
