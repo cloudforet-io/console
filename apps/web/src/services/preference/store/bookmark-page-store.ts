@@ -99,8 +99,10 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     } else {
                         defaultFilters.push({ k: 'data.workspaceId', v: state.params.group, o: '=' });
                     }
-                } else if (state.params.folder) {
-                    defaultFilters.push({ k: 'data.folder', v: state.params.folder, o: '=' });
+                }
+                if (state.params.folder) {
+                    const folderId = state.bookmarkFolderList.find((i) => i.name === state.params?.folder)?.id;
+                    if (folderId) defaultFilters.push({ k: 'data.folder', v: folderId, o: '=' });
                 }
             }
             if (selectedType === BOOKMARK_MODAL_TYPE.LINK) {

@@ -17,7 +17,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
-import type { BookmarkModalType } from '@/common/components/bookmark/type/type';
+import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
@@ -38,6 +38,7 @@ const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
+    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
 });
 const state = reactive({
     visibleMenu: false,
@@ -70,6 +71,12 @@ const handleClickCreateButton = () => {
 const handleSelectMenuItem = (value: MenuItem) => {
     if (value.name === BOOKMARK_MODAL_TYPE.LINK) {
         bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK);
+        if (state.folder) {
+            const selectedFolder = storeState.bookmarkFolderList.find((item) => item.name === state.folder);
+            if (selectedFolder) {
+                bookmarkStore.setSelectedBookmark(selectedFolder);
+            }
+        }
     } else if (value.name === BOOKMARK_MODAL_TYPE.FOLDER) {
         bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.FOLDER);
     }
