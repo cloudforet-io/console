@@ -120,7 +120,7 @@ const handleCreateNotice = async () => {
             files: data.files,
             options: data.options,
             writer: data.writer,
-            resource_group: workspaceState.selectedRadioIdx === 0 ? 'DOMAIN' : 'WORKSPACE',
+            resource_group: 'WORKSPACE',
             workspaces: workspaceState.selectedRadioIdx === 0 ? ['*'] : workspaceState.selectedItems.map((item) => item.name),
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
