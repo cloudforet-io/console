@@ -100,7 +100,9 @@ const handleSelectMenuItem = (value: MenuItem) => {
                 </div>
             </template>
             <template #extra>
-                <div class="extra">
+                <div v-if="state.group === 'global'"
+                     class="extra"
+                >
                     <p-button style-type="tertiary"
                               icon-left="ic_delete"
                               :disabled="storeState.selectedIndices.length === 0"
@@ -122,6 +124,12 @@ const handleSelectMenuItem = (value: MenuItem) => {
                         />
                     </div>
                 </div>
+                <p-button v-else
+                          style-type="tertiary"
+                          icon-right="ic_arrow-right-up"
+                >
+                    {{ $t('IAM.BOOKMARK.GO_TO_WORKSPACE') }}
+                </p-button>
             </template>
         </p-heading>
         <router-view />
