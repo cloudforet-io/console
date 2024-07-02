@@ -13,20 +13,39 @@ import type { PublicConfigModel } from '@/schema/config/public-config/model';
 
 import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+interface BookmarkPageState {
+    loading: boolean;
+    bookmarkFolderList: BookmarkItem[];
+    bookmarkList: BookmarkItem[];
+    bookmarkTotalCount: number;
+    pageStart: number;
+    pageLimit: number;
+    searchFilter: ConsoleFilter[];
+    selectedIndices: number[];
+    params?: Record<string, string>;
+    selectedType: string;
+    isTableItem: boolean;
+}
+
 export const useBookmarkPageStore = defineStore('page-bookmark', () => {
-    const state = reactive({
+    const bookmarkStore = useBookmarkStore();
+
+    const state = reactive<BookmarkPageState>({
         loading: false,
-        bookmarkFolderList: [] as BookmarkItem[],
-        bookmarkList: [] as BookmarkItem[],
+        bookmarkFolderList: [],
+        bookmarkList: [],
         bookmarkTotalCount: 0,
         pageStart: 0,
         pageLimit: 15,
-        searchFilter: [] as ConsoleFilter[],
-        selectedIndices: [] as number[],
-        params: undefined as Record<string, string>|undefined,
+        searchFilter: [],
+        selectedIndices: [],
+        params: undefined,
+        selectedType: 'All',
+        isTableItem: false,
     });
 
     const getters = reactive({
@@ -53,18 +72,25 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         setSelectedBookmarkIndices: (indices: number[]) => {
             state.selectedIndices = indices;
         },
-        setParams: (params: Record<string, string>) => {
+        setParams: (params?: Record<string, string>) => {
             state.params = params;
+        },
+        setSelectedType: (type: string) => {
+            state.selectedType = type;
         },
     };
     const actions = {
         resetState: () => {
+            state.loading = false;
+            state.bookmarkTotalCount = 0;
+            state.params = undefined;
+            state.selectedType = 'All';
             state.bookmarkFolderList = [];
             state.bookmarkList = [];
             state.pageStart = 0;
             state.pageLimit = 15;
-            state.searchFilter = [] as ConsoleFilter[];
-            state.selectedIndices = [] as number[];
+            state.searchFilter = [];
+            state.selectedIndices = [];
         },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
@@ -82,9 +108,11 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     workspace_id: i.data.workspaceId,
                     id: i.name,
                 } as BookmarkItem));
+                bookmarkStore.setBookmarkFolderData(state.bookmarkFolderList);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkFolderList = [];
+                bookmarkStore.setBookmarkFolderData([]);
             }
         },
         fetchBookmarkList: async (selectedType?: string) => {
@@ -137,9 +165,11 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                 });
                 state.bookmarkList = await Promise.all(promises);
                 state.bookmarkTotalCount = total_count || 0;
+                bookmarkStore.setBookmarkData(state.bookmarkList);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkList = [];
+                bookmarkStore.setBookmarkData([]);
             } finally {
                 state.loading = false;
             }

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive,
+    computed, reactive,
 } from 'vue';
 
 import { PHeading, PButton, PContextMenu } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { at } from 'lodash';
 
 import { i18n } from '@/translations';
 
@@ -19,11 +20,13 @@ const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
+const bookmarkPageGetters = bookmarkPageStore.getters;
 
 const storeState = reactive({
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
+    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
 });
 const state = reactive({
     visibleMenu: false,
@@ -50,10 +53,11 @@ const handleSelectMenuItem = (value: MenuItem) => {
     }
     state.visibleMenu = false;
 };
-
-onMounted(() => {
-    bookmarkPageStore.fetchBookmarkFolderList();
-});
+const handleClickDeleteButton = () => {
+    const selectedItems = at(storeState.bookmarkList, storeState.selectedIndices);
+    bookmarkStore.setSelectedBookmarks(selectedItems);
+    bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.MULTI_DELETE);
+};
 </script>
 
 <template>
@@ -66,8 +70,9 @@ onMounted(() => {
                     <p-button style-type="tertiary"
                               icon-left="ic_delete"
                               :disabled="storeState.selectedIndices.length === 0"
+                              @click="handleClickDeleteButton"
                     >
-                        {{ $t('IAM.BOOKMARK.DELETE') }}
+                        {{ $t('IAM.BOOKMARK.DELETE') }} {{ storeState.selectedIndices.length || ' ' }}
                     </p-button>
                     <div class="create-button-wrapper">
                         <p-button icon-left="ic_plus"

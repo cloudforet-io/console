@@ -1,7 +1,6 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -16,12 +15,23 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import getRandomId from '@/lib/random-id-generator';
 
 import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
-import { DEFAULT_BOOKMARK } from '@/common/components/bookmark/constant/constant';
 import type { BookmarkItem, BookmarkModalStateType, BookmarkModalType } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
+
+interface BookmarkState {
+    bookmarkFolderData: BookmarkItem[];
+    bookmarkData: BookmarkItem[];
+    filterByFolder?: string|TranslateResult;
+    selectedBookmark?: BookmarkItem;
+    selectedBookmarks: BookmarkItem[];
+    isFullMode: boolean;
+    isFileFullMode: boolean;
+    modal: BookmarkModalStateType;
+    bookmarkType: BookmarkType;
+}
 
 export const useBookmarkStore = defineStore('bookmark', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
@@ -35,25 +45,20 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     });
 
-    const DefaultBookmarkData = DEFAULT_BOOKMARK.map((i) => ({
-        ...i,
-        workspaceId: _getters.currentWorkspaceId,
-    }));
-
-    const state = reactive({
-        bookmarkFolderData: [] as BookmarkItem[],
-        bookmarkData: [] as BookmarkItem[],
-        filterByFolder: undefined as string|undefined|TranslateResult,
-        selectedBookmark: undefined as BookmarkItem|undefined,
-        selectedBookmarks: [] as BookmarkItem[],
+    const state = reactive<BookmarkState>({
+        bookmarkFolderData: [],
+        bookmarkData: [],
+        filterByFolder: undefined,
+        selectedBookmark: undefined,
+        selectedBookmarks: [],
         isFullMode: false,
         isFileFullMode: false,
         modal: {
-            isNew: undefined as boolean|undefined,
-            isEdit: undefined as boolean|undefined,
-            type: undefined as BookmarkModalType|undefined,
-        } as BookmarkModalStateType,
-        bookmarkType: BOOKMARK_TYPE.WORKSPACE as BookmarkType,
+            isNew: undefined,
+            isEdit: undefined,
+            type: undefined,
+        },
+        bookmarkType: BOOKMARK_TYPE.WORKSPACE,
     });
 
     const getters = reactive({
@@ -109,8 +114,13 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         setBookmarkType: (type: BookmarkType) => {
             state.bookmarkType = type;
         },
+        setBookmarkData: (data: BookmarkItem[]) => {
+            state.bookmarkData = data;
+        },
+        setBookmarkFolderData: (data: BookmarkItem[]) => {
+            state.bookmarkFolderData = data;
+        },
     };
-
 
     const actions = {
         resetState: () => {
@@ -175,10 +185,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                     query: bookmarkListApiQuery.data,
                 });
                 if (status === 'succeed') {
-                    if (state.bookmarkType === BOOKMARK_TYPE.WORKSPACE && isEmpty(response)) {
-                        await actions.createDefaultBookmark();
-                        return;
-                    }
                     const promises: Promise<BookmarkItem>[] = (response.results ?? []).map(async (item) => {
                         const imgIcon = item.data.imgIcon || await fetchFavicon(item.data.link);
                         return {
@@ -193,20 +199,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkData = [];
-            }
-        },
-        createDefaultBookmark: async () => {
-            try {
-                await Promise.all(DefaultBookmarkData.map(async (item) => {
-                    await actions.createBookmarkLink({
-                        name: item.name as string || '',
-                        link: item.link || '',
-                        imgIcon: item.imgIcon,
-                        type: BOOKMARK_TYPE.WORKSPACE,
-                    });
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
             }
         },
         createBookmarkFolder: async (name: string, type?: string) => {

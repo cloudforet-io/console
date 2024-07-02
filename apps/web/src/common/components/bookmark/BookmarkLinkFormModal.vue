@@ -142,10 +142,11 @@ const fetchBookmarkFolderList = async () => {
             query: bookmarkListApiQuery.data,
         });
         if (status === 'succeed') {
-            state.bookmarkFolderList = (response.results ?? []).map((i) => ({
+            const list = (response.results ?? []).map((i) => ({
                 ...i.data,
                 id: i.name,
             } as BookmarkItem));
+            state.bookmarkFolderList = storeState.isAdminMode ? list.filter((i) => i.isGlobal) : list;
         }
     } catch (e) {
         ErrorHandler.handleError(e);

@@ -30,12 +30,18 @@ const bookmarkPageGetters = bookmarkPageStore.getters;
 const route = useRoute();
 
 const storeState = reactive({
+    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
     loading: computed<boolean>(() => bookmarkPageState.loading),
+    selectedType: computed<string>(() => bookmarkPageState.selectedType),
+});
+const state = reactive({
+    group: computed<string>(() => route.params.group),
+    folder: computed<string>(() => route.params.folder),
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -73,11 +79,10 @@ const tableState = reactive({
         { label: i18n.t('IAM.BOOKMARK.LINK') as string, name: BOOKMARK_MODAL_TYPE.LINK },
         { label: i18n.t('IAM.BOOKMARK.FOLDER') as string, name: BOOKMARK_MODAL_TYPE.FOLDER },
     ])),
-    selectedType: 'All' as string,
 });
 
 const handleSelectType = (value: string) => {
-    tableState.selectedType = value;
+    bookmarkPageStore.setSelectedType(value);
     if (value === 'All') {
         fetchBookmarkList();
     } else {
@@ -106,9 +111,12 @@ const handleChange = (options: any = {}) => {
     fetchBookmarkList();
 };
 
-watch(() => route.params, () => {
-    bookmarkPageStore.fetchBookmarkList();
-    tableState.selectedType = 'All';
+watch([() => route.params, () => storeState.bookmarkFolderList], async ([params, bookmarkFolderList]) => {
+    if (!bookmarkFolderList || bookmarkFolderList?.length === 0) return;
+    await bookmarkPageStore.setParams(params);
+    await bookmarkPageStore.setSelectedBookmarkIndices([]);
+    await fetchBookmarkList();
+    bookmarkPageStore.setSelectedType('All');
 }, { immediate: true });
 </script>
 
@@ -121,7 +129,7 @@ watch(() => route.params, () => {
             <p-toolbox-table class="table"
                              search-type="query"
                              searchable
-                             selectable
+                             :selectable="state.group === 'global'"
                              sortable
                              sort-by="name"
                              :sort-desc="true"
@@ -136,12 +144,14 @@ watch(() => route.params, () => {
                              @refresh="fetchBookmarkList"
                              @update:select-index="handleUpdateSelectIndex"
             >
-                <template #toolbox-bottom>
+                <template v-if="!state.folder"
+                          #toolbox-bottom
+                >
                     <div class="select-type-wrapper">
                         <span>{{ $t('IAM.BOOKMARK.TYPE') }}</span>
                         <p-select-status v-for="(item, idx) in tableState.typeField"
                                          :key="idx"
-                                         :selected="tableState.selectedType"
+                                         :selected="storeState.selectedType"
                                          class="mr-2"
                                          :value="item.name"
                                          @change="handleSelectType"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PToolboxTable, PLazyImg, PI, PDataLoader,
@@ -107,9 +107,10 @@ const fetchBookmarkList = async () => {
     await bookmarkPageStore.fetchBookmarkList();
 };
 
-onMounted(async () => {
+(async () => {
+    bookmarkPageStore.setParams(undefined);
     await fetchBookmarkList();
-});
+})();
 </script>
 
 <template>

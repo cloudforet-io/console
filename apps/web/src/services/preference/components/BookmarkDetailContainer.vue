@@ -3,15 +3,18 @@ import {
     computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PHeading, PButton, PContextMenu, PI,
+    PHeading, PButton, PContextMenu, PI, PIconButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { at } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -23,22 +26,27 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo } from '@/services/preference/composables/bookmark-data-helper';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
+const bookmarkPageGetters = bookmarkPageStore.getters;
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const route = useRoute();
+const router = useRouter();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
+    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
 });
 const state = reactive({
     visibleMenu: false,
@@ -54,6 +62,7 @@ const state = reactive({
     ])),
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
+    selectedFolder: computed<BookmarkItem|undefined>(() => storeState.bookmarkFolderList.find((item) => item.name === state.folder)),
     headingTitle: computed<TranslateResult|string>(() => {
         if (state.folder) {
             return state.folder;
@@ -66,15 +75,51 @@ const state = reactive({
 });
 
 const handleClickCreateButton = () => {
-    state.visibleMenu = !state.visibleMenu;
+    if (!state.folder) {
+        state.visibleMenu = !state.visibleMenu;
+        return;
+    }
+    handleSelectMenuItem({ name: BOOKMARK_MODAL_TYPE.LINK });
+};
+const handleClickGoBackButton = () => {
+    router.push({
+        name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
+        params: {
+            group: state.group,
+        },
+    });
+};
+const handleClickWorkspaceButton = () => {
+    window.open(router.resolve({
+        name: WORKSPACE_HOME_ROUTE._NAME,
+        params: {
+            workspaceId: state.group,
+        },
+    }).href, '_blank');
+};
+const handleClickDeleteButton = () => {
+    const selectedItems = at(storeState.bookmarkList, storeState.selectedIndices);
+    bookmarkStore.setSelectedBookmarks(selectedItems);
+    bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.MULTI_DELETE);
+};
+const handleClickEditFolderButton = () => {
+    if (state.selectedFolder) {
+        bookmarkStore.setSelectedBookmark(state.selectedFolder);
+    }
+    bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.FOLDER, true);
+};
+const handleClickDeleteFolderButton = () => {
+    if (state.selectedFolder) {
+        bookmarkStore.setSelectedBookmark(state.selectedFolder);
+    }
+    bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
 };
 const handleSelectMenuItem = (value: MenuItem) => {
     if (value.name === BOOKMARK_MODAL_TYPE.LINK) {
         bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK);
         if (state.folder) {
-            const selectedFolder = storeState.bookmarkFolderList.find((item) => item.name === state.folder);
-            if (selectedFolder) {
-                bookmarkStore.setSelectedBookmark(selectedFolder);
+            if (state.selectedFolder) {
+                bookmarkStore.setSelectedBookmark(state.selectedFolder);
             }
         }
     } else if (value.name === BOOKMARK_MODAL_TYPE.FOLDER) {
@@ -87,11 +132,13 @@ const handleSelectMenuItem = (value: MenuItem) => {
 <template>
     <div class="bookmark-detail-container">
         <p-heading :title="state.headingTitle"
+                   :show-back-button="!!state.folder"
                    class="title"
+                   @click-back-button="handleClickGoBackButton"
         >
             <template #title-left-extra>
-                <div v-if="state.group"
-                     class="title-left-extra"
+                <div v-if="!state.folder"
+                     class="title-extra"
                 >
                     <p-i v-if="state.group === 'global'"
                          name="ic_globe-filled"
@@ -105,6 +152,29 @@ const handleSelectMenuItem = (value: MenuItem) => {
                                          size="sm"
                     />
                 </div>
+                <div v-else
+                     class="title-extra"
+                >
+                    <p-i name="ic_folder"
+                         :color="gray[900]"
+                         width="1.25rem"
+                         height="1.25rem"
+                    />
+                </div>
+            </template>
+            <template v-if="state.folder && state.group === 'global'"
+                      #title-right-extra
+            >
+                <div class="title-extra">
+                    <p-icon-button name="ic_edit-text"
+                                   style-type="transparent"
+                                   @click="handleClickEditFolderButton"
+                    />
+                    <p-icon-button name="ic_delete"
+                                   style-type="transparent"
+                                   @click="handleClickDeleteFolderButton"
+                    />
+                </div>
             </template>
             <template #extra>
                 <div v-if="state.group === 'global'"
@@ -113,14 +183,15 @@ const handleSelectMenuItem = (value: MenuItem) => {
                     <p-button style-type="tertiary"
                               icon-left="ic_delete"
                               :disabled="storeState.selectedIndices.length === 0"
+                              @click="handleClickDeleteButton"
                     >
-                        {{ $t('IAM.BOOKMARK.DELETE') }}
+                        {{ $t('IAM.BOOKMARK.DELETE') }} {{ storeState.selectedIndices.length || ' ' }}
                     </p-button>
                     <div class="create-button-wrapper">
                         <p-button icon-left="ic_plus"
                                   @click="handleClickCreateButton"
                         >
-                            {{ $t('IAM.BOOKMARK.ADD_GLOBAL_BOOKMARK') }}
+                            {{ state.folder ? $t('IAM.BOOKMARK.ADD_LINK') : $t('IAM.BOOKMARK.ADD_GLOBAL_BOOKMARK') }}
                         </p-button>
                         <p-context-menu v-show="state.visibleMenu"
                                         class="create-context-menu"
@@ -134,6 +205,7 @@ const handleSelectMenuItem = (value: MenuItem) => {
                 <p-button v-else
                           style-type="tertiary"
                           icon-right="ic_arrow-right-up"
+                          @click="handleClickWorkspaceButton"
                 >
                     {{ $t('IAM.BOOKMARK.GO_TO_WORKSPACE') }}
                 </p-button>
@@ -161,7 +233,7 @@ const handleSelectMenuItem = (value: MenuItem) => {
                 }
             }
         }
-        .title-left-extra {
+        .title-extra {
             @apply flex items-center;
         }
     }
