@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute } from 'vue-router/composables';
@@ -75,10 +75,6 @@ const handleSelectMenuItem = (value: MenuItem) => {
     }
     state.visibleMenu = false;
 };
-
-watch(() => route.params, () => {
-    bookmarkPageStore.fetchBookmarkList();
-}, { immediate: true });
 </script>
 
 <template>

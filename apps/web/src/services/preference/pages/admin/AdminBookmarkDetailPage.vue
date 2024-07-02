@@ -1,23 +1,16 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import BookmarkManagementDetailTable from '@/services/preference/components/BookmarkManagementDetailTable.vue';
-import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
-
-const bookmarkPageStore = useBookmarkPageStore();
 
 const route = useRoute();
 
 const state = reactive({
     group: computed<string>(() => route.params.group),
 });
-
-watch(() => route.params, () => {
-    bookmarkPageStore.fetchBookmarkList();
-}, { immediate: true });
 </script>
 
 <template>
