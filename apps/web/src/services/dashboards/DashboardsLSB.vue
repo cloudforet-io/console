@@ -22,6 +22,8 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
+import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
+import LSBMenuItem from '@/common/modules/navigations/lsb/modules/LSBMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
@@ -74,7 +76,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    workspaceMenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.map((d) => ({
+    workspaceV2MenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.filter((d) => d.version === '2.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -89,7 +91,22 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    privateMenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.map((d) => ({
+    workspaceV1MenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.filter((d) => d.version === '1.0').map((d) => ({
+        type: MENU_ITEM_TYPE.ITEM,
+        id: d.dashboard_id,
+        label: d.name,
+        to: getProperRouteLocation({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            params: {
+                dashboardId: d.dashboard_id,
+            },
+        }),
+        favoriteOptions: {
+            type: FAVORITE_TYPE.DASHBOARD,
+            id: d.dashboard_id,
+        },
+    }))),
+    privateV2MenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.filter((d) => d.version === '2.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -108,6 +125,30 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
+    privateV1MenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.filter((d) => d.version === '1.0').map((d) => ({
+        type: MENU_ITEM_TYPE.ITEM,
+        id: d.dashboard_id,
+        label: d.name,
+        to: getProperRouteLocation({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            params: {
+                dashboardId: d.dashboard_id,
+            },
+        }),
+        icon: {
+            name: 'ic_lock-filled',
+            color: gray[500],
+        },
+        favoriteOptions: {
+            type: FAVORITE_TYPE.DASHBOARD,
+            id: d.dashboard_id,
+        },
+    }))),
+    deprecatedMenu: computed<LSBItem>(() => ({
+        type: MENU_ITEM_TYPE.SLOT,
+        label: i18n.t('COMMON.DEPRECATED'),
+        id: 'deprecated',
+    })),
     menuSet: computed<LSBMenu[]>(() => {
         const defaultMenuSet: LSBMenu[] = [
             {
@@ -143,11 +184,11 @@ const state = reactive({
             },
             { type: MENU_ITEM_TYPE.DIVIDER },
         );
-
         return [
             ...defaultMenuSet,
-            ...(storeState.isWorkspaceOwner ? filterMenuItems(state.workspaceMenuSet) : []),
-            ...filterMenuItems(state.privateMenuSet),
+            ...(storeState.isWorkspaceOwner ? filterMenuItems(state.workspaceV2MenuSet) : []),
+            ...filterMenuItems(state.privateV2MenuSet),
+            state.deprecatedMenu,
         ];
     }),
 });
@@ -200,6 +241,23 @@ callApiWithGrantGuard();
                     />
                 </template>
             </l-s-b-router-menu-item>
+        </template>
+        <template #slot-deprecated>
+            <l-s-b-collapsible-menu-item class="category-menu-item mt-1"
+                                         :item="{
+                                             type: 'collapsible',
+                                             label: $t('COMMON.DEPRECATED'),
+                                             subItems: [...state.workspaceV1MenuSet, ...state.privateV1MenuSet]
+                                         }"
+                                         is-sub-item
+            >
+                <template #collapsible-contents="{ item: _item }">
+                    <l-s-b-menu-item v-for="item in _item?.subItems"
+                                     :key="item.id"
+                                     :menu-data="item"
+                    />
+                </template>
+            </l-s-b-collapsible-menu-item>
         </template>
     </l-s-b>
 </template>
