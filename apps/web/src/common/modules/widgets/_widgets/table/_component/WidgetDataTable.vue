@@ -68,7 +68,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
         if (Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
             const referenceKey = REFERENCE_FIELD_MAP[field.name];
             const referenceValueKey = item[field.name];
-            return storeState[referenceKey][referenceValueKey]?.name || referenceValueKey || '-';
+            return storeState[referenceKey][referenceValueKey]?.label || referenceValueKey || '-';
         }
         return item[field.name] || '-';
     }
