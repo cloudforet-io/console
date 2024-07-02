@@ -15,9 +15,10 @@ import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookma
 
 import { gray } from '@/styles/colors';
 
-
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
+
+const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]|undefined>(() => bookmarkState.bookmarkFolderData),
@@ -82,6 +83,7 @@ const handleConfirm = async () => {
             bookmarkStore.setSelectedBookmarks([]);
         }
 
+        emit('confirm');
         await handleClose();
     } finally {
         state.loading = false;
@@ -93,55 +95,65 @@ const handleClose = () => {
 </script>
 
 <template>
-    <p-button-modal class="bookmark-delete-modal"
-                    :header-title="state.headerTitle"
-                    size="sm"
-                    :fade="true"
-                    :backdrop="true"
-                    :visible="state.isFolder || state.isLink || state.isMulti"
-                    theme-color="alert"
-                    :loading="state.loading"
-                    @confirm="handleConfirm"
-                    @close="handleClose"
-                    @cancel="handleClose"
-    >
-        <template #body>
-            <div class="content">
-                <div v-for="(item, idx) in state.items"
-                     :key="`delete-item-${idx}`"
-                     class="content-wrapper"
-                >
-                    <div class="icon-wrapper"
-                         :class="{'is-folder': !item.link}"
+    <div class="bookmark-delete-modal">
+        <p-button-modal :header-title="state.headerTitle"
+                        size="sm"
+                        :fade="true"
+                        :backdrop="true"
+                        :visible="state.isFolder || state.isLink || state.isMulti"
+                        theme-color="alert"
+                        :loading="state.loading"
+                        @confirm="handleConfirm"
+                        @close="handleClose"
+                        @cancel="handleClose"
+        >
+            <template #body>
+                <div class="content">
+                    <div v-for="(item, idx) in state.items"
+                         :key="`delete-item-${idx}`"
+                         class="content-wrapper"
                     >
-                        <p-i v-if="!item.link"
-                             name="ic_folder"
-                             width="1.25rem"
-                             height="1.25rem"
-                        />
-                        <p-lazy-img
-                            v-else
-                            :src="assetUrlConverter(item?.imgIcon)"
-                            width="1.5rem"
-                            height="1.5rem"
-                            error-icon="ic_globe-filled"
-                            :error-icon-color="gray[500]"
-                            class="icon"
-                        />
-                    </div>
-                    <div class="text-wrapper">
-                        <span>{{ item?.name }}</span>
-                        <span v-if="item.link"
-                              class="link"
-                        >{{ item.link }}</span>
+                        <div v-if="item.isGlobal"
+                             class="global-wrapper"
+                        >
+                            <p-i name="ic_globe-filled"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                                 :color="gray[500]"
+                            />
+                        </div>
+                        <div class="icon-wrapper"
+                             :class="{'is-folder': !item.link}"
+                        >
+                            <p-i v-if="!item.link"
+                                 name="ic_folder"
+                                 width="1.25rem"
+                                 height="1.25rem"
+                            />
+                            <p-lazy-img
+                                v-else
+                                :src="assetUrlConverter(item?.imgIcon)"
+                                width="1.5rem"
+                                height="1.5rem"
+                                error-icon="ic_globe-filled"
+                                :error-icon-color="gray[500]"
+                                class="icon"
+                            />
+                        </div>
+                        <div class="text-wrapper">
+                            <span>{{ item?.name }}</span>
+                            <span v-if="item.link"
+                                  class="link"
+                            >{{ item.link }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </template>
-        <template #confirm-button>
-            <span>{{ $t('HOME.BOOKMARK_DELETE') }}</span>
-        </template>
-    </p-button-modal>
+            </template>
+            <template #confirm-button>
+                <span>{{ $t('HOME.BOOKMARK_DELETE') }}</span>
+            </template>
+        </p-button-modal>
+    </div>
 </template>
 
 <style scoped lang="postcss">
@@ -150,9 +162,23 @@ const handleClose = () => {
         @apply overflow-y-auto;
         max-height: 16rem;
         .content-wrapper {
-            @apply flex items-center bg-gray-100 rounded-xl;
+            @apply relative flex items-center bg-gray-100 rounded-xl;
             padding: 0.5rem;
+            margin-right: 1rem;
+            margin-left: 1rem;
             gap: 0.5rem;
+            &:first-child {
+                margin-top: 0.375rem;
+            }
+            .global-wrapper {
+                @apply absolute flex items-center justify-center bg-white border border-gray-200;
+                width: 1.25rem;
+                height: 1.25rem;
+                top: -0.25rem;
+                left: -0.25rem;
+                border-radius: 0.375rem;
+                z-index: 10;
+            }
             .icon-wrapper {
                 @apply relative flex items-center justify-center rounded-xl;
                 width: 2.5rem;
@@ -171,6 +197,21 @@ const handleClose = () => {
             & + .content-wrapper {
                 margin-top: 0.25rem;
             }
+        }
+    }
+}
+
+/* custom design-system component - p-button-modal */
+:deep(.p-button-modal) {
+    .modal-content {
+        padding: 1rem;
+    }
+    .header {
+        padding-top: 1rem;
+        padding-right: 1rem;
+        padding-left: 1rem;
+        .modal-header {
+            margin-bottom: 0;
         }
     }
 }
