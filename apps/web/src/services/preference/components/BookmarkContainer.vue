@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -16,6 +16,7 @@ import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookma
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
+
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkStore = useBookmarkStore();
@@ -26,8 +27,13 @@ const router = useRouter();
 
 const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
+    selectedType: computed<string>(() => bookmarkPageState.selectedType),
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
 });
+const state = reactive({
+    globalFolderList: computed<BookmarkItem[]>(() => storeState.bookmarkFolderList.filter((item) => item.isGlobal)),
+});
+
 const handleCreateFolder = (isEdit?: boolean, name?: string) => {
     if (isEdit && name) {
         router.push({
@@ -58,12 +64,9 @@ const handleConfirmDelete = () => {
     bookmarkPageStore.setSelectedBookmarkIndices([]);
 };
 
-watch(() => route.params, () => {
-    bookmarkPageStore.setParams(route.params);
-}, { immediate: true });
-
 onUnmounted(() => {
     bookmarkPageStore.resetState();
+    bookmarkStore.resetState();
 });
 
 onMounted(() => {
@@ -75,11 +78,11 @@ onMounted(() => {
     <div class="admin-bookmark-page">
         <router-view />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
-                                    :bookmark-folder-list="storeState.bookmarkFolderList"
+                                    :bookmark-folder-list="state.globalFolderList"
                                     @confirm="handleCreateFolder"
         />
         <bookmark-link-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.LINK"
-                                  :bookmark-folder-list="storeState.bookmarkFolderList"
+                                  :bookmark-folder-list="state.globalFolderList"
                                   @confirm="bookmarkPageStore.fetchBookmarkList()"
         />
         <bookmark-delete-modal

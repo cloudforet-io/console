@@ -109,6 +109,12 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         setBookmarkType: (type: BookmarkType) => {
             state.bookmarkType = type;
         },
+        setBookmarkData: (data: BookmarkItem[]) => {
+            state.bookmarkData = data;
+        },
+        setBookmarkFolderData: (data: BookmarkItem[]) => {
+            state.bookmarkFolderData = data;
+        },
     };
 
 

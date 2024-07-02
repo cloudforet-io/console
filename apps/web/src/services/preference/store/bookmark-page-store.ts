@@ -13,10 +13,13 @@ import type { PublicConfigModel } from '@/schema/config/public-config/model';
 
 import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const useBookmarkPageStore = defineStore('page-bookmark', () => {
+    const bookmarkStore = useBookmarkStore();
+
     const state = reactive({
         loading: false,
         bookmarkFolderList: [] as BookmarkItem[],
@@ -27,6 +30,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         searchFilter: [] as ConsoleFilter[],
         selectedIndices: [] as number[],
         params: undefined as Record<string, string>|undefined,
+        selectedType: 'All' as string,
     });
 
     const getters = reactive({
@@ -53,12 +57,19 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         setSelectedBookmarkIndices: (indices: number[]) => {
             state.selectedIndices = indices;
         },
-        setParams: (params: Record<string, string>) => {
+        setParams: (params?: Record<string, string>) => {
             state.params = params;
+        },
+        setSelectedType: (type: string) => {
+            state.selectedType = type;
         },
     };
     const actions = {
         resetState: () => {
+            state.loading = false;
+            state.bookmarkTotalCount = 0;
+            state.params = undefined as Record<string, string>|undefined;
+            state.selectedType = 'All' as string;
             state.bookmarkFolderList = [];
             state.bookmarkList = [];
             state.pageStart = 0;
@@ -82,9 +93,11 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     workspace_id: i.data.workspaceId,
                     id: i.name,
                 } as BookmarkItem));
+                bookmarkStore.setBookmarkFolderData(state.bookmarkFolderList);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkFolderList = [];
+                bookmarkStore.setBookmarkFolderData([]);
             }
         },
         fetchBookmarkList: async (selectedType?: string) => {
@@ -137,9 +150,11 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                 });
                 state.bookmarkList = await Promise.all(promises);
                 state.bookmarkTotalCount = total_count || 0;
+                bookmarkStore.setBookmarkData(state.bookmarkList);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkList = [];
+                bookmarkStore.setBookmarkData([]);
             } finally {
                 state.loading = false;
             }
