@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import type { TreemapSeriesOption } from 'echarts/charts';
@@ -140,10 +140,6 @@ const drawChart = (rawData: Data|null) => {
         name: getReferenceLabel(props.allReferenceTypeInfo, state.categoryByField, v[state.categoryByField]),
         value: v[state.dataField],
     })) || [];
-
-    // init chart and set options
-    state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions, true);
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
@@ -156,10 +152,17 @@ const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
     return state.data;
 };
 
+/* Watcher */
+watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.chart = init(chartContext.value);
+        state.chart.setOption(state.chartOptions, true);
+    }
+});
+
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
     loadWidget,
@@ -170,14 +173,11 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div ref="chartContext"
-             class="chart"
-        />
+        <!--Do not delete div element below. It's defense code for redraw-->
+        <div class="h-full">
+            <div ref="chartContext"
+                 class="h-full"
+            />
+        </div>
     </widget-frame>
 </template>
-
-<style lang="postcss" scoped>
-.chart {
-    height: 100%;
-}
-</style>

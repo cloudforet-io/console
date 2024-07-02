@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import type { GaugeSeriesOption } from 'echarts/charts';
@@ -168,8 +168,6 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
     state.chartData = rawData?.results?.[0]?.[state.dataField] || 0;
-    state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions, true);
 };
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
     state.loading = true;
@@ -180,6 +178,14 @@ const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
     state.loading = false;
     return state.data;
 };
+
+/* Watcher */
+watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.chart = init(chartContext.value);
+        state.chart.setOption(state.chartOptions, true);
+    }
+});
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
@@ -194,14 +200,11 @@ useResizeObserver(chartContext, throttle(() => {
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div ref="chartContext"
-             class="chart"
-        />
+        <!--Do not delete div element below. It's defense code for redraw-->
+        <div class="h-full">
+            <div ref="chartContext"
+                 class="h-full"
+            />
+        </div>
     </widget-frame>
 </template>
-
-<style lang="postcss" scoped>
-.chart {
-    height: 100%;
-}
-</style>

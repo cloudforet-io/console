@@ -380,7 +380,6 @@ onMounted(async () => {
     if (!props.dataTableId) return;
     state.dataTable = await getWidgetDataTable(props.dataTableId);
 });
-
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
     loadWidget,
@@ -391,20 +390,23 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div class="table-wrapper">
-            <widget-data-table class="data-table"
-                               :widget-id="props.widgetId"
-                               :fields="state.tableFields"
-                               :items="state.finalConvertedData?.results"
-                               :field-type="state.tableDataFieldType"
-                               :criteria="state.tableDataCriteria"
-                               :data-field="state.tableDataField"
-                               :comparison-info="state.comparisonInfo"
-                               :sub-total-info="state.subTotalInfo"
-                               :total-info="state.totalInfo"
-                               :granularity="state.granularity"
-                               :data-info="state.dataInfo"
-            />
+        <!--Do not delete div element below. It's defense code for redraw-->
+        <div class="h-full">
+            <div class="table-wrapper">
+                <widget-data-table class="data-table"
+                                   :widget-id="props.widgetId"
+                                   :fields="state.tableFields"
+                                   :items="state.finalConvertedData?.results"
+                                   :field-type="state.tableDataFieldType"
+                                   :criteria="state.tableDataCriteria"
+                                   :data-field="state.tableDataField"
+                                   :comparison-info="state.comparisonInfo"
+                                   :sub-total-info="state.subTotalInfo"
+                                   :total-info="state.totalInfo"
+                                   :granularity="state.granularity"
+                                   :data-info="state.dataInfo"
+                />
+            </div>
         </div>
     </widget-frame>
 </template>
