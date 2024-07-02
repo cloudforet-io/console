@@ -55,11 +55,11 @@ const state = reactive({
         if (!state.data) return null;
         if (state.tableDataFieldType === 'staticField') return state.staticFieldSlicedData;
         if (isDateField(state.tableDataField)) return state.timeSeriesDynamicFieldSlicedData;
-        return state.noneTimeSeriedsDynamicFieldSlicedData;
+        return state.noneTimeSeriesDynamicFieldSlicedData;
     }),
     staticFieldSlicedData: null as Data | null,
     timeSeriesDynamicFieldSlicedData: null as Data | null,
-    noneTimeSeriedsDynamicFieldSlicedData: null as Data | null,
+    noneTimeSeriesDynamicFieldSlicedData: null as Data | null,
     // data fetch options
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
@@ -372,7 +372,7 @@ watch(() => state.data, () => {
             results.push(totalDataItem);
         }
 
-        state.noneTimeSeriedsDynamicFieldSlicedData = { results };
+        state.noneTimeSeriesDynamicFieldSlicedData = { results };
     }
 }, { immediate: true });
 
