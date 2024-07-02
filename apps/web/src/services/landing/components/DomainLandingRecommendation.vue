@@ -83,7 +83,7 @@ const handleClickCardButton = (type: string) => {
     let url = '';
 
     if (type === 'quick-start-guide') {
-        url = `https://cloudforet.io/${storeState.language}/docs/guides/admin-mode/getting-started`;
+        url = storeState.language === 'en' ? 'https://cloudforet.io/docs/guides/getting-started' : `https://cloudforet.io/${storeState.language}/docs/guides/getting-started`;
     } else if (type === 'role-type') {
         url = router.resolve({
             name: makeAdminRouteName(IAM_ROUTE.ROLE._NAME),

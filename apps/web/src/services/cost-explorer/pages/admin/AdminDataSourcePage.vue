@@ -51,7 +51,9 @@ onUnmounted(() => {
                          :color="gray[900]"
                     />
                     <p-link :text="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.GUIDE')"
-                            :href="`https://cloudforet.io/${storeState.language}/docs/guides/admin-mode/data-sources`"
+                            :href="storeState.language
+                                ? 'https://cloudforet.io/docs/guides/admin-mode/data-sources'
+                                : `https://cloudforet.io/${storeState.language}/docs/guides/admin-mode/data-sources`"
                             size="sm"
                             action-icon="external-link"
                             new-tab
