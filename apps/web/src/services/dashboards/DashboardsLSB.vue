@@ -255,6 +255,7 @@ callApiWithGrantGuard();
                     <l-s-b-menu-item v-for="item in _item?.subItems"
                                      :key="item.id"
                                      :menu-data="item"
+                                     :current-path="state.currentPath"
                     />
                 </template>
             </l-s-b-collapsible-menu-item>
