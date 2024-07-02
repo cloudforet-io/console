@@ -78,6 +78,9 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         setSelectedType: (type: string) => {
             state.selectedType = type;
         },
+        setIsTableItem: (status: boolean) => {
+            state.isTableItem = status;
+        },
     };
     const actions = {
         resetState: () => {

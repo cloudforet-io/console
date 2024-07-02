@@ -3,8 +3,9 @@ import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PToolboxTable, PLazyImg, PI, PDataLoader, PSelectStatus,
+    PToolboxTable, PLazyImg, PI, PDataLoader, PSelectStatus, PSelectDropdown,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type {
     KeyItemSet,
     ValueHandlerMap,
@@ -18,11 +19,13 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
+const bookmarkStore = useBookmarkStore();
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
@@ -59,7 +62,7 @@ const tableState = reactive({
         {
             name: 'action_button',
             label: ' ',
-            type: 'item',
+            width: '2rem',
             sortable: false,
         },
     ]),
@@ -80,6 +83,20 @@ const tableState = reactive({
         { label: i18n.t('IAM.BOOKMARK.FOLDER') as string, name: BOOKMARK_MODAL_TYPE.FOLDER },
     ])),
 });
+const dropdownState = reactive({
+    menuItems: computed<MenuItem[]>(() => ([
+        {
+            icon: 'ic_edit',
+            name: 'edit',
+            label: i18n.t('IAM.BOOKMARK.EDIT'),
+        },
+        {
+            icon: 'ic_delete',
+            name: 'delete',
+            label: i18n.t('IAM.BOOKMARK.DELETE'),
+        },
+    ])),
+});
 
 const handleSelectType = (value: string) => {
     bookmarkPageStore.setSelectedType(value);
@@ -94,6 +111,24 @@ const handleUpdateSelectIndex = async (indices: number[]) => {
 };
 const fetchBookmarkList = async (selectedType?: string) => {
     await bookmarkPageStore.fetchBookmarkList(selectedType);
+};
+const handleSelectDropdownMenu = (item: BookmarkItem, menu: string) => {
+    bookmarkPageStore.setIsTableItem(true);
+    if (menu === 'edit') {
+        bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, true);
+        return;
+    }
+    if (menu === 'delete') {
+        bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.DELETE_LINK : BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
+        return;
+    }
+
+    bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, false);
+};
+const handleUpdateVisibleMenu = (item: BookmarkItem, visibleMenu: boolean) => {
+    if (visibleMenu) {
+        bookmarkStore.setSelectedBookmark(item, true);
+    }
 };
 
 const BookmarkListApiQueryHelper = new ApiQueryHelper();
@@ -180,6 +215,19 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                 <template #col-link-format="{value}">
                     <span class="col-link">{{ value ?? '--' }}</span>
                 </template>
+                <template #col-action_button-format="{item}">
+                    <p-select-dropdown v-if="item.isGlobal"
+                                       :menu="dropdownState.menuItems"
+                                       style-type="icon-button"
+                                       button-icon="ic_ellipsis-horizontal"
+                                       use-fixed-menu-style
+                                       class="overlay"
+                                       reset-selected-on-unmounted
+                                       menu-position="right"
+                                       @select="handleSelectDropdownMenu(item, $event)"
+                                       @update:visible-menu="handleUpdateVisibleMenu(item, $event)"
+                    />
+                </template>
             </p-toolbox-table>
         </p-data-loader>
     </section>
@@ -205,12 +253,26 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
             margin-left: 1rem;
             margin-bottom: 1rem;
         }
+
+        /* custom design-system component - p-select-dropdown */
+        :deep(.p-select-dropdown) {
+            .dropdown-context-menu {
+                min-width: 7.25rem !important;
+                margin-top: 0;
+                margin-left: -5.25rem;
+            }
+        }
     }
 
     /* custom design-system component - p-toolbox-table */
     :deep(.p-toolbox-table) {
         .p-toolbox {
             padding-bottom: 0;
+        }
+        td.has-width {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+            min-width: unset;
         }
     }
 }

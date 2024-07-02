@@ -28,6 +28,7 @@ const router = useRouter();
 const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
+    isTableItem: computed<boolean>(() => bookmarkPageState.isTableItem),
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
 });
 const state = reactive({
@@ -36,28 +37,31 @@ const state = reactive({
 
 const handleCreateFolder = (isEdit?: boolean, name?: string) => {
     if (isEdit && name) {
-        router.push({
-            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
-            params: {
-                group: route.params.group,
-                folder: name,
-            },
-        });
-    } else {
-        bookmarkPageStore.fetchBookmarkList();
+        if (!storeState.isTableItem) {
+            router.push({
+                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+                params: {
+                    group: route.params.group,
+                    folder: name,
+                },
+            });
+        }
+        bookmarkPageStore.setIsTableItem(false);
     }
+    bookmarkPageStore.fetchBookmarkList();
     bookmarkPageStore.fetchBookmarkFolderList();
 };
 const handleConfirmDelete = () => {
     if (route.params.folder) {
-        router.push({
-            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
-            params: {
-                group: route.params.group,
-            },
-        });
-        bookmarkPageStore.fetchBookmarkFolderList();
-        return;
+        if (!storeState.isTableItem) {
+            router.push({
+                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
+                params: {
+                    group: route.params.group,
+                },
+            });
+        }
+        bookmarkPageStore.setIsTableItem(false);
     }
     bookmarkPageStore.fetchBookmarkFolderList();
     bookmarkPageStore.fetchBookmarkList(storeState.selectedType);
