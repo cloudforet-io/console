@@ -33,7 +33,7 @@ const bookmarkState = bookmarkStore.state;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 
-const emit = defineEmits<{(e: 'confirm'): void; }>();
+const emit = defineEmits<{(e: 'confirm', isEdit?: boolean, name?: string): void; }>();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
@@ -110,7 +110,7 @@ const handleConfirm = async () => {
         } else {
             await bookmarkStore.createBookmarkFolder(name.value, state.scope);
         }
-        emit('confirm');
+        emit('confirm', storeState.modal.isEdit, name.value);
         await handleClose();
     } finally {
         state.loading = false;

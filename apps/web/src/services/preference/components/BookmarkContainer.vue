@@ -28,6 +28,20 @@ const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
 });
+const handleCreateFolder = (isEdit?: boolean, name?: string) => {
+    if (isEdit && name) {
+        router.push({
+            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+            params: {
+                group: route.params.group,
+                folder: name,
+            },
+        });
+    } else {
+        bookmarkPageStore.fetchBookmarkList();
+    }
+    bookmarkPageStore.fetchBookmarkFolderList();
+};
 const handleConfirmDelete = () => {
     if (route.params.folder) {
         router.push({
