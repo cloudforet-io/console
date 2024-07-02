@@ -268,22 +268,15 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
         setOptions(_options);
-
-        // project_id
-        const _projectId = _dashboardInfo.project_id === '*' ? undefined : _dashboardInfo.project_id;
-        setProjectId(_projectId);
+        setProjectId(_dashboardInfo.project_id);
 
         // variables, variables schema
-        let _variablesSchema: DashboardVariablesSchema = {
+        const _variablesSchema: DashboardVariablesSchema = {
             properties: _dashboardInfo.variables_schema?.properties ?? {},
             order: _dashboardInfo.variables_schema?.order,
             fixed_options: _dashboardInfo.variables_schema?.fixed_options,
         };
-        let _variables = _dashboardInfo.variables ?? {};
-        if (_projectId) {
-            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema);
-            _variables = refineProjectDashboardVariables(_variables, _projectId);
-        }
+        const _variables = _dashboardInfo.variables ?? {};
         const _variablesInitMap = {};
         Object.entries<DashboardVariableSchemaProperty>(_variablesSchema.properties).forEach(([propertyName, property]) => {
             if (property.use) _variablesInitMap[propertyName] = false;
