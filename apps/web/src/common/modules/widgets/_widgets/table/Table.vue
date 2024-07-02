@@ -23,7 +23,11 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
-import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import {
+    getAllRequiredFieldsFilled,
+    getWidgetBasedOnDate,
+    getWidgetDateRange,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getWidgetDataTable, sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -47,6 +51,7 @@ const emit = defineEmits<WidgetEmit>();
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
+    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as Data | null,
     comparisonData: null as Data | null,
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
@@ -204,7 +209,8 @@ const getWidgetTableDateFields = (
     return dateFields.slice(-limitCount);
 };
 
-const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast> => {
+const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|undefined> => {
+    if (!state.allRequiredFieldsFilled) return undefined;
     try {
         state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');

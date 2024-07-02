@@ -17,6 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import { getAllRequiredFieldsFilled } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetFrameEmit, WidgetProps, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
@@ -175,11 +176,7 @@ export const useWidgetFrame = (
             if (props.loading || overrides.widgetLoading?.value) return false;
             return overrides.noData?.value || false;
         }),
-        allRequiredFieldsFilled: computed<boolean>(() => {
-            const widgetConfig = getWidgetConfig(props.widgetName);
-            const requiredFields = Object.keys(widgetConfig?.requiredFieldsSchema || {});
-            return requiredFields.every((d) => !!props.widgetOptions?.[d]);
-        }),
+        allRequiredFieldsFilled: computed<boolean>(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     });
     const widgetFrameProps = computed<WidgetFrameProps>(() => ({
         widgetId: props.widgetId,

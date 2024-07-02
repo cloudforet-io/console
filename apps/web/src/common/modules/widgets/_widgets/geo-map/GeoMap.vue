@@ -26,7 +26,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import {
+    getAllRequiredFieldsFilled,
+    getWidgetBasedOnDate,
+    getWidgetDateRange,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange, WidgetLoadData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
@@ -48,6 +52,7 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
+    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as WidgetLoadData | null,
     chart: null as EChartsType | null,
     chartData: [],
@@ -104,7 +109,8 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Api */
-const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
+const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast|undefined> => {
+    if (!state.allRequiredFieldsFilled) return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
