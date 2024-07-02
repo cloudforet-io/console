@@ -57,15 +57,12 @@ const state = reactive({
         if (!state.selectedDataSource.length) return [];
         const targetCostDataSource = storeState.costDataSource[state.selectedDataSource[0].name];
         const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.cost_info?.name;
-        const dataInfo = targetCostDataSource?.data?.plugin_info?.metadata?.data_info ?? {};
-        const additionalMenuItems: MenuItem[] = targetCostDataSource.data?.cost_data_keys?.map((key) => {
-            const alias = dataInfo[key]?.name;
-            return {
-                type: 'item',
-                name: `data.${key}`,
-                label: alias ? `${key} (${alias})` : key,
-            };
-        });
+        // const dataInfo = targetCostDataSource?.data?.plugin_info?.metadata?.data_info ?? {};
+        const additionalMenuItems: MenuItem[] = targetCostDataSource.data?.cost_data_keys?.map((key) => ({
+            type: 'item',
+            name: `data.${key}`,
+            label: key,
+        }));
         const dataTypeItems = [
             { type: 'item', name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },
             { type: 'item', name: 'usage_quantity', label: 'Usage' },
