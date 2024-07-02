@@ -1005,6 +1005,7 @@
 			"TITLE": "Set columns"
 		},
 		"DELETED": "Deleted",
+		"DEPRECATED": "Deprecated",
 		"EDITOR": {
 			"ALIGN_CENTER": "Center",
 			"ALIGN_JUSTIFY": "Justify",

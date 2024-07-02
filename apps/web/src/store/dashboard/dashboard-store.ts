@@ -220,8 +220,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     };
     //
     const getDashboardNameList = (dashboardType: DashboardType) => {
-        if (dashboardType === 'PRIVATE') return state.privateDashboardItems.map((item) => item.name);
-        return state.publicDashboardItems.map((item) => item.name);
+        if (dashboardType === 'PRIVATE') return (state.privateDashboardItems.filter((i) => i.version === '2.0')).map((item) => item.name);
+        return state.publicDashboardItems.filter((i) => i.version === '2.0').map((item) => item.name);
     };
 
 
