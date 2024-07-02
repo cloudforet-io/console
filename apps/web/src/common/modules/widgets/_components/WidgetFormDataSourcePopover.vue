@@ -106,7 +106,6 @@ const state = reactive({
             return costAlias ? `Cost (${costAlias})` : 'Cost';
         }
         if (state.selectedCostDataType === 'usage_quantity') {
-            // return usageAlias ? `Usage (${usageAlias})` : 'Usage';
             return 'Usage';
         }
         return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
@@ -115,7 +114,7 @@ const state = reactive({
         {
             key: DATA_TABLE_OPERATOR.CONCAT,
             name: 'Concatenate',
-            description: 'Combines multiple tables into one by stacking tshem.',
+            description: 'Combines multiple tables into one by stacking them.',
             icon: 'ic_db-concat',
         },
         {
