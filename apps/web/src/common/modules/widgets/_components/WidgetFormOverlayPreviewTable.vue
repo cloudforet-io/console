@@ -14,6 +14,7 @@ import bytes from 'bytes';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Page } from '@/schema/_common/type';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -90,8 +91,8 @@ const state = reactive({
 });
 
 const emptyState = reactive({
-    title: computed(() => 'To get started, add your data.'),
-    description: computed(() => 'The preview will be displayed here.'),
+    title: computed(() => i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_TITLE')),
+    description: computed(() => i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_DESC')),
 });
 /* Events */
 const handleSelectGranularity = async (granularity: Granularity) => {

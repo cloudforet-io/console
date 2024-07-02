@@ -1496,6 +1496,10 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "지난 7일 ~ 예정 일정"
 			},
+			"PREVIEW_TABLE_EMPTY_DESC": "",
+			"PREVIEW_TABLE_EMPTY_TITLE": "",
+			"REQUIRED_FIELDS_ARE_MISSING": "",
+			"REQUIRED_FIELDS_ARE_MISSING_DESC": "",
 			"RESET": "초기화",
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "클라우드 서비스 ",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "지역",
