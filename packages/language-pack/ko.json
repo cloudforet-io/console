@@ -1005,6 +1005,7 @@
 			"TITLE": "필드 변경하기"
 		},
 		"DELETED": "삭제됨",
+		"DEPRECATED": "",
 		"EDITOR": {
 			"ALIGN_CENTER": "가운데 정렬",
 			"ALIGN_JUSTIFY": "양쪽 정렬",
