@@ -188,6 +188,7 @@ export const useWidgetFrame = (
         errorMessage: overrides.errorMessage?.value,
         noData: _state.noData,
         allRequiredFieldsFilled: _state.allRequiredFieldsFilled,
+        disableManageButtons: props.disableManageButtons,
         //
         title: _state.title,
         description: props.description,
