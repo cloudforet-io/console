@@ -146,7 +146,7 @@ const getValue = (item, field: PreviewTableField) => {
     if (field.type === 'LABEL' && Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
         const referenceKey = REFERENCE_FIELD_MAP[field.name];
         const referenceValueKey = item[field.name];
-        return storeState[referenceKey][referenceValueKey]?.name ?? '-';
+        return storeState[referenceKey][referenceValueKey]?.label || storeState[referenceKey][referenceValueKey]?.name || '-';
     }
     if (field.type === 'DATA') {
         return itemValue ? valueFormatter(itemValue, field) : '-';

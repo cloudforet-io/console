@@ -58,8 +58,8 @@ const state = reactive({
         return result;
     }),
     starredMenuItems: computed<LSBMenu[]>(() => [
-        ...(storeState.isWorkspaceOwner ? filterStarredItems(state.workspaceMenuSet) : []),
-        ...filterStarredItems(state.privateMenuSet),
+        ...(storeState.isWorkspaceOwner ? filterStarredItems(state.workspaceV2MenuSet) : []),
+        ...filterStarredItems(state.privateV2MenuSet),
     ]),
     domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,

@@ -115,6 +115,7 @@ const state = reactive({
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => ({
+        start: state.dateRange.start,
         end: state.dateRange.end,
     })),
     errorMessage: computed(() => state.errorMessage),

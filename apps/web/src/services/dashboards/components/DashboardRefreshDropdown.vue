@@ -36,6 +36,7 @@ const emit = defineEmits<{(e: 'refresh'): void;
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     intervalOptionList: computed<{label: TranslateResult; value: RefreshIntervalOption}[]>(() => [
@@ -92,12 +93,14 @@ const handleSelectRefreshIntervalOption = (option) => {
     clearRefreshInterval();
     executeRefreshInterval();
 
-    dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
-        options: {
-            ...dashboardDetailState.dashboardInfo?.options || {},
-            refresh_interval_option: option,
-        },
-    });
+    if (!dashboardDetailGetters.disableManageButtons) {
+        dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
+            options: {
+                ...dashboardDetailState.dashboardInfo?.options || {},
+                refresh_interval_option: option,
+            },
+        });
+    }
 };
 
 watch([() => props.dashboardId, () => props.loading], ([dashboardId, loading], prev) => {

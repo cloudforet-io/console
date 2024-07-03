@@ -36,7 +36,8 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-// import ProjectSummaryAllSummaryWidgetRegionService from '@/services/project/components/ProjectSummaryAllSummaryWidgetRegionService.vue';
+import ProjectSummaryAllSummaryWidgetRegionService
+    from '@/services/project/components/ProjectSummaryAllSummaryWidgetRegionService.vue';
 import { SERVICE_CATEGORY } from '@/services/project/constants/project-summary-constant';
 import type { DateType, ServiceCategory } from '@/services/project/types/project-summary-type';
 
@@ -519,11 +520,11 @@ onUnmounted(() => {
                     <div class="sub-title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
                     </div>
-                    <!--                    <project-summary-all-summary-widget-region-service-->
-                    <!--                        :project-id="projectId"-->
-                    <!--                        :label="state.activeTab"-->
-                    <!--                        :count="state.countMap[state.activeTab]"-->
-                    <!--                    />-->
+                    <project-summary-all-summary-widget-region-service
+                        :project-id="projectId"
+                        :label="state.activeTab"
+                        :count="state.countMap[state.activeTab]"
+                    />
                 </div>
             </div>
         </div>
