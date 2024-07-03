@@ -2,6 +2,8 @@ import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, onMounted, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
+import { isEmpty } from 'lodash';
+
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -71,6 +73,19 @@ const convertConsoleFiltersToMetricFilter = (filters?: ConsoleFilter[]): MetricF
     });
     return _result;
 };
+const getRecursiveDataTableIds = (prevValue: string[] = [], dataTable: DataTableModel, dataTables: DataTableModel[]): string[] => {
+    let _results: string[] = [];
+    if (dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
+        if (dataTable.operator === 'JOIN' || dataTable.operator === 'CONCAT') {
+            const _dataTableIds = dataTable?.options?.[dataTable.operator]?.data_tables ?? [];
+            const _dataTables = dataTables.filter((d) => _dataTableIds.includes(d.data_table_id));
+            _results = _results.concat(..._dataTables.map((d) => getRecursiveDataTableIds(prevValue, d, dataTables)));
+            return _results;
+        }
+        return prevValue.concat(dataTable.data_table_id);
+    }
+    return prevValue.concat(dataTable.data_table_id);
+};
 const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>, dateRange?: DateRange, dashboardVars?: DashboardVars): Location|undefined => {
     const _granularity = (widgetOptions?.granularity as string) || 'MONTHLY';
     const _groupBy: string[] = dataTable?.options?.group_by?.map((d) => d.key);
@@ -135,42 +150,29 @@ export const useWidgetFrame = (
         dataTable: computed<DataTableModel|undefined>(() => _state.dataTables?.find((d) => d.data_table_id === props.dataTableId)),
         dataTables: [] as DataTableModel[],
         unit: computed<string|undefined>(() => {
-            if (!_state.dataTable) return undefined;
-            if (_state.dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
-                if (_state.dataTable.operator === 'JOIN') {
-                    const _dataTableIds = _state.dataTable?.options?.JOIN?.data_tables ?? [];
-                    const _dataTables = _state.dataTables.filter((d) => _dataTableIds.includes(d.data_table_id));
-                    const _units = _dataTables.map((d) => d.options?.data_unit).filter((d) => d);
-                    return _units.join(', ');
-                }
-                return undefined;
-            }
-            return _state.dataTable.options?.data_unit;
+            if (isEmpty(_state.dataTable)) return undefined;
+            const _units: string[] = [];
+            Object.values(_state.dataTable.data_info).forEach((d) => {
+                if (d?.unit) _units.push(d.unit);
+            });
+            return _units.join(', ');
         }),
         fullDataLinkList: computed<FullDataLink[]>(() => {
             if (!_state.dataTable) return [];
-            if (_state.dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
-                if (_state.dataTable.operator === 'JOIN') {
-                    const _dataTableIds = _state.dataTable?.options?.JOIN?.data_tables ?? [];
-                    const _dataTables = _state.dataTables.filter((d) => _dataTableIds.includes(d.data_table_id));
-                    const _result: FullDataLink[] = [];
-                    _dataTables.forEach((d) => {
-                        const _location = getFullDataLocation(d, props.widgetOptions, overrides.dateRange?.value, props.dashboardVars);
-                        if (_location) {
-                            _result.push({
-                                name: d.options?.data_name,
-                                location: _location,
-                            });
-                        }
+            let _dataTableIds = getRecursiveDataTableIds([], _state.dataTable, _state.dataTables);
+            _dataTableIds = Array.from(new Set(_dataTableIds));
+            const _dataTables = _state.dataTables.filter((d) => _dataTableIds.includes(d.data_table_id));
+            const _result: FullDataLink[] = [];
+            _dataTables.forEach((d) => {
+                const _location = getFullDataLocation(d, props.widgetOptions, overrides.dateRange?.value, props.dashboardVars);
+                if (_location) {
+                    _result.push({
+                        name: d.options?.data_name,
+                        location: _location,
                     });
-                    return _result;
                 }
-                return [];
-            }
-            return [{
-                name: _state.dataTable?.options?.data_name,
-                location: getFullDataLocation(_state.dataTable, props.widgetOptions, overrides.dateRange?.value, props.dashboardVars),
-            }];
+            });
+            return _result;
         }),
         noData: computed(() => {
             if (props.loading || overrides.widgetLoading?.value) return false;
