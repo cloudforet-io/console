@@ -32,6 +32,7 @@ import type { WidgetSize, WidgetOverlayType } from '@/common/modules/widgets/typ
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type {
     DataTableOperator,
+    WidgetStatus,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -72,6 +73,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             if (widgetValidMapValues.length !== widgetValueMapKeys.length) return false;
             return widgetValidMapValues.every((valid) => valid);
         }),
+        widgetState: computed<WidgetStatus|undefined>(() => state.widget?.state),
     });
 
     /* Mutations */
