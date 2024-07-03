@@ -101,6 +101,7 @@ const handleUpdateWidgetOptions = async () => {
         widget_type: widgetGenerateState.selectedWidgetName,
         data_table_id: widgetGenerateState.selectedDataTableId,
         options: widgetGenerateState.widgetFormValueMap,
+        // state: 'ACTIVE' // TODO: update after api is ready
     });
     await nextTick();
     await loadOverlayWidget();

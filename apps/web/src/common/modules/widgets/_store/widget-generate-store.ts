@@ -51,7 +51,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         latestWidgetId: '',
         selectedWidgetName: 'table',
         title: '',
-        description: '',
+        description: undefined as undefined | string,
         size: 'full' as WidgetSize,
         widgetFormValueMap: {} as Record<string, WidgetFieldValues|undefined>,
         widgetValidMap: {} as Record<string, boolean>,
@@ -98,7 +98,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setTitle = (title: string) => {
         state.title = title;
     };
-    const setDescription = (description: string) => {
+    const setDescription = (description?: string) => {
         state.description = description;
     };
     const setSelectedWidgetName = (widgetName: string) => {
@@ -244,6 +244,10 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     };
                 } else {
                     result = await fetcher(updateParams);
+                    // TODO: update after api is ready
+                    // if (state.widget?.state === 'ACTIVE') {
+                    //     await actions.updateWidget({ state: 'INACTIVE' });
+                    // }
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
             } catch (e: any) {
@@ -314,7 +318,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.overlayStep = 1;
             state.selectedDataTableId = undefined;
             state.title = '';
-            state.description = '';
+            state.description = undefined;
             state.size = 'full';
             state.widgetValidMap = {};
             state.widgetFormValueMap = {};
@@ -325,7 +329,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.widget = widgetInfo;
             state.widgetId = widgetInfo?.widget_id || '';
             state.title = widgetInfo?.name || _widgetConfig.meta?.title || '';
-            state.description = widgetInfo?.description || '';
+            state.description = widgetInfo?.description;
             state.size = widgetInfo?.size || _widgetConfig.meta?.sizes[0];
             state.selectedDataTableId = widgetInfo?.data_table_id || undefined;
             state.widgetFormValueMap = widgetInfo?.options || {};
