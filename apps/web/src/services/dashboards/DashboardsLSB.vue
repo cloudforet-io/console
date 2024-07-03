@@ -149,6 +149,10 @@ const state = reactive({
         label: i18n.t('COMMON.DEPRECATED'),
         id: 'deprecated',
     })),
+    deprecatedSubItem: computed<LSBMenu[]>(() => [
+        ...state.workspaceV1MenuSet,
+        ...state.privateV1MenuSet,
+    ]),
     menuSet: computed<LSBMenu[]>(() => {
         const defaultMenuSet: LSBMenu[] = [
             {
@@ -184,12 +188,16 @@ const state = reactive({
             },
             { type: MENU_ITEM_TYPE.DIVIDER },
         );
-        return [
+
+        const menuSet: LSBMenu[] = [
             ...defaultMenuSet,
             ...(storeState.isWorkspaceOwner ? filterMenuItems(state.workspaceV2MenuSet) : []),
             ...filterMenuItems(state.privateV2MenuSet),
-            state.deprecatedMenu,
         ];
+        if (state.deprecatedSubItem.length) {
+            menuSet.push(state.deprecatedMenu);
+        }
+        return menuSet;
     }),
 });
 
@@ -247,9 +255,10 @@ callApiWithGrantGuard();
                                          :item="{
                                              type: 'collapsible',
                                              label: $t('COMMON.DEPRECATED'),
-                                             subItems: [...state.workspaceV1MenuSet, ...state.privateV1MenuSet]
+                                             subItems: state.deprecatedSubItem,
                                          }"
                                          is-sub-item
+                                         :override-collapsed="true"
             >
                 <template #collapsible-contents="{ item: _item }">
                     <l-s-b-menu-item v-for="item in _item?.subItems"
