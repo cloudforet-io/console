@@ -25,7 +25,7 @@ export interface WidgetFrameProps {
     description?: string;
     size?: WidgetSize;
     width?: number;
-    basedOnText?: string;
+    periodText?: string;
     unit?: string;
     fullDataLinkList?: FullDataLink[];
 }

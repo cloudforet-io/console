@@ -115,8 +115,8 @@ const handleToggleWidth = () => {
                 <template #content>
                     <div class="metadata-content">
                         <div class="metadata-item-row">
-                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.BASED_ON') }}</span>
-                            <span>{{ props.basedOnText }}</span>
+                            <span class="metadata-title">{{ $t('COMMON.WIDGETS.PERIOD') }}</span>
+                            <span>{{ props.periodText }}</span>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>
