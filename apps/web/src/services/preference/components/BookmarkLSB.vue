@@ -67,9 +67,10 @@ const state = reactive({
             id: folder.id,
             icon: { name: 'ic_folder', color: gray[900] },
             to: {
-                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
                 params: {
-                    folder: folder.id || '',
+                    group: folder.workspaceId || 'global',
+                    folder: folder.name as string || '',
                 },
             },
         }))),
@@ -88,18 +89,20 @@ const state = reactive({
         </template>
         <template #slot-bookmark>
             <template v-if="state.bookmarkKeyword">
-                <l-s-b-router-menu-item v-for="(_item, idx) of state.bookmarkFilteredByKeyword"
-                                        :key="idx"
-                                        :item="_item"
-                                        :idx="`search-${idx}`"
-                                        :current-path="state.currentPath"
-                                        is-hide-favorite
-                >
-                    <p-text-highlighting class="search-result-text"
-                                         :term="state.bookmarkKeyword"
-                                         :text="_item.label"
-                    />
-                </l-s-b-router-menu-item>
+                <div class="router-menu-wrapper">
+                    <l-s-b-router-menu-item v-for="(_item, idx) of state.bookmarkFilteredByKeyword"
+                                            :key="idx"
+                                            :item="_item"
+                                            :idx="`search-${idx}`"
+                                            :current-path="state.currentPath"
+                                            is-hide-favorite
+                    >
+                        <p-text-highlighting class="search-result-text"
+                                             :term="state.bookmarkKeyword"
+                                             :text="_item.label"
+                        />
+                    </l-s-b-router-menu-item>
+                </div>
                 <p-empty v-if="state.bookmarkKeyword && !state.bookmarkFilteredByKeyword.length"
                          class="search-empty"
                 >
@@ -126,6 +129,11 @@ const state = reactive({
         @apply text-paragraph-md;
         white-space: pre;
         margin-top: 0.75rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .router-menu-wrapper {
+        @apply flex flex-col;
     }
 }
 </style>
