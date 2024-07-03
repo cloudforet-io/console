@@ -99,7 +99,7 @@ const state = reactive({
         const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map((field) => ({ name: field, label: field, fieldInfo: { type: 'labelField' } })) ?? [];
         let dataFields: TableWidgetField[] = [];
         if (state.tableDataFieldType === 'staticField') {
-            state.tableDataField.forEach((field) => {
+            state.tableDataField?.forEach((field) => {
                 dataFields.push({
                     name: field,
                     label: field,
@@ -270,7 +270,7 @@ watch(() => state.data, () => {
             const dataItem = { ...d };
             let subTotalValue = 0;
 
-            state.tableDataField.forEach((field) => {
+            state.tableDataField?.forEach((field) => {
                 const fieldValue = d[field] ?? 0;
                 subTotalValue += fieldValue;
 
