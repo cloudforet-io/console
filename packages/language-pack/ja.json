@@ -1778,6 +1778,7 @@
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "ワークスペース全体でこのダッシュボードの共有を解除してもよろしいですか？"
 		},
 		"FORM": {
+			"ALT_E_CLONE_DASHBOARD": "",
 			"ALT_E_CREATE_DASHBOARD": "ダッシュボードの作成に失敗しました",
 			"ALT_E_DELETE_DASHBOARD": "ダッシュボードの削除に失敗しました",
 			"ALT_E_EDIT_NAME": "ダッシュボード名の更新に失敗しました",
