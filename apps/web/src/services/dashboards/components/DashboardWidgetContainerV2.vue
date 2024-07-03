@@ -211,9 +211,9 @@ const handleDeleteModalConfirm = async () => {
     delete state.mountedWidgetMap[_targetWidgetId];
     state.mountedWidgetMap = { ...state.mountedWidgetMap };
     // 3. close modal
-    await dashboardDetailStore.listDashboardWidgets();
     widgetDeleteState.visibleModal = false;
     widgetDeleteState.targetWidget = null;
+    await dashboardDetailStore.listDashboardWidgets();
 };
 const handleClickAddWidget = () => {
     widgetGenerateStore.setOverlayType('ADD');
