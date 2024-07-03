@@ -84,7 +84,7 @@ const state = reactive({
                 type: 'item',
                 name: 'duplicate',
                 label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
-                icon: 'ic_duplicate',
+                icon: 'ic_clone',
             },
             { type: 'divider', name: 'divider' },
             {

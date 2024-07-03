@@ -9,7 +9,7 @@ export const standardIconActionSet: IconSet[] = [
         eventAction: () => {},
     },
     {
-        iconName: 'ic_duplicate',
+        iconName: 'ic_clone',
         tooltipText: 'Duplicate',
         eventAction: () => {},
     },
@@ -26,7 +26,7 @@ export const extraIconActionSet: IconSet[] = [
         eventAction: () => {},
     },
     {
-        iconName: 'ic_duplicate',
+        iconName: 'ic_clone',
         eventAction: () => {},
     },
     {
