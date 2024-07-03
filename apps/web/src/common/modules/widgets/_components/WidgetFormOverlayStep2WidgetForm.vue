@@ -28,7 +28,6 @@ import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-fi
 import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-model';
 
 
-const emit = defineEmits<{(e: 'ready-to-preview'): void}>();
 const FORM_TITLE_MAP = {
     WIDGET_INFO: 'WIDGET_INFO',
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
@@ -183,14 +182,13 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
 };
 
 // eslint-disable-next-line max-len
-const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetFormValueMap[name] === undefined}`;
+const keyGenerator = (name: string) => `${name}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetFormValueMap[name] === undefined}`;
 
 /* Watcher */
 watch(() => widgetGenerateState.widgetValidMap, () => {
     if (state.isPreviewInitiated) return;
     const _requiredField = state.widgetRequiredFieldSchemaMap.map(([d]) => d);
     if (_requiredField.every((d) => widgetGenerateState.widgetValidMap[d])) {
-        emit('ready-to-preview');
         state.isPreviewInitiated = true;
     }
 }, { deep: true });
@@ -297,7 +295,7 @@ onMounted(() => {
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetRequiredFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="keyGenerator(fieldName, 'require')"
+                               :key="keyGenerator(fieldName)"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
@@ -329,7 +327,7 @@ onMounted(() => {
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetOptionalFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="keyGenerator(fieldName, 'option')"
+                               :key="keyGenerator(fieldName)"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :all-value-map="widgetGenerateState.widgetFormValueMap"

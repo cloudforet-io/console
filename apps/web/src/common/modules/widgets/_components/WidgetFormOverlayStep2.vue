@@ -36,8 +36,6 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
-    readyToMounted: false,
-    mountedWidgetId: undefined as string|undefined,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
         { label: 'Full', name: 'FULL' },
@@ -47,7 +45,7 @@ const state = reactive({
     widgetSize: computed(() => {
         if (widgetGenerateState.overlayType === 'EXPAND') return 'full';
         if (state.selectedWidgetSize === 'FULL') return 'full';
-        return widgetGenerateState.size;
+        return widgetGenerateState.widget?.size;
     }),
     widgetWidth: computed(() => {
         if (state.widgetSize === 'full' || state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND') {
@@ -55,13 +53,20 @@ const state = reactive({
         }
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
-    isWidgetOptionsChanged: computed<boolean>(() => Object.entries(widgetGenerateState.widgetFormValueMap).some(([k, v]) => {
-        if (v !== undefined) {
-            return !isEqual(v, widgetGenerateState.previewWidgetValueMap[k]);
-        }
-        return false;
-    })),
-    disableUpdatePreview: computed<boolean>(() => !state.isWidgetOptionsChanged || !widgetGenerateGetters.isAllWidgetFormValid),
+    isWidgetFieldChanged: computed<boolean>(() => {
+        const _isOptionsChanged = Object.entries(widgetGenerateState.widgetFormValueMap).some(([k, v]) => {
+            if (v !== undefined) {
+                return !isEqual(v, widgetGenerateState.widget?.options[k]);
+            }
+            return false;
+        });
+        // const _isWidgetInactive = widgetGenerateState.widget?.state === 'INACTIVE'; // TODO: after api is ready
+        const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widgetGenerateState.widget?.widget_type;
+        const _isNameChanged = widgetGenerateState.title !== widgetGenerateState.widget?.name;
+        const _isDescriptionChanged = widgetGenerateState.description !== widgetGenerateState.widget?.description;
+        return _isOptionsChanged || _isTypeChanged || _isNameChanged || _isDescriptionChanged;
+    }),
+    disableApplyButton: computed<boolean>(() => !state.isWidgetFieldChanged || !widgetGenerateGetters.isAllWidgetFormValid),
     //
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
@@ -87,38 +92,31 @@ const loadOverlayWidget = async () => {
 const handleChangeWidgetSize = (widgetSize: string) => {
     state.selectedWidgetSize = widgetSize;
 };
-const handleUpdatePreview = async () => {
-    widgetGenerateStore.setPreviewWidgetValueMap(cloneDeep(widgetGenerateState.widgetFormValueMap));
+const handleUpdateWidgetOptions = async () => {
+    await widgetGenerateStore.updateWidget({
+        widget_id: widgetGenerateState.widgetId,
+        name: widgetGenerateState.title,
+        description: widgetGenerateState.description,
+        size: widgetGenerateState.size,
+        widget_type: widgetGenerateState.selectedWidgetName,
+        data_table_id: widgetGenerateState.selectedDataTableId,
+        options: widgetGenerateState.widgetFormValueMap,
+    });
     await nextTick();
     await loadOverlayWidget();
 };
-const handleReadyToPreview = async () => {
-    widgetGenerateStore.setPreviewWidgetValueMap(cloneDeep(widgetGenerateState.widgetFormValueMap));
-    await nextTick();
-    state.readyToMounted = true;
-};
-const handleMountWidget = (widgetId: string) => {
-    state.mountedWidgetId = widgetId;
-};
 
 /* Watcher */
-watch(() => widgetGenerateState.selectedWidgetName, () => {
-    if (widgetGenerateState.size === 'sm') {
+watch(() => widgetGenerateState.widget?.size, (widgetSize) => {
+    if (widgetSize === 'sm') {
         state.selectedWidgetSize = 'ACTUAL';
     } else {
         state.selectedWidgetSize = 'FULL';
     }
 }, { immediate: true });
-watch([() => state.mountedWidgetId, () => state.readyToMounted], ([mountedWidgetId, readyToMounted]) => {
-    if (mountedWidgetId && readyToMounted) {
-        loadOverlayWidget();
-        state.mountedWidgetId = undefined;
-        state.readyToMounted = false;
-    }
-});
 
 onMounted(async () => {
-    if (widgetGenerateState.overlayType === 'EXPAND') await loadOverlayWidget();
+    await loadOverlayWidget();
 });
 onBeforeMount(() => {
     initSnapshot();
@@ -151,45 +149,45 @@ onUnmounted(() => {
                     >
                         {{ widgetSize.label }}
                     </p-select-button>
+                    <p-divider vertical
+                               class="divider"
+                    />
+                    <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
+                              style-type="substitutive"
+                              icon-left="ic_refresh"
+                              class="apply-button"
+                              :disabled="state.disableApplyButton"
+                              @click="handleUpdateWidgetOptions"
+                    >
+                        {{ $t('COMMON.WIDGETS.APPLY') }}
+                        <div v-if="state.isWidgetFieldChanged"
+                             class="update-dot"
+                        />
+                    </p-button>
                 </div>
             </div>
             <div class="widget-wrapper"
                  :class="{ 'full-size': state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND' }"
             >
-                <component :is="getWidgetComponent(widgetGenerateState.selectedWidgetName)"
+                <component :is="getWidgetComponent(widgetGenerateState.widget.widget_type)"
                            ref="overlayWidgetRef"
-                           :widget-name="widgetGenerateState.selectedWidgetName"
-                           :widget-id="widgetGenerateState.widgetId"
+                           :widget-name="widgetGenerateState.widget.widget_type"
+                           :widget-id="widgetGenerateState.widget.widget_id"
                            :data-table-id="widgetGenerateState.selectedDataTableId"
                            :size="state.widgetSize"
                            :width="state.widgetWidth"
-                           :title="widgetGenerateState.title"
-                           :description="widgetGenerateState.description"
-                           :widget-options="widgetGenerateState.previewWidgetValueMap"
+                           :title="widgetGenerateState.widget.name"
+                           :description="widgetGenerateState.widget.description"
+                           :widget-options="widgetGenerateState.widget.options"
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailGetters.refinedVars"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            disable-refresh-on-loading
                            mode="overlay"
-                           @mounted="handleMountWidget"
                 />
-                <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
-                          style-type="substitutive"
-                          icon-left="ic_refresh"
-                          class="update-preview-button"
-                          :disabled="state.disableUpdatePreview"
-                          @click="handleUpdatePreview"
-                >
-                    <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.UPDATE_PREVIEW') }}</span>
-                    <div v-if="state.isWidgetOptionsChanged"
-                         class="update-dot"
-                    />
-                </p-button>
             </div>
         </div>
-        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'"
-                                               @ready-to-preview="handleReadyToPreview"
-        />
+        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'" />
     </div>
 </template>
 
@@ -226,6 +224,10 @@ onUnmounted(() => {
             .widget-size-wrapper {
                 display: flex;
                 gap: 0.5rem;
+                align-items: center;
+                .divider {
+                    height: 1.5rem;
+                }
             }
         }
         .widget-wrapper {
@@ -241,18 +243,15 @@ onUnmounted(() => {
                     height: 100%;
                 }
             }
-            .update-preview-button {
-                position: absolute;
-                top: 1rem;
-                right: 1rem;
-                z-index: 100;
-                .update-dot {
-                    @apply absolute bg-blue-500 rounded-full border-2 border-white;
-                    width: 0.75rem;
-                    height: 0.75rem;
-                    right: -0.375rem;
-                    top: -0.375rem;
-                }
+        }
+        .apply-button {
+            position: relative;
+            .update-dot {
+                @apply absolute bg-blue-500 rounded-full border-2 border-white;
+                width: 0.75rem;
+                height: 0.75rem;
+                right: -0.375rem;
+                top: -0.375rem;
             }
         }
     }

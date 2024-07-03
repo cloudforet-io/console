@@ -41,7 +41,7 @@ const state = reactive({
     buttonText: computed<TranslateResult>(() => {
         if (widgetGenerateState.overlayStep === 1) return i18n.t('COMMON.WIDGETS.CONFIGURE_WIDGET');
         if (widgetGenerateState.overlayType === 'ADD') return i18n.t('COMMON.WIDGETS.ADD_WIDGET_TO_DASHBOARD');
-        return i18n.t('COMMON.WIDGETS.SAVE');
+        return i18n.t('COMMON.WIDGETS.DONE');
     }),
     isAllValid: computed<boolean>(() => {
         if (widgetGenerateState.overlayStep === 1) return !!widgetGenerateState.selectedDataTableId;
@@ -61,33 +61,18 @@ const handleClickContinue = async () => {
     if (widgetGenerateState.overlayStep === 1) {
         await fetcher({
             widget_id: widgetGenerateState.widgetId,
-            widget_type: widgetGenerateState.selectedWidgetName,
             data_table_id: widgetGenerateState.selectedDataTableId,
-            options: {},
         });
-        widgetGenerateStore.setWidgetFormValueMap({});
-        widgetGenerateStore.setWidgetValidMap({});
         widgetGenerateStore.setOverlayStep(2);
         return;
     }
-    await fetcher({
-        widget_id: widgetGenerateState.widgetId,
-        name: widgetGenerateState.title,
-        description: widgetGenerateState.description,
-        size: widgetGenerateState.size,
-        widget_type: widgetGenerateState.selectedWidgetName,
-        data_table_id: widgetGenerateState.selectedDataTableId,
-        options: widgetGenerateState.widgetFormValueMap,
-    });
     widgetGenerateStore.setShowOverlay(false);
 };
 const handleUpdateVisible = (value: boolean) => {
     widgetGenerateStore.setShowOverlay(value);
 };
-const handleCloseOverlay = () => {
-    widgetGenerateStore.setShowOverlay(false);
-};
 
+/* Watcher */
 watch(() => widgetGenerateState.showOverlay, (val) => {
     if (!val) {
         widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
@@ -112,11 +97,6 @@ watch(() => widgetGenerateState.showOverlay, (val) => {
                       #footer
             >
                 <div class="footer-wrapper">
-                    <p-button style-type="transparent"
-                              @click="handleCloseOverlay"
-                    >
-                        {{ $t('COMMON.WIDGETS.CANCEL') }}
-                    </p-button>
                     <p-button :style-type="widgetGenerateState.overlayStep === 1 ? 'substitutive' : 'primary'"
                               :icon-right="widgetGenerateState.overlayStep === 1 ? 'ic_arrow-right' : undefined"
                               :disabled="!state.isAllValid"
