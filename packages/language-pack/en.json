@@ -3346,6 +3346,7 @@
 			"TITLE": "Gather all your multi-cloud assets here {domain_icon} in the Management Console to elevate {boost_icon} your efficiency and productivity.",
 			"WELCOME_TITLE": "Welcome to the Cloud Management Console!"
 		},
+		"NOT_FOUND_ACCESS_WORKSPACE": "There are no accessible workspaces.",
 		"NOT_FOUND_DESC": "Looks like you don’t have any workspace.",
 		"RECENT": "Recent Visits",
 		"ROLE_TYPE_MEMBER": "Member",

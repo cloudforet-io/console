@@ -3346,6 +3346,7 @@
 			"TITLE": "マルチクラウド資産を管理コンソールに{domain_icon} すべて集めて表示し、効率性と生産性を{boost_icon}向上させましょう。",
 			"WELCOME_TITLE": "クラウド管理コンソールへようこそ！"
 		},
+		"NOT_FOUND_ACCESS_WORKSPACE": "アクセス可能なワークスペースがありません。",
 		"NOT_FOUND_DESC": "まだ作成されたワークスペースがありません。",
 		"RECENT": "最近のアクセス",
 		"ROLE_TYPE_MEMBER": "構成員",

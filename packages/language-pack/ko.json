@@ -3346,6 +3346,7 @@
 			"TITLE": "멀티 클라우드 자산을 관리 콘솔에 {domain_icon} 모두 모아 보고, \n효율성과 생산성을 {boost_icon}  높이세요.",
 			"WELCOME_TITLE": "클라우드 관리 콘솔에 오신걸 환영합니다! "
 		},
+		"NOT_FOUND_ACCESS_WORKSPACE": "접근 가능한 워크스페이스가 없습니다.",
 		"NOT_FOUND_DESC": "아직 생성된 워크스페이스가 없습니다.",
 		"RECENT": "최근 방문",
 		"ROLE_TYPE_MEMBER": "멤버",
