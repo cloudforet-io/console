@@ -119,11 +119,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         } else {
             publicDashboardApiQueryHelper.addFilter({
                 k: 'resource_group',
-                v: ['WORKSPACE', 'PROJECT'],
-                o: '',
-            }, {
-                k: 'workspace_id',
-                v: _state.currentWorkspace?.workspace_id || '',
+                v: ['WORKSPACE', 'DOMAIN'],
                 o: '=',
             });
         }

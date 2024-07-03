@@ -19,6 +19,7 @@ export interface WidgetFrameProps {
     errorMessage?: string;
     noData?: boolean;
     allRequiredFieldsFilled?: boolean;
+    disableManageButtons?: boolean;
     //
     title?: TranslateResult;
     description?: string;

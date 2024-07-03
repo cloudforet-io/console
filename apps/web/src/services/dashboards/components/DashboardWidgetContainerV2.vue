@@ -17,8 +17,6 @@ import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-wid
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
 
-import config from '@/lib/config';
-
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
@@ -55,7 +53,6 @@ const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
-const isDashboardEditDisabled = config.get('DASHBOARD_EDIT_DISABLE');
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
@@ -292,6 +289,7 @@ defineExpose({
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
+                               :disable-manage-buttons="dashboardDetailGetters.disableManageButtons"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                @mounted="handleWidgetMounted(widget.widget_id)"
                                @click-edit="handleOpenWidgetOverlay(widget, 'EDIT')"
@@ -310,10 +308,10 @@ defineExpose({
                     >
                         {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
                         <template #button>
-                            <p-button style-type="substitutive"
+                            <p-button v-if="!dashboardDetailGetters.disableManageButtons"
+                                      style-type="substitutive"
                                       icon-left="ic_plus_bold"
                                       class="add-widget-button"
-                                      :disabled="isDashboardEditDisabled"
                                       @click="handleClickAddWidget"
                             >
                                 {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}

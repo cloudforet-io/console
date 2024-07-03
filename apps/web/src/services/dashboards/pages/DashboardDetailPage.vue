@@ -166,7 +166,7 @@ onUnmounted(() => {
                                  :template-name="state.templateName"
         />
         <div class="filter-box">
-            <dashboard-labels :editable="!dashboardDetailGetters.isDeprecatedDashboard"
+            <dashboard-labels :editable="!dashboardDetailGetters.isDeprecatedDashboard && !dashboardDetailGetters.disableManageButtons"
                               @update-labels="handleUpdateLabels"
             />
             <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
@@ -180,6 +180,7 @@ onUnmounted(() => {
             />
             <dashboard-variables-v2 v-else
                                     class="variable-selector-wrapper"
+                                    :disable-save-button="dashboardDetailGetters.disableManageButtons"
                                     :loading="state.dashboardVariablesLoading"
                                     @update="handleUpdateDashboardVariables"
             />
