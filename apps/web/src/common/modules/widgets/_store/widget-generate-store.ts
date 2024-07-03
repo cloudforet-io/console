@@ -244,6 +244,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     };
                 } else {
                     result = await fetcher(updateParams);
+                    if (state.widget?.state === 'ACTIVE') {
+                        await actions.updateWidget({ state: 'INACTIVE' });
+                    }
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
             } catch (e: any) {

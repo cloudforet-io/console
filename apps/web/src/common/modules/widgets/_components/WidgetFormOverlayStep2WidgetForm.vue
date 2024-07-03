@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, onMounted, reactive,
 } from 'vue';
 
 import {
@@ -9,14 +9,6 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
@@ -65,30 +57,13 @@ const state = reactive({
     errorModalCurrentType: undefined as 'default'|'geoMap'| 'progressCard'|undefined,
 });
 
-/* Api */
-const updateWidget = async (dataTableId: string) => {
-    const isPrivate = widgetGenerateState.widgetId.startsWith('private');
-    const fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
-    try {
-        await fetcher({
-            widget_id: widgetGenerateState.widgetId,
-            widget_type: widgetGenerateState.selectedWidgetName,
-            data_table_id: dataTableId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
 /* Event */
 const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    await updateWidget(dataTableId);
-    widgetGenerateStore.setWidgetFormValueMap({});
-    widgetGenerateStore.setWidgetValidMap({});
-    state.isPreviewInitiated = false;
+    await widgetGenerateStore.updateWidget({
+        data_table_id: dataTableId,
+        state: 'INACTIVE',
+    });
 };
 
 const checkDefaultValidation = () => {
@@ -146,7 +121,6 @@ const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setWidgetFormValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
     checkDefaultValidation();
-    state.isPreviewInitiated = false;
 };
 const handleUpdateWidgetTitle = (title: string) => {
     widgetGenerateStore.setTitle(title);
@@ -183,15 +157,6 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
 
 // eslint-disable-next-line max-len
 const keyGenerator = (name: string) => `${name}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetFormValueMap[name] === undefined}`;
-
-/* Watcher */
-watch(() => widgetGenerateState.widgetValidMap, () => {
-    if (state.isPreviewInitiated) return;
-    const _requiredField = state.widgetRequiredFieldSchemaMap.map(([d]) => d);
-    if (_requiredField.every((d) => widgetGenerateState.widgetValidMap[d])) {
-        state.isPreviewInitiated = true;
-    }
-}, { deep: true });
 
 onMounted(() => {
     checkDefaultValidation();

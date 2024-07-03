@@ -8,13 +8,6 @@ import {
     PButton, POverlayLayout,
 } from '@spaceone/design-system';
 
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { i18n } from '@/translations';
 
 import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetFormOverlayStep1.vue';
@@ -54,15 +47,13 @@ const state = reactive({
 
 /* Event */
 const handleClickContinue = async () => {
-    const isPrivate = widgetGenerateState.widgetId.startsWith('private');
-    const fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
     if (widgetGenerateState.overlayStep === 1) {
-        await fetcher({
-            widget_id: widgetGenerateState.widgetId,
-            data_table_id: widgetGenerateState.selectedDataTableId,
-        });
+        if (widgetGenerateState.widget?.data_table_id !== widgetGenerateState.selectedDataTableId) {
+            await widgetGenerateStore.updateWidget({
+                widget_id: widgetGenerateState.widgetId,
+                data_table_id: widgetGenerateState.selectedDataTableId,
+            });
+        }
         widgetGenerateStore.setOverlayStep(2);
         return;
     }
