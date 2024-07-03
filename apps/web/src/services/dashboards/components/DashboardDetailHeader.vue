@@ -47,7 +47,6 @@ const state = reactive({
     shareWithCodeModalVisible: false,
     shareToWorkspaceModalVisible: false,
     isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared),
-    disableManageButtons: computed<boolean>(() => !storeState.isAdminMode && (dashboardDetailState.dashboardInfo?.resource_group === 'DOMAIN')),
     menuItems: computed<MenuItem[]>(() => {
         if (dashboardDetailGetters.isDeprecatedDashboard) {
             return [
@@ -150,7 +149,7 @@ const handleNameUpdate = (name: string) => {
                         width="20rem"
                         height="1.5rem"
             />
-            <template v-if="!state.disableManageButtons"
+            <template v-if="!dashboardDetailGetters.disableManageButtons"
                       #title-right-extra
             >
                 <p-select-dropdown style-type="icon-button"
@@ -165,7 +164,8 @@ const handleNameUpdate = (name: string) => {
             <template v-if="!dashboardDetailGetters.isDeprecatedDashboard"
                       #extra
             >
-                <dashboard-control-buttons :dashboard-id="props.dashboardId"
+                <dashboard-control-buttons v-if="!dashboardDetailGetters.disableManageButtons"
+                                           :dashboard-id="props.dashboardId"
                                            :name="dashboardDetailState.name"
                 />
             </template>

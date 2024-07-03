@@ -5,12 +5,9 @@ import { PButton } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
-import config from '@/lib/config';
-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 
-const isDashboardEditDisabled = config.get('DASHBOARD_EDIT_DISABLE');
 const widgetGenerateStore = useWidgetGenerateStore();
 const state = reactive({
     loading: false,
@@ -34,8 +31,7 @@ const handleClickWidgetReorder = () => {
 
 <template>
     <div class="dashboard-control-buttons">
-        <p-button v-if="!isDashboardEditDisabled"
-                  icon-left="ic_plus"
+        <p-button icon-left="ic_plus"
                   style-type="tertiary"
                   size="sm"
                   :loading="state.loading"
