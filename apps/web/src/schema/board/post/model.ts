@@ -15,7 +15,7 @@ export interface PostModel {
     view_count: 0;
     writer: string;
     files: FileModel[];
-    resource_group: Extract<ResourceGroupType, 'SYSTEM'|'DOMAIN'>;
+    resource_group: Extract<ResourceGroupType, 'SYSTEM'|'DOMAIN'|'WORKSPACE'>;
     domain_id: string;
     user_id: string;
     created_at: string;
