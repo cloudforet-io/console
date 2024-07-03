@@ -1580,7 +1580,7 @@
 			"CREATE": "作成",
 			"CREAT_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"DASHBOARDS_TITLE": "ダッシュボード",
-			"DEPRECATED": "廃止された",
+			"DEPRECATED": "サポート終了",
 			"DEPRECATED_DESCRIPTION": "このダッシュボードはサポートが終了し、新しいダッシュボードが適用されるとすぐに削除される予定です。",
 			"FILTER_ALL": "すべて",
 			"FILTER_PRIVATE": "非公開",

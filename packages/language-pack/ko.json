@@ -1580,7 +1580,7 @@
 			"CREATE": "생성",
 			"CREAT_NEW_DASHBOARD": "대시보드 생성",
 			"DASHBOARDS_TITLE": "대시보드",
-			"DEPRECATED": "사용 중지된",
+			"DEPRECATED": "지원 중지된",
 			"DEPRECATED_DESCRIPTION": "이 대시보드는 더 이상 지원되지 않으며 새로운 대시보드가 적용되면 제거될 예정입니다.",
 			"FILTER_ALL": "전체",
 			"FILTER_PRIVATE": "비공개",
