@@ -126,10 +126,10 @@ export const useWidgetFrame = (
             if (props.size && _state.widgetConfig.meta.sizes.includes(props.size)) return props.size;
             return _state.widgetConfig.meta.sizes[0];
         }),
-        basedOnText: computed<string>(() => {
+        periodText: computed<string>(() => {
             if (!overrides.dateRange) return '';
             const _dateRange = overrides.dateRange?.value as DateRange;
-            if (_dateRange?.start) return `${_dateRange.start} ~ ${_dateRange.end}`;
+            if (_dateRange?.start && (_dateRange.start !== _dateRange.end)) return `${_dateRange.start} ~ ${_dateRange.end}`;
             return _dateRange.end;
         }),
         dataTable: computed<DataTableModel|undefined>(() => _state.dataTables?.find((d) => d.data_table_id === props.dataTableId)),
@@ -194,7 +194,7 @@ export const useWidgetFrame = (
         description: props.description,
         size: _state.size,
         width: props.width,
-        basedOnText: _state.basedOnText,
+        periodText: _state.periodText,
         unit: _state.unit,
         fullDataLinkList: _state.fullDataLinkList,
     }));

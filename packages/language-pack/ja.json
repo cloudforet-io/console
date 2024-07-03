@@ -1473,6 +1473,7 @@
 				"MORE_THAN_PREVIOUS_YEAR": "前年よりも多い"
 			},
 			"NUMBER_FIELD_VALIDATION": "値は {max} 以下でなければなりません。",
+			"PERIOD": "期間",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "アカウントID",
 				"AGO": "前",
@@ -2019,7 +2020,8 @@
 			},
 			"UNIT": "ユニット",
 			"UPDATE_TITLE": "ウィジェットの更新",
-			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。"
+			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。",
+			"월": ""
 		}
 	},
 	"HOME": {
