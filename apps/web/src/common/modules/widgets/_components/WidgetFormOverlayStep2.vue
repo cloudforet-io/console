@@ -56,7 +56,7 @@ const state = reactive({
     isWidgetFieldChanged: computed<boolean>(() => {
         const _isOptionsChanged = Object.entries(widgetGenerateState.widgetFormValueMap).some(([k, v]) => {
             if (v !== undefined) {
-                return !isEqual(v, widgetGenerateState.widget?.options[k]);
+                return !isEqual(v, widgetGenerateState.widget?.options?.[k]);
             }
             return false;
         });
