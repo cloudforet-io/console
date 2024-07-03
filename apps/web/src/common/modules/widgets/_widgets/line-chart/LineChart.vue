@@ -176,10 +176,10 @@ const getLineByData = (rawData: Data) => {
         const _slicedData = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.lineByCount);
         const _etcData = d[state.dataField]?.slice(state.lineByCount).reduce((acc, v) => {
             acc[state.lineByField] = 'etc';
-            acc.value += v.value;
+            acc.value += v.value || 0;
             return acc;
-        }, {});
-        const _values = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
+        }, { value: 0 });
+        const _values = _etcData.value === 0 ? _slicedData : [..._slicedData, _etcData];
         _values.forEach((v) => {
             _slicedByLineBy.push({
                 [state.xAxisField]: d[state.xAxisField],
