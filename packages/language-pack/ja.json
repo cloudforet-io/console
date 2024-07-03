@@ -1436,6 +1436,7 @@
 			},
 			"DEFAULT_WIDTH": "デフォルト幅",
 			"DELETE": "削除",
+			"DONE": "完了",
 			"EDIT": "編集",
 			"EDIT_WIDGET": "ウィジェット編集",
 			"EXPAND": "展開する",
@@ -1772,7 +1773,8 @@
 			"SHARE_TO_ALL_WORKSPACES": "すべてのワークスペースに共有する",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "このダッシュボードをすべてのワークスペースと共有しますか？",
 			"SHARE_WITH_CODE": "コードで共有",
-			"UNSHARE_TO_ALL_WORKSPACES": "すべてのワークスペースから共有解除"
+			"UNSHARE_FROM_ALL_WORKSPACES": "すべてのワークスペースから共有解除",
+			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "ワークスペース全体でこのダッシュボードの共有を解除してもよろしいですか？"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "ダッシュボードの作成に失敗しました",

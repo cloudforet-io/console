@@ -1436,6 +1436,7 @@
 			},
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
+			"DONE": "Done",
 			"EDIT": "Edit",
 			"EDIT_WIDGET": "Edit Widget",
 			"EXPAND": "Expand",
@@ -1772,7 +1773,8 @@
 			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "Are you sure you want to share this dashboard to all workspace?",
 			"SHARE_WITH_CODE": "Share with Code",
-			"UNSHARE_TO_ALL_WORKSPACES": "Unshare from All Workspaces"
+			"UNSHARE_FROM_ALL_WORKSPACES": "Unshare from All Workspaces",
+			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "Are you sure you want to unshare this dashboard from all workspace?"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",
