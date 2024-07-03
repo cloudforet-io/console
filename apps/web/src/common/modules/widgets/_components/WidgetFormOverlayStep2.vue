@@ -16,9 +16,7 @@ import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
-import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
@@ -46,7 +44,6 @@ const state = reactive({
         { label: 'Actual', name: 'ACTUAL' },
     ],
     selectedWidgetSize: 'ACTUAL',
-    widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetSize: computed(() => {
         if (widgetGenerateState.overlayType === 'EXPAND') return 'full';
         if (state.selectedWidgetSize === 'FULL') return 'full';

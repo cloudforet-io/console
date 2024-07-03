@@ -77,19 +77,19 @@
                 {{ $t('COMMON.MONITORING.NO_METRICS') }}
             </div>
             <template v-else>
-                <!--                <div class="metric-chart-wrapper grid grid-cols-12">-->
-                <!--                    <metric-chart v-for="(item, index) in metricChartDataList"-->
-                <!--                                  :key="index"-->
-                <!--                                  :loading="item.loading"-->
-                <!--                                  :labels="item.labels"-->
-                <!--                                  :dataset="item.dataset"-->
-                <!--                                  :unit="item.metric.unit"-->
-                <!--                                  :timezone="timezone"-->
-                <!--                                  :resources="availableResources"-->
-                <!--                                  :title="item.metric.name"-->
-                <!--                                  :error="item.error"-->
-                <!--                    />-->
-                <!--                </div>-->
+                <div class="metric-chart-wrapper grid grid-cols-12">
+                    <metric-chart v-for="(item, idx) in metricChartDataList"
+                                  :key="`${item.metric.key}-${idx}`"
+                                  :loading="item.loading"
+                                  :labels="item.labels"
+                                  :dataset="item.dataset"
+                                  :unit="item.metric.unit"
+                                  :timezone="timezone"
+                                  :resources="availableResources"
+                                  :title="item.metric.name"
+                                  :error="item.error"
+                    />
+                </div>
                 <p-button v-if="metricChartDataList.length !== metrics.length"
                           style-type="tertiary"
                           class="more-btn"
@@ -126,12 +126,12 @@ import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-// import MetricChart from '@/common/components/charts/metric-chart/MetricChart.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { StatisticsType } from '@/common/modules/monitoring/config';
 import {
     COLORS, STATISTICS_TYPE, TIME_RANGE,
 } from '@/common/modules/monitoring/config';
+import MetricChart from '@/common/modules/monitoring/MetricChart.vue';
 import type {
     AvailableResource,
     Metric, MetricChartData, StatItem,
@@ -148,6 +148,7 @@ const LOAD_LIMIT = 12;
 export default {
     name: 'Monitoring',
     components: {
+        MetricChart,
         PButton,
         PSelectDropdown,
         PSelectButtonGroup,

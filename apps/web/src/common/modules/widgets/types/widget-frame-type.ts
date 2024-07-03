@@ -17,6 +17,9 @@ export interface WidgetFrameProps {
     mode: 'overlay'|'view'|'edit-layout';
     loading?: boolean;
     errorMessage?: string;
+    noData?: boolean;
+    allRequiredFieldsFilled?: boolean;
+    disableManageButtons?: boolean;
     //
     title?: TranslateResult;
     description?: string;

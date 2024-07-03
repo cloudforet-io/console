@@ -33,6 +33,7 @@ import {
     DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
+import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
     DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions,
@@ -100,13 +101,12 @@ const state = reactive({
     selectedCostDataTypeLabel: computed(() => {
         if (!state.selectedCostDataSourceId || !state.selectedCostDataType) return '';
         const targetCostDataSource = storeState.costDataSources[state.selectedCostDataSourceId];
-        const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
-        const usageAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
+        const costAlias: string|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.name;
         if (state.selectedCostDataType === 'cost') {
             return costAlias ? `Cost (${costAlias})` : 'Cost';
         }
         if (state.selectedCostDataType === 'usage_quantity') {
-            return usageAlias ? `Usage (${usageAlias})` : 'Usage';
+            return 'Usage';
         }
         return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
     }),
@@ -114,7 +114,7 @@ const state = reactive({
         {
             key: DATA_TABLE_OPERATOR.CONCAT,
             name: 'Concatenate',
-            description: 'Combines multiple tables into one by stacking tshem.',
+            description: 'Combines multiple tables into one by stacking them.',
             icon: 'ic_db-concat',
         },
         {
@@ -201,10 +201,21 @@ const handleConfirmDataSource = async () => {
             : `${state.selectedNamespace.name} - ${storeState.metrics[state.selectedMetricId]?.label}`;
         const addParameters = {
             source_type: state.selectedDataSourceDomain,
-            name: getDuplicatedDataTableName(dataTableBaseName),
+            name: getDuplicatedDataTableName(dataTableBaseName, widgetGenerateState.dataTables),
         } as DataTableAddParameters;
+        const dataKey = state.selectedCostDataType?.replace('data.', '');
+        const costUnit: string|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.unit;
+        const additionalDataInfo: Record<string, { name: string, unit: string }>|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.data_info;
+        const additionalDataUnit = dataKey !== 'cost' && additionalDataInfo ? additionalDataInfo[dataKey]?.unit : undefined;
+        let dataUnit: string|undefined;
+        if (dataKey === 'cost') {
+            dataUnit = costUnit;
+        } else {
+            dataUnit = additionalDataUnit;
+        }
         const costOptions: DataTableAddOptions = {
             data_name: state.selectedCostDataTypeLabel,
+            data_unit: dataUnit,
             COST: {
                 data_source_id: state.selectedCostDataSourceId,
                 data_key: state.selectedCostDataType,
@@ -226,26 +237,6 @@ const handleConfirmDataSource = async () => {
     }
     state.showPopover = false;
     state.loading = false;
-};
-
-/* Utils */
-const getDuplicatedDataTableName = (name: string): string => {
-    let _name = name;
-    const _regex = /^(.*?)\s*\((\d+)\)$/i;
-    const dataTableNames = widgetGenerateStore.state.dataTables.map((dataTable) => dataTable.name);
-
-    while (dataTableNames.includes(_name)) {
-        const match = _regex.exec(_name);
-        if (match) {
-            const baseName = match[1];
-            const numberStr = match[2];
-            const newNumber = numberStr ? parseInt(numberStr) + 1 : 2;
-            _name = `${baseName} (${newNumber})`;
-        } else {
-            _name = `${_name} (2)`;
-        }
-    }
-    return _name;
 };
 
 watch(() => state.showPopover, (val) => {

@@ -63,6 +63,7 @@ const handleClickContinue = async () => {
             widget_id: widgetGenerateState.widgetId,
             widget_type: widgetGenerateState.selectedWidgetName,
             data_table_id: widgetGenerateState.selectedDataTableId,
+            options: {},
         });
         widgetGenerateStore.setWidgetFormValueMap({});
         widgetGenerateStore.setWidgetValidMap({});

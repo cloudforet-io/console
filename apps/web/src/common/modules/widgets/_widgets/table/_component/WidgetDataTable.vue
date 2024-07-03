@@ -60,7 +60,7 @@ const valueFormatter = (value, field: TableWidgetField) => {
         const _originalVal = bytes.parse(`${value}${_unit}`);
         return byteFormatter(_originalVal);
     }
-    return numberFormatter(value);
+    return numberFormatter(value, { notation: 'compact' });
 };
 
 const getValue = (item: TableDataItem, field: TableWidgetField) => {
@@ -68,7 +68,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
         if (Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
             const referenceKey = REFERENCE_FIELD_MAP[field.name];
             const referenceValueKey = item[field.name];
-            return storeState[referenceKey][referenceValueKey]?.name || referenceValueKey || '-';
+            return storeState[referenceKey][referenceValueKey]?.label || storeState[referenceKey][referenceValueKey]?.name || referenceValueKey || '-';
         }
         return item[field.name] || '-';
     }
@@ -224,7 +224,7 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         @apply min-w-full;
         border-collapse: separate;
         border-spacing: 0;
-        padding: 0 1rem 1rem 0;
+        padding: 0;
     }
 
     th {
@@ -316,13 +316,6 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         .td-contents {
             @apply flex items-center pl-4 gap-1;
             width: 100%;
-
-            /* custom design-system component - p-tooltip */
-            :deep(.p-tooltip) {
-                .tooltip-inner {
-                    white-space: pre;
-                }
-            }
 
             .comparison-icon {
                 min-width: 0.75rem;

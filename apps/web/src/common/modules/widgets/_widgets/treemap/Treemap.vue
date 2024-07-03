@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import type { TreemapSeriesOption } from 'echarts/charts';
@@ -25,6 +25,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
+    getAllRequiredFieldsFilled,
     getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateRange,
@@ -45,6 +46,8 @@ const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: false,
+    errorMessage: undefined as string|undefined,
+    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: [],
@@ -72,7 +75,6 @@ const state = reactive({
             },
         ],
     })),
-    errorMessage: undefined as string|undefined,
     //
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
@@ -89,10 +91,12 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     dateRange: computed(() => state.dateRange),
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
+    noData: computed(() => (state.data ? !state.data.results?.length : false)),
 });
 
 /* Util */
-const fetchWidget = async (): Promise<Data|APIErrorToast> => {
+const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
+    if (!state.allRequiredFieldsFilled) return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
@@ -139,10 +143,6 @@ const drawChart = (rawData: Data|null) => {
         name: getReferenceLabel(props.allReferenceTypeInfo, state.categoryByField, v[state.categoryByField]),
         value: v[state.dataField],
     })) || [];
-
-    // init chart and set options
-    state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions, true);
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
@@ -155,10 +155,17 @@ const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
     return state.data;
 };
 
+/* Watcher */
+watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.chart = init(chartContext.value);
+        state.chart.setOption(state.chartOptions, true);
+    }
+});
+
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
     loadWidget,
@@ -169,14 +176,11 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div ref="chartContext"
-             class="chart"
-        />
+        <!--Do not delete div element below. It's defense code for redraw-->
+        <div class="h-full">
+            <div ref="chartContext"
+                 class="h-full"
+            />
+        </div>
     </widget-frame>
 </template>
-
-<style lang="postcss" scoped>
-.chart {
-    height: 100%;
-}
-</style>

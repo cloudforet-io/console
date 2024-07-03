@@ -30,6 +30,7 @@ const { i18nDayjs } = useI18nDayjs();
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
     monthMenuItems: computed<MenuItem[]>(() => {
         const monthData: MenuItem[] = [];
@@ -96,12 +97,14 @@ const handleSelectMonthMenuItem = (selected: string) => {
         updateDashboardDateRange(state.selectedDateRange);
     }
 
-    dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
-        options: {
-            ...dashboardDetailState.dashboardInfo?.options || {},
-            date_range: state.selectedDateRange,
-        },
-    });
+    if (!dashboardDetailGetters.disableManageButtons) {
+        dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
+            options: {
+                ...dashboardDetailState.dashboardInfo?.options || {},
+                date_range: state.selectedDateRange,
+            },
+        });
+    }
 };
 const handleCustomRangeModalConfirm = (dateRange: DateRange) => {
     const { start, end } = dateRange;

@@ -42,7 +42,7 @@ const state = reactive({
         } return [];
     }),
     headerMenuItems: computed<MenuItem[]>(() => {
-        const costAlias: string|undefined = state.targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
+        const costAlias: string|undefined = state.targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost || state.targetCostDataSource?.data?.plugin_info?.metadata?.cost_info?.name;
         const usageAlias: string|undefined = state.targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
         return [
             { type: 'item', name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },

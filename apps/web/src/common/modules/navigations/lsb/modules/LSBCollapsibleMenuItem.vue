@@ -66,6 +66,7 @@ watch(() => props.overrideCollapsed, (changedCollapsed) => {
 <style scoped lang="postcss">
 .l-s-b-collapsible-menu-item {
     @apply flex flex-col text-label-md;
+    overflow: hidden;
     .collapsible-title {
         @apply flex items-center font-bold;
         height: 1.5rem;

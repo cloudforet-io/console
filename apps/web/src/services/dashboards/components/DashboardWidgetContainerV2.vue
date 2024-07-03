@@ -86,9 +86,9 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
         _widgetIdList?.forEach((widgetId) => {
             const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
             if (!_widget) return;
-            const config = getWidgetConfig(_widget.widget_type);
-            if (!config) return;
-            const _size = _widget.size || config.meta.sizes[0];
+            const _config = getWidgetConfig(_widget.widget_type);
+            if (!_config) return;
+            const _size = _widget.size || _config.meta.sizes[0];
             const _component = getWidgetComponent(_widget.widget_type);
             if (!_component) return;
             _refinedWidgets.push({
@@ -289,6 +289,7 @@ defineExpose({
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
+                               :disable-manage-buttons="dashboardDetailGetters.disableManageButtons"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                @mounted="handleWidgetMounted(widget.widget_id)"
                                @click-edit="handleOpenWidgetOverlay(widget, 'EDIT')"
@@ -307,7 +308,8 @@ defineExpose({
                     >
                         {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
                         <template #button>
-                            <p-button style-type="substitutive"
+                            <p-button v-if="!dashboardDetailGetters.disableManageButtons"
+                                      style-type="substitutive"
                                       icon-left="ic_plus_bold"
                                       class="add-widget-button"
                                       @click="handleClickAddWidget"

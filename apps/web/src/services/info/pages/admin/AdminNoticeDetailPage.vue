@@ -8,7 +8,9 @@ import { PButton, PHeading } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { PostSendParameters } from '@/schema/board/post/api-verbs/send';
+import type { PostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -37,6 +39,9 @@ const noticeDetailState = noticeDetailStore.state;
 
 const router = useRouter();
 
+const storeState = reactive({
+    post: computed<undefined|PostModel>(() => noticeDetailState.post),
+});
 const state = reactive({
     hasPermissionToEditOrDelete: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     deleteModalVisible: false,
@@ -90,6 +95,7 @@ const handleClickSendEmail = async () => {
         showSuccessMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SEND_EMAIL'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
+        hideLoadingMessage(loadingMessageId);
         showErrorMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_E_SEND_EMAIL'), e);
     } finally {
         state.sendLoading = false;
@@ -118,7 +124,8 @@ onBeforeMount(async () => {
                     >
                         {{ $t('INFO.NOTICE.FORM.EDIT') }}
                     </p-button>
-                    <p-button style-type="tertiary"
+                    <p-button v-if="storeState.post?.resource_group !== RESOURCE_GROUP.SYSTEM"
+                              style-type="tertiary"
                               icon-left="ic_paper-airplane"
                               :loading="state.sendLoading"
                               @click="handleClickSendEmail"

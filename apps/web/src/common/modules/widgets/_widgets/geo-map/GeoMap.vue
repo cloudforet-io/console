@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import axios from 'axios';
@@ -26,7 +26,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
-import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import {
+    getAllRequiredFieldsFilled,
+    getWidgetBasedOnDate,
+    getWidgetDateRange,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange, WidgetLoadData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
@@ -48,6 +52,7 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
+    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as WidgetLoadData | null,
     chart: null as EChartsType | null,
     chartData: [],
@@ -104,7 +109,8 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Api */
-const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
+const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast|undefined> => {
+    if (!state.allRequiredFieldsFilled) return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
@@ -162,12 +168,11 @@ const drawChart = async (rawData: WidgetLoadData|null) => {
             },
         });
     });
-    state.chartData = _seriesData;
     const response = await axios.get('map/geo-data.json');
     const geoJson = response.data;
     registerMap('world', geoJson);
-    state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions, true);
+
+    state.chartData = _seriesData;
 };
 const loadWidget = async (data?: WidgetLoadData): Promise<WidgetLoadData|APIErrorToast> => {
     state.loading = true;
@@ -178,6 +183,14 @@ const loadWidget = async (data?: WidgetLoadData): Promise<WidgetLoadData|APIErro
     state.loading = false;
     return state.data;
 };
+
+/* Watcher */
+watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.chart = init(chartContext.value);
+        state.chart.setOption(state.chartOptions, true);
+    }
+});
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
@@ -192,14 +205,11 @@ defineExpose<WidgetExpose<WidgetLoadData>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div ref="chartContext"
-             class="chart"
-        />
+        <!--Do not delete div element below. It's defense code for redraw-->
+        <div class="h-full">
+            <div ref="chartContext"
+                 class="h-full"
+            />
+        </div>
     </widget-frame>
 </template>
-
-<style lang="postcss" scoped>
-.chart {
-    height: 100%;
-}
-</style>

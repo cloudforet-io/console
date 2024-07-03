@@ -145,7 +145,10 @@ const groupByState = reactive({
     }),
 });
 const costFilterState = reactive({
-    managedGroupByItems: computed<MenuItem[]>(() => Object.values(GROUP_BY_ITEM_MAP).filter((item) => (storeState.isAdminMode ? item.name !== 'project_id' : item.name !== 'workspace_id'))),
+    managedGroupByItems: computed<MenuItem[]>(() => {
+        if (storeState.isAdminMode) return Object.values(GROUP_BY_ITEM_MAP);
+        return Object.values(GROUP_BY_ITEM_MAP).filter((item) => item.name !== 'workspace_id');
+    }),
     additionalInfoGroupByItems: computed<MenuItem[]>(() => {
         const dataSource = storeState.costDataSources[props.sourceId ?? ''];
         return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys.map((key) => ({
@@ -159,7 +162,10 @@ const costFilterState = reactive({
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
         const metricLabelsInfo = storeState.metrics[props.sourceId ?? ''].data.labels_info;
-        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => (storeState.isAdminMode ? labelInfo.key !== 'project_id' : labelInfo.key !== 'workspace_id')) : [];
+        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => {
+            if (storeState.isAdminMode) return true;
+            return labelInfo.key !== 'workspace_id';
+        }) : [];
     }),
     metricFilterItems: computed<MenuItem[]>(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
 });
