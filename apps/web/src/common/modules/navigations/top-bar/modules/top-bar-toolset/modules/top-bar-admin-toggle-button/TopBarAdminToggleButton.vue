@@ -46,9 +46,9 @@ const handleToggleAdminMode = throttle(async () => {
             await router.push({
                 name: ROOT_ROUTE.WORKSPACE._NAME,
                 params: { workspaceId: lastAccessedWorkspaceId },
-            });
+            }).catch(() => {});
         } else {
-            await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
+            await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME }).catch(() => {});
         }
 
         Vue.notify({

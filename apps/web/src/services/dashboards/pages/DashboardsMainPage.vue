@@ -46,7 +46,9 @@ const state = reactive({
         if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE' && !state.isWorkspaceOwner) return [];
         let target = dashboardGetters.workspaceItems || [];
         if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
-        return target as DashboardModel[];
+        const v2List = target.filter((d) => d.version === '2.0');
+        const v1List = target.filter((d) => d.version === '1.0');
+        return [...v2List, ...v1List];
     }),
     privateDashboardList: computed<DashboardModel[]>(() => {
         if (dashboardState.scope && dashboardState.scope !== 'PRIVATE') return [];

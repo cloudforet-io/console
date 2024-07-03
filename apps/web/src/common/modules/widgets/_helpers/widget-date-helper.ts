@@ -1,5 +1,9 @@
 import dayjs from 'dayjs';
 
+import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
+
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
@@ -83,4 +87,10 @@ export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, fi
         return allReferenceTypeInfo.service_account.referenceMap[val]?.label || val;
     }
     return val;
+};
+
+export const getAllRequiredFieldsFilled = (widgetName: string, widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>): boolean => {
+    const widgetConfig = getWidgetConfig(widgetName);
+    const requiredFields = Object.keys(widgetConfig?.requiredFieldsSchema || {});
+    return requiredFields.every((d) => widgetOptions?.[d] !== null && widgetOptions?.[d] !== undefined && widgetOptions?.[d] !== '');
 };

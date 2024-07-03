@@ -5,7 +5,8 @@ import {
 } from 'vue';
 
 import {
-    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, useContextMenuController, PDataLoader, PTooltip,
+    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, PTooltip, PSkeleton, PButton,
+    useContextMenuController,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -13,8 +14,6 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
-
-import config from '@/lib/config';
 
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFrameEmit } from '@/common/modules/widgets/types/widget-display-type';
@@ -24,7 +23,6 @@ import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-fra
 const props = defineProps<WidgetFrameProps>();
 const emit = defineEmits<WidgetFrameEmit>();
 
-const isDashboardEditDisabled = config.get('DASHBOARD_EDIT_DISABLE');
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     showWidthToggleButton: computed(() => props.widgetSizes.length > 1 && !props.loading && props.mode === 'edit-layout'),
@@ -35,19 +33,20 @@ const state = reactive({
             label: i18n.t('COMMON.WIDGETS.EXPAND'),
             icon: 'ic_arrows-expand-all',
         },
-        ...(isDashboardEditDisabled ? [] : [{
+        ...(props.disableManageButtons ? [] : [{
             type: 'item',
             name: 'edit',
             label: i18n.t('COMMON.WIDGETS.EDIT'),
             icon: 'ic_edit',
-        } as MenuItem]),
+        },
         { type: 'divider', name: '' },
         {
             type: 'item',
             name: 'delete',
             label: i18n.t('COMMON.WIDGETS.DELETE'),
             icon: 'ic_delete',
-        }])),
+        }] as MenuItem[]),
+    ])),
     sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
         type: 'item',
         name: size,
@@ -102,7 +101,7 @@ const handleToggleWidth = () => {
             <h3 class="title">
                 {{ props.title }}
             </h3>
-            <p-popover v-if="!props.errorMessage"
+            <p-popover v-if="!props.errorMessage && props.allRequiredFieldsFilled"
                        class="metadata-popover"
                        position="bottom-start"
                        :trigger="POPOVER_TRIGGER.CLICK"
@@ -173,32 +172,55 @@ const handleToggleWidth = () => {
             />
         </div>
         <div class="body-wrapper">
-            <p-data-loader class="chart-loader"
-                           :loading="props.loading"
-                           loader-type="skeleton"
-                           disable-empty-case
-                           :loader-backdrop-opacity="1"
-                           show-data-from-scratch
+            <p-skeleton v-if="props.loading"
+                        width="100%"
+                        height="100%"
+            />
+            <p-empty v-else-if="!props.allRequiredFieldsFilled"
+                     class="empty-content"
+                     :title="$t('COMMON.WIDGETS.REQUIRED_FIELDS_ARE_MISSING')"
+                     :show-image="props.size !== WIDGET_SIZE.sm"
+                     :show-button="props.mode === 'view'"
             >
-                <div class="h-full">
-                    <slot v-if="!props.errorMessage" />
-                    <p-empty v-else
-                             class="empty-content"
-                             :title="$t('COMMON.WIDGETS.UNABLE_TO_LOAD_WIDGET')"
-                             :show-image="props.size !== WIDGET_SIZE.sm"
+                <template #image>
+                    <img class="empty-image"
+                         alt="missing-field-image"
+                         src="@/assets/images/img_star__missing-field.svg"
                     >
-                        <template #image>
-                            <img class="empty-image"
-                                 alt="empty-default-image"
-                                 src="@/assets/images/img_ghost_no-connection.png"
-                            >
-                        </template>
-                        <p class="empty-text">
-                            {{ !props.dataTableId ? $t('COMMON.WIDGETS.SELECT_A_DATA_TABLE') : props.errorMessage }}
-                        </p>
-                    </p-empty>
-                </div>
-            </p-data-loader>
+                </template>
+                <template #button>
+                    <p-button style-type="substitutive"
+                              size="sm"
+                              @click="() => emit('click-edit')"
+                    >
+                        {{ $t('COMMON.WIDGETS.EDIT_WIDGET') }}
+                    </p-button>
+                </template>
+                <p class="empty-text">
+                    {{ $t('COMMON.WIDGETS.REQUIRED_FIELDS_ARE_MISSING_DESC') }}
+                </p>
+            </p-empty>
+            <p-empty v-else-if="props.errorMessage"
+                     class="empty-content"
+                     :title="$t('COMMON.WIDGETS.UNABLE_TO_LOAD_WIDGET')"
+                     :show-image="props.size !== WIDGET_SIZE.sm"
+            >
+                <template #image>
+                    <img class="empty-image"
+                         alt="empty-default-image"
+                         src="@/assets/images/img_ghost_no-connection.png"
+                    >
+                </template>
+                <p class="empty-text">
+                    {{ !props.dataTableId ? $t('COMMON.WIDGETS.SELECT_A_DATA_TABLE') : props.errorMessage }}
+                </p>
+            </p-empty>
+            <div v-else-if="props.noData"
+                 class="no-data-content"
+            >
+                <span>{{ $t('COMMON.WIDGETS.NO_DATA_TO_DISPLAY') }}</span>
+            </div>
+            <slot v-else />
         </div>
         <div v-if="state.showWidthToggleButton"
              class="widget-toggle-button-wrapper"
@@ -296,6 +318,13 @@ const handleToggleWidth = () => {
         .chart-loader {
             height: 100%;
         }
+    }
+    .no-data-content {
+        @apply text-paragraph-md text-gray-300;
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
     }
     .widget-toggle-button-wrapper {
         position: absolute;

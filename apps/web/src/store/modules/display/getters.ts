@@ -59,7 +59,7 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
 
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
     const userWorkspaceStore = useUserWorkspaceStore();
-    const tagetWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
+    const targetWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
     const menu = { ..._menu };
     if (menu.subMenuList) {
         menu.subMenuList = filterMenuByRoute(menu.subMenuList, router);
@@ -71,7 +71,7 @@ const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayM
 
     const to: RawLocation = {
         name: menu.to.name,
-        params: tagetWorkspaceId ? { workspaceId: tagetWorkspaceId } : {},
+        params: targetWorkspaceId ? { workspaceId: targetWorkspaceId } : {},
     };
     const link = router.resolve(to);
     if (link?.href !== '/') results.push(menu);

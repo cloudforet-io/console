@@ -24,6 +24,7 @@ import getRandomId from '@/lib/random-id-generator';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import type { JoinRestrictedMap } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { WidgetSize, WidgetOverlayType } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
@@ -219,7 +220,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             };
             const unsavedTransformData = {
                 data_table_id: `UNSAVED-${getRandomId()}`,
-                name: '',
+                name: getDuplicatedDataTableName(`${operatorType} Data`, state.dataTables),
                 data_type: DATA_TABLE_TYPE.TRANSFORMED,
                 operator: operatorType,
                 options: {

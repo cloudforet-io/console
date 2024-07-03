@@ -42,7 +42,7 @@ const state = reactive({
 });
 
 const dataTableNameState = reactive({
-    editMode: !!state.isUnsavedTransformed,
+    editMode: false,
     proxyDataTableName: useProxyValue('dataTableName', props, emit),
 });
 

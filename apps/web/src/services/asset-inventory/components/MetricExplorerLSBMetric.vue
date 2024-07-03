@@ -19,6 +19,8 @@ import type {
 import type { MetricReferenceItem } from '@/store/reference/metric-reference-store';
 
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import { gray } from '@/styles/colors';
 
 import MetricExplorerLSBMetricTree from '@/services/asset-inventory/components/MetricExplorerLSBMetricTree.vue';
@@ -37,8 +39,8 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const { getProperRouteLocation } = useProperRouteLocation();
 const route = useRoute();
-
 
 const storeState = reactive({
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
@@ -71,12 +73,12 @@ const state = reactive({
                     ...metric,
                     type: 'metric',
                     is_managed: metric.data.is_managed,
-                    to: {
+                    to: getProperRouteLocation({
                         name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                         params: {
                             metricId: metric.key,
                         },
-                    },
+                    }),
                 },
             };
             const examples = state.metricExamples.filter((example) => example.metric_id === metric.key);
@@ -89,13 +91,13 @@ const state = reactive({
                         data: {
                             ...example,
                             type: 'example',
-                            to: {
+                            to: getProperRouteLocation({
                                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                                 params: {
                                     metricId: metric.key,
                                     metricExampleId: example.example_id,
                                 },
-                            },
+                            }),
                         },
                     })),
                 };

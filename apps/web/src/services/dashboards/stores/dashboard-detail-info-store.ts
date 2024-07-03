@@ -20,9 +20,12 @@ import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-wid
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
+import config from '@/lib/config';
 import getRandomId from '@/lib/random-id-generator';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -33,6 +36,7 @@ import type {
     CreateDashboardParameters, DashboardModel, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
+
 
 
 interface WidgetValidMap {
@@ -83,7 +87,11 @@ const refineProjectDashboardVariables = (variables: DashboardVariables, projectI
 
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
     const dashboardStore = useDashboardStore();
-
+    const appContextStore = useAppContextStore();
+    const storeState = reactive({
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+        domainId: computed(() => store.state.domain.domainId),
+    });
     const state = reactive({
         dashboardInfo: null as DashboardModel|null,
         loadingDashboard: false,
@@ -119,6 +127,12 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         isWidgetLayoutValid: computed(() => Object.values(state.widgetValidMap).every((d) => d === true)),
         isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
         isDeprecatedDashboard: computed<boolean>(() => state.dashboardInfo?.version === '1.0'),
+        isSharedDashboard: computed<boolean>(() => state.dashboardInfo?.workspace_id === '*'),
+        disableManageButtons: computed<boolean>(() => {
+            const editableDomains = config.get('DASHBOARD_EDITABLE_DOMAINS');
+            if (!storeState.isAdminMode && getters.isSharedDashboard) return true;
+            return !editableDomains?.includes(storeState.domainId);
+        }),
         refinedVariablesSchema: computed<DashboardVariablesSchema>(() => {
             const _storedVariablesSchema = cloneDeep(state.variablesSchema);
             const _refinedVariablesSchema: DashboardVariablesSchema = {
@@ -242,7 +256,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        state.projectId = _dashboardInfo.project_id === '*' ? undefined : _dashboardInfo.project_id;
+        state.projectId = _dashboardInfo.project_id;
         state.vars = _dashboardInfo.vars ?? {};
         state.dashboardLayouts = _dashboardInfo.layouts ?? [];
     };
@@ -268,22 +282,15 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
         setOptions(_options);
-
-        // project_id
-        const _projectId = _dashboardInfo.project_id === '*' ? undefined : _dashboardInfo.project_id;
-        setProjectId(_projectId);
+        setProjectId(_dashboardInfo.project_id);
 
         // variables, variables schema
-        let _variablesSchema: DashboardVariablesSchema = {
+        const _variablesSchema: DashboardVariablesSchema = {
             properties: _dashboardInfo.variables_schema?.properties ?? {},
             order: _dashboardInfo.variables_schema?.order,
             fixed_options: _dashboardInfo.variables_schema?.fixed_options,
         };
-        let _variables = _dashboardInfo.variables ?? {};
-        if (_projectId) {
-            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema);
-            _variables = refineProjectDashboardVariables(_variables, _projectId);
-        }
+        const _variables = _dashboardInfo.variables ?? {};
         const _variablesInitMap = {};
         Object.entries<DashboardVariableSchemaProperty>(_variablesSchema.properties).forEach(([propertyName, property]) => {
             if (property.use) _variablesInitMap[propertyName] = false;
