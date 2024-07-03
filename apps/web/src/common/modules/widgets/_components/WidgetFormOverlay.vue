@@ -8,6 +8,8 @@ import {
     PButton, POverlayLayout,
 } from '@spaceone/design-system';
 
+import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
+import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import { i18n } from '@/translations';
 
 import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetFormOverlayStep1.vue';
@@ -49,10 +51,15 @@ const state = reactive({
 const handleClickContinue = async () => {
     if (widgetGenerateState.overlayStep === 1) {
         if (widgetGenerateState.widget?.data_table_id !== widgetGenerateState.selectedDataTableId) {
-            await widgetGenerateStore.updateWidget({
+            const _updateParams: PublicWidgetUpdateParameters|PrivateWidgetUpdateParameters = {
                 widget_id: widgetGenerateState.widgetId,
                 data_table_id: widgetGenerateState.selectedDataTableId,
-            });
+            };
+            // TODO: update after api is ready
+            // if (widgetGenerateState.widget?.state === 'ACTIVE') {
+            //     _updateParams.state = 'INACTIVE';
+            // }
+            await widgetGenerateStore.updateWidget(_updateParams);
         }
         widgetGenerateStore.setOverlayStep(2);
         return;
