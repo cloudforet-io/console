@@ -1778,6 +1778,7 @@
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "Are you sure you want to unshare this dashboard from all workspace?"
 		},
 		"FORM": {
+			"ALT_E_CLONE_DASHBOARD": "Failed to clone dashboard",
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",
 			"ALT_E_DELETE_DASHBOARD": "Failed to delete dashboard",
 			"ALT_E_EDIT_NAME": "Failed to update dashboard name",

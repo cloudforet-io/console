@@ -1778,6 +1778,7 @@
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "이 대시보드를 모든 워크스페이스에서 공유 해제하시겠습니까?"
 		},
 		"FORM": {
+			"ALT_E_CLONE_DASHBOARD": "대시보드 복제 실패",
 			"ALT_E_CREATE_DASHBOARD": "대시보드 생성 실패",
 			"ALT_E_DELETE_DASHBOARD": "대시보드 삭제 실패",
 			"ALT_E_EDIT_NAME": "대시보드 이름 수정 실패",

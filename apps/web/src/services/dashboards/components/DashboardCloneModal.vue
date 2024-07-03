@@ -107,7 +107,7 @@ const cloneDashboard = async (): Promise<string|undefined> => {
         const res = await dashboardStore.createDashboard(state.dashboardType, _sharedDashboard);
         return res.dashboard_id;
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CLONE_DASHBOARD'));
     } finally {
         state.loading = false;
     }
