@@ -8,6 +8,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import type { DataTableDeleteParameters } from '@/schema/dashboard/public-data-table/api-verbs/delete';
@@ -16,6 +17,7 @@ import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-tab
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -35,6 +37,7 @@ import type {
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel|PrivateWidgetModel;
+type WidgetUpdateParameters = PublicWidgetUpdateParameters|PrivateWidgetUpdateParameters;
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const state = reactive({
         // display
@@ -49,7 +52,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         title: '',
         description: '',
         size: 'full' as WidgetSize,
-        previewWidgetValueMap: {} as Record<string, WidgetFieldValues|undefined>,
         widgetFormValueMap: {} as Record<string, WidgetFieldValues|undefined>,
         widgetValidMap: {} as Record<string, boolean>,
         // Data Table
@@ -106,9 +108,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setWidgetFormValueMap = (widgetValueMap: Record<string, WidgetFieldValues|undefined>) => {
         state.widgetFormValueMap = widgetValueMap;
     };
-    const setPreviewWidgetValueMap = (widgetValueMap: Record<string, WidgetFieldValues|undefined>) => {
-        state.previewWidgetValueMap = widgetValueMap;
-    };
     const setWidgetValidMap = (widgetValidMap: Record<string, boolean>) => {
         state.widgetValidMap = widgetValidMap;
     };
@@ -134,7 +133,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setDescription,
         setSize,
         setWidgetFormValueMap,
-        setPreviewWidgetValueMap,
         setWidgetValidMap,
         setSelectedPreviewGranularity,
         setDataTableUpdating,
@@ -290,6 +288,21 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 state.dataTableLoadLoading = false;
             }
         },
+        updateWidget: async (updateParams: Partial<WidgetUpdateParameters>) => {
+            const isPrivate = state.widgetId.startsWith('private');
+            const fetcher = isPrivate
+                ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
+                : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
+            try {
+                state.widget = await fetcher({
+                    widget_id: state.widgetId,
+                    ...updateParams,
+                });
+            } catch (e: any) {
+                showErrorMessage(e.message, e);
+                ErrorHandler.handleError(e);
+            }
+        },
         /* Step 2 */
         reset: () => {
             state.widget = undefined;
@@ -314,7 +327,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.size = widgetInfo?.size || _widgetConfig.meta?.sizes[0];
             state.selectedDataTableId = widgetInfo?.data_table_id || undefined;
             state.widgetFormValueMap = widgetInfo?.options || {};
-            state.previewWidgetValueMap = widgetInfo?.options || {};
         },
     };
 

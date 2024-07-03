@@ -304,12 +304,11 @@ defineExpose({
                     <p-empty show-image
                              image-size="sm"
                              class="empty-wrapper"
-                             show-button
+                             :show-button="!dashboardDetailGetters.disableManageButtons"
                     >
                         {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
                         <template #button>
-                            <p-button v-if="!dashboardDetailGetters.disableManageButtons"
-                                      style-type="substitutive"
+                            <p-button style-type="substitutive"
                                       icon-left="ic_plus_bold"
                                       class="add-widget-button"
                                       @click="handleClickAddWidget"

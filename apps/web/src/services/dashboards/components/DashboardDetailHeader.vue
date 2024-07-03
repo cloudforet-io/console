@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PHeading, PSkeleton, PSelectDropdown,
+    PHeading, PSkeleton, PSelectDropdown, PButtonModal,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -69,7 +69,7 @@ const state = reactive({
             _shareToAllWorkspacesMenuItems = [{
                 type: 'item',
                 name: 'shareToAllWorkspaces',
-                label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_TO_ALL_WORKSPACES') : i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES'),
+                label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_WORKSPACES') : i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES'),
                 icon: 'ic_share',
             }];
         }
@@ -84,7 +84,7 @@ const state = reactive({
                 type: 'item',
                 name: 'duplicate',
                 label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
-                icon: 'ic_duplicate',
+                icon: 'ic_clone',
             },
             { type: 'divider', name: 'divider' },
             {
@@ -120,6 +120,7 @@ const shareDashboard = async () => {
         });
         dashboardDetailStore.setDashboardInfo(updatedDashboard);
         showSuccessMessage(_message, '');
+        state.shareToWorkspaceModalVisible = false;
     } catch (e: any) {
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
@@ -134,11 +135,14 @@ const handleSelectItem = (selected: MenuItem) => {
     if (selected.name === 'duplicate') state.cloneModalVisible = true;
     if (selected.name === 'shareWithCode') state.shareWithCodeModalVisible = true;
     if (selected.name === 'delete') state.deleteModalVisible = true;
-    if (selected.name === 'shareToAllWorkspaces') shareDashboard();
+    if (selected.name === 'shareToAllWorkspaces') state.shareToWorkspaceModalVisible = true;
 };
 const handleNameUpdate = (name: string) => {
     dashboardDetailStore.setName(name);
     dashboardDetailStore.setOriginDashboardName(name);
+};
+const handleConfirmShareToAllWorkspaces = async () => {
+    await shareDashboard();
 };
 </script>
 
@@ -187,6 +191,16 @@ const handleNameUpdate = (name: string) => {
         <dashboard-share-with-code-modal :visible.sync="state.shareWithCodeModalVisible"
                                          :dashboard-id="props.dashboardId"
         />
+        <p-button-modal :header-title="state.isSharedDashboard ? $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_WORKSPACES') : $t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES')"
+                        :visible.sync="state.shareToWorkspaceModalVisible"
+                        size="sm"
+                        :loading="state.loading"
+                        @confirm="handleConfirmShareToAllWorkspaces"
+        >
+            <template #body>
+                {{ state.isSharedDashboard ? $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_WORKSPACES_DESC') : $t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES_DESC') }}
+            </template>
+        </p-button-modal>
     </div>
 </template>
 

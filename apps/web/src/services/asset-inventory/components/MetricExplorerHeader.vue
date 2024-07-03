@@ -315,7 +315,7 @@ const handleOpenEditQuery = () => {
                     <p-button v-if="state.isDuplicateEnabled"
                               class="mr-2"
                               style-type="tertiary"
-                              icon-left="ic_duplicate"
+                              icon-left="ic_clone"
                               :loading="state.loadingDuplicate"
                               @click="handleDuplicate"
                     >

@@ -1436,6 +1436,7 @@
 			},
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
+			"DONE": "완료",
 			"EDIT": "편집",
 			"EDIT_WIDGET": "위젯 수정",
 			"EXPAND": "확장",
@@ -1772,7 +1773,8 @@
 			"SHARE_TO_ALL_WORKSPACES": "전체 워크스페이스에 공유",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "이 대시보드를 전체 워크스페이스에 공유하시겠습니까?",
 			"SHARE_WITH_CODE": "코드로 공유",
-			"UNSHARE_TO_ALL_WORKSPACES": "전체 워크스페이스 공유 해제"
+			"UNSHARE_FROM_ALL_WORKSPACES": "전체 워크스페이스 공유 해제",
+			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "이 대시보드를 모든 워크스페이스에서 공유 해제하시겠습니까?"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "대시보드 생성 실패",
