@@ -12,10 +12,6 @@ import type {
     ValueItem,
 } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
-import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
@@ -23,8 +19,9 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
-import { useQueryTags } from '@/common/composables/query-tags';
 
+import { makeSearchQueryTagsHandler, makeValueHandler } from '@/services/preference/composables/bookmark-data-helper';
+import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
@@ -78,13 +75,13 @@ const tableState = reactive({
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeDistinctValueHandler('config.PublicConfig', 'name'),
-        link: makeDistinctValueHandler('config.PublicConfig', 'link'),
+        name: makeValueHandler(storeState.bookmarkList, 'name'),
+        link: makeValueHandler(storeState.bookmarkList, 'link'),
     })),
     typeField: computed<ValueItem[]>(() => ([
         { label: i18n.t('IAM.BOOKMARK.ALL') as string, name: 'All' },
-        { label: i18n.t('IAM.BOOKMARK.LINK') as string, name: BOOKMARK_MODAL_TYPE.LINK },
-        { label: i18n.t('IAM.BOOKMARK.FOLDER') as string, name: BOOKMARK_MODAL_TYPE.FOLDER },
+        { label: i18n.t('IAM.BOOKMARK.LINK') as string, name: BOOKMARK_TYPE.LINK },
+        { label: i18n.t('IAM.BOOKMARK.FOLDER') as string, name: BOOKMARK_TYPE.FOLDER },
     ])),
 });
 const dropdownState = reactive({
@@ -148,15 +145,10 @@ const handleClickName = (item: BookmarkItem) => {
     });
 };
 
-const BookmarkListApiQueryHelper = new ApiQueryHelper();
-let bookmarkListApiQuery = BookmarkListApiQueryHelper.data;
-const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
-const { queryTags } = queryTagHelper;
-
 const handleChange = (options: any = {}) => {
-    bookmarkListApiQuery = getApiQueryWithToolboxOptions(BookmarkListApiQueryHelper, options) ?? bookmarkListApiQuery;
     if (options.queryTags !== undefined) {
-        bookmarkPageStore.setBookmarkListSearchFilters(BookmarkListApiQueryHelper.filters);
+        const filters = makeSearchQueryTagsHandler(options.queryTags);
+        bookmarkPageStore.setBookmarkListSearchFilters(filters);
     }
     if (options.pageStart !== undefined) bookmarkPageStore.setBookmarkListPageStart(options.pageStart - 1);
     if (options.pageLimit !== undefined) bookmarkPageStore.setBookmarkListPageLimit(options.pageLimit);
@@ -191,7 +183,6 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                              :items="storeState.bookmarkList"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
-                             :query-tags="queryTags"
                              @change="handleChange"
                              @refresh="fetchBookmarkList"
                              @update:select-index="handleUpdateSelectIndex"

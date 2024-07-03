@@ -8,9 +8,7 @@ import {
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
-import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
@@ -22,12 +20,16 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
-import { useQueryTags } from '@/common/composables/query-tags';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
 
-import { getWorkspaceInfo } from '@/services/preference/composables/bookmark-data-helper';
+import {
+    getWorkspaceInfo,
+    makeSearchQueryTagsHandler,
+    makeValueHandler,
+} from '@/services/preference/composables/bookmark-data-helper';
+import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
@@ -85,9 +87,10 @@ const tableState = reactive({
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeDistinctValueHandler('config.PublicConfig', 'name'),
-        scope: makeDistinctValueHandler('config.PublicConfig', 'scope'),
-        link: makeDistinctValueHandler('config.PublicConfig', 'link'),
+        type: makeEnumValueHandler(BOOKMARK_TYPE),
+        name: makeValueHandler(storeState.bookmarkList, 'name'),
+        scope: makeValueHandler(storeState.bookmarkList, 'scope'),
+        link: makeValueHandler(storeState.bookmarkList, 'link'),
     })),
 });
 const dropdownState = reactive({
@@ -110,18 +113,13 @@ const getFolderInfo = (id: string): BookmarkItem|undefined => {
     return storeState.bookmarkFolderList.find((i) => i.id === id);
 };
 
-const BookmarkListApiQueryHelper = new ApiQueryHelper();
-let bookmarkListApiQuery = BookmarkListApiQueryHelper.data;
-const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
-const { queryTags } = queryTagHelper;
-
 const handleUpdateSelectIndex = async (indices: number[]) => {
     bookmarkPageStore.setSelectedBookmarkIndices(indices);
 };
 const handleChange = (options: any = {}) => {
-    bookmarkListApiQuery = getApiQueryWithToolboxOptions(BookmarkListApiQueryHelper, options) ?? bookmarkListApiQuery;
     if (options.queryTags !== undefined) {
-        bookmarkPageStore.setBookmarkListSearchFilters(BookmarkListApiQueryHelper.filters);
+        const filters = makeSearchQueryTagsHandler(options.queryTags);
+        bookmarkPageStore.setBookmarkListSearchFilters(filters);
     }
     if (options.pageStart !== undefined) bookmarkPageStore.setBookmarkListPageStart(options.pageStart - 1);
     if (options.pageLimit !== undefined) bookmarkPageStore.setBookmarkListPageLimit(options.pageLimit);
@@ -189,7 +187,6 @@ const fetchBookmarkList = async () => {
                              :items="storeState.bookmarkList"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
-                             :query-tags="queryTags"
                              :get-row-selectable="getRowSelectable"
                              @change="handleChange"
                              @refresh="fetchBookmarkList"
