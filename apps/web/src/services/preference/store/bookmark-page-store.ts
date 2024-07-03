@@ -12,10 +12,11 @@ import type { PublicConfigListParameters } from '@/schema/config/public-config/a
 import type { PublicConfigModel } from '@/schema/config/public-config/model';
 
 import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
-import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
 
 interface BookmarkPageState {
     loading: boolean;
@@ -136,9 +137,9 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     if (folderId) defaultFilters.push({ k: 'data.folder', v: folderId, o: '=' });
                 }
             }
-            if (selectedType === BOOKMARK_MODAL_TYPE.LINK) {
+            if (selectedType === BOOKMARK_TYPE.LINK) {
                 defaultFilters.push({ k: 'data.link', v: null, o: '!=' });
-            } else if (selectedType === BOOKMARK_MODAL_TYPE.FOLDER) {
+            } else if (selectedType === BOOKMARK_TYPE.FOLDER) {
                 defaultFilters.push({ k: 'data.link', v: null, o: '=' });
             }
             const BookmarkListApiQueryHelper = new ApiQueryHelper()
