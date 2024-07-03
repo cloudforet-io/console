@@ -14,7 +14,9 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { gray } from '@/styles/colors';
 
@@ -27,6 +29,7 @@ const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
+const gnbStore = useGnbStore();
 
 const route = useRoute();
 
@@ -38,23 +41,51 @@ const storeState = reactive({
 const state = reactive({
     bookmarkTreeData: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(storeState.bookmarkFolderList)),
     selectedTreeId: undefined as string|undefined,
-    // bookmarkGroupNavigation: computed<Breadcrumb[]>(() => {
-    //     const allPaths = parentGroupitems.value.map((item) => ({
-    //         name: item.name,
-    //         to: {
-    //             name: PREFERENCE_ROUTE.BOOKMARK._NAME,
-    //             params: {
-    //                 group: item.id,
-    //             },
-    //         },
-    //     }));
-    //
-    //     return [
-    //         { name: i18n.t('MENU.ADMINISTRATION_PREFERENCE'), data: null },
-    //         { name: i18n.t('MENU.ADMINISTRATION_BOOKMARK'), data: null },
-    //         ...allPaths,
-    //     ];
-    // }),
+    group: computed<string>(() => route.params.group),
+    folder: computed<string>(() => route.params.folder),
+    bookmarkGroupNavigation: computed<Breadcrumb[]>(() => {
+        const allPaths: Breadcrumb[] = [];
+        if (state.group) {
+            const workspaceItem = storeState.workspaceList.find((item) => item.workspace_id === state.group);
+            allPaths.push({
+                name: state.group === 'global' ? i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : workspaceItem?.name || '',
+                to: {
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
+                    params: {
+                        group: state.group,
+                    },
+                },
+            });
+        }
+        if (state.folder) {
+            allPaths.push({
+                name: state.folder,
+                to: {
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+                    params: {
+                        group: state.group,
+                        folder: state.folder,
+                    },
+                },
+            });
+        }
+
+        return [
+            {
+                name: i18n.t('MENU.ADMINISTRATION_PREFERENCE'),
+                to: {
+                    name: makeAdminRouteName(PREFERENCE_ROUTE._NAME),
+                },
+            },
+            {
+                name: i18n.t('MENU.ADMINISTRATION_BOOKMARK'),
+                to: {
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                },
+            },
+            ...allPaths,
+        ];
+    }),
 });
 
 const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[]): TreeNode[] => {
@@ -124,12 +155,17 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
     return result;
 };
 
-// watch(() => state.bookmarkGroupNavigation, async (bookmarkGroupNavigation) => {
-//     gnbStore.setBreadcrumbs(bookmarkGroupNavigation);
-// });
-
-watch(() => route.params, (params) => {
-    const selectedTreeId = (params.group || params.id) as string|undefined;
+watch(() => state.bookmarkGroupNavigation, async (bookmarkGroupNavigation) => {
+    gnbStore.setBreadcrumbs(bookmarkGroupNavigation);
+}, { immediate: true });
+watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookmarkFolderList]) => {
+    let selectedTreeId: string|undefined = '';
+    if (params.folder) {
+        const selectedFolder = bookmarkFolderList.find((item) => item.name === params.folder);
+        selectedTreeId = selectedFolder?.id || '';
+    } else if (params.group) {
+        selectedTreeId = params.group;
+    }
     if (selectedTreeId) {
         state.selectedTreeId = selectedTreeId as string;
     } else {

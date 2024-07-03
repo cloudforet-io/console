@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectStatus, PSelectDropdown,
@@ -18,11 +18,14 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
 const bookmarkStore = useBookmarkStore();
@@ -31,6 +34,7 @@ const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 
 const route = useRoute();
+const router = useRouter();
 
 const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
@@ -130,6 +134,19 @@ const handleUpdateVisibleMenu = (item: BookmarkItem, visibleMenu: boolean) => {
         bookmarkStore.setSelectedBookmark(item, true);
     }
 };
+const handleClickName = (item: BookmarkItem) => {
+    if (item.link) {
+        window.open(item.link, '_blank');
+        return;
+    }
+    router.push({
+        name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+        params: {
+            group: item.workspaceId || 'global',
+            folder: item.name as string || '',
+        },
+    });
+};
 
 const BookmarkListApiQueryHelper = new ApiQueryHelper();
 let bookmarkListApiQuery = BookmarkListApiQueryHelper.data;
@@ -196,7 +213,9 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                     </div>
                 </template>
                 <template #col-name-format="{value, item}">
-                    <div class="col-name">
+                    <div class="col-name"
+                         @click="handleClickName(item)"
+                    >
                         <p-lazy-img v-if="item.link"
                                     class="left-icon"
                                     :src="item.imgIcon"
@@ -241,6 +260,9 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
             gap: 0.5rem;
             .name {
                 @apply truncate;
+            }
+            &:hover {
+                @apply cursor-pointer underline;
             }
         }
         .col-link {
