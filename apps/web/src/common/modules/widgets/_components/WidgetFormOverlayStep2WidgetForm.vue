@@ -62,7 +62,7 @@ const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
     await widgetGenerateStore.updateWidget({
         data_table_id: dataTableId,
-        // state: 'INACTIVE', // TODO: update after api is ready
+        state: 'INACTIVE',
     });
 };
 

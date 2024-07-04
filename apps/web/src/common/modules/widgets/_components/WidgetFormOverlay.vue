@@ -54,10 +54,9 @@ const handleClickContinue = async () => {
                 widget_id: widgetGenerateState.widgetId,
                 data_table_id: widgetGenerateState.selectedDataTableId,
             };
-            // TODO: update after api is ready
-            // if (widgetGenerateState.widget?.state === 'ACTIVE') {
-            //     _updateParams.state = 'INACTIVE';
-            // }
+            if (widgetGenerateState.widget?.state === 'ACTIVE') {
+                _updateParams.state = 'INACTIVE';
+            }
             await widgetGenerateStore.updateWidget(_updateParams);
         }
         widgetGenerateStore.setOverlayStep(2);
