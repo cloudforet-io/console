@@ -133,7 +133,7 @@ watch(() => labelsMenuItem.value, (value) => {
         state.proxyValue = {
             ...state.proxyValue,
             value: props.value?.value ?? state.menuItems[DEFAULT_INDEX]?.name,
-            criteria: state.dataInfoMenuItems[0]?.name,
+            criteria: state.selectedFieldType === 'dynamicField' ? state.dataInfoMenuItems[0]?.name : undefined,
         };
     }
 });
