@@ -7,6 +7,7 @@ import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { WidgetState } from '@/common/modules/widgets/types/widget-model';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
@@ -16,6 +17,7 @@ export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export interface WidgetProps {
     widgetName: string;
     widgetId: string;
+    widgetState?: WidgetState;
     dataTableId?: string;
     title?: string;
     description?: string;

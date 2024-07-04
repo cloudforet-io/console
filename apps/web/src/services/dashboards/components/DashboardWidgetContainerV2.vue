@@ -278,6 +278,7 @@ defineExpose({
                                ref="widgetRef"
                                :widget-name="widget.widget_type"
                                :widget-id="widget.widget_id"
+                               :widget-state="widget.state"
                                :data-table-id="widget.data_table_id"
                                :title="widget.name"
                                :description="widget.description"

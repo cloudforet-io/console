@@ -2,6 +2,8 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 
+import type { WidgetState } from '@/common/modules/widgets/types/widget-model';
+
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export interface FullDataLink {
@@ -18,6 +20,7 @@ export interface WidgetFrameProps {
     loading?: boolean;
     errorMessage?: string;
     noData?: boolean;
+    widgetState?: WidgetState;
     allRequiredFieldsFilled?: boolean;
     disableManageButtons?: boolean;
     //

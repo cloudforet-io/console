@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onBeforeMount, onMounted, onUnmounted, reactive, ref, watch,
+    computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -128,9 +128,6 @@ watch(() => state.mounted, async (mounted) => {
     }
 });
 
-onMounted(async () => {
-    await loadOverlayWidget();
-});
 onBeforeMount(() => {
     initSnapshot();
 });
@@ -186,6 +183,7 @@ onUnmounted(() => {
                            ref="overlayWidgetRef"
                            :widget-name="widgetGenerateState.widget.widget_type"
                            :widget-id="widgetGenerateState.widget.widget_id"
+                           :widget-state="widgetGenerateState.widget.state"
                            :data-table-id="widgetGenerateState.selectedDataTableId"
                            :size="state.widgetSize"
                            :width="state.widgetWidth"

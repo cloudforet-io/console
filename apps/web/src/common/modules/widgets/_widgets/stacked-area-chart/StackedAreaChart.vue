@@ -255,7 +255,6 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
     loadWidget,

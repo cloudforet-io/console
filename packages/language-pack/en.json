@@ -1398,6 +1398,8 @@
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
 			"DAILY_UPDATE_NO_DATA": "No Daily Update",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
+			"DATA_NOT_DISPLAYED": "Data Not Displayed",
+			"DATA_NOT_DISPLAYED_DESC": "Please complete all required fields and click the [Apply] button to display the data.",
 			"DATA_TABLE": {
 				"ALERT": {
 					"DELETE_DESC": "Are you sure you want to delete this data?",
