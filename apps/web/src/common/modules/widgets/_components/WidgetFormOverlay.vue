@@ -8,15 +8,24 @@ import {
     PButton, POverlayLayout,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
+import type { PublicWidgetDeleteParameters } from '@/schema/dashboard/public-widget/api-verbs/delete';
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetFormOverlayStep1.vue';
 import WidgetFormOverlayStep2 from '@/common/modules/widgets/_components/WidgetFormOverlayStep2.vue';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
@@ -46,6 +55,21 @@ const state = reactive({
     }),
 });
 
+/* Api */
+const deleteWidget = async (widgetId: string) => {
+    const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+    const fetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.delete<PrivateWidgetDeleteParameters>
+        : SpaceConnector.clientV2.dashboard.publicWidget.delete<PublicWidgetDeleteParameters>;
+    try {
+        await fetcher({
+            widget_id: widgetId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
 /* Event */
 const handleClickContinue = async () => {
     if (widgetGenerateState.overlayStep === 1) {
@@ -54,10 +78,9 @@ const handleClickContinue = async () => {
                 widget_id: widgetGenerateState.widgetId,
                 data_table_id: widgetGenerateState.selectedDataTableId,
             };
-            // TODO: update after api is ready
-            // if (widgetGenerateState.widget?.state === 'ACTIVE') {
-            //     _updateParams.state = 'INACTIVE';
-            // }
+            if (widgetGenerateState.widget?.state === 'ACTIVE') {
+                _updateParams.state = 'INACTIVE';
+            }
             await widgetGenerateStore.updateWidget(_updateParams);
         }
         widgetGenerateStore.setOverlayStep(2);
@@ -70,12 +93,16 @@ const handleUpdateVisible = (value: boolean) => {
 };
 
 /* Watcher */
-watch(() => widgetGenerateState.showOverlay, (val) => {
+watch(() => widgetGenerateState.showOverlay, async (val) => {
     if (!val) {
-        widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
-        widgetGenerateStore.reset();
+        if (widgetGenerateState.widget?.state === 'CREATING') {
+            await deleteWidget(widgetGenerateState.widgetId);
+        } else {
+            widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
+            widgetGenerateStore.reset();
+        }
     } else if (widgetGenerateState.overlayType !== 'ADD') {
-        widgetGenerateStore.listDataTable();
+        await widgetGenerateStore.listDataTable();
     }
 });
 </script>

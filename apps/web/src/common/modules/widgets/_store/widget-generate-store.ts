@@ -244,10 +244,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     };
                 } else {
                     result = await fetcher(updateParams);
-                    // TODO: update after api is ready
-                    // if (state.widget?.state === 'ACTIVE') {
-                    //     await actions.updateWidget({ state: 'INACTIVE' });
-                    // }
+                    if (state.widget?.state === 'ACTIVE') {
+                        await actions.updateWidget({ state: 'INACTIVE' });
+                    }
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
             } catch (e: any) {

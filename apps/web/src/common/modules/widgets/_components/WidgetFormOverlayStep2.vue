@@ -12,6 +12,8 @@ import type {
     DashboardOptions, DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
@@ -30,6 +32,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 const overlayWidgetRef = ref<HTMLElement|null>(null);
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -59,18 +62,45 @@ const state = reactive({
     }),
     isWidgetFieldChanged: computed<boolean>(() => {
         const _isOptionsChanged = isWidgetOptionsChanged(false, widgetGenerateState.widgetFormValueMap, widgetGenerateState.widget?.options || {});
-        // const _isWidgetInactive = widgetGenerateState.widget?.state === 'INACTIVE'; // TODO: after api is ready
         const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widgetGenerateState.widget?.widget_type;
         const _isNameChanged = widgetGenerateState.title !== widgetGenerateState.widget?.name;
         const _isDescriptionChanged = widgetGenerateState.description !== widgetGenerateState.widget?.description;
         return _isOptionsChanged || _isTypeChanged || _isNameChanged || _isDescriptionChanged;
     }),
-    disableApplyButton: computed<boolean>(() => !state.isWidgetFieldChanged || !widgetGenerateGetters.isAllWidgetFormValid),
+    disableApplyButton: computed<boolean>(() => {
+        if (!widgetGenerateGetters.isAllWidgetFormValid) return true;
+        const _isWidgetInactive = widgetGenerateState.widget?.state === 'INACTIVE';
+        return !_isWidgetInactive && !state.isWidgetFieldChanged;
+    }),
     //
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
 });
 
+/* Api */
+const updateWidget = async () => {
+    const _isCreating = widgetGenerateState.widget?.state === 'CREATING';
+    await widgetGenerateStore.updateWidget({
+        widget_id: widgetGenerateState.widgetId,
+        name: widgetGenerateState.title,
+        description: widgetGenerateState.description,
+        size: widgetGenerateState.size,
+        widget_type: widgetGenerateState.selectedWidgetName,
+        data_table_id: widgetGenerateState.selectedDataTableId,
+        options: widgetGenerateState.widgetFormValueMap,
+        state: 'ACTIVE',
+    });
+    if (_isCreating) {
+        dashboardDetailStore.addWidgetToDashboardLayouts(widgetGenerateState.widgetId);
+        await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
+            dashboard_id: dashboardDetailState.dashboardId,
+            layouts: dashboardDetailState.dashboardLayouts,
+        });
+    }
+};
+
+
+/* Util */
 const isWidgetOptionsChanged = (
     isChanged: boolean,
     widgetForm: Record<string, WidgetFieldValues|undefined>,
@@ -90,8 +120,6 @@ const isWidgetOptionsChanged = (
     });
     return _isChanged;
 };
-
-/* Util */
 const initSnapshot = () => {
     state.varsSnapshot = cloneDeep(dashboardDetailState.vars);
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
@@ -101,7 +129,7 @@ const reset = () => {
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
 const loadOverlayWidget = async () => {
-    const res = await overlayWidgetRef.value?.loadWidget();
+    const res = await overlayWidgetRef?.value?.loadWidget();
     if (typeof res === 'function') {
         res('Please check the widget options.');
     }
@@ -112,16 +140,7 @@ const handleChangeWidgetSize = (widgetSize: string) => {
     state.selectedWidgetSize = widgetSize;
 };
 const handleUpdateWidgetOptions = async () => {
-    await widgetGenerateStore.updateWidget({
-        widget_id: widgetGenerateState.widgetId,
-        name: widgetGenerateState.title,
-        description: widgetGenerateState.description,
-        size: widgetGenerateState.size,
-        widget_type: widgetGenerateState.selectedWidgetName,
-        data_table_id: widgetGenerateState.selectedDataTableId,
-        options: widgetGenerateState.widgetFormValueMap,
-        // state: 'ACTIVE' // TODO: update after api is ready
-    });
+    await updateWidget();
     if (state.selectedWidgetType === widgetGenerateState.selectedWidgetName) {
         await loadOverlayWidget();
     } else {
@@ -143,6 +162,9 @@ watch(() => widgetGenerateState.widget?.size, (widgetSize) => {
 }, { immediate: true });
 watch(() => state.mounted, async (mounted) => {
     if (mounted) {
+        if (widgetGenerateState.widget?.state === 'CREATING') {
+            await updateWidget();
+        }
         await loadOverlayWidget();
         state.mounted = false;
     }

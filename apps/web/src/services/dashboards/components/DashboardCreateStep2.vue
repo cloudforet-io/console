@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PLabel, PI, PFieldGroup, PTextInput,
@@ -51,6 +53,7 @@ const {
     dashboardName: '',
 }, {
     dashboardName(value: string) {
+        if (dashboardCreatePageState.loading) return '';
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
         if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
         if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
@@ -71,6 +74,11 @@ const handleUpdateLabels = (items: InputItem[]) => {
 /* Watcher */
 watch(() => isAllValid.value, (value) => {
     emit('update:is-valid', value);
+});
+
+onMounted(() => {
+    dashboardCreatePageStore.setDashboardLabels(dashboardCreatePageState.templateLabels);
+    state.labels = dashboardCreatePageState.dashboardLabels.map((label) => ({ name: label }));
 });
 </script>
 
@@ -98,7 +106,6 @@ watch(() => isAllValid.value, (value) => {
                            required
                            :invalid="invalidState.dashboardName"
                            :invalid-text="invalidTexts.dashboardName"
-                           :disalbed="dashboardCreatePageState.dashboardCreated"
             >
                 <template #default="{invalid}">
                     <p-text-input :value="dashboardName"
