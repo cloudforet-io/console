@@ -6,7 +6,7 @@ import {
 import {
     PDivider, PSelectButton, PButton,
 } from '@spaceone/design-system';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import type {
     DashboardOptions, DashboardVars,
@@ -17,6 +17,7 @@ import WidgetFormOverlayStep2WidgetForm
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
@@ -57,12 +58,7 @@ const state = reactive({
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
     isWidgetFieldChanged: computed<boolean>(() => {
-        const _isOptionsChanged = Object.entries(widgetGenerateState.widgetFormValueMap).some(([k, v]) => {
-            if (v !== undefined) {
-                return !isEqual(v, widgetGenerateState.widget?.options?.[k]);
-            }
-            return false;
-        });
+        const _isOptionsChanged = isWidgetOptionsChanged(false, widgetGenerateState.widgetFormValueMap, widgetGenerateState.widget?.options || {});
         // const _isWidgetInactive = widgetGenerateState.widget?.state === 'INACTIVE'; // TODO: after api is ready
         const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widgetGenerateState.widget?.widget_type;
         const _isNameChanged = widgetGenerateState.title !== widgetGenerateState.widget?.name;
@@ -74,6 +70,26 @@ const state = reactive({
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
 });
+
+const isWidgetOptionsChanged = (
+    isChanged: boolean,
+    widgetForm: Record<string, WidgetFieldValues|undefined>,
+    widgetOptions: Record<string, WidgetFieldValues|undefined>,
+): boolean => {
+    if (isChanged) return true;
+    let _isChanged = false;
+    Object.entries(widgetForm).forEach(([k, v]) => {
+        if (_isChanged) return;
+        if (typeof v === 'object') {
+            _isChanged = isWidgetOptionsChanged(_isChanged, v, widgetOptions[k]);
+            return;
+        }
+        if (v !== undefined) {
+            _isChanged = widgetOptions[k] !== v;
+        }
+    });
+    return _isChanged;
+};
 
 /* Util */
 const initSnapshot = () => {
@@ -106,8 +122,12 @@ const handleUpdateWidgetOptions = async () => {
         options: widgetGenerateState.widgetFormValueMap,
         // state: 'ACTIVE' // TODO: update after api is ready
     });
-    state.selectedWidgetType = widgetGenerateState.selectedWidgetName;
-    state.mounted = false;
+    if (state.selectedWidgetType === widgetGenerateState.selectedWidgetName) {
+        await loadOverlayWidget();
+    } else {
+        state.selectedWidgetType = widgetGenerateState.selectedWidgetName;
+        state.mounted = false;
+    }
 };
 const handleMountWidgetComponent = () => {
     state.mounted = true;
