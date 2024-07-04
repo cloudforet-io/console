@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PI, PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown,
+    PI, PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -152,6 +152,7 @@ const handleToggleWidth = () => {
                      class="empty-content"
                      :title="$t('COMMON.WIDGETS.DATA_NOT_DISPLAYED')"
                      :show-image="props.size !== WIDGET_SIZE.sm"
+                     :show-button="props.mode === 'view'"
             >
                 <template #image>
                     <img class="empty-image"
@@ -162,6 +163,14 @@ const handleToggleWidth = () => {
                 <p class="empty-text">
                     {{ $t('COMMON.WIDGETS.DATA_NOT_DISPLAYED_DESC') }}
                 </p>
+                <template #button>
+                    <p-button style-type="substitutive"
+                              size="sm"
+                              @click="() => emit('click-edit')"
+                    >
+                        {{ $t('COMMON.WIDGETS.EDIT_WIDGET') }}
+                    </p-button>
+                </template>
             </p-empty>
             <p-empty v-else-if="props.errorMessage"
                      class="empty-content"
