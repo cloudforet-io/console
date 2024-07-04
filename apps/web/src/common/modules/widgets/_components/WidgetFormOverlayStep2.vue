@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, nextTick, onBeforeMount, onMounted, onUnmounted, reactive, ref, watch,
+    computed, onBeforeMount, onMounted, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -17,6 +17,7 @@ import WidgetFormOverlayStep2WidgetForm
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
@@ -36,6 +37,8 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
+    mounted: false,
+    selectedWidgetType: widgetGenerateState.widget?.widget_type as WidgetType,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
         { label: 'Full', name: 'FULL' },
@@ -103,8 +106,11 @@ const handleUpdateWidgetOptions = async () => {
         options: widgetGenerateState.widgetFormValueMap,
         // state: 'ACTIVE' // TODO: update after api is ready
     });
-    await nextTick();
-    await loadOverlayWidget();
+    state.selectedWidgetType = widgetGenerateState.selectedWidgetName;
+    state.mounted = false;
+};
+const handleMountWidgetComponent = () => {
+    state.mounted = true;
 };
 
 /* Watcher */
@@ -115,6 +121,12 @@ watch(() => widgetGenerateState.widget?.size, (widgetSize) => {
         state.selectedWidgetSize = 'FULL';
     }
 }, { immediate: true });
+watch(() => state.mounted, async (mounted) => {
+    if (mounted) {
+        await loadOverlayWidget();
+        state.mounted = false;
+    }
+});
 
 onMounted(async () => {
     await loadOverlayWidget();
@@ -170,7 +182,7 @@ onUnmounted(() => {
             <div class="widget-wrapper"
                  :class="{ 'full-size': state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND' }"
             >
-                <component :is="getWidgetComponent(widgetGenerateState.widget.widget_type)"
+                <component :is="getWidgetComponent(state.selectedWidgetType)"
                            ref="overlayWidgetRef"
                            :widget-name="widgetGenerateState.widget.widget_type"
                            :widget-id="widgetGenerateState.widget.widget_id"
@@ -185,6 +197,7 @@ onUnmounted(() => {
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            disable-refresh-on-loading
                            mode="overlay"
+                           @mounted="handleMountWidgetComponent"
                 />
             </div>
         </div>
