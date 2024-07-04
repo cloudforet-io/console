@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -12,7 +12,10 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
-import { getDefaultMenuItemIndex } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import {
+    getDefaultMenuItemIndex,
+    getInitialSelectedMenuItem,
+} from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type {
     WidgetFieldComponentProps,
@@ -113,47 +116,19 @@ watch(() => labelsMenuItem.value, (value) => {
 
 watch(() => state.menuItems, (menuItems) => {
     if (!Array.isArray(menuItems)) return;
-    const isIncludedInMenuItems = (data: string[]|string):boolean => {
-        if (Array.isArray(data)) {
-            return data.every((d) => menuItems.some((m) => m.name === d));
-        }
-        return menuItems.some((m) => m.name === data);
-    };
-    if (state.multiselectable) {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : [state.menuItems[0]?.name],
-        };
-        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
-    } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
-        };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
-    }
-}, { immediate: true });
-/* Init */
-onMounted(() => {
     const _defaultIndex = getDefaultMenuItemIndex(state.menuItems, props.widgetFieldSchema?.options?.defaultIndex, props.widgetFieldSchema?.options?.excludeDateField);
+    const _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, _defaultIndex);
     if (state.multiselectable) {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: props.value?.value ?? [state.menuItems[_defaultIndex]?.name],
-        };
-        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+        state.selectedItem = convertToMenuItem(_value as string[]);
     } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: props.value?.value ?? state.menuItems[_defaultIndex]?.name,
-        };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[_defaultIndex]?.name;
+        state.selectedItem = _value;
     }
     state.proxyValue = {
         ...state.proxyValue,
+        value: _value,
         count: props.value.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT,
     };
-});
+}, { immediate: true });
 </script>
 
 <template>

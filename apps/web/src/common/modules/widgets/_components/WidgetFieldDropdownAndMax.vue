@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -12,7 +12,10 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { getDefaultMenuItemIndex } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import {
+    getDefaultMenuItemIndex,
+    getInitialSelectedMenuItem,
+} from '@/common/modules/widgets/_helpers/widget-field-helper';
 
 
 const props = withDefaults(defineProps<{
@@ -60,14 +63,14 @@ watch(() => state.isAllValid, (isValid) => {
     emit('update:is-valid', isValid);
 }, { immediate: true });
 
-/* Init */
-onMounted(() => {
-    const _defaultIndex = getDefaultMenuItemIndex(props.menuItems, props.defaultIndex, props.excludeDateField);
+watch(() => props.menuItems, (menuItems) => {
+    const _defaultIndex = getDefaultMenuItemIndex(menuItems, props.defaultIndex, props.excludeDateField);
+    const _value = getInitialSelectedMenuItem(menuItems, state.proxyValue, _defaultIndex);
     state.proxyValue = {
-        value: props.value?.value ?? props.menuItems[_defaultIndex]?.name ?? '',
-        count: props.value?.count ?? props.defaultCount,
+        value: _value,
+        count: state.proxyValue.count,
     };
-});
+}, { immediate: true });
 </script>
 
 <template>

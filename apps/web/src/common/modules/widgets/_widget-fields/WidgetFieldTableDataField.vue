@@ -1,21 +1,22 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput, PSelectButton, PTooltip, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep } from 'lodash';
 
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
+import { getInitialSelectedMenuItem } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
+
 
 const DEFAULT_COUNT = 5;
 const DEFAULT_FIELD_TYPE = 'staticField';
@@ -118,7 +119,6 @@ const handleUpdateCount = (val: number) => {
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
-const isIncludedInDataInfoMenuItems = (data: string):boolean => state.dataInfoMenuItems.some((m) => m?.name === data);
 const convertToMenuItem = (data: string[]) => data.map((d) => ({
     name: d,
     label: d,
@@ -156,53 +156,25 @@ watch(() => state.selectedFieldType, (selectedFieldType) => {
 
 watch(() => state.menuItems, (menuItems) => {
     if (!Array.isArray(menuItems)) return;
-    const isIncludedInMenuItems = (data: string[]|string):boolean => {
-        if (Array.isArray(data)) {
-            return data.every((d) => menuItems.some((m) => m.name === d));
-        }
-        return menuItems.some((m) => m.name === data);
-    };
-    if (state.selectedFieldType === 'staticField') {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : [state.menuItems[0]?.name],
-        };
-        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+
+    const _selectedFieldType = props.value?.fieldType ?? DEFAULT_FIELD_TYPE;
+    const _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value);
+    let _criteria: TableDataFieldValue['criteria'];
+    if (_selectedFieldType === 'staticField') {
+        state.selectedItem = convertToMenuItem(_value as string[]);
     } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
-            criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
-        };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
-        state.selectedCriteria = state.proxyValue?.criteria ?? state.dataInfoMenuItems[0]?.name;
-    }
-}, { immediate: true });
-/* Init */
-onMounted(() => {
-    state.selectedFieldType = props.value?.fieldType ?? DEFAULT_FIELD_TYPE;
-    if (state.selectedFieldType === 'staticField') {
-        state.proxyValue = {
-            ...state.proxyValue,
-            fieldType: state.selectedFieldType,
-            value: props.value?.value ?? cloneDeep(state.menuItems ?? []).map((d) => d.name),
-        };
-        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
-    } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            fieldType: state.selectedFieldType,
-            value: props.value?.value ?? state.menuItems?.[1]?.name,
-            criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
-        };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[1]?.name;
-        state.selectedCriteria = state.proxyValue?.criteria ?? state.dataInfoMenuItems[0]?.name;
+        _criteria = getInitialSelectedMenuItem(state.dataInfoMenuItems, state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name;
+        state.selectedItem = _value;
+        state.selectedCriteria = _criteria;
     }
     state.proxyValue = {
         ...state.proxyValue,
+        fieldType: _selectedFieldType,
+        value: _value,
+        criteria: _criteria,
         count: props.value?.count ?? DEFAULT_COUNT,
     };
-});
+}, { immediate: true });
 </script>
 
 <template>
