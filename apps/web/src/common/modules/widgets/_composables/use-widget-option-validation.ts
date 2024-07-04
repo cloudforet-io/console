@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 import {
-    computed, reactive, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
@@ -15,7 +15,7 @@ interface WidgetOptionValidationProps {
 }
 
 interface WidgetOptionValidationReturnType {
-    optionsInvalid: boolean;
+    optionsInvalid: Ref<boolean>;
 }
 
 export const useWidgetOptionValidation = ({
@@ -24,40 +24,38 @@ export const useWidgetOptionValidation = ({
 }: WidgetOptionValidationProps): WidgetOptionValidationReturnType => {
     const _state = reactive({
         valueMap: optionValueMap,
-        requiredFields: computed(() => Object.keys(config.requiredFieldsSchema)),
-        optionalFields: computed(() => Object.keys(config.optionalFieldsSchema)),
+        requiredFields: computed(() => Object.keys(config?.requiredFieldsSchema ?? {})),
+        optionalFields: computed(() => Object.keys(config?.optionalFieldsSchema ?? {})),
     });
 
     const state = reactive({
-        invalid: false,
+        optionsInvalid: false,
     });
 
     const checkWidgetOptionsFieldsValidation = (valueMap: OptionsValueMap) => {
         // Required Fields Value Validation
-        _state.requiredFields.forEach((field) => {
+        state.optionsInvalid = _state.requiredFields.some((field) => {
             const fieldValue = valueMap[field];
             if (field === 'granularity') {
-                state.invalid = !fieldValue;
-                return;
+                return !fieldValue;
             }
             if (field === 'dataField') {
                 const isMultiSelectable = (config.requiredFieldsSchema[field]?.options as DataFieldOptions)?.multiSelectable;
-                state.invalid = isMultiSelectable && Array.isArray(fieldValue) ? !fieldValue.length : !fieldValue;
+                return isMultiSelectable && Array.isArray(fieldValue) ? !fieldValue.length : !fieldValue;
             }
             if (field === 'tableDataField') {
                 const tableDataFieldValue = fieldValue as TableDataFieldValue;
                 if (tableDataFieldValue?.fieldType === 'dynamicField') {
-                    state.invalid = !tableDataFieldValue.criteria || !tableDataFieldValue.value;
-                    return;
+                    return !tableDataFieldValue.criteria || !tableDataFieldValue.value;
                 }
                 if (tableDataFieldValue?.fieldType === 'staticField') {
-                    state.invalid = !tableDataFieldValue.value || !tableDataFieldValue.value.length;
-                    return;
+                    return !tableDataFieldValue.value?.length;
                 }
-                return;
+                return false;
             }
-            state.invalid = !fieldValue?.value;
+            return Array.isArray(fieldValue?.value) ? !fieldValue?.value.length : !fieldValue?.value;
         });
+
 
         // Label Info Fields Value Duplicate Validation (Except Table Widget)
         const allFields = [..._state.requiredFields, ..._state.optionalFields];
@@ -66,17 +64,18 @@ export const useWidgetOptionValidation = ({
         if (labelInfoFields.length > 1) {
             const labelInfoFieldValues = labelInfoFields.map((field) => valueMap[field]);
             const labelInfoFieldValuesSet = new Set(labelInfoFieldValues);
-            state.invalid = labelInfoFieldValues.length !== labelInfoFieldValuesSet.size;
+            state.optionsInvalid = labelInfoFieldValues.length !== labelInfoFieldValuesSet.size;
         }
 
         // Label Info Fields Value Duplicate Validation (Table Widget)
-        if (config.widgetName === 'table') {
+        if (config?.widgetName === 'table') {
             const groupByField = 'groupBy';
             const tableDataField = 'tableDataField';
             const groupByFieldValue = valueMap[groupByField] as GroupByValue;
             const tableDataFieldValue = valueMap[tableDataField] as TableDataFieldValue;
-            if (tableDataFieldValue.fieldType === 'dynamicField') {
-                state.invalid = (groupByFieldValue?.value ?? []).includes(tableDataFieldValue.value as string);
+            const allValueExist = groupByFieldValue?.value && !!groupByFieldValue.value.length && tableDataFieldValue?.value;
+            if (tableDataFieldValue?.fieldType === 'dynamicField' && allValueExist) {
+                state.optionsInvalid = (groupByFieldValue?.value ?? []).includes(tableDataFieldValue.value as string);
             }
         }
     };
@@ -86,6 +85,6 @@ export const useWidgetOptionValidation = ({
     }, { immediate: true, deep: true });
 
     return {
-        optionsInvalid: state.invalid,
+        ...toRefs(state),
     };
 };
