@@ -138,7 +138,7 @@ const handleToggleWidth = () => {
                                class="etc-button"
                                :menu="state.etcMenuItems"
                                :selected="[]"
-                               use-fixed-menu-style
+                               menu-position="right"
                                reset-selection-on-menu-close
                                @select="handleSelectEtcMenu"
             />

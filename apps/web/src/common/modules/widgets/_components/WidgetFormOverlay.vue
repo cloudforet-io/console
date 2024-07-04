@@ -35,7 +35,6 @@ const state = reactive({
     }),
     buttonText: computed<TranslateResult>(() => {
         if (widgetGenerateState.overlayStep === 1) return i18n.t('COMMON.WIDGETS.CONFIGURE_WIDGET');
-        if (widgetGenerateState.overlayType === 'ADD') return i18n.t('COMMON.WIDGETS.ADD_WIDGET_TO_DASHBOARD');
         return i18n.t('COMMON.WIDGETS.DONE');
     }),
     isAllValid: computed<boolean>(() => {
