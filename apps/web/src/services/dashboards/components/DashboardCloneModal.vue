@@ -7,7 +7,6 @@ import {
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import { DASHBOARD_TYPE } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { DashboardType } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -99,7 +98,7 @@ const cloneDashboard = async (): Promise<string|undefined> => {
             tags: { created_by: store.state.user.userId },
         };
         if (storeState.isAdminMode) {
-            state.dashboardType = DASHBOARD_TYPE.PUBLIC;
+            state.isPrivate = false;
             _sharedDashboard.resource_group = RESOURCE_GROUP.DOMAIN;
         } else if (state.dashboardType !== 'PRIVATE') {
             _sharedDashboard.resource_group = state.targetDashboard.resource_group || RESOURCE_GROUP.WORKSPACE;
