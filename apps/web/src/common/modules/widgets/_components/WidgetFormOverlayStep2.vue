@@ -16,8 +16,10 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
+import { useWidgetOptionValidation } from '@/common/modules/widgets/_composables/use-widget-option-validation';
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
+import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
@@ -42,6 +44,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
     mounted: false,
+    widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     selectedWidgetType: widgetGenerateState.widget?.widget_type as WidgetType,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
@@ -70,11 +73,18 @@ const state = reactive({
     disableApplyButton: computed<boolean>(() => {
         if (!widgetGenerateGetters.isAllWidgetFormValid) return true;
         const _isWidgetInactive = widgetGenerateState.widget?.state === 'INACTIVE';
-        return !_isWidgetInactive && !state.isWidgetFieldChanged;
+        return (!_isWidgetInactive && !state.isWidgetFieldChanged) || optionsInvalid.value;
     }),
     //
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
+});
+
+const {
+    optionsInvalid,
+} = useWidgetOptionValidation({
+    optionValueMap: computed(() => widgetGenerateState.widgetFormValueMap),
+    config: computed(() => state.widgetConfig),
 });
 
 /* Api */
@@ -241,7 +251,9 @@ onUnmounted(() => {
                 />
             </div>
         </div>
-        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'" />
+        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'"
+                                               :widget-validation-invalid="optionsInvalid"
+        />
     </div>
 </template>
 

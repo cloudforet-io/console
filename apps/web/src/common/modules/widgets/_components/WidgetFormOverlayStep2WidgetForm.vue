@@ -19,12 +19,21 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-model';
 
+import { red } from '@/styles/colors';
+
 
 const FORM_TITLE_MAP = {
     WIDGET_INFO: 'WIDGET_INFO',
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
+
+interface Props {
+    widgetValidationInvalid?: boolean;
+}
+
+const props = defineProps<Props>();
+
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
@@ -56,6 +65,7 @@ const state = reactive({
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
     errorModalCurrentType: undefined as 'default'|'geoMap'| 'progressCard'|undefined,
 });
+
 
 /* Event */
 const handleSelectDataTable = async (dataTableId: string) => {
@@ -246,6 +256,21 @@ onMounted(() => {
         <div class="form-group-wrapper"
              :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.REQUIRED_FIELDS] }"
         >
+            <div v-if="props.widgetValidationInvalid"
+                 class="widget-validation-warning"
+            >
+                <div class="warning-title">
+                    <p-i name="ic_error-filled"
+                         width="1.25rem"
+                         height="1.25rem"
+                         :color="red[400]"
+                    />
+                    <span>Empty or incorrect values</span>
+                </div>
+                <p class="warning-description">
+                    To illustrate chart properly, check the form below and set the correct values.
+                </p>
+            </div>
             <div class="title-wrapper"
                  @click="handleClickCollapsibleTitle(FORM_TITLE_MAP.REQUIRED_FIELDS)"
             >
@@ -402,6 +427,19 @@ onMounted(() => {
         @apply text-label-lg;
         font-weight: 700;
         padding-top: 1rem;
+    }
+    .widget-validation-warning {
+        @apply w-full bg-red-100 rounded;
+        padding: 0.5rem 1rem;
+        margin-top: 0.5rem;
+        .warning-title {
+            @apply flex items-center gap-1 text-label-lg font-bold text-red-500;
+            margin-bottom: 0.25rem;
+        }
+        .warning-description {
+            @apply text-paragraph-md text-gray-900;
+            padding-left: 1.5rem;
+        }
     }
 }
 </style>
