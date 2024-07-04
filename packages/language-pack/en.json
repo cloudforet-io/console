@@ -1005,7 +1005,6 @@
 			"TITLE": "Set columns"
 		},
 		"DELETED": "Deleted",
-		"DEPRECATED": "Deprecated",
 		"EDITOR": {
 			"ALIGN_CENTER": "Center",
 			"ALIGN_JUSTIFY": "Justify",
@@ -1819,7 +1818,10 @@
 			"SAVE": "Save"
 		},
 		"LNB": {
-			"ONLY_FAVORITE": "Favorites only"
+			"DEPRECATED": "Deprecated",
+			"ONLY_FAVORITE": "Favorites only",
+			"PRIVATE": "Private",
+			"SHARED": "Shared"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {

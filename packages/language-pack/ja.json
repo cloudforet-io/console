@@ -1005,7 +1005,6 @@
 			"TITLE": "フィールドを変更する"
 		},
 		"DELETED": "削除",
-		"DEPRECATED": "",
 		"EDITOR": {
 			"ALIGN_CENTER": "中央寄せ",
 			"ALIGN_JUSTIFY": "両端揃え",
@@ -1819,7 +1818,10 @@
 			"SAVE": "保存"
 		},
 		"LNB": {
-			"ONLY_FAVORITE": "お気に入りだけを表示する"
+			"DEPRECATED": "",
+			"ONLY_FAVORITE": "お気に入りだけを表示する",
+			"PRIVATE": "",
+			"SHARED": ""
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
