@@ -12,7 +12,7 @@
       "cache": true
     },
     "@cloudforet/core-lib#build": {
-      "dependsOn": ["@spaceone/design-system#transpile"],
+      "dependsOn": ["@cloudforet/mirinae#transpile"],
       "outputs": ["./dist/**"],
       "inputs": [
         "src/**", "package.json", "package-lock.json", "tsconfig.build.json",
@@ -20,7 +20,7 @@
       ],
       "cache": true
     },
-    "@spaceone/design-system#build": {
+    "@cloudforet/mirinae#build": {
       "outputs": ["./dist/**", "./css/**"],
         "inputs": [
           "src/**", "postcss.config.cjs", "tailwind.config.cjs",
@@ -30,7 +30,7 @@
       "cache": true
     },
     "web#build": {
-      "dependsOn": ["@spaceone/design-system#build", "@spaceone/design-system#transpile", "@cloudforet/utils#build", "@cloudforet/core-lib#build"],
+      "dependsOn": ["@cloudforet/mirinae#build", "@cloudforet/mirinae#transpile", "@cloudforet/utils#build", "@cloudforet/core-lib#build"],
       "outputs": ["./dist/**"],
       "inputs": [
         "public/**", "!public/config/development.json",
@@ -55,13 +55,22 @@
       "outputs": ["./types/**"],
       "cache": true
     },
-    "@spaceone/design-system#transpile": {
+    "@cloudforet/mirinae#transpile": {
       "outputs": ["./types/**"],
         "inputs": [
           "src/**",
           "package.json", "tsconfig.build.json", "vite.config.js",
           "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
         ],
+      "cache": true
+    },
+    "@cloudforet/mirinae#build": {
+      "outputs": ["./dist/**", "./css/**", "./types/**"],
+      "inputs": [
+        "src/**", "postcss.config.cjs", "tailwind.config.cjs",
+        "package.json", "tsconfig.build.json", "vite.config.js",
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+      ],
       "cache": true
     },
     "dev": {

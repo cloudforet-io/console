@@ -138,6 +138,7 @@ export default defineComponent<ButtonProps>({
                 emit('click');
             }
         };
+        console.log('hihi');
 
         return {
             ...toRefs(state),
