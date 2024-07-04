@@ -168,7 +168,7 @@ const drawChart = (rawData: Data|null) => {
         });
         return acc;
     }, Object.fromEntries(state.dataField.map((field) => [field, 0])));
-    if (!isEmpty(_etcData)) {
+    if (Object.values(_etcData).some((v) => v > 0)) {
         _slicedData.push({ [state.xAxisField]: 'etc', ..._etcData });
     }
 
@@ -179,7 +179,7 @@ const drawChart = (rawData: Data|null) => {
     } else {
         _xAxisData = Array.from(new Set(_slicedData.map((v) => v[state.xAxisField] as string)));
         _xAxisData = _xAxisData.slice(0, state.xAxisCount);
-        if (!isEmpty(_etcData)) {
+        if (Object.values(_etcData).some((v) => v > 0)) {
             _xAxisData.push('etc');
         }
     }
