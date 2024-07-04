@@ -1005,7 +1005,6 @@
 			"TITLE": "필드 변경하기"
 		},
 		"DELETED": "삭제됨",
-		"DEPRECATED": "",
 		"EDITOR": {
 			"ALIGN_CENTER": "가운데 정렬",
 			"ALIGN_JUSTIFY": "양쪽 정렬",
@@ -1819,7 +1818,10 @@
 			"SAVE": "저장"
 		},
 		"LNB": {
-			"ONLY_FAVORITE": "즐겨찾기 항목만 노출"
+			"DEPRECATED": "",
+			"ONLY_FAVORITE": "즐겨찾기 항목만 노출",
+			"PRIVATE": "",
+			"SHARED": ""
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {

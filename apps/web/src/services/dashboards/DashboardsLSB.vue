@@ -144,11 +144,23 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
+    sharedMenu: computed<LSBItem>(() => ({
+        type: MENU_ITEM_TYPE.SLOT,
+        label: i18n.t('COMMON.SHARED'),
+        id: 'shared',
+    })),
+    privateMenu: computed<LSBItem>(() => ({
+        type: MENU_ITEM_TYPE.SLOT,
+        label: i18n.t('COMMON.PRIVATE'),
+        id: 'private',
+    })),
     deprecatedMenu: computed<LSBItem>(() => ({
         type: MENU_ITEM_TYPE.SLOT,
         label: i18n.t('COMMON.DEPRECATED'),
         id: 'deprecated',
     })),
+    sharedSubItem: computed<LSBMenu[]>(() => (storeState.isWorkspaceOwner ? filterMenuItems(state.workspaceV2MenuSet) : [])),
+    privateSubItem: computed<LSBMenu[]>(() => filterMenuItems(state.privateV2MenuSet)),
     deprecatedSubItem: computed<LSBMenu[]>(() => [
         ...state.workspaceV1MenuSet,
         ...state.privateV1MenuSet,
@@ -160,9 +172,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.SLOT,
                 label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
                 id: MENU_ID.DASHBOARDS,
-                to: getProperRouteLocation({
-                    name: DASHBOARDS_ROUTE._NAME,
-                }),
+                to: getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }),
                 hideFavorite: true,
                 icon: 'ic_dots-4-square',
             },
@@ -191,8 +201,8 @@ const state = reactive({
 
         const menuSet: LSBMenu[] = [
             ...defaultMenuSet,
-            ...(storeState.isWorkspaceOwner ? filterMenuItems(state.workspaceV2MenuSet) : []),
-            ...filterMenuItems(state.privateV2MenuSet),
+            state.sharedMenu,
+            state.privateMenu,
         ];
         if (state.deprecatedSubItem.length) {
             menuSet.push(state.deprecatedMenu);
@@ -250,11 +260,49 @@ callApiWithGrantGuard();
                 </template>
             </l-s-b-router-menu-item>
         </template>
+        <template v-if="storeState.isWorkspaceOwner"
+                  #slot-shared
+        >
+            <l-s-b-collapsible-menu-item class="category-menu-item mt-1"
+                                         :item="{
+                                             type: 'collapsible',
+                                             label: $t('DASHBOARDS.LNB.SHARED'),
+                                             subItems: state.sharedSubItem,
+                                         }"
+                                         is-sub-item
+            >
+                <template #collapsible-contents="{ item: _item }">
+                    <l-s-b-menu-item v-for="item in _item?.subItems"
+                                     :key="item.id"
+                                     :menu-data="item"
+                                     :current-path="state.currentPath"
+                    />
+                </template>
+            </l-s-b-collapsible-menu-item>
+        </template>
+        <template #slot-private>
+            <l-s-b-collapsible-menu-item class="category-menu-item mt-1"
+                                         :item="{
+                                             type: 'collapsible',
+                                             label: $t('DASHBOARDS.LNB.PRIVATE'),
+                                             subItems: state.privateSubItem,
+                                         }"
+                                         is-sub-item
+            >
+                <template #collapsible-contents="{ item: _item }">
+                    <l-s-b-menu-item v-for="item in _item?.subItems"
+                                     :key="item.id"
+                                     :menu-data="item"
+                                     :current-path="state.currentPath"
+                    />
+                </template>
+            </l-s-b-collapsible-menu-item>
+        </template>
         <template #slot-deprecated>
             <l-s-b-collapsible-menu-item class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
-                                             label: $t('COMMON.DEPRECATED'),
+                                             label: $t('DASHBOARDS.LNB.DEPRECATED'),
                                              subItems: state.deprecatedSubItem,
                                          }"
                                          is-sub-item
