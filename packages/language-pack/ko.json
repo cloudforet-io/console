@@ -1398,6 +1398,8 @@
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
 			"DAILY_UPDATE_NO_DATA": "일간 변동 사항이 없습니다.",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
+			"DATA_NOT_DISPLAYED": "",
+			"DATA_NOT_DISPLAYED_DESC": "",
 			"DATA_TABLE": {
 				"ALERT": {
 					"DELETE_DESC": "이 데이터를 삭제하시겠습니까?",
