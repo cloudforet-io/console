@@ -12,6 +12,8 @@ import type {
     DashboardOptions, DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
@@ -30,6 +32,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 const overlayWidgetRef = ref<HTMLElement|null>(null);
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -76,6 +79,7 @@ const state = reactive({
 
 /* Api */
 const updateWidget = async () => {
+    const _isCreating = widgetGenerateState.widget?.state === 'CREATING';
     await widgetGenerateStore.updateWidget({
         widget_id: widgetGenerateState.widgetId,
         name: widgetGenerateState.title,
@@ -86,6 +90,13 @@ const updateWidget = async () => {
         options: widgetGenerateState.widgetFormValueMap,
         state: 'ACTIVE',
     });
+    if (_isCreating) {
+        dashboardDetailStore.addWidgetToDashboardLayouts(widgetGenerateState.widgetId);
+        await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
+            dashboard_id: dashboardDetailState.dashboardId,
+            layouts: dashboardDetailState.dashboardLayouts,
+        });
+    }
 };
 
 

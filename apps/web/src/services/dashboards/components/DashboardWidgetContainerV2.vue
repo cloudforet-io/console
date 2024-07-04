@@ -232,6 +232,14 @@ watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
         await loadAWidget(widgetGenerateState.latestWidgetId);
     }
 });
+watch(() => dashboardDetailState.dashboardWidgets, (dashboardWidgets) => {
+    // delete creating widgets
+    dashboardWidgets.forEach((widget) => {
+        if (widget.state === 'CREATING') {
+            deleteWidget(widget.widget_id);
+        }
+    });
+}, { immediate: true });
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
 const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
     if (widgetObserverMap) {
