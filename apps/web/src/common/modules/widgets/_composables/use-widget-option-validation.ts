@@ -16,7 +16,6 @@ interface WidgetOptionValidationProps {
 
 interface WidgetOptionValidationReturnType {
     optionsInvalid: boolean;
-    optionsInvalidText: string;
 }
 
 export const useWidgetOptionValidation = ({
@@ -31,7 +30,6 @@ export const useWidgetOptionValidation = ({
 
     const state = reactive({
         invalid: false,
-        invalidText: computed(() => 'fuck'),
     });
 
     const checkWidgetOptionsFieldsValidation = (valueMap: OptionsValueMap) => {
@@ -89,6 +87,5 @@ export const useWidgetOptionValidation = ({
 
     return {
         optionsInvalid: state.invalid,
-        optionsInvalidText: state.invalidText,
     };
 };
