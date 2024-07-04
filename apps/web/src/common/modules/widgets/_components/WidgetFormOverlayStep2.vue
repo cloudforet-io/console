@@ -111,11 +111,11 @@ const isWidgetOptionsChanged = (
     Object.entries(widgetForm).forEach(([k, v]) => {
         if (_isChanged) return;
         if (typeof v === 'object') {
-            _isChanged = isWidgetOptionsChanged(_isChanged, v, widgetOptions[k]);
+            _isChanged = isWidgetOptionsChanged(_isChanged, v, widgetOptions?.[k]);
             return;
         }
         if (v !== undefined) {
-            _isChanged = widgetOptions[k] !== v;
+            _isChanged = widgetOptions?.[k] !== v;
         }
     });
     return _isChanged;

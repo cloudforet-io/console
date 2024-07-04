@@ -58,6 +58,7 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
     const state = reactive({
         loading: false as boolean,
         currentStep: 1 as number,
+        dashboardCreated: false as boolean,
         dashboardTemplates: [] as DashboardTemplateModel[],
         templateLabels: [] as string[],
         templateName: '' as string,
@@ -101,6 +102,7 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         setDashboardScope('WORKSPACE');
         setDashboardName('');
         setDashboardLabels([]);
+        state.dashboardCreated = false;
     };
     const listDashboardTemplates = async () => {
         try {
@@ -164,6 +166,7 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
                 _dashboardParams.resource_group = state.dashboardScope || RESOURCE_GROUP.WORKSPACE;
             }
             const res = await dashboardStore.createDashboard(getters.dashboardType, _dashboardParams);
+            state.dashboardCreated = true;
             return res.dashboard_id;
         } catch (e) {
             ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));

@@ -53,7 +53,7 @@ const {
     dashboardName: '',
 }, {
     dashboardName(value: string) {
-        if (dashboardCreatePageState.loading) return '';
+        if (dashboardCreatePageState.loading || dashboardCreatePageState.dashboardCreated) return '';
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
         if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
         if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
