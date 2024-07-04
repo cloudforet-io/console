@@ -45,6 +45,7 @@ const state = reactive({
             icon: 'ic_delete',
         }] as MenuItem[]),
     ])),
+    etcMenuVisible: false,
     sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
         type: 'item',
         name: size,
@@ -132,12 +133,14 @@ const handleToggleWidth = () => {
         </div>
         <div v-if="props.mode !== 'overlay'"
              class="action-button-wrapper"
+             :class="{ 'selected': state.etcMenuVisible }"
         >
             <p-select-dropdown style-type="icon-button"
                                button-icon="ic_ellipsis-horizontal"
                                class="etc-button"
                                :menu="state.etcMenuItems"
                                :selected="[]"
+                               :visible-menu.sync="state.etcMenuVisible"
                                menu-position="right"
                                reset-selection-on-menu-close
                                @select="handleSelectEtcMenu"
@@ -316,6 +319,9 @@ const handleToggleWidth = () => {
         top: 0.25rem;
         display: none;
         padding: 0.25rem;
+        &.selected {
+            display: block;
+        }
         .etc-button {
             @apply border border-gray-200 rounded-full;
         }

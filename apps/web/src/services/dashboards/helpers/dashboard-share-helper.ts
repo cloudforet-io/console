@@ -110,7 +110,7 @@ export const getSharedDashboardLayouts = async (
 ): Promise<SharedDashboardLayout[]> => {
     const _widgetDataTablesMap = await _getWidgetDataTablesMap(dashboardLayouts, costDataSource);
     const _sharedLayouts: SharedDashboardInfo['layouts'] = [];
-    dashboardLayouts.forEach((layout) => {
+    dashboardLayouts?.forEach((layout) => {
         const _sharedWidgets: SharedWidgetInfo[] = [];
         layout.widgets?.forEach((widgetId) => {
             const _widget = dashboardWidgets.find((w) => w.widget_id === widgetId);
