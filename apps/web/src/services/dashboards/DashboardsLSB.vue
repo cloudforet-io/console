@@ -260,7 +260,9 @@ callApiWithGrantGuard();
                 </template>
             </l-s-b-router-menu-item>
         </template>
-        <template #slot-shared>
+        <template v-if="storeState.isWorkspaceOwner"
+                  #slot-shared
+        >
             <l-s-b-collapsible-menu-item class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
