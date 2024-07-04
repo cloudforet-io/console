@@ -24,7 +24,6 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getAllRequiredFieldsFilled,
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -51,7 +50,6 @@ const emit = defineEmits<WidgetEmit>();
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
-    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as Data | null,
     comparisonData: null as Data | null,
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
@@ -210,7 +208,7 @@ const getWidgetTableDateFields = (
 };
 
 const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|undefined> => {
-    if (!state.allRequiredFieldsFilled) return undefined;
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
