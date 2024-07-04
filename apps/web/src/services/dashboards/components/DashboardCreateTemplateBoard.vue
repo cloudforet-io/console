@@ -45,6 +45,7 @@ const handleClickBoardItem = (boardItem: BoardSet) => {
     }
     dashboardCreatePageStore.setTemplateName(boardItem.name);
     dashboardCreatePageStore.setTemplateLabels(boardItem.labels);
+    dashboardCreatePageStore.setDashboardLabels(boardItem.labels);
     dashboardCreatePageStore.setCurrentStep(2);
 };
 </script>
