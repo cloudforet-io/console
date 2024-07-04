@@ -13,7 +13,7 @@ import type {
 
 const emit = defineEmits<WidgetFieldComponentEmit<number>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<MinOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<MinOptions, number>>(), {
     widgetFieldSchema: () => ({
         options: {
             default: 0,

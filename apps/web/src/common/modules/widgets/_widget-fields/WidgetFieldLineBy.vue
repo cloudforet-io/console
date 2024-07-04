@@ -18,7 +18,7 @@ import type {
 import type { LineByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const props = defineProps<WidgetFieldComponentProps<LineByOptions>>();
+const props = defineProps<WidgetFieldComponentProps<LineByOptions, LineByValue>>();
 const emit = defineEmits<WidgetFieldComponentEmit<LineByValue|undefined>>();
 const { labelsMenuItem } = useGranularityMenuItem(props, 'groupBy');
 const state = reactive({

@@ -14,7 +14,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions, string>>(), {
     widgetFieldSchema: () => ({}),
 });
 const emit = defineEmits<WidgetFieldComponentEmit<string | string[]>>();

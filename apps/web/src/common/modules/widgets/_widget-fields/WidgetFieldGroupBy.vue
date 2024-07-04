@@ -23,7 +23,7 @@ import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-v
 
 
 const DEFAULT_COUNT = 5;
-const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions, GroupByValue>>(), {
     value: () => ({}),
 });
 

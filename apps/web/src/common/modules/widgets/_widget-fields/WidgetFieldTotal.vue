@@ -10,7 +10,7 @@ import type { TotalValue } from '@/common/modules/widgets/types/widget-field-val
 
 const emit = defineEmits<WidgetFieldComponentEmit<TotalValue|undefined>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<TotalOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<TotalOptions, TotalValue>>(), {
     widgetFieldSchema: () => ({
         options: {
             toggle: false,

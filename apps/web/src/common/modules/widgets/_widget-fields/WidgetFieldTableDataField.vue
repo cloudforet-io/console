@@ -19,7 +19,7 @@ import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-
 
 const DEFAULT_COUNT = 5;
 const DEFAULT_FIELD_TYPE = 'staticField';
-const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions, TableDataFieldValue>>(), {
 });
 const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
 
