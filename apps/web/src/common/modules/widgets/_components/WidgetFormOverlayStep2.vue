@@ -186,6 +186,7 @@ onUnmounted(() => {
                            ref="overlayWidgetRef"
                            :widget-name="widgetGenerateState.widget.widget_type"
                            :widget-id="widgetGenerateState.widget.widget_id"
+                           :widget-state="widgetGenerateState.widget.state"
                            :data-table-id="widgetGenerateState.selectedDataTableId"
                            :size="state.widgetSize"
                            :width="state.widgetWidth"
