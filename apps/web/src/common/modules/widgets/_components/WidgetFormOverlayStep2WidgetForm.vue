@@ -155,9 +155,6 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
     widgetGenerateStore.setWidgetValidMap(_validMap);
 };
 
-// eslint-disable-next-line max-len
-const keyGenerator = (name: string) => `${name}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetFormValueMap[name] === undefined}`;
-
 onMounted(() => {
     checkDefaultValidation();
 });
@@ -260,7 +257,7 @@ onMounted(() => {
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetRequiredFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="keyGenerator(fieldName)"
+                               :key="`widget-required-field-${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
@@ -292,7 +289,7 @@ onMounted(() => {
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetOptionalFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="keyGenerator(fieldName)"
+                               :key="`widget-optional-field-${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
