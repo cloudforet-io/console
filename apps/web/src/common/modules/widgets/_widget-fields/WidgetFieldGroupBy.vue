@@ -117,10 +117,12 @@ watch(() => labelsMenuItem.value, (value) => {
 watch(() => state.menuItems, (menuItems) => {
     if (!Array.isArray(menuItems)) return;
     const _defaultIndex = getDefaultMenuItemIndex(state.menuItems, props.widgetFieldSchema?.options?.defaultIndex, props.widgetFieldSchema?.options?.excludeDateField);
-    const _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, _defaultIndex);
+    let _value;
     if (state.multiselectable) {
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value ?? [], _defaultIndex);
         state.selectedItem = convertToMenuItem(_value as string[]);
     } else {
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, _defaultIndex);
         state.selectedItem = _value;
     }
     state.proxyValue = {

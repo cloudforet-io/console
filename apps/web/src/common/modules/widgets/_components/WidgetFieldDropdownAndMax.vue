@@ -68,7 +68,7 @@ watch(() => props.menuItems, (menuItems) => {
     const _value = getInitialSelectedMenuItem(menuItems, state.proxyValue, _defaultIndex);
     state.proxyValue = {
         value: _value,
-        count: state.proxyValue.count,
+        count: state.proxyValue.count ?? props.defaultCount,
     };
 }, { immediate: true });
 </script>

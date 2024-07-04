@@ -71,13 +71,15 @@ const convertToMenuItem = (data: string[]|string) => {
 };
 
 watch(() => state.menuItems, (menuItems) => {
-    const _value = getInitialSelectedMenuItem(menuItems, state.proxyValue);
-    state.proxyValue = _value;
+    let _value;
     if (state.multiselectable) {
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue ?? []);
         state.selectedItem = convertToMenuItem(_value);
     } else {
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue);
         state.selectedItem = _value;
     }
+    state.proxyValue = _value;
 }, { immediate: true });
 </script>
 

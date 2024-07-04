@@ -158,11 +158,13 @@ watch(() => state.menuItems, (menuItems) => {
     if (!Array.isArray(menuItems)) return;
 
     const _selectedFieldType = props.value?.fieldType ?? DEFAULT_FIELD_TYPE;
-    const _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value);
+    let _value: string[] | string;
     let _criteria: TableDataFieldValue['criteria'];
     if (_selectedFieldType === 'staticField') {
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value ?? []);
         state.selectedItem = convertToMenuItem(_value as string[]);
     } else {
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value);
         _criteria = getInitialSelectedMenuItem(state.dataInfoMenuItems, state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name;
         state.selectedItem = _value;
         state.selectedCriteria = _criteria;

@@ -9,8 +9,10 @@ export const getDefaultMenuItemIndex = (menuItems: MenuItem[], idx = 0, excludeD
     return idx + _dateFieldCount;
 };
 
-export const getInitialSelectedMenuItem = (menuItems: MenuItem[], data: string[]|string, idx = 0): string|Array<string|undefined>|undefined => {
+export const getInitialSelectedMenuItem = (menuItems: MenuItem[], data?: string[]|string, idx = 0): string|Array<string|undefined>|undefined => {
+    if (!data) return menuItems[idx]?.name;
     if (Array.isArray(data)) {
+        if (data.length === 0) return [menuItems[0]?.name];
         const isAllDataIncluded = data.every((d) => menuItems.some((m) => m.name === d));
         if (isAllDataIncluded) return data;
         return [menuItems[idx]?.name];
