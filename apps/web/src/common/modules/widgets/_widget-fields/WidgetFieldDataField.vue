@@ -15,7 +15,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions, string>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions, string|string[]>>(), {
     widgetFieldSchema: () => ({}),
 });
 const emit = defineEmits<WidgetFieldComponentEmit<string | string[]>>();
@@ -70,11 +70,10 @@ const convertToMenuItem = (data: string[]|string) => {
 };
 
 const initValue = () => {
-    state.proxyValue = state.proxyValue?.value;
     if (state.multiselectable) {
-        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+        state.selectedItem = convertToMenuItem(state.proxyValue ?? []);
     } else {
-        state.selectedItem = state.proxyValue?.value;
+        state.selectedItem = state.proxyValue;
     }
 };
 watch(() => state.menuItems, (menuItems) => {
@@ -87,10 +86,10 @@ watch(() => state.menuItems, (menuItems) => {
 
     if (state.multiselectable) {
         state.proxyValue = getInitialSelectedMenuItem(menuItems, state.proxyValue ?? []);
-        state.selectedItem = convertToMenuItem(state.proxyValue);
+        state.selectedItem = convertToMenuItem(state.proxyValue ?? []);
     } else {
         state.proxyValue = getInitialSelectedMenuItem(menuItems, state.proxyValue);
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
+        state.selectedItem = state.proxyValue ?? state.menuItems[0]?.name;
     }
 }, { immediate: true });
 </script>
