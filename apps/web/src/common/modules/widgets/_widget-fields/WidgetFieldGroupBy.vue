@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -12,7 +12,10 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
-import { getDefaultMenuItemIndex } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import {
+    getDefaultMenuItemIndex,
+    getInitialSelectedMenuItem,
+} from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type {
     WidgetFieldComponentProps,
@@ -23,7 +26,7 @@ import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-v
 
 
 const DEFAULT_COUNT = 5;
-const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions, GroupByValue>>(), {
     value: () => ({}),
 });
 
@@ -31,6 +34,7 @@ const { labelsMenuItem } = useGranularityMenuItem(props, 'groupBy');
 
 const emit = defineEmits<WidgetFieldComponentEmit<GroupByValue>>();
 const state = reactive({
+    isInitiated: false,
     proxyValue: useProxyValue('value', props, emit),
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget ?? 'labels_info';
@@ -43,11 +47,14 @@ const state = reactive({
         }));
     }),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
+    hideCount: computed(() => props.widgetFieldSchema?.options?.hideCount),
+    fixedValue: computed(() => props.widgetFieldSchema?.options?.fixedValue),
     fieldName: computed(() => i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.GROUP_BY')),
     selectedItem: undefined as undefined | MenuItem[] | string,
     isValid: computed<boolean>(() => {
-        if (!props.widgetFieldSchema?.options?.hideCount && !state.proxyValue?.count) return false;
+        if (!state.hideCount && !state.proxyValue?.count) return false;
         if (state.multiselectable && !state.selectedItem?.length) return false;
+        if (state.fixedValue) return state.selectedItem?.[0]?.label === state.fixedValue || state.selectedItem === state.fixedValue;
         return !!state.selectedItem;
     }),
     max: computed(() => props.widgetFieldSchema?.options?.max),
@@ -83,10 +90,10 @@ watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
 
-const convertToMenuItem = (data: string[]) => data.map((d) => ({
+const convertToMenuItem = (data?: string[]) => data?.map((d) => ({
     name: d,
     label: d,
-}));
+})) ?? [];
 watch(() => labelsMenuItem.value, (value) => {
     let isSelectedValueValid = false;
     if (state.selectedItem === undefined) {
@@ -111,49 +118,44 @@ watch(() => labelsMenuItem.value, (value) => {
     }
 });
 
-watch(() => state.menuItems, (menuItems) => {
-    if (!Array.isArray(menuItems)) return;
-    const isIncludedInMenuItems = (data: string[]|string):boolean => {
-        if (Array.isArray(data)) {
-            return data.every((d) => menuItems.some((m) => m.name === d));
-        }
-        return menuItems.some((m) => m.name === data);
+const initValue = () => {
+    state.proxyValue = {
+        ...state.proxyValue,
+        value: props.value?.value,
+        count: props.value?.count,
     };
     if (state.multiselectable) {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : [state.menuItems[0]?.name],
-        };
         state.selectedItem = convertToMenuItem(state.proxyValue?.value);
     } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
-        };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
+        state.selectedItem = state.proxyValue?.value;
     }
-}, { immediate: true });
-/* Init */
-onMounted(() => {
+};
+watch(() => state.menuItems, (menuItems) => {
+    if (!state.isInitiated) {
+        initValue();
+        state.isInitiated = true;
+    }
+
+    if (!menuItems?.length) return;
+
     const _defaultIndex = getDefaultMenuItemIndex(state.menuItems, props.widgetFieldSchema?.options?.defaultIndex, props.widgetFieldSchema?.options?.excludeDateField);
+    let _value: string | string[] | undefined;
     if (state.multiselectable) {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: props.value?.value ?? [state.menuItems[_defaultIndex]?.name],
-        };
-        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value ?? [], _defaultIndex);
+        state.selectedItem = convertToMenuItem(_value);
+    } else if (state.fixedValue) {
+        _value = menuItems.some((menu) => menu.name === state.fixedValue) ? state.fixedValue : undefined;
+        state.selectedItem = _value;
     } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: props.value?.value ?? state.menuItems[_defaultIndex]?.name,
-        };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[_defaultIndex]?.name;
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, _defaultIndex);
+        state.selectedItem = _value;
     }
     state.proxyValue = {
         ...state.proxyValue,
-        count: props.value.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT,
+        value: _value,
+        count: props.value?.count ?? props.widgetFieldSchema?.options?.defaultMaxCount ?? DEFAULT_COUNT,
     };
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -171,23 +173,25 @@ onMounted(() => {
                                        :selected="state.selectedItem"
                                        :multi-selectable="state.multiselectable"
                                        show-select-marker
+                                       :invalid="!state.isValid"
+                                       :disabled="!!state.fixedValue"
                                        appearance-type="badge"
                                        @update:selected="handleUpdateSelect"
                     />
                 </p-field-group>
-                <p-field-group :label="$t('COMMON.WIDGETS.MAX_ITEMS')"
+                <p-field-group v-if="!state.hideCount"
+                               :label="$t('COMMON.WIDGETS.MAX_ITEMS')"
                                style-type="secondary"
                                class="max-items"
                                :invalid="!state.isMaxValid"
                                :invalid-text="$t('COMMON.WIDGETS.NUMBER_FIELD_VALIDATION', {max: state.max})"
                                required
                 >
-                    <p-text-input v-if="!widgetFieldSchema?.options?.hideCount"
-                                  type="number"
+                    <p-text-input type="number"
                                   :min="1"
                                   :max="props.widgetFieldSchema?.options?.max"
                                   :invalid="!state.isMaxValid"
-                                  :value="state.proxyValue?.count ?? DEFAULT_COUNT"
+                                  :value="state.proxyValue?.count"
                                   @update:value="handleUpdateCount"
                     />
                     <template #label-extra>

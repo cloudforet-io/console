@@ -26,7 +26,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getAllRequiredFieldsFilled,
+    getApiQueryDateRange,
     getDateLabelFormat, getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
@@ -36,7 +36,9 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { XAxisValue, YAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    ColorSchemaValue, XAxisValue, YAxisValue, ColorValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 type Data = ListResponse<{
@@ -50,7 +52,6 @@ const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
-    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as Data | null,
     chart: null as EChartsType | null,
     xAxisData: [],
@@ -98,9 +99,9 @@ const state = reactive({
             orient: 'horizontal',
             left: 'left',
             bottom: 0,
-            // inRange: {
-            //     color: ['#cdd3ef', '#21e121'],
-            // },
+            inRange: {
+                color: state.colorValue,
+            },
             outOfRange: {
                 color: '#999',
             },
@@ -125,6 +126,7 @@ const state = reactive({
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     yAxisField: computed<string>(() => (props.widgetOptions?.yAxis as YAxisValue)?.value),
     yAxisCount: computed<number>(() => (props.widgetOptions?.yAxis as YAxisValue)?.count),
+    colorValue: computed<ColorValue>(() => (props.widgetOptions?.colorSchema as ColorSchemaValue).colorValue),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
@@ -147,18 +149,19 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 
 /* Util */
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
-    if (!state.allRequiredFieldsFilled) return undefined;
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: _queryDateRange.start,
+                end: _queryDateRange.end,
                 group_by: [state.xAxisField, state.yAxisField],
                 fields: {
                     [state.dataField]: {

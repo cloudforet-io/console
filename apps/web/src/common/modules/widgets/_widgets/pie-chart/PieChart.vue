@@ -26,7 +26,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getAllRequiredFieldsFilled,
+    getApiQueryDateRange,
     getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateRange,
@@ -47,7 +47,6 @@ const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: true,
     errorMessage: undefined as string|undefined,
-    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: [],
@@ -125,18 +124,19 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 
 /* Util */
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
-    if (!state.allRequiredFieldsFilled) return undefined;
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: _queryDateRange.start,
+                end: _queryDateRange.end,
                 group_by: [state.groupByField],
                 fields: {
                     [state.dataField]: {

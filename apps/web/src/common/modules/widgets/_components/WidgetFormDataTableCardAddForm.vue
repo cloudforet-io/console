@@ -441,6 +441,8 @@ onMounted(async () => {
             @apply text-label-lg;
             font-weight: 700;
             padding: 1rem 0;
+            vertical-align: middle;
+            cursor: pointer;
         }
         .form-wrapper {
             padding: 0.5rem 0 0.25rem 1.25rem;

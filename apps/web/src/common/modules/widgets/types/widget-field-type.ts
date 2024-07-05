@@ -46,6 +46,7 @@ export interface GroupByOptions {
     defaultMaxCount: number;
     defaultIndex?: number;
     excludeDateField?: boolean;
+    fixedValue?: string;
 }
 export interface CategoryByOptions {
     dataTarget?: string;
@@ -126,14 +127,14 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'formatRules'
     | 'granularity' | 'colorSchema';
 
-export interface WidgetFieldComponentProps<FieldOptions> {
+export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;
     allValueMap: {
         [key in WidgetFieldName]: WidgetFieldValues;
     }
     widgetFieldSchema?: WidgetFieldSchema<FieldOptions>;
     isValid?: boolean;
-    value?: any;
+    value?: FieldValue;
 }
 
 export interface WidgetFieldComponentEmit<ValueType> {

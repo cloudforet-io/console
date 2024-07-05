@@ -12,7 +12,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<TotalFieldOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<TotalFieldOptions, string>>(), {
 });
 const emit = defineEmits<WidgetFieldComponentEmit<string>>();
 const state = reactive({

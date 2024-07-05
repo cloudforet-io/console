@@ -18,7 +18,6 @@ import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
@@ -45,7 +44,6 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
@@ -186,11 +184,6 @@ const handleConfirmDataSource = async () => {
     if (widgetGenerateState.overlayType === 'ADD' && !widgetGenerateState.widgetId) {
         const createdWidget = await createWidget();
         if (createdWidget) {
-            dashboardDetailStore.addWidgetToDashboardLayouts(createdWidget.widget_id);
-            await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
-                dashboard_id: dashboardDetailState.dashboardId,
-                layouts: dashboardDetailState.dashboardLayouts,
-            });
             widgetGenerateStore.setWidgetForm(createdWidget);
         }
     }

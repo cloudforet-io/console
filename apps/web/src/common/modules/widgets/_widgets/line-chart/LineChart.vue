@@ -28,7 +28,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getAllRequiredFieldsFilled,
+    getApiQueryDateRange,
     getDateLabelFormat, getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
@@ -51,7 +51,6 @@ const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
-    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as Data | null,
     chart: null as EChartsType | null,
     xAxisData: [],
@@ -131,16 +130,17 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 
 /* Util */
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
-    if (!state.allRequiredFieldsFilled) return undefined;
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const _query: any = {
             granularity: state.granularity,
-            start: state.dateRange.start,
-            end: state.dateRange.end,
+            start: _queryDateRange.start,
+            end: _queryDateRange.end,
             group_by: [state.xAxisField],
             fields: {
                 [state.dataField]: {
@@ -174,12 +174,12 @@ const getLineByData = (rawData: Data) => {
     const _slicedByLineBy: any[] = [];
     rawData.results?.forEach((d) => {
         const _slicedData = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.lineByCount);
-        const _etcData = d[state.dataField].slice(state.lineByCount).reduce((acc, v) => {
+        const _etcData = d[state.dataField]?.slice(state.lineByCount).reduce((acc, v) => {
             acc[state.lineByField] = 'etc';
-            acc.value += v.value;
+            acc.value += v.value || 0;
             return acc;
-        }, {});
-        const _values = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
+        }, { value: 0 });
+        const _values = _etcData.value === 0 ? _slicedData : [..._slicedData, _etcData];
         _values.forEach((v) => {
             _slicedByLineBy.push({
                 [state.xAxisField]: d[state.xAxisField],

@@ -107,11 +107,10 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
     });
     return _refinedWidgets;
 };
-const getWidgetLoading = (widgetId: string) => {
+const getWidgetLoading = () => {
     if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
     // if (!state.intersectedWidgetMap[widgetId]) return true;
-    if (widgetGenerateState.widgetId === widgetId) return true;
     return false;
 };
 const refreshAllWidget = debounce(async () => {
@@ -211,9 +210,9 @@ const handleDeleteModalConfirm = async () => {
     delete state.mountedWidgetMap[_targetWidgetId];
     state.mountedWidgetMap = { ...state.mountedWidgetMap };
     // 3. close modal
-    await dashboardDetailStore.listDashboardWidgets();
     widgetDeleteState.visibleModal = false;
     widgetDeleteState.targetWidget = null;
+    await dashboardDetailStore.listDashboardWidgets();
 };
 const handleClickAddWidget = () => {
     widgetGenerateStore.setOverlayType('ADD');
@@ -233,6 +232,14 @@ watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
         await loadAWidget(widgetGenerateState.latestWidgetId);
     }
 });
+watch(() => dashboardDetailState.dashboardWidgets, (dashboardWidgets) => {
+    // delete creating widgets
+    dashboardWidgets.forEach((widget) => {
+        if (widget.state === 'CREATING') {
+            deleteWidget(widget.widget_id);
+        }
+    });
+}, { immediate: true });
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
 const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
     if (widgetObserverMap) {
@@ -278,6 +285,7 @@ defineExpose({
                                ref="widgetRef"
                                :widget-name="widget.widget_type"
                                :widget-id="widget.widget_id"
+                               :widget-state="widget.state"
                                :data-table-id="widget.data_table_id"
                                :title="widget.name"
                                :description="widget.description"
@@ -304,12 +312,11 @@ defineExpose({
                     <p-empty show-image
                              image-size="sm"
                              class="empty-wrapper"
-                             show-button
+                             :show-button="!dashboardDetailGetters.disableManageButtons"
                     >
                         {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
                         <template #button>
-                            <p-button v-if="!dashboardDetailGetters.disableManageButtons"
-                                      style-type="substitutive"
+                            <p-button style-type="substitutive"
                                       icon-left="ic_plus_bold"
                                       class="add-widget-button"
                                       @click="handleClickAddWidget"

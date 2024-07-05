@@ -1005,7 +1005,6 @@
 			"TITLE": "フィールドを変更する"
 		},
 		"DELETED": "削除",
-		"DEPRECATED": "",
 		"EDITOR": {
 			"ALIGN_CENTER": "中央寄せ",
 			"ALIGN_JUSTIFY": "両端揃え",
@@ -1399,6 +1398,8 @@
 			"DAILY_UPDATE_HELP": "管理しているリソースの使用量を確認します",
 			"DAILY_UPDATE_NO_DATA": "本日の変更事項はありません。",
 			"DAILY_UPDATE_TITLE": "本日の変更事項",
+			"DATA_NOT_DISPLAYED": "",
+			"DATA_NOT_DISPLAYED_DESC": "",
 			"DATA_TABLE": {
 				"ALERT": {
 					"DELETE_DESC": "このデータを削除してもよろしいですか？",
@@ -1436,6 +1437,7 @@
 			},
 			"DEFAULT_WIDTH": "デフォルト幅",
 			"DELETE": "削除",
+			"DONE": "完了",
 			"EDIT": "編集",
 			"EDIT_WIDGET": "ウィジェット編集",
 			"EXPAND": "展開する",
@@ -1449,6 +1451,11 @@
 				"TOGGLE_MORE": "もっと見る"
 			},
 			"FIELD": "フィールド",
+			"FORM": {
+				"WIDGET_VALIDATION_WARNING_DESC": "",
+				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "",
+				"WIDGET_VALIDATION_WARNING_TITLE": ""
+			},
 			"FORMAT_RULES": {
 				"BASE": "ベース",
 				"GAUGE_DESC": "ゲージの色は閾値に基づいて変化します。",
@@ -1472,6 +1479,7 @@
 				"MORE_THAN_PREVIOUS_YEAR": "前年よりも多い"
 			},
 			"NUMBER_FIELD_VALIDATION": "値は {max} 以下でなければなりません。",
+			"PERIOD": "期間",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "アカウントID",
 				"AGO": "前",
@@ -1580,7 +1588,7 @@
 			"CREATE": "作成",
 			"CREAT_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"DASHBOARDS_TITLE": "ダッシュボード",
-			"DEPRECATED": "廃止された",
+			"DEPRECATED": "サポート終了",
 			"DEPRECATED_DESCRIPTION": "このダッシュボードはサポートが終了し、新しいダッシュボードが適用されるとすぐに削除される予定です。",
 			"FILTER_ALL": "すべて",
 			"FILTER_PRIVATE": "非公開",
@@ -1772,9 +1780,11 @@
 			"SHARE_TO_ALL_WORKSPACES": "すべてのワークスペースに共有する",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "このダッシュボードをすべてのワークスペースと共有しますか？",
 			"SHARE_WITH_CODE": "コードで共有",
-			"UNSHARE_TO_ALL_WORKSPACES": "すべてのワークスペースから共有解除"
+			"UNSHARE_FROM_ALL_WORKSPACES": "すべてのワークスペースから共有解除",
+			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "ワークスペース全体でこのダッシュボードの共有を解除してもよろしいですか？"
 		},
 		"FORM": {
+			"ALT_E_CLONE_DASHBOARD": "",
 			"ALT_E_CREATE_DASHBOARD": "ダッシュボードの作成に失敗しました",
 			"ALT_E_DELETE_DASHBOARD": "ダッシュボードの削除に失敗しました",
 			"ALT_E_EDIT_NAME": "ダッシュボード名の更新に失敗しました",
@@ -1815,7 +1825,10 @@
 			"SAVE": "保存"
 		},
 		"LNB": {
-			"ONLY_FAVORITE": "お気に入りだけを表示する"
+			"DEPRECATED": "",
+			"ONLY_FAVORITE": "お気に入りだけを表示する",
+			"PRIVATE": "",
+			"SHARED": ""
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
@@ -2017,7 +2030,8 @@
 			},
 			"UNIT": "ユニット",
 			"UPDATE_TITLE": "ウィジェットの更新",
-			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。"
+			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。",
+			"월": ""
 		}
 	},
 	"HOME": {

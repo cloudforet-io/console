@@ -9,7 +9,7 @@ import type { MaxOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } 
 
 const emit = defineEmits<WidgetFieldComponentEmit<number>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<MaxOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<MaxOptions, number>>(), {
     widgetFieldSchema: () => ({
         options: {
             default: 0,
