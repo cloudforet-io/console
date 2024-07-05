@@ -406,8 +406,6 @@ onMounted(() => {
     .form-wrapper {
         @apply flex flex-col gap-4;
         padding: 1rem 1.25rem 1rem 1.25rem;
-        vertical-align: middle;
-        cursor: pointer;
         &.no-gap {
             gap: 0;
         }
@@ -427,6 +425,8 @@ onMounted(() => {
         @apply text-label-lg;
         font-weight: 700;
         padding-top: 1rem;
+        vertical-align: middle;
+        cursor: pointer;
     }
     .widget-validation-warning {
         @apply w-full bg-red-100 rounded;
