@@ -15,16 +15,22 @@ import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookma
 
 import { gray } from '@/styles/colors';
 
+interface Props {
+    bookmarkList: BookmarkItem[]
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    bookmarkList: () => [],
+});
+
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 
-const emit = defineEmits<{(e: 'confirm'): void; }>();
+const emit = defineEmits<{(e: 'confirm', isFolder?: boolean): void; }>();
 
 const storeState = reactive({
-    bookmarkFolderList: computed<BookmarkItem[]|undefined>(() => bookmarkState.bookmarkFolderData),
-    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     type: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
-    isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
+    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
 });
 const state = reactive({
@@ -52,38 +58,36 @@ const state = reactive({
 });
 
 const deleteFolder = async (id?: string) => {
-    await bookmarkStore.deleteBookmarkFolder(id);
+    await bookmarkStore.deleteBookmarkFolder({
+        id,
+        bookmarkList: props.bookmarkList,
+    });
 };
 const deleteLink = async (id?: string) => {
     await bookmarkStore.deleteBookmarkLink(id);
 };
 const handleConfirm = async () => {
     state.loading = true;
+    let isFolder: undefined|boolean;
     try {
         if (state.isFolder) {
+            isFolder = true;
             await deleteFolder(storeState.selectedBookmark?.id);
-            if (storeState.isFileFullMode) {
-                bookmarkStore.setFullMode(true);
-                bookmarkStore.setSelectedBookmark(undefined);
-            }
         } else if (state.isLink) {
             await deleteLink(storeState.selectedBookmark?.id);
-            if (storeState.isFileFullMode) {
-                const folder = storeState.bookmarkFolderList?.find((i) => i.id === storeState.selectedBookmark?.folder);
-                bookmarkStore.setSelectedBookmark(folder);
-            }
         } else {
             const promises = storeState.selectedBookmarks.map(async (item) => {
                 if (item.link) {
                     return deleteLink(item.id);
                 }
+                isFolder = true;
                 return deleteFolder(item.id);
             });
             await Promise.all(promises);
             bookmarkStore.setSelectedBookmarks([]);
         }
 
-        emit('confirm');
+        emit('confirm', isFolder);
         await handleClose();
     } finally {
         state.loading = false;
@@ -141,10 +145,12 @@ const handleClose = () => {
                             />
                         </div>
                         <div class="text-wrapper">
-                            <span>{{ item?.name }}</span>
-                            <span v-if="item.link"
-                                  class="link"
-                            >{{ item.link }}</span>
+                            <p>{{ item?.name }}</p>
+                            <p v-if="item.link"
+                               class="link"
+                            >
+                                {{ item.link }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -191,7 +197,8 @@ const handleClose = () => {
             .text-wrapper {
                 @apply flex flex-col text-label-md;
                 .link {
-                    @apply text-label-sm text-gray-500;
+                    @apply truncate text-label-sm text-gray-500;
+                    max-width: 22rem;
                 }
             }
             & + .content-wrapper {

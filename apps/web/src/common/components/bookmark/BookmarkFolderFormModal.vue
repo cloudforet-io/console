@@ -22,10 +22,16 @@ import type { BookmarkType } from '@/services/workspace-home/types/workspace-hom
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
+    bookmarkList: BookmarkItem[],
+    filterByFolder?: TranslateResult,
+    selectedBookmark?: BookmarkItem,
 }
 
 const props = withDefaults(defineProps<Props>(), {
     bookmarkFolderList: undefined,
+    bookmarkList: () => [],
+    filterByFolder: undefined,
+    selectedBookmark: undefined,
 });
 
 const bookmarkStore = useBookmarkStore();
@@ -37,16 +43,14 @@ const emit = defineEmits<{(e: 'confirm', isEdit?: boolean, name?: string): void;
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
-    filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
-    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
-    isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
-    modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
-    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+
+    modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
+    bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
     loading: false,
-    bookmark: computed<string|undefined|TranslateResult>(() => storeState.selectedBookmark?.name || storeState.filterByFolder),
+    bookmark: computed<string|undefined|TranslateResult>(() => props.selectedBookmark?.name || props.filterByFolder),
     radioMenuList: computed<RadioType[]>(() => {
         const menu: RadioType[] = [{
             label: i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
@@ -98,15 +102,10 @@ const handleConfirm = async () => {
     try {
         if (storeState.modal.isEdit) {
             await bookmarkStore.updateBookmarkFolder({
-                id: storeState.selectedBookmark?.id,
+                id: props.selectedBookmark?.id,
                 name: name.value,
+                bookmarkList: props.bookmarkList,
             });
-            if (storeState.isFileFullMode) {
-                await bookmarkStore.setSelectedBookmark({
-                    ...storeState.selectedBookmark,
-                    name: name.value,
-                });
-            }
         } else {
             await bookmarkStore.createBookmarkFolder(name.value, state.scope);
         }

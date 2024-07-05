@@ -43,18 +43,20 @@ const props = withDefaults(defineProps<Props>(), {
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
-const bookmarkGetters = bookmarkStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
+const workspaceHomePageGetters = workspaceHomePageStore.getters;
 
 const storeState = reactive({
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
-    bookmarkFolderData: computed<BookmarkItem[]>(() => bookmarkState.bookmarkFolderData),
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
-    filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
+
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
-    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
+    bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
+    filterByFolder: computed<TranslateResult|undefined>(() => bookmarkState.filterByFolder),
+
+    recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
+    bookmarkFolderData: computed<BookmarkItem[]>(() => workspaceHomePageState.bookmarkFolderData),
+    bookmarkList: computed<BookmarkItem[]>(() => workspaceHomePageGetters.bookmarkList),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
@@ -117,12 +119,13 @@ const handleClickItem = (item) => {
         } else if (item.id === 'add-link') {
             bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK, false);
         } else {
-            bookmarkStore.setFileFullMode(true, item);
+            workspaceHomePageStore.setFileFullMode(true, item);
+            workspaceHomePageStore.fetchBookmarkList();
         }
         return;
     }
     if (item.icon) {
-        bookmarkStore.setFullMode(true);
+        workspaceHomePageStore.setFullMode(true);
     } else {
         window.open(item.link, '_blank');
     }

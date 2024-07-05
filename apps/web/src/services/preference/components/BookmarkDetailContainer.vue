@@ -30,11 +30,11 @@ import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
+const bookmarkStore = useBookmarkStore();
+const bookmarkState = bookmarkStore.state;
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
-const bookmarkStore = useBookmarkStore();
-const bookmarkState = bookmarkStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 
@@ -43,8 +43,10 @@ const router = useRouter();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
+
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
+
+    selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
 });
