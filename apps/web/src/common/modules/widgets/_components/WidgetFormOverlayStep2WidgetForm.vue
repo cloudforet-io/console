@@ -51,7 +51,6 @@ const state = reactive({
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     // display
-    isPreviewInitiated: false,
     collapsedTitleMap: {
         [FORM_TITLE_MAP.WIDGET_INFO]: false,
         [FORM_TITLE_MAP.REQUIRED_FIELDS]: false,
@@ -123,6 +122,7 @@ const handleShowErrorModal = (value:number|undefined) => {
 };
 
 const handleSelectWidgetName = (widgetName: string) => {
+    if (widgetName === widgetGenerateState.selectedWidgetName) return;
     widgetGenerateStore.setSelectedWidgetName(widgetName);
 
     const _config = getWidgetConfig(widgetName);
@@ -166,7 +166,7 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
 };
 
 // eslint-disable-next-line max-len
-const keyGenerator = (name: string) => `${name}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetFormValueMap[name] === undefined}`;
+const keyGenerator = (name: string) => `${name}-${widgetGenerateState.selectedWidgetName}`;
 
 onMounted(() => {
     checkDefaultValidation();

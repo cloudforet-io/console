@@ -7,6 +7,7 @@ import { PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { getInitialSelectedMenuItem } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type {
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
@@ -68,17 +69,11 @@ const convertToMenuItem = (data: string[]|string) => {
 };
 
 watch(() => state.menuItems, (menuItems) => {
-    const isIncludedInMenuItems = (data: string[]|string):boolean => {
-        if (Array.isArray(data)) {
-            return data.every((d) => menuItems.some((m) => m.name === d));
-        }
-        return menuItems.some((m) => m.name === data);
-    };
     if (state.multiselectable) {
-        state.proxyValue = isIncludedInMenuItems(state.proxyValue) ? state.proxyValue : [state.menuItems[0]?.name];
+        state.proxyValue = getInitialSelectedMenuItem(menuItems, state.proxyValue);
         state.selectedItem = convertToMenuItem(state.proxyValue);
     } else {
-        state.proxyValue = isIncludedInMenuItems(state.proxyValue) ? state.proxyValue : state.menuItems[0]?.name;
+        state.proxyValue = getInitialSelectedMenuItem(menuItems, state.proxyValue);
         state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
     }
 }, { immediate: true });

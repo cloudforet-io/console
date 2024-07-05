@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -12,7 +12,10 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { getDefaultMenuItemIndex } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import {
+    getDefaultMenuItemIndex,
+    getInitialSelectedMenuItem,
+} from '@/common/modules/widgets/_helpers/widget-field-helper';
 
 
 const props = withDefaults(defineProps<{
@@ -36,6 +39,7 @@ const emit = defineEmits<{(e: 'update:is-valid', isValid:boolean): void;
     (e: 'update:value', value: {value: string; count: number}): void;
 }>();
 const state = reactive({
+    isInitiated: false,
     proxyValue: useProxyValue('value', props, emit),
     isMaxValid: computed<boolean>(() => (props.max ? ((state.proxyValue?.count <= props.max) && !!state.proxyValue?.count) : true)),
     tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
@@ -43,6 +47,7 @@ const state = reactive({
         max: props.max,
     })),
     isAllValid: computed<boolean>(() => ((props.menuItems.length) ? state.isMaxValid : false)),
+    selectedItem: undefined as undefined | MenuItem[],
 });
 
 /* Event */
@@ -61,13 +66,28 @@ watch(() => state.isAllValid, (isValid) => {
 }, { immediate: true });
 
 /* Init */
-onMounted(() => {
-    const _defaultIndex = getDefaultMenuItemIndex(props.menuItems, props.defaultIndex, props.excludeDateField);
+const initValue = () => {
     state.proxyValue = {
-        value: props.value?.value ?? props.menuItems[_defaultIndex]?.name ?? '',
-        count: props.value?.count ?? props.defaultCount,
+        ...state.proxyValue,
+        value: props.value?.value,
+        count: props.value?.count,
     };
-});
+};
+watch(() => props.menuItems, (menuItems) => {
+    if (!state.isInitiated) {
+        initValue();
+        state.isInitiated = true;
+    }
+
+    if (!menuItems?.length) return;
+
+    const _defaultIndex = getDefaultMenuItemIndex(props.menuItems, props.defaultIndex, props.excludeDateField);
+    const _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, _defaultIndex);
+    state.proxyValue = {
+        value: _value,
+        count: props.value?.count ?? props.defaultCount ?? 5,
+    };
+}, { immediate: true });
 </script>
 
 <template>
@@ -95,7 +115,7 @@ onMounted(() => {
                           :min="1"
                           :max="props.max"
                           :invalid="!state.isMaxValid"
-                          :value="state.proxyValue?.count ?? props.value?.value"
+                          :value="state.proxyValue?.count"
                           @update:value="handleUpdateCount"
             />
             <template #label-extra>
