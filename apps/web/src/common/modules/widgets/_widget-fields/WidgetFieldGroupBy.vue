@@ -47,11 +47,14 @@ const state = reactive({
         }));
     }),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
+    hideCount: computed(() => props.widgetFieldSchema?.options?.hideCount),
+    fixedValue: computed(() => props.widgetFieldSchema?.options?.fixedValue),
     fieldName: computed(() => i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.GROUP_BY')),
     selectedItem: undefined as undefined | MenuItem[] | string,
     isValid: computed<boolean>(() => {
-        if (!props.widgetFieldSchema?.options?.hideCount && !state.proxyValue?.count) return false;
+        if (!state.hideCount && !state.proxyValue?.count) return false;
         if (state.multiselectable && !state.selectedItem?.length) return false;
+        if (state.fixedValue) return state.selectedItem?.[0]?.label === state.fixedValue || state.selectedItem === state.fixedValue;
         return !!state.selectedItem;
     }),
     max: computed(() => props.widgetFieldSchema?.options?.max),
@@ -140,6 +143,9 @@ watch(() => state.menuItems, (menuItems) => {
     if (state.multiselectable) {
         _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value ?? [], _defaultIndex);
         state.selectedItem = convertToMenuItem(_value);
+    } else if (state.fixedValue) {
+        _value = menuItems.some((menu) => menu.name === state.fixedValue) ? state.fixedValue : undefined;
+        state.selectedItem = _value;
     } else {
         _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, _defaultIndex);
         state.selectedItem = _value;
@@ -167,19 +173,21 @@ watch(() => state.menuItems, (menuItems) => {
                                        :selected="state.selectedItem"
                                        :multi-selectable="state.multiselectable"
                                        show-select-marker
+                                       :invalid="!state.isValid"
+                                       :disabled="!!state.fixedValue"
                                        appearance-type="badge"
                                        @update:selected="handleUpdateSelect"
                     />
                 </p-field-group>
-                <p-field-group :label="$t('COMMON.WIDGETS.MAX_ITEMS')"
+                <p-field-group v-if="!state.hideCount"
+                               :label="$t('COMMON.WIDGETS.MAX_ITEMS')"
                                style-type="secondary"
                                class="max-items"
                                :invalid="!state.isMaxValid"
                                :invalid-text="$t('COMMON.WIDGETS.NUMBER_FIELD_VALIDATION', {max: state.max})"
                                required
                 >
-                    <p-text-input v-if="!widgetFieldSchema?.options?.hideCount"
-                                  type="number"
+                    <p-text-input type="number"
                                   :min="1"
                                   :max="props.widgetFieldSchema?.options?.max"
                                   :invalid="!state.isMaxValid"
