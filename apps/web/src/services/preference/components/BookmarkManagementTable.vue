@@ -199,6 +199,8 @@ const fetchBookmarkList = async () => {
                         <p-lazy-img v-if="item.link"
                                     class="left-icon"
                                     :src="item.imgIcon"
+                                    error-icon="ic_link"
+                                    :error-icon-color="gray[500]"
                                     width="1.5rem"
                                     height="1.5rem"
                         />

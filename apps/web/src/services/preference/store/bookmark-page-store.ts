@@ -53,7 +53,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
             const workspaceBookmark = state.bookmarkList.filter((i) => !i.isGlobal);
             const sortedWorkspaceBookmark = sortBy(workspaceBookmark, (i) => !i.link).reverse();
             const combinedBookmarkList = [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
-            return combinedBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit);
+            return combinedBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit).filter((i) => !i.folder);
         }),
     });
 
