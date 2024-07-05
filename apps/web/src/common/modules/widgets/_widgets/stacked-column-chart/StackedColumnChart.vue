@@ -178,7 +178,8 @@ const drawChart = (rawData?: Data|null) => {
             acc.value += v.value || 0;
             return acc;
         }, { value: 0 });
-        const _values = _etcData.value === 0 ? _slicedData : [..._slicedData, _etcData];
+        let _values = _etcData.value === 0 ? _slicedData : [..._slicedData, _etcData];
+        _values = orderBy(_values, 'value', 'desc');
         _values.forEach((v) => {
             _slicedByStackBy.push({
                 [state.xAxisField]: d[state.xAxisField],

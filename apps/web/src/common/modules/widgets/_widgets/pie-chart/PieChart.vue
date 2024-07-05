@@ -166,7 +166,8 @@ const drawChart = (rawData: Data|null) => {
         acc[state.dataField] = (acc[state.dataField] || 0) + cur[state.dataField];
         return acc;
     }, {} as Record<string, string|number>);
-    const _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
+    let _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
+    _refinedData = orderBy(_refinedData, state.dataField, 'desc');
     state.chartData = _refinedData?.map((v) => ({
         name: v[state.groupByField],
         value: v[state.dataField],
