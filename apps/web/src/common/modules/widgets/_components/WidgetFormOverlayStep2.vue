@@ -82,6 +82,7 @@ const state = reactive({
 
 const {
     optionsInvalid,
+    optionsInvalidText,
 } = useWidgetOptionValidation({
     optionValueMap: computed(() => widgetGenerateState.widgetFormValueMap),
     widgetConfig: computed(() => state.widgetConfig),
@@ -253,6 +254,7 @@ onUnmounted(() => {
         </div>
         <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'"
                                                :widget-validation-invalid="optionsInvalid"
+                                               :widget-validation-invalid-text="optionsInvalidText"
         />
     </div>
 </template>

@@ -2,9 +2,12 @@ import type { Ref } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+
+import { i18n } from '@/translations';
 
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type { DataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
+import type { DataFieldOptions, GroupByOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type {
     WidgetFieldValues, TableDataFieldValue, GroupByValue, FormatRulesValue,
     ColorSchemaValue,
@@ -19,6 +22,7 @@ interface WidgetOptionValidationProps {
 
 interface WidgetOptionValidationReturnType {
     optionsInvalid: Ref<boolean>;
+    optionsInvalidText: Ref<string|TranslateResult>;
 }
 
 export const useWidgetOptionValidation = ({
@@ -34,6 +38,12 @@ export const useWidgetOptionValidation = ({
 
     const state = reactive({
         optionsInvalid: false,
+        optionsInvalidText: computed(() => {
+            if (_state.widgetConfig.widgetName === 'geoMap' && getRequiredFieldValidation(_state.valueMap, _state.widgetConfig)) {
+                return i18n.t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_DESC_GEO_MAP');
+            }
+            return i18n.t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_DESC');
+        }),
     });
 
     const getRequiredFieldValidation = (valueMap: OptionsValueMap, config: WidgetConfig) => _state.requiredFields.some((field) => {
@@ -44,6 +54,13 @@ export const useWidgetOptionValidation = ({
         if (field === 'dataField') {
             const isMultiSelectable = (config.requiredFieldsSchema[field]?.options as DataFieldOptions)?.multiSelectable;
             return isMultiSelectable && Array.isArray(fieldValue) ? !fieldValue.length : !fieldValue;
+        }
+        if (field === 'groupBy') {
+            const fixedValue = (config.requiredFieldsSchema.groupBy?.options as GroupByOptions)?.fixedValue;
+            if (fixedValue) {
+                return !fieldValue?.value || fieldValue?.value !== fixedValue;
+            }
+            return Array.isArray(fieldValue?.value) ? !fieldValue?.value.length : !fieldValue?.value;
         }
         if (field === 'tableDataField') {
             const tableDataFieldValue = fieldValue as TableDataFieldValue;
