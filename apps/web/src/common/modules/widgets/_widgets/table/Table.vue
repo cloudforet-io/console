@@ -224,6 +224,7 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
             state.tableDataField?.forEach((field) => {
                 _fields[field] = { key: field, operator: 'sum' };
             });
+            _sort = state.tableDataField.map((field) => ({ key: field, desc: true }));
         } else {
             _fields[state.tableDataCriteria] = { key: state.tableDataCriteria, operator: 'sum' };
             _field_group = [state.tableDataField];
