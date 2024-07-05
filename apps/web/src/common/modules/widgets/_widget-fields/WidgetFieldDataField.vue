@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOption
 });
 const emit = defineEmits<WidgetFieldComponentEmit<string | string[]>>();
 const state = reactive({
+    isInitiated: false,
     proxyValue: useProxyValue('value', props, emit),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     menuItems: computed<MenuItem[]>(() => {
@@ -68,26 +69,30 @@ const convertToMenuItem = (data: string[]|string) => {
     };
 };
 
-watch(() => state.menuItems, (menuItems) => {
+const initValue = () => {
+    state.proxyValue = state.proxyValue?.value;
     if (state.multiselectable) {
-        state.proxyValue = getInitialSelectedMenuItem(menuItems, state.proxyValue);
+        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+    } else {
+        state.selectedItem = state.proxyValue?.value;
+    }
+};
+watch(() => state.menuItems, (menuItems) => {
+    if (!state.isInitiated) {
+        initValue();
+        state.isInitiated = true;
+    }
+
+    if (!menuItems?.length) return;
+
+    if (state.multiselectable) {
+        state.proxyValue = getInitialSelectedMenuItem(menuItems, state.proxyValue ?? []);
         state.selectedItem = convertToMenuItem(state.proxyValue);
     } else {
         state.proxyValue = getInitialSelectedMenuItem(menuItems, state.proxyValue);
         state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
     }
 }, { immediate: true });
-
-onMounted(() => {
-    if (state.multiselectable) {
-        state.proxyValue = props.value ?? [state.menuItems[0]?.name];
-        state.selectedItem = convertToMenuItem(state.proxyValue);
-    } else {
-        state.proxyValue = props.value ?? state.menuItems[0]?.name;
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
-    }
-});
-
 </script>
 
 <template>
