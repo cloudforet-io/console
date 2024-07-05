@@ -84,7 +84,7 @@ const {
     optionsInvalid,
 } = useWidgetOptionValidation({
     optionValueMap: computed(() => widgetGenerateState.widgetFormValueMap),
-    config: computed(() => state.widgetConfig),
+    widgetConfig: computed(() => state.widgetConfig),
 });
 
 /* Api */
