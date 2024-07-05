@@ -48,6 +48,7 @@ const storeState = reactive({
 const state = reactive({
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
+    bookmarkList: computed<BookmarkItem[]>(() => (state.folder ? storeState.bookmarkList : storeState.bookmarkList.filter((i) => !i.folder))),
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -182,7 +183,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
                              :total-count="storeState.bookmarkTotalCount"
-                             :items="storeState.bookmarkList"
+                             :items="state.bookmarkList"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              @change="handleChange"
