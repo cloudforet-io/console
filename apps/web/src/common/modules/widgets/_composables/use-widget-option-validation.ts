@@ -115,6 +115,7 @@ export const useWidgetOptionValidation = ({
     };
 
     const checkWidgetOptionsFieldsValidation = (valueMap: OptionsValueMap, config: WidgetConfig) => {
+        if (!_state.requiredFields.every((field) => Object.keys(valueMap).includes(field))) return;
         const requiredFieldInvalid = getRequiredFieldValidation(valueMap, config);
         const duplicatedLabelInfo = getDuplicatedLabelInfoValidation(valueMap, config);
 
