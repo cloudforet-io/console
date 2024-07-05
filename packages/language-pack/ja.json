@@ -1451,6 +1451,10 @@
 				"TOGGLE_MORE": "もっと見る"
 			},
 			"FIELD": "フィールド",
+			"FORM": {
+				"WIDGET_VALIDATION_WARNING_DESC": "",
+				"WIDGET_VALIDATION_WARNING_TITLE": ""
+			},
 			"FORMAT_RULES": {
 				"BASE": "ベース",
 				"GAUGE_DESC": "ゲージの色は閾値に基づいて変化します。",

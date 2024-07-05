@@ -1451,6 +1451,10 @@
 				"TOGGLE_MORE": "show more"
 			},
 			"FIELD": "Field",
+			"FORM": {
+				"WIDGET_VALIDATION_WARNING_DESC": "To illustrate chart properly, check the form below and set the correct values.",
+				"WIDGET_VALIDATION_WARNING_TITLE": "Empty or incorrect values"
+			},
 			"FORMAT_RULES": {
 				"BASE": "Base",
 				"GAUGE_DESC": "Gauge color changes based on threshold values.",

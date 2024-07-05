@@ -265,10 +265,10 @@ onMounted(() => {
                          height="1.25rem"
                          :color="red[400]"
                     />
-                    <span>Empty or incorrect values</span>
+                    <span>{{ $t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_TITLE') }}</span>
                 </div>
                 <p class="warning-description">
-                    To illustrate chart properly, check the form below and set the correct values.
+                    {{ $t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_DESC') }}
                 </p>
             </div>
             <div class="title-wrapper"
