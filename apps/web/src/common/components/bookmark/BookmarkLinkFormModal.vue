@@ -48,16 +48,16 @@ const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 
-const emit = defineEmits<{(e: 'confirm'): void; }>();
+const emit = defineEmits<{(e: 'confirm', selectedFolder?: BookmarkItem, scope?: BookmarkType): void; }>();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
-    modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
-    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
-    isFullMode: computed<boolean|undefined>(() => bookmarkState.isFullMode),
-    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+
+    modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
+    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
+    bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
     loading: false,
@@ -78,7 +78,7 @@ const state = reactive({
         return menu;
     }),
     selectedRadioIdx: 0,
-    scope: computed(() => state.radioMenuList[state.selectedRadioIdx].name),
+    scope: computed<BookmarkType>(() => state.radioMenuList[state.selectedRadioIdx].name),
 });
 
 const {
@@ -175,22 +175,9 @@ const handleConfirm = async () => {
                 folder: state.selectedFolder?.id,
                 type: state.scope,
             });
-            if (!storeState.isAdminMode) {
-                await bookmarkStore.setBookmarkType(state.scope);
-                await bookmarkStore.setSelectedBookmark(state.selectedFolder, false);
-                await bookmarkStore.fetchBookmarkFolderList();
-                await bookmarkStore.fetchBookmarkList();
-            }
             showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');
         }
-        if (storeState.isFullMode && state.selectedFolder?.id) {
-            if (state.selectedFolder?.id) {
-                await bookmarkStore.setFileFullMode(true, state.selectedFolder);
-            } else {
-                await bookmarkStore.setFullMode(true);
-            }
-        }
-        emit('confirm');
+        emit('confirm', state.selectedFolder, state.scope);
         await handleClose();
     } finally {
         state.loading = false;

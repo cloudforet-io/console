@@ -12,7 +12,6 @@ import type { PublicConfigListParameters } from '@/schema/config/public-config/a
 import type { PublicConfigModel } from '@/schema/config/public-config/model';
 
 import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
-import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -33,8 +32,6 @@ interface BookmarkPageState {
 }
 
 export const useBookmarkPageStore = defineStore('page-bookmark', () => {
-    const bookmarkStore = useBookmarkStore();
-
     const state = reactive<BookmarkPageState>({
         loading: false,
         bookmarkFolderList: [],
@@ -112,11 +109,9 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     workspace_id: i.data.workspaceId,
                     id: i.name,
                 } as BookmarkItem));
-                bookmarkStore.setBookmarkFolderData(state.bookmarkFolderList);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkFolderList = [];
-                bookmarkStore.setBookmarkFolderData([]);
             }
         },
         fetchBookmarkList: async (selectedType?: string) => {
@@ -169,11 +164,9 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                 });
                 state.bookmarkList = await Promise.all(promises);
                 state.bookmarkTotalCount = total_count || 0;
-                bookmarkStore.setBookmarkData(state.bookmarkList);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkList = [];
-                bookmarkStore.setBookmarkData([]);
             } finally {
                 state.loading = false;
             }

@@ -16,16 +16,17 @@ import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookma
 import BookmarkManagementTable from '@/services/preference/components/BookmarkManagementTable.vue';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
-const bookmarkPageStore = useBookmarkPageStore();
-const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
+const bookmarkPageStore = useBookmarkPageStore();
+const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 
 const storeState = reactive({
+    modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
+
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
-    modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
 });
 const state = reactive({

@@ -30,6 +30,7 @@ import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-st
 import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import type { MoreMenuItem, BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
@@ -44,6 +45,8 @@ const FOLDER_DEFAULT_GAP = 4;
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
+const workspaceHomePageStore = useWorkspaceHomePageStore();
+const workspaceHomePageState = workspaceHomePageStore.state;
 
 const { width } = useWindowSize();
 
@@ -59,12 +62,13 @@ const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(more
 const storeState = reactive({
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     language: computed<string>(() => store.state.user.language),
-    filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
-    isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
-    isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
+
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
-    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
+    bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
+    filterByFolder: computed<TranslateResult|undefined>(() => bookmarkState.filterByFolder),
+    isFullMode: computed<boolean>(() => workspaceHomePageState.isFullMode),
+    isFileFullMode: computed<boolean>(() => workspaceHomePageState.isFileFullMode),
 });
 const state = reactive({
     isLaptopSize: computed<boolean>(() => width.value < screens.laptop.max),
@@ -112,7 +116,7 @@ const {
 });
 
 const handleClickFullModeButton = () => {
-    bookmarkStore.setFullMode(!storeState.isFullMode);
+    workspaceHomePageStore.setFullMode(!storeState.isFullMode);
 };
 const handleClickActionButton = (type: BookmarkModalType, isEdit?: boolean, isNew?: boolean) => {
     bookmarkStore.setModalType(type, isEdit, isNew);
@@ -129,7 +133,8 @@ const handleClickFolder = (item: BookmarkItem, isClickedMore?: boolean) => {
     bookmarkStore.setSelectedBookmark(item);
 };
 const handleGoBackButton = () => {
-    bookmarkStore.setFileFullMode(false);
+    workspaceHomePageStore.setFileFullMode(false);
+    workspaceHomePageStore.fetchBookmarkList();
 };
 
 const handleClickAddMore = () => {
@@ -162,8 +167,8 @@ const handleSelectTool = async (value: BookmarkType) => {
     bookmarkStore.setBookmarkType(value);
     bookmarkStore.setSelectedBookmarks([]);
 
-    await bookmarkStore.fetchBookmarkFolderList();
-    await bookmarkStore.fetchBookmarkList();
+    await workspaceHomePageStore.fetchBookmarkFolderList();
+    await workspaceHomePageStore.fetchBookmarkList();
     await bookmarkStore.setSelectedBookmark(undefined);
 };
 
@@ -211,9 +216,13 @@ watch(() => storeState.bookmarkType, (bookmarkType) => {
     moreState.selectedItems = [];
 }, { immediate: true });
 watch(() => storeState.filterByFolder, (filterByFolder) => {
-    const refinedFilterByFolderIdx = state.refinedFolderList.findIndex((item) => item.name === filterByFolder);
-    if (filterByFolder && refinedFilterByFolderIdx !== -1) {
-        moreState.selectedItems = [state.refinedFolderList[refinedFilterByFolderIdx]];
+    const refinedFilterByFolder = state.refinedFolderList.find((item) => item.name === filterByFolder);
+    if (filterByFolder && refinedFilterByFolder) {
+        moreState.selectedItems = [{
+            ...refinedFilterByFolder,
+            name: refinedFilterByFolder.id,
+            label: refinedFilterByFolder.name,
+        }];
     }
 }, { immediate: true });
 </script>

@@ -140,7 +140,7 @@ const handleSelectDropdownMenu = (item: BookmarkItem, menu: string) => {
 };
 const handleUpdateVisibleMenu = (item: BookmarkItem, visibleMenu: boolean) => {
     if (visibleMenu) {
-        bookmarkStore.setSelectedBookmark(item, true);
+        bookmarkStore.setSelectedBookmark(item);
     }
 };
 const getRowSelectable = (item) => !item.isGlobal;

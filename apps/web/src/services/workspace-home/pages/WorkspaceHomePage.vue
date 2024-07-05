@@ -14,7 +14,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
-import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
@@ -29,7 +28,6 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
-const bookmarkStore = useBookmarkStore();
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
@@ -54,7 +52,7 @@ const state = reactive({
 });
 
 watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
-    await workspaceHomePageStore.init();
+    await workspaceHomePageStore.resetState();
     if (!currentWorkspaceId) return;
 
     state.loading = true;
@@ -74,8 +72,8 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
         await workspaceHomePageStore.fetchAppList();
     }
     // bookmark
-    await bookmarkStore.fetchBookmarkFolderList();
-    await bookmarkStore.fetchBookmarkList();
+    await workspaceHomePageStore.fetchBookmarkFolderList();
+    await workspaceHomePageStore.fetchBookmarkList();
     // configs
     await workspaceHomePageStore.fetchFavoriteList();
     // summaries

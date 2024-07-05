@@ -25,11 +25,11 @@ import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 import type { TreeNode } from '@/services/project/tree/type';
 
+const gnbStore = useGnbStore();
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
-const gnbStore = useGnbStore();
 
 const route = useRoute();
 
