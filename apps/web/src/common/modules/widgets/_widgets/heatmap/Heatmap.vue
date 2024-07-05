@@ -36,7 +36,9 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { XAxisValue, YAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    ColorSchemaValue, XAxisValue, YAxisValue, ColorValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 type Data = ListResponse<{
@@ -97,9 +99,9 @@ const state = reactive({
             orient: 'horizontal',
             left: 'left',
             bottom: 0,
-            // inRange: {
-            //     color: ['#cdd3ef', '#21e121'],
-            // },
+            inRange: {
+                color: state.colorValue,
+            },
             outOfRange: {
                 color: '#999',
             },
@@ -124,6 +126,7 @@ const state = reactive({
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     yAxisField: computed<string>(() => (props.widgetOptions?.yAxis as YAxisValue)?.value),
     yAxisCount: computed<number>(() => (props.widgetOptions?.yAxis as YAxisValue)?.count),
+    colorValue: computed<ColorValue>(() => (props.widgetOptions?.colorSchema as ColorSchemaValue).colorValue),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
