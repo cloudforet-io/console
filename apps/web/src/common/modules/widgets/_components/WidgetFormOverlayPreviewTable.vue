@@ -334,6 +334,7 @@ watch(() => storeState.dataTableUpdating, () => {
     .toolbox-left-wrapper {
         @apply flex items-center;
         gap: 0.75rem;
+        height: 100%;
         .view-table-title {
             @apply text-label-lg font-bold;
         }
