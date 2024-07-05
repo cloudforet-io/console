@@ -2,6 +2,7 @@ import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import dayjs from 'dayjs';
+import { sortBy } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -157,31 +158,34 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
             };
         },
         fetchBookmarkFolderList: async () => {
-            let fetcher;
-            if (_getters.bookmarkType === BOOKMARK_TYPE.USER) {
-                fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
-            } else if (_getters.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.list);
-            }
-
             const bookmarkListApiQuery = new ApiQueryHelper()
                 .setSort('updated_at', true)
                 .setFilters([
                     { k: 'name', v: 'console:bookmark', o: '' },
                     { k: 'data.link', v: null, o: '=' },
-                ])
-                .setOrFilters([
-                    { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
                 ]);
             try {
+                let fetcher;
+                if (_getters.bookmarkType === BOOKMARK_TYPE.USER) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
+                    bookmarkListApiQuery.addFilter({ k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' });
+                } else if (_getters.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
+                    fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.list);
+                    bookmarkListApiQuery.setOrFilters([
+                        { k: 'workspace_id', v: '*', o: '=' },
+                        { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
+                    ]);
+                }
+
                 const { status, response } = await fetcher({
                     query: bookmarkListApiQuery.data,
                 });
                 if (status === 'succeed') {
-                    state.bookmarkFolderData = (response.results ?? []).map((i) => ({
+                    const list = (response.results ?? []).map((i) => ({
                         ...i.data,
                         id: i.name,
                     } as BookmarkItem));
+                    state.bookmarkFolderData = sortBy(list, [(i) => !i.isGlobal]);
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -193,15 +197,19 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                 .setSort('updated_at', true)
                 .setFilters([
                     { k: 'name', v: 'console:bookmark', o: '' },
-                    { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
                     { k: 'data.link', v: null, o: '!=' },
                 ]);
             try {
                 let fetcher;
                 if (_getters.bookmarkType === BOOKMARK_TYPE.USER) {
                     fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
+                    bookmarkListApiQuery.addFilter({ k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' });
                 } else if (_getters.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.publicConfig.list);
+                    bookmarkListApiQuery.setOrFilters([
+                        { k: 'workspace_id', v: '*', o: '=' },
+                        { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
+                    ]);
                 }
                 const { status, response } = await fetcher({
                     query: bookmarkListApiQuery.data,
@@ -216,7 +224,8 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                         };
                     });
 
-                    state.bookmarkData = await Promise.all(promises);
+                    const list = await Promise.all(promises);
+                    state.bookmarkData = sortBy(list, [(i) => !i.isGlobal]);
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
