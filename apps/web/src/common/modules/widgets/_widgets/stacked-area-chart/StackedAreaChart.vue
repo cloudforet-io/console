@@ -74,10 +74,11 @@ const state = reactive({
                 const _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
                 const _values = _params.map((p) => {
                     const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.lineByField, p.seriesName);
-                    const _value = numberFormatter(p.value) || '';
+                    const _value = p.value ? numberFormatter(p.value) : undefined;
+                    if (!_value) return undefined;
                     return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
                 });
-                return [_axisValue, ..._values].join('<br/>');
+                return [_axisValue, ..._values].filter((d) => !!d).join('<br/>');
             },
         },
         xAxis: {

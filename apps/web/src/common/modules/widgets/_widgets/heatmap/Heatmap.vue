@@ -10,7 +10,9 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { isEmpty, orderBy, throttle } from 'lodash';
+import {
+    isEmpty, max, orderBy, throttle,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -57,7 +59,13 @@ const state = reactive({
     xAxisData: [],
     yAxisData: [],
     chartData: [],
+    heatmapMaxValue: computed(() => max(state.chartData.map((d) => d?.[2] || 0)) ?? 1),
     chartOptions: computed<HeatmapSeriesOption>(() => ({
+        grid: {
+            left: 0,
+            right: '3%',
+            containLabel: true,
+        },
         xAxis: {
             type: 'category',
             data: state.xAxisData,
@@ -99,6 +107,7 @@ const state = reactive({
             orient: 'horizontal',
             left: 'left',
             bottom: 0,
+            max: state.heatmapMaxValue,
             inRange: {
                 color: state.colorValue,
             },
@@ -126,7 +135,7 @@ const state = reactive({
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     yAxisField: computed<string>(() => (props.widgetOptions?.yAxis as YAxisValue)?.value),
     yAxisCount: computed<number>(() => (props.widgetOptions?.yAxis as YAxisValue)?.count),
-    colorValue: computed<ColorValue>(() => (props.widgetOptions?.colorSchema as ColorSchemaValue).colorValue),
+    colorValue: computed<ColorValue>(() => (props.widgetOptions?.colorSchema as ColorSchemaValue)?.colorValue),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
