@@ -293,6 +293,18 @@ watch(() => state.menuItems, (menuItems) => {
             padding-right: 1.5rem;
         }
     }
+    .max-items {
+        width: 7.5rem;
+
+        .tooltip {
+            position: relative;
+            padding-left: 1.25rem;
+            .icon {
+                position: absolute;
+                right: 0;
+            }
+        }
+    }
 }
 
 /* custom design-system component - p-field-group */
