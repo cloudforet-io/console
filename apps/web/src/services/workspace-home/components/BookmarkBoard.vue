@@ -161,12 +161,13 @@ const checkSelectedId = (id?: string) => {
             <p-board-item v-for="(item, idx) in props.boardList"
                           :key="idx"
                           class="board-item"
-                          :class="{'selected': checkSelectedId(item.id)}"
+                          :class="{'selected': checkSelectedId(item.id), 'is-global': item?.isGlobal }"
                           @click="handleClickItem(item)"
             >
                 <template #content>
                     <p-checkbox v-if="!(storeState.bookmarkType === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember) && (props.isFullMode && !item.icon)"
                                 :value="true"
+                                :disabled="item?.isGlobal"
                                 :selected="checkSelectedId(item.id)"
                                 @change="handleClickCheckBox(item)"
                     />
@@ -179,22 +180,42 @@ const checkSelectedId = (id?: string) => {
                              height="1.25rem"
                              :color="gray[800]"
                         />
-                        <p-i v-else
-                             name="ic_folder"
-                             width="1.25rem"
-                             height="1.25rem"
-                             :color="blue[800]"
-                        />
+                        <div v-else
+                             class="folder-item-icon-wrapper"
+                        >
+                            <p-i name="ic_folder"
+                                 width="1.25rem"
+                                 height="1.25rem"
+                                 :color="blue[800]"
+                            />
+                            <p-i v-if="item.isGlobal"
+                                 name="ic_globe-filled"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                                 class="global"
+                                 :color="gray[600]"
+                            />
+                        </div>
                     </div>
                     <div v-else
                          class="image-wrapper"
                     >
-                        <p-lazy-img v-if="item.imgIcon"
-                                    :src="assetUrlConverter(item.imgIcon)"
-                                    error-icon="ic_link"
-                                    :error-icon-color="gray[500]"
-                                    class="icon"
-                        />
+                        <div v-if="item.imgIcon"
+                             class="folder-item-icon-wrapper"
+                        >
+                            <p-lazy-img :src="assetUrlConverter(item.imgIcon)"
+                                        error-icon="ic_link"
+                                        :error-icon-color="gray[500]"
+                                        class="icon"
+                            />
+                            <p-i v-if="item.isGlobal"
+                                 name="ic_globe-filled"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                                 class="global"
+                                 :color="gray[600]"
+                            />
+                        </div>
                         <div v-else-if="item.icon"
                              class="show-more"
                         >
@@ -231,7 +252,7 @@ const checkSelectedId = (id?: string) => {
                 <template v-if="!(storeState.bookmarkType === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)"
                           #overlay-content
                 >
-                    <p-select-dropdown v-if="!item.icon"
+                    <p-select-dropdown v-if="!item.icon && !item.isGlobal"
                                        :menu="state.menuItems"
                                        style-type="icon-button"
                                        button-icon="ic_ellipsis-horizontal"
@@ -294,8 +315,10 @@ const checkSelectedId = (id?: string) => {
                 @apply border border-blue-500;
                 box-shadow: 0 0 4px 0 rgba(0, 178, 255, 0.4);
 
-                .text-wrapper {
-                    max-width: calc(100% - 4.5rem);
+                &:not(.is-global) {
+                    .text-wrapper {
+                        max-width: calc(100% - 4.5rem);
+                    }
                 }
             }
 
@@ -304,6 +327,17 @@ const checkSelectedId = (id?: string) => {
                 width: 2rem;
                 height: 2rem;
                 border-radius: 0.375rem;
+                .folder-item-icon-wrapper {
+                    width: 1.25rem;
+                    height: 1.25rem;
+                    .global {
+                        @apply absolute bg-gray-150 rounded-full;
+                        width: 0.875rem !important;
+                        height: 0.875rem !important;
+                        right: 0;
+                        bottom: 0;
+                    }
+                }
 
                 /* custom design-system component - p-lazy-img */
                 :deep(.p-lazy-img) {
@@ -418,8 +452,10 @@ const checkSelectedId = (id?: string) => {
                         }
                     }
                     &:hover {
-                        .text-wrapper {
-                            max-width: calc(100% - 2.5rem);
+                        &:not(.is-global) {
+                            .text-wrapper {
+                                max-width: calc(100% - 2.5rem);
+                            }
                         }
                         .overlay {
                             @apply hidden;
@@ -469,8 +505,10 @@ const checkSelectedId = (id?: string) => {
                 }
                 &:hover {
                     @apply border-blue-500;
-                    .text-wrapper {
-                        max-width: calc(100% - 6.5rem);
+                    &:not(.is-global) {
+                        .text-wrapper {
+                            max-width: calc(100% - 6.5rem);
+                        }
                     }
                     .overlay {
                         @apply block;
