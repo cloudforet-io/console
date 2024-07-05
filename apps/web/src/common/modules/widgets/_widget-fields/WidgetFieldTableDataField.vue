@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput, PSelectButton, PTooltip, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep } from 'lodash';
 
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
+import { getInitialSelectedMenuItem } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
@@ -27,6 +27,7 @@ const { labelsMenuItem } = useGranularityMenuItem(props, 'tableDataField');
 const MIN_LABELS_INFO_COUNT = 1;
 const DEFAULT_INDEX = 1;
 const state = reactive({
+    isInitiated: false,
     proxyValue: useProxyValue('value', props, emit),
     fieldTypeMenuItems: computed<MenuItem[]>(() => [
         {
@@ -118,11 +119,10 @@ const handleUpdateCount = (val: number) => {
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
-const isIncludedInDataInfoMenuItems = (data: string):boolean => state.dataInfoMenuItems.some((m) => m?.name === data);
-const convertToMenuItem = (data: string[]) => data.map((d) => ({
+const convertToMenuItem = (data?: string[]) => data?.map((d) => ({
     name: d,
     label: d,
-}));
+})) ?? [];
 
 watch(() => labelsMenuItem.value, (value) => {
     if (!(value.find((d) => d.name === state.selectedItem)) && (state.selectedFieldType === 'dynamicField')) {
@@ -154,55 +154,47 @@ watch(() => state.selectedFieldType, (selectedFieldType) => {
     }
 }, { immediate: true });
 
-watch(() => state.menuItems, (menuItems) => {
-    if (!Array.isArray(menuItems)) return;
-    const isIncludedInMenuItems = (data: string[]|string):boolean => {
-        if (Array.isArray(data)) {
-            return data.every((d) => menuItems.some((m) => m.name === d));
-        }
-        return menuItems.some((m) => m.name === data);
+const initValue = () => {
+    state.selectedFieldType = props.value?.fieldType ?? DEFAULT_FIELD_TYPE;
+    state.proxyValue = {
+        ...state.proxyValue,
+        fieldType: state.selectedFieldType,
+        value: props.value?.value,
+        criteria: state.proxyValue?.criteria,
+        count: props.value?.count ?? DEFAULT_COUNT,
     };
     if (state.selectedFieldType === 'staticField') {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : [state.menuItems[0]?.name],
-        };
         state.selectedItem = convertToMenuItem(state.proxyValue?.value);
     } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: isIncludedInMenuItems(state.proxyValue?.value) ? state.proxyValue?.value : state.menuItems[0]?.name,
-            criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
-        };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[0]?.name;
-        state.selectedCriteria = state.proxyValue?.criteria ?? state.dataInfoMenuItems[0]?.name;
+        state.selectedItem = state.proxyValue?.value;
+        state.selectedCriteria = state.proxyValue?.criteria;
     }
-}, { immediate: true });
-/* Init */
-onMounted(() => {
-    state.selectedFieldType = props.value?.fieldType ?? DEFAULT_FIELD_TYPE;
+};
+watch(() => state.menuItems, (menuItems) => {
+    if (!state.isInitiated) {
+        initValue();
+        state.isInitiated = true;
+    }
+
+    if (!menuItems?.length) return;
+
+    let _value: string | string[] | undefined;
+    let _criteria: string | undefined;
     if (state.selectedFieldType === 'staticField') {
-        state.proxyValue = {
-            ...state.proxyValue,
-            fieldType: state.selectedFieldType,
-            value: props.value?.value ?? cloneDeep(state.menuItems ?? []).map((d) => d.name),
-        };
-        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value ?? [], 0);
+        state.selectedItem = convertToMenuItem(_value);
     } else {
-        state.proxyValue = {
-            ...state.proxyValue,
-            fieldType: state.selectedFieldType,
-            value: props.value?.value ?? state.menuItems?.[1]?.name,
-            criteria: isIncludedInDataInfoMenuItems(state.proxyValue?.criteria) ? state.proxyValue?.criteria : state.dataInfoMenuItems[0]?.name,
-        };
-        state.selectedItem = state.proxyValue?.value ?? state.menuItems[1]?.name;
-        state.selectedCriteria = state.proxyValue?.criteria ?? state.dataInfoMenuItems[0]?.name;
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, 0);
+        _criteria = getInitialSelectedMenuItem(state.dataInfoMenuItems, state.proxyValue, 0);
+        state.selectedItem = _value;
+        state.selectedCriteria = _criteria;
     }
     state.proxyValue = {
         ...state.proxyValue,
-        count: props.value?.count ?? DEFAULT_COUNT,
+        value: _value,
+        criteria: _criteria,
     };
-});
+}, { immediate: true });
 </script>
 
 <template>
