@@ -49,12 +49,12 @@ export interface YAxisValue {
 }
 export interface TableDataFieldValue {
     fieldType: 'dynamicField' | 'staticField';
-    value: string | string[];
+    value?: string | string[];
     criteria?: string;
     count: number;
 }
 export interface GroupByValue {
-    value: string | string[];
+    value?: string | string[];
     count?: number;
 }
 
