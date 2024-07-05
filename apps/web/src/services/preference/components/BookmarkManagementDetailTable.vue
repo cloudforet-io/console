@@ -20,6 +20,8 @@ import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/const
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
+import { gray } from '@/styles/colors';
+
 import { makeSearchQueryTagsHandler, makeValueHandler } from '@/services/preference/composables/bookmark-data-helper';
 import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
@@ -46,6 +48,7 @@ const storeState = reactive({
 const state = reactive({
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
+    bookmarkList: computed<BookmarkItem[]>(() => (state.folder ? storeState.bookmarkList : storeState.bookmarkList.filter((i) => !i.folder))),
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -180,7 +183,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
                              :total-count="storeState.bookmarkTotalCount"
-                             :items="storeState.bookmarkList"
+                             :items="state.bookmarkList"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              @change="handleChange"
@@ -212,6 +215,8 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                                     :src="item.imgIcon"
                                     width="1.5rem"
                                     height="1.5rem"
+                                    error-icon="ic_link"
+                                    :error-icon-color="gray[500]"
                         />
                         <p-i v-else
                              name="ic_folder"

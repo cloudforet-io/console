@@ -29,6 +29,8 @@ import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/const
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 
+import { gray } from '@/styles/colors';
+
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import type { MoreMenuItem, BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
@@ -268,10 +270,21 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                             <p-i name="ic_folder-filled"
                                  width="0.875rem"
                                  height="0.875rem"
+                                 class="folder"
+                            />
+                            <p-i v-if="storeState.selectedBookmark?.isGlobal"
+                                 name="ic_globe-filled"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                                 class="global"
+                                 :color="gray[600]"
                             />
                         </div>
                     </template>
-                    <template v-if="storeState.isFileFullMode && !state.isMobileSize && !(state.selectedToolId === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)"
+                    <template v-if="storeState.isFileFullMode
+                                  && !state.isMobileSize
+                                  && !(state.selectedToolId === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)
+                                  && !storeState.selectedBookmark?.isGlobal"
                               #right
                     >
                         <div class="title-right-wrapper">
@@ -298,7 +311,8 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                     >
                         <span>{{ $t('HOME.FORM_FOLDER') }}</span>
                     </p-button>
-                    <p-button icon-left="ic_plus"
+                    <p-button v-if="!storeState.selectedBookmark?.isGlobal"
+                              icon-left="ic_plus"
                               size="sm"
                               class="add-link-button"
                               style-type="tertiary"
@@ -351,11 +365,21 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                                  width="0.875rem"
                                  height="0.875rem"
                             />
-                            <p-i v-else
-                                 name="ic_folder"
-                                 width="0.875rem"
-                                 height="0.875rem"
-                            />
+                            <span v-else
+                                  class="folder-item-icon-wrapper"
+                            >
+                                <p-i name="ic_folder"
+                                     width="0.875rem"
+                                     height="0.875rem"
+                                />
+                                <p-i v-if="item.isGlobal"
+                                     name="ic_globe-filled"
+                                     width="0.625rem"
+                                     height="0.625rem"
+                                     class="global"
+                                     :color="gray[600]"
+                                />
+                            </span>
                             <span>{{ item.name }}</span>
                         </p-button>
                     </div>
@@ -478,6 +502,15 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                     &:hover {
                         @apply bg-gray-200;
                     }
+
+                    .folder-item-icon-wrapper {
+                        @apply relative;
+                        .global {
+                            @apply absolute bg-gray-150 rounded-full;
+                            right: -0.25rem;
+                            bottom: -0.125rem;
+                        }
+                    }
                 }
                 .show-more-wrapper {
                     .more-context-menu {
@@ -501,6 +534,11 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                 @apply relative flex items-center justify-center bg-blue-200 rounded;
                 width: 1.5rem;
                 height: 1.5rem;
+                .global {
+                    @apply absolute bg-gray-150 rounded-full;
+                    right: -0.125rem;
+                    bottom: -0.125rem;
+                }
             }
             .title-right-wrapper {
                 @apply flex text-gray-900;

@@ -44,7 +44,7 @@ const router = useRouter();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
+    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList.filter((i) => !i.folder)),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
@@ -164,6 +164,7 @@ const fetchBookmarkList = async () => {
 
 (async () => {
     bookmarkPageStore.setParams(undefined);
+    await bookmarkPageStore.setSelectedBookmarkIndices([]);
     await fetchBookmarkList();
 })();
 </script>
@@ -199,6 +200,8 @@ const fetchBookmarkList = async () => {
                         <p-lazy-img v-if="item.link"
                                     class="left-icon"
                                     :src="item.imgIcon"
+                                    error-icon="ic_link"
+                                    :error-icon-color="gray[500]"
                                     width="1.5rem"
                                     height="1.5rem"
                         />
