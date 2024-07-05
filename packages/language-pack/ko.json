@@ -1451,6 +1451,10 @@
 				"TOGGLE_MORE": "더보기"
 			},
 			"FIELD": "필드",
+			"FORM": {
+				"WIDGET_VALIDATION_WARNING_DESC": "",
+				"WIDGET_VALIDATION_WARNING_TITLE": ""
+			},
 			"FORMAT_RULES": {
 				"BASE": "기본",
 				"GAUGE_DESC": "게이지 색상은 임계값에 따라 변경됩니다.",

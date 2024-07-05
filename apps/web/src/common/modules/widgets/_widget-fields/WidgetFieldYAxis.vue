@@ -16,7 +16,7 @@ import type {
 import type { YAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const props = defineProps<WidgetFieldComponentProps<YAxisOptions>>();
+const props = defineProps<WidgetFieldComponentProps<YAxisOptions, YAxisValue>>();
 const emit = defineEmits<WidgetFieldComponentEmit<YAxisValue>>();
 const { labelsMenuItem } = useGranularityMenuItem(props, 'groupBy');
 const state = reactive({

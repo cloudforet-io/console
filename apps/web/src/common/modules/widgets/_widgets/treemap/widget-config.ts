@@ -19,7 +19,6 @@ const treemap: WidgetConfig = {
                 defaultMaxCount: 20,
                 max: 30,
                 defaultIndex: 0,
-                excludeDateField: true,
             },
         },
     },

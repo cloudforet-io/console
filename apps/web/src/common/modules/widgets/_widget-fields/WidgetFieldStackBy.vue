@@ -17,7 +17,7 @@ import type {
 import type { StackByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const props = defineProps<WidgetFieldComponentProps<StackByOptions>>();
+const props = defineProps<WidgetFieldComponentProps<StackByOptions, StackByValue>>();
 const emit = defineEmits<WidgetFieldComponentEmit<StackByValue>>();
 const { labelsMenuItem } = useGranularityMenuItem(props, 'xAxis');
 const state = reactive({

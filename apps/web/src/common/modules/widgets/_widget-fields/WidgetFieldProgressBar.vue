@@ -22,7 +22,7 @@ import { indigo } from '@/styles/colors';
 
 const emit = defineEmits<WidgetFieldComponentEmit<ProgressBarValue|undefined>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<ProgressBarOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<ProgressBarOptions, ProgressBarValue>>(), {
     widgetFieldSchema: () => ({}),
 });
 

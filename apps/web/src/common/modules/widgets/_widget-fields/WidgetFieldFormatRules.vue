@@ -21,7 +21,7 @@ import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-fie
 import { violet } from '@/styles/colors';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions, FormatRulesValue[]>>(), {
     widgetFieldSchema: () => ({}),
 });
 

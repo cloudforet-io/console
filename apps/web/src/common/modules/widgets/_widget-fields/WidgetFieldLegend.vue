@@ -9,7 +9,7 @@ import type { LegendOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit
 
 const emit = defineEmits<WidgetFieldComponentEmit<boolean|undefined>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<LegendOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<LegendOptions, boolean>>(), {
     widgetFieldSchema: () => ({
         options: {
             default: false,
