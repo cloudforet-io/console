@@ -1453,6 +1453,7 @@
 			"FIELD": "Field",
 			"FORM": {
 				"WIDGET_VALIDATION_WARNING_DESC": "To illustrate chart properly, check the form below and set the correct values.",
+				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "The ‘Region’ field is missing from the Data Table.",
 				"WIDGET_VALIDATION_WARNING_TITLE": "Empty or incorrect values"
 			},
 			"FORMAT_RULES": {

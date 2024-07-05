@@ -46,6 +46,7 @@ export interface GroupByOptions {
     defaultMaxCount: number;
     defaultIndex?: number;
     excludeDateField?: boolean;
+    fixedValue?: string;
 }
 export interface CategoryByOptions {
     dataTarget?: string;

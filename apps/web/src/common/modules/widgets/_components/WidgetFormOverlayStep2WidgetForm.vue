@@ -2,6 +2,7 @@
 import {
     computed, onMounted, reactive,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea, PButtonModal,
@@ -30,6 +31,7 @@ const FORM_TITLE_MAP = {
 
 interface Props {
     widgetValidationInvalid?: boolean;
+    widgetValidationInvalidText?: string|TranslateResult;
 }
 
 const props = defineProps<Props>();
@@ -268,7 +270,7 @@ onMounted(() => {
                     <span>{{ $t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_TITLE') }}</span>
                 </div>
                 <p class="warning-description">
-                    {{ $t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_DESC') }}
+                    {{ props.widgetValidationInvalidText }}
                 </p>
             </div>
             <div class="title-wrapper"
