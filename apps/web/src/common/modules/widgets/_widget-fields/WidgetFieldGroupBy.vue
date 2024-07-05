@@ -121,8 +121,8 @@ watch(() => labelsMenuItem.value, (value) => {
 const initValue = () => {
     state.proxyValue = {
         ...state.proxyValue,
-        value: props.value?.value,
-        count: props.value?.count,
+        value: state.proxyValue?.value,
+        count: state.proxyValue?.count,
     };
     if (state.multiselectable) {
         state.selectedItem = convertToMenuItem(state.proxyValue?.value);
