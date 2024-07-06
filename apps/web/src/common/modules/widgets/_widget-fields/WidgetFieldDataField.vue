@@ -98,7 +98,8 @@ onMounted(() => {
             <p-select-dropdown :menu="state.menuItems"
                                :selected="state.selectedItem"
                                :multi-selectable="state.multiselectable"
-                               show-select-marker
+                               :show-select-marker="state.multiselectable"
+                               :invalid="!state.isValid"
                                appearance-type="badge"
                                @update:selected="handleUpdateSelect"
             />
