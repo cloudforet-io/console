@@ -19,6 +19,7 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { DEFAULT_SORT } from '@/common/modules/widgets/_constants/data-table-constant';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -63,7 +64,7 @@ const state = reactive({
         { type: 'DIVIDER', name: '' },
         ...state.dataFields.map((key) => ({ type: 'DATA', name: key })),
     ]),
-    sortBy: [] as { key: string; desc: boolean }[],
+    sortBy: DEFAULT_SORT as { key: string; desc: boolean }[],
     granularityItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -167,14 +168,14 @@ const getSortIcon = (field: PreviewTableField) => {
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
     if (dataTableId) {
         state.thisPage = 1;
-        state.sortBy = [];
+        state.sortBy = DEFAULT_SORT;
     }
 });
 
 watch(() => storeState.dataTableUpdating, () => {
     if (storeState.dataTableUpdating) {
         state.thisPage = 1;
-        state.sortBy = [];
+        state.sortBy = DEFAULT_SORT;
     }
 });
 
