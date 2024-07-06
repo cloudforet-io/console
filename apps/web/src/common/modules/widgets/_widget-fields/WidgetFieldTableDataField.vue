@@ -59,6 +59,13 @@ const state = reactive({
         }
         return !!state.selectedItem;
     }),
+    dataFieldInvalid: computed(() => {
+        if (state.menuItems.length === 0) return true;
+        if (Array.isArray(state.selectedItem)) {
+            return !state.selectedItem.length;
+        }
+        return !state.selectedItem;
+    }),
     max: computed(() => props.widgetFieldSchema?.options?.max),
     isMaxValid: computed<boolean>(() => (state.max ? (state.proxyValue?.count <= state.max) && !!state.proxyValue?.count : true)),
     tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
@@ -221,7 +228,6 @@ watch(() => state.menuItems, (menuItems) => {
             >
                 <p-select-dropdown :menu="state.dataInfoMenuItems"
                                    :selected="state.selectedCriteria"
-                                   show-select-marker
                                    appearance-type="badge"
                                    @update:selected="handleUpdateCriteria"
                 />
@@ -235,7 +241,8 @@ watch(() => state.menuItems, (menuItems) => {
                     <p-select-dropdown :menu="state.menuItems"
                                        :selected="state.selectedItem"
                                        :multi-selectable="state.multiSelectable"
-                                       show-select-marker
+                                       :show-select-marker="state.multiSelectable"
+                                       :invalid="state.dataFieldInvalid"
                                        appearance-type="badge"
                                        @update:selected="handleUpdateValue"
                     />
