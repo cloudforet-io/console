@@ -450,6 +450,13 @@ const checkSelectedId = (id?: string) => {
                         .show-more {
                             @apply bg-transparent;
                         }
+
+                        .folder-item-icon-wrapper {
+                            .global {
+                                right: -0.375rem;
+                                bottom: -0.25rem;
+                            }
+                        }
                     }
                     &:hover {
                         &:not(.is-global) {
