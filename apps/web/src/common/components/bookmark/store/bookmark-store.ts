@@ -94,7 +94,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             workspaceId,
         }: { workspaceId?: string }) => {
             try {
-                await Promise.all(DefaultBookmarkData.map(async (item) => {
+                DefaultBookmarkData.map(async (item) => {
                     await actions.createBookmarkLink({
                         name: item.name as string || '',
                         link: item.link || '',
@@ -103,7 +103,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         isDefault: true,
                         workspaceId,
                     });
-                }));
+                });
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
