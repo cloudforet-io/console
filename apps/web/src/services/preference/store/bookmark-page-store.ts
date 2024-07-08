@@ -49,14 +49,14 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     });
 
     const getters = reactive({
-        bookmarkList: computed<BookmarkItem[]>(() => {
+        entireBookmarkList: computed<BookmarkItem[]>(() => {
             const globalBookmark = state.bookmarkList.filter((i) => i.isGlobal);
             const sortedGlobalBookmark = sortBy(globalBookmark, (i) => !i.link).reverse();
             const workspaceBookmark = state.bookmarkList.filter((i) => !i.isGlobal);
             const sortedWorkspaceBookmark = sortBy(workspaceBookmark, (i) => !i.link).reverse();
-            const combinedBookmarkList = [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
-            return combinedBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit);
+            return [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
         }),
+        bookmarkList: computed<BookmarkItem[]>(() => getters.entireBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit)),
         selectedIndices: computed<number[]>(() => {
             const selectedItems = at(getters.bookmarkList, state.selectedIndices);
             const activeItems = filter(selectedItems, (i) => i.isGlobal);

@@ -12,6 +12,8 @@ import type {
     ValueItem,
 } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
@@ -38,17 +40,24 @@ const router = useRouter();
 const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
+    entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
     bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
     loading: computed<boolean>(() => bookmarkPageState.loading),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
+    searchFilter: computed<ConsoleFilter[]>(() => bookmarkPageState.searchFilter),
 });
 const state = reactive({
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
-    bookmarkList: computed<BookmarkItem[]>(() => (state.folder ? storeState.bookmarkList : storeState.bookmarkList.filter((i) => !i.folder))),
+    bookmarkList: computed<BookmarkItem[]>(() => {
+        if (state.folder) {
+            return storeState.bookmarkList;
+        }
+        return storeState.searchFilter.length === 0 ? storeState.bookmarkList.filter((i) => !i.folder) : storeState.bookmarkList;
+    }),
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -78,8 +87,8 @@ const tableState = reactive({
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeValueHandler(storeState.bookmarkList, 'name'),
-        link: makeValueHandler(storeState.bookmarkList, 'link'),
+        name: makeValueHandler(storeState.entireBookmarkList, 'name'),
+        link: makeValueHandler(storeState.entireBookmarkList, 'link'),
     })),
     typeField: computed<ValueItem[]>(() => ([
         { label: i18n.t('IAM.BOOKMARK.ALL') as string, name: 'All' },

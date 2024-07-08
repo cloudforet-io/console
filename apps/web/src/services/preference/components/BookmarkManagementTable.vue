@@ -9,6 +9,7 @@ import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/t
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
@@ -44,15 +45,18 @@ const router = useRouter();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList.filter((i) => !i.folder)),
+    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
+    entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
     bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
     loading: computed<boolean>(() => bookmarkPageState.loading),
+    searchFilter: computed<ConsoleFilter[]>(() => bookmarkPageState.searchFilter),
 });
 const tableState = reactive({
+    items: computed(() => (storeState.searchFilter.length === 0 ? storeState.bookmarkList.filter((i) => !i.folder) : storeState.bookmarkList)),
     fields: computed(() => [
         {
             name: 'name',
@@ -88,9 +92,9 @@ const tableState = reactive({
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
         type: makeEnumValueHandler(BOOKMARK_TYPE),
-        name: makeValueHandler(storeState.bookmarkList, 'name'),
-        scope: makeValueHandler(storeState.bookmarkList, 'scope'),
-        link: makeValueHandler(storeState.bookmarkList, 'link'),
+        name: makeValueHandler(storeState.entireBookmarkList, 'name'),
+        scope: makeValueHandler(storeState.entireBookmarkList, 'scope'),
+        link: makeValueHandler(storeState.entireBookmarkList, 'link'),
     })),
 });
 const dropdownState = reactive({
@@ -185,7 +189,7 @@ const fetchBookmarkList = async () => {
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
                              :total-count="storeState.bookmarkTotalCount"
-                             :items="storeState.bookmarkList"
+                             :items="tableState.items"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              :get-row-selectable="getRowSelectable"
