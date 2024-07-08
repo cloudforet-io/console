@@ -11,6 +11,7 @@ import { cloneDeep } from 'lodash';
 import type {
     DashboardOptions, DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
+import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
@@ -48,8 +49,8 @@ const state = reactive({
     selectedWidgetType: widgetGenerateState.widget?.widget_type as WidgetType,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
-        { label: 'Full', name: 'FULL' },
-        { label: 'Actual', name: 'ACTUAL' },
+        { label: i18n.t('COMMON.WIDGETS.FULL'), name: 'FULL' },
+        { label: i18n.t('COMMON.WIDGETS.ACTUAL'), name: 'ACTUAL' },
     ],
     selectedWidgetSize: 'ACTUAL',
     widgetSize: computed(() => {

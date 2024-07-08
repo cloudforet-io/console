@@ -1312,6 +1312,7 @@
 			"TITLE": "프로젝트 변경"
 		},
 		"WIDGETS": {
+			"ACTUAL": "실제 크기",
 			"ADD_WIDGET": "위젯 추가",
 			"ADD_WIDGET_TO_DASHBOARD": "대시보드에 위젯 추가",
 			"ALL_SUMMARY": {
@@ -1398,8 +1399,8 @@
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
 			"DAILY_UPDATE_NO_DATA": "일간 변동 사항이 없습니다.",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
-			"DATA_NOT_DISPLAYED": "",
-			"DATA_NOT_DISPLAYED_DESC": "",
+			"DATA_NOT_DISPLAYED": "데이터 표시 불가",
+			"DATA_NOT_DISPLAYED_DESC": "모든 필수 필드를 설정하고, [적용하기] 버튼을 클릭하여 위젯 설정을 완료해주세요.",
 			"DATA_TABLE": {
 				"ADD": "데이터 추가",
 				"ALERT": {
@@ -1456,13 +1457,14 @@
 			"FORM": {
 				"WIDGET_VALIDATION_WARNING_DESC": "차트가 정상적으로 표시 되려면 필수 필드에 값이 올바르게 선택되었는지 확인해주세요.",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "데이터 테이블에서 'Region' 필드를 추가해주세요. ",
-				"WIDGET_VALIDATION_WARNING_TITLE": "비어있거나, 잘못된 값이 선택된 필드 존재 "
+				"WIDGET_VALIDATION_WARNING_TITLE": "잘못 선택된 필드 존재"
 			},
 			"FORMAT_RULES": {
 				"BASE": "기본",
 				"GAUGE_DESC": "게이지 색상은 임계값에 따라 변경됩니다.",
 				"PROGRESS_CARD_DESC": "바 색상은 임계값에 따라 변경됩니다."
 			},
+			"FULL": "확대 보기",
 			"FULL_WIDTH": "전체 너비",
 			"HEALTH_DASHBOARD_DESC_1": "AWS의 비즈니스 또는 엔터프라이즈 플랜을 사용하는 경우 AWS Health Dashboard를 사용할 수 있습니다. ",
 			"HEALTH_DASHBOARD_DESC_2": "적합한 플랜을 이용중이지만 위젯을 사용할 수 없다면 아래의 이메일로 문의를 주세요. ",

@@ -1312,6 +1312,7 @@
 			"TITLE": "Change Project"
 		},
 		"WIDGETS": {
+			"ACTUAL": "Actual",
 			"ADD_WIDGET": "Add Widget",
 			"ADD_WIDGET_TO_DASHBOARD": "Add Widget to Dashboard",
 			"ALL_SUMMARY": {
@@ -1463,6 +1464,7 @@
 				"GAUGE_DESC": "Gauge color changes based on threshold values.",
 				"PROGRESS_CARD_DESC": "Bar color changes based on threshold values."
 			},
+			"FULL": "Full ",
 			"FULL_WIDTH": "Full Width",
 			"HEALTH_DASHBOARD_DESC_1": "You can use the AWS Health Dashboard. If you have a Business or Enterprise support plan of AWS.",
 			"HEALTH_DASHBOARD_DESC_2": "Can't see the widget? even you are using a suitable plan. Please contact us.",
