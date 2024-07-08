@@ -1605,6 +1605,7 @@
 			"LABEL_VIWERS": "Viewers",
 			"PRIVATE": "Private",
 			"PROJECT": "Project",
+			"SHARED": "Shared",
 			"SINGLE_PROJECT": "Single Project",
 			"TOOLTIP_CLONE": "Clone",
 			"TOOLTIP_DELETE": "Delete",

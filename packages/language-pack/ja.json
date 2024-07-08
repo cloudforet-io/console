@@ -1605,6 +1605,7 @@
 			"LABEL_VIWERS": "公開可否",
 			"PRIVATE": "非公開",
 			"PROJECT": "プロジェクト",
+			"SHARED": "共有",
 			"SINGLE_PROJECT": "個別プロジェクト",
 			"TOOLTIP_CLONE": "複製",
 			"TOOLTIP_DELETE": "削除",

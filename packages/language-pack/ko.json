@@ -1605,6 +1605,7 @@
 			"LABEL_VIWERS": "공개 여부",
 			"PRIVATE": "비공개",
 			"PROJECT": "프로젝트",
+			"SHARED": "공유",
 			"SINGLE_PROJECT": "개별 프로젝트",
 			"TOOLTIP_CLONE": "복제",
 			"TOOLTIP_DELETE": "삭제",
