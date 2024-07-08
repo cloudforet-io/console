@@ -14,7 +14,7 @@ import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { ComparisonOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
-import type { ComparisonFormat, ComparisonValue, TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { ComparisonFormat, ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const emit = defineEmits<WidgetFieldComponentEmit<ComparisonValue[]|undefined>>();
@@ -93,7 +93,8 @@ const checkValue = ():boolean => {
     return true;
 };
 
-watch([() => state.proxyValue, () => state.toggleValue], () => {
+watch(() => state.proxyValue, (changed) => {
+    if (changed === undefined) state.toggleValue = false;
     emit('update:is-valid', checkValue());
 }, { immediate: true });
 
@@ -106,15 +107,6 @@ const initValue = () => {
         state.proxyValue = undefined;
     }
 };
-
-watch(() => props.allValueMap, (after, before) => {
-    const afterTableField = after.tableDataField as TableDataFieldValue;
-    const beforeTableField = before.tableDataField as TableDataFieldValue;
-    if (afterTableField && afterTableField.fieldType !== beforeTableField?.fieldType) {
-        state.toggleValue = false;
-        state.proxyValue = undefined;
-    }
-});
 
 onMounted(() => {
     if (!state.toggleValue) state.proxyValue = undefined;
