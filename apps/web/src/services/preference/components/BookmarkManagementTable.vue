@@ -6,6 +6,7 @@ import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -93,20 +94,6 @@ const tableState = reactive({
         link: makeValueHandler(storeState.entireBookmarkList, 'link'),
     })),
 });
-const dropdownState = reactive({
-    menuItems: computed<MenuItem[]>(() => ([
-        {
-            icon: 'ic_edit',
-            name: 'edit',
-            label: i18n.t('IAM.BOOKMARK.EDIT'),
-        },
-        {
-            icon: 'ic_delete',
-            name: 'delete',
-            label: i18n.t('IAM.BOOKMARK.DELETE'),
-        },
-    ])),
-});
 
 const getFolderInfo = (id: string): BookmarkItem|undefined => {
     if (!id) return undefined;
@@ -135,6 +122,10 @@ const handleSelectDropdownMenu = (item: BookmarkItem, menu: string) => {
         bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.DELETE_LINK : BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
         return;
     }
+    if (menu === 'add') {
+        bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK);
+        return;
+    }
 
     bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, false);
 };
@@ -156,6 +147,32 @@ const handleClickName = (item: BookmarkItem) => {
             folder: item.name as string || '',
         },
     });
+};
+const getDropdownMenu = (item: BookmarkItem) => {
+    const defaultSets: MenuItem[] = [
+        {
+            icon: 'ic_edit',
+            name: 'edit',
+            label: i18n.t('HOME.BOOKMARK_EDIT'),
+        },
+        {
+            icon: 'ic_delete',
+            name: 'delete',
+            label: i18n.t('HOME.BOOKMARK_DELETE'),
+        },
+    ];
+    if (!item.link) {
+        return [
+            {
+                icon: 'ic_plus',
+                name: 'add',
+                label: i18n.t('HOME.BOOKMARK_ADD_LINK'),
+            },
+            { type: CONTEXT_MENU_TYPE.divider },
+            ...defaultSets,
+        ];
+    }
+    return defaultSets;
 };
 
 const fetchBookmarkList = async () => {
@@ -261,7 +278,7 @@ const fetchBookmarkList = async () => {
                 </template>
                 <template #col-action_button-format="{item}">
                     <p-select-dropdown v-if="item.isGlobal"
-                                       :menu="dropdownState.menuItems"
+                                       :menu="getDropdownMenu(item)"
                                        style-type="icon-button"
                                        button-icon="ic_ellipsis-horizontal"
                                        use-fixed-menu-style
