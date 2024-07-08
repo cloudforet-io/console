@@ -122,9 +122,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setJoinRestrictedMap = (value: JoinRestrictedMap) => {
         state.joinRestrictedMap = value;
     };
-    const setDataTables = (value: Partial<DataTableModel>[]) => {
-        state.dataTables = value;
-    };
 
     const mutations = {
         setWidgetId,
@@ -142,7 +139,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setSelectedPreviewGranularity,
         setDataTableUpdating,
         setJoinRestrictedMap,
-        setDataTables,
     };
     const actions = {
         listDataTable: async () => {

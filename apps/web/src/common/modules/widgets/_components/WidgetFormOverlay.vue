@@ -66,9 +66,6 @@ const deleteWidget = async (widgetId: string) => {
         await fetcher({
             widget_id: widgetId,
         });
-        widgetGenerateStore.setDataTables([]);
-        widgetGenerateStore.setSelectedDataTableId();
-        widgetGenerateStore.setWidgetId('');
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -103,8 +100,8 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
             await deleteWidget(widgetGenerateState.widgetId);
         } else {
             widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
-            widgetGenerateStore.reset();
         }
+        widgetGenerateStore.reset();
     } else if (widgetGenerateState.overlayType !== 'ADD') {
         await widgetGenerateStore.listDataTable();
     }
