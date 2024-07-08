@@ -19,8 +19,9 @@ import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-t
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import { i18n } from '@/translations';
 
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -189,6 +190,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 const result = await fetcher(parameters);
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== unsavedId);
                 state.dataTables.push(result);
+                showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
                 return result;
             } catch (e: any) {
                 showErrorMessage(e.message, e);
@@ -249,6 +251,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     }
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
+                showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
                 return result;
             } catch (e: any) {
                 showErrorMessage(e.message, e);
