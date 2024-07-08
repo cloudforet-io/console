@@ -1,0 +1,29 @@
+{
+  "name": "sb-v7-vite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@storybook/addon-essentials": "^7.6.10",
+    "@storybook/addon-interactions": "^7.6.10",
+    "@storybook/addon-links": "^7.6.10",
+    "@storybook/blocks": "^7.6.10",
+    "@storybook/test": "^7.6.10",
+    "@storybook/vue": "^7.6.10",
+    "@storybook/vue-vite": "^7.6.10",
+    "@vitejs/plugin-vue2": "^2.3.1",
+    "storybook": "^7.6.10"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
