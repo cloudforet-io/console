@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton, PPopover, PSelectCard, PI,
@@ -108,29 +109,29 @@ const state = reactive({
         }
         return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
     }),
-    operatorInfoList: computed<{ key: DataTableOperator, name: string; description: string; icon: string;}[]>(() => [
+    operatorInfoList: computed<{ key: DataTableOperator, name: string; description: string|TranslateResult; icon: string;}[]>(() => [
         {
             key: DATA_TABLE_OPERATOR.CONCAT,
             name: 'Concatenate',
-            description: 'Combines multiple tables into one by stacking them.',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.CONCAT_DESC'),
             icon: 'ic_db-concat',
         },
         {
             key: DATA_TABLE_OPERATOR.JOIN,
             name: 'Join',
-            description: 'Merge rows from different tables based on a common column.',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.JOIN_DESC'),
             icon: 'ic_join',
         },
         {
             key: DATA_TABLE_OPERATOR.EVAL,
             name: 'Evaluate',
-            description: 'Apply functions or calculations to data fields.',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL_DESC'),
             icon: 'ic_db-evaluation',
         },
         {
             key: DATA_TABLE_OPERATOR.QUERY,
             name: 'Query',
-            description: 'Filter and extract data that meet specific conditions.',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.QUERY_DESC'),
             icon: 'ic_db-where',
         },
 
