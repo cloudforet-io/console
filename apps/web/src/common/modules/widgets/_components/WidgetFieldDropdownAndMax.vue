@@ -148,7 +148,7 @@ watch(() => props.menuItems, (menuItems) => {
         }
     }
     .max-items {
-        width: 7.5rem;
+        width: 10rem;
 
         .tooltip {
             position: relative;
