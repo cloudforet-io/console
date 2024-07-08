@@ -106,7 +106,7 @@ watch(() => route.params, async (params) => {
 
     // set query options from url query
     const currentQuery = router.currentRoute.query;
-    setQueryOptions(currentQuery);
+    if (!isEmpty(currentQuery)) setQueryOptions(currentQuery);
 
     metricExplorerPageStore.setMetricInitiated(true);
     gnbStore.setBreadcrumbs(state.breadCrumbs);
