@@ -25,9 +25,9 @@ const bookmarkPageGetters = bookmarkPageStore.getters;
 const storeState = reactive({
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
 
-    selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
+    selectedIndices: computed<number[]>(() => bookmarkPageGetters.selectedIndices),
 });
 const state = reactive({
     visibleMenu: false,
