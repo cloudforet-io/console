@@ -1597,6 +1597,7 @@
 		"ALL_DASHBOARDS": {
 			"CREATE": "Create",
 			"CREAT_NEW_DASHBOARD": "Create New Dashboard",
+			"DASHBOARD": "Dashboard",
 			"DASHBOARDS_TITLE": "Dashboard",
 			"DEPRECATED": "Deprecated",
 			"DEPRECATED_DESCRIPTION": "This dashboard is no longer supported and will be removed soon as the new dashboard is adopted.",

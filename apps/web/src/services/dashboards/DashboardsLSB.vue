@@ -179,7 +179,7 @@ const state = reactive({
             { type: MENU_ITEM_TYPE.DIVIDER },
             {
                 type: MENU_ITEM_TYPE.TOP_TITLE,
-                label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'),
+                label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARD'),
             },
         ];
 
