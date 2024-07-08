@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PHeading, PSkeleton, PSelectDropdown, PButtonModal,
+    PHeading, PSkeleton, PSelectDropdown, PButtonModal, PI, PBadge,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -10,6 +10,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { PublicDashboardShareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/share';
 import type { PublicDashboardUnshareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/unshare';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -38,6 +40,7 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 const state = reactive({
     loading: false,
@@ -47,7 +50,24 @@ const state = reactive({
     shareWithCodeModalVisible: false,
     shareToWorkspaceModalVisible: false,
     isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared),
+    badgeStyleType: computed<string>(() => {
+        if (dashboardDetailState.dashboardScope === 'PRIVATE') return 'gray150';
+        return 'indigo100';
+    }),
+    badgeText: computed(() => {
+        if (dashboardDetailState.dashboardScope === 'PRIVATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
+        if (dashboardDetailState.dashboardInfo?.workspace_id === '*') return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+        return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_WORKSPACE_OWNER');
+    }),
     menuItems: computed<MenuItem[]>(() => {
+        if (dashboardDetailGetters.disableManageButtons) {
+            return [{
+                type: 'item',
+                name: 'duplicate',
+                label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
+                icon: 'ic_clone',
+            }];
+        }
         if (dashboardDetailGetters.isDeprecatedDashboard) {
             return [
                 {
@@ -153,9 +173,20 @@ const handleConfirmShareToAllWorkspaces = async () => {
                         width="20rem"
                         height="1.5rem"
             />
-            <template v-if="!dashboardDetailGetters.disableManageButtons"
-                      #title-right-extra
-            >
+            <template #title-right-extra>
+                <p-badge v-if="!storeState.isAdminMode"
+                         badge-type="subtle"
+                         :style-type="state.badgeStyleType"
+                >
+                    <p-i v-if="dashboardDetailState.dashboardScope === 'PRIVATE'"
+                         name="ic_lock-filled"
+                         width="0.75rem"
+                         height="0.75rem"
+                         color="gray900"
+                         class="mr-1"
+                    />
+                    {{ state.badgeText }}
+                </p-badge>
                 <p-select-dropdown style-type="icon-button"
                                    button-icon="ic_ellipsis-horizontal"
                                    :menu="state.menuItems"

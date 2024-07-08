@@ -275,6 +275,7 @@ defineExpose({
     >
         <p-data-loader :loading="dashboardDetailState.loadingDashboard"
                        :data="state.refinedWidgetInfoList"
+                       loader-backdrop-color="gray.100"
         >
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">
