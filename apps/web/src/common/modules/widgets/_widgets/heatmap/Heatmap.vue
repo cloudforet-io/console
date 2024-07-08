@@ -95,6 +95,7 @@ const state = reactive({
         },
         tooltip: {
             position: 'top',
+            confine: true,
             formatter: (params) => {
                 const _name = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.name);
                 const _value = numberFormatter(params.value[2]) || '';

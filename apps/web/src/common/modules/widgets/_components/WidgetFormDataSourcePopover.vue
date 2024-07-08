@@ -266,12 +266,12 @@ onMounted(() => {
             <div v-if="!state.selectedPopperCondition"
                  class="data-source-popper-condition-wrapper"
             >
-                <p-select-card :label="i18n.t('Add Data')"
+                <p-select-card :label="i18n.t('COMMON.WIDGETS.DATA_TABLE.ADD')"
                                icon="ic_service_data-sources"
                                block
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.ADDED)"
                 />
-                <p-select-card :label="i18n.t('Transform Data')"
+                <p-select-card :label="i18n.t('COMMON.WIDGETS.DATA_TABLE.TRANSFORM')"
                                icon="ic_transform-data"
                                block
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.TRANSFORMED)"

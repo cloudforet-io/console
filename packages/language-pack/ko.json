@@ -1401,6 +1401,7 @@
 			"DATA_NOT_DISPLAYED": "",
 			"DATA_NOT_DISPLAYED_DESC": "",
 			"DATA_TABLE": {
+				"ADD": "데이터 추가",
 				"ALERT": {
 					"DELETE_DESC": "이 데이터를 삭제하시겠습니까?",
 					"DELETE_HEADER": "데이터 삭제",
@@ -1433,7 +1434,8 @@
 					"UPDATE_DATA_TALBE_INVALID_SUCCESS": "변경 사항 반영 완료",
 					"UPDATE_DATA_TALBE_INVALID_WARNING": "변경 사항 반영 실패. 입력 폼을 다시 한번 확인해 주세요. ",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "선택한 '{first_data}', '{second_data}' 두 데이터는 한 개 이상의 동일한 데이터 필드가 있어 Join을 수행할 수 없습니다. "
-				}
+				},
+				"TRANSFORM": "데이터 병합/변환"
 			},
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
@@ -1452,9 +1454,9 @@
 			},
 			"FIELD": "필드",
 			"FORM": {
-				"WIDGET_VALIDATION_WARNING_DESC": "",
-				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "",
-				"WIDGET_VALIDATION_WARNING_TITLE": ""
+				"WIDGET_VALIDATION_WARNING_DESC": "차트가 정상적으로 표시 되려면 필수 필드에 값이 올바르게 선택되었는지 확인해주세요.",
+				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "데이터 테이블에서 'Region' 필드를 추가해주세요. ",
+				"WIDGET_VALIDATION_WARNING_TITLE": "비어있거나, 잘못된 값이 선택된 필드 존재 "
 			},
 			"FORMAT_RULES": {
 				"BASE": "기본",
