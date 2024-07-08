@@ -19,7 +19,7 @@ import { gray } from '@/styles/colors';
 
 const emit = defineEmits<WidgetFieldComponentEmit<IconValue>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<IconOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<IconOptions, IconValue>>(), {
     widgetFieldSchema: () => ({
         options: {
             default: 'ic_circle-filled',

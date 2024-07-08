@@ -159,7 +159,7 @@ watch(() => dashboardDetailState.variablesSchema.order, (after, before) => {
                 <div v-if="value"
                      class="button-wrapper"
                 >
-                    <p-icon-button name="ic_duplicate"
+                    <p-icon-button name="ic_clone"
                                    @click="handleCloneVariable(item.percentage)"
                     />
                     <p-icon-button name="ic_edit"

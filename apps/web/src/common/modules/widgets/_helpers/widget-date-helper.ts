@@ -1,13 +1,12 @@
+import type { ManipulateType } from 'dayjs';
 import dayjs from 'dayjs';
 
-import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
-import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
-export const getTimeUnit = (granularity: string): string => {
+export const getTimeUnit = (granularity: string): ManipulateType => {
     if (granularity === 'DAILY') return 'day';
     if (granularity === 'YEARLY') return 'year';
     return 'month';
@@ -31,7 +30,15 @@ export const getDateLabelFormat = (granularity: string): string => {
 export const getWidgetBasedOnDate = (granularity: string, end?: string): string => {
     const _dateFormat = getDateFormat(granularity);
     if (end) {
-        if (granularity === 'DAILY') return dayjs.utc(end).endOf('month').format(_dateFormat);
+        if (granularity === 'DAILY') {
+            const now = dayjs.utc();
+            const endDate = dayjs.utc(end);
+
+            if (now.isSame(endDate, 'month')) {
+                return now.format(_dateFormat);
+            }
+            return endDate.endOf('month').format(_dateFormat);
+        }
         return dayjs.utc(end).format(_dateFormat);
     }
     return dayjs.utc().format(_dateFormat);
@@ -46,7 +53,7 @@ export const getWidgetDateFields = (granularity: string, start: string, end: str
     const _timeUnit = getTimeUnit(granularity);
     const _dateFormat = getDateFormat(granularity);
 
-    const results = [];
+    const results: string[] = [];
     let now = dayjs.utc(start).clone();
     while (now.isSameOrBefore(dayjs.utc(end), _timeUnit)) {
         results.push(now.format(_dateFormat));
@@ -89,8 +96,32 @@ export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, fi
     return val;
 };
 
-export const getAllRequiredFieldsFilled = (widgetName: string, widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>): boolean => {
-    const widgetConfig = getWidgetConfig(widgetName);
-    const requiredFields = Object.keys(widgetConfig?.requiredFieldsSchema || {});
-    return requiredFields.every((d) => widgetOptions?.[d] !== null && widgetOptions?.[d] !== undefined && widgetOptions?.[d] !== '');
+export const getApiQueryDateRange = (granularity: string, dateRange: DateRange): DateRange => {
+    const _timeUnit = getTimeUnit(granularity);
+    const _dateFormat = getDateFormat(granularity);
+    const _start = dayjs.utc(dateRange.start);
+    const _end = dayjs.utc(dateRange.end);
+    if (granularity === 'DAILY') {
+        if (_end.diff(_start, _timeUnit) > 31) {
+            return {
+                start: _end.subtract(31, _timeUnit).format(_dateFormat),
+                end: _end.format(_dateFormat),
+            };
+        }
+    } else if (granularity === 'MONTHLY') {
+        if (_end.diff(_start, _timeUnit) > 12) {
+            return {
+                start: _end.subtract(11, _timeUnit).format(_dateFormat),
+                end: _end.format(_dateFormat),
+            };
+        }
+    } else if (granularity === 'YEARLY') {
+        if (_end.diff(_start, _timeUnit) > 3) {
+            return {
+                start: _end.subtract(2, _timeUnit).format(_dateFormat),
+                end: _end.format(_dateFormat),
+            };
+        }
+    }
+    return dateRange;
 };

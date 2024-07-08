@@ -1005,7 +1005,6 @@
 			"TITLE": "필드 변경하기"
 		},
 		"DELETED": "삭제됨",
-		"DEPRECATED": "",
 		"EDITOR": {
 			"ALIGN_CENTER": "가운데 정렬",
 			"ALIGN_JUSTIFY": "양쪽 정렬",
@@ -1399,6 +1398,8 @@
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
 			"DAILY_UPDATE_NO_DATA": "일간 변동 사항이 없습니다.",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
+			"DATA_NOT_DISPLAYED": "",
+			"DATA_NOT_DISPLAYED_DESC": "",
 			"DATA_TABLE": {
 				"ALERT": {
 					"DELETE_DESC": "이 데이터를 삭제하시겠습니까?",
@@ -1436,6 +1437,7 @@
 			},
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
+			"DONE": "완료",
 			"EDIT": "편집",
 			"EDIT_WIDGET": "위젯 수정",
 			"EXPAND": "확장",
@@ -1449,6 +1451,11 @@
 				"TOGGLE_MORE": "더보기"
 			},
 			"FIELD": "필드",
+			"FORM": {
+				"WIDGET_VALIDATION_WARNING_DESC": "",
+				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "",
+				"WIDGET_VALIDATION_WARNING_TITLE": ""
+			},
 			"FORMAT_RULES": {
 				"BASE": "기본",
 				"GAUGE_DESC": "게이지 색상은 임계값에 따라 변경됩니다.",
@@ -1472,6 +1479,7 @@
 				"MORE_THAN_PREVIOUS_YEAR": "전년 대비 상승"
 			},
 			"NUMBER_FIELD_VALIDATION": "값은 {max} 이하이어야 합니다.",
+			"PERIOD": "기간",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "계정 ID",
 				"AGO": "전",
@@ -1580,7 +1588,7 @@
 			"CREATE": "생성",
 			"CREAT_NEW_DASHBOARD": "대시보드 생성",
 			"DASHBOARDS_TITLE": "대시보드",
-			"DEPRECATED": "사용 중지된",
+			"DEPRECATED": "지원 중지된",
 			"DEPRECATED_DESCRIPTION": "이 대시보드는 더 이상 지원되지 않으며 새로운 대시보드가 적용되면 제거될 예정입니다.",
 			"FILTER_ALL": "전체",
 			"FILTER_PRIVATE": "비공개",
@@ -1772,9 +1780,11 @@
 			"SHARE_TO_ALL_WORKSPACES": "전체 워크스페이스에 공유",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "이 대시보드를 전체 워크스페이스에 공유하시겠습니까?",
 			"SHARE_WITH_CODE": "코드로 공유",
-			"UNSHARE_TO_ALL_WORKSPACES": "전체 워크스페이스 공유 해제"
+			"UNSHARE_FROM_ALL_WORKSPACES": "전체 워크스페이스 공유 해제",
+			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "이 대시보드를 모든 워크스페이스에서 공유 해제하시겠습니까?"
 		},
 		"FORM": {
+			"ALT_E_CLONE_DASHBOARD": "대시보드 복제 실패",
 			"ALT_E_CREATE_DASHBOARD": "대시보드 생성 실패",
 			"ALT_E_DELETE_DASHBOARD": "대시보드 삭제 실패",
 			"ALT_E_EDIT_NAME": "대시보드 이름 수정 실패",
@@ -1815,7 +1825,10 @@
 			"SAVE": "저장"
 		},
 		"LNB": {
-			"ONLY_FAVORITE": "즐겨찾기 항목만 노출"
+			"DEPRECATED": "",
+			"ONLY_FAVORITE": "즐겨찾기 항목만 노출",
+			"PRIVATE": "",
+			"SHARED": ""
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
@@ -1840,7 +1853,7 @@
 			"AWS_TRUSTED_ADVISOR": {
 				"DESC": "AWS Trusted Advisor를 통해 검사, 분석된 현황을 프로젝트별로 확인할 수 있는 위젯. "
 			},
-			"BASED_ON": "기준월",
+			"BASED_ON": "",
 			"BUDGET_STATUS": {
 				"DESC": "조회 기간동안의 상위 200개의 예산 사용률을 보여주는 위젯. "
 			},
@@ -2017,7 +2030,8 @@
 			},
 			"UNIT": "단위",
 			"UPDATE_TITLE": "위젯 편집",
-			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. "
+			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. ",
+			"월": "기준월"
 		}
 	},
 	"HOME": {
@@ -3357,6 +3371,7 @@
 			"TITLE": "멀티 클라우드 자산을 관리 콘솔에 {domain_icon} 모두 모아 보고, \n효율성과 생산성을 {boost_icon}  높이세요.",
 			"WELCOME_TITLE": "클라우드 관리 콘솔에 오신걸 환영합니다! "
 		},
+		"NOT_FOUND_ACCESS_WORKSPACE": "접근 가능한 워크스페이스가 없습니다.",
 		"NOT_FOUND_DESC": "아직 생성된 워크스페이스가 없습니다.",
 		"RECENT": "최근 방문",
 		"ROLE_TYPE_MEMBER": "멤버",

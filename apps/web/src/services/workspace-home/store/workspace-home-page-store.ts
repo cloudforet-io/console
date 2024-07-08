@@ -93,7 +93,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
     });
 
     const _getters = reactive({
-        timezone: computed(() => store.state.user.timezone),
         userId: computed<string>(() => store.state.user.userId),
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
         providerMap: computed<ProviderReferenceDataMap>(() => allReferenceGetters.provider),
@@ -334,8 +333,8 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                         query: {
                             granularity: 'DAILY',
                             group_by: ['labels.Provider'],
-                            start: dayjs.tz(dayjs.utc(), _getters.timezone).format('YYYY-MM-DD'),
-                            end: dayjs.tz(dayjs.utc(), _getters.timezone).format('YYYY-MM-DD'),
+                            start: dayjs.utc().format('YYYY-MM-DD'),
+                            end: dayjs.utc().format('YYYY-MM-DD'),
                             fields: {
                                 count: {
                                     key: 'value',
@@ -371,8 +370,8 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                         query: {
                             granularity: 'DAILY',
                             group_by: ['labels.Provider', 'labels.Cloud Service Group', 'labels.Cloud Service Type'],
-                            start: dayjs.tz(dayjs.utc(), _getters.timezone).format('YYYY-MM-DD'),
-                            end: dayjs.tz(dayjs.utc(), _getters.timezone).format('YYYY-MM-DD'),
+                            start: dayjs.utc().format('YYYY-MM-DD'),
+                            end: dayjs.utc().format('YYYY-MM-DD'),
                             fields: {
                                 count: {
                                     key: 'value',

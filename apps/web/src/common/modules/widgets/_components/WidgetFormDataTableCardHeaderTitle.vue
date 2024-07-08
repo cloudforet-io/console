@@ -57,8 +57,6 @@ const handleSelectDataTable = async (dataTableId: string) => {
         data_table_id: dataTableId,
     });
     widgetGenerateStore.setSelectedPreviewGranularity(GRANULARITY.MONTHLY);
-    widgetGenerateStore.setWidgetFormValueMap({});
-    widgetGenerateStore.setWidgetValidMap({});
 };
 const handleUpdateDataTableName = (value: string) => {
     if (value.length <= 60) {

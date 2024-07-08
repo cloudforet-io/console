@@ -6,7 +6,6 @@ import {
 import { isEqual } from 'lodash';
 
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
-import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import type {
     WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -34,10 +33,7 @@ export const useWidgetInitAndRefresh = <Data = any>({
     const stopLoadingWatch = watch(() => props.loading, async (loading) => {
         if (props.disableRefreshOnLoading) return;
         if (!initiated.value && !loading) {
-            const widgetConfig = getWidgetConfig(props.widgetName);
-            const requiredFields = Object.keys(widgetConfig?.requiredFieldsSchema || {});
-            const allRequiredFieldsFilled = requiredFields.every((d) => !!props.widgetOptions?.[d]);
-            if (allRequiredFieldsFilled) {
+            if (props.widgetState === 'ACTIVE') {
                 await loadWidget();
                 initiated.value = true;
             }

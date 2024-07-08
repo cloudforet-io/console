@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core/index';
 import {
-    reactive, computed, ref,
+    reactive, computed,
 } from 'vue';
 
 import {
-    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, PTooltip, PSkeleton, PButton,
-    useContextMenuController,
+    PI, PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -47,6 +45,7 @@ const state = reactive({
             icon: 'ic_delete',
         }] as MenuItem[]),
     ])),
+    etcMenuVisible: false,
     sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
         type: 'item',
         name: size,
@@ -54,25 +53,7 @@ const state = reactive({
     }))),
 });
 
-const etcButtonRef = ref<HTMLElement|null>(null);
-const etcContextMenuRef = ref<any|null>(null);
-const {
-    visibleMenu: visibleContextMenu,
-    contextMenuStyle,
-    toggleContextMenu,
-    hideContextMenu,
-} = useContextMenuController({
-    useFixedStyle: true,
-    targetRef: etcButtonRef,
-    contextMenuRef: etcContextMenuRef,
-    position: 'right',
-});
-onClickOutside(etcButtonRef, hideContextMenu);
-
 /* Event */
-const handleClickEtcButton = () => {
-    toggleContextMenu();
-};
 const handleSelectEtcMenu = (selected: MenuItem) => {
     if (selected.name === 'expand') {
         emit('click-expand');
@@ -81,7 +62,6 @@ const handleSelectEtcMenu = (selected: MenuItem) => {
     } else if (selected.name === 'delete') {
         emit('click-delete');
     }
-    hideContextMenu();
 };
 const handleToggleWidth = () => {
     let nextSize: WidgetSize = WIDGET_SIZE.full;
@@ -101,7 +81,7 @@ const handleToggleWidth = () => {
             <h3 class="title">
                 {{ props.title }}
             </h3>
-            <p-popover v-if="!props.errorMessage && props.allRequiredFieldsFilled"
+            <p-popover v-if="!props.errorMessage && props.widgetState === 'ACTIVE'"
                        class="metadata-popover"
                        position="bottom-start"
                        :trigger="POPOVER_TRIGGER.CLICK"
@@ -115,8 +95,8 @@ const handleToggleWidth = () => {
                 <template #content>
                     <div class="metadata-content">
                         <div class="metadata-item-row">
-                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.BASED_ON') }}</span>
-                            <span>{{ props.basedOnText }}</span>
+                            <span class="metadata-title">{{ $t('COMMON.WIDGETS.PERIOD') }}</span>
+                            <span>{{ props.periodText }}</span>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>
@@ -153,22 +133,17 @@ const handleToggleWidth = () => {
         </div>
         <div v-if="props.mode !== 'overlay'"
              class="action-button-wrapper"
+             :class="{ 'selected': state.etcMenuVisible }"
         >
-            <p-icon-button ref="etcButtonRef"
-                           name="ic_ellipsis-horizontal"
-                           style-type="tertiary"
-                           shape="square"
-                           size="sm"
-                           @click="handleClickEtcButton"
-            />
-            <p-context-menu v-show="visibleContextMenu"
-                            ref="etcContextMenuRef"
-                            class="etc-context-menu"
-                            :menu="state.etcMenuItems"
-                            :selected="[]"
-                            :style="contextMenuStyle"
-                            use-fixed-menu-style
-                            @select="handleSelectEtcMenu"
+            <p-select-dropdown style-type="icon-button"
+                               button-icon="ic_ellipsis-horizontal"
+                               class="etc-button"
+                               :menu="state.etcMenuItems"
+                               :selected="[]"
+                               :visible-menu.sync="state.etcMenuVisible"
+                               menu-position="right"
+                               reset-selection-on-menu-close
+                               @select="handleSelectEtcMenu"
             />
         </div>
         <div class="body-wrapper">
@@ -176,18 +151,21 @@ const handleToggleWidth = () => {
                         width="100%"
                         height="100%"
             />
-            <p-empty v-else-if="!props.allRequiredFieldsFilled"
+            <p-empty v-else-if="props.widgetState === 'INACTIVE'"
                      class="empty-content"
-                     :title="$t('COMMON.WIDGETS.REQUIRED_FIELDS_ARE_MISSING')"
+                     :title="$t('COMMON.WIDGETS.DATA_NOT_DISPLAYED')"
                      :show-image="props.size !== WIDGET_SIZE.sm"
                      :show-button="props.mode === 'view'"
             >
                 <template #image>
                     <img class="empty-image"
-                         alt="missing-field-image"
-                         src="@/assets/images/img_star__missing-field.svg"
+                         alt="need-to-apply-image"
+                         src="@/assets/images/img_star-need-apply.svg"
                     >
                 </template>
+                <p class="empty-text">
+                    {{ $t('COMMON.WIDGETS.DATA_NOT_DISPLAYED_DESC') }}
+                </p>
                 <template #button>
                     <p-button style-type="substitutive"
                               size="sm"
@@ -196,9 +174,6 @@ const handleToggleWidth = () => {
                         {{ $t('COMMON.WIDGETS.EDIT_WIDGET') }}
                     </p-button>
                 </template>
-                <p class="empty-text">
-                    {{ $t('COMMON.WIDGETS.REQUIRED_FIELDS_ARE_MISSING_DESC') }}
-                </p>
             </p-empty>
             <p-empty v-else-if="props.errorMessage"
                      class="empty-content"
@@ -344,8 +319,11 @@ const handleToggleWidth = () => {
         top: 0.25rem;
         display: none;
         padding: 0.25rem;
-        .etc-context-menu {
-            z-index: 1000;
+        &.selected {
+            display: block;
+        }
+        .etc-button {
+            @apply border border-gray-200 rounded-full;
         }
     }
 }

@@ -43,7 +43,7 @@ const state = reactive({
         />
         <p class="text">
             <strong class="title">
-                {{ state.isWarning ? $t('LADING.NOT_FOUND_DESC') : $t('LADING.DOMAIN.EXPLORE_WORKSPACE_TITLE') }}
+                {{ state.isWarning ? $t('LADING.NOT_FOUND_ACCESS_WORKSPACE') : $t('LADING.DOMAIN.EXPLORE_WORKSPACE_TITLE') }}
             </strong>
             <span class="desc">
                 {{ state.isWarning ? $t('LADING.DOMAIN.ALT_W_DESC') : $t('LADING.DOMAIN.EXPLORE_WORKSPACE_DESC') }}

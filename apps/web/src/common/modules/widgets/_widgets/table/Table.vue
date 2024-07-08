@@ -24,7 +24,6 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getAllRequiredFieldsFilled,
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -51,7 +50,6 @@ const emit = defineEmits<WidgetEmit>();
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
-    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as Data | null,
     comparisonData: null as Data | null,
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
@@ -99,7 +97,7 @@ const state = reactive({
         const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map((field) => ({ name: field, label: field, fieldInfo: { type: 'labelField' } })) ?? [];
         let dataFields: TableWidgetField[] = [];
         if (state.tableDataFieldType === 'staticField') {
-            state.tableDataField.forEach((field) => {
+            state.tableDataField?.forEach((field) => {
                 dataFields.push({
                     name: field,
                     label: field,
@@ -210,7 +208,7 @@ const getWidgetTableDateFields = (
 };
 
 const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|undefined> => {
-    if (!state.allRequiredFieldsFilled) return undefined;
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
@@ -220,14 +218,17 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
         const _fields = {};
         let _groupBy: string[] = [...state.groupByField];
         let _field_group: string[] = [];
+        // let _sort: Query['sort'] = [];
         if (state.tableDataFieldType === 'staticField') {
             state.tableDataField?.forEach((field) => {
                 _fields[field] = { key: field, operator: 'sum' };
             });
+            // _sort = state.tableDataField.map((field) => ({ key: field, desc: true }));
         } else {
             _fields[state.tableDataCriteria] = { key: state.tableDataCriteria, operator: 'sum' };
             _field_group = [state.tableDataField];
             _groupBy = [..._groupBy, state.tableDataField];
+            // _sort = [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
         }
         const res = await _fetcher({
             widget_id: props.widgetId,
@@ -238,6 +239,7 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
                 group_by: _groupBy,
                 field_group: _field_group,
                 fields: _fields,
+                // sort: _sort,
             },
             vars: props.dashboardVars,
         });
@@ -270,7 +272,7 @@ watch(() => state.data, () => {
             const dataItem = { ...d };
             let subTotalValue = 0;
 
-            state.tableDataField.forEach((field) => {
+            state.tableDataField?.forEach((field) => {
                 const fieldValue = d[field] ?? 0;
                 subTotalValue += fieldValue;
 
