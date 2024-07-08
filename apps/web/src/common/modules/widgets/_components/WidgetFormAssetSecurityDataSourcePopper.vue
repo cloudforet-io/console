@@ -7,6 +7,7 @@ import {
     PFieldTitle, PContextMenu,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { sortBy } from 'lodash';
 
 import { i18n } from '@/translations';
 
@@ -41,7 +42,7 @@ const state = reactive({
             .map((namespace) => namespace.data.group);
         const _groupMenuItems: MenuItem[] = [];
         const _uniqueGroups = Array.from(new Set(groups));
-        _uniqueGroups.forEach((group) => {
+        sortBy(_uniqueGroups, (group) => group !== 'common').forEach((group) => {
             if (group === 'common') {
                 _groupMenuItems.push({
                     type: 'item',
@@ -124,7 +125,7 @@ const handleSelectMetric = (item: MenuItem) => {
                             @select="handleSelectCategory"
             >
                 <template #item--format="{ item }">
-                    <div v-if="item.name === 'COMMON'"
+                    <div v-if="item.name === 'common'"
                          class="flex gap-1"
                     >
                         <img src="@/assets/images/img_common-asset@2x.png"
