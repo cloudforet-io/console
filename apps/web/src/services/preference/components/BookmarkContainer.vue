@@ -112,3 +112,9 @@ onMounted(() => {
         />
     </div>
 </template>
+
+<style lang="postcss" scoped>
+.admin-bookmark-page {
+    padding-bottom: 2.5rem;
+}
+</style>

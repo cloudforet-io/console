@@ -25,7 +25,7 @@ import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import { gray } from '@/styles/colors';
 
 import { makeSearchQueryTagsHandler, makeValueHandler } from '@/services/preference/composables/bookmark-data-helper';
-import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
+import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/preference/constants/bookmark-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
@@ -177,7 +177,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
 </script>
 
 <template>
-    <section class="data-source-management-table">
+    <section class="bookmark-management-detail-table">
         <p-data-loader :loading="storeState.loading"
                        class="data-loader-wrapper"
                        :data="true"
@@ -189,6 +189,8 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                              sortable
                              sort-by="name"
                              :sort-desc="true"
+                             :page-size="30"
+                             :page-size-options="PageSizeOptions"
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
                              :total-count="storeState.bookmarkTotalCount"
@@ -258,7 +260,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
 </template>
 
 <style lang="postcss" scoped>
-.data-source-management-table {
+.bookmark-management-detail-table {
     .table {
         .col-name {
             @apply flex items-center;
@@ -284,9 +286,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
         /* custom design-system component - p-select-dropdown */
         :deep(.p-select-dropdown) {
             .dropdown-context-menu {
-                min-width: 7.25rem !important;
                 margin-top: 0;
-                margin-left: -5.25rem;
             }
         }
     }
