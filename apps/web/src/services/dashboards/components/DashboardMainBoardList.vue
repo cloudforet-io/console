@@ -122,7 +122,8 @@ onMounted(() => {
     <div class="dashboard-board-list"
          :class="{ 'is-collapsed': state.isCollapsed }"
     >
-        <div class="title-wrapper"
+        <div v-if="props.fieldTitle"
+             class="title-wrapper"
              @click="state.isCollapsed = !state.isCollapsed"
         >
             <p-i name="ic_chevron-down"
