@@ -8,7 +8,7 @@ function getAbsolutePath(value) {
   return dirname(require.resolve(join(value, "package.json")));
 }
 
-/** @type { import('@storybook/vue-vite').StorybookConfig } */
+/** @type { import('@storybook/vue-webpack5').StorybookConfig } */
 const config = {
   stories: [
     "../stories/**/*.mdx",
@@ -19,12 +19,13 @@ const config = {
     getAbsolutePath("@storybook/addon-essentials"),
     getAbsolutePath("@storybook/addon-interactions"),
   ],
-  core: {
-    builder: '@storybook/builder-vite',
-  },
   framework: {
-    name: getAbsolutePath("@storybook/vue-vite"),
-    options: {},
+    name: getAbsolutePath("@storybook/vue-webpack5"),
+    options: {
+      builder: {
+        useSWC: true,
+      },
+    },
   },
   docs: {
     autodocs: "tag",
