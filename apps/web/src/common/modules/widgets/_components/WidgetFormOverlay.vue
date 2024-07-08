@@ -57,6 +57,7 @@ const state = reactive({
 
 /* Api */
 const deleteWidget = async (widgetId: string) => {
+    if (!widgetId) return;
     const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
     const fetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateWidget.delete<PrivateWidgetDeleteParameters>
@@ -65,6 +66,9 @@ const deleteWidget = async (widgetId: string) => {
         await fetcher({
             widget_id: widgetId,
         });
+        widgetGenerateStore.setDataTables([]);
+        widgetGenerateStore.setSelectedDataTableId();
+        widgetGenerateStore.setWidgetId('');
     } catch (e) {
         ErrorHandler.handleError(e);
     }
