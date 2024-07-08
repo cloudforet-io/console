@@ -12,6 +12,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PublicConfigListParameters } from '@/schema/config/public-config/api-verbs/list';
 import type { PublicConfigModel } from '@/schema/config/public-config/model';
+import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
@@ -20,6 +22,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
 
 interface BookmarkPageState {
+    workspaceList: WorkspaceModel[];
     loading: boolean;
     bookmarkFolderList: BookmarkItem[];
     bookmarkList: BookmarkItem[];
@@ -35,6 +38,7 @@ interface BookmarkPageState {
 
 export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     const state = reactive<BookmarkPageState>({
+        workspaceList: [],
         loading: false,
         bookmarkFolderList: [],
         bookmarkList: [],
@@ -94,6 +98,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     };
     const actions = {
         resetState: () => {
+            state.workspaceList = [];
             state.loading = false;
             state.bookmarkTotalCount = 0;
             state.params = undefined;
@@ -104,6 +109,15 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
             state.pageLimit = 15;
             state.searchFilter = [];
             state.selectedIndices = [];
+        },
+        fetchWorkspaceList: async () => {
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>();
+                state.workspaceList = results ?? [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.workspaceList = [];
+            }
         },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
