@@ -310,21 +310,21 @@ const fetchBookmarkList = async () => {
             @apply block truncate;
             max-width: 12rem;
         }
-
-        /* custom design-system component - p-select-dropdown */
-        :deep(.p-select-dropdown) {
-            .dropdown-context-menu {
-                margin-top: 0;
-            }
-        }
     }
 
     /* custom design-system component - p-toolbox-table */
     :deep(.p-toolbox-table) {
-        td.has-width {
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-            min-width: unset;
+        td {
+            .dropdown-context-menu {
+                min-width: 7.25rem !important;
+                margin-top: 0;
+                margin-left: -5.25rem;
+            }
+            &.has-width {
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+                min-width: unset;
+            }
         }
     }
 }
