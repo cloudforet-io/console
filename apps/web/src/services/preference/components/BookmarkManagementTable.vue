@@ -115,11 +115,11 @@ const handleChange = (options: any = {}) => {
 const handleSelectDropdownMenu = (item: BookmarkItem, menu: string) => {
     bookmarkPageStore.setIsTableItem(true);
     if (menu === 'edit') {
-        bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, true);
+        bookmarkStore.setModalType(item.link ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, true);
         return;
     }
     if (menu === 'delete') {
-        bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.DELETE_LINK : BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
+        bookmarkStore.setModalType(item.link ? BOOKMARK_MODAL_TYPE.DELETE_LINK : BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
         return;
     }
     if (menu === 'add') {
@@ -127,7 +127,7 @@ const handleSelectDropdownMenu = (item: BookmarkItem, menu: string) => {
         return;
     }
 
-    bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, false);
+    bookmarkStore.setModalType(item.link ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, false);
 };
 const handleUpdateVisibleMenu = (item: BookmarkItem, visibleMenu: boolean) => {
     if (visibleMenu) {
@@ -241,7 +241,8 @@ const fetchBookmarkList = async () => {
                         </span>
                     </div>
                 </template>
-                <template #col-workspace_id-format="{value, item}">
+                <!-- eslint-disable-next-line vue/no-unused-vars -->
+                <template #col-workspace_id-format="{_, item}">
                     <div class="col-workspace">
                         <div v-if="item.isGlobal"
                              class="workspace"
@@ -256,11 +257,11 @@ const fetchBookmarkList = async () => {
                         <div v-else
                              class="workspace"
                         >
-                            <workspace-logo-icon :text="getWorkspaceInfo(value, storeState.workspaceList)?.name || ''"
-                                                 :theme="getWorkspaceInfo(value, storeState.workspaceList)?.tags?.theme"
+                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name || ''"
+                                                 :theme="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.tags?.theme"
                                                  size="xs"
                             />
-                            <span class="text">{{ getWorkspaceInfo(value, storeState.workspaceList)?.name }}</span>
+                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name }}</span>
                         </div>
                         <div v-if="item.folder"
                              class="folder-wrapper"
