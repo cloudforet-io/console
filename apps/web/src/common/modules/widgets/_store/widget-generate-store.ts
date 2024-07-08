@@ -279,13 +279,24 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>;
             try {
                 state.dataTableLoadLoading = true;
+                const _granularity = state.selectedPreviewGranularity || 'MONTHLY';
+                let _sort = loadParams.sort;
+                const dataTable = state.dataTables.find((_dataTable) => _dataTable.data_table_id === loadParams.data_table_id);
+                if (!_sort || (_sort && _sort.length === 0)) {
+                    const labelsInfoList = Object.keys(dataTable?.labels_info ?? {});
+                    if (labelsInfoList.includes('Date')) _sort = [{ key: 'Date', desc: false }];
+                    else if (_granularity === 'DAILY') _sort = [{ key: 'Day', desc: false }];
+                    else if (_granularity === 'MONTHLY') _sort = [{ key: 'Month', desc: false }];
+                    else if (_granularity === 'YEARLY') _sort = [{ key: 'Year', desc: false }];
+                }
                 const { results, total_count } = await fetcher({
-                    granularity: state.selectedPreviewGranularity || 'MONTHLY',
+                    granularity: _granularity,
                     page: {
                         start: 1,
                         limit: 15,
                     },
                     ...loadParams,
+                    sort: _sort,
                 });
                 state.previewData = { results: results ?? [], total_count: total_count ?? 0 };
             } catch (e) {
