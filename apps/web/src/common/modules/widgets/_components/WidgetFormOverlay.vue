@@ -57,6 +57,7 @@ const state = reactive({
 
 /* Api */
 const deleteWidget = async (widgetId: string) => {
+    if (!widgetId) return;
     const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
     const fetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateWidget.delete<PrivateWidgetDeleteParameters>
@@ -99,8 +100,8 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
             await deleteWidget(widgetGenerateState.widgetId);
         } else {
             widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
-            widgetGenerateStore.reset();
         }
+        widgetGenerateStore.reset();
     } else if (widgetGenerateState.overlayType !== 'ADD') {
         await widgetGenerateStore.listDataTable();
     }

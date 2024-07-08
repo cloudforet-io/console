@@ -161,7 +161,7 @@ const costFilterState = reactive({
 
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
-        const metricLabelsInfo = storeState.metrics[props.sourceId ?? ''].data.labels_info;
+        const metricLabelsInfo = storeState.metrics[props.sourceId ?? '']?.data?.labels_info;
         return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => {
             if (storeState.isAdminMode) return true;
             return labelInfo.key !== 'workspace_id';
