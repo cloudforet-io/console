@@ -1,6 +1,8 @@
 import { computed, reactive } from 'vue';
 
-import { sortBy } from 'lodash';
+import {
+    at, filter, indexOf, sortBy,
+} from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -54,6 +56,16 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
             const sortedWorkspaceBookmark = sortBy(workspaceBookmark, (i) => !i.link).reverse();
             const combinedBookmarkList = [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
             return combinedBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit);
+        }),
+        selectedIndices: computed<number[]>(() => {
+            const selectedItems = at(getters.bookmarkList, state.selectedIndices);
+            const activeItems = filter(selectedItems, (i) => i.isGlobal);
+            const activeItemIndices: number[] = [];
+            activeItems.forEach((item) => {
+                const index = indexOf(getters.bookmarkList, item);
+                if (index !== -1) activeItemIndices.push(index);
+            });
+            return activeItemIndices;
         }),
     });
 
