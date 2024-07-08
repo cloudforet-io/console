@@ -44,7 +44,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         bookmarkList: [],
         bookmarkTotalCount: 0,
         pageStart: 0,
-        pageLimit: 15,
+        pageLimit: 30,
         searchFilter: [],
         selectedIndices: [],
         params: undefined,
@@ -106,7 +106,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
             state.bookmarkFolderList = [];
             state.bookmarkList = [];
             state.pageStart = 0;
-            state.pageLimit = 15;
+            state.pageLimit = 30;
             state.searchFilter = [];
             state.selectedIndices = [];
         },

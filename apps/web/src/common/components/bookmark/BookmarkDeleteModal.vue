@@ -139,7 +139,7 @@ const handleClose = () => {
                                 :src="assetUrlConverter(item?.imgIcon)"
                                 width="1.5rem"
                                 height="1.5rem"
-                                error-icon="ic_globe-filled"
+                                error-icon="ic_link"
                                 :error-icon-color="gray[500]"
                                 class="icon"
                             />

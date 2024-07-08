@@ -28,7 +28,7 @@ import {
     makeSearchQueryTagsHandler,
     makeValueHandler,
 } from '@/services/preference/composables/bookmark-data-helper';
-import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
+import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/preference/constants/bookmark-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
@@ -170,7 +170,7 @@ const fetchBookmarkList = async () => {
 </script>
 
 <template>
-    <section class="data-source-management-table">
+    <section class="bookmark-management-table">
         <p-data-loader :loading="storeState.loading"
                        class="data-loader-wrapper"
                        :data="true"
@@ -182,6 +182,8 @@ const fetchBookmarkList = async () => {
                              sortable
                              sort-by="name"
                              :sort-desc="true"
+                             :page-size="30"
+                             :page-size-options="PageSizeOptions"
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
                              :total-count="storeState.bookmarkTotalCount"
@@ -211,7 +213,15 @@ const fetchBookmarkList = async () => {
                              width="1.25rem"
                              height="1.25rem"
                         />
-                        <span class="name">{{ value }}</span>
+                        <span class="name">
+                            {{ value }}
+                            <p-i v-if="item.link"
+                                 name="ic_external-link"
+                                 color="inherit"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
+                        </span>
                     </div>
                 </template>
                 <template #col-workspace_id-format="{value, item}">
@@ -268,13 +278,14 @@ const fetchBookmarkList = async () => {
 </template>
 
 <style lang="postcss" scoped>
-.data-source-management-table {
+.bookmark-management-table {
     .table {
         .col-name {
             @apply flex items-center;
             gap: 0.5rem;
             .name {
-                @apply truncate;
+                @apply flex items-center truncate;
+                gap: 0.125rem;
                 max-width: 20.625rem;
             }
             &:hover {
@@ -303,9 +314,7 @@ const fetchBookmarkList = async () => {
         /* custom design-system component - p-select-dropdown */
         :deep(.p-select-dropdown) {
             .dropdown-context-menu {
-                min-width: 7.25rem !important;
                 margin-top: 0;
-                margin-left: -5.25rem;
             }
         }
     }
