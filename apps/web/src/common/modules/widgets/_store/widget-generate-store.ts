@@ -171,6 +171,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 state.dataTables.push(result);
                 return result;
             } catch (e) {
+                showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
                 return undefined;
             }
@@ -228,7 +229,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             } as Partial<DataTableModel>;
             state.dataTables.push(unsavedTransformData);
         },
-        updateDataTable: async (updateParams: DataTableUpdateParameters, unsaved?: boolean) => {
+        updateDataTable: async (updateParams: DataTableUpdateParameters, unsaved?: boolean): Promise<DataTableModel|undefined> => {
             const isPrivate = state.widgetId.startsWith('private');
             const fetcher = isPrivate
                 ? SpaceConnector.clientV2.dashboard.privateDataTable.update<DataTableUpdateParameters, DataTableModel>
@@ -248,9 +249,11 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     }
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
+                return result;
             } catch (e: any) {
                 showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
+                return undefined;
             }
         },
         deleteDataTable: async (deleteParams: DataTableDeleteParameters, unsaved?: boolean) => {
