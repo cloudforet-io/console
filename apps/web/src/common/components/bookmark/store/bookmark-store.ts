@@ -10,6 +10,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import getRandomId from '@/lib/random-id-generator';
 
+import { DEFAULT_BOOKMARK } from '@/common/components/bookmark/constant/constant';
 import type { BookmarkItem, BookmarkModalStateType, BookmarkModalType } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -34,6 +35,11 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         isAdminMode: computed(() => appContextGetters.isAdminMode),
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     });
+
+    const DefaultBookmarkData = DEFAULT_BOOKMARK.map((i) => ({
+        ...i,
+        workspaceId: _getters.currentWorkspaceId,
+    }));
 
     const state = reactive<BookmarkState>({
         modal: {
@@ -84,6 +90,24 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             state.selectedBookmark = undefined;
             state.selectedBookmarks = [];
         },
+        createDefaultBookmark: async ({
+            workspaceId,
+        }: { workspaceId?: string }) => {
+            try {
+                await Promise.all(DefaultBookmarkData.map(async (item) => {
+                    await actions.createBookmarkLink({
+                        name: item.name as string || '',
+                        link: item.link || '',
+                        imgIcon: item.imgIcon,
+                        type: BOOKMARK_TYPE.WORKSPACE,
+                        isDefault: true,
+                        workspaceId,
+                    });
+                }));
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
         createBookmarkFolder: async (name: string, type?: string) => {
             try {
                 let fetcher;
@@ -110,8 +134,8 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             }
         },
         createBookmarkLink: async ({
-            name, link, folder, imgIcon, type,
-        }: { name?: string|TranslateResult, link?: string, folder?: string, imgIcon?: string, type?: BookmarkType}) => {
+            name, link, folder, imgIcon, type, isDefault, workspaceId,
+        }: { name?: string|TranslateResult, link?: string, folder?: string, imgIcon?: string, type?: BookmarkType, isDefault?: boolean, workspaceId?: string}) => {
             try {
                 let fetcher;
                 let resource_group: undefined|string;
@@ -120,19 +144,28 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                     resource_group = undefined;
                 } else if (_getters.isAdminMode || type === BOOKMARK_TYPE.WORKSPACE || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
                     fetcher = SpaceConnector.clientV2.config.publicConfig.create;
-                    resource_group = _getters.isAdminMode ? 'DOMAIN' : 'WORKSPACE';
+                    if (_getters.isAdminMode) {
+                        if (isDefault) {
+                            resource_group = 'WORKSPACE';
+                        } else {
+                            resource_group = 'DOMAIN';
+                        }
+                    } else {
+                        resource_group = 'WORKSPACE';
+                    }
                 }
                 await fetcher({
                     name: `console:bookmark:${folder}:${name}-${getRandomId()}`,
                     data: {
-                        workspaceId: _getters.currentWorkspaceId,
+                        workspaceId: _getters.currentWorkspaceId || workspaceId,
                         name,
                         folder,
                         link,
                         imgIcon,
-                        isGlobal: _getters.isAdminMode,
+                        isGlobal: resource_group === 'DOMAIN',
                     },
                     resource_group,
+                    workspace_id: workspaceId,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
