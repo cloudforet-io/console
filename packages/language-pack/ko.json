@@ -1779,6 +1779,8 @@
 			"SELECT_MONTH": "월 선택",
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "공유",
+			"SHARED_BY_ADMIN": "Admin에 의해 공유됨",
+			"SHARED_TO_WORKSPACES": "워크스페이스에 공유됨",
 			"SHARE_TO_ALL_WORKSPACES": "전체 워크스페이스에 공유",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "이 대시보드를 전체 워크스페이스에 공유하시겠습니까?",
 			"SHARE_WITH_CODE": "코드로 공유",

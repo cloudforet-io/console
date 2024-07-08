@@ -1779,6 +1779,8 @@
 			"SELECT_MONTH": "月を選択",
 			"SET_HOME": "ホームダッシュボードとして設定",
 			"SHARE": "共有",
+			"SHARED_BY_ADMIN": "Adminにより共有",
+			"SHARED_TO_WORKSPACES": "ワークスペースに共有",
 			"SHARE_TO_ALL_WORKSPACES": "すべてのワークスペースに共有する",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "このダッシュボードをすべてのワークスペースと共有しますか？",
 			"SHARE_WITH_CODE": "コードで共有",
