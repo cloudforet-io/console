@@ -81,7 +81,7 @@ const handleToggleWidth = () => {
             <h3 class="title">
                 {{ props.title }}
             </h3>
-            <p-popover v-if="!props.errorMessage && props.allRequiredFieldsFilled"
+            <p-popover v-if="!props.errorMessage && props.widgetState === 'ACTIVE'"
                        class="metadata-popover"
                        position="bottom-start"
                        :trigger="POPOVER_TRIGGER.CLICK"
