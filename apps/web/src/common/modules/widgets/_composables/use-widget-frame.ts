@@ -2,7 +2,7 @@ import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, onMounted, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
-import { isEmpty } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -98,10 +98,12 @@ const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: Record<W
     };
     const _filter = dataTable?.source_type === DATA_SOURCE_DOMAIN.COST ? _costFilters : _assetFilters;
 
+    const _dateRange: DateRange = cloneDeep(dateRange);
+    if (!_dateRange?.start) _dateRange.start = dateRange?.end;
     const _query = {
         granularity: primitiveToQueryString(_granularity),
         group_by: arrayToQueryString(_groupBy),
-        period: objectToQueryString(dateRange),
+        period: objectToQueryString(_dateRange),
         filters: arrayToQueryString(_filter),
     };
     if (dataTable?.source_type === DATA_SOURCE_DOMAIN.COST) {
