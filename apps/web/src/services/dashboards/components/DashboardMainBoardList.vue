@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PBadge, PBoard, PFieldTitle, PI, PLabel, PPagination,
+    PBadge, PBoard, PI, PLabel,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
@@ -13,7 +13,6 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -22,18 +21,15 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
-import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
-
-const PAGE_SIZE = 10;
 
 interface Props {
-    scopeType?: DashboardScope;
+    dashboardType?: 'SHARED' | 'PRIVATE' | 'DEPRECATED';
     fieldTitle?: string;
     dashboardList?: DashboardModel[];
 }
 const props = withDefaults(defineProps<Props>(), {
-    scopeType: undefined,
+    dashboardType: 'SHARED',
     fieldTitle: undefined,
     dashboardList: () => ([]),
 });
@@ -42,7 +38,6 @@ type DashboardBoardSet = BoardSet & DashboardModel;
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
-const allReferenceStore = useAllReferenceStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const appContextStore = useAppContextStore();
@@ -50,15 +45,23 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
-    thisPage: 1,
+    isCollapsed: false,
     dashboardTotalCount: computed<number>(() => props.dashboardList.length ?? 0),
-    projectItems: computed(() => allReferenceStore.getters.project),
     dashboardListByBoardSets: computed<DashboardBoardSet[]>(() => props.dashboardList
-        .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
         .map((d) => ({
             ...d,
             iconButtonSets: convertBoardItemButtonSet(d),
         }))),
+    badgeStyleType: computed(() => {
+        if (props.dashboardType === 'SHARED') return 'indigo100';
+        if (props.dashboardType === 'PRIVATE') return 'gray150';
+        return 'red100';
+    }),
+    badgeText: computed(() => {
+        if (props.dashboardType === 'SHARED') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARED');
+        if (props.dashboardType === 'PRIVATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
+        return i18n.t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED');
+    }),
 });
 
 const deleteModalState = reactive({
@@ -66,6 +69,7 @@ const deleteModalState = reactive({
     selectedId: undefined as string|undefined,
 });
 
+/* Util */
 const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
     if (!storeState.isAdminMode && dashboardItem.resource_group === 'DOMAIN') return [];
     const dashboardId = dashboardItem.dashboard_id || '';
@@ -77,6 +81,7 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
         },
     ];
 };
+const isPrivate = (dashboardId: string): boolean => dashboardId.startsWith('private');
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
@@ -99,25 +104,28 @@ const handleSetQuery = (selectedLabel: string | string[]) => {
         .addFilter({ k: 'labels', o: '=', v: selectedLabel });
     dashboardStore.setSearchFilters(labelQueryHelper.filters);
 };
-const handlePage = (page: number) => {
-    state.thisPage = page;
-};
 
-watch(() => props.dashboardList, () => {
-    state.thisPage = 1;
+onMounted(() => {
+    if (props.dashboardType === 'DEPRECATED') state.isCollapsed = true;
 });
 </script>
 
 <template>
-    <div class="dashboard-board-list">
-        <p-field-title v-if="props.fieldTitle"
-                       class="p-field-title"
+    <div class="dashboard-board-list"
+         :class="{ 'is-collapsed': state.isCollapsed }"
+    >
+        <div class="title-wrapper"
+             @click="state.isCollapsed = !state.isCollapsed"
         >
-            <template #default>
-                <span>{{ props.fieldTitle }}</span>
-                <span class="board-count">({{ state.dashboardTotalCount }})</span>
-            </template>
-        </p-field-title>
+            <p-i name="ic_chevron-down"
+                 width="1.25rem"
+                 height="1.25rem"
+                 color="inherit transparent"
+                 class="arrow-button"
+            />
+            <span>{{ props.fieldTitle }}</span>
+            <span class="board-count">({{ state.dashboardTotalCount }})</span>
+        </div>
         <p-board :board-sets="state.dashboardListByBoardSets"
                  selectable
                  class="board"
@@ -137,29 +145,35 @@ watch(() => props.dashboardList, () => {
                             </span>
                         </div>
                         <div class="right-part">
-                            <p-i v-if="scopeType === 'PRIVATE'"
+                            <span v-if="board.tags?.created_by"
+                                  class="board-item-title-sub-text"
+                            >{{ board.tags?.created_by }}</span>
+                        </div>
+                    </div>
+                    <div class="labels-wrapper">
+                        <p-badge badge-type="subtle"
+                                 :style-type="state.badgeStyleType"
+                        >
+                            <p-i v-if="props.dashboardType === 'PRIVATE'"
                                  name="ic_lock-filled"
                                  width="0.75rem"
                                  height="0.75rem"
                                  color="gray900"
-                                 class="private-icon"
+                                 class="mr-1"
                             />
-                            <span v-if="board.tags?.created_by"
-                                  class="board-item-title-sub-text"
-                            >{{ board.tags?.created_by }}</span>
-                            <span v-if="board.tags?.created_by && props.scopeType === 'PROJECT'"
-                                  class="board-item-title-sub-text"
-                            >•</span>
-                            <span class="board-item-title-sub-text">{{ props.scopeType === 'PROJECT' ? board.label : '' }}</span>
-                        </div>
-                    </div>
-                    <div class="labels-wrapper">
-                        <p-badge v-if="board.version === '1.0'"
-                                 shape="square"
+                            {{ state.badgeText }}
+                        </p-badge>
+                        <p-badge v-if="props.dashboardType === 'DEPRECATED' && isPrivate(board.dashboard_id)"
                                  badge-type="subtle"
-                                 style-type="red100"
+                                 style-type="gray150"
                         >
-                            {{ $t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED') }}
+                            <p-i name="ic_lock-filled"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                                 color="gray900"
+                                 class="mr-1"
+                            />
+                            {{ $t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE') }}
                         </p-badge>
                         <p-label v-for="(label, idx) in board.labels"
                                  :key="`${board.name}-label-${idx}`"
@@ -171,15 +185,6 @@ watch(() => props.dashboardList, () => {
                 </div>
             </template>
         </p-board>
-        <div v-if="state.dashboardTotalCount >= 10"
-             class="dashboard-list-pagination"
-        >
-            <p-pagination :total-count="state.dashboardTotalCount"
-                          :page-size="PAGE_SIZE"
-                          :this-page="state.thisPage"
-                          @change="handlePage"
-            />
-        </div>
         <dashboard-delete-modal
             :visible.sync="deleteModalState.visible"
             :dashboard-id="deleteModalState.selectedId"
@@ -193,12 +198,20 @@ watch(() => props.dashboardList, () => {
     margin-top: 0.5rem;
     margin-bottom: 1.25rem;
 
-    .p-field-title {
+    .title-wrapper {
+        @apply text-label-md;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-weight: bold;
+        cursor: pointer;
         margin-bottom: 0.5rem;
-    }
-    .board-count {
-        font-weight: normal;
-        margin-left: 0.5rem;
+        .arrow-button {
+            transition: transform 0.3s ease-in-out;
+        }
+        .board-count {
+            font-weight: normal;
+        }
     }
     .board {
         /* custom p-board-item */
@@ -245,9 +258,20 @@ watch(() => props.dashboardList, () => {
             }
         }
     }
-    .dashboard-list-pagination {
-        @apply w-full flex justify-center;
-        margin-top: 0.5rem;
+    &.is-collapsed {
+        .title-wrapper {
+            .arrow-button {
+                transform: rotate(-90deg);
+            }
+        }
+        .board {
+            display: none;
+            height: 0;
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            transition: opacity 0s ease;
+        }
     }
 }
 </style>
