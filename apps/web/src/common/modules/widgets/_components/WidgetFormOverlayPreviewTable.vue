@@ -156,7 +156,7 @@ const getValue = (item, field: PreviewTableField) => {
     if (field.type === 'DATA') {
         return itemValue ? valueFormatter(itemValue, field) : '-';
     }
-    return item[field.name] ?? '-';
+    return item[field.name] || '-';
 };
 
 const getSortIcon = (field: PreviewTableField) => {
