@@ -16,8 +16,6 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
@@ -26,6 +24,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo } from '@/services/preference/composables/bookmark-data-helper';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
@@ -35,17 +34,14 @@ const bookmarkState = bookmarkStore.state;
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
-const userWorkspaceStore = useUserWorkspaceStore();
-const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const route = useRoute();
 const router = useRouter();
 
 const storeState = reactive({
-    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
 
+    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
@@ -204,7 +200,7 @@ const handleSelectMenuItem = (value: MenuItem) => {
                         />
                     </div>
                 </div>
-                <p-button v-else
+                <p-button v-else-if="getWorkspaceInfo(state.group, storeState.workspaceList).state === WORKSPACE_STATE.ENABLE"
                           style-type="tertiary"
                           icon-right="ic_arrow-right-up"
                           @click="handleClickWorkspaceButton"

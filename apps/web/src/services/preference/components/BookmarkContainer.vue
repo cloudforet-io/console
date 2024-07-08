@@ -85,6 +85,7 @@ onUnmounted(() => {
 });
 
 onMounted(() => {
+    bookmarkPageStore.fetchWorkspaceList();
     bookmarkPageStore.fetchBookmarkFolderList();
 });
 </script>
