@@ -31,4 +31,7 @@ export const JOIN_TYPE = {
 // NOTE: temporary solution for the global variable
 export const MANAGED_GLOBAL_VARIABLE = [GROUP_BY.WORKSPACE, GROUP_BY.PROJECT, GROUP_BY.SERVICE_ACCOUNT, GROUP_BY.REGION] as string[];
 
-export const DEFAULT_SORT = [{ key: 'Date', desc: false }];
+export const DEFAULT_DATE_SORT = [{ key: 'Date', desc: false }];
+export const DEFAULT_SEPARATED_DATE_SORT = [
+    // { key: 'Year', desc: false }, { key: 'Month', desc: false }, { key: 'Day', desc: false },
+];

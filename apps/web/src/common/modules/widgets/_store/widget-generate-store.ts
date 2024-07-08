@@ -24,7 +24,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { DATA_TABLE_TYPE, DEFAULT_SORT } from '@/common/modules/widgets/_constants/data-table-constant';
+import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import type { JoinRestrictedMap } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -157,7 +157,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             }
         },
         /* Step 1 */
-        createAddDataTable: async (addParams: Partial<DataTableAddParameters>) => {
+        createAddDataTable: async (addParams: Partial<DataTableAddParameters>):Promise<DataTableModel|undefined> => {
             const parameters = {
                 widget_id: state.widgetId,
                 ...addParams,
@@ -169,11 +169,11 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             try {
                 const result = await fetcher(parameters);
                 state.dataTables.push(result);
-                if (!state.selectedDataTableId) {
-                    state.selectedDataTableId = result.data_table_id;
-                }
+                return result;
             } catch (e) {
+                showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
+                return undefined;
             }
         },
         createTransformDataTable: async (transformParams: Partial<DataTableTransformParameters>, unsavedId: string): Promise<DataTableModel|undefined> => {
@@ -229,7 +229,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             } as Partial<DataTableModel>;
             state.dataTables.push(unsavedTransformData);
         },
-        updateDataTable: async (updateParams: DataTableUpdateParameters, unsaved?: boolean) => {
+        updateDataTable: async (updateParams: DataTableUpdateParameters, unsaved?: boolean): Promise<DataTableModel|undefined> => {
             const isPrivate = state.widgetId.startsWith('private');
             const fetcher = isPrivate
                 ? SpaceConnector.clientV2.dashboard.privateDataTable.update<DataTableUpdateParameters, DataTableModel>
@@ -249,9 +249,11 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                     }
                 }
                 state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
+                return result;
             } catch (e: any) {
                 showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
+                return undefined;
             }
         },
         deleteDataTable: async (deleteParams: DataTableDeleteParameters, unsaved?: boolean) => {
@@ -283,7 +285,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                         start: 1,
                         limit: 15,
                     },
-                    sort: DEFAULT_SORT,
                     ...loadParams,
                 });
                 state.previewData = { results: results ?? [], total_count: total_count ?? 0 };

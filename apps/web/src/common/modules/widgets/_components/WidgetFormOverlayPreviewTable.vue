@@ -19,7 +19,10 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import { DEFAULT_SORT } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DEFAULT_DATE_SORT,
+    DEFAULT_SEPARATED_DATE_SORT,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -64,7 +67,8 @@ const state = reactive({
         { type: 'DIVIDER', name: '' },
         ...state.dataFields.map((key) => ({ type: 'DATA', name: key })),
     ]),
-    sortBy: DEFAULT_SORT as { key: string; desc: boolean }[],
+    isSeparatedDataTable: computed(() => !Object.keys(storeState.selectedDataTable?.labels_info ?? {}).includes('Date')),
+    sortBy: [] as { key: string; desc: boolean }[],
     granularityItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -152,7 +156,7 @@ const getValue = (item, field: PreviewTableField) => {
     if (field.type === 'DATA') {
         return itemValue ? valueFormatter(itemValue, field) : '-';
     }
-    return item[field.name] ?? '-';
+    return item[field.name] || '-';
 };
 
 const getSortIcon = (field: PreviewTableField) => {
@@ -168,16 +172,20 @@ const getSortIcon = (field: PreviewTableField) => {
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
     if (dataTableId) {
         state.thisPage = 1;
-        state.sortBy = DEFAULT_SORT;
+        // state.sortBy = state.isSeparatedDataTable ? DEFAULT_SEPARATED_DATE_SORT : DEFAULT_DATE_SORT;
     }
 });
 
 watch(() => storeState.dataTableUpdating, () => {
     if (storeState.dataTableUpdating) {
         state.thisPage = 1;
-        state.sortBy = DEFAULT_SORT;
+        // state.sortBy = state.isSeparatedDataTable ? DEFAULT_SEPARATED_DATE_SORT : DEFAULT_DATE_SORT;
     }
 });
+
+watch(() => state.isSeparatedDataTable, (changed) => {
+    state.sortBy = changed ? DEFAULT_SEPARATED_DATE_SORT : DEFAULT_DATE_SORT;
+}, { immediate: true });
 
 </script>
 

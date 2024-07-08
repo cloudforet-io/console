@@ -130,8 +130,9 @@ const initValue = () => {
     }
 };
 
-watch(() => state.isAllValid, (value) => {
-    emit('update:is-valid', value);
+watch([() => state.isAllValid, () => state.proxyValue], ([isAllValid, value]) => {
+    if (value === undefined) state.toggleValue = false;
+    emit('update:is-valid', isAllValid);
 }, { immediate: true });
 
 onMounted(() => {
