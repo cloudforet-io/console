@@ -5,6 +5,8 @@ import { join, dirname } from "path";
  * It is needed in projects that use Yarn PnP or are set up within a monorepo.
  */
 function getAbsolutePath(value) {
+  console.log(dirname(require.resolve(join(value, "package.json"))))
+
   return dirname(require.resolve(join(value, "package.json")));
 }
 
@@ -15,20 +17,17 @@ const config = {
     "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)",
   ],
   addons: [
-    getAbsolutePath("@storybook/addon-links"),
-    getAbsolutePath("@storybook/addon-essentials"),
-    getAbsolutePath("@storybook/addon-interactions"),
+    "@storybook/addon-links",
+    "@storybook/addon-essentials",
+    "@storybook/addon-interactions",
+    "@storybook/addon-webpack5-compiler-babel"
   ],
-  framework: {
-    name: getAbsolutePath("@storybook/vue-webpack5"),
-    options: {
-      builder: {
-        useSWC: true,
-      },
-    },
+  framework: "@storybook/vue-webpack5",
+  core: {
+    builder: '@storybook/builder-webpack5',
   },
   docs: {
     autodocs: "tag",
-  },
+  }
 };
 export default config;
