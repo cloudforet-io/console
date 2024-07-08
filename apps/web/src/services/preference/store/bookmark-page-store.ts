@@ -1,6 +1,8 @@
 import { computed, reactive } from 'vue';
 
-import { sortBy } from 'lodash';
+import {
+    at, filter, indexOf, sortBy,
+} from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -10,6 +12,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PublicConfigListParameters } from '@/schema/config/public-config/api-verbs/list';
 import type { PublicConfigModel } from '@/schema/config/public-config/model';
+import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
@@ -18,6 +22,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
 
 interface BookmarkPageState {
+    workspaceList: WorkspaceModel[];
     loading: boolean;
     bookmarkFolderList: BookmarkItem[];
     bookmarkList: BookmarkItem[];
@@ -33,12 +38,13 @@ interface BookmarkPageState {
 
 export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     const state = reactive<BookmarkPageState>({
+        workspaceList: [],
         loading: false,
         bookmarkFolderList: [],
         bookmarkList: [],
         bookmarkTotalCount: 0,
         pageStart: 0,
-        pageLimit: 15,
+        pageLimit: 30,
         searchFilter: [],
         selectedIndices: [],
         params: undefined,
@@ -47,13 +53,23 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     });
 
     const getters = reactive({
-        bookmarkList: computed<BookmarkItem[]>(() => {
+        entireBookmarkList: computed<BookmarkItem[]>(() => {
             const globalBookmark = state.bookmarkList.filter((i) => i.isGlobal);
             const sortedGlobalBookmark = sortBy(globalBookmark, (i) => !i.link).reverse();
             const workspaceBookmark = state.bookmarkList.filter((i) => !i.isGlobal);
             const sortedWorkspaceBookmark = sortBy(workspaceBookmark, (i) => !i.link).reverse();
-            const combinedBookmarkList = [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
-            return combinedBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit);
+            return [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
+        }),
+        bookmarkList: computed<BookmarkItem[]>(() => getters.entireBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit)),
+        selectedIndices: computed<number[]>(() => {
+            const selectedItems = at(getters.bookmarkList, state.selectedIndices);
+            const activeItems = filter(selectedItems, (i) => i.isGlobal);
+            const activeItemIndices: number[] = [];
+            activeItems.forEach((item) => {
+                const index = indexOf(getters.bookmarkList, item);
+                if (index !== -1) activeItemIndices.push(index);
+            });
+            return activeItemIndices;
         }),
     });
 
@@ -82,6 +98,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     };
     const actions = {
         resetState: () => {
+            state.workspaceList = [];
             state.loading = false;
             state.bookmarkTotalCount = 0;
             state.params = undefined;
@@ -89,9 +106,18 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
             state.bookmarkFolderList = [];
             state.bookmarkList = [];
             state.pageStart = 0;
-            state.pageLimit = 15;
+            state.pageLimit = 30;
             state.searchFilter = [];
             state.selectedIndices = [];
+        },
+        fetchWorkspaceList: async () => {
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>();
+                state.workspaceList = results ?? [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.workspaceList = [];
+            }
         },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()

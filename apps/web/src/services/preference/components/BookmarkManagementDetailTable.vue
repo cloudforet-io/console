@@ -12,6 +12,8 @@ import type {
     ValueItem,
 } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
@@ -23,7 +25,7 @@ import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import { gray } from '@/styles/colors';
 
 import { makeSearchQueryTagsHandler, makeValueHandler } from '@/services/preference/composables/bookmark-data-helper';
-import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
+import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/preference/constants/bookmark-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
@@ -38,17 +40,24 @@ const router = useRouter();
 const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
+    entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
     bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
     loading: computed<boolean>(() => bookmarkPageState.loading),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
+    searchFilter: computed<ConsoleFilter[]>(() => bookmarkPageState.searchFilter),
 });
 const state = reactive({
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
-    bookmarkList: computed<BookmarkItem[]>(() => (state.folder ? storeState.bookmarkList : storeState.bookmarkList.filter((i) => !i.folder))),
+    bookmarkList: computed<BookmarkItem[]>(() => {
+        if (state.folder) {
+            return storeState.bookmarkList;
+        }
+        return storeState.searchFilter.length === 0 ? storeState.bookmarkList.filter((i) => !i.folder) : storeState.bookmarkList;
+    }),
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -78,8 +87,8 @@ const tableState = reactive({
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeValueHandler(storeState.bookmarkList, 'name'),
-        link: makeValueHandler(storeState.bookmarkList, 'link'),
+        name: makeValueHandler(storeState.entireBookmarkList, 'name'),
+        link: makeValueHandler(storeState.entireBookmarkList, 'link'),
     })),
     typeField: computed<ValueItem[]>(() => ([
         { label: i18n.t('IAM.BOOKMARK.ALL') as string, name: 'All' },
@@ -168,7 +177,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
 </script>
 
 <template>
-    <section class="data-source-management-table">
+    <section class="bookmark-management-detail-table">
         <p-data-loader :loading="storeState.loading"
                        class="data-loader-wrapper"
                        :data="true"
@@ -180,6 +189,8 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                              sortable
                              sort-by="name"
                              :sort-desc="true"
+                             :page-size="30"
+                             :page-size-options="PageSizeOptions"
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
                              :total-count="storeState.bookmarkTotalCount"
@@ -249,7 +260,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
 </template>
 
 <style lang="postcss" scoped>
-.data-source-management-table {
+.bookmark-management-detail-table {
     .table {
         .col-name {
             @apply flex items-center;
@@ -271,15 +282,6 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
             margin-left: 1rem;
             margin-bottom: 1rem;
         }
-
-        /* custom design-system component - p-select-dropdown */
-        :deep(.p-select-dropdown) {
-            .dropdown-context-menu {
-                min-width: 7.25rem !important;
-                margin-top: 0;
-                margin-left: -5.25rem;
-            }
-        }
     }
 
     /* custom design-system component - p-toolbox-table */
@@ -287,10 +289,17 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
         .p-toolbox {
             padding-bottom: 0;
         }
-        td.has-width {
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-            min-width: unset;
+        td {
+            .dropdown-context-menu {
+                min-width: 7.25rem !important;
+                margin-top: 0;
+                margin-left: -5.25rem;
+            }
+            &.has-width {
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+                min-width: unset;
+            }
         }
     }
 }

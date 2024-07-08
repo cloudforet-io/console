@@ -9,13 +9,12 @@ import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/t
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
@@ -29,7 +28,7 @@ import {
     makeSearchQueryTagsHandler,
     makeValueHandler,
 } from '@/services/preference/composables/bookmark-data-helper';
-import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
+import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/preference/constants/bookmark-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
@@ -37,22 +36,23 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
-const userWorkspaceStore = useUserWorkspaceStore();
-const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const router = useRouter();
 
 const storeState = reactive({
-    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList.filter((i) => !i.folder)),
+    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
+    entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
+    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
     loading: computed<boolean>(() => bookmarkPageState.loading),
+    searchFilter: computed<ConsoleFilter[]>(() => bookmarkPageState.searchFilter),
 });
 const tableState = reactive({
+    items: computed(() => (storeState.searchFilter.length === 0 ? storeState.bookmarkList.filter((i) => !i.folder) : storeState.bookmarkList)),
     fields: computed(() => [
         {
             name: 'name',
@@ -88,9 +88,9 @@ const tableState = reactive({
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
         type: makeEnumValueHandler(BOOKMARK_TYPE),
-        name: makeValueHandler(storeState.bookmarkList, 'name'),
-        scope: makeValueHandler(storeState.bookmarkList, 'scope'),
-        link: makeValueHandler(storeState.bookmarkList, 'link'),
+        name: makeValueHandler(storeState.entireBookmarkList, 'name'),
+        scope: makeValueHandler(storeState.entireBookmarkList, 'scope'),
+        link: makeValueHandler(storeState.entireBookmarkList, 'link'),
     })),
 });
 const dropdownState = reactive({
@@ -170,7 +170,7 @@ const fetchBookmarkList = async () => {
 </script>
 
 <template>
-    <section class="data-source-management-table">
+    <section class="bookmark-management-table">
         <p-data-loader :loading="storeState.loading"
                        class="data-loader-wrapper"
                        :data="true"
@@ -182,10 +182,12 @@ const fetchBookmarkList = async () => {
                              sortable
                              sort-by="name"
                              :sort-desc="true"
+                             :page-size="30"
+                             :page-size-options="PageSizeOptions"
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
                              :total-count="storeState.bookmarkTotalCount"
-                             :items="storeState.bookmarkList"
+                             :items="tableState.items"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              :get-row-selectable="getRowSelectable"
@@ -211,7 +213,15 @@ const fetchBookmarkList = async () => {
                              width="1.25rem"
                              height="1.25rem"
                         />
-                        <span class="name">{{ value }}</span>
+                        <span class="name">
+                            {{ value }}
+                            <p-i v-if="item.link"
+                                 name="ic_external-link"
+                                 color="inherit"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
+                        </span>
                     </div>
                 </template>
                 <template #col-workspace_id-format="{value, item}">
@@ -268,13 +278,14 @@ const fetchBookmarkList = async () => {
 </template>
 
 <style lang="postcss" scoped>
-.data-source-management-table {
+.bookmark-management-table {
     .table {
         .col-name {
             @apply flex items-center;
             gap: 0.5rem;
             .name {
-                @apply truncate;
+                @apply flex items-center truncate;
+                gap: 0.125rem;
                 max-width: 20.625rem;
             }
             &:hover {
@@ -299,23 +310,21 @@ const fetchBookmarkList = async () => {
             @apply block truncate;
             max-width: 12rem;
         }
+    }
 
-        /* custom design-system component - p-select-dropdown */
-        :deep(.p-select-dropdown) {
+    /* custom design-system component - p-toolbox-table */
+    :deep(.p-toolbox-table) {
+        td {
             .dropdown-context-menu {
                 min-width: 7.25rem !important;
                 margin-top: 0;
                 margin-left: -5.25rem;
             }
-        }
-    }
-
-    /* custom design-system component - p-toolbox-table */
-    :deep(.p-toolbox-table) {
-        td.has-width {
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-            min-width: unset;
+            &.has-width {
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+                min-width: unset;
+            }
         }
     }
 }

@@ -11,8 +11,6 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -28,13 +26,11 @@ import type { TreeNode } from '@/services/project/tree/type';
 const gnbStore = useGnbStore();
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
-const userWorkspaceStore = useUserWorkspaceStore();
-const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const route = useRoute();
 
 const storeState = reactive({
-    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
 });
 
