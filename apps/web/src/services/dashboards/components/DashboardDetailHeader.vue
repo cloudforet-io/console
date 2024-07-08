@@ -50,14 +50,21 @@ const state = reactive({
     shareWithCodeModalVisible: false,
     shareToWorkspaceModalVisible: false,
     isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared),
+    showBadge: computed<boolean>(() => {
+        if (dashboardDetailState.dashboardScope === 'PRIVATE') return true;
+        return dashboardDetailState.dashboardInfo?.workspace_id === '*';
+    }),
     badgeStyleType: computed<string>(() => {
         if (dashboardDetailState.dashboardScope === 'PRIVATE') return 'gray150';
         return 'indigo100';
     }),
     badgeText: computed(() => {
         if (dashboardDetailState.dashboardScope === 'PRIVATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
-        if (dashboardDetailState.dashboardInfo?.workspace_id === '*') return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
-        return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_WORKSPACE_OWNER');
+        if (dashboardDetailState.dashboardInfo?.workspace_id === '*') {
+            if (storeState.isAdminMode) return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
+            return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+        }
+        return '';
     }),
     menuItems: computed<MenuItem[]>(() => {
         if (dashboardDetailGetters.disableManageButtons) {
@@ -174,7 +181,7 @@ const handleConfirmShareToAllWorkspaces = async () => {
                         height="1.5rem"
             />
             <template #title-right-extra>
-                <p-badge v-if="!storeState.isAdminMode"
+                <p-badge v-if="state.showBadge"
                          badge-type="subtle"
                          :style-type="state.badgeStyleType"
                 >

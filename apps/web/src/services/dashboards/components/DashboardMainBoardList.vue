@@ -58,7 +58,10 @@ const state = reactive({
         return 'red100';
     }),
     badgeText: computed(() => {
-        if (props.dashboardType === 'SHARED') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARED');
+        if (props.dashboardType === 'SHARED') {
+            if (storeState.isAdminMode) return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
+            return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+        }
         if (props.dashboardType === 'PRIVATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
         return i18n.t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED');
     }),
@@ -80,6 +83,11 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
             eventAction: () => handleClickDeleteDashboard(dashboardId),
         },
     ];
+};
+const showBadge = (board: DashboardModel): boolean => {
+    if (props.dashboardType === 'PRIVATE' || props.dashboardType === 'DEPRECATED') return true;
+    if (board?.workspace_id === '*') return true;
+    return false;
 };
 const isPrivate = (dashboardId: string): boolean => dashboardId.startsWith('private');
 
@@ -151,7 +159,8 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="labels-wrapper">
-                        <p-badge badge-type="subtle"
+                        <p-badge v-if="showBadge(board)"
+                                 badge-type="subtle"
                                  :style-type="state.badgeStyleType"
                         >
                             <p-i v-if="props.dashboardType === 'PRIVATE'"

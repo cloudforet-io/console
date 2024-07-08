@@ -1779,6 +1779,8 @@
 			"SELECT_MONTH": "Select Month",
 			"SET_HOME": "Set as Home Dashboard",
 			"SHARE": "Share",
+			"SHARED_BY_ADMIN": "Shared by Admin",
+			"SHARED_TO_WORKSPACES": "Shared to Workspaces",
 			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "Are you sure you want to share this dashboard to all workspace?",
 			"SHARE_WITH_CODE": "Share with Code",
