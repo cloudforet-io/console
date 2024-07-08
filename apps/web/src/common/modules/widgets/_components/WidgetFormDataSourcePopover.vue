@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -30,7 +30,7 @@ import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
-    DATA_TABLE_TYPE,
+    DATA_TABLE_TYPE, DEFAULT_DATE_SORT,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -221,12 +221,19 @@ const handleConfirmDataSource = async () => {
                 metric_id: state.selectedMetricId,
             },
         };
-        await widgetGenerateStore.createAddDataTable({
+        const result = await widgetGenerateStore.createAddDataTable({
             ...addParameters,
             options: {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
         });
+        if (!widgetGenerateState.selectedDataTableId && result) {
+            widgetGenerateStore.setSelectedDataTableId(result?.data_table_id);
+            await widgetGenerateStore.loadDataTable({
+                data_table_id: result?.data_table_id,
+                sort: DEFAULT_DATE_SORT,
+            });
+        }
     }
     state.showPopover = false;
     state.loading = false;
@@ -237,10 +244,6 @@ watch(() => state.showPopover, (val) => {
         state.selectedDataSourceDomain = undefined;
         state.selectedPopperCondition = undefined;
     }
-});
-
-onMounted(() => {
-    console.debug(state.operatorMap);
 });
 </script>
 
