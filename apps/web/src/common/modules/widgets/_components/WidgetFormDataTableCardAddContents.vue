@@ -33,7 +33,7 @@ import WidgetFormDataTableCardSourceForm
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
-    DATA_TABLE_TYPE, DEFAULT_DATE_SORT, DEFAULT_SEPARATED_DATE_SORT,
+    DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { AdditionalLabel, DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -275,7 +275,6 @@ const handleUpdateDataTable = async () => {
     widgetGenerateStore.setDataTableUpdating(true);
     await widgetGenerateStore.loadDataTable({
         data_table_id: state.dataTableId,
-        sort: advancedOptionsState.separateDate ? DEFAULT_SEPARATED_DATE_SORT : DEFAULT_DATE_SORT,
     });
 
     // Update Referenced Transformed DataTable

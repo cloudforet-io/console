@@ -19,8 +19,6 @@ import WidgetFormDataTableCardTransformForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
 import {
     DATA_TABLE_TYPE,
-    DEFAULT_DATE_SORT,
-    DEFAULT_SEPARATED_DATE_SORT,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
@@ -216,7 +214,6 @@ const handleUpdateDataTable = async () => {
             widgetGenerateStore.setDataTableUpdating(true);
             await widgetGenerateStore.loadDataTable({
                 data_table_id: dataTable.data_table_id,
-                sort: Object.keys(dataTable?.labels_info ?? {}).includes('Date') ? DEFAULT_DATE_SORT : DEFAULT_SEPARATED_DATE_SORT,
             });
         }
         return;
@@ -226,12 +223,11 @@ const handleUpdateDataTable = async () => {
         name: state.dataTableName,
         options: { [state.operator]: options() },
     };
-    const result = await widgetGenerateStore.updateDataTable(updateParams);
+    await widgetGenerateStore.updateDataTable(updateParams);
     widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
     widgetGenerateStore.setDataTableUpdating(true);
     await widgetGenerateStore.loadDataTable({
         data_table_id: state.dataTableId,
-        sort: Object.keys(result?.labels_info ?? {}).includes('Date') ? DEFAULT_DATE_SORT : DEFAULT_SEPARATED_DATE_SORT,
     });
 
 

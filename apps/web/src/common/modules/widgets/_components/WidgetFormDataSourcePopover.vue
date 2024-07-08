@@ -31,7 +31,7 @@ import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
-    DATA_TABLE_TYPE, DEFAULT_DATE_SORT,
+    DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -232,7 +232,6 @@ const handleConfirmDataSource = async () => {
             widgetGenerateStore.setSelectedDataTableId(result?.data_table_id);
             await widgetGenerateStore.loadDataTable({
                 data_table_id: result?.data_table_id,
-                sort: DEFAULT_DATE_SORT,
             });
         }
     }

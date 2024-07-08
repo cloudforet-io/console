@@ -10,10 +10,6 @@ import {
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
 import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';
 import WidgetFormOverlayPreviewTable from '@/common/modules/widgets/_components/WidgetFormOverlayPreviewTable.vue';
-import {
-    DEFAULT_DATE_SORT,
-    DEFAULT_SEPARATED_DATE_SORT,
-} from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 const widgetGenerateStore = useWidgetGenerateStore();
@@ -109,7 +105,6 @@ onMounted(async () => {
         widgetGenerateStore.setDataTableUpdating(true);
         await widgetGenerateStore.loadDataTable({
             data_table_id: widgetGenerateState.selectedDataTableId,
-            sort: Object.keys(storeState.selectedDataTable?.labels_info ?? {}).includes('Date') ? DEFAULT_DATE_SORT : DEFAULT_SEPARATED_DATE_SORT,
         });
     }
 });

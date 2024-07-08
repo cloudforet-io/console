@@ -15,8 +15,6 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import { useProxyValue } from '@/common/composables/proxy-state';
 import {
     DATA_TABLE_TYPE,
-    DEFAULT_DATE_SORT,
-    DEFAULT_SEPARATED_DATE_SORT,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableDataType } from '@/common/modules/widgets/types/widget-model';
@@ -59,7 +57,6 @@ const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
     await widgetGenerateStore.loadDataTable({
         data_table_id: dataTableId,
-        sort: Object.keys(storeState.currentDataTable?.labels_info ?? {}).includes('Date') ? DEFAULT_DATE_SORT : DEFAULT_SEPARATED_DATE_SORT,
     });
     widgetGenerateStore.setSelectedPreviewGranularity(GRANULARITY.MONTHLY);
 };

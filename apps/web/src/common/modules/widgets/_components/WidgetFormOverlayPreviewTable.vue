@@ -19,10 +19,6 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import {
-    DEFAULT_DATE_SORT,
-    DEFAULT_SEPARATED_DATE_SORT,
-} from '@/common/modules/widgets/_constants/data-table-constant';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -172,20 +168,16 @@ const getSortIcon = (field: PreviewTableField) => {
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
     if (dataTableId) {
         state.thisPage = 1;
-        // state.sortBy = state.isSeparatedDataTable ? DEFAULT_SEPARATED_DATE_SORT : DEFAULT_DATE_SORT;
+        state.sortBy = [];
     }
 });
 
 watch(() => storeState.dataTableUpdating, () => {
     if (storeState.dataTableUpdating) {
         state.thisPage = 1;
-        // state.sortBy = state.isSeparatedDataTable ? DEFAULT_SEPARATED_DATE_SORT : DEFAULT_DATE_SORT;
+        state.sortBy = [];
     }
 });
-
-watch(() => state.isSeparatedDataTable, (changed) => {
-    state.sortBy = changed ? DEFAULT_SEPARATED_DATE_SORT : DEFAULT_DATE_SORT;
-}, { immediate: true });
 
 </script>
 
