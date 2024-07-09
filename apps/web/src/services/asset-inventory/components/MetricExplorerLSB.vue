@@ -221,6 +221,7 @@ const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceIte
                 type: MENU_ITEM_TYPE.COLLAPSIBLE,
                 label,
                 icon,
+                initialCollapsed: true,
                 subItems: [{
                     label: namespace.name,
                     name: namespace.key,
@@ -339,6 +340,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                                                      class="category-menu-item"
                                                      :item="item"
                                                      is-sub-item
+                                                     :override-collapsed="item.initialCollapsed"
                         >
                             <template #left-image>
                                 <img v-if="item.icon === 'COMMON'"
