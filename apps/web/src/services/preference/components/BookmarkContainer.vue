@@ -62,7 +62,18 @@ const handleCreateFolder = async (isEdit?: boolean, name?: string) => {
     await bookmarkPageStore.fetchBookmarkFolderList();
     await bookmarkPageStore.fetchBookmarkList();
 };
-const handleCreateLink = () => {
+const handleCreateLink = (selectedFolder?: BookmarkItem) => {
+    if (route.params.folder) {
+        if (!selectedFolder) {
+            router.push({
+                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
+                params: {
+                    group: route.params.group,
+                },
+            });
+        }
+        bookmarkPageStore.setIsTableItem(false);
+    }
     bookmarkPageStore.fetchBookmarkList();
 };
 const handleConfirmDelete = (isFolder?: boolean) => {
