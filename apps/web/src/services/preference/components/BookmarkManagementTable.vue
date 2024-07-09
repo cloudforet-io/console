@@ -3,9 +3,10 @@ import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown,
+    PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown, PLink,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -29,8 +30,10 @@ import {
     makeValueHandler,
 } from '@/services/preference/composables/bookmark-data-helper';
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/preference/constants/bookmark-constant';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkPageStore = useBookmarkPageStore();
@@ -93,20 +96,6 @@ const tableState = reactive({
         link: makeValueHandler(storeState.entireBookmarkList, 'link'),
     })),
 });
-const dropdownState = reactive({
-    menuItems: computed<MenuItem[]>(() => ([
-        {
-            icon: 'ic_edit',
-            name: 'edit',
-            label: i18n.t('IAM.BOOKMARK.EDIT'),
-        },
-        {
-            icon: 'ic_delete',
-            name: 'delete',
-            label: i18n.t('IAM.BOOKMARK.DELETE'),
-        },
-    ])),
-});
 
 const getFolderInfo = (id: string): BookmarkItem|undefined => {
     if (!id) return undefined;
@@ -128,15 +117,19 @@ const handleChange = (options: any = {}) => {
 const handleSelectDropdownMenu = (item: BookmarkItem, menu: string) => {
     bookmarkPageStore.setIsTableItem(true);
     if (menu === 'edit') {
-        bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, true);
+        bookmarkStore.setModalType(item.link ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, true);
         return;
     }
     if (menu === 'delete') {
-        bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.DELETE_LINK : BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
+        bookmarkStore.setModalType(item.link ? BOOKMARK_MODAL_TYPE.DELETE_LINK : BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
+        return;
+    }
+    if (menu === 'add') {
+        bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK);
         return;
     }
 
-    bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, false);
+    bookmarkStore.setModalType(item.link ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, false);
 };
 const handleUpdateVisibleMenu = (item: BookmarkItem, visibleMenu: boolean) => {
     if (visibleMenu) {
@@ -156,6 +149,32 @@ const handleClickName = (item: BookmarkItem) => {
             folder: item.name as string || '',
         },
     });
+};
+const getDropdownMenu = (item: BookmarkItem) => {
+    const defaultSets: MenuItem[] = [
+        {
+            icon: 'ic_edit',
+            name: 'edit',
+            label: i18n.t('HOME.BOOKMARK_EDIT'),
+        },
+        {
+            icon: 'ic_delete',
+            name: 'delete',
+            label: i18n.t('HOME.BOOKMARK_DELETE'),
+        },
+    ];
+    if (!item.link) {
+        return [
+            {
+                icon: 'ic_plus',
+                name: 'add',
+                label: i18n.t('HOME.BOOKMARK_ADD_LINK'),
+            },
+            { type: CONTEXT_MENU_TYPE.divider },
+            ...defaultSets,
+        ];
+    }
+    return defaultSets;
 };
 
 const fetchBookmarkList = async () => {
@@ -224,7 +243,8 @@ const fetchBookmarkList = async () => {
                         </span>
                     </div>
                 </template>
-                <template #col-workspace_id-format="{value, item}">
+                <!-- eslint-disable-next-line vue/no-unused-vars -->
+                <template #col-workspace_id-format="{_, item}">
                     <div class="col-workspace">
                         <div v-if="item.isGlobal"
                              class="workspace"
@@ -236,14 +256,31 @@ const fetchBookmarkList = async () => {
                             />
                             <span class="global">{{ $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') }}</span>
                         </div>
+                        <p-link v-else-if="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.state === WORKSPACE_STATE.ENABLE"
+                                :to="{
+                                    name: WORKSPACE_HOME_ROUTE._NAME,
+                                    params: {
+                                        workspaceId: item.workspaceId,
+                                    },
+                                }"
+                                action-icon="internal-link"
+                                new-tab
+                                class="workspace"
+                        >
+                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name || ''"
+                                                 :theme="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.tags?.theme"
+                                                 size="xs"
+                            />
+                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name }}</span>
+                        </p-link>
                         <div v-else
                              class="workspace"
                         >
-                            <workspace-logo-icon :text="getWorkspaceInfo(value, storeState.workspaceList)?.name || ''"
-                                                 :theme="getWorkspaceInfo(value, storeState.workspaceList)?.tags?.theme"
+                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name || ''"
+                                                 :theme="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.tags?.theme"
                                                  size="xs"
                             />
-                            <span class="text">{{ getWorkspaceInfo(value, storeState.workspaceList)?.name }}</span>
+                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name }}</span>
                         </div>
                         <div v-if="item.folder"
                              class="folder-wrapper"
@@ -261,7 +298,7 @@ const fetchBookmarkList = async () => {
                 </template>
                 <template #col-action_button-format="{item}">
                     <p-select-dropdown v-if="item.isGlobal"
-                                       :menu="dropdownState.menuItems"
+                                       :menu="getDropdownMenu(item)"
                                        style-type="icon-button"
                                        button-icon="ic_ellipsis-horizontal"
                                        use-fixed-menu-style
@@ -304,6 +341,16 @@ const fetchBookmarkList = async () => {
             .text {
                 @apply truncate;
                 max-width: 10rem;
+            }
+
+            /* custom design-system component - p-link */
+            :deep(.p-link) {
+                @apply flex items-center;
+                gap: 0.25rem;
+                .text {
+                    @apply flex items-center;
+                    gap: 0.25rem;
+                }
             }
         }
         .col-link {

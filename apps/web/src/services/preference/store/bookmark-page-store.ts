@@ -55,9 +55,10 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     const getters = reactive({
         entireBookmarkList: computed<BookmarkItem[]>(() => {
             const globalBookmark = state.bookmarkList.filter((i) => i.isGlobal);
-            const sortedGlobalBookmark = sortBy(globalBookmark, (i) => !i.link).reverse();
+            const sortedGlobalBookmark = sortBy(globalBookmark, [(i) => !i.link, (i) => i.updatedAt]).reverse();
+
             const workspaceBookmark = state.bookmarkList.filter((i) => !i.isGlobal);
-            const sortedWorkspaceBookmark = sortBy(workspaceBookmark, (i) => !i.link).reverse();
+            const sortedWorkspaceBookmark = sortBy(workspaceBookmark, [(i) => !i.link, (i) => i.updatedAt]).reverse();
             return [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
         }),
         bookmarkList: computed<BookmarkItem[]>(() => getters.entireBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit)),
@@ -132,8 +133,9 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                 });
                 state.bookmarkFolderList = (results ?? []).map((i) => ({
                     ...i.data,
-                    workspace_id: i.data.workspaceId,
+                    workspaceId: i.data.workspaceId,
                     id: i.name,
+                    updatedAt: i.updated_at,
                 } as BookmarkItem));
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -177,15 +179,17 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                         return {
                             ...item.data as BookmarkItem,
                             id: item.name,
-                            workspace_id: item.data.workspaceId,
+                            workspaceId: item.data.workspaceId,
+                            updatedAt: item.updated_at,
                         };
                     }
                     const imgIcon = item.data.imgIcon || await fetchFavicon(item.data.link);
                     return {
                         ...item.data as BookmarkItem,
                         id: item.name,
-                        workspace_id: item.data.workspaceId,
+                        workspaceId: item.data.workspaceId,
                         imgIcon: imgIcon || undefined,
+                        updatedAt: item.updated_at,
                     };
                 });
                 state.bookmarkList = await Promise.all(promises);
