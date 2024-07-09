@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI, PTreeView } from '@spaceone/design-system';
+import { PI, PTextButton, PTreeView } from '@spaceone/design-system';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
@@ -35,7 +35,9 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    bookmarkTreeData: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(storeState.bookmarkFolderList)),
+    showMorePage: 1,
+    convertedList: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(storeState.bookmarkFolderList)),
+    bookmarkTreeData: computed<TreeNode[]>(() => state.convertedList.slice(0, 20 * state.showMorePage)),
     selectedTreeId: undefined as string|undefined,
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
@@ -230,6 +232,15 @@ watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookm
                 </div>
             </template>
         </p-tree-view>
+        <p-text-button v-if="state.convertedList.length !== state.bookmarkTreeData.length"
+                       style-type="highlight"
+                       size="sm"
+                       icon-right="ic_chevron-down"
+                       class="show-more"
+                       @click="state.showMorePage += 1"
+        >
+            {{ $t('IAM.BOOKMARK.TOGGLE_MORE') }}
+        </p-text-button>
     </div>
 </template>
 
@@ -275,6 +286,10 @@ watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookm
                 display: block;
             }
         }
+    }
+    .show-more {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
     }
 }
 </style>

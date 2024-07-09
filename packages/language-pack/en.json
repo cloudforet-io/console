@@ -2177,6 +2177,7 @@
 			"GLOBAL_NOTIFICATION": "Global bookmarks are displayed at the top of every workspace home and are managed only by admins.",
 			"GO_TO_WORKSPACE": "Go to this Workspace",
 			"LINK": "Link",
+			"TOGGLE_MORE": "show more",
 			"TYPE": "Type"
 		},
 		"DOMAIN_SETTINGS": {
