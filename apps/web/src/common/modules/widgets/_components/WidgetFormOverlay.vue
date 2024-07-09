@@ -5,7 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, POverlayLayout,
+    PButton, PButtonModal, POverlayLayout,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -53,10 +53,12 @@ const state = reactive({
         }
         return false;
     }),
+    warningModalVisible: false,
 });
 
 /* Api */
 const deleteWidget = async (widgetId: string) => {
+    if (!widgetId) return;
     const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
     const fetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateWidget.delete<PrivateWidgetDeleteParameters>
@@ -89,19 +91,28 @@ const handleClickContinue = async () => {
     widgetGenerateStore.setShowOverlay(false);
 };
 const handleUpdateVisible = (value: boolean) => {
+    if (!value && widgetGenerateState.widget?.state === 'CREATING') {
+        state.warningModalVisible = true;
+        return;
+    }
     widgetGenerateStore.setShowOverlay(value);
+};
+const handleCloseWarningModal = () => {
+    state.warningModalVisible = false;
+};
+const handleConfirmWarningModal = async () => {
+    state.warningModalVisible = false;
+    await deleteWidget(widgetGenerateState.widgetId);
+    widgetGenerateStore.reset();
+    widgetGenerateStore.setShowOverlay(false);
 };
 
 /* Watcher */
 watch(() => widgetGenerateState.showOverlay, async (val) => {
-    if (!val) {
-        if (widgetGenerateState.widget?.state === 'CREATING') {
-            await deleteWidget(widgetGenerateState.widgetId);
-        } else {
-            widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
-            widgetGenerateStore.reset();
-        }
-    } else if (widgetGenerateState.overlayType !== 'ADD') {
+    if (!val && widgetGenerateState.widget?.state !== 'CREATING') {
+        widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
+        widgetGenerateStore.reset();
+    } else if (val && widgetGenerateState.overlayType !== 'ADD') {
         await widgetGenerateStore.listDataTable();
     }
 });
@@ -113,7 +124,7 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                           style-type="primary"
                           size="full"
                           :title="state.sidebarTitle"
-                          @update:visible="handleUpdateVisible"
+                          @close="handleUpdateVisible"
         >
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
             <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2" />
@@ -131,6 +142,19 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                 </div>
             </template>
         </p-overlay-layout>
+        <p-button-modal :header-title="$t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_TITLE')"
+                        :visible.sync="state.warningModalVisible"
+                        size="sm"
+                        :fade="true"
+                        :backdrop="true"
+                        theme-color="alert"
+                        @confirm="handleConfirmWarningModal"
+                        @cancel="handleCloseWarningModal"
+        >
+            <template #body>
+                <p>{{ $t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_DESC') }}</p>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 

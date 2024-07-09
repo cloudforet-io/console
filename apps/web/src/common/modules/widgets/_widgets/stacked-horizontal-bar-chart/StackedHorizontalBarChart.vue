@@ -148,7 +148,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
                     },
                 },
                 field_group: [state.stackByField],
-                sort: [{ key: `_total_${state.dataField}`, desc: true }],
+                sort: [{ key: `_total_${state.dataField}`, desc: false }],
                 page: { start: 1, limit: state.yAxisCount },
             },
             vars: props.dashboardVars,

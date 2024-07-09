@@ -6,11 +6,12 @@ import {
 import {
     PDivider, PSelectButton, PButton,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import type {
     DashboardOptions, DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
+import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
@@ -48,8 +49,8 @@ const state = reactive({
     selectedWidgetType: widgetGenerateState.widget?.widget_type as WidgetType,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
-        { label: 'Full', name: 'FULL' },
-        { label: 'Actual', name: 'ACTUAL' },
+        { label: i18n.t('COMMON.WIDGETS.FULL'), name: 'FULL' },
+        { label: i18n.t('COMMON.WIDGETS.ACTUAL'), name: 'ACTUAL' },
     ],
     selectedWidgetSize: 'ACTUAL',
     widgetSize: computed(() => {
@@ -121,11 +122,11 @@ const isWidgetOptionsChanged = (
     let _isChanged = false;
     Object.entries(widgetForm).forEach(([k, v]) => {
         if (_isChanged) return;
-        if (typeof v === 'object') {
+        if (typeof v === 'object' && !Array.isArray(v)) {
             _isChanged = isWidgetOptionsChanged(_isChanged, v, widgetOptions?.[k]);
             return;
         }
-        _isChanged = widgetOptions?.[k] !== v;
+        _isChanged = !isEqual(widgetOptions?.[k], v);
     });
     return _isChanged;
 };

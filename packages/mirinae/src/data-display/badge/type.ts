@@ -38,6 +38,7 @@ export const SUBTLE_STYLE_TYPE = {
     green200: 'green200',
     indigo100: 'indigo100',
     gray100: 'gray100',
+    gray150: 'gray150',
     gray200: 'gray200',
     yellow200: 'yellow200',
     red100: 'red100',

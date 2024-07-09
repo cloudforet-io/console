@@ -93,7 +93,8 @@ const checkValue = ():boolean => {
     return true;
 };
 
-watch(() => state.proxyValue, () => {
+watch(() => state.proxyValue, (changed) => {
+    if (changed === undefined) state.toggleValue = false;
     emit('update:is-valid', checkValue());
 }, { immediate: true });
 

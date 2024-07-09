@@ -1312,6 +1312,7 @@
 			"TITLE": "Change Project"
 		},
 		"WIDGETS": {
+			"ACTUAL": "Actual",
 			"ADD_WIDGET": "Add Widget",
 			"ADD_WIDGET_TO_DASHBOARD": "Add Widget to Dashboard",
 			"ALL_SUMMARY": {
@@ -1401,6 +1402,7 @@
 			"DATA_NOT_DISPLAYED": "Data Not Displayed",
 			"DATA_NOT_DISPLAYED_DESC": "Please complete all required fields and click the [Apply] button to display the data.",
 			"DATA_TABLE": {
+				"ADD": "Add Data",
 				"ALERT": {
 					"DELETE_DESC": "Are you sure you want to delete this data?",
 					"DELETE_HEADER": "Delete Data",
@@ -1414,17 +1416,23 @@
 					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "This name is already being used.",
 					"ADDITIONAL_LABELS_NAME": "Field Name",
 					"ADDITIONAL_LABELS_VALUE": "Value",
+					"ADD_FILTER": "Add Filter",
 					"ADD_LABEL": "Add Label",
 					"ADVANCED_OPTIONS": "Advanced Options",
+					"CONCAT_DESC": "Combines multiple tables into one by stacking them.",
 					"DATA_FIELD_NAME": "Data Field Name",
 					"DATA_FIELD_NAME_GROUP_BY_INVALID_TEXT": "Please enter the name.",
 					"DATA_FIELD_NAME_INVALID_TEXT": "Please enter the name.",
 					"DATA_TABLE_NAME_SUCCESS": "Data name successfully changed.",
 					"DATA_TABLE_NAME_WARNING": "A data with this name already exists.",
 					"DATA_UNIT": "Data Unit",
+					"EVAL_DESC": "Apply Functions or calculations to data fields. ",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day cannot be used as field names.",
 					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "Group by names cannot be used as field names.",
+					"FILTERS": "Filters",
 					"GROUP_BY": "Group by",
+					"JOIN_DESC": "Merge rows from different tables based on a common column. ",
+					"QUERY_DESC": "Filter and extract data that meet specific conditions. ",
 					"SELECT_DATA_SOURCE_SUCCESS": "Data successfully changed.",
 					"SELECT_DATA_TABLE_WARNING": "Please save the data table first.",
 					"SEPARATE": "Separate Date",
@@ -1433,7 +1441,8 @@
 					"UPDATE_DATA_TALBE_INVALID_SUCCESS": "Changes have been successfully applied.",
 					"UPDATE_DATA_TALBE_INVALID_WARNING": "Unable to apply changes. Please check the form.",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "'{first_data}' cannot be joined with '{second_data}' because the two data tables have one or more identical data fields."
-				}
+				},
+				"TRANSFORM": "Transform Data"
 			},
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
@@ -1452,6 +1461,8 @@
 			},
 			"FIELD": "Field",
 			"FORM": {
+				"CREATING_WIDGET_WARNING_MODAL_DESC": "Are you sure you want to exit? Closing this window will discard any data currently being generated.",
+				"CREATING_WIDGET_WARNING_MODAL_TITLE": "Unsaved Data",
 				"WIDGET_VALIDATION_WARNING_DESC": "To illustrate chart properly, check the form below and set the correct values.",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "The ‘Region’ field is missing from the Data Table.",
 				"WIDGET_VALIDATION_WARNING_TITLE": "Empty or incorrect values"
@@ -1461,6 +1472,7 @@
 				"GAUGE_DESC": "Gauge color changes based on threshold values.",
 				"PROGRESS_CARD_DESC": "Bar color changes based on threshold values."
 			},
+			"FULL": "Full ",
 			"FULL_WIDTH": "Full Width",
 			"HEALTH_DASHBOARD_DESC_1": "You can use the AWS Health Dashboard. If you have a Business or Enterprise support plan of AWS.",
 			"HEALTH_DASHBOARD_DESC_2": "Can't see the widget? even you are using a suitable plan. Please contact us.",
@@ -1587,6 +1599,7 @@
 		"ALL_DASHBOARDS": {
 			"CREATE": "Create",
 			"CREAT_NEW_DASHBOARD": "Create New Dashboard",
+			"DASHBOARD": "Dashboard",
 			"DASHBOARDS_TITLE": "Dashboard",
 			"DEPRECATED": "Deprecated",
 			"DEPRECATED_DESCRIPTION": "This dashboard is no longer supported and will be removed soon as the new dashboard is adopted.",
@@ -1601,6 +1614,7 @@
 			"LABEL_VIWERS": "Viewers",
 			"PRIVATE": "Private",
 			"PROJECT": "Project",
+			"SHARED": "Shared",
 			"SINGLE_PROJECT": "Single Project",
 			"TOOLTIP_CLONE": "Clone",
 			"TOOLTIP_DELETE": "Delete",
@@ -1777,6 +1791,8 @@
 			"SELECT_MONTH": "Select Month",
 			"SET_HOME": "Set as Home Dashboard",
 			"SHARE": "Share",
+			"SHARED_BY_ADMIN": "Shared by Admin",
+			"SHARED_TO_WORKSPACES": "Shared to Workspaces",
 			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "Are you sure you want to share this dashboard to all workspace?",
 			"SHARE_WITH_CODE": "Share with Code",
