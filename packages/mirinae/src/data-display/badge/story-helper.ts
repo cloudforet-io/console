@@ -1,4 +1,4 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/vue';
 
 import {
     BADGE_FONT_WEIGHT, BADGE_SHAPE, BADGE_STYLE_TYPE, BADGE_TYPE,
