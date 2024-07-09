@@ -4,7 +4,9 @@
 </script>
 
 <template>
-    <button class="primary">버튼</button>
+    <button class="primary">
+        버튼
+    </button>
 </template>
 
 <style lang="postcss">
