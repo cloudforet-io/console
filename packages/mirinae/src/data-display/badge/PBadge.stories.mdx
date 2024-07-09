@@ -10,7 +10,7 @@ import { getBadgesArgTypes } from '@/data-display/badge/story-helper';
     }
 }} argTypes={getBadgesArgTypes()}/>
 
-export const Template = (args,{argTypes})=>({
+export const Template = (args, { argTypes })=>({
     props: Object.keys(argTypes),
     components: { PBadge },
     template: `

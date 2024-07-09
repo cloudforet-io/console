@@ -3,7 +3,9 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 
 import { getBadgesArgTypes } from '@/data-display/badge/story-helper';
-import { SOLID_STYLE_TYPE, SOLID_OUTLINE_STYLE_TYPE, SUBTLE_STYLE_TYPE } from '@/data-display/badge/type';
+import {
+    SOLID_STYLE_TYPE, SOLID_OUTLINE_STYLE_TYPE, SUBTLE_STYLE_TYPE, BADGE_FONT_WEIGHT, BADGE_SHAPE, BADGE_STYLE_TYPE, BADGE_TYPE,
+} from '@/data-display/badge/type';
 
 import PBadge from './PBadge.vue';
 
@@ -13,35 +15,53 @@ const meta : Meta<PBadgePropsAndCustomArgs> = {
     title: 'Data Display/Badge',
     component: PBadge,
     argTypes: getBadgesArgTypes(),
-    // render: (args) => ({
-    //     components: { PBadge },
-    //     setup() {
-    //         return { args };
-    //     },
-    //     template: `
-    //         <div style="display:flex; align-items:center; justify-content:center; height:100px;">
-    //             <p-badge
-    //                 :badge-type="badgeType"
-    //                 :style-type="styleType"
-    //                 :text-color="textColor"
-    //                 :background-color="backgroundColor"
-    //                 :outline-color="outlineColor"
-    //                 :shape="shape"
-    //                 :font-weight="fontWeight"
-    //             >{{$props.defaultSlot}}</p-badge>
-    //         </div>`
-    // })
+    parameters: {
+        design: {
+            type: 'figma',
+            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124077',
+        },
+    },
+    args: {
+        badgeType: BADGE_TYPE.SOLID,
+        styleType: BADGE_STYLE_TYPE.primary,
+        textColor: undefined,
+        backgroundColor: undefined,
+        outlineColor: undefined,
+        shape: BADGE_SHAPE.ROUND,
+        fontWeight: BADGE_FONT_WEIGHT.REGULAR,
+        defaultSlot: 'badge',
+    },
 };
 
 export default meta;
 type Story = StoryObj<typeof PBadge>;
 
-export const BadgeTypes: Story = {
+const Template: Story = {
     render: (args) => ({
         components: { PBadge },
         setup() {
+            return { args };
+        },
+        template: `
+            <div style="display:flex; align-items:center; justify-content:center; height:100px;">
+            <p-badge
+                :badge-type="args.badgeType"
+                :style-type="args.styleType"
+                :text-color="args.textColor"
+                :background-color="args.backgroundColor"
+                :outline-color="args.outlineColor"
+                :shape="args.shape"
+                :font-weight="args.fontWeight"
+            >{{args.defaultSlot}}</p-badge>
+            </div>`,
+    }),
+};
+
+export const BadgeTypes: Story = {
+    render: () => ({
+        components: { PBadge },
+        setup() {
             return {
-                args,
                 solidStyleTypes: Object.values(SOLID_STYLE_TYPE),
                 solidOutlineStyleTypes: Object.values(SOLID_OUTLINE_STYLE_TYPE),
                 subtleStyleTypes: Object.values(SUBTLE_STYLE_TYPE),
@@ -83,6 +103,40 @@ export const BadgeTypes: Story = {
                 </p-badge>
             </div>`,
     }),
+};
+
+export const Shapes: Story = {
+    render: () => ({
+        components: { PBadge },
+        template: `
+            <div style="display: flex; align-items: center; justify-content: center; height: 100px">
+                <p-badge shape="round">
+                    <div>round</div>
+                </p-badge>
+                <p-badge shape="square" style="margin-left: 20px">
+                    <div>square</div>
+                </p-badge>
+            </div>`,
+    }),
+};
+
+export const FontWeight: Story = {
+    render: () => ({
+        components: { PBadge },
+        template: `
+            <div style="display: flex; align-items: center; justify-content: center; height: 100px">
+                <p-badge shape="round">
+                    <div>Regular</div>
+                </p-badge>
+                <p-badge shape="round" style="margin-left: 20px" font-weight="medium">
+                    <div>Medium</div>
+                </p-badge>
+            </div>`,
+    }),
+};
+
+export const Playground: Story = {
+    ...Template,
 };
 
 // import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
