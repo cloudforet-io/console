@@ -109,10 +109,16 @@ const handleChange = (options: any = {}) => {
     if (options.queryTags !== undefined) {
         const filters = makeSearchQueryTagsHandler(options.queryTags);
         bookmarkPageStore.setBookmarkListSearchFilters(filters);
+        fetchBookmarkList();
     }
-    if (options.pageStart !== undefined) bookmarkPageStore.setBookmarkListPageStart(options.pageStart - 1);
-    if (options.pageLimit !== undefined) bookmarkPageStore.setBookmarkListPageLimit(options.pageLimit);
-    fetchBookmarkList();
+    if (options.pageStart !== undefined) {
+        bookmarkPageStore.setBookmarkListPageStart(options.pageStart - 1);
+        bookmarkPageStore.setSelectedBookmarkIndices([]);
+    }
+    if (options.pageLimit !== undefined) {
+        bookmarkPageStore.setBookmarkListPageLimit(options.pageLimit);
+        bookmarkPageStore.setSelectedBookmarkIndices([]);
+    }
 };
 const handleSelectDropdownMenu = (item: BookmarkItem, menu: string) => {
     bookmarkPageStore.setIsTableItem(true);
