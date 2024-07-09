@@ -11,7 +11,7 @@ import type {
     EChartsType,
 } from 'echarts/core';
 import {
-    isEmpty, throttle,
+    isEmpty, sortBy, throttle,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -159,10 +159,9 @@ const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
     // sort and slice Data, etc
-    // const _sortedData = sortBy(rawData?.results, (v) => state.dataField.reduce((acc, field) => acc + (v[field] as number), 0)).reverse();
-    const _rawData = rawData?.results ?? [];
-    const _slicedData = _rawData.slice(0, state.xAxisCount);
-    const _etcData = _rawData.slice(state.xAxisCount).reduce((acc, v) => {
+    const _sortedData = sortBy(rawData?.results, (v) => state.dataField.reduce((acc, field) => acc + (v[field] as number), 0)).reverse();
+    const _slicedData = _sortedData.slice(0, state.xAxisCount);
+    const _etcData = _sortedData.slice(state.xAxisCount).reduce((acc, v) => {
         state.dataField.forEach((field) => {
             acc[field] = (acc[field] as number) + (v[field] as number);
         });
