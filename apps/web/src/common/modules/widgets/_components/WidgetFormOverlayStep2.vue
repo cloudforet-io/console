@@ -6,7 +6,7 @@ import {
 import {
     PDivider, PSelectButton, PButton,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import type {
     DashboardOptions, DashboardVars,
@@ -122,11 +122,11 @@ const isWidgetOptionsChanged = (
     let _isChanged = false;
     Object.entries(widgetForm).forEach(([k, v]) => {
         if (_isChanged) return;
-        if (typeof v === 'object') {
+        if (typeof v === 'object' && !Array.isArray(v)) {
             _isChanged = isWidgetOptionsChanged(_isChanged, v, widgetOptions?.[k]);
             return;
         }
-        _isChanged = widgetOptions?.[k] !== v;
+        _isChanged = !isEqual(widgetOptions?.[k], v);
     });
     return _isChanged;
 };
