@@ -19,6 +19,7 @@ interface BadgeProps {
     outlineColor?: string;
     shape?: BadgeShape;
     fontWeight?: BadgeFontWeight;
+    defaultSlot?: 'badge';
 }
 
 const props = withDefaults(defineProps<BadgeProps>(), {
@@ -29,6 +30,7 @@ const props = withDefaults(defineProps<BadgeProps>(), {
     outlineColor: undefined,
     shape: BADGE_SHAPE.ROUND,
     fontWeight: BADGE_FONT_WEIGHT.REGULAR,
+    defaultSlot: 'badge',
 });
 
 const state = reactive({
