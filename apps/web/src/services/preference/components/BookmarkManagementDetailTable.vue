@@ -6,6 +6,7 @@ import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectStatus, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type {
     KeyItemSet,
     ValueHandlerMap,
@@ -96,21 +97,33 @@ const tableState = reactive({
         { label: i18n.t('IAM.BOOKMARK.FOLDER') as string, name: BOOKMARK_TYPE.FOLDER },
     ])),
 });
-const dropdownState = reactive({
-    menuItems: computed<MenuItem[]>(() => ([
+
+const getDropdownMenu = (item: BookmarkItem) => {
+    const defaultSets: MenuItem[] = [
         {
             icon: 'ic_edit',
             name: 'edit',
-            label: i18n.t('IAM.BOOKMARK.EDIT'),
+            label: i18n.t('HOME.BOOKMARK_EDIT'),
         },
         {
             icon: 'ic_delete',
             name: 'delete',
-            label: i18n.t('IAM.BOOKMARK.DELETE'),
+            label: i18n.t('HOME.BOOKMARK_DELETE'),
         },
-    ])),
-});
-
+    ];
+    if (!item.link) {
+        return [
+            {
+                icon: 'ic_plus',
+                name: 'add',
+                label: i18n.t('HOME.BOOKMARK_ADD_LINK'),
+            },
+            { type: CONTEXT_MENU_TYPE.divider },
+            ...defaultSets,
+        ];
+    }
+    return defaultSets;
+};
 const handleSelectType = (value: string) => {
     bookmarkPageStore.setSelectedType(value);
     if (value === 'All') {
@@ -128,11 +141,15 @@ const fetchBookmarkList = async (selectedType?: string) => {
 const handleSelectDropdownMenu = (item: BookmarkItem, menu: string) => {
     bookmarkPageStore.setIsTableItem(true);
     if (menu === 'edit') {
-        bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, true);
+        bookmarkStore.setModalType(item.link ? BOOKMARK_MODAL_TYPE.LINK : BOOKMARK_MODAL_TYPE.FOLDER, true);
         return;
     }
     if (menu === 'delete') {
-        bookmarkStore.setModalType(item.folder ? BOOKMARK_MODAL_TYPE.DELETE_LINK : BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
+        bookmarkStore.setModalType(item.link ? BOOKMARK_MODAL_TYPE.DELETE_LINK : BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
+        return;
+    }
+    if (menu === 'add') {
+        bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK);
         return;
     }
 
@@ -249,7 +266,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                 </template>
                 <template #col-action_button-format="{item}">
                     <p-select-dropdown v-if="item.isGlobal"
-                                       :menu="dropdownState.menuItems"
+                                       :menu="getDropdownMenu(item)"
                                        style-type="icon-button"
                                        button-icon="ic_ellipsis-horizontal"
                                        use-fixed-menu-style
@@ -294,6 +311,9 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
     :deep(.p-toolbox-table) {
         .p-toolbox {
             padding-bottom: 0;
+        }
+        .table-container {
+            padding-bottom: 2.5rem;
         }
         td {
             .dropdown-context-menu {
