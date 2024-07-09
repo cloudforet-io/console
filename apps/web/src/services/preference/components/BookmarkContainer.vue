@@ -108,7 +108,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="admin-bookmark-page">
+    <div class="bookmark-container">
         <router-view />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
                                     :bookmark-folder-list="state.globalFolderList"
@@ -129,9 +129,3 @@ onMounted(() => {
         />
     </div>
 </template>
-
-<style lang="postcss" scoped>
-.admin-bookmark-page {
-    padding-bottom: 2.5rem;
-}
-</style>

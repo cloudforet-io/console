@@ -367,6 +367,9 @@ const fetchBookmarkList = async () => {
 
     /* custom design-system component - p-toolbox-table */
     :deep(.p-toolbox-table) {
+        .table-container {
+            padding-bottom: 2.5rem;
+        }
         td {
             .dropdown-context-menu {
                 min-width: 7.25rem !important;

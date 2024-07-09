@@ -211,6 +211,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookm
                                                  :text="getWorkspaceInfo(node.data.id, storeState.workspaceList)?.name || ''"
                                                  :theme="getWorkspaceInfo(node.data.id, storeState.workspaceList)?.tags?.theme"
                                                  size="xxs"
+                                                 class="workspace-logo-icon"
                             />
                             <span class="text">{{ node.id === 'global' ? $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : getWorkspaceInfo(node.data.name, storeState.workspaceList)?.name || '' }}</span>
                         </div>
@@ -243,7 +244,11 @@ watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookm
             .bookmark {
                 @apply flex items-center gap-1;
             }
-
+            .workspace-logo-icon {
+                width: 0.875rem;
+                min-width: 0.875rem;
+                height: 0.875rem;
+            }
             .bookmark-icon {
                 min-width: 0.875rem;
             }
