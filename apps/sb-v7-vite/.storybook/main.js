@@ -11,8 +11,8 @@ function getAbsolutePath(value) {
 /** @type { import('@storybook/vue-vite').StorybookConfig } */
 const config = {
   stories: [
-    "../stories/**/*.mdx",
-    "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)",
+    '../../../packages/mirinae/src/yubeom/**/*.mdx',
+    '../../../packages/mirinae/src/yubeom/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
@@ -22,7 +22,7 @@ const config = {
   framework: {
     name: getAbsolutePath("@storybook/vue-vite"),
     options: {},
-  },
+  }
   // docs: {
   //   autodocs: "tag",
   // },
