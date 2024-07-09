@@ -85,7 +85,25 @@ const state = reactive({
 });
 
 const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[]): TreeNode[] => {
-    const workspaceMap: { [key: string]: TreeNode } = {};
+    const workspaceMap: { [key: string]: TreeNode } = storeState.workspaceList.flatMap((item) => item.workspace_id)
+        .reduce((acc, cur) => {
+            acc[cur] = {
+                id: cur,
+                depth: 0,
+                data: {
+                    id: cur,
+                    name: cur,
+                    to: {
+                        name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
+                        params: {
+                            group: cur,
+                        },
+                    },
+                },
+                children: [],
+            };
+            return acc;
+        }, {} as { [key: string]: TreeNode });
     const globalChildren: TreeNode[] = [];
 
     allBookmarkFolderItems?.forEach((item) => {

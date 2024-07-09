@@ -1,7 +1,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    at, filter, indexOf, sortBy,
+    at, filter, forEach, indexOf, sortBy,
 } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -59,6 +59,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
 
             const workspaceBookmark = state.bookmarkList.filter((i) => !i.isGlobal);
             const sortedWorkspaceBookmark = sortBy(workspaceBookmark, [(i) => !i.link, (i) => i.updatedAt]).reverse();
+
             return [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
         }),
         bookmarkList: computed<BookmarkItem[]>(() => getters.entireBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit)),
@@ -113,8 +114,12 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         },
         fetchWorkspaceList: async () => {
             try {
-                const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>();
-                state.workspaceList = results ?? [];
+                const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+                    query: {
+                        filter: [{ k: 'state', v: 'ENABLED', o: 'eq' }],
+                    },
+                });
+                state.workspaceList = sortBy((results ?? []), (i) => i.name.toLowerCase());
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.workspaceList = [];
@@ -131,12 +136,25 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                 const { results } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
-                state.bookmarkFolderList = (results ?? []).map((i) => ({
+
+                const list = (results ?? []).map((i) => ({
                     ...i.data,
                     workspaceId: i.data.workspaceId,
                     id: i.name,
                     updatedAt: i.updated_at,
                 } as BookmarkItem));
+
+                const enabledWorkspaceBookmark: BookmarkItem[] = [];
+                forEach(list, (item) => {
+                    const workspace = state.workspaceList.find((w) => w.workspace_id === item.workspaceId);
+                    if (workspace?.state === 'ENABLED') {
+                        enabledWorkspaceBookmark.push(item);
+                    } else if (item.isGlobal) {
+                        enabledWorkspaceBookmark.push(item);
+                    }
+                });
+
+                state.bookmarkFolderList = enabledWorkspaceBookmark;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkFolderList = [];
@@ -170,7 +188,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                 .setFilters(defaultFilters);
             state.loading = true;
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
+                const { results } = await SpaceConnector.clientV2.config.publicConfig.list<PublicConfigListParameters, ListResponse<PublicConfigModel>>({
                     query: BookmarkListApiQueryHelper.data,
                 });
 
@@ -192,8 +210,19 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                         updatedAt: item.updated_at,
                     };
                 });
-                state.bookmarkList = await Promise.all(promises);
-                state.bookmarkTotalCount = total_count || 0;
+                const list = await Promise.all(promises);
+
+                const enabledWorkspaceBookmark: BookmarkItem[] = [];
+                forEach(list, (item) => {
+                    const workspace = state.workspaceList.find((w) => w.workspace_id === item.workspaceId);
+                    if (workspace?.state === 'ENABLED') {
+                        enabledWorkspaceBookmark.push(item);
+                    } else if (item.isGlobal) {
+                        enabledWorkspaceBookmark.push(item);
+                    }
+                });
+                state.bookmarkList = enabledWorkspaceBookmark;
+                state.bookmarkTotalCount = enabledWorkspaceBookmark.length || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkList = [];

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
+
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
@@ -32,6 +34,7 @@ const router = useRouter();
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
 
+    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
@@ -79,6 +82,10 @@ const handleConfirmDelete = (isFolder?: boolean) => {
     bookmarkPageStore.setSelectedBookmarkIndices([]);
 };
 
+watch(() => storeState.workspaceList, () => {
+    bookmarkPageStore.fetchBookmarkFolderList();
+});
+
 onUnmounted(() => {
     bookmarkPageStore.resetState();
     bookmarkStore.resetState();
@@ -86,7 +93,6 @@ onUnmounted(() => {
 
 onMounted(() => {
     bookmarkPageStore.fetchWorkspaceList();
-    bookmarkPageStore.fetchBookmarkFolderList();
 });
 </script>
 
