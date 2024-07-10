@@ -2085,7 +2085,7 @@
 		"BOOKMARK_MORE": "추가",
 		"BOOKMARK_MY": "나의",
 		"BOOKMARK_MY_BOOKMARK": "내 북마크",
-		"BOOKMARK_SEARCH": "",
+		"BOOKMARK_SEARCH": "폴더 검색",
 		"BOOKMARK_SELECTED": "{count}개 선택됨",
 		"BOOKMARK_SHARED": "공유",
 		"BOOKMARK_SHARED_BOOKMARK": "공유 북마크",
@@ -2165,7 +2165,7 @@
 			"TITLE": "앱"
 		},
 		"BOOKMARK": {
-			"ADD_GLOBAL_BOOKMARK": "",
+			"ADD_GLOBAL_BOOKMARK": "글로벌 북마크 추가",
 			"ADD_LINK": "링크 추가",
 			"ALL": "전체",
 			"ALL_BOOKMARK": "모든 북마크",
@@ -2174,8 +2174,8 @@
 			"EDIT": "수정",
 			"FOLDER": "폴더",
 			"GLOBAL_BOOKMARK": "글로벌 북마크",
-			"GLOBAL_NOTIFICATION": "",
-			"GO_TO_WORKSPACE": "",
+			"GLOBAL_NOTIFICATION": "글로벌 북마크는 모든 워크스페이스 홈의 상단에 표시되며 Admin에 의해 관리됩니다.",
+			"GO_TO_WORKSPACE": "이 워크스페이스로 이동하기",
 			"LINK": "링크",
 			"TYPE": "타입"
 		},
