@@ -396,6 +396,53 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"ANOMALY_DETECTION": {
+				"CANCEL": "Cancel",
+				"CONFIG": {
+					"AND_MORE": "...and more",
+					"BASE_INFORMATION": "Base Information",
+					"COL_CATEGORY": "Category",
+					"COL_CATEGORY_PLACEHOLDER": "Select Category",
+					"COL_DATASOURCE_PLACEHOLDER": "Select Data Source",
+					"COL_DATA_SOURCE": "Data Source",
+					"COL_ITEM": "Item",
+					"COL_ITEM_PLACEHOLDER": "Select Item",
+					"COL_NAME": "Name",
+					"COL_NAME_PLACEHOLDER": "Detection Configuration Name",
+					"COL_POLICY": "Policy",
+					"COL_SEND_TO": "Send to",
+					"COL_SEND_TO_PLACEHOLDER": "Select Workspace Owner",
+					"CREATE_TITLE": "Create Detection Configuration",
+					"DETECTED": "Detected",
+					"LAST_12_MONTHS": "Last 12 Months",
+					"MODAL_DELETE_DESC": "Are you sure you want to delete this detection configuration?",
+					"MODAL_DELETE_TITLE": "Delete Detection Configuration",
+					"MODAL_EDIT_TITLE": "Edit Detection Configuration Name",
+					"NAME_REQUIRED": "Please enter name.",
+					"NO_RULES": "No rules",
+					"RECIPIENTS": "Recipients",
+					"RULE": "rule",
+					"RULES": "rules",
+					"TITLE": "Detection Configuration",
+					"TREND_TITLE": "Detection Configuration Trend",
+					"USERS": "Users",
+					"VIEW_HISTORY": "View History",
+					"VIEW_POLICY": "View this Policy"
+				},
+				"CREATE": "Create",
+				"EDIT": "Edit",
+				"HISTORY": {
+					"ALL": "All",
+					"CUSTOM": "Custom",
+					"LAST_MONTH": "Last Month",
+					"THIS_MONTH": "This Month",
+					"TITLE": "Anomaly Detection History"
+				},
+				"POLICY": {
+					"TITLE": "Policy Management"
+				},
+				"SAVE_CHANGES": "Save Changes"
+			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "Failed to Create Budget",
 				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "The selected data source ({dataSourceName}) already has a budget created for the same target ({name}).",
@@ -3480,6 +3527,7 @@
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "Service Account",
 		"CONSOLE_HOME": "Console Home",
 		"COST_EXPLORER": "Cost Explorer",
+		"COST_EXPLORER_ANOMALY_DETECTION": "Anomaly Detection",
 		"COST_EXPLORER_BUDGET": "Budget",
 		"COST_EXPLORER_COST_ANALYSIS": "Cost Analysis",
 		"COST_EXPLORER_DASHBOARD": "Dashboard",

@@ -396,6 +396,53 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"ANOMALY_DETECTION": {
+				"CANCEL": "취소",
+				"CONFIG": {
+					"AND_MORE": "...기타 등등",
+					"BASE_INFORMATION": "기본 정보",
+					"COL_CATEGORY": "",
+					"COL_CATEGORY_PLACEHOLDER": "",
+					"COL_DATASOURCE_PLACEHOLDER": "",
+					"COL_DATA_SOURCE": "데이터 소스",
+					"COL_ITEM": "",
+					"COL_ITEM_PLACEHOLDER": "",
+					"COL_NAME": "이름",
+					"COL_NAME_PLACEHOLDER": "",
+					"COL_POLICY": "정책(Policy)",
+					"COL_SEND_TO": "",
+					"COL_SEND_TO_PLACEHOLDER": "",
+					"CREATE_TITLE": "",
+					"DETECTED": "",
+					"LAST_12_MONTHS": "지난 12개월",
+					"MODAL_DELETE_DESC": "",
+					"MODAL_DELETE_TITLE": "",
+					"MODAL_EDIT_TITLE": "",
+					"NAME_REQUIRED": "이름을 입력해 주세요.",
+					"NO_RULES": "",
+					"RECIPIENTS": "수신처",
+					"RULE": "규칙",
+					"RULES": "규칙",
+					"TITLE": "",
+					"TREND_TITLE": "",
+					"USERS": "사용자",
+					"VIEW_HISTORY": "",
+					"VIEW_POLICY": ""
+				},
+				"CREATE": "생성",
+				"EDIT": "편집",
+				"HISTORY": {
+					"ALL": "전체",
+					"CUSTOM": "기간 선택",
+					"LAST_MONTH": "지난달",
+					"THIS_MONTH": "이번 달",
+					"TITLE": ""
+				},
+				"POLICY": {
+					"TITLE": ""
+				},
+				"SAVE_CHANGES": "변경사항 저장"
+			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "예산 생성 실패",
 				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "선택한 데이터 소스({dataSourceName})에 동일한 타겟({name})으로 이미 예산이 생성되어 있습니다.",
@@ -3480,6 +3527,7 @@
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "서비스 어카운트",
 		"CONSOLE_HOME": "콘솔 홈",
 		"COST_EXPLORER": "비용 관리",
+		"COST_EXPLORER_ANOMALY_DETECTION": "",
 		"COST_EXPLORER_BUDGET": "예산",
 		"COST_EXPLORER_COST_ANALYSIS": "비용 분석",
 		"COST_EXPLORER_DASHBOARD": "대시보드",

@@ -396,6 +396,53 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"ANOMALY_DETECTION": {
+				"CANCEL": "取消",
+				"CONFIG": {
+					"AND_MORE": "…その他",
+					"BASE_INFORMATION": "基本情報",
+					"COL_CATEGORY": "",
+					"COL_CATEGORY_PLACEHOLDER": "",
+					"COL_DATASOURCE_PLACEHOLDER": "",
+					"COL_DATA_SOURCE": "データソース",
+					"COL_ITEM": "",
+					"COL_ITEM_PLACEHOLDER": "",
+					"COL_NAME": "名前",
+					"COL_NAME_PLACEHOLDER": "",
+					"COL_POLICY": "ポリシー",
+					"COL_SEND_TO": "",
+					"COL_SEND_TO_PLACEHOLDER": "",
+					"CREATE_TITLE": "",
+					"DETECTED": "",
+					"LAST_12_MONTHS": "過去12ヶ月間",
+					"MODAL_DELETE_DESC": "",
+					"MODAL_DELETE_TITLE": "",
+					"MODAL_EDIT_TITLE": "",
+					"NAME_REQUIRED": "名前を入力してください",
+					"NO_RULES": "",
+					"RECIPIENTS": "受信者",
+					"RULE": "ルール",
+					"RULES": "ルール",
+					"TITLE": "",
+					"TREND_TITLE": "",
+					"USERS": "ユーザー",
+					"VIEW_HISTORY": "",
+					"VIEW_POLICY": ""
+				},
+				"CREATE": "作成",
+				"EDIT": "編集",
+				"HISTORY": {
+					"ALL": "すべて",
+					"CUSTOM": "カスタム",
+					"LAST_MONTH": "直近の月",
+					"THIS_MONTH": "今月",
+					"TITLE": ""
+				},
+				"POLICY": {
+					"TITLE": ""
+				},
+				"SAVE_CHANGES": "変更事項保存"
+			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "予算の作成に失敗しました",
 				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "選択したデータソース（{dataSourceName}）には、すでに同じターゲット（{name}）の予算が作成されています。",
@@ -3480,6 +3527,7 @@
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "サービスアカウント",
 		"CONSOLE_HOME": "コンソールホーム",
 		"COST_EXPLORER": "費用管理",
+		"COST_EXPLORER_ANOMALY_DETECTION": "",
 		"COST_EXPLORER_BUDGET": "予算",
 		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
 		"COST_EXPLORER_DASHBOARD": "ダッシュボード",
