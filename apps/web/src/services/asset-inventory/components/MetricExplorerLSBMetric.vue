@@ -145,8 +145,11 @@ watch(() => route.params, () => {
 }, { immediate: true });
 
 /* Watcher */
-watch(() => storeState.selectedNamespace, (selectedNamespace) => {
-    if (!isEmpty(selectedNamespace)) metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
+watch(() => storeState.selectedNamespace, async (selectedNamespace) => {
+    if (!isEmpty(selectedNamespace)) {
+        await allReferenceStore.load('metric', { force: true });
+        await metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
+    }
 }, { immediate: true });
 </script>
 
