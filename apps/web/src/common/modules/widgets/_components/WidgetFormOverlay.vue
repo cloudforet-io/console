@@ -54,6 +54,16 @@ const state = reactive({
         return false;
     }),
     warningModalVisible: false,
+    warningModalTitle: computed(() => {
+        if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_TITLE');
+        if (widgetGenerateState.widget?.state === 'INACTIVE') return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_TITLE');
+        return '';
+    }),
+    warningModalDescription: computed(() => {
+        if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_DESC');
+        if (widgetGenerateState.widget?.state === 'INACTIVE') return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_DESC');
+        return '';
+    }),
 });
 
 /* Api */
@@ -91,7 +101,7 @@ const handleClickContinue = async () => {
     widgetGenerateStore.setShowOverlay(false);
 };
 const handleUpdateVisible = (value: boolean) => {
-    if (!value && widgetGenerateState.widget?.state === 'CREATING') {
+    if (!value && (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE')) {
         state.warningModalVisible = true;
         return;
     }
@@ -102,7 +112,7 @@ const handleCloseWarningModal = () => {
 };
 const handleConfirmWarningModal = async () => {
     state.warningModalVisible = false;
-    await deleteWidget(widgetGenerateState.widgetId);
+    if (widgetGenerateState.widget?.state === 'CREATING') await deleteWidget(widgetGenerateState.widgetId);
     widgetGenerateStore.reset();
     widgetGenerateStore.setShowOverlay(false);
 };
@@ -142,7 +152,7 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                 </div>
             </template>
         </p-overlay-layout>
-        <p-button-modal :header-title="$t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_TITLE')"
+        <p-button-modal :header-title="state.warningModalTitle"
                         :visible.sync="state.warningModalVisible"
                         size="sm"
                         :fade="true"
@@ -152,7 +162,7 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                         @cancel="handleCloseWarningModal"
         >
             <template #body>
-                <p>{{ $t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_DESC') }}</p>
+                <p>{{ state.warningModalDescription }}</p>
             </template>
         </p-button-modal>
     </div>

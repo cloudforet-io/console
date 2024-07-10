@@ -128,7 +128,7 @@ const {
 } = useContextMenuController({
     targetRef,
     contextMenuRef,
-    useFixedStyle: true,
+    // useFixedStyle: true,
     useReorderBySelection: true,
     menu: toRef(state, 'filterItems'),
     selected: toRef(state, 'selectedItems'),
@@ -314,7 +314,6 @@ onMounted(() => {
                                            multi-selectable
                                            appearance-type="badge"
                                            show-select-marker
-                                           use-fixed-menu-style
                                            :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
                                            :show-delete-all-button="false"
                                            :page-size="10"

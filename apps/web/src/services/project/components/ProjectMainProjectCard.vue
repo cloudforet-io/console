@@ -147,8 +147,8 @@ const handleSelectProject = () => {
 <style scoped lang="postcss">
 .project-main-project-card {
     @apply flex flex-col justify-between bg-white border border-gray-200 rounded-lg cursor-pointer;
-    height: 6.375rem;
-    padding: 1rem 1rem 0.5rem;
+    height: 6.625rem;
+    padding: 1rem 1rem 0.75rem;
 
     .main-contents {
         .title-wrapper {

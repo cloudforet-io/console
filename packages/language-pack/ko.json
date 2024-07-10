@@ -1463,6 +1463,8 @@
 			"FORM": {
 				"CREATING_WIDGET_WARNING_MODAL_DESC": "이 창을 닫으면 생성 중인 모든 데이터가 삭제됩니다.",
 				"CREATING_WIDGET_WARNING_MODAL_TITLE": "저장되지 않은 데이터",
+				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "",
+				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "",
 				"WIDGET_VALIDATION_WARNING_DESC": "차트가 정상적으로 표시 되려면 필수 필드에 값이 올바르게 선택되었는지 확인해주세요.",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "데이터 테이블에서 'Region' 필드를 추가해주세요. ",
 				"WIDGET_VALIDATION_WARNING_TITLE": "잘못 선택된 필드 존재"
