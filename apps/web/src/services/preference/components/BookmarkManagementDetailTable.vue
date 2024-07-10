@@ -188,8 +188,8 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
     await bookmarkPageStore.setParams(params);
     await bookmarkPageStore.setSelectedBookmarkIndices([]);
     await bookmarkPageStore.setBookmarkListPageStart(0);
+    await bookmarkPageStore.setSelectedType('All');
     await fetchBookmarkList();
-    bookmarkPageStore.setSelectedType('All');
 }, { immediate: true });
 </script>
 
