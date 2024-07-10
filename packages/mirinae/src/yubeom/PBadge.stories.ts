@@ -74,7 +74,7 @@ export const BadgeTypes: Story = {
                     v-for="styleType in solidStyleTypes"
                     :badge-type="'solid'"
                     :style-type="styleType"
-                    :key="styleType"
+                    :key="\`solid-\${styleType}\`"
                     class="m-2"
                 >
                     {{ styleType }}
@@ -85,7 +85,7 @@ export const BadgeTypes: Story = {
                     v-for="styleType in solidOutlineStyleTypes"
                     :badge-type="'solid-outline'"
                     :style-type="styleType"
-                    :key="styleType"
+                    :key="\`outline-\${styleType}\`"
                     class="m-2"
                 >
                     {{ styleType }}
@@ -96,7 +96,7 @@ export const BadgeTypes: Story = {
                     v-for="styleType in subtleStyleTypes"
                     :badge-type="'subtle'"
                     :style-type="styleType"
-                    :key="styleType"
+                    :key="\`subtle-\${styleType}\`"
                     class="m-2"
                 >
                     {{ styleType }}
