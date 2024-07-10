@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-
 import { getBadgesArgTypes } from '@/data-display/badge/story-helper';
 import {
     SOLID_STYLE_TYPE, SOLID_OUTLINE_STYLE_TYPE, SUBTLE_STYLE_TYPE, BADGE_FONT_WEIGHT, BADGE_SHAPE, BADGE_STYLE_TYPE, BADGE_TYPE,
@@ -42,15 +41,15 @@ const Template: Story = {
         components: { PBadge },
         template: `
             <div style="display:flex; align-items:center; justify-content:center; height:100px;">
-            <p-badge
-                :badge-type="badgeType"
-                :style-type="styleType"
-                :text-color="textColor"
-                :background-color="backgroundColor"
-                :outline-color="outlineColor"
-                :shape="shape"
-                :font-weight="fontWeight"
-            >{{$props.defaultSlot}}</p-badge>
+                <p-badge
+                    :badge-type="badgeType"
+                    :style-type="styleType"
+                    :text-color="textColor"
+                    :background-color="backgroundColor"
+                    :outline-color="outlineColor"
+                    :shape="shape"
+                    :font-weight="fontWeight"
+                >{{$props.defaultSlot}}</p-badge>
             </div>`,
     }),
 };

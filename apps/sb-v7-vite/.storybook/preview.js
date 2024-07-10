@@ -3,7 +3,6 @@ import '@/styles/style.pcss';
 import Vue from 'vue';
 
 import { i18n, I18nConnector } from '@/translations';
-import { withDesign } from 'storybook-addon-designs';
 import VTooltip from 'v-tooltip';
 import velocity from 'velocity-animate';
 import Fragment from 'vue-fragment';
@@ -59,15 +58,6 @@ Object.keys(screens).forEach((k) => {
 
 /** @type { import('@storybook/vue').Preview } */
 const preview = {
-  // parameters: {
-  //   actions: { argTypesRegex: "^on[A-Z].*" },
-  //   controls: {
-  //     matchers: {
-  //       color: /(background|color)$/i,
-  //       date: /Date$/i,
-  //     },
-  //   },
-  // },
   parameters : {
     controls: { expanded: true },
     layout: 'centered',
@@ -85,7 +75,6 @@ const preview = {
     },
     options: {
       storySort: (a, b) => a.title === b.title ? 0 : a.id.localeCompare(b.id, undefined, { numeric: true }),
-        // storySort: (a, b) => (a[1].kind === b[1].kind ? 0 : a[1].id.localeCompare(b[1].id, undefined, { numeric: true })),
     },
     actions: { argTypesRegex: '^on.*' },
   },
