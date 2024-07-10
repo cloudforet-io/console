@@ -14,7 +14,7 @@ const state = reactive({
 </script>
 
 <template>
-    <div class="admin-bookmark-page">
+    <div class="admin-bookmark-detail-page">
         <div v-if="state.group === 'global'"
              class="notification"
         >
@@ -25,7 +25,7 @@ const state = reactive({
 </template>
 
 <style lang="postcss" scoped>
-.admin-bookmark-page {
+.admin-bookmark-detail-page {
     .notification {
         @apply bg-violet-200 text-paragraph-md;
         border-radius: 0.25rem;

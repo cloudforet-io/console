@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
+
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
@@ -32,6 +34,7 @@ const router = useRouter();
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
 
+    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
@@ -59,7 +62,18 @@ const handleCreateFolder = async (isEdit?: boolean, name?: string) => {
     await bookmarkPageStore.fetchBookmarkFolderList();
     await bookmarkPageStore.fetchBookmarkList();
 };
-const handleCreateLink = () => {
+const handleCreateLink = (selectedFolder?: BookmarkItem) => {
+    if (route.params.folder) {
+        if (!selectedFolder) {
+            router.push({
+                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
+                params: {
+                    group: route.params.group,
+                },
+            });
+        }
+        bookmarkPageStore.setIsTableItem(false);
+    }
     bookmarkPageStore.fetchBookmarkList();
 };
 const handleConfirmDelete = (isFolder?: boolean) => {
@@ -79,6 +93,10 @@ const handleConfirmDelete = (isFolder?: boolean) => {
     bookmarkPageStore.setSelectedBookmarkIndices([]);
 };
 
+watch(() => storeState.workspaceList, () => {
+    bookmarkPageStore.fetchBookmarkFolderList();
+});
+
 onUnmounted(() => {
     bookmarkPageStore.resetState();
     bookmarkStore.resetState();
@@ -86,12 +104,11 @@ onUnmounted(() => {
 
 onMounted(() => {
     bookmarkPageStore.fetchWorkspaceList();
-    bookmarkPageStore.fetchBookmarkFolderList();
 });
 </script>
 
 <template>
-    <div class="admin-bookmark-page">
+    <div class="bookmark-container">
         <router-view />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
                                     :bookmark-folder-list="state.globalFolderList"
@@ -112,9 +129,3 @@ onMounted(() => {
         />
     </div>
 </template>
-
-<style lang="postcss" scoped>
-.admin-bookmark-page {
-    padding-bottom: 2.5rem;
-}
-</style>

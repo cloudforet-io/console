@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI, PTreeView } from '@spaceone/design-system';
+import { PI, PTextButton, PTreeView } from '@spaceone/design-system';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
@@ -35,7 +35,9 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    bookmarkTreeData: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(storeState.bookmarkFolderList)),
+    showMorePage: 1,
+    convertedList: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(storeState.bookmarkFolderList)),
+    bookmarkTreeData: computed<TreeNode[]>(() => state.convertedList.slice(0, 20 * state.showMorePage)),
     selectedTreeId: undefined as string|undefined,
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
@@ -85,7 +87,25 @@ const state = reactive({
 });
 
 const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[]): TreeNode[] => {
-    const workspaceMap: { [key: string]: TreeNode } = {};
+    const workspaceMap: { [key: string]: TreeNode } = storeState.workspaceList.flatMap((item) => item.workspace_id)
+        .reduce((acc, cur) => {
+            acc[cur] = {
+                id: cur,
+                depth: 0,
+                data: {
+                    id: cur,
+                    name: cur,
+                    to: {
+                        name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
+                        params: {
+                            group: cur,
+                        },
+                    },
+                },
+                children: [],
+            };
+            return acc;
+        }, {} as { [key: string]: TreeNode });
     const globalChildren: TreeNode[] = [];
 
     allBookmarkFolderItems?.forEach((item) => {
@@ -193,6 +213,7 @@ watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookm
                                                  :text="getWorkspaceInfo(node.data.id, storeState.workspaceList)?.name || ''"
                                                  :theme="getWorkspaceInfo(node.data.id, storeState.workspaceList)?.tags?.theme"
                                                  size="xxs"
+                                                 class="workspace-logo-icon"
                             />
                             <span class="text">{{ node.id === 'global' ? $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : getWorkspaceInfo(node.data.name, storeState.workspaceList)?.name || '' }}</span>
                         </div>
@@ -211,6 +232,15 @@ watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookm
                 </div>
             </template>
         </p-tree-view>
+        <p-text-button v-if="state.convertedList.length !== state.bookmarkTreeData.length"
+                       style-type="highlight"
+                       size="sm"
+                       icon-right="ic_chevron-down"
+                       class="show-more"
+                       @click="state.showMorePage += 1"
+        >
+            {{ $t('IAM.BOOKMARK.TOGGLE_MORE') }}
+        </p-text-button>
     </div>
 </template>
 
@@ -225,7 +255,11 @@ watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookm
             .bookmark {
                 @apply flex items-center gap-1;
             }
-
+            .workspace-logo-icon {
+                width: 0.875rem;
+                min-width: 0.875rem;
+                height: 0.875rem;
+            }
             .bookmark-icon {
                 min-width: 0.875rem;
             }
@@ -252,6 +286,10 @@ watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookm
                 display: block;
             }
         }
+    }
+    .show-more {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
     }
 }
 </style>
