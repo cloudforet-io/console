@@ -1,11 +1,13 @@
 import { join, dirname } from "path";
+import type { StorybookConfig } from "@storybook/vue-vite";
 
 function getAbsolutePath(value) {
   return dirname(require.resolve(join(value, "package.json")));
 }
 
 /** @type { import('@storybook/vue-vite').StorybookConfig } */
-const config = {
+const config: StorybookConfig = {
+  staticDirs: ['../public'],
   stories: [
     '../../../packages/mirinae/src/yubeom/**/*.mdx',
     '../../../packages/mirinae/src/yubeom/**/*.stories.@(js|jsx|ts|tsx)',
@@ -18,7 +20,10 @@ const config = {
     getAbsolutePath("@storybook/addon-storysource"),
     getAbsolutePath("@storybook/addon-a11y")
   ],
-  framework: getAbsolutePath("@storybook/vue-vite"),
+  framework: {
+    name: getAbsolutePath("@storybook/vue-vite") as "@storybook/vue-vite",
+    options: {},
+  },
   previewHead: (head) => {
     return `
       ${head}
