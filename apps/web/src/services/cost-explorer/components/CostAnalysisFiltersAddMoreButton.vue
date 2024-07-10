@@ -28,7 +28,9 @@ const costAnalysisPageState = costAnalysisPageStore.state;
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
         const tagsMenuItems = state.tagsMenuItems;
-        if (!tagsMenuItems.length) return costAnalysisPageGetters.defaultGroupByItems;
+        if (!tagsMenuItems.length) {
+            return costAnalysisPageGetters.defaultGroupByItems;
+        }
         return [
             ...costAnalysisPageGetters.defaultGroupByItems,
             { type: 'header', label: 'Tags', name: 'tags' },
