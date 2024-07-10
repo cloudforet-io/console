@@ -26,7 +26,6 @@ interface BookmarkPageState {
     loading: boolean;
     bookmarkFolderList: BookmarkItem[];
     bookmarkList: BookmarkItem[];
-    bookmarkTotalCount: number;
     pageStart: number;
     pageLimit: number;
     searchFilter: ConsoleFilter[];
@@ -42,7 +41,6 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         loading: false,
         bookmarkFolderList: [],
         bookmarkList: [],
-        bookmarkTotalCount: 0,
         pageStart: 0,
         pageLimit: 30,
         searchFilter: [],
@@ -59,8 +57,8 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
 
             const workspaceBookmark = state.bookmarkList.filter((i) => !i.isGlobal);
             const sortedWorkspaceBookmark = sortBy(workspaceBookmark, [(i) => !i.link, (i) => i.updatedAt]).reverse();
-
-            return [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
+            const combinedBookmark = [...sortedGlobalBookmark, ...sortedWorkspaceBookmark];
+            return (!state.params?.folder && state.searchFilter.length === 0) ? combinedBookmark.filter((i) => !i.folder) : combinedBookmark;
         }),
         bookmarkList: computed<BookmarkItem[]>(() => getters.entireBookmarkList.slice(state.pageStart, state.pageStart + state.pageLimit)),
         selectedIndices: computed<number[]>(() => {
@@ -102,7 +100,6 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
         resetState: () => {
             state.workspaceList = [];
             state.loading = false;
-            state.bookmarkTotalCount = 0;
             state.params = undefined;
             state.selectedType = 'All';
             state.bookmarkFolderList = [];
@@ -222,7 +219,6 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                     }
                 });
                 state.bookmarkList = enabledWorkspaceBookmark;
-                state.bookmarkTotalCount = enabledWorkspaceBookmark.length || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkList = [];

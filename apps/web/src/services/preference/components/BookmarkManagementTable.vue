@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { computed, reactive, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown, PLink,
@@ -40,14 +40,14 @@ const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 
+const route = useRoute();
 const router = useRouter();
 
 const storeState = reactive({
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
+    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
     workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
-    bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
@@ -55,7 +55,6 @@ const storeState = reactive({
     searchFilter: computed<ConsoleFilter[]>(() => bookmarkPageState.searchFilter),
 });
 const tableState = reactive({
-    items: computed(() => (storeState.searchFilter.length === 0 ? storeState.bookmarkList.filter((i) => !i.folder) : storeState.bookmarkList)),
     fields: computed(() => [
         {
             name: 'name',
@@ -187,11 +186,12 @@ const fetchBookmarkList = async () => {
     await bookmarkPageStore.fetchBookmarkList();
 };
 
-(async () => {
+watch(() => route.params, async () => {
     bookmarkPageStore.setParams(undefined);
     await bookmarkPageStore.setSelectedBookmarkIndices([]);
+    await bookmarkPageStore.setBookmarkListPageStart(0);
     await fetchBookmarkList();
-})();
+}, { immediate: true });
 </script>
 
 <template>
@@ -211,8 +211,8 @@ const fetchBookmarkList = async () => {
                              :page-size-options="PageSizeOptions"
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
-                             :total-count="storeState.bookmarkTotalCount"
-                             :items="tableState.items"
+                             :total-count="bookmarkPageGetters.entireBookmarkList.length"
+                             :items="storeState.bookmarkList"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              :get-row-selectable="getRowSelectable"
