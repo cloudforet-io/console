@@ -17,6 +17,7 @@ import type {
     SelectDropdownAppearanceType,
     SelectDropdownMenuItem,
     SelectDropdownStyleType,
+    SelectDropdownSize,
 } from '@/inputs/dropdown/select-dropdown/type';
 import {
     CONTEXT_MENU_POSITION,
@@ -29,6 +30,7 @@ interface SelectDropdownProps {
     /* dropdown button */
     styleType?: SelectDropdownStyleType;
     appearanceType?: SelectDropdownAppearanceType;
+    size?: SelectDropdownSize;
     disabled?: boolean;
     invalid?: boolean;
     placeholder?: string;
@@ -69,6 +71,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     /* dropdown button */
     styleType: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
     appearanceType: SELECT_DROPDOWN_APPEARANCE_TYPE.BASIC,
+    size: 'md',
     selected: undefined,
     placeholder: undefined,
     selectionLabel: undefined,
@@ -309,6 +312,7 @@ defineExpose({ reloadMenu });
          :class="{
              'p-select-dropdown': true,
              [props.styleType]: true,
+             [props.size]: true,
              'is-fixed-width': props.isFixedWidth,
              'is-filterable': props.isFilterable,
          }"
@@ -316,6 +320,7 @@ defineExpose({ reloadMenu });
         <dropdown-button ref="targetRef"
                          :style-type="props.styleType"
                          :appearance-type="props.appearanceType"
+                         :size="props.size"
                          :button-icon="props.buttonIcon"
                          :invalid="props.invalid"
                          :disabled="props.disabled"
@@ -397,6 +402,12 @@ defineExpose({ reloadMenu });
     @apply relative inline-block;
     min-width: 6.5rem;
 
+    &.sm {
+        min-width: 4.125rem;
+    }
+    &.icon-button, &.tertiary-icon-button {
+        min-width: 0;
+    }
     .dropdown-context-menu {
         @apply absolute;
         margin-top: -1px;

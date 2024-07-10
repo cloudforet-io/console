@@ -13,11 +13,13 @@ import {
 } from '@/inputs/dropdown/select-dropdown/type';
 import type {
     SelectDropdownAppearanceType, SelectDropdownMenuItem, SelectDropdownStyleType,
+    SelectDropdownSize,
 } from '@/inputs/dropdown/select-dropdown/type';
 
 interface Props {
     styleType?: SelectDropdownStyleType;
     appearanceType?: SelectDropdownAppearanceType;
+    size?: SelectDropdownSize;
     buttonIcon?: string;
     invalid?: boolean;
     disabled?: boolean;
@@ -36,6 +38,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     styleType: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
     appearanceType: SELECT_DROPDOWN_APPEARANCE_TYPE.BASIC,
+    size: 'md',
     placeholder: undefined,
     selectionLabel: undefined,
     showDeleteAllButton: false,
@@ -76,6 +79,8 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
     <div :class="{
         'dropdown-button-component': true,
         [props.styleType]: true,
+        [props.appearanceType]: true,
+        [props.size]: true,
         invalid: props.invalid,
         disabled: props.disabled,
         readonly: props.readonly,
@@ -85,14 +90,15 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         'selection-highlight': props.selectionHighlight && props.selectedItems.length > 0,
     }"
     >
-        <span v-if="props.styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
+        <span v-if="[SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON, SELECT_DROPDOWN_STYLE_TYPE.TERTIARY_ICON_BUTTON].includes(props.styleType)"
               class="dropdown-icon-button-wrapper"
         >
             <p-i :name="props.buttonIcon || (props.isVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down')"
                  color="inherit"
-                 width="1.5rem"
-                 height="1.5rem"
+                 :width="props.size === 'sm' ? '1rem' : '1.5rem'"
+                 :height="props.size === 'sm' ? '1rem' : '1.5rem'"
                  class="dropdown-icon-button"
+                 :class="[props.styleType]"
                  @click.stop="emit('click-dropdown-button')"
                  @keydown.down="emit('enter-key')"
             />
@@ -170,8 +176,8 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 >
                     <slot name="button-icon">
                         <p-i :name="props.isVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
-                             width="1.5rem"
-                             height="1.5rem"
+                             :width="props.size === 'sm' ? '1rem' : '1.5rem'"
+                             :height="props.size === 'sm' ? '1rem' : '1.5rem'"
                              color="inherit"
                         />
                     </slot>
@@ -226,9 +232,6 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
             .delete-all-button {
                 @apply inline-flex items-center text-gray-400 cursor-pointer;
                 width: 1rem;
-                &.disabled {
-                    @apply cursor-not-allowed;
-                }
             }
             .arrow-button {
                 @apply inline-flex items-center text-gray-600 cursor-pointer;
@@ -253,6 +256,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
     }
 
     &.disabled {
+        @apply cursor-not-allowed;
         .dropdown-button {
             @apply bg-gray-100 border-gray-300 cursor-not-allowed;
             .arrow-button {
@@ -261,6 +265,9 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         }
         .dropdown-icon-button {
             @apply cursor-not-allowed text-gray-300;
+        }
+        &.tertiary-icon-button {
+            @apply bg-gray-200 rounded border-transparent;
         }
     }
 
@@ -317,18 +324,65 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
             }
         }
     }
-    &.icon-button {
-        @apply flex items-center justify-center text-gray-600 cursor-pointer;
+    &.icon-button, &.tertiary-icon-button {
+        @apply flex items-center justify-center text-gray-900 cursor-pointer;
         width: 2rem;
         height: 2rem;
         .dropdown-icon-button-wrapper {
-            @apply flex items-center justify-center rounded-full;
+            @apply flex items-center justify-center;
             width: 2rem;
             height: 2rem;
         }
+    }
+    &.icon-button {
+        @apply rounded-full;
         &:not(.disabled, .readonly, .invalid):hover {
-            .dropdown-icon-button {
-                @apply text-secondary;
+            @apply bg-blue-200 text-secondary;
+        }
+        .dropdown-button {
+            @apply rounded-full;
+        }
+    }
+    &.tertiary-icon-button {
+        @apply border border-gray-300 rounded;
+        &:not(.disabled, .readonly, .invalid):hover {
+            @apply bg-gray-100;
+        }
+    }
+    &.sm {
+        .dropdown-button {
+            @apply text-label-sm;
+            min-height: 1.25rem;
+            .selection-display-wrapper {
+                @apply text-label-sm;
+                padding: 0.25rem 0;
+                .selection-wrapper {
+                    .selected-item {
+                        .selected-item-badge {
+                            min-height: 1rem;
+                            margin-left: 0;
+                        }
+                    }
+                }
+            }
+            .extra-button-wrapper {
+                .arrow-button {
+                    width: 1.125rem;
+                }
+            }
+        }
+        &.badge {
+            .selection-display-wrapper {
+                padding: 3px 0;
+            }
+        }
+        &.icon-button, &.tertiary-icon-button {
+            width: 1.5rem;
+            height: 1.5rem;
+            .dropdown-icon-button-wrapper {
+                @apply flex items-center justify-center rounded-full;
+                width: 1.5rem;
+                height: 1.5rem;
             }
         }
     }
@@ -362,12 +416,10 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
             }
         }
         &.icon-button {
-            .dropdown-icon-button-wrapper {
-                @apply bg-blue-300;
-                .dropdown-icon-button {
-                    @apply text-secondary;
-                }
-            }
+            @apply bg-blue-300 text-secondary;
+        }
+        &.tertiary-icon-button {
+            @apply bg-gray-200 rounded;
         }
     }
 
@@ -397,6 +449,9 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                     @apply text-gray-600;
                 }
             }
+        }
+        &.tertiary-icon-button {
+            @apply bg-gray-200 rounded;
         }
     }
 
