@@ -33,7 +33,9 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
+    costInfo: computed(() => storeState.selectedItem.plugin_info?.metadata?.cost_info || {}),
     dataType: computed<DataType[]>(() => {
+        const costDataSourceCostInfo = state.costInfo;
         const costDataKeys = storeState.selectedItem.cost_data_keys || [];
 
         const customDataType = costDataKeys.map((key) => ({
@@ -43,7 +45,7 @@ const state = reactive({
         }));
 
         return [
-            { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COST'), name: 'cost', disabled: true },
+            { label: costDataSourceCostInfo?.name ?? i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COST'), name: 'cost', disabled: true },
             { label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.USAGE'), name: 'usage', disabled: true },
             ...customDataType,
         ];
@@ -139,7 +141,7 @@ const handleConfirm = async () => {
                 />
                 <span>
                     {{ item.label }}
-                    <span v-if="item.name === 'cost'"
+                    <span v-if="item.name === 'cost' && !state.costInfo?.name"
                           class="extra"
                     >
                         ({{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ACTUAL_COST') }})
