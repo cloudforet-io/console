@@ -48,6 +48,25 @@ const extraArgTypes: ArgTypes = {
             options: SELECT_DROPDOWN_APPEARANCE_TYPE,
         },
     },
+    size: {
+        name: 'size',
+        type: { name: 'string' },
+        description: 'Size of dropdown button.',
+        defaultValue: 'md',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'md',
+            },
+        },
+        control: {
+            type: 'select',
+            options: ['md', 'sm'],
+        },
+    },
     disabled: {
         name: 'disabled',
         type: { name: 'boolean' },

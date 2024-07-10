@@ -34,11 +34,13 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
+    groupByItems: computed<SelectDropdownMenuItem[]>(() => [...costAnalysisPageGetters.managedGroupByItems, ...state.selectedAdditionalGroupByMenu]),
     selectedGroupByItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
         return { name: d, label: d.split('.')[1] };
     })),
     selectedTagsMenu: [] as SelectDropdownMenuItem[],
+    selectedAdditionalGroupByMenu: [] as SelectDropdownMenuItem[],
     dataSourceId: computed<string>(() => costAnalysisPageGetters.selectedDataSourceId ?? ''),
 });
 
@@ -77,6 +79,12 @@ const setSelectedTagsMenu = (groupBy?: string[]) => {
         .filter((d) => d.startsWith('tags.'))
         .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
 };
+const setSelectedAdditionalInfoGroupBy = (groupBy?: string[]) => {
+    if (!groupBy) return;
+    state.selectedAdditionalGroupByMenu = groupBy
+        .filter((d) => d.startsWith('additional_info.'))
+        .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
+};
 
 /* event */
 const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem[], isSelected: boolean) => {
@@ -92,11 +100,15 @@ const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem
         costAnalysisPageStore.setGroupBy(selectedItems.map((d) => d.name));
     }
 };
-const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
+const handleSelectAdditionalGroupBy = (target: string, selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
     if (isSelected) {
         if (state.selectedGroupByItems.length + 1 > 3) {
             showInfoMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'), i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY_DESC'));
-            state.selectedTagsMenu = state.selectedTagsMenu.filter((d) => d.name !== selectedItem.name);
+            if (target === 'tags') {
+                state.selectedTagsMenu = state.selectedTagsMenu.filter((d) => d.name !== selectedItem.name);
+            } else if (target === 'additional') {
+                state.selectedAdditionalGroupByMenu = state.selectedAdditionalGroupByMenu.filter((d) => d.name !== selectedItem.name);
+            }
             return;
         }
         costAnalysisPageStore.setGroupBy([selectedItem.name, ...costAnalysisPageState.groupBy]);
@@ -109,8 +121,10 @@ const handleClearTagsGroupBy = () => {
     costAnalysisPageStore.setGroupBy(costAnalysisPageState.groupBy.filter((d) => !d.startsWith('tags.')));
 };
 
+/* Watcher */
 watch(() => costAnalysisPageState.groupBy, (groupBy) => {
     setSelectedTagsMenu(groupBy);
+    setSelectedAdditionalInfoGroupBy(groupBy);
 });
 </script>
 
@@ -121,7 +135,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             <span class="selected-group-by-items-count">{{ state.selectedGroupByItems.length }}</span>
             <span>/3</span>
         </p>
-        <p-select-button v-for="defaultGroupByItem in costAnalysisPageGetters.defaultGroupByItems"
+        <p-select-button v-for="defaultGroupByItem in state.groupByItems"
                          :key="defaultGroupByItem.name"
                          :value="defaultGroupByItem"
                          :selected="state.selectedGroupByItems"
@@ -137,15 +151,26 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
                                :selected.sync="state.selectedTagsMenu"
                                selection-label="Tags"
                                appearance-type="badge"
+                               size="sm"
                                :show-delete-all-button="false"
                                multi-selectable
                                selection-highlight
                                show-select-marker
                                is-filterable
-                               @select="handleSelectTagsGroupBy"
+                               @select="handleSelectAdditionalGroupBy('tags', ...arguments)"
                                @clear-selection="handleClearTagsGroupBy"
             />
         </div>
+        <p-select-dropdown :menu="costAnalysisPageGetters.additionalInfoGroupByItems"
+                           :selected.sync="state.selectedAdditionalGroupByMenu"
+                           style-type="tertiary-icon-button"
+                           button-icon="ic_ellipsis-horizontal"
+                           size="sm"
+                           multi-selectable
+                           selection-highlight
+                           show-select-marker
+                           @select="handleSelectAdditionalGroupBy('additional', ...arguments)"
+        />
     </div>
 </template>
 
@@ -166,18 +191,10 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
     }
     .tags-button-wrapper {
         position: relative;
-        padding-right: 3.5rem;
 
         /* custom design-system component - p-select-dropdown */
         :deep(.p-select-dropdown) {
             .dropdown-button-component {
-                .dropdown-button {
-                    height: 1.375rem;
-                    min-height: 1.5rem;
-                    .placeholder {
-                        font-size: 0.75rem;
-                    }
-                }
                 &.selected {
                     .dropdown-button {
                         @apply bg-secondary border-secondary text-white;
@@ -190,12 +207,6 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
                         }
                     }
                 }
-            }
-            .selection-wrapper {
-                font-size: 0.75rem;
-            }
-            .p-context-menu {
-                min-width: 9rem;
             }
         }
     }
