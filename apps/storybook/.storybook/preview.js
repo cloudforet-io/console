@@ -33,16 +33,12 @@ Vue.prototype.toJSON = function () {
 
 I18nConnector.i18n = i18n;
 
-
-I18nConnector.i18n = i18n;
-
 webFontLoader.load({
     google: {
         families: webFonts,
         urls: fontUrls,
     },
 });
-
 
 const viewports = {};
 Object.keys(screens).forEach((k) => {

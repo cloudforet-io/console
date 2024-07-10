@@ -1,5 +1,5 @@
 {
-  "name": "sb-v7-vite",
+  "name": "storybook",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,6 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^26.0.1",
+    "@storybook/addon-a11y": "^7.6.10",
     "@storybook/addon-designs": "^7.0.9",
     "@storybook/addon-docs": "^7.6.10",
     "@storybook/addon-essentials": "^7.6.10",
@@ -26,11 +27,11 @@
     "@storybook/vue": "^7.6.10",
     "@storybook/vue-vite": "^7.6.10",
     "@vitejs/plugin-vue2": "^2.3.1",
-    "storybook": "^7.6.10",
-    "vue-component-type-helpers": "^2.0.26",
     "eslint-config-custom": "*",
     "postcss-config-custom": "*",
-    "tsconfig": "*"
+    "storybook": "^7.6.10",
+    "tsconfig": "*",
+    "vue-component-type-helpers": "^2.0.26"
   },
   "resolutions": {
     "react": "18.3.1",
