@@ -77,7 +77,7 @@ const {
     targetRef,
     contextMenuRef,
     useReorderBySelection: true,
-    useFixedStyle: true,
+    // useFixedStyle: true,
     menu: toRef(state, 'menuItems'),
     selected: toRef(state, 'selectedItems'),
     pageSize: 10,
