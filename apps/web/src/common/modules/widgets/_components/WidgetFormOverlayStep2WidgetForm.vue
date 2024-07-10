@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, onMounted, reactive,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea, PButtonModal,
@@ -9,14 +10,6 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
@@ -27,13 +20,22 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-model';
 
+import { red } from '@/styles/colors';
 
-const emit = defineEmits<{(e: 'ready-to-preview'): void}>();
+
 const FORM_TITLE_MAP = {
     WIDGET_INFO: 'WIDGET_INFO',
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
+
+interface Props {
+    widgetValidationInvalid?: boolean;
+    widgetValidationInvalidText?: string|TranslateResult;
+}
+
+const props = defineProps<Props>();
+
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
@@ -51,7 +53,6 @@ const state = reactive({
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     // display
-    isPreviewInitiated: false,
     collapsedTitleMap: {
         [FORM_TITLE_MAP.WIDGET_INFO]: false,
         [FORM_TITLE_MAP.REQUIRED_FIELDS]: false,
@@ -66,30 +67,14 @@ const state = reactive({
     errorModalCurrentType: undefined as 'default'|'geoMap'| 'progressCard'|undefined,
 });
 
-/* Api */
-const updateWidget = async (dataTableId: string) => {
-    const isPrivate = widgetGenerateState.widgetId.startsWith('private');
-    const fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
-    try {
-        await fetcher({
-            widget_id: widgetGenerateState.widgetId,
-            widget_type: widgetGenerateState.selectedWidgetName,
-            data_table_id: dataTableId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
 
 /* Event */
 const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    await updateWidget(dataTableId);
-    widgetGenerateStore.setWidgetFormValueMap({});
-    widgetGenerateStore.setWidgetValidMap({});
-    state.isPreviewInitiated = false;
+    await widgetGenerateStore.updateWidget({
+        data_table_id: dataTableId,
+        state: 'INACTIVE',
+    });
 };
 
 const checkDefaultValidation = () => {
@@ -139,6 +124,7 @@ const handleShowErrorModal = (value:number|undefined) => {
 };
 
 const handleSelectWidgetName = (widgetName: string) => {
+    if (widgetName === widgetGenerateState.selectedWidgetName) return;
     widgetGenerateStore.setSelectedWidgetName(widgetName);
 
     const _config = getWidgetConfig(widgetName);
@@ -147,7 +133,6 @@ const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setWidgetFormValueMap({});
     widgetGenerateStore.setWidgetValidMap({});
     checkDefaultValidation();
-    state.isPreviewInitiated = false;
 };
 const handleUpdateWidgetTitle = (title: string) => {
     widgetGenerateStore.setTitle(title);
@@ -183,17 +168,7 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
 };
 
 // eslint-disable-next-line max-len
-const keyGenerator = (name:string, type: 'require'|'option') => `${widgetGenerateGetters.selectedDataTable?.data_table_id}-${type}-${name}-${widgetGenerateState.widgetId}-${widgetGenerateState.selectedWidgetName}-${widgetGenerateState.widgetFormValueMap[name] === undefined}`;
-
-/* Watcher */
-watch(() => widgetGenerateState.widgetValidMap, () => {
-    if (state.isPreviewInitiated) return;
-    const _requiredField = state.widgetRequiredFieldSchemaMap.map(([d]) => d);
-    if (_requiredField.every((d) => widgetGenerateState.widgetValidMap[d])) {
-        emit('ready-to-preview');
-        state.isPreviewInitiated = true;
-    }
-}, { deep: true });
+const keyGenerator = (name: string) => `${name}-${widgetGenerateState.selectedWidgetName}`;
 
 onMounted(() => {
     checkDefaultValidation();
@@ -283,6 +258,21 @@ onMounted(() => {
         <div class="form-group-wrapper"
              :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.REQUIRED_FIELDS] }"
         >
+            <div v-if="props.widgetValidationInvalid"
+                 class="widget-validation-warning"
+            >
+                <div class="warning-title">
+                    <p-i name="ic_error-filled"
+                         width="1.25rem"
+                         height="1.25rem"
+                         :color="red[400]"
+                    />
+                    <span>{{ $t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_TITLE') }}</span>
+                </div>
+                <p class="warning-description">
+                    {{ props.widgetValidationInvalidText }}
+                </p>
+            </div>
             <div class="title-wrapper"
                  @click="handleClickCollapsibleTitle(FORM_TITLE_MAP.REQUIRED_FIELDS)"
             >
@@ -297,7 +287,7 @@ onMounted(() => {
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetRequiredFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="keyGenerator(fieldName, 'require')"
+                               :key="keyGenerator(fieldName)"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
@@ -329,7 +319,7 @@ onMounted(() => {
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetOptionalFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="keyGenerator(fieldName, 'option')"
+                               :key="keyGenerator(fieldName)"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
@@ -418,8 +408,6 @@ onMounted(() => {
     .form-wrapper {
         @apply flex flex-col gap-4;
         padding: 1rem 1.25rem 1rem 1.25rem;
-        vertical-align: middle;
-        cursor: pointer;
         &.no-gap {
             gap: 0;
         }
@@ -439,6 +427,21 @@ onMounted(() => {
         @apply text-label-lg;
         font-weight: 700;
         padding-top: 1rem;
+        vertical-align: middle;
+        cursor: pointer;
+    }
+    .widget-validation-warning {
+        @apply w-full bg-red-100 rounded;
+        padding: 0.5rem 1rem;
+        margin-top: 0.5rem;
+        .warning-title {
+            @apply flex items-center gap-1 text-label-lg font-bold text-red-500;
+            margin-bottom: 0.25rem;
+        }
+        .warning-description {
+            @apply text-paragraph-md text-gray-900;
+            padding-left: 1.5rem;
+        }
     }
 }
 </style>

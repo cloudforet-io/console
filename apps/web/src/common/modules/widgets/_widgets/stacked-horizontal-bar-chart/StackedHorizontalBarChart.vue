@@ -26,7 +26,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getAllRequiredFieldsFilled,
+    getApiQueryDateRange,
     getDateLabelFormat, getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
@@ -47,7 +47,6 @@ const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
-    allRequiredFieldsFilled: computed(() => getAllRequiredFieldsFilled(props.widgetName, props.widgetOptions)),
     data: null as Data | null,
     yAxisData: [],
     chartData: [],
@@ -128,18 +127,19 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 
 /* Api */
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
-    if (!state.allRequiredFieldsFilled) return undefined;
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: _queryDateRange.start,
+                end: _queryDateRange.end,
                 group_by: [state.yAxisField, state.stackByField],
                 fields: {
                     [state.dataField]: {
@@ -148,7 +148,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
                     },
                 },
                 field_group: [state.stackByField],
-                sort: [{ key: `_total_${state.dataField}`, desc: true }],
+                sort: [{ key: `_total_${state.dataField}`, desc: false }],
                 page: { start: 1, limit: state.yAxisCount },
             },
             vars: props.dashboardVars,
@@ -178,12 +178,13 @@ const drawChart = (rawData?: Data|null) => {
     const _slicedByStackBy: any[] = [];
     rawData.results?.forEach((d) => {
         const _slicedData = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.stackByCount);
-        const _etcData = d[state.dataField].slice(state.stackByCount).reduce((acc, v) => {
+        const _etcData = d[state.dataField]?.slice(state.stackByCount).reduce((acc, v) => {
             acc[state.stackByField] = 'etc';
-            acc.value += v.value;
+            acc.value += v.value || 0;
             return acc;
-        }, {});
-        const _values = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
+        }, { value: 0 });
+        let _values = _etcData.value === 0 ? _slicedData : [..._slicedData, _etcData];
+        _values = orderBy(_values, 'value', 'desc');
         _values.forEach((v) => {
             _slicedByStackBy.push({
                 [state.yAxisField]: d[state.yAxisField],

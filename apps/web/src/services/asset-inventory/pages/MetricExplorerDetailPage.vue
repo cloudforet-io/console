@@ -79,7 +79,7 @@ const setQueryOptions = (urlQuery: MetricExplorerPageUrlQuery) => {
     const _filters = queryStringToObject(urlQuery.filters);
 
     if (_granularity) metricExplorerPageStore.setGranularity(_granularity as Granularity);
-    if (_groupBy?.length) metricExplorerPageStore.setSelectedGroupByList(_groupBy);
+    metricExplorerPageStore.setSelectedGroupByList(_groupBy || []);
     if (!isEmpty(_period)) metricExplorerPageStore.setPeriod(_period);
     if (!isEmpty(_filters)) metricExplorerPageStore.setFilters(_filters);
 };
@@ -106,7 +106,7 @@ watch(() => route.params, async (params) => {
 
     // set query options from url query
     const currentQuery = router.currentRoute.query;
-    setQueryOptions(currentQuery);
+    if (!isEmpty(currentQuery)) setQueryOptions(currentQuery);
 
     metricExplorerPageStore.setMetricInitiated(true);
     gnbStore.setBreadcrumbs(state.breadCrumbs);

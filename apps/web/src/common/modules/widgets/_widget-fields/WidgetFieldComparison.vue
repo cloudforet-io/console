@@ -19,7 +19,7 @@ import type { ComparisonFormat, ComparisonValue } from '@/common/modules/widgets
 
 const emit = defineEmits<WidgetFieldComponentEmit<ComparisonValue[]|undefined>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptions, ComparisonValue>>(), {
     widgetFieldSchema: () => ({
         options: {
             toggle: false,
@@ -93,7 +93,8 @@ const checkValue = ():boolean => {
     return true;
 };
 
-watch(() => state.proxyValue, () => {
+watch(() => state.proxyValue, (changed) => {
+    if (changed === undefined) state.toggleValue = false;
     emit('update:is-valid', checkValue());
 }, { immediate: true });
 

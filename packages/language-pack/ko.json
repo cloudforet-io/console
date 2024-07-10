@@ -1052,7 +1052,6 @@
 			"TITLE": "필드 변경하기"
 		},
 		"DELETED": "삭제됨",
-		"DEPRECATED": "",
 		"EDITOR": {
 			"ALIGN_CENTER": "가운데 정렬",
 			"ALIGN_JUSTIFY": "양쪽 정렬",
@@ -1360,6 +1359,7 @@
 			"TITLE": "프로젝트 변경"
 		},
 		"WIDGETS": {
+			"ACTUAL": "실제 크기",
 			"ADD_WIDGET": "위젯 추가",
 			"ADD_WIDGET_TO_DASHBOARD": "대시보드에 위젯 추가",
 			"ALL_SUMMARY": {
@@ -1446,7 +1446,10 @@
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
 			"DAILY_UPDATE_NO_DATA": "일간 변동 사항이 없습니다.",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
+			"DATA_NOT_DISPLAYED": "데이터 표시 불가",
+			"DATA_NOT_DISPLAYED_DESC": "모든 필수 필드를 설정하고, [적용하기] 버튼을 클릭하여 위젯 설정을 완료해주세요.",
 			"DATA_TABLE": {
+				"ADD": "데이터 추가",
 				"ALERT": {
 					"DELETE_DESC": "이 데이터를 삭제하시겠습니까?",
 					"DELETE_HEADER": "데이터 삭제",
@@ -1460,17 +1463,23 @@
 					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "이미 사용 중인 이름입니다.",
 					"ADDITIONAL_LABELS_NAME": "필드 명",
 					"ADDITIONAL_LABELS_VALUE": "값",
+					"ADD_FILTER": "필터 추가",
 					"ADD_LABEL": "추가",
 					"ADVANCED_OPTIONS": "고급 설정 옵션",
+					"CONCAT_DESC": "여러 테이블을 하나로 결합합니다.",
 					"DATA_FIELD_NAME": "데이터 필드명",
 					"DATA_FIELD_NAME_GROUP_BY_INVALID_TEXT": "이름을 입력하세요.",
 					"DATA_FIELD_NAME_INVALID_TEXT": "이름을 입력하세요.",
 					"DATA_TABLE_NAME_SUCCESS": "데이터 이름 수정 완료",
 					"DATA_TABLE_NAME_WARNING": "동일한 이름의 데이터가 이미 존재합니다.",
 					"DATA_UNIT": "데이터 단위",
+					"EVAL_DESC": "데이터 필드에 함수나 계산을 적용합니다.",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day는 필드 이름으로 사용할 수 없습니다.",
 					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "Group by로 사용 중인 명칭은 필드 이름으로 사용할 수 없습니다. ",
+					"FILTERS": "필터",
 					"GROUP_BY": "그룹별 통계(Group By)",
+					"JOIN_DESC": "공통 열을 기준으로 다른 테이블의 행을 병합합니다.",
+					"QUERY_DESC": "특정 조건을 충족하는 데이터를 필터링하고 추출합니다.",
 					"SELECT_DATA_SOURCE_SUCCESS": "데이터 수정 완료",
 					"SELECT_DATA_TABLE_WARNING": "데이터 테이블을 먼저 저장하세요.",
 					"SEPARATE": "날짜 형식 변경",
@@ -1479,10 +1488,12 @@
 					"UPDATE_DATA_TALBE_INVALID_SUCCESS": "변경 사항 반영 완료",
 					"UPDATE_DATA_TALBE_INVALID_WARNING": "변경 사항 반영 실패. 입력 폼을 다시 한번 확인해 주세요. ",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "선택한 '{first_data}', '{second_data}' 두 데이터는 한 개 이상의 동일한 데이터 필드가 있어 Join을 수행할 수 없습니다. "
-				}
+				},
+				"TRANSFORM": "데이터 병합/변환"
 			},
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
+			"DONE": "완료",
 			"EDIT": "편집",
 			"EDIT_WIDGET": "위젯 수정",
 			"EXPAND": "확장",
@@ -1496,11 +1507,21 @@
 				"TOGGLE_MORE": "더보기"
 			},
 			"FIELD": "필드",
+			"FORM": {
+				"CREATING_WIDGET_WARNING_MODAL_DESC": "이 창을 닫으면 생성 중인 모든 데이터가 삭제됩니다.",
+				"CREATING_WIDGET_WARNING_MODAL_TITLE": "저장되지 않은 데이터",
+				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "",
+				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "",
+				"WIDGET_VALIDATION_WARNING_DESC": "차트가 정상적으로 표시 되려면 필수 필드에 값이 올바르게 선택되었는지 확인해주세요.",
+				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "데이터 테이블에서 'Region' 필드를 추가해주세요. ",
+				"WIDGET_VALIDATION_WARNING_TITLE": "잘못 선택된 필드 존재"
+			},
 			"FORMAT_RULES": {
 				"BASE": "기본",
 				"GAUGE_DESC": "게이지 색상은 임계값에 따라 변경됩니다.",
 				"PROGRESS_CARD_DESC": "바 색상은 임계값에 따라 변경됩니다."
 			},
+			"FULL": "확대 보기",
 			"FULL_WIDTH": "전체 너비",
 			"HEALTH_DASHBOARD_DESC_1": "AWS의 비즈니스 또는 엔터프라이즈 플랜을 사용하는 경우 AWS Health Dashboard를 사용할 수 있습니다. ",
 			"HEALTH_DASHBOARD_DESC_2": "적합한 플랜을 이용중이지만 위젯을 사용할 수 없다면 아래의 이메일로 문의를 주세요. ",
@@ -1519,6 +1540,7 @@
 				"MORE_THAN_PREVIOUS_YEAR": "전년 대비 상승"
 			},
 			"NUMBER_FIELD_VALIDATION": "값은 {max} 이하이어야 합니다.",
+			"PERIOD": "기간",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "계정 ID",
 				"AGO": "전",
@@ -1626,8 +1648,9 @@
 		"ALL_DASHBOARDS": {
 			"CREATE": "생성",
 			"CREAT_NEW_DASHBOARD": "대시보드 생성",
+			"DASHBOARD": "대시보드",
 			"DASHBOARDS_TITLE": "대시보드",
-			"DEPRECATED": "사용 중지된",
+			"DEPRECATED": "지원 중지된",
 			"DEPRECATED_DESCRIPTION": "이 대시보드는 더 이상 지원되지 않으며 새로운 대시보드가 적용되면 제거될 예정입니다.",
 			"FILTER_ALL": "전체",
 			"FILTER_PRIVATE": "비공개",
@@ -1640,6 +1663,7 @@
 			"LABEL_VIWERS": "공개 여부",
 			"PRIVATE": "비공개",
 			"PROJECT": "프로젝트",
+			"SHARED": "공유",
 			"SINGLE_PROJECT": "개별 프로젝트",
 			"TOOLTIP_CLONE": "복제",
 			"TOOLTIP_DELETE": "삭제",
@@ -1816,12 +1840,16 @@
 			"SELECT_MONTH": "월 선택",
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "공유",
+			"SHARED_BY_ADMIN": "Admin에 의해 공유됨",
+			"SHARED_TO_WORKSPACES": "워크스페이스에 공유됨",
 			"SHARE_TO_ALL_WORKSPACES": "전체 워크스페이스에 공유",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "이 대시보드를 전체 워크스페이스에 공유하시겠습니까?",
 			"SHARE_WITH_CODE": "코드로 공유",
-			"UNSHARE_TO_ALL_WORKSPACES": "전체 워크스페이스 공유 해제"
+			"UNSHARE_FROM_ALL_WORKSPACES": "전체 워크스페이스 공유 해제",
+			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "이 대시보드를 모든 워크스페이스에서 공유 해제하시겠습니까?"
 		},
 		"FORM": {
+			"ALT_E_CLONE_DASHBOARD": "대시보드 복제 실패",
 			"ALT_E_CREATE_DASHBOARD": "대시보드 생성 실패",
 			"ALT_E_DELETE_DASHBOARD": "대시보드 삭제 실패",
 			"ALT_E_EDIT_NAME": "대시보드 이름 수정 실패",
@@ -1862,7 +1890,10 @@
 			"SAVE": "저장"
 		},
 		"LNB": {
-			"ONLY_FAVORITE": "즐겨찾기 항목만 노출"
+			"DEPRECATED": "",
+			"ONLY_FAVORITE": "즐겨찾기 항목만 노출",
+			"PRIVATE": "",
+			"SHARED": ""
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
@@ -1887,7 +1918,7 @@
 			"AWS_TRUSTED_ADVISOR": {
 				"DESC": "AWS Trusted Advisor를 통해 검사, 분석된 현황을 프로젝트별로 확인할 수 있는 위젯. "
 			},
-			"BASED_ON": "기준월",
+			"BASED_ON": "",
 			"BUDGET_STATUS": {
 				"DESC": "조회 기간동안의 상위 200개의 예산 사용률을 보여주는 위젯. "
 			},
@@ -2064,7 +2095,8 @@
 			},
 			"UNIT": "단위",
 			"UPDATE_TITLE": "위젯 편집",
-			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. "
+			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. ",
+			"월": "기준월"
 		}
 	},
 	"HOME": {
@@ -3393,6 +3425,7 @@
 			"TITLE": "멀티 클라우드 자산을 관리 콘솔에 {domain_icon} 모두 모아 보고, \n효율성과 생산성을 {boost_icon}  높이세요.",
 			"WELCOME_TITLE": "클라우드 관리 콘솔에 오신걸 환영합니다! "
 		},
+		"NOT_FOUND_ACCESS_WORKSPACE": "접근 가능한 워크스페이스가 없습니다.",
 		"NOT_FOUND_DESC": "아직 생성된 워크스페이스가 없습니다.",
 		"RECENT": "최근 방문",
 		"ROLE_TYPE_MEMBER": "멤버",

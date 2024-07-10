@@ -22,7 +22,7 @@ import { indigo } from '@/styles/colors';
 
 const emit = defineEmits<WidgetFieldComponentEmit<ProgressBarValue|undefined>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<ProgressBarOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<ProgressBarOptions, ProgressBarValue>>(), {
     widgetFieldSchema: () => ({}),
 });
 
@@ -130,8 +130,9 @@ const initValue = () => {
     }
 };
 
-watch(() => state.isAllValid, (value) => {
-    emit('update:is-valid', value);
+watch([() => state.isAllValid, () => state.proxyValue], ([isAllValid, value]) => {
+    if (value === undefined) state.toggleValue = false;
+    emit('update:is-valid', isAllValid);
 }, { immediate: true });
 
 onMounted(() => {

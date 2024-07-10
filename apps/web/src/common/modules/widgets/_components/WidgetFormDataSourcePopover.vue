@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton, PPopover, PSelectCard, PI,
@@ -18,7 +19,6 @@ import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
@@ -45,7 +45,6 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
@@ -110,29 +109,29 @@ const state = reactive({
         }
         return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
     }),
-    operatorInfoList: computed<{ key: DataTableOperator, name: string; description: string; icon: string;}[]>(() => [
+    operatorInfoList: computed<{ key: DataTableOperator, name: string; description: string|TranslateResult; icon: string;}[]>(() => [
         {
             key: DATA_TABLE_OPERATOR.CONCAT,
             name: 'Concatenate',
-            description: 'Combines multiple tables into one by stacking them.',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.CONCAT_DESC'),
             icon: 'ic_db-concat',
         },
         {
             key: DATA_TABLE_OPERATOR.JOIN,
             name: 'Join',
-            description: 'Merge rows from different tables based on a common column.',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.JOIN_DESC'),
             icon: 'ic_join',
         },
         {
             key: DATA_TABLE_OPERATOR.EVAL,
             name: 'Evaluate',
-            description: 'Apply functions or calculations to data fields.',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL_DESC'),
             icon: 'ic_db-evaluation',
         },
         {
             key: DATA_TABLE_OPERATOR.QUERY,
             name: 'Query',
-            description: 'Filter and extract data that meet specific conditions.',
+            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.QUERY_DESC'),
             icon: 'ic_db-where',
         },
 
@@ -186,11 +185,6 @@ const handleConfirmDataSource = async () => {
     if (widgetGenerateState.overlayType === 'ADD' && !widgetGenerateState.widgetId) {
         const createdWidget = await createWidget();
         if (createdWidget) {
-            dashboardDetailStore.addWidgetToDashboardLayouts(createdWidget.widget_id);
-            await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
-                dashboard_id: dashboardDetailState.dashboardId,
-                layouts: dashboardDetailState.dashboardLayouts,
-            });
             widgetGenerateStore.setWidgetForm(createdWidget);
         }
     }
@@ -228,12 +222,18 @@ const handleConfirmDataSource = async () => {
                 metric_id: state.selectedMetricId,
             },
         };
-        await widgetGenerateStore.createAddDataTable({
+        const result = await widgetGenerateStore.createAddDataTable({
             ...addParameters,
             options: {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
         });
+        if (!widgetGenerateState.selectedDataTableId && result) {
+            widgetGenerateStore.setSelectedDataTableId(result?.data_table_id);
+            await widgetGenerateStore.loadDataTable({
+                data_table_id: result?.data_table_id,
+            });
+        }
     }
     state.showPopover = false;
     state.loading = false;
@@ -244,10 +244,6 @@ watch(() => state.showPopover, (val) => {
         state.selectedDataSourceDomain = undefined;
         state.selectedPopperCondition = undefined;
     }
-});
-
-onMounted(() => {
-    console.debug(state.operatorMap);
 });
 </script>
 
@@ -273,12 +269,12 @@ onMounted(() => {
             <div v-if="!state.selectedPopperCondition"
                  class="data-source-popper-condition-wrapper"
             >
-                <p-select-card :label="i18n.t('Add Data')"
+                <p-select-card :label="i18n.t('COMMON.WIDGETS.DATA_TABLE.ADD')"
                                icon="ic_service_data-sources"
                                block
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.ADDED)"
                 />
-                <p-select-card :label="i18n.t('Transform Data')"
+                <p-select-card :label="i18n.t('COMMON.WIDGETS.DATA_TABLE.TRANSFORM')"
                                icon="ic_transform-data"
                                block
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.TRANSFORMED)"

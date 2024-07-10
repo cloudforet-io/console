@@ -5,23 +5,27 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, POverlayLayout,
+    PButton, PButtonModal, POverlayLayout,
 } from '@spaceone/design-system';
-
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
+import type { PublicWidgetDeleteParameters } from '@/schema/dashboard/public-widget/api-verbs/delete';
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetFormOverlayStep1.vue';
 import WidgetFormOverlayStep2 from '@/common/modules/widgets/_components/WidgetFormOverlayStep2.vue';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
@@ -40,8 +44,7 @@ const state = reactive({
     }),
     buttonText: computed<TranslateResult>(() => {
         if (widgetGenerateState.overlayStep === 1) return i18n.t('COMMON.WIDGETS.CONFIGURE_WIDGET');
-        if (widgetGenerateState.overlayType === 'ADD') return i18n.t('COMMON.WIDGETS.ADD_WIDGET_TO_DASHBOARD');
-        return i18n.t('COMMON.WIDGETS.SAVE');
+        return i18n.t('COMMON.WIDGETS.DONE');
     }),
     isAllValid: computed<boolean>(() => {
         if (widgetGenerateState.overlayStep === 1) return !!widgetGenerateState.selectedDataTableId;
@@ -50,50 +53,77 @@ const state = reactive({
         }
         return false;
     }),
+    warningModalVisible: false,
+    warningModalTitle: computed(() => {
+        if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_TITLE');
+        if (widgetGenerateState.widget?.state === 'INACTIVE') return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_TITLE');
+        return '';
+    }),
+    warningModalDescription: computed(() => {
+        if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_DESC');
+        if (widgetGenerateState.widget?.state === 'INACTIVE') return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_DESC');
+        return '';
+    }),
 });
+
+/* Api */
+const deleteWidget = async (widgetId: string) => {
+    if (!widgetId) return;
+    const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+    const fetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.delete<PrivateWidgetDeleteParameters>
+        : SpaceConnector.clientV2.dashboard.publicWidget.delete<PublicWidgetDeleteParameters>;
+    try {
+        await fetcher({
+            widget_id: widgetId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
 
 /* Event */
 const handleClickContinue = async () => {
-    const isPrivate = widgetGenerateState.widgetId.startsWith('private');
-    const fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
     if (widgetGenerateState.overlayStep === 1) {
-        await fetcher({
-            widget_id: widgetGenerateState.widgetId,
-            widget_type: widgetGenerateState.selectedWidgetName,
-            data_table_id: widgetGenerateState.selectedDataTableId,
-            options: {},
-        });
-        widgetGenerateStore.setWidgetFormValueMap({});
-        widgetGenerateStore.setWidgetValidMap({});
+        if (widgetGenerateState.widget?.data_table_id !== widgetGenerateState.selectedDataTableId) {
+            const _updateParams: PublicWidgetUpdateParameters|PrivateWidgetUpdateParameters = {
+                widget_id: widgetGenerateState.widgetId,
+                data_table_id: widgetGenerateState.selectedDataTableId,
+            };
+            if (widgetGenerateState.widget?.state === 'ACTIVE') {
+                _updateParams.state = 'INACTIVE';
+            }
+            await widgetGenerateStore.updateWidget(_updateParams);
+        }
         widgetGenerateStore.setOverlayStep(2);
         return;
     }
-    await fetcher({
-        widget_id: widgetGenerateState.widgetId,
-        name: widgetGenerateState.title,
-        description: widgetGenerateState.description,
-        size: widgetGenerateState.size,
-        widget_type: widgetGenerateState.selectedWidgetName,
-        data_table_id: widgetGenerateState.selectedDataTableId,
-        options: widgetGenerateState.widgetFormValueMap,
-    });
     widgetGenerateStore.setShowOverlay(false);
 };
 const handleUpdateVisible = (value: boolean) => {
+    if (!value && (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE')) {
+        state.warningModalVisible = true;
+        return;
+    }
     widgetGenerateStore.setShowOverlay(value);
 };
-const handleCloseOverlay = () => {
+const handleCloseWarningModal = () => {
+    state.warningModalVisible = false;
+};
+const handleConfirmWarningModal = async () => {
+    state.warningModalVisible = false;
+    if (widgetGenerateState.widget?.state === 'CREATING') await deleteWidget(widgetGenerateState.widgetId);
+    widgetGenerateStore.reset();
     widgetGenerateStore.setShowOverlay(false);
 };
 
-watch(() => widgetGenerateState.showOverlay, (val) => {
-    if (!val) {
+/* Watcher */
+watch(() => widgetGenerateState.showOverlay, async (val) => {
+    if (!val && widgetGenerateState.widget?.state !== 'CREATING') {
         widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
         widgetGenerateStore.reset();
-    } else if (widgetGenerateState.overlayType !== 'ADD') {
-        widgetGenerateStore.listDataTable();
+    } else if (val && widgetGenerateState.overlayType !== 'ADD') {
+        await widgetGenerateStore.listDataTable();
     }
 });
 </script>
@@ -104,7 +134,7 @@ watch(() => widgetGenerateState.showOverlay, (val) => {
                           style-type="primary"
                           size="full"
                           :title="state.sidebarTitle"
-                          @update:visible="handleUpdateVisible"
+                          @close="handleUpdateVisible"
         >
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
             <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2" />
@@ -112,11 +142,6 @@ watch(() => widgetGenerateState.showOverlay, (val) => {
                       #footer
             >
                 <div class="footer-wrapper">
-                    <p-button style-type="transparent"
-                              @click="handleCloseOverlay"
-                    >
-                        {{ $t('COMMON.WIDGETS.CANCEL') }}
-                    </p-button>
                     <p-button :style-type="widgetGenerateState.overlayStep === 1 ? 'substitutive' : 'primary'"
                               :icon-right="widgetGenerateState.overlayStep === 1 ? 'ic_arrow-right' : undefined"
                               :disabled="!state.isAllValid"
@@ -127,6 +152,19 @@ watch(() => widgetGenerateState.showOverlay, (val) => {
                 </div>
             </template>
         </p-overlay-layout>
+        <p-button-modal :header-title="state.warningModalTitle"
+                        :visible.sync="state.warningModalVisible"
+                        size="sm"
+                        :fade="true"
+                        :backdrop="true"
+                        theme-color="alert"
+                        @confirm="handleConfirmWarningModal"
+                        @cancel="handleCloseWarningModal"
+        >
+            <template #body>
+                <p>{{ state.warningModalDescription }}</p>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 

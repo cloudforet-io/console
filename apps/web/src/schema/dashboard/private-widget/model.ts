@@ -3,7 +3,7 @@ import type { Tags } from '@/schema/_common/model';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
-import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
+import type { WidgetType, WidgetState } from '@/common/modules/widgets/types/widget-model';
 
 
 export interface PrivateWidgetModel {
@@ -21,4 +21,5 @@ export interface PrivateWidgetModel {
     domain_id?: string;
     created_at: string;
     updated_at: string;
+    state: WidgetState;
 }

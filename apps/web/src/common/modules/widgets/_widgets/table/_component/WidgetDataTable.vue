@@ -123,12 +123,12 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
     if (field.fieldInfo?.type === 'labelField' || field.fieldInfo?.additionalType === 'comparison') return '';
     if (props.fieldType === 'staticField') {
         const dataInfo = props.dataInfo?.[field.name || ''];
-        return dataInfo?.unit ? `• Unit: ${dataInfo?.unit} \n• ${field.name}: ${item[field.name]}` : '';
+        return `• Unit: ${dataInfo?.unit ?? '-'} \n• ${field.name}: ${numberFormatter(item[field.name])}`;
     }
     const dataInfo = props.dataInfo?.[props.criteria || ''];
     const dynamicData = item[props.criteria || ''] ?? [];
     const dynamicDataItem = dynamicData.find((data) => data[props.dataField as string] === field.name);
-    return dataInfo?.unit ? `• Unit: ${dataInfo?.unit} \n• ${props.criteria}: ${dynamicDataItem?.value || 0}` : '';
+    return `• Unit: ${dataInfo?.unit ?? '-'} \n• ${props.criteria}: ${numberFormatter(dynamicDataItem?.value) || 0}`;
 };
 
 </script>
@@ -218,7 +218,7 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
     @apply bg-white h-full w-full relative;
     max-width: 81.5rem;
     max-height: 100%;
-    overflow: scroll;
+    overflow: auto;
 
     table {
         @apply min-w-full;
@@ -326,9 +326,6 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
             }
         }
     }
-}
-.widget-data-table::-webkit-scrollbar {
-    display: none;
 }
 
 </style>

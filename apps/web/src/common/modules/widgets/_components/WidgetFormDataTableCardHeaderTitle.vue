@@ -13,7 +13,9 @@ import { i18n } from '@/translations';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DATA_TABLE_TYPE,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableDataType } from '@/common/modules/widgets/types/widget-model';
 
@@ -57,8 +59,6 @@ const handleSelectDataTable = async (dataTableId: string) => {
         data_table_id: dataTableId,
     });
     widgetGenerateStore.setSelectedPreviewGranularity(GRANULARITY.MONTHLY);
-    widgetGenerateStore.setWidgetFormValueMap({});
-    widgetGenerateStore.setWidgetValidMap({});
 };
 const handleUpdateDataTableName = (value: string) => {
     if (value.length <= 60) {

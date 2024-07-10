@@ -141,4 +141,18 @@ export const getOverlayLayoutArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
+    // event
+    close: {
+        name: 'close',
+        description: 'Event emitted when the close button is clicked',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 });

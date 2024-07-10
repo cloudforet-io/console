@@ -221,8 +221,6 @@ const handleConfirmModal = async () => {
         if (beforeSelectedDataTableId === state.dataTableId) {
             const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
             widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
-            widgetGenerateStore.setWidgetFormValueMap({});
-            widgetGenerateStore.setWidgetValidMap({});
         }
     }
     if (modalState.mode === 'RESET') {
@@ -307,7 +305,6 @@ const handleUpdateDataTable = async () => {
         }));
     }
 
-    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
     setInitialDataTableForm();
     state.filterFormKey = getRandomId();
 };
