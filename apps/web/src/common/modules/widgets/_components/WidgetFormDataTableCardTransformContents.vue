@@ -7,7 +7,7 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
@@ -19,8 +19,6 @@ import WidgetFormDataTableCardTransformForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
 import {
     DATA_TABLE_TYPE,
-    DEFAULT_DATE_SORT,
-    DEFAULT_SEPARATED_DATE_SORT,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
@@ -216,7 +214,6 @@ const handleUpdateDataTable = async () => {
             widgetGenerateStore.setDataTableUpdating(true);
             await widgetGenerateStore.loadDataTable({
                 data_table_id: dataTable.data_table_id,
-                sort: Object.keys(dataTable?.labels_info ?? {}).includes('Date') ? DEFAULT_DATE_SORT : DEFAULT_SEPARATED_DATE_SORT,
             });
         }
         return;
@@ -226,12 +223,11 @@ const handleUpdateDataTable = async () => {
         name: state.dataTableName,
         options: { [state.operator]: options() },
     };
-    const result = await widgetGenerateStore.updateDataTable(updateParams);
+    await widgetGenerateStore.updateDataTable(updateParams);
     widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
     widgetGenerateStore.setDataTableUpdating(true);
     await widgetGenerateStore.loadDataTable({
         data_table_id: state.dataTableId,
-        sort: Object.keys(result?.labels_info ?? {}).includes('Date') ? DEFAULT_DATE_SORT : DEFAULT_SEPARATED_DATE_SORT,
     });
 
 
@@ -262,8 +258,6 @@ const handleUpdateDataTable = async () => {
             return null;
         }));
     }
-
-    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
 };
 
 /* Utils */

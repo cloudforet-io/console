@@ -1461,6 +1461,8 @@
 			},
 			"FIELD": "Field",
 			"FORM": {
+				"CREATING_WIDGET_WARNING_MODAL_DESC": "Are you sure you want to exit? Closing this window will discard any data currently being generated.",
+				"CREATING_WIDGET_WARNING_MODAL_TITLE": "Unsaved Data",
 				"WIDGET_VALIDATION_WARNING_DESC": "To illustrate chart properly, check the form below and set the correct values.",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "The ‘Region’ field is missing from the Data Table.",
 				"WIDGET_VALIDATION_WARNING_TITLE": "Empty or incorrect values"
