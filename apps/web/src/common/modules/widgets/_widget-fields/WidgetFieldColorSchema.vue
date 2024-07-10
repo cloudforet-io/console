@@ -19,7 +19,7 @@ import type { ColorSchemaValue } from '@/common/modules/widgets/types/widget-fie
 const DEFAULT_COLOR = 'Coral';
 const emit = defineEmits<WidgetFieldComponentEmit<ColorSchemaValue>>();
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<ColorSchemaOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<ColorSchemaOptions, ColorSchemaValue>>(), {
     widgetFieldSchema: () => ({
         options: {
             default: 'ic_circle-filled',

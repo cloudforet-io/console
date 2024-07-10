@@ -17,7 +17,7 @@ import type {
 import type { CategoryByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const props = defineProps<WidgetFieldComponentProps<CategoryByOptions>>();
+const props = defineProps<WidgetFieldComponentProps<CategoryByOptions, CategoryByValue>>();
 const emit = defineEmits<WidgetFieldComponentEmit<CategoryByValue>>();
 const { labelsMenuItem } = useGranularityMenuItem(props, 'groupBy');
 const state = reactive({

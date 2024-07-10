@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core';
 import {
-    computed, defineExpose, reactive, ref,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -10,7 +10,9 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { isEmpty, orderBy, throttle } from 'lodash';
+import {
+    isEmpty, max, orderBy, throttle,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -26,6 +28,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
+    getApiQueryDateRange,
     getDateLabelFormat, getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
@@ -35,7 +38,9 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { XAxisValue, YAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    ColorSchemaValue, XAxisValue, YAxisValue, ColorValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 type Data = ListResponse<{
@@ -54,7 +59,13 @@ const state = reactive({
     xAxisData: [],
     yAxisData: [],
     chartData: [],
+    heatmapMaxValue: computed(() => max(state.chartData.map((d) => d?.[2] || 0)) ?? 1),
     chartOptions: computed<HeatmapSeriesOption>(() => ({
+        grid: {
+            left: 0,
+            right: '3%',
+            containLabel: true,
+        },
         xAxis: {
             type: 'category',
             data: state.xAxisData,
@@ -84,6 +95,7 @@ const state = reactive({
         },
         tooltip: {
             position: 'top',
+            confine: true,
             formatter: (params) => {
                 const _name = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.name);
                 const _value = numberFormatter(params.value[2]) || '';
@@ -96,9 +108,10 @@ const state = reactive({
             orient: 'horizontal',
             left: 'left',
             bottom: 0,
-            // inRange: {
-            //     color: ['#cdd3ef', '#21e121'],
-            // },
+            max: state.heatmapMaxValue,
+            inRange: {
+                color: state.colorValue,
+            },
             outOfRange: {
                 color: '#999',
             },
@@ -123,11 +136,14 @@ const state = reactive({
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     yAxisField: computed<string>(() => (props.widgetOptions?.yAxis as YAxisValue)?.value),
     yAxisCount: computed<number>(() => (props.widgetOptions?.yAxis as YAxisValue)?.count),
+    colorValue: computed<ColorValue>(() => (props.widgetOptions?.colorSchema as ColorSchemaValue)?.colorValue),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
         if (Object.values(DATE_FIELD).includes(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+        } else if (Object.values(DATE_FIELD).includes(state.yAxisField)) {
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.yAxisCount);
         }
         return { start: _start, end: _end };
     }),
@@ -138,21 +154,24 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     dateRange: computed(() => state.dateRange),
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
+    noData: computed(() => (state.data ? !state.data.results?.length : false)),
 });
 
 /* Util */
-const fetchWidget = async (): Promise<Data|APIErrorToast> => {
+const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: _queryDateRange.start,
+                end: _queryDateRange.end,
                 group_by: [state.xAxisField, state.yAxisField],
                 fields: {
                     [state.dataField]: {
@@ -207,9 +226,6 @@ const drawChart = (rawData: Data|null) => {
         });
     });
     state.chartData = _chartData;
-
-    state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions, true);
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
@@ -221,6 +237,14 @@ const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
     state.loading = false;
     return state.data;
 };
+
+/* Watcher */
+watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.chart = init(chartContext.value);
+        state.chart.setOption(state.chartOptions, true);
+    }
+});
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
@@ -235,14 +259,11 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div ref="chartContext"
-             class="chart"
-        />
+        <!--Do not delete div element below. It's defense code for redraw-->
+        <div class="h-full">
+            <div ref="chartContext"
+                 class="h-full"
+            />
+        </div>
     </widget-frame>
 </template>
-
-<style lang="postcss" scoped>
-.chart {
-    height: 100%;
-}
-</style>

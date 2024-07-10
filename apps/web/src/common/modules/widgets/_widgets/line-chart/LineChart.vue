@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -28,6 +28,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
+    getApiQueryDateRange,
     getDateLabelFormat, getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
@@ -67,15 +68,17 @@ const state = reactive({
         },
         tooltip: {
             trigger: 'axis',
+            confine: true,
             formatter: (params) => {
                 const _params = params as any[];
                 const _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
                 const _values = _params.map((p) => {
                     const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.lineByField, p.seriesName);
-                    const _value = numberFormatter(p.value) || '';
+                    const _value = p.value ? numberFormatter(p.value) : undefined;
+                    if (!_value) return undefined;
                     return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
                 });
-                return [_axisValue, ..._values].join('<br/>');
+                return [_axisValue, ..._values].filter((d) => !!d).join('<br/>');
             },
         },
         xAxis: {
@@ -123,19 +126,22 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     dateRange: computed(() => state.dateRange),
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
+    noData: computed(() => (state.data ? !state.data.results?.length : false)),
 });
 
 /* Util */
-const fetchWidget = async (): Promise<Data|APIErrorToast> => {
+const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const _query: any = {
             granularity: state.granularity,
-            start: state.dateRange.start,
-            end: state.dateRange.end,
+            start: _queryDateRange.start,
+            end: _queryDateRange.end,
             group_by: [state.xAxisField],
             fields: {
                 [state.dataField]: {
@@ -169,12 +175,12 @@ const getLineByData = (rawData: Data) => {
     const _slicedByLineBy: any[] = [];
     rawData.results?.forEach((d) => {
         const _slicedData = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.lineByCount);
-        const _etcData = d[state.dataField].slice(state.lineByCount).reduce((acc, v) => {
+        const _etcData = d[state.dataField]?.slice(state.lineByCount).reduce((acc, v) => {
             acc[state.lineByField] = 'etc';
-            acc.value += v.value;
+            acc.value += v.value || 0;
             return acc;
-        }, {});
-        const _values = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
+        }, { value: 0 });
+        const _values = _etcData.value === 0 ? _slicedData : [..._slicedData, _etcData];
         _values.forEach((v) => {
             _slicedByLineBy.push({
                 [state.xAxisField]: d[state.xAxisField],
@@ -221,10 +227,6 @@ const drawChart = (rawData: Data|null) => {
     } else {
         state.chartData = getTotalData(rawData);
     }
-
-    // init chart and set options
-    state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions, true);
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
@@ -236,6 +238,14 @@ const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
     state.loading = false;
     return state.data;
 };
+
+/* Watcher */
+watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.chart = init(chartContext.value);
+        state.chart.setOption(state.chartOptions, true);
+    }
+});
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
@@ -250,14 +260,11 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div ref="chartContext"
-             class="chart"
-        />
+        <!--Do not delete div element below. It's defense code for redraw-->
+        <div class="h-full">
+            <div ref="chartContext"
+                 class="h-full"
+            />
+        </div>
     </widget-frame>
 </template>
-
-<style lang="postcss" scoped>
-.chart {
-    height: 100%;
-}
-</style>

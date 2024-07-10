@@ -33,8 +33,10 @@ export const useWidgetInitAndRefresh = <Data = any>({
     const stopLoadingWatch = watch(() => props.loading, async (loading) => {
         if (props.disableRefreshOnLoading) return;
         if (!initiated.value && !loading) {
-            await loadWidget();
-            initiated.value = true;
+            if (props.widgetState === 'ACTIVE') {
+                await loadWidget();
+                initiated.value = true;
+            }
         }
     }, { immediate: true });
 

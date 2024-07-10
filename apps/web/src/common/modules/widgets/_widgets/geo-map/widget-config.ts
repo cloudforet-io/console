@@ -10,6 +10,13 @@ const geoMap: WidgetConfig = {
     requiredFieldsSchema: {
         granularity: {},
         dataField: {},
+        groupBy: {
+            options: {
+                dataTarget: 'labels_info',
+                hideCount: true,
+                fixedValue: 'Region',
+            },
+        },
     },
     optionalFieldsSchema: {
         legend: {

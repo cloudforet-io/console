@@ -107,7 +107,8 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Api */
-const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
+const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast|undefined> => {
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate

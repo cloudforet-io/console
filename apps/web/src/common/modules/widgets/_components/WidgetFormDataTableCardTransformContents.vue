@@ -7,7 +7,7 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
@@ -17,7 +17,9 @@ import WidgetFormDataTableCardHeaderTitle
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
 import WidgetFormDataTableCardTransformForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
-import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DATA_TABLE_TYPE,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
     DataTableAlertModalMode, QueryCondition, EvalFormula, TransformDataTableInfo,
@@ -133,8 +135,6 @@ const handleConfirmModal = async () => {
         if (beforeSelectedDataTableId === state.dataTableId) {
             const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
             widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
-            widgetGenerateStore.setWidgetFormValueMap({});
-            widgetGenerateStore.setWidgetValidMap({});
         }
     }
     if (modalState.mode === 'RESET') {
@@ -258,8 +258,6 @@ const handleUpdateDataTable = async () => {
             return null;
         }));
     }
-
-    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
 };
 
 /* Utils */

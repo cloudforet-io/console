@@ -14,6 +14,7 @@ import bytes from 'bytes';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Page } from '@/schema/_common/type';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -45,6 +46,7 @@ const storeState = reactive({
     selectedDataTable: computed(() => widgetGenerateGetters.selectedDataTable),
     loading: computed(() => widgetGenerateState.dataTableLoadLoading),
     dataTableUpdating: computed(() => widgetGenerateState.dataTableUpdating),
+    selectedGranularity: computed(() => widgetGenerateState.selectedPreviewGranularity),
     // reference
     project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     workspace: computed(() => allReferenceStore.getters.workspace),
@@ -58,10 +60,19 @@ const state = reactive({
     dataFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
     dataInfo: computed(() => storeState.selectedDataTable?.data_info),
     fields: computed<PreviewTableField[]>(() => [
-        ...state.labelFields.map((key) => ({ type: 'LABEL', name: key, sortKey: key })),
+        ...state.labelFields.map((key) => ({ type: 'LABEL', name: key, sortKey: key })).filter((field) => {
+            const _granularity = storeState.selectedGranularity;
+            if (state.labelFields.some((d) => d === 'Year' || d === 'Month' || d === 'Date')) {
+                if (_granularity === GRANULARITY.DAILY && (field.name === 'Year' || field.name === 'Month')) return false;
+                if (_granularity === GRANULARITY.MONTHLY && (field.name === 'Year' || field.name === 'Day')) return false;
+                if (_granularity === GRANULARITY.YEARLY && (field.name === 'Month' || field.name === 'Day')) return false;
+            }
+            return true;
+        }),
         { type: 'DIVIDER', name: '' },
         ...state.dataFields.map((key) => ({ type: 'DATA', name: key })),
     ]),
+    isSeparatedDataTable: computed(() => !Object.keys(storeState.selectedDataTable?.labels_info ?? {}).includes('Date')),
     sortBy: [] as { key: string; desc: boolean }[],
     granularityItems: computed<MenuItem[]>(() => ([
         {
@@ -90,8 +101,8 @@ const state = reactive({
 });
 
 const emptyState = reactive({
-    title: computed(() => 'To get started, add your data.'),
-    description: computed(() => 'The preview will be displayed here.'),
+    title: computed(() => i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_TITLE')),
+    description: computed(() => i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_DESC')),
 });
 /* Events */
 const handleSelectGranularity = async (granularity: Granularity) => {
@@ -137,7 +148,7 @@ const valueFormatter = (value, field: PreviewTableField) => {
         const _originalVal = bytes.parse(`${value}${_unit}`);
         return byteFormatter(_originalVal);
     }
-    return numberFormatter(value);
+    return numberFormatter(value, { notation: 'compact' });
 };
 
 const getValue = (item, field: PreviewTableField) => {
@@ -145,12 +156,12 @@ const getValue = (item, field: PreviewTableField) => {
     if (field.type === 'LABEL' && Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
         const referenceKey = REFERENCE_FIELD_MAP[field.name];
         const referenceValueKey = item[field.name];
-        return storeState[referenceKey][referenceValueKey]?.name ?? '-';
+        return storeState[referenceKey][referenceValueKey]?.label || storeState[referenceKey][referenceValueKey]?.name || '-';
     }
     if (field.type === 'DATA') {
         return itemValue ? valueFormatter(itemValue, field) : '-';
     }
-    return item[field.name] ?? '-';
+    return item[field.name] || '-';
 };
 
 const getSortIcon = (field: PreviewTableField) => {
@@ -333,6 +344,7 @@ watch(() => storeState.dataTableUpdating, () => {
     .toolbox-left-wrapper {
         @apply flex items-center;
         gap: 0.75rem;
+        height: 100%;
         .view-table-title {
             @apply text-label-lg font-bold;
         }

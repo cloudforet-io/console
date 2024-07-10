@@ -86,9 +86,9 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
         _widgetIdList?.forEach((widgetId) => {
             const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
             if (!_widget) return;
-            const config = getWidgetConfig(_widget.widget_type);
-            if (!config) return;
-            const _size = _widget.size || config.meta.sizes[0];
+            const _config = getWidgetConfig(_widget.widget_type);
+            if (!_config) return;
+            const _size = _widget.size || _config.meta.sizes[0];
             const _component = getWidgetComponent(_widget.widget_type);
             if (!_component) return;
             _refinedWidgets.push({
@@ -107,11 +107,10 @@ const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {
     });
     return _refinedWidgets;
 };
-const getWidgetLoading = (widgetId: string) => {
+const getWidgetLoading = () => {
     if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
     // if (!state.intersectedWidgetMap[widgetId]) return true;
-    if (widgetGenerateState.widgetId === widgetId) return true;
     return false;
 };
 const refreshAllWidget = debounce(async () => {
@@ -211,9 +210,9 @@ const handleDeleteModalConfirm = async () => {
     delete state.mountedWidgetMap[_targetWidgetId];
     state.mountedWidgetMap = { ...state.mountedWidgetMap };
     // 3. close modal
-    await dashboardDetailStore.listDashboardWidgets();
     widgetDeleteState.visibleModal = false;
     widgetDeleteState.targetWidget = null;
+    await dashboardDetailStore.listDashboardWidgets();
 };
 const handleClickAddWidget = () => {
     widgetGenerateStore.setOverlayType('ADD');
@@ -233,6 +232,16 @@ watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
         await loadAWidget(widgetGenerateState.latestWidgetId);
     }
 });
+watch(() => dashboardDetailState.dashboardWidgets, (dashboardWidgets) => {
+    // delete creating widgets
+    if (!widgetGenerateState.showOverlay) {
+        dashboardWidgets.forEach((widget) => {
+            if (widget.state === 'CREATING') {
+                deleteWidget(widget.widget_id);
+            }
+        });
+    }
+}, { immediate: true });
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
 const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
     if (widgetObserverMap) {
@@ -268,6 +277,7 @@ defineExpose({
     >
         <p-data-loader :loading="dashboardDetailState.loadingDashboard"
                        :data="state.refinedWidgetInfoList"
+                       loader-backdrop-color="gray.100"
         >
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">
@@ -278,6 +288,7 @@ defineExpose({
                                ref="widgetRef"
                                :widget-name="widget.widget_type"
                                :widget-id="widget.widget_id"
+                               :widget-state="widget.state"
                                :data-table-id="widget.data_table_id"
                                :title="widget.name"
                                :description="widget.description"
@@ -289,6 +300,7 @@ defineExpose({
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"
+                               :disable-manage-buttons="dashboardDetailGetters.disableManageButtons"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                @mounted="handleWidgetMounted(widget.widget_id)"
                                @click-edit="handleOpenWidgetOverlay(widget, 'EDIT')"
@@ -303,7 +315,7 @@ defineExpose({
                     <p-empty show-image
                              image-size="sm"
                              class="empty-wrapper"
-                             show-button
+                             :show-button="!dashboardDetailGetters.disableManageButtons"
                     >
                         {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
                         <template #button>

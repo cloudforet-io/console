@@ -21,7 +21,7 @@ import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-fie
 import { violet } from '@/styles/colors';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions, FormatRulesValue[]>>(), {
     widgetFieldSchema: () => ({}),
 });
 
@@ -87,6 +87,7 @@ onMounted(() => {
         if (fm.threshold === undefined) return undefined;
         return !!fm.threshold;
     }) ?? [];
+    emit('update:value', state.value);
 });
 
 </script>

@@ -15,12 +15,12 @@ const gauge: WidgetConfig = {
         dataField: {},
         min: {
             options: {
-                default: 3,
+                default: 0,
             },
         },
         max: {
             options: {
-                default: 3,
+                default: 100,
             },
         },
         formatRules: {

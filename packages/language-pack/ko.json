@@ -569,8 +569,8 @@
 				"FILTERS": "필터",
 				"FILTER_MODAL_HELP_TEXT_1": "선택한 필터가 없습니다.",
 				"FILTER_MODAL_HELP_TEXT_2": "리스트에 있는 필터를 선택 하세요.",
-				"GRANULARITY": "세부 기준",
-				"GROUP_BY": "그룹별 통계",
+				"GRANULARITY": "세부 기준(Granularity)",
+				"GROUP_BY": "그룹별 통계(Group By)",
 				"HELP_TEXT": {
 					"UP_TO_31_DAYS": "최대 31일 까지",
 					"UP_TO_LAST_12_MONTHS": "최대 12개월 기간내 설정 가능"
@@ -774,8 +774,8 @@
 						"DEFAULT": "기본",
 						"IN_RATIO": "{ratio}% 비율",
 						"LABEL_FILTERS": "필터",
-						"LABEL_GRANULARITY": "세부 기준",
-						"LABEL_GROUP_BY": "그룹별 통계",
+						"LABEL_GRANULARITY": "세부 기준(Granularity)",
+						"LABEL_GROUP_BY": "그룹별 통계(Group By)",
 						"LABEL_QUERY_NAME": "쿼리명",
 						"LABEL_STACK": "누적",
 						"LAST_MONTH_TOTAL_SPEND_DESC": "조회 기간의 전월에 발생한 총 비용을 나타내주는 위젯.",
@@ -800,7 +800,7 @@
 					"FORM": {
 						"DELETE_CONTENTS": "삭제시 복구가 불가합니다.",
 						"DELETE_TITLE": "선택한 위젯을 삭제하시겠습니까?",
-						"LABEL_GROUP_BY": "그룹별 통계 (Group By)",
+						"LABEL_GROUP_BY": "그룹별 통계(Group By)",
 						"LABEL_NAME": "이름",
 						"UPDATE_TITLE": "위젯 이름 변경"
 					},
@@ -975,7 +975,7 @@
 			"INDEX": "인덱스",
 			"ISSUE_DATE": "발행일자 ",
 			"REPORT_NUMBER": "리포트 번호",
-			"SUBTOTAL": "소계 ",
+			"SUBTOTAL": "소계(Subtotal)",
 			"TO": "수신자",
 			"TOTAL": "총합계 ",
 			"TOTAL_AMOUNT_BY_PROVIDER": "프로바이더별 총합계 "
@@ -1312,6 +1312,7 @@
 			"TITLE": "프로젝트 변경"
 		},
 		"WIDGETS": {
+			"ACTUAL": "실제 크기",
 			"ADD_WIDGET": "위젯 추가",
 			"ADD_WIDGET_TO_DASHBOARD": "대시보드에 위젯 추가",
 			"ALL_SUMMARY": {
@@ -1336,7 +1337,7 @@
 				"TREND_TITLE": "트렌드",
 				"TYPE_TITLE": "{service} 타입 "
 			},
-			"APPLY": "",
+			"APPLY": "적용하기",
 			"BILLING": {
 				"DAY": "일",
 				"HIDE": "숨기기",
@@ -1375,8 +1376,8 @@
 				"ADD_COMPARISON": "비교 추가",
 				"ALL": "전체",
 				"COMPARE_TARGET": "비교 대상",
-				"COMPARE_WITH": "비교하기",
-				"COMPARISON": "비교",
+				"COMPARE_WITH": "비교 대상",
+				"COMPARISON": "비교(Δ)",
 				"DECREASE": "감소",
 				"FIELD_NAME": "필드명",
 				"FIXED": "금액 고정",
@@ -1386,7 +1387,7 @@
 				"PERCENT": "비율",
 				"PREVIOUS_DAY": "전",
 				"PREVIOUS_MONTH": "이전 월",
-				"PREVIOUS_PERIOD": "이전 기간",
+				"PREVIOUS_PERIOD": "전일/전월/전년 데이터 ",
 				"PREVIOUS_YEAR": "작년"
 			},
 			"CONFIGURE_WIDGET": "위젯 구성",
@@ -1398,47 +1399,58 @@
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
 			"DAILY_UPDATE_NO_DATA": "일간 변동 사항이 없습니다.",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
+			"DATA_NOT_DISPLAYED": "데이터 표시 불가",
+			"DATA_NOT_DISPLAYED_DESC": "모든 필수 필드를 설정하고, [적용하기] 버튼을 클릭하여 위젯 설정을 완료해주세요.",
 			"DATA_TABLE": {
+				"ADD": "데이터 추가",
 				"ALERT": {
-					"DELETE_DESC": "",
-					"DELETE_HEADER": "",
-					"DELETE_UNABLED_DESC": "",
-					"DELETE_UNABLED_HEADER": "",
-					"RESET_DESC": "",
-					"RESET_HEADER": ""
+					"DELETE_DESC": "이 데이터를 삭제하시겠습니까?",
+					"DELETE_HEADER": "데이터 삭제",
+					"DELETE_UNABLED_DESC": "현재 '{data_name}'에서 사용 중입니다. '{data_name}'에서 선택을 해제한 후에 삭제를 재시도하세요.",
+					"DELETE_UNABLED_HEADER": "데이터 삭제 불가합니다",
+					"RESET_DESC": "재설정 시, 모든 입력값이 가장 마지막 입력값으로 되돌아갑니다. 이 작업은 취소할 수 없습니다.",
+					"RESET_HEADER": "데이터 옵션을 리셋하시겠습니까?"
 				},
 				"FORM": {
-					"ADDITIONAL_LABELS": "",
-					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "",
-					"ADDITIONAL_LABELS_NAME": "",
-					"ADDITIONAL_LABELS_VALUE": "",
-					"ADD_LABEL": "",
-					"ADVANCED_OPTIONS": "",
-					"DATA_FIELD_NAME": "",
-					"DATA_FIELD_NAME_GROUP_BY_INVALID_TEXT": "",
-					"DATA_FIELD_NAME_INVALID_TEXT": "",
-					"DATA_TABLE_NAME_SUCCESS": "",
-					"DATA_TABLE_NAME_WARNING": "",
-					"DATA_UNIT": "",
-					"FIELD_NAME_DATE_INVALID_TEXT": "",
-					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "",
-					"GROUP_BY": "",
-					"SELECT_DATA_SOURCE_SUCCESS": "",
-					"SELECT_DATA_TABLE_WARNING": "",
-					"SEPARATE": "",
-					"SEPARATE_DESC": "",
-					"TIME_DIFF": "",
-					"UPDATE_DATA_TALBE_INVALID_SUCCESS": "",
-					"UPDATE_DATA_TALBE_INVALID_WARNING": "",
-					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": ""
-				}
+					"ADDITIONAL_LABELS": "레이블 필드 추가",
+					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "이미 사용 중인 이름입니다.",
+					"ADDITIONAL_LABELS_NAME": "필드 명",
+					"ADDITIONAL_LABELS_VALUE": "값",
+					"ADD_FILTER": "필터 추가",
+					"ADD_LABEL": "추가",
+					"ADVANCED_OPTIONS": "고급 설정 옵션",
+					"CONCAT_DESC": "여러 테이블을 하나로 결합합니다.",
+					"DATA_FIELD_NAME": "데이터 필드명",
+					"DATA_FIELD_NAME_GROUP_BY_INVALID_TEXT": "이름을 입력하세요.",
+					"DATA_FIELD_NAME_INVALID_TEXT": "이름을 입력하세요.",
+					"DATA_TABLE_NAME_SUCCESS": "데이터 이름 수정 완료",
+					"DATA_TABLE_NAME_WARNING": "동일한 이름의 데이터가 이미 존재합니다.",
+					"DATA_UNIT": "데이터 단위",
+					"EVAL_DESC": "데이터 필드에 함수나 계산을 적용합니다.",
+					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day는 필드 이름으로 사용할 수 없습니다.",
+					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "Group by로 사용 중인 명칭은 필드 이름으로 사용할 수 없습니다. ",
+					"FILTERS": "필터",
+					"GROUP_BY": "그룹별 통계(Group By)",
+					"JOIN_DESC": "공통 열을 기준으로 다른 테이블의 행을 병합합니다.",
+					"QUERY_DESC": "특정 조건을 충족하는 데이터를 필터링하고 추출합니다.",
+					"SELECT_DATA_SOURCE_SUCCESS": "데이터 수정 완료",
+					"SELECT_DATA_TABLE_WARNING": "데이터 테이블을 먼저 저장하세요.",
+					"SEPARATE": "날짜 형식 변경",
+					"SEPARATE_DESC": "Year, Month, Day 3개 컬럼으로 분리 ",
+					"TIME_DIFF": "과거 데이터 설정(Time Diff)",
+					"UPDATE_DATA_TALBE_INVALID_SUCCESS": "변경 사항 반영 완료",
+					"UPDATE_DATA_TALBE_INVALID_WARNING": "변경 사항 반영 실패. 입력 폼을 다시 한번 확인해 주세요. ",
+					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "선택한 '{first_data}', '{second_data}' 두 데이터는 한 개 이상의 동일한 데이터 필드가 있어 Join을 수행할 수 없습니다. "
+				},
+				"TRANSFORM": "데이터 병합/변환"
 			},
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
+			"DONE": "완료",
 			"EDIT": "편집",
 			"EDIT_WIDGET": "위젯 수정",
 			"EXPAND": "확장",
-			"EXPAND_WIDGET": "위젯 확장",
+			"EXPAND_WIDGET": "전체 보기",
 			"FAVORITES_WIDGET": {
 				"LABEL_CLOUD_SERVICE": "클라우드 서비스",
 				"LABEL_PROJECT": "프로젝트",
@@ -1448,11 +1460,21 @@
 				"TOGGLE_MORE": "더보기"
 			},
 			"FIELD": "필드",
+			"FORM": {
+				"CREATING_WIDGET_WARNING_MODAL_DESC": "이 창을 닫으면 생성 중인 모든 데이터가 삭제됩니다.",
+				"CREATING_WIDGET_WARNING_MODAL_TITLE": "저장되지 않은 데이터",
+				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "",
+				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "",
+				"WIDGET_VALIDATION_WARNING_DESC": "차트가 정상적으로 표시 되려면 필수 필드에 값이 올바르게 선택되었는지 확인해주세요.",
+				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "데이터 테이블에서 'Region' 필드를 추가해주세요. ",
+				"WIDGET_VALIDATION_WARNING_TITLE": "잘못 선택된 필드 존재"
+			},
 			"FORMAT_RULES": {
 				"BASE": "기본",
 				"GAUGE_DESC": "게이지 색상은 임계값에 따라 변경됩니다.",
 				"PROGRESS_CARD_DESC": "바 색상은 임계값에 따라 변경됩니다."
 			},
+			"FULL": "확대 보기",
 			"FULL_WIDTH": "전체 너비",
 			"HEALTH_DASHBOARD_DESC_1": "AWS의 비즈니스 또는 엔터프라이즈 플랜을 사용하는 경우 AWS Health Dashboard를 사용할 수 있습니다. ",
 			"HEALTH_DASHBOARD_DESC_2": "적합한 플랜을 이용중이지만 위젯을 사용할 수 없다면 아래의 이메일로 문의를 주세요. ",
@@ -1461,6 +1483,7 @@
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"MAX_ITEMS": "최대 항목 수",
 			"MAX_ITEMS_DESC": "{fieldName} 값의 최대 개수는 {max}입니다.",
+			"NO_DATA_TO_DISPLAY": "데이터가 없습니다.",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "전일 대비 하락",
 				"LESS_THAN_PREVIOUS_MONTH": "전월 대비 하락",
@@ -1470,6 +1493,7 @@
 				"MORE_THAN_PREVIOUS_YEAR": "전년 대비 상승"
 			},
 			"NUMBER_FIELD_VALIDATION": "값은 {max} 이하이어야 합니다.",
+			"PERIOD": "기간",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "계정 ID",
 				"AGO": "전",
@@ -1495,6 +1519,10 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "지난 7일 ~ 예정 일정"
 			},
+			"PREVIEW_TABLE_EMPTY_DESC": "여기에 데이터 구성의 미리보기가 표시됩니다.",
+			"PREVIEW_TABLE_EMPTY_TITLE": "데이터를 추가해 주세요.",
+			"REQUIRED_FIELDS_ARE_MISSING": "필수 필드 중 입력 누락 존재",
+			"REQUIRED_FIELDS_ARE_MISSING_DESC": "위젯 설정을 완료해주세요.",
 			"RESET": "초기화",
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "클라우드 서비스 ",
 			"RESOURCE_BY_REGION_DEFAULT_ITEM": "지역",
@@ -1548,8 +1576,8 @@
 			"TOP_PROJECT_STORAGE": "저장소",
 			"TOP_PROJECT_TITLE": "가장 많은 리소스를 사용중인 프로젝트",
 			"TOTAL": {
-				"DESC": "총합 행 고정",
-				"SUB_TOTAL_DESC": "소계 열 고정"
+				"DESC": "행 고정",
+				"SUB_TOTAL_DESC": "열 고정"
 			},
 			"TRUSTED_ADVISOR": {
 				"LABEL_COST_OPTIMIZATION": "비용 최적화",
@@ -1573,8 +1601,9 @@
 		"ALL_DASHBOARDS": {
 			"CREATE": "생성",
 			"CREAT_NEW_DASHBOARD": "대시보드 생성",
+			"DASHBOARD": "대시보드",
 			"DASHBOARDS_TITLE": "대시보드",
-			"DEPRECATED": "사용 중지된",
+			"DEPRECATED": "지원 중지된",
 			"DEPRECATED_DESCRIPTION": "이 대시보드는 더 이상 지원되지 않으며 새로운 대시보드가 적용되면 제거될 예정입니다.",
 			"FILTER_ALL": "전체",
 			"FILTER_PRIVATE": "비공개",
@@ -1587,6 +1616,7 @@
 			"LABEL_VIWERS": "공개 여부",
 			"PRIVATE": "비공개",
 			"PROJECT": "프로젝트",
+			"SHARED": "공유",
 			"SINGLE_PROJECT": "개별 프로젝트",
 			"TOOLTIP_CLONE": "복제",
 			"TOOLTIP_DELETE": "삭제",
@@ -1604,7 +1634,7 @@
 			"CURRENT_WORKSPACE": "현재 워크스페이스",
 			"DASHBOARD_SCOPE": "대시보드 범위",
 			"GO_BACK": "뒤로가기",
-			"LABEL": "라벨",
+			"LABEL": "레이블",
 			"LABEL_DEFAULT_TEMPLATE": "기본 템플릿 중 선택",
 			"LABEL_EXISTING_DASHBOARD": "저장된 대시보드 중 선택",
 			"LABEL_SCOPE": "대시보드 범위",
@@ -1627,7 +1657,7 @@
 			"STEP2_DESC_FOR_ADMIN": "대시보드 세부 정보를 추가하세요.",
 			"TEMPLATE": {
 				"FIELD_EXISTING_TEMPLATE": "저장된 대시보드 중 선택",
-				"FIELD_OOTB_TEMPLATE": "기본 제공 템플릿 ",
+				"FIELD_OOTB_TEMPLATE": "기본 제공 템플릿(Out-of-the-Box Dashboard)",
 				"FILTER_LABEL": "레이블",
 				"FILTER_PLUGIN": "플러그인",
 				"FILTER_PROVIDER": "프로바이더"
@@ -1726,8 +1756,8 @@
 		},
 		"DETAIL": {
 			"ADD_WIDGET": "위젯 추가",
-			"ALT_S_SHARE_DASHBOARD": "",
-			"ALT_S_UNSHARE_DASHBOARD": "",
+			"ALT_S_SHARE_DASHBOARD": "대시보드 공유 완료",
+			"ALT_S_UNSHARE_DASHBOARD": "대시보드 공유 해제 완료",
 			"APPLY": "확인",
 			"AUTO": "자동",
 			"BASED_ON": "기준월",
@@ -1763,12 +1793,16 @@
 			"SELECT_MONTH": "월 선택",
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "공유",
+			"SHARED_BY_ADMIN": "Admin에 의해 공유됨",
+			"SHARED_TO_WORKSPACES": "워크스페이스에 공유됨",
 			"SHARE_TO_ALL_WORKSPACES": "전체 워크스페이스에 공유",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "이 대시보드를 전체 워크스페이스에 공유하시겠습니까?",
 			"SHARE_WITH_CODE": "코드로 공유",
-			"UNSHARE_TO_ALL_WORKSPACES": ""
+			"UNSHARE_FROM_ALL_WORKSPACES": "전체 워크스페이스 공유 해제",
+			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "이 대시보드를 모든 워크스페이스에서 공유 해제하시겠습니까?"
 		},
 		"FORM": {
+			"ALT_E_CLONE_DASHBOARD": "대시보드 복제 실패",
 			"ALT_E_CREATE_DASHBOARD": "대시보드 생성 실패",
 			"ALT_E_DELETE_DASHBOARD": "대시보드 삭제 실패",
 			"ALT_E_EDIT_NAME": "대시보드 이름 수정 실패",
@@ -1809,7 +1843,10 @@
 			"SAVE": "저장"
 		},
 		"LNB": {
-			"ONLY_FAVORITE": "즐겨찾기 항목만 노출"
+			"DEPRECATED": "",
+			"ONLY_FAVORITE": "즐겨찾기 항목만 노출",
+			"PRIVATE": "",
+			"SHARED": ""
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
@@ -1834,7 +1871,7 @@
 			"AWS_TRUSTED_ADVISOR": {
 				"DESC": "AWS Trusted Advisor를 통해 검사, 분석된 현황을 프로젝트별로 확인할 수 있는 위젯. "
 			},
-			"BASED_ON": "기준월",
+			"BASED_ON": "",
 			"BUDGET_STATUS": {
 				"DESC": "조회 기간동안의 상위 200개의 예산 사용률을 보여주는 위젯. "
 			},
@@ -1950,30 +1987,30 @@
 					"EXPAND_AND_EDIT": "확장 및 편집",
 					"FIELD_NAME": "필드명",
 					"FORMAT_RULES": "포멧 규칙",
-					"GRANULARITY": "세부 기준",
-					"GROUP_BY": "그룹별 통계",
+					"GRANULARITY": "세부 기준(Granularity)",
+					"GROUP_BY": "그룹별 통계(Group By)",
 					"ICON": "아이콘",
-					"LEGEND": "범례",
+					"LEGEND": "범례(Legend)",
 					"LINE_BY": "라인별",
 					"MAX": "최대",
 					"MIN": "최소",
 					"OPTIONAL_FIELDS": "추가 설정 항목",
-					"PROGRESS_BAR": "진행 바",
+					"PROGRESS_BAR": "진행 바(Progress Bar) ",
 					"PROGRESS_BAR_DESCRIPTION_1": "비율 계산 공식: ",
 					"PROGRESS_BAR_DESCRIPTION_2": "[기준 필드 ÷ 총합 필드 x 100]",
 					"REQUIRED_FIELDS": "필수 입력 항목",
 					"STACK_BY": "스택별",
 					"STATIC_FIELD": "정적 필드",
-					"SUB_TOTAL": "소계 ",
+					"SUB_TOTAL": "소계(Subtotal)",
 					"TITLE": "이름",
-					"TOTAL": "전체",
+					"TOTAL": "총합(Total)",
 					"TOTAL_FIELD": "총합 필드",
 					"UPDATE_PREVIEW": "미리보기 업데이트",
 					"VALIDATION_MODAL": {
-						"DESC": "",
+						"DESC": "이 차트를 올바르게 표시하려면, 데이터에 최소 {number}개의 그룹별 통계(Group by) 선택 또는 레이블 필드 추가가 필요합니다.",
 						"EDIT_DATA": "데이터 편집으로 이동",
-						"GEO_MAP_DESC": "",
-						"PROGRESS_CARD_DESC": "",
+						"GEO_MAP_DESC": "이 차트를 올바르게 표시하려면, 데이터의 그룹별 통계(Group by)에 'Region' 필드가 선택되어 있어야 합니다.  ",
+						"PROGRESS_CARD_DESC": "이 차트를 올바르게 표시하려면, 데이터에 최소 2개 이상의 데이터 필드가 있어야 합니다. ",
 						"TITLE": "추가 필드가 필요합니다."
 					},
 					"WIDGET_INFO": "위젯 기본 정보",
@@ -2011,7 +2048,8 @@
 			},
 			"UNIT": "단위",
 			"UPDATE_TITLE": "위젯 편집",
-			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. "
+			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. ",
+			"월": "기준월"
 		}
 	},
 	"HOME": {
@@ -3131,8 +3169,8 @@
 			"EDIT_QUERY": "쿼리 수정",
 			"EMPTY_TEXT": "검색 결과가 없습니다.\n다시 확인 후 검색해 주세요.",
 			"FILTERS": "필터",
-			"GRANULARITY": "세부 기준",
-			"GROUP_BY": "그룹별 통계",
+			"GRANULARITY": "세부 기준(Granularity)",
+			"GROUP_BY": "그룹별 통계(Group By)",
 			"HIDE_ALL": "전체 숨김",
 			"MAIN": {
 				"ANALYZE_DATA": "데이터 분석 하기",
@@ -3350,6 +3388,7 @@
 			"TITLE": "멀티 클라우드 자산을 관리 콘솔에 {domain_icon} 모두 모아 보고, \n효율성과 생산성을 {boost_icon}  높이세요.",
 			"WELCOME_TITLE": "클라우드 관리 콘솔에 오신걸 환영합니다! "
 		},
+		"NOT_FOUND_ACCESS_WORKSPACE": "접근 가능한 워크스페이스가 없습니다.",
 		"NOT_FOUND_DESC": "아직 생성된 워크스페이스가 없습니다.",
 		"RECENT": "최근 방문",
 		"ROLE_TYPE_MEMBER": "멤버",
@@ -4078,8 +4117,8 @@
 				"INVITE": "초대",
 				"INVITE_MEMBER": "멤버 초대",
 				"KEYCLOAK": "Keycloak",
-				"LABEL_HELP_TEXT": "각 라벨은 엔터 키로 구분되며, 최대 5개 추가 가능",
-				"LABEL_LABEL": "라벨",
+				"LABEL_HELP_TEXT": "각 레이블은 엔터 키로 구분되며, 최대 5개 추가 가능",
+				"LABEL_LABEL": "레이블",
 				"LABEL_PLACEHOLDER": "ex. 개발자",
 				"MEMBER": "멤버",
 				"MODAL_VALIDATION_REQUIRED": "필수 입력 항목입니다.",
@@ -4135,7 +4174,7 @@
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "이 프로젝트의 얼럿 설정하기",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "통합된 외부 이벤트를 수신하거나 이 프로젝트를 관리하려면 '얼럿 활성화' 버튼을 클릭하세요.",
 			"PROJECT_ID": "프로젝트 아이디: ",
-			"PROJECT_MEMBER_LABEL": "라벨 ",
+			"PROJECT_MEMBER_LABEL": "레이블",
 			"REPORT_CANCEL": "취소",
 			"REPORT_DESC": "SpaceONE은 프로젝트를 바탕으로 한 월간 보고서를 제공합니다. 곧 더 많은 콘텐츠를 제공할 예정입니다. ",
 			"REPORT_DOWNLOAD_FILE_DESC": "*제공하는 파일 형식 (PDF, PPTX, CSV)",

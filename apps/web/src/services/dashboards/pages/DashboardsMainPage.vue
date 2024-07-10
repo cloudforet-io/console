@@ -16,6 +16,8 @@ import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/qu
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
+import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
+import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
@@ -27,9 +29,7 @@ import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
-import DashboardMainSelectFilter from '@/services/dashboards/components/DashboardMainSelectFilter.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -38,35 +38,36 @@ const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
 const router = useRouter();
+const storeState = reactive({
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+});
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: computed(() => dashboardState.loading),
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    workspaceDashboardList: computed<DashboardModel[]>(() => {
+    sharedDashboardList: computed<PublicDashboardModel[]>(() => {
         if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE' && !state.isWorkspaceOwner) return [];
-        let target = dashboardGetters.workspaceItems || [];
-        if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
-        return target as DashboardModel[];
+        if (!storeState.isWorkspaceOwner) return [];
+        return dashboardGetters.workspaceItems.filter((d) => d.version === '2.0') || [];
     }),
-    privateDashboardList: computed<DashboardModel[]>(() => {
+    privateDashboardList: computed<PrivateDashboardModel[]>(() => {
         if (dashboardState.scope && dashboardState.scope !== 'PRIVATE') return [];
-        return dashboardGetters.privateItems as DashboardModel[] || [];
+        return dashboardGetters.privateItems.filter((d) => d.version === '2.0') || [];
+    }),
+    deprecatedDashboardList: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
+        const _publicDeprecated = dashboardGetters.workspaceItems.filter((d) => d.version === '1.0');
+        const _privateDeprecated = dashboardGetters.privateItems.filter((d) => d.version === '1.0');
+        return [..._publicDeprecated, ..._privateDeprecated];
     }),
     dashboardTotalCount: computed<number>(() => {
         if (state.isAdminMode) return dashboardGetters.domainItems.length;
-        return state.workspaceDashboardList.length + state.privateDashboardList.length;
+        return state.sharedDashboardList.length + state.privateDashboardList.length + state.deprecatedDashboardList.length;
     }),
-    filteredDashboardStatus: computed(() => {
+    filteredDashboardStatus: computed<boolean>(() => {
         if (state.isAdminMode) {
             return !!(dashboardGetters.domainItems.length);
         }
-        if (dashboardState.scope === 'WORKSPACE') {
-            return !!(state.workspaceDashboardList.length);
-        }
-        if (dashboardState.scope === 'PRIVATE') {
-            return !!(state.privateDashboardList.length);
-        }
-        return !!(state.dashboardTotalCount && (state.workspaceDashboardList.length || state.privateDashboardList.length));
+        return !!(state.dashboardTotalCount && (state.sharedDashboardList.length || state.privateDashboardList.length || state.deprecatedDashboardList.length));
     }),
 });
 
@@ -171,7 +172,6 @@ onUnmounted(() => {
             </template>
         </p-heading>
         <p-divider class="dashboard-divider" />
-        <dashboard-main-select-filter v-if="!state.isAdminMode" />
         <p-toolbox filters-visible
                    search-type="query"
                    :pagination-visible="false"
@@ -208,23 +208,27 @@ onUnmounted(() => {
                 </p-empty>
             </template>
             <dashboard-main-board-list v-if="state.isAdminMode"
-                                       class="dashboard-list full-mode"
+                                       class="dashboard-list"
                                        :dashboard-list="dashboardGetters.domainItems"
             />
             <template v-else>
-                <dashboard-main-board-list v-if="state.workspaceDashboardList.length"
-                                           scope-type="WORKSPACE"
+                <dashboard-main-board-list v-if="state.sharedDashboardList.length"
+                                           dashboard-type="SHARED"
                                            class="dashboard-list"
-                                           :class="{'full-mode': dashboardState.scope === 'WORKSPACE'}"
-                                           :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')"
-                                           :dashboard-list="state.workspaceDashboardList"
+                                           :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SHARED')"
+                                           :dashboard-list="state.sharedDashboardList"
                 />
                 <dashboard-main-board-list v-if="state.privateDashboardList.length"
-                                           scope-type="PRIVATE"
+                                           dashboard-type="PRIVATE"
                                            class="dashboard-list"
-                                           :class="{'full-mode': dashboardState.scope === 'PRIVATE'}"
                                            :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
                                            :dashboard-list="state.privateDashboardList"
+                />
+                <dashboard-main-board-list v-if="state.deprecatedDashboardList.length"
+                                           dashboard-type="DEPRECATED"
+                                           class="dashboard-list"
+                                           :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED')"
+                                           :dashboard-list="state.deprecatedDashboardList"
                 />
             </template>
         </p-data-loader>
@@ -244,11 +248,7 @@ onUnmounted(() => {
         min-height: 16.875rem;
 
         .dashboard-list {
-            @apply flex-grow;
-
-            &.full-mode {
-                @apply w-full;
-            }
+            @apply flex-grow w-full;
         }
     }
 

@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core/index';
 import {
-    reactive, computed, ref,
+    reactive, computed,
 } from 'vue';
 
 import {
-    PI, PIconButton, PPopover, PLink, PEmpty, PContextMenu, useContextMenuController, PDataLoader, PTooltip,
+    PI, PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -13,8 +12,6 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
-
-import config from '@/lib/config';
 
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFrameEmit } from '@/common/modules/widgets/types/widget-display-type';
@@ -24,7 +21,6 @@ import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-fra
 const props = defineProps<WidgetFrameProps>();
 const emit = defineEmits<WidgetFrameEmit>();
 
-const isDashboardEditDisabled = config.get('DASHBOARD_EDIT_DISABLE');
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     showWidthToggleButton: computed(() => props.widgetSizes.length > 1 && !props.loading && props.mode === 'edit-layout'),
@@ -35,19 +31,21 @@ const state = reactive({
             label: i18n.t('COMMON.WIDGETS.EXPAND'),
             icon: 'ic_arrows-expand-all',
         },
-        ...(isDashboardEditDisabled ? [] : [{
+        ...(props.disableManageButtons ? [] : [{
             type: 'item',
             name: 'edit',
             label: i18n.t('COMMON.WIDGETS.EDIT'),
             icon: 'ic_edit',
-        } as MenuItem]),
+        },
         { type: 'divider', name: '' },
         {
             type: 'item',
             name: 'delete',
             label: i18n.t('COMMON.WIDGETS.DELETE'),
             icon: 'ic_delete',
-        }])),
+        }] as MenuItem[]),
+    ])),
+    etcMenuVisible: false,
     sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
         type: 'item',
         name: size,
@@ -55,25 +53,7 @@ const state = reactive({
     }))),
 });
 
-const etcButtonRef = ref<HTMLElement|null>(null);
-const etcContextMenuRef = ref<any|null>(null);
-const {
-    visibleMenu: visibleContextMenu,
-    contextMenuStyle,
-    toggleContextMenu,
-    hideContextMenu,
-} = useContextMenuController({
-    useFixedStyle: true,
-    targetRef: etcButtonRef,
-    contextMenuRef: etcContextMenuRef,
-    position: 'right',
-});
-onClickOutside(etcButtonRef, hideContextMenu);
-
 /* Event */
-const handleClickEtcButton = () => {
-    toggleContextMenu();
-};
 const handleSelectEtcMenu = (selected: MenuItem) => {
     if (selected.name === 'expand') {
         emit('click-expand');
@@ -82,7 +62,6 @@ const handleSelectEtcMenu = (selected: MenuItem) => {
     } else if (selected.name === 'delete') {
         emit('click-delete');
     }
-    hideContextMenu();
 };
 const handleToggleWidth = () => {
     let nextSize: WidgetSize = WIDGET_SIZE.full;
@@ -102,7 +81,7 @@ const handleToggleWidth = () => {
             <h3 class="title">
                 {{ props.title }}
             </h3>
-            <p-popover v-if="!props.errorMessage"
+            <p-popover v-if="!props.errorMessage && props.widgetState === 'ACTIVE'"
                        class="metadata-popover"
                        position="bottom-start"
                        :trigger="POPOVER_TRIGGER.CLICK"
@@ -116,8 +95,8 @@ const handleToggleWidth = () => {
                 <template #content>
                     <div class="metadata-content">
                         <div class="metadata-item-row">
-                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.BASED_ON') }}</span>
-                            <span>{{ props.basedOnText }}</span>
+                            <span class="metadata-title">{{ $t('COMMON.WIDGETS.PERIOD') }}</span>
+                            <span>{{ props.periodText }}</span>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>
@@ -154,51 +133,69 @@ const handleToggleWidth = () => {
         </div>
         <div v-if="props.mode !== 'overlay'"
              class="action-button-wrapper"
+             :class="{ 'selected': state.etcMenuVisible }"
         >
-            <p-icon-button ref="etcButtonRef"
-                           name="ic_ellipsis-horizontal"
-                           style-type="tertiary"
-                           shape="square"
-                           size="sm"
-                           @click="handleClickEtcButton"
-            />
-            <p-context-menu v-show="visibleContextMenu"
-                            ref="etcContextMenuRef"
-                            class="etc-context-menu"
-                            :menu="state.etcMenuItems"
-                            :selected="[]"
-                            :style="contextMenuStyle"
-                            use-fixed-menu-style
-                            @select="handleSelectEtcMenu"
+            <p-select-dropdown style-type="icon-button"
+                               button-icon="ic_ellipsis-horizontal"
+                               class="etc-button"
+                               :menu="state.etcMenuItems"
+                               :selected="[]"
+                               :visible-menu.sync="state.etcMenuVisible"
+                               menu-position="right"
+                               reset-selection-on-menu-close
+                               @select="handleSelectEtcMenu"
             />
         </div>
         <div class="body-wrapper">
-            <p-data-loader class="chart-loader"
-                           :loading="props.loading"
-                           loader-type="skeleton"
-                           disable-empty-case
-                           :loader-backdrop-opacity="1"
-                           show-data-from-scratch
+            <p-skeleton v-if="props.loading"
+                        width="100%"
+                        height="100%"
+            />
+            <p-empty v-else-if="props.widgetState === 'INACTIVE'"
+                     class="empty-content"
+                     :title="$t('COMMON.WIDGETS.DATA_NOT_DISPLAYED')"
+                     :show-image="props.size !== WIDGET_SIZE.sm"
+                     :show-button="props.mode === 'view'"
             >
-                <div class="h-full">
-                    <slot v-if="!props.errorMessage" />
-                    <p-empty v-else
-                             class="empty-content"
-                             :title="$t('COMMON.WIDGETS.UNABLE_TO_LOAD_WIDGET')"
-                             :show-image="props.size !== WIDGET_SIZE.sm"
+                <template #image>
+                    <img class="empty-image"
+                         alt="need-to-apply-image"
+                         src="@/assets/images/img_star-need-apply.svg"
                     >
-                        <template #image>
-                            <img class="empty-image"
-                                 alt="empty-default-image"
-                                 src="@/assets/images/img_ghost_no-connection.png"
-                            >
-                        </template>
-                        <p class="empty-text">
-                            {{ !props.dataTableId ? $t('COMMON.WIDGETS.SELECT_A_DATA_TABLE') : props.errorMessage }}
-                        </p>
-                    </p-empty>
-                </div>
-            </p-data-loader>
+                </template>
+                <p class="empty-text">
+                    {{ $t('COMMON.WIDGETS.DATA_NOT_DISPLAYED_DESC') }}
+                </p>
+                <template #button>
+                    <p-button style-type="substitutive"
+                              size="sm"
+                              @click="() => emit('click-edit')"
+                    >
+                        {{ $t('COMMON.WIDGETS.EDIT_WIDGET') }}
+                    </p-button>
+                </template>
+            </p-empty>
+            <p-empty v-else-if="props.errorMessage"
+                     class="empty-content"
+                     :title="$t('COMMON.WIDGETS.UNABLE_TO_LOAD_WIDGET')"
+                     :show-image="props.size !== WIDGET_SIZE.sm"
+            >
+                <template #image>
+                    <img class="empty-image"
+                         alt="empty-default-image"
+                         src="@/assets/images/img_ghost_no-connection.png"
+                    >
+                </template>
+                <p class="empty-text">
+                    {{ !props.dataTableId ? $t('COMMON.WIDGETS.SELECT_A_DATA_TABLE') : props.errorMessage }}
+                </p>
+            </p-empty>
+            <div v-else-if="props.noData"
+                 class="no-data-content"
+            >
+                <span>{{ $t('COMMON.WIDGETS.NO_DATA_TO_DISPLAY') }}</span>
+            </div>
+            <slot v-else />
         </div>
         <div v-if="state.showWidthToggleButton"
              class="widget-toggle-button-wrapper"
@@ -297,6 +294,13 @@ const handleToggleWidth = () => {
             height: 100%;
         }
     }
+    .no-data-content {
+        @apply text-paragraph-md text-gray-300;
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+    }
     .widget-toggle-button-wrapper {
         position: absolute;
         bottom: 0.375rem;
@@ -315,8 +319,11 @@ const handleToggleWidth = () => {
         top: 0.25rem;
         display: none;
         padding: 0.25rem;
-        .etc-context-menu {
-            z-index: 1000;
+        &.selected {
+            display: block;
+        }
+        .etc-button {
+            @apply border border-gray-200 rounded-full;
         }
     }
 }

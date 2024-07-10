@@ -6,8 +6,6 @@ import {
 
 import { PIconButton } from '@spaceone/design-system';
 
-import { store } from '@/store';
-
 import AssetSummaryProviderItem from '@/services/workspace-home/components/AssetSummaryProviderItem.vue';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import {
@@ -28,7 +26,6 @@ const workspaceHomePageState = workspaceHomePageStore.state;
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
     providers: computed<ProviderResourceDataItem[]>(() => workspaceHomePageState.providers),
 });
 const state = reactive({

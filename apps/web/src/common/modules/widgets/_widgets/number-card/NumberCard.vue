@@ -117,10 +117,12 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     })),
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
+    noData: computed(() => (state.data ? !state.data.results?.length : false)),
 });
 
 /* Util */
-const fetchWidget = async (): Promise<Data|APIErrorToast> => {
+const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate

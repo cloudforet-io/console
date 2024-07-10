@@ -2,7 +2,6 @@ import '@/styles/style.pcss';
 
 import Vue from 'vue';
 
-import { applyAmchartsGlobalSettings } from '@/plugins/amcharts';
 import { i18n, I18nConnector } from '@/translations';
 import { withDesign } from 'storybook-addon-designs';
 import VTooltip from 'v-tooltip';
@@ -29,8 +28,6 @@ Vue.use(SvgIcon, {
 });
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
-
-applyAmchartsGlobalSettings();
 
 Vue.prototype.toJSON = function () {
     return this;

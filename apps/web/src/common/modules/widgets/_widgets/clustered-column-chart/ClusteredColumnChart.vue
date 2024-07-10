@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -28,6 +28,7 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
+    getApiQueryDateRange,
     getDateLabelFormat, getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
@@ -56,6 +57,7 @@ const state = reactive({
     chartData: [],
     chartOptions: computed<BarSeriesOption>(() => ({
         legend: {
+            type: 'scroll',
             show: state.showLegends,
             bottom: 0,
             left: 0,
@@ -117,10 +119,12 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     dateRange: computed(() => state.dateRange),
     errorMessage: computed(() => state.errorMessage),
     widgetLoading: computed(() => state.loading),
+    noData: computed(() => (state.data ? !state.data.results?.length : false)),
 });
 
 /* Util */
-const fetchWidget = async (): Promise<Data|APIErrorToast> => {
+const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
+    if (props.widgetState === 'INACTIVE') return undefined;
     try {
         const _fields = {};
         state.dataField?.forEach((field) => {
@@ -130,12 +134,13 @@ const fetchWidget = async (): Promise<Data|APIErrorToast> => {
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: _queryDateRange.start,
+                end: _queryDateRange.end,
                 group_by: [state.xAxisField],
                 fields: _fields,
             },
@@ -162,7 +167,7 @@ const drawChart = (rawData: Data|null) => {
         });
         return acc;
     }, Object.fromEntries(state.dataField.map((field) => [field, 0])));
-    if (!isEmpty(_etcData)) {
+    if (Object.values(_etcData).some((v) => v > 0)) {
         _slicedData.push({ [state.xAxisField]: 'etc', ..._etcData });
     }
 
@@ -173,7 +178,7 @@ const drawChart = (rawData: Data|null) => {
     } else {
         _xAxisData = Array.from(new Set(_slicedData.map((v) => v[state.xAxisField] as string)));
         _xAxisData = _xAxisData.slice(0, state.xAxisCount);
-        if (!isEmpty(_etcData)) {
+        if (Object.values(_etcData).some((v) => v > 0)) {
             _xAxisData.push('etc');
         }
     }
@@ -194,10 +199,6 @@ const drawChart = (rawData: Data|null) => {
         });
     });
     state.chartData = _seriesData;
-
-    // init chart and set options
-    state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions, true);
 };
 
 const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
@@ -210,10 +211,17 @@ const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
     return state.data;
 };
 
+/* Watcher */
+watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.chart = init(chartContext.value);
+        state.chart.setOption(state.chartOptions, true);
+    }
+});
+
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
     loadWidget,
@@ -224,14 +232,11 @@ defineExpose<WidgetExpose<Data>>({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <div ref="chartContext"
-             class="chart"
-        />
+        <!--Do not delete div element below. It's defense code for redraw-->
+        <div class="h-full">
+            <div ref="chartContext"
+                 class="h-full"
+            />
+        </div>
     </widget-frame>
 </template>
-
-<style lang="postcss" scoped>
-.chart {
-    height: 100%;
-}
-</style>

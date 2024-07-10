@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
 
-import { useProxyValue } from '@/hooks';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 interface Props {
@@ -23,15 +21,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update:visible'): void;
+    (e: 'close'): void;
 }>();
 
-const state = reactive({
-    proxyVisible: useProxyValue('visible', props, emit),
-});
-
-
 const handleClose = () => {
-    state.proxyVisible = false;
+    emit('close');
 };
 </script>
 

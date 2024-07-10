@@ -106,7 +106,10 @@ const state = reactive({
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
         const metricLabelsInfo = storeState.metrics[props.sourceId ?? ''].data.labels_info;
-        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => (storeState.isAdminMode ? labelInfo.key !== 'project_id' : labelInfo.key !== 'workspace_id')) : [];
+        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => {
+            if (storeState.isAdminMode) return true;
+            return labelInfo.key !== 'workspace_id';
+        }) : [];
     }),
 });
 
@@ -125,7 +128,7 @@ const {
 } = useContextMenuController({
     targetRef,
     contextMenuRef,
-    useFixedStyle: true,
+    // useFixedStyle: true,
     useReorderBySelection: true,
     menu: toRef(state, 'filterItems'),
     selected: toRef(state, 'selectedItems'),
@@ -289,7 +292,7 @@ onMounted(() => {
 
 <template>
     <p-field-group class="widget-form-data-table-card-filters"
-                   label="Filters"
+                   :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.FILTERS')"
     >
         <div class="filters-area">
             <div v-for="(item) in state.selectedItems"
@@ -311,7 +314,6 @@ onMounted(() => {
                                            multi-selectable
                                            appearance-type="badge"
                                            show-select-marker
-                                           use-fixed-menu-style
                                            :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
                                            :show-delete-all-button="false"
                                            :page-size="10"
@@ -333,7 +335,7 @@ onMounted(() => {
                           icon-left="ic_plus_bold"
                           @click="handleAddFilter"
                 >
-                    Add Filter
+                    {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_FILTER') }}
                 </p-button>
                 <p-context-menu v-show="visibleMenu"
                                 ref="contextMenuRef"

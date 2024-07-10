@@ -136,7 +136,7 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
                 // blank template
                 _dashboardParams = {
                     name: state.dashboardName,
-                    labels: state.templateLabels,
+                    labels: state.dashboardLabels,
                     tags: { created_by: store.state.user.userId },
                 };
             }

@@ -9,8 +9,11 @@ import {
     PPaneLayout, PRadio, PRadioGroup,
     PTextInput,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceRouter } from '@/router';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -49,6 +52,7 @@ const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+    postResourceGroup: computed<ResourceGroupType|undefined>(() => noticeDetailState.post?.resource_group),
 });
 const state = reactive({
     userName: computed<string>(() => store.state.user.name),
@@ -58,9 +62,9 @@ const state = reactive({
 });
 const workspaceState = reactive({
     selectedItems: [] as WorkspaceDropdownMenuItem[],
-    radioMenuList: computed(() => ([
-        i18n.t('INFO.NOTICE.FORM.ALL'),
-        i18n.t('INFO.NOTICE.FORM.SPECIFIC_WORKSPACE'),
+    radioMenuList: computed<MenuItem[]>(() => ([
+        { label: i18n.t('INFO.NOTICE.FORM.ALL'), name: RESOURCE_GROUP.DOMAIN },
+        { label: i18n.t('INFO.NOTICE.FORM.SPECIFIC_WORKSPACE'), name: RESOURCE_GROUP.WORKSPACE },
     ])),
     selectedRadioIdx: 0,
 });
@@ -133,7 +137,7 @@ const handleEditNotice = async () => {
     try {
         await noticeDetailStore.updateNoticePost({
             ...formData.value,
-            workspaces: workspaceState.selectedRadioIdx === 0 ? ['*'] : workspaceState.selectedItems.map((item) => item.name),
+            workspaces: workspaceState.selectedRadioIdx === 0 ? [] : workspaceState.selectedItems.map((item) => item.name),
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
         SpaceRouter.router.back();
@@ -197,10 +201,11 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
                         <p-radio v-for="(item, idx) in workspaceState.radioMenuList"
                                  :key="`workspace-scope-${idx}`"
                                  v-model="workspaceState.selectedRadioIdx"
+                                 :disabled="props.type === 'EDIT' && item.name !== storeState.postResourceGroup"
                                  :value="idx"
                         >
                             <span class="radio-item">
-                                {{ item }}
+                                {{ item.label }}
                             </span>
                         </p-radio>
                     </p-radio-group>

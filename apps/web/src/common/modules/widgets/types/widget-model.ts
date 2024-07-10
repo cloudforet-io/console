@@ -15,7 +15,7 @@ export type LabelsInfo = Record<string, object>;
 export type DataInfo = Record<string, { unit: string }>;
 export type DataTableOptions = DataTableAddOptions | DataTableTransformOptions;
 export type JoinType = typeof JOIN_TYPE[keyof typeof JOIN_TYPE];
-
+export type WidgetState = 'CREATING' | 'INACTIVE' | 'ACTIVE';
 /* ADD Data Type Options */
 export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;

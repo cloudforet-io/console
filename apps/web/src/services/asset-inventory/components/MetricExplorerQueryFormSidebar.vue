@@ -175,7 +175,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                           style-type="primary"
                           size="lg"
                           :title="state.sidebarTitle"
-                          @update:visible="handleClose"
+                          @close="handleClose"
         >
             <div class="sidebar-contents">
                 <p-field-group v-if="metricExplorerPageState.metricQueryFormMode === 'CREATE'"

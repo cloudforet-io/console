@@ -102,14 +102,13 @@ const state = reactive({
     }),
     costDataTypeItems: computed(() => {
         const targetCostDataSource = storeState.costDataSources[state.dataSourceId];
-        const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
-        const usageAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
+        const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost || targetCostDataSource?.data?.plugin_info?.metadata?.cost_info?.name;
         const additionalMenuItems: MenuItem[] = targetCostDataSource.data?.cost_data_keys?.map((key) => ({
             name: `data.${key}`, label: key,
         }));
         return [
             { name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },
-            { name: 'usage_quantity', label: usageAlias ? `Usage (${usageAlias})` : 'Usage' },
+            { name: 'usage_quantity', label: 'Usage' },
             ...(additionalMenuItems || []),
         ];
     }),
@@ -222,8 +221,6 @@ const handleConfirmModal = async () => {
         if (beforeSelectedDataTableId === state.dataTableId) {
             const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
             widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
-            widgetGenerateStore.setWidgetFormValueMap({});
-            widgetGenerateStore.setWidgetValidMap({});
         }
     }
     if (modalState.mode === 'RESET') {
@@ -308,7 +305,6 @@ const handleUpdateDataTable = async () => {
         }));
     }
 
-    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
     setInitialDataTableForm();
     state.filterFormKey = getRandomId();
 };

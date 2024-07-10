@@ -49,12 +49,12 @@ export interface YAxisValue {
 }
 export interface TableDataFieldValue {
     fieldType: 'dynamicField' | 'staticField';
-    value: string | string[];
+    value?: string | string[];
     criteria?: string;
     count: number;
 }
 export interface GroupByValue {
-    value: string | string[];
+    value?: string | string[];
     count?: number;
 }
 
@@ -62,9 +62,11 @@ export interface TotalValue {
     toggleValue: boolean;
     freeze: boolean;
 }
+
+export type ColorValue = typeof COLOR_SCHEMA[keyof typeof COLOR_SCHEMA];
 export interface ColorSchemaValue {
     colorName: keyof typeof COLOR_SCHEMA;
-    colorValue: typeof COLOR_SCHEMA[keyof typeof COLOR_SCHEMA]
+    colorValue: ColorValue;
 }
 
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]

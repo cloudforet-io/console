@@ -16,7 +16,7 @@ import type {
 import type { XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const props = defineProps<WidgetFieldComponentProps<XAxisOptions>>();
+const props = defineProps<WidgetFieldComponentProps<XAxisOptions, XAxisValue>>();
 const emit = defineEmits<WidgetFieldComponentEmit<XAxisValue>>();
 const { labelsMenuItem } = useGranularityMenuItem(props, 'xAxis');
 const state = reactive({

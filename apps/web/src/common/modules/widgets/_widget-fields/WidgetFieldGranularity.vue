@@ -16,7 +16,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const props = defineProps<WidgetFieldComponentProps<undefined>>();
+const props = defineProps<WidgetFieldComponentProps<undefined, string>>();
 const emit = defineEmits<WidgetFieldComponentEmit<string>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
