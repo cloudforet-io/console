@@ -18,7 +18,8 @@ const config = {
     getAbsolutePath("@storybook/addon-links"),
     getAbsolutePath("@storybook/addon-essentials"),
     getAbsolutePath("@storybook/addon-interactions"),
-    getAbsolutePath("@storybook/addon-designs")
+    getAbsolutePath("@storybook/addon-designs"),
+    getAbsolutePath("@storybook/addon-storysource")
   ],
   framework: {
     name: getAbsolutePath("@storybook/vue-vite"),
