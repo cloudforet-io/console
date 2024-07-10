@@ -26,11 +26,11 @@
     "@storybook/vue": "^7.6.10",
     "@storybook/vue-vite": "^7.6.10",
     "@vitejs/plugin-vue2": "^2.3.1",
+    "storybook": "^7.6.10",
+    "vue-component-type-helpers": "^2.0.26",
     "eslint-config-custom": "*",
     "postcss-config-custom": "*",
-    "storybook": "^7.6.10",
-    "tsconfig": "*",
-    "vue-component-type-helpers": "^2.0.26"
+    "tsconfig": "*"
   },
   "resolutions": {
     "react": "18.3.1",
