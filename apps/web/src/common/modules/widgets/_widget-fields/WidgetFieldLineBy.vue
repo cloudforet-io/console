@@ -122,7 +122,7 @@ onMounted(() => {
 
 .toggle-box {
     text-align: right;
-    width: calc(100% - 51px);
+    width: 100%;
 }
 
 </style>
