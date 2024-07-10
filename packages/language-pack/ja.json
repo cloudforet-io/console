@@ -1463,6 +1463,8 @@
 			"FORM": {
 				"CREATING_WIDGET_WARNING_MODAL_DESC": "終了してもよろしいですか？ このウィンドウを閉じると、生成中のデータがすべて破棄されます。",
 				"CREATING_WIDGET_WARNING_MODAL_TITLE": "保存されていないデータ",
+				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "",
+				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "",
 				"WIDGET_VALIDATION_WARNING_DESC": "チャートを正常に表示するには、必須フィールドに正しい値が選択されているか確認してください。",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "データテーブルに「地域」フィールドを追加してください。",
 				"WIDGET_VALIDATION_WARNING_TITLE": "空欄または誤った値が選択されたフィールドが存在します。"
