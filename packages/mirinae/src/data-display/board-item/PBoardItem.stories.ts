@@ -8,8 +8,6 @@ import { getBoardItemArgTypes } from '@/data-display/board-item/story-helper';
 import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
 import { I18nConnector } from '@/translations';
 
-
-
 import PBoardItem from './PBoardItem.vue';
 
 type PBoardItemPropsAndCustomArgs = ComponentProps<typeof PBoardItem>;
