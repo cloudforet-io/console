@@ -3,9 +3,12 @@ import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PSelectDropdown, PStatus, PToolboxTable, PLink,
+    PSelectDropdown, PStatus, PToolboxTable, PLink, PSelectStatus,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type {
+    ValueItem,
+} from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import {
@@ -29,7 +32,7 @@ import { userStateFormatter } from '@/services/iam/composables/refined-table-dat
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import {
     EXCEL_TABLE_FIELDS,
-    WORKSPACE_SEARCH_HANDLERS,
+    WORKSPACE_SEARCH_HANDLERS, WORKSPACE_STATE,
     WORKSPACE_TABLE_FIELDS,
 } from '@/services/preference/constants/workspace-constant';
 import type { WorkspaceTableModel } from '@/services/preference/store/workspace-page-store';
@@ -71,6 +74,15 @@ if (route.query.selectedWorkspaceId) {
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
+const state = reactive({
+    typeField: computed<ValueItem[]>(() => ([
+        { label: i18n.t('IAM.WORKSPACES.ALL') as string, name: 'ALL' },
+        { label: i18n.t('IAM.WORKSPACES.ENABLE') as string, name: WORKSPACE_STATE.ENABLE },
+        { label: i18n.t('IAM.WORKSPACES.DISABLE') as string, name: WORKSPACE_STATE.DISABLE },
+        { label: i18n.t('IAM.WORKSPACES.DORMANT') as string, name: WORKSPACE_STATE.DORMANT },
+    ])),
+    selectedType: 'ALL',
+});
 
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
@@ -108,10 +120,12 @@ const handleSelectDropdown = (name: string) => {
     emit('select-action', name);
 };
 
+const handleSelectType = async (value: string) => {
+    state.selectedType = value;
+};
 const handleSelect = (index: number[]) => {
     workspacePageStore.$patch({ selectedIndices: index });
 };
-
 const handleChange = async (options: ToolboxOptions = {}) => {
     workspaceListApiQuery = getApiQueryWithToolboxOptions(workspaceListApiQueryHelper, options) ?? workspaceListApiQuery;
     if (options.queryTags !== undefined) {
@@ -123,7 +137,6 @@ const handleChange = async (options: ToolboxOptions = {}) => {
     if (options.pageLimit !== undefined) workspacePageStore.$patch({ pageLimit: options.pageLimit });
     await workspacePageStore.load({ query: workspaceListApiQuery });
 };
-
 
 const handleExport = async () => {
     try {
@@ -179,6 +192,20 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
                          @refresh="handleChange()"
                          @export="handleExport"
         >
+            <template #toolbox-bottom>
+                <div class="select-type-wrapper">
+                    <span class="mr-2">{{ $t('IAM.WORKSPACES.STATE') }}</span>
+                    <p-select-status v-for="(item, idx) in state.typeField"
+                                     :key="idx"
+                                     :selected="state.selectedType"
+                                     class="mr-2"
+                                     :value="item.name"
+                                     @change="handleSelectType"
+                    >
+                        {{ item.label }}
+                    </p-select-status>
+                </div>
+            </template>
             <template #toolbox-left>
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :menu="dropdownMenu"
@@ -227,6 +254,13 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
     }
     .left-toolbox-item-select-dropdown {
         min-width: 6.5rem;
+    }
+    .select-type-wrapper {
+        @apply flex items-center text-label-md text-gray-600;
+        gap: 0.5rem;
+        margin-top: -0.5rem;
+        margin-left: 1rem;
+        margin-bottom: 1rem;
     }
 }
 </style>

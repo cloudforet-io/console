@@ -1,6 +1,6 @@
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
-import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
@@ -24,6 +24,7 @@ export const EXCEL_TABLE_FIELDS: ExcelDataField[] = [
 export const WORKSPACE_STATE = {
     ENABLE: 'ENABLED',
     DISABLE: 'DISABLED',
+    DORMANT: 'DORMANT',
 } as const;
 
 export const WORKSPACE_SEARCH_HANDLERS = {
@@ -33,7 +34,6 @@ export const WORKSPACE_SEARCH_HANDLERS = {
             { name: 'workspace_id', label: 'Workspace ID' },
             { name: 'name', label: 'Name' },
             { name: 'tags.description', label: 'Description' },
-            { name: 'state', label: 'State' },
             { name: 'created_at', label: 'Created', dataType: 'datetime' },
         ],
     }] as KeyItemSet[],
@@ -41,7 +41,6 @@ export const WORKSPACE_SEARCH_HANDLERS = {
         workspace_id: makeDistinctValueHandler('identity.Workspace', 'workspace_id'),
         name: makeDistinctValueHandler('identity.Workspace', 'name'),
         'tags.description': makeDistinctValueHandler('identity.Workspace', 'tags.description'),
-        state: makeEnumValueHandler(WORKSPACE_STATE),
         created_at: makeDistinctValueHandler('identity.Workspace', 'created_at', 'datetime'),
     },
 } as const;

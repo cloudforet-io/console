@@ -238,7 +238,7 @@ watch(() => route.params, async () => {
                           #toolbox-bottom
                 >
                     <div class="select-type-wrapper">
-                        <span>{{ $t('IAM.BOOKMARK.TYPE') }}</span>
+                        <span class="mr-2">{{ $t('IAM.BOOKMARK.TYPE') }}</span>
                         <p-select-status v-for="(item, idx) in tableState.typeField"
                                          :key="idx"
                                          :selected="storeState.selectedType"
@@ -395,7 +395,7 @@ watch(() => route.params, async () => {
         }
         .select-type-wrapper {
             @apply flex items-center text-label-md text-gray-600;
-            gap: 1rem;
+            gap: 0.5rem;
             margin-left: 1rem;
             margin-bottom: 1rem;
         }
