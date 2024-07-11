@@ -1,19 +1,14 @@
-import { faker } from '@faker-js/faker';
-import type { ArgTypes } from '@storybook/addons';
-import { range } from 'lodash';
-
 import { getCardArgTypes } from '@/data-display/cards/card/story-helper';
 import { getDataLoaderArgTypes } from '@/feedbacks/loading/data-loader/story-helper';
 
 export const getListCardArgTypes = () => {
     const dataLoaderArgTypes = getDataLoaderArgTypes();
-    const argTypes: ArgTypes = {
+    const argTypes = {
         ...getCardArgTypes(),
         items: {
             name: 'items',
-            type: { name: 'array' },
+            type: 'array',
             description: 'List items',
-            defaultValue: range(10).map(() => faker.lorem.sentence(8)),
             table: {
                 type: {
                     summary: 'array',
@@ -23,15 +18,12 @@ export const getListCardArgTypes = () => {
                     summary: '[]',
                 },
             },
-            control: {
-                type: 'object',
-            },
+            control: 'object',
         },
         loading: {
             name: 'loading',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to show loader or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -41,15 +33,12 @@ export const getListCardArgTypes = () => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         hoverable: {
             name: 'hoverable',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to show hover style or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -59,14 +48,11 @@ export const getListCardArgTypes = () => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         itemSlot: {
             name: 'item',
             description: 'Slot for list item.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -76,18 +62,18 @@ export const getListCardArgTypes = () => {
                 },
                 category: 'slots',
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
-
+        disableEmptyCase: dataLoaderArgTypes.disableEmptyCase,
+        loaderSlot: dataLoaderArgTypes.loaderSlot,
+        noDataSlot: dataLoaderArgTypes.noDataSlot,
     };
 
-    argTypes.disableEmptyCase = dataLoaderArgTypes.disableEmptyCase;
-    argTypes.loaderSlot = dataLoaderArgTypes.loaderSlot;
-    argTypes.noDataSlot = dataLoaderArgTypes.noDataSlot;
+    // argTypes.disableEmptyCase = dataLoaderArgTypes.disableEmptyCase;
+    // argTypes.loaderSlot = dataLoaderArgTypes.loaderSlot;
+    // argTypes.noDataSlot = dataLoaderArgTypes.noDataSlot;
 
-    delete argTypes.defaultSlot;
+    // delete argTypes.defaultSlot;
 
     return argTypes;
 };
