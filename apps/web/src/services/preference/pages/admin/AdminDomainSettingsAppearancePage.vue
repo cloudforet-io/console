@@ -18,13 +18,15 @@ const domainConfigStore = useDomainSettingsStore();
 const domainConfigGetters = domainConfigStore.getters;
 const state = reactive({
     isChanged: computed<boolean>(() => {
-        if ([state.wordtypeLogoUrl, state.symbolFaviconUrl, state.loginPageImageUrl,
-            domainConfigGetters.wordtypeLogoUrl, domainConfigGetters.symbolFaviconUrl, domainConfigGetters.loginPageImageUrl]
+        if ([state.wordtypeLogoUrl, state.symbolFaviconUrl, state.loginPageImageUrl, state.displayName,
+            domainConfigGetters.wordtypeLogoUrl, domainConfigGetters.symbolFaviconUrl, domainConfigGetters.loginPageImageUrl, domainConfigGetters.displayName]
             .every((d) => !d)) return false;
         return (state.wordtypeLogoUrl !== domainConfigGetters.wordtypeLogoUrl)
             || (state.symbolFaviconUrl !== domainConfigGetters.symbolFaviconUrl)
-            || (state.loginPageImageUrl !== domainConfigGetters.loginPageImageUrl);
+            || (state.loginPageImageUrl !== domainConfigGetters.loginPageImageUrl)
+            || (state.displayName !== domainConfigGetters.displayName);
     }),
+    displayName: undefined as string | undefined,
     wordtypeLogoUrl: undefined as string | undefined,
     symbolFaviconUrl: undefined as string | undefined,
     loginPageImageUrl: undefined as string | undefined,
@@ -34,6 +36,7 @@ const state = reactive({
 const handleSaveChanges = async () => {
     try {
         await domainConfigStore.updateDomainSettings({
+            display_name: state.displayName,
             wordtype_logo_url: state.wordtypeLogoUrl,
             symbol_favicon_url: state.symbolFaviconUrl,
             login_page_image_url: state.loginPageImageUrl,
@@ -45,6 +48,9 @@ const handleSaveChanges = async () => {
 };
 
 /* Watcher */
+watch(() => domainConfigGetters.displayName, (val) => {
+    state.displayName = val;
+}, { immediate: true });
 watch(() => domainConfigGetters.wordtypeLogoUrl, (val) => {
     state.wordtypeLogoUrl = val;
 }, { immediate: true });
@@ -59,6 +65,20 @@ watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
 <template>
     <p-pane-layout class="admin-domain-setting-brand-assets-page">
         <div class="content-wrapper">
+            <div class="field-wrapper">
+                <div class="left-part">
+                    <p-field-title label="Display Name" />
+                    <p-text-input :value.sync="state.displayName" />
+                    <div class="description">
+                        {{ $t('IAM.DOMAIN_SETTINGS.DOMAIN_NAME_IMAGE_DESCRIPTION') }}
+                    </div>
+                </div>
+                <div class="right-part">
+                    <img src="@/assets/images/domain-settings/display_name_image.png"
+                         alt="Symbol & Favicon image sample"
+                    >
+                </div>
+            </div>
             <div class="field-wrapper">
                 <div class="left-part">
                     <p-field-title label="Wordtype Logo URL" />

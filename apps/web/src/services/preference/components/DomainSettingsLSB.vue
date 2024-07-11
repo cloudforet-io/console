@@ -27,12 +27,6 @@ const state = reactive({
         },
         {
             type: MENU_ITEM_TYPE.ITEM,
-            label: i18n.t('IAM.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE'),
-            to: { name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE._NAME) },
-            hideFavorite: true,
-        },
-        {
-            type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION'),
             to: { name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME) },
             hideFavorite: true,

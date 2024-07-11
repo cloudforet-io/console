@@ -2246,6 +2246,7 @@
 			"DOMAIN_ID": "ドメインID",
 			"DOMAIN_INFORMATION": "",
 			"DOMAIN_NAME": "ドメイン名",
+			"DOMAIN_NAME_IMAGE_DESCRIPTION": "",
 			"EMAIL_INVALID": "無効なメール形式です",
 			"LANGUAGE": "言語",
 			"SAVE_CHANGE": "変更事項保存",

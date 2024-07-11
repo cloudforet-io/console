@@ -11,7 +11,6 @@ const PreferenceContainer = () => import('@/services/preference/PreferenceContai
 const DomainSettingsContainer = () => import('@/services/preference/components/DomainSettingsContainer.vue');
 const AdminDomainSettingsBaseInformationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsDomainInformationPage.vue');
 const AdminDomainSettingsBrandAssetsPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsAppearancePage.vue');
-const AdminDomainSettingsTimezoneAndLanguagePage = () => import('@/services/preference/pages/admin/AdminDomainSettingsTimezoneAndLanguagePage.vue');
 const AdminDomainSettingsAutoDormancyConfigurationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsAutoDormancyConfigurationPage.vue');
 const WorkspacesPage = () => import('@/services/preference/pages/admin/AdminWorkspacesPage.vue');
 // const BookmarkPage = () => import('@/services/preference/pages/admin/AdminBookmarkPage.vue');
@@ -94,12 +93,6 @@ const adminPreferenceRoutes: RouteConfig = {
                     name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.APPEARANCE._NAME),
                     meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.APPEARANCE].translationId },
                     component: AdminDomainSettingsBrandAssetsPage,
-                },
-                {
-                    path: '/timezone-and-language',
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE._NAME),
-                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.TIMEZONE_AND_LANGUAGE].translationId },
-                    component: AdminDomainSettingsTimezoneAndLanguagePage,
                 },
                 {
                     path: '/auto-dormancy-configuration',

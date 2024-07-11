@@ -32,7 +32,6 @@ export const MENU_ID = Object.freeze({
     DOMAIN_SETTINGS: 'domain_settings',
     DOMAIN_INFORMATION: 'domain_information',
     APPEARANCE: 'appearance',
-    TIMEZONE_AND_LANGUAGE: 'timezone_and_language',
     AUTO_DORMANCY_CONFIGURATION: 'auto_dormancy_configuration',
     WORKSPACES: 'workspaces',
     BOOKMARK: 'bookmark',

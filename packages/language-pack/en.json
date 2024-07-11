@@ -2246,6 +2246,7 @@
 			"DOMAIN_ID": "Domain ID",
 			"DOMAIN_INFORMATION": "Domain Information",
 			"DOMAIN_NAME": "Domain Name",
+			"DOMAIN_NAME_IMAGE_DESCRIPTION": "The name displayed in the browser tab. If left blank, the default is ‘SpaceONE’. Choose a name that is easy to recognize and reflects the domain's function or brand.",
 			"EMAIL_INVALID": "Invalid e-mail format.",
 			"LANGUAGE": "Language",
 			"SAVE_CHANGE": "Save Change",

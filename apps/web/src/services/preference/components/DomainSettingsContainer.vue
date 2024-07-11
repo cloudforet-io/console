@@ -26,8 +26,6 @@ const state = reactive({
             title = i18n.t('IAM.DOMAIN_SETTINGS.DOMAIN_INFORMATION');
         } else if (route.name === makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.APPEARANCE._NAME)) {
             title = i18n.t('IAM.DOMAIN_SETTINGS.APPEARANCE');
-        } else if (route.name === makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE._NAME)) {
-            title = i18n.t('IAM.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE');
         } else if (route.name === makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME)) {
             title = i18n.t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION');
         }

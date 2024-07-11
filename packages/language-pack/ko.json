@@ -2246,6 +2246,7 @@
 			"DOMAIN_ID": "도메인 아이디",
 			"DOMAIN_INFORMATION": "",
 			"DOMAIN_NAME": "도메인명",
+			"DOMAIN_NAME_IMAGE_DESCRIPTION": "",
 			"EMAIL_INVALID": "잘못된 이메일 형식입니다.",
 			"LANGUAGE": "언어",
 			"SAVE_CHANGE": "변경사항 저장",
