@@ -80,11 +80,11 @@ export const useGranularityMenuItem = (props: WidgetFieldComponentProps<WidgetFi
             if (state.isDateSeparated) {
                 const dateRemovedLabelsMenuItem = originLabelsMenuItem.filter((item) => item.name !== DATE_FIELD.DATE);
                 if (state.granularity === 'MONTHLY') {
-                    return dateRemovedLabelsMenuItem.filter((item) => item.name !== DATE_FIELD.DAY);
+                    return dateRemovedLabelsMenuItem.filter((item) => item.name !== DATE_FIELD.DAY && item.name !== DATE_FIELD.YEAR);
                 } if (state.granularity === 'YEARLY') {
                     return dateRemovedLabelsMenuItem.filter((item) => item.name !== DATE_FIELD.DAY && item.name !== DATE_FIELD.MONTH);
                 }
-                return dateRemovedLabelsMenuItem;
+                return dateRemovedLabelsMenuItem.filter((item) => item.name !== DATE_FIELD.MONTH && item.name !== DATE_FIELD.YEAR);
             }
             return originLabelsMenuItem;
         }),

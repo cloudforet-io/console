@@ -1312,6 +1312,7 @@
 			"TITLE": "프로젝트 변경"
 		},
 		"WIDGETS": {
+			"ACTUAL": "실제 크기",
 			"ADD_WIDGET": "위젯 추가",
 			"ADD_WIDGET_TO_DASHBOARD": "대시보드에 위젯 추가",
 			"ALL_SUMMARY": {
@@ -1398,8 +1399,8 @@
 			"DAILY_UPDATE_HELP": "관리중인 리소스의 사용 증감을 확인합니다. ",
 			"DAILY_UPDATE_NO_DATA": "일간 변동 사항이 없습니다.",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
-			"DATA_NOT_DISPLAYED": "",
-			"DATA_NOT_DISPLAYED_DESC": "",
+			"DATA_NOT_DISPLAYED": "데이터 표시 불가",
+			"DATA_NOT_DISPLAYED_DESC": "모든 필수 필드를 설정하고, [적용하기] 버튼을 클릭하여 위젯 설정을 완료해주세요.",
 			"DATA_TABLE": {
 				"ADD": "데이터 추가",
 				"ALERT": {
@@ -1415,17 +1416,23 @@
 					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "이미 사용 중인 이름입니다.",
 					"ADDITIONAL_LABELS_NAME": "필드 명",
 					"ADDITIONAL_LABELS_VALUE": "값",
+					"ADD_FILTER": "필터 추가",
 					"ADD_LABEL": "추가",
 					"ADVANCED_OPTIONS": "고급 설정 옵션",
+					"CONCAT_DESC": "여러 테이블을 하나로 결합합니다.",
 					"DATA_FIELD_NAME": "데이터 필드명",
 					"DATA_FIELD_NAME_GROUP_BY_INVALID_TEXT": "이름을 입력하세요.",
 					"DATA_FIELD_NAME_INVALID_TEXT": "이름을 입력하세요.",
 					"DATA_TABLE_NAME_SUCCESS": "데이터 이름 수정 완료",
 					"DATA_TABLE_NAME_WARNING": "동일한 이름의 데이터가 이미 존재합니다.",
 					"DATA_UNIT": "데이터 단위",
+					"EVAL_DESC": "데이터 필드에 함수나 계산을 적용합니다.",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day는 필드 이름으로 사용할 수 없습니다.",
 					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "Group by로 사용 중인 명칭은 필드 이름으로 사용할 수 없습니다. ",
+					"FILTERS": "필터",
 					"GROUP_BY": "그룹별 통계(Group By)",
+					"JOIN_DESC": "공통 열을 기준으로 다른 테이블의 행을 병합합니다.",
+					"QUERY_DESC": "특정 조건을 충족하는 데이터를 필터링하고 추출합니다.",
 					"SELECT_DATA_SOURCE_SUCCESS": "데이터 수정 완료",
 					"SELECT_DATA_TABLE_WARNING": "데이터 테이블을 먼저 저장하세요.",
 					"SEPARATE": "날짜 형식 변경",
@@ -1454,15 +1461,20 @@
 			},
 			"FIELD": "필드",
 			"FORM": {
+				"CREATING_WIDGET_WARNING_MODAL_DESC": "이 창을 닫으면 생성 중인 모든 데이터가 삭제됩니다.",
+				"CREATING_WIDGET_WARNING_MODAL_TITLE": "저장되지 않은 데이터",
+				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "",
+				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "",
 				"WIDGET_VALIDATION_WARNING_DESC": "차트가 정상적으로 표시 되려면 필수 필드에 값이 올바르게 선택되었는지 확인해주세요.",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "데이터 테이블에서 'Region' 필드를 추가해주세요. ",
-				"WIDGET_VALIDATION_WARNING_TITLE": "비어있거나, 잘못된 값이 선택된 필드 존재 "
+				"WIDGET_VALIDATION_WARNING_TITLE": "잘못 선택된 필드 존재"
 			},
 			"FORMAT_RULES": {
 				"BASE": "기본",
 				"GAUGE_DESC": "게이지 색상은 임계값에 따라 변경됩니다.",
 				"PROGRESS_CARD_DESC": "바 색상은 임계값에 따라 변경됩니다."
 			},
+			"FULL": "확대 보기",
 			"FULL_WIDTH": "전체 너비",
 			"HEALTH_DASHBOARD_DESC_1": "AWS의 비즈니스 또는 엔터프라이즈 플랜을 사용하는 경우 AWS Health Dashboard를 사용할 수 있습니다. ",
 			"HEALTH_DASHBOARD_DESC_2": "적합한 플랜을 이용중이지만 위젯을 사용할 수 없다면 아래의 이메일로 문의를 주세요. ",
@@ -1589,6 +1601,7 @@
 		"ALL_DASHBOARDS": {
 			"CREATE": "생성",
 			"CREAT_NEW_DASHBOARD": "대시보드 생성",
+			"DASHBOARD": "대시보드",
 			"DASHBOARDS_TITLE": "대시보드",
 			"DEPRECATED": "지원 중지된",
 			"DEPRECATED_DESCRIPTION": "이 대시보드는 더 이상 지원되지 않으며 새로운 대시보드가 적용되면 제거될 예정입니다.",
@@ -1603,6 +1616,7 @@
 			"LABEL_VIWERS": "공개 여부",
 			"PRIVATE": "비공개",
 			"PROJECT": "프로젝트",
+			"SHARED": "공유",
 			"SINGLE_PROJECT": "개별 프로젝트",
 			"TOOLTIP_CLONE": "복제",
 			"TOOLTIP_DELETE": "삭제",
@@ -1779,6 +1793,8 @@
 			"SELECT_MONTH": "월 선택",
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "공유",
+			"SHARED_BY_ADMIN": "Admin에 의해 공유됨",
+			"SHARED_TO_WORKSPACES": "워크스페이스에 공유됨",
 			"SHARE_TO_ALL_WORKSPACES": "전체 워크스페이스에 공유",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "이 대시보드를 전체 워크스페이스에 공유하시겠습니까?",
 			"SHARE_WITH_CODE": "코드로 공유",

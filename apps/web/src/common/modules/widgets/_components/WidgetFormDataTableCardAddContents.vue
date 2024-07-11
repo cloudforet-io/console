@@ -305,7 +305,6 @@ const handleUpdateDataTable = async () => {
         }));
     }
 
-    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
     setInitialDataTableForm();
     state.filterFormKey = getRandomId();
 };

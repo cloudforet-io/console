@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { orderBy, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
@@ -218,17 +219,17 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
         const _fields = {};
         let _groupBy: string[] = [...state.groupByField];
         let _field_group: string[] = [];
-        // let _sort: Query['sort'] = [];
+        let _sort: Query['sort'] = [];
         if (state.tableDataFieldType === 'staticField') {
             state.tableDataField?.forEach((field) => {
                 _fields[field] = { key: field, operator: 'sum' };
             });
-            // _sort = state.tableDataField.map((field) => ({ key: field, desc: true }));
+            _sort = _groupBy.includes('Date') ? [{ key: 'Date', desc: false }] : state.tableDataField.map((field) => ({ key: field, desc: true }));
         } else {
             _fields[state.tableDataCriteria] = { key: state.tableDataCriteria, operator: 'sum' };
             _field_group = [state.tableDataField];
             _groupBy = [..._groupBy, state.tableDataField];
-            // _sort = [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
+            _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
         }
         const res = await _fetcher({
             widget_id: props.widgetId,
@@ -239,7 +240,7 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
                 group_by: _groupBy,
                 field_group: _field_group,
                 fields: _fields,
-                // sort: _sort,
+                sort: _sort,
             },
             vars: props.dashboardVars,
         });

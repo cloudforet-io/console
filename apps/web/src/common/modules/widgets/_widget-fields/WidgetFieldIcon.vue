@@ -32,7 +32,7 @@ const DEFAULT_COLOR:string = gray[900];
 
 const state = reactive({
     proxyValue: useProxyValue<IconValue|undefined>('value', props, emit),
-    isEnable: !!props.value,
+    toggleValue: !!props.value,
     visibleMenu: false,
     selectedIcon: DEFAULT_ICON as Icon,
     iconList: [
@@ -69,7 +69,7 @@ const state = reactive({
 });
 
 const handleUpdateValue = (value: boolean) => {
-    state.isEnable = value;
+    state.toggleValue = value;
     if (!value) {
         state.proxyValue = undefined;
     } else {
@@ -109,13 +109,14 @@ const handleUpdateColor = (color: string) => {
 };
 
 const checkValue = ():boolean => {
-    if (state.isEnable) {
+    if (state.toggleValue) {
         return !!(state.proxyValue?.color && state.iconList.find((icon) => icon.name === state.proxyValue?.icon?.name));
     }
     return true;
 };
 
-watch(() => state.proxyValue, () => {
+watch(() => state.proxyValue, (changed) => {
+    if (changed === undefined) state.toggleValue = false;
     emit('update:is-valid', checkValue());
 }, { immediate: true });
 
@@ -132,7 +133,7 @@ const initValue = () => {
 };
 
 onMounted(() => {
-    if (!state.isEnable) state.proxyValue = undefined;
+    if (!state.toggleValue) state.proxyValue = undefined;
     else {
         initValue();
     }
@@ -144,11 +145,11 @@ onMounted(() => {
     <div class="widget-field-icon">
         <div class="field-header">
             <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ICON') }}</p-field-title>
-            <p-toggle-button :value="state.isEnable"
+            <p-toggle-button :value="state.toggleValue"
                              @update:value="handleUpdateValue"
             />
         </div>
-        <div v-if="state.isEnable"
+        <div v-if="state.toggleValue"
              class="contents"
         >
             <p-select-dropdown class="w-full"

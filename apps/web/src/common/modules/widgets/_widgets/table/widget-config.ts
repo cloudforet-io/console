@@ -1,6 +1,6 @@
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
-import { indigo, red, yellow } from '@/styles/colors';
+// import { indigo, red, yellow } from '@/styles/colors';
 
 
 const table: WidgetConfig = {
@@ -29,15 +29,16 @@ const table: WidgetConfig = {
         comparison: {},
         subTotal: {},
         total: {},
-        progressBar: {
-            options: {
-                defaultFormatRules: [
-                    { threshold: 90, color: yellow[500] },
-                    { threshold: 100, color: red[400] },
-                ],
-                baseColor: indigo[500],
-            },
-        },
+        // NOTE: rollback after progress developed
+        // progressBar: {
+        //     options: {
+        //         defaultFormatRules: [
+        //             { threshold: 90, color: yellow[500] },
+        //             { threshold: 100, color: red[400] },
+        //         ],
+        //         baseColor: indigo[500],
+        //     },
+        // },
     },
     dependencies: {
         groupBy: ['comparison'],

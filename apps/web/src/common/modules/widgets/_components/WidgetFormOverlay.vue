@@ -5,7 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, POverlayLayout,
+    PButton, PButtonModal, POverlayLayout,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -53,6 +53,17 @@ const state = reactive({
         }
         return false;
     }),
+    warningModalVisible: false,
+    warningModalTitle: computed(() => {
+        if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_TITLE');
+        if (widgetGenerateState.widget?.state === 'INACTIVE') return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_TITLE');
+        return '';
+    }),
+    warningModalDescription: computed(() => {
+        if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_DESC');
+        if (widgetGenerateState.widget?.state === 'INACTIVE') return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_DESC');
+        return '';
+    }),
 });
 
 /* Api */
@@ -90,19 +101,28 @@ const handleClickContinue = async () => {
     widgetGenerateStore.setShowOverlay(false);
 };
 const handleUpdateVisible = (value: boolean) => {
+    if (!value && (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE')) {
+        state.warningModalVisible = true;
+        return;
+    }
     widgetGenerateStore.setShowOverlay(value);
+};
+const handleCloseWarningModal = () => {
+    state.warningModalVisible = false;
+};
+const handleConfirmWarningModal = async () => {
+    state.warningModalVisible = false;
+    if (widgetGenerateState.widget?.state === 'CREATING') await deleteWidget(widgetGenerateState.widgetId);
+    widgetGenerateStore.reset();
+    widgetGenerateStore.setShowOverlay(false);
 };
 
 /* Watcher */
 watch(() => widgetGenerateState.showOverlay, async (val) => {
-    if (!val) {
-        if (widgetGenerateState.widget?.state === 'CREATING') {
-            await deleteWidget(widgetGenerateState.widgetId);
-        } else {
-            widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
-        }
+    if (!val && widgetGenerateState.widget?.state !== 'CREATING') {
+        widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
         widgetGenerateStore.reset();
-    } else if (widgetGenerateState.overlayType !== 'ADD') {
+    } else if (val && widgetGenerateState.overlayType !== 'ADD') {
         await widgetGenerateStore.listDataTable();
     }
 });
@@ -114,7 +134,7 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                           style-type="primary"
                           size="full"
                           :title="state.sidebarTitle"
-                          @update:visible="handleUpdateVisible"
+                          @close="handleUpdateVisible"
         >
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
             <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2" />
@@ -132,6 +152,19 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                 </div>
             </template>
         </p-overlay-layout>
+        <p-button-modal :header-title="state.warningModalTitle"
+                        :visible.sync="state.warningModalVisible"
+                        size="sm"
+                        :fade="true"
+                        :backdrop="true"
+                        theme-color="alert"
+                        @confirm="handleConfirmWarningModal"
+                        @cancel="handleCloseWarningModal"
+        >
+            <template #body>
+                <p>{{ state.warningModalDescription }}</p>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 

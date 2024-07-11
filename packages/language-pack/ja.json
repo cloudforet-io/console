@@ -1312,6 +1312,7 @@
 			"TITLE": "プロジェクト変更"
 		},
 		"WIDGETS": {
+			"ACTUAL": "実際のサイズ",
 			"ADD_WIDGET": "ウィジェットを追加する",
 			"ADD_WIDGET_TO_DASHBOARD": "ダッシュボードにウィジェットを追加する",
 			"ALL_SUMMARY": {
@@ -1398,8 +1399,8 @@
 			"DAILY_UPDATE_HELP": "管理しているリソースの使用量を確認します",
 			"DAILY_UPDATE_NO_DATA": "本日の変更事項はありません。",
 			"DAILY_UPDATE_TITLE": "本日の変更事項",
-			"DATA_NOT_DISPLAYED": "",
-			"DATA_NOT_DISPLAYED_DESC": "",
+			"DATA_NOT_DISPLAYED": "データが表示されません",
+			"DATA_NOT_DISPLAYED_DESC": "すべての必須フィールドを設定し、[適用]ボタンをクリックしてウィジェットの設定を完了してください。",
 			"DATA_TABLE": {
 				"ADD": "データを追加",
 				"ALERT": {
@@ -1415,17 +1416,23 @@
 					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "この名前はすでに使用されています。",
 					"ADDITIONAL_LABELS_NAME": "名前",
 					"ADDITIONAL_LABELS_VALUE": "値",
+					"ADD_FILTER": "フィルターを追加",
 					"ADD_LABEL": "追加",
 					"ADVANCED_OPTIONS": "詳細オプション",
+					"CONCAT_DESC": "複数のテーブルを1つに結合します。",
 					"DATA_FIELD_NAME": "データフィールド名",
 					"DATA_FIELD_NAME_GROUP_BY_INVALID_TEXT": "名前を入力してください。",
 					"DATA_FIELD_NAME_INVALID_TEXT": "名前を入力してください",
 					"DATA_TABLE_NAME_SUCCESS": "データ名が正常に変更されました。",
 					"DATA_TABLE_NAME_WARNING": "この名前のデータはすでに存在します。",
 					"DATA_UNIT": "データ単位",
+					"EVAL_DESC": "データフィールドに関数や計算を適用します。",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day はフィールド名として使用できません。",
 					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "グループ名はフィールド名として使用できません。",
+					"FILTERS": "フィルター",
 					"GROUP_BY": "グループ別統計(Group By)",
+					"JOIN_DESC": "共通の列に基づいて、異なるテーブルの行を結合します。",
+					"QUERY_DESC": "特定の条件を満たすデータをフィルタリングして抽出します。",
 					"SELECT_DATA_SOURCE_SUCCESS": "データが正常に変更されました。",
 					"SELECT_DATA_TABLE_WARNING": "先にデータテーブルを保存してください。",
 					"SEPARATE": "日付形式の変更",
@@ -1454,6 +1461,10 @@
 			},
 			"FIELD": "フィールド",
 			"FORM": {
+				"CREATING_WIDGET_WARNING_MODAL_DESC": "終了してもよろしいですか？ このウィンドウを閉じると、生成中のデータがすべて破棄されます。",
+				"CREATING_WIDGET_WARNING_MODAL_TITLE": "保存されていないデータ",
+				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "",
+				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "",
 				"WIDGET_VALIDATION_WARNING_DESC": "チャートを正常に表示するには、必須フィールドに正しい値が選択されているか確認してください。",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "データテーブルに「地域」フィールドを追加してください。",
 				"WIDGET_VALIDATION_WARNING_TITLE": "空欄または誤った値が選択されたフィールドが存在します。"
@@ -1463,6 +1474,7 @@
 				"GAUGE_DESC": "ゲージの色は閾値に基づいて変化します。",
 				"PROGRESS_CARD_DESC": "棒グラフの色は閾値に基づいて変化します。"
 			},
+			"FULL": "全画面表示",
 			"FULL_WIDTH": "フル幅",
 			"HEALTH_DASHBOARD_DESC_1": "AWSビジネスもしくはエンタープライズサポートプランを使用している場合、AWS Health Dashboardが利用できます",
 			"HEALTH_DASHBOARD_DESC_2": "適切なプランを利用しているが、ウィジェットが利用できない場合、以下のメールにてお問い合わせください",
@@ -1589,6 +1601,7 @@
 		"ALL_DASHBOARDS": {
 			"CREATE": "作成",
 			"CREAT_NEW_DASHBOARD": "新規ダッシュボード作成",
+			"DASHBOARD": "ダッシュボード",
 			"DASHBOARDS_TITLE": "ダッシュボード",
 			"DEPRECATED": "サポート終了",
 			"DEPRECATED_DESCRIPTION": "このダッシュボードはサポートが終了し、新しいダッシュボードが適用されるとすぐに削除される予定です。",
@@ -1603,6 +1616,7 @@
 			"LABEL_VIWERS": "公開可否",
 			"PRIVATE": "非公開",
 			"PROJECT": "プロジェクト",
+			"SHARED": "共有",
 			"SINGLE_PROJECT": "個別プロジェクト",
 			"TOOLTIP_CLONE": "複製",
 			"TOOLTIP_DELETE": "削除",
@@ -1779,6 +1793,8 @@
 			"SELECT_MONTH": "月を選択",
 			"SET_HOME": "ホームダッシュボードとして設定",
 			"SHARE": "共有",
+			"SHARED_BY_ADMIN": "Adminにより共有",
+			"SHARED_TO_WORKSPACES": "ワークスペースに共有",
 			"SHARE_TO_ALL_WORKSPACES": "すべてのワークスペースに共有する",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "このダッシュボードをすべてのワークスペースと共有しますか？",
 			"SHARE_WITH_CODE": "コードで共有",

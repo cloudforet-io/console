@@ -234,11 +234,13 @@ watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
 });
 watch(() => dashboardDetailState.dashboardWidgets, (dashboardWidgets) => {
     // delete creating widgets
-    dashboardWidgets.forEach((widget) => {
-        if (widget.state === 'CREATING') {
-            deleteWidget(widget.widget_id);
-        }
-    });
+    if (!widgetGenerateState.showOverlay) {
+        dashboardWidgets.forEach((widget) => {
+            if (widget.state === 'CREATING') {
+                deleteWidget(widget.widget_id);
+            }
+        });
+    }
 }, { immediate: true });
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
 const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
@@ -275,6 +277,7 @@ defineExpose({
     >
         <p-data-loader :loading="dashboardDetailState.loadingDashboard"
                        :data="state.refinedWidgetInfoList"
+                       loader-backdrop-color="gray.100"
         >
             <div class="widgets-wrapper">
                 <template v-for="(widget) in state.refinedWidgetInfoList">

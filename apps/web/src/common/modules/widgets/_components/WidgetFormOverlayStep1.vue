@@ -14,11 +14,13 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const dataTableContentsRef = ref<HTMLElement|null>(null);
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
+    selectedDataTable: computed(() => widgetGenerateGetters.selectedDataTable),
 });
 
 const displayState = reactive({
