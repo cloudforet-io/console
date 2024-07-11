@@ -11,8 +11,10 @@ const config: StorybookConfig = {
   stories: [
     '../../../packages/mirinae/src/data-display/board/**/*.mdx',
     '../../../packages/mirinae/src/data-display/badge/**/*.mdx',
+    '../../../packages/mirinae/src/data-display/board-item/**/*.mdx',
     '../../../packages/mirinae/src/data-display/board/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/badge/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/data-display/board-item/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),

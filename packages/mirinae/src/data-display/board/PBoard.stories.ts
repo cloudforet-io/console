@@ -3,7 +3,6 @@ import { reactive, toRefs, computed } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-
 import { boardStandardItemSets, basicItemSets } from '@/data-display/board/mock';
 import { getBoardArgTypes } from '@/data-display/board/story-helper';
 import { BOARD_STYLE_TYPE } from '@/data-display/board/type';
