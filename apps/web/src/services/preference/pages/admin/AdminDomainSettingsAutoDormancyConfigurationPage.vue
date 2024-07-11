@@ -257,6 +257,7 @@ onMounted(async () => {
             }
             .cost-content-wrapper {
                 @apply flex flex-col;
+                flex: 1;
                 gap: 1.25rem;
                 .cost-report-button {
                     @apply absolute;
@@ -268,7 +269,7 @@ onMounted(async () => {
                 }
                 .cost-input {
                     @apply relative;
-                    width: 15rem;
+                    max-width: 15rem;
                     .placeholder {
                         @apply absolute text-label-md text-gray-400 text-right;
                         top: 0.5rem;
@@ -314,6 +315,26 @@ onMounted(async () => {
     .save-button {
         width: 7.5rem;
         margin-bottom: 1rem;
+    }
+
+    @screen tablet {
+        .cost-report-button {
+            @apply hidden;
+        }
+    }
+
+    @screen mobile {
+        .cost-wrapper {
+            @apply flex-col items-center;
+            .cost-threshold-chart {
+                width: auto;
+                height: auto;
+                max-width: 13rem;
+            }
+            .cost-content-wrapper {
+                max-width: 15rem;
+            }
+        }
     }
 }
 </style>
