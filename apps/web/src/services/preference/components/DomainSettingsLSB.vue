@@ -15,14 +15,14 @@ const state = reactive({
     menuSet: computed<LSBItem[]>(() => [
         {
             type: MENU_ITEM_TYPE.ITEM,
-            label: i18n.t('IAM.DOMAIN_SETTINGS.BASE_INFORMATION'),
-            to: { name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BASE_INFORMATION._NAME) },
+            label: i18n.t('IAM.DOMAIN_SETTINGS.DOMAIN_INFORMATION'),
+            to: { name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.DOMAIN_INFORMATION._NAME) },
             hideFavorite: true,
         },
         {
             type: MENU_ITEM_TYPE.ITEM,
-            label: i18n.t('IAM.DOMAIN_SETTINGS.BRAND_ASSETS'),
-            to: { name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BRAND_ASSETS._NAME) },
+            label: i18n.t('IAM.DOMAIN_SETTINGS.APPEARANCE'),
+            to: { name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.APPEARANCE._NAME) },
             hideFavorite: true,
         },
         {

@@ -22,10 +22,10 @@ const route = useRoute();
 const state = reactive({
     headingTitle: computed<TranslateResult>(() => {
         let title: TranslateResult = '';
-        if (route.name === makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BASE_INFORMATION._NAME)) {
-            title = i18n.t('IAM.DOMAIN_SETTINGS.BASE_INFORMATION');
-        } else if (route.name === makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BRAND_ASSETS._NAME)) {
-            title = i18n.t('IAM.DOMAIN_SETTINGS.BRAND_ASSETS');
+        if (route.name === makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.DOMAIN_INFORMATION._NAME)) {
+            title = i18n.t('IAM.DOMAIN_SETTINGS.DOMAIN_INFORMATION');
+        } else if (route.name === makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.APPEARANCE._NAME)) {
+            title = i18n.t('IAM.DOMAIN_SETTINGS.APPEARANCE');
         } else if (route.name === makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE._NAME)) {
             title = i18n.t('IAM.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE');
         } else if (route.name === makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME)) {

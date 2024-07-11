@@ -9,8 +9,8 @@ import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const PreferenceContainer = () => import('@/services/preference/PreferenceContainer.vue');
 const DomainSettingsContainer = () => import('@/services/preference/components/DomainSettingsContainer.vue');
-const AdminDomainSettingsBaseInformationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsBaseInformationPage.vue');
-const AdminDomainSettingsBrandAssetsPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsBrandAssetsPage.vue');
+const AdminDomainSettingsBaseInformationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsDomainInformationPage.vue');
+const AdminDomainSettingsBrandAssetsPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsAppearancePage.vue');
 const AdminDomainSettingsTimezoneAndLanguagePage = () => import('@/services/preference/pages/admin/AdminDomainSettingsTimezoneAndLanguagePage.vue');
 const AdminDomainSettingsAutoDormancyConfigurationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsAutoDormancyConfigurationPage.vue');
 const WorkspacesPage = () => import('@/services/preference/pages/admin/AdminWorkspacesPage.vue');
@@ -79,20 +79,20 @@ const adminPreferenceRoutes: RouteConfig = {
                 translationId: MENU_INFO_MAP[MENU_ID.DOMAIN_SETTINGS].translationId,
             },
             redirect: () => ({
-                name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BASE_INFORMATION._NAME),
+                name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.DOMAIN_INFORMATION._NAME),
             }),
             component: DomainSettingsContainer,
             children: [
                 {
-                    path: '/base-information',
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BASE_INFORMATION._NAME),
-                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.BASE_INFORMATION].translationId },
+                    path: '/domain-information',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.DOMAIN_INFORMATION._NAME),
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.DOMAIN_INFORMATION].translationId },
                     component: AdminDomainSettingsBaseInformationPage,
                 },
                 {
-                    path: '/brand-assets',
-                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.BRAND_ASSETS._NAME),
-                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.BRAND_ASSETS].translationId },
+                    path: '/appearance',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.APPEARANCE._NAME),
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.APPEARANCE].translationId },
                     component: AdminDomainSettingsBrandAssetsPage,
                 },
                 {
