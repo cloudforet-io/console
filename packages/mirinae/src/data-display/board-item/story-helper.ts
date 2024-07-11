@@ -1,16 +1,10 @@
-import type { ArgTypes } from '@storybook/addons';
 import icon from 'vue-svgicon';
 
-import {
-    standardIconActionSet,
-} from '@/data-display/board-item/mock';
-
-export const getBoardItemArgTypes = (): ArgTypes => ({
+export const getBoardItemArgTypes = () => ({
     leftIcon: {
         name: 'leftIcon',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Icon name in Left Content Area.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -20,16 +14,13 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
                 summary: 'ic_refresh',
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(icon.icons),
-        },
+        control: 'select',
+        options: Object.keys(icon.icons),
     },
     iconButtonSets: {
         name: 'iconButtonSets',
-        type: { name: 'array' },
+        type: 'array',
         description: 'Array of icon-button-set that will fit into the right overlay content area',
-        defaultValue: standardIconActionSet,
         table: {
             type: {
                 summary: 'array',
@@ -42,9 +33,8 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
     },
     rounded: {
         name: 'rounded',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Use `border-radius` style of the card item.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -54,15 +44,12 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     selected: {
         name: 'selected',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Selected style',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -72,15 +59,12 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     // slots
     contentSlot: {
         name: 'content',
         description: 'Slot for main contents',
-        defaultValue: 'Board Item Main Content',
         table: {
             type: {
                 summary: null,
@@ -92,7 +76,6 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
     leftContentSlot: {
         name: 'leftContent',
         description: 'Slot to replace left icon',
-        defaultValue: 'Board Item Left Content',
         table: {
             type: {
                 summary: null,
@@ -104,7 +87,6 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
     customRightContentSlot: {
         name: 'customRightContentSlot',
         description: 'Slot to replace right-icon-button-content to custom content',
-        defaultValue: 'Board Item Custom Right Content',
         table: {
             type: {
                 summary: null,
