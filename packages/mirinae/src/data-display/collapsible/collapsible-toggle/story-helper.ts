@@ -1,15 +1,12 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
 
 
-export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
+export const getCollapsibleToggleArgTypes = () => ({
     /* props */
     'v-model': {
         name: 'v-model',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'boolean',
@@ -23,9 +20,8 @@ export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
     },
     isCollapsed: {
         name: 'isCollapsed',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Collapsed state of toggle button.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -35,15 +31,12 @@ export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     toggleType: {
         name: 'toggleType',
-        type: { name: 'string' },
+        type: 'string',
         description: 'type of toggle button.',
-        defaultValue: COLLAPSIBLE_TOGGLE_TYPE.text,
         table: {
             type: {
                 summary: 'string',
@@ -53,26 +46,21 @@ export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
                 summary: COLLAPSIBLE_TOGGLE_TYPE.text,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(COLLAPSIBLE_TOGGLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(COLLAPSIBLE_TOGGLE_TYPE),
     },
     /* slot */
     defaultSlot: {
         name: 'default',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Slot for toggle button contents.',
-        defaultValue: 'Show',
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* event */
     onUpdateIsCollapsed: {
