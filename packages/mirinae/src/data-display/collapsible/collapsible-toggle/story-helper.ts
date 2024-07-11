@@ -1,6 +1,5 @@
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
 
-
 export const getCollapsibleToggleArgTypes = () => ({
     /* props */
     'v-model': {

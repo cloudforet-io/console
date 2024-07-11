@@ -3,7 +3,6 @@ import { reactive, toRefs } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-
 import { getCollapsibleToggleArgTypes } from '@/data-display/collapsible/collapsible-toggle/story-helper';
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
 import { useProxyValue } from '@/hooks';
