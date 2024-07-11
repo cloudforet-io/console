@@ -26,10 +26,13 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 
+import { gray } from '@/styles/colors';
+
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
-import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import type { MoreMenuItem, BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
@@ -44,6 +47,8 @@ const FOLDER_DEFAULT_GAP = 4;
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
+const workspaceHomePageStore = useWorkspaceHomePageStore();
+const workspaceHomePageState = workspaceHomePageStore.state;
 
 const { width } = useWindowSize();
 
@@ -59,12 +64,13 @@ const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(more
 const storeState = reactive({
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     language: computed<string>(() => store.state.user.language),
-    filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
-    isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
-    isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
+
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
-    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
+    bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
+    filterByFolder: computed<TranslateResult|undefined>(() => bookmarkState.filterByFolder),
+    isFullMode: computed<boolean>(() => workspaceHomePageState.isFullMode),
+    isFileFullMode: computed<boolean>(() => workspaceHomePageState.isFileFullMode),
 });
 const state = reactive({
     isLaptopSize: computed<boolean>(() => width.value < screens.laptop.max),
@@ -112,7 +118,7 @@ const {
 });
 
 const handleClickFullModeButton = () => {
-    bookmarkStore.setFullMode(!storeState.isFullMode);
+    workspaceHomePageStore.setFullMode(!storeState.isFullMode);
 };
 const handleClickActionButton = (type: BookmarkModalType, isEdit?: boolean, isNew?: boolean) => {
     bookmarkStore.setModalType(type, isEdit, isNew);
@@ -129,7 +135,8 @@ const handleClickFolder = (item: BookmarkItem, isClickedMore?: boolean) => {
     bookmarkStore.setSelectedBookmark(item);
 };
 const handleGoBackButton = () => {
-    bookmarkStore.setFileFullMode(false);
+    workspaceHomePageStore.setFileFullMode(false);
+    workspaceHomePageStore.fetchBookmarkList();
 };
 
 const handleClickAddMore = () => {
@@ -162,8 +169,8 @@ const handleSelectTool = async (value: BookmarkType) => {
     bookmarkStore.setBookmarkType(value);
     bookmarkStore.setSelectedBookmarks([]);
 
-    await bookmarkStore.fetchBookmarkFolderList();
-    await bookmarkStore.fetchBookmarkList();
+    await workspaceHomePageStore.fetchBookmarkFolderList();
+    await workspaceHomePageStore.fetchBookmarkList();
     await bookmarkStore.setSelectedBookmark(undefined);
 };
 
@@ -211,9 +218,13 @@ watch(() => storeState.bookmarkType, (bookmarkType) => {
     moreState.selectedItems = [];
 }, { immediate: true });
 watch(() => storeState.filterByFolder, (filterByFolder) => {
-    const refinedFilterByFolderIdx = state.refinedFolderList.findIndex((item) => item.name === filterByFolder);
-    if (filterByFolder && refinedFilterByFolderIdx !== -1) {
-        moreState.selectedItems = [state.refinedFolderList[refinedFilterByFolderIdx]];
+    const refinedFilterByFolder = state.refinedFolderList.find((item) => item.name === filterByFolder);
+    if (filterByFolder && refinedFilterByFolder) {
+        moreState.selectedItems = [{
+            ...refinedFilterByFolder,
+            name: refinedFilterByFolder.id,
+            label: refinedFilterByFolder.name,
+        }];
     }
 }, { immediate: true });
 </script>
@@ -259,10 +270,21 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                             <p-i name="ic_folder-filled"
                                  width="0.875rem"
                                  height="0.875rem"
+                                 class="folder"
+                            />
+                            <p-i v-if="storeState.selectedBookmark?.isGlobal"
+                                 name="ic_globe-filled"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                                 class="global"
+                                 :color="gray[600]"
                             />
                         </div>
                     </template>
-                    <template v-if="storeState.isFileFullMode && !state.isMobileSize && !(state.selectedToolId === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)"
+                    <template v-if="storeState.isFileFullMode
+                                  && !state.isMobileSize
+                                  && !(state.selectedToolId === BOOKMARK_TYPE.WORKSPACE && storeState.isWorkspaceMember)
+                                  && !storeState.selectedBookmark?.isGlobal"
                               #right
                     >
                         <div class="title-right-wrapper">
@@ -289,7 +311,8 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                     >
                         <span>{{ $t('HOME.FORM_FOLDER') }}</span>
                     </p-button>
-                    <p-button icon-left="ic_plus"
+                    <p-button v-if="!storeState.selectedBookmark?.isGlobal"
+                              icon-left="ic_plus"
                               size="sm"
                               class="add-link-button"
                               style-type="tertiary"
@@ -342,11 +365,21 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                                  width="0.875rem"
                                  height="0.875rem"
                             />
-                            <p-i v-else
-                                 name="ic_folder"
-                                 width="0.875rem"
-                                 height="0.875rem"
-                            />
+                            <span v-else
+                                  class="folder-item-icon-wrapper"
+                            >
+                                <p-i name="ic_folder"
+                                     width="0.875rem"
+                                     height="0.875rem"
+                                />
+                                <p-i v-if="item.isGlobal"
+                                     name="ic_globe-filled"
+                                     width="0.625rem"
+                                     height="0.625rem"
+                                     class="global"
+                                     :color="gray[600]"
+                                />
+                            </span>
                             <span>{{ item.name }}</span>
                         </p-button>
                     </div>
@@ -469,6 +502,15 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                     &:hover {
                         @apply bg-gray-200;
                     }
+
+                    .folder-item-icon-wrapper {
+                        @apply relative;
+                        .global {
+                            @apply absolute bg-gray-150 rounded-full;
+                            right: -0.25rem;
+                            bottom: -0.125rem;
+                        }
+                    }
                 }
                 .show-more-wrapper {
                     .more-context-menu {
@@ -492,6 +534,11 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                 @apply relative flex items-center justify-center bg-blue-200 rounded;
                 width: 1.5rem;
                 height: 1.5rem;
+                .global {
+                    @apply absolute bg-gray-150 rounded-full;
+                    right: -0.125rem;
+                    bottom: -0.125rem;
+                }
             }
             .title-right-wrapper {
                 @apply flex text-gray-900;

@@ -13,7 +13,10 @@ const AdminDomainSettingsBaseInformationPage = () => import('@/services/preferen
 const AdminDomainSettingsBrandAssetsPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsAppearancePage.vue');
 const AdminDomainSettingsAutoDormancyConfigurationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsAutoDormancyConfigurationPage.vue');
 const WorkspacesPage = () => import('@/services/preference/pages/admin/AdminWorkspacesPage.vue');
-// const BookmarkPage = () => import('@/services/preference/pages/admin/AdminBookmarkPage.vue');
+const BookmarkContainer = () => import('@/services/preference/components/BookmarkContainer.vue');
+const BookmarkPage = () => import('@/services/preference/pages/admin/AdminBookmarkPage.vue');
+const BookmarkDetailContainer = () => import('@/services/preference/components/BookmarkDetailContainer.vue');
+const BookmarkDetailPage = () => import('@/services/preference/pages/admin/AdminBookmarkDetailPage.vue');
 
 const adminPreferenceRoutes: RouteConfig = {
     path: 'preference',
@@ -36,39 +39,48 @@ const adminPreferenceRoutes: RouteConfig = {
             },
             component: WorkspacesPage,
         },
-        // TODO: will be updated next part
-        // {
-        //     path: 'bookmark',
-        //     name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
-        //     meta: {
-        //         lsbVisible: true,
-        //         menuId: MENU_ID.BOOKMARK,
-        //         translationId: MENU_INFO_MAP[MENU_ID.BOOKMARK].translationId,
-        //     },
-        //     component: BookmarkPage,
-        //     children: [
-        //         {
-        //             path: ':group?',
-        //             name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
-        //             meta: {
-        //                 menuId: MENU_ID.BOOKMARK,
-        //                 lsbVisible: true,
-        //             },
-        //             props: true,
-        //             component: BookmarkPage,
-        //         },
-        //         {
-        //             path: ':folder?',
-        //             name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
-        //             meta: {
-        //                 menuId: MENU_ID.BOOKMARK,
-        //                 lsbVisible: true,
-        //             },
-        //             props: true,
-        //             component: BookmarkPage,
-        //         },
-        //     ],
-        // },
+        {
+            path: 'bookmark',
+            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+            meta: {
+                lsbVisible: true,
+                menuId: MENU_ID.BOOKMARK,
+                translationId: MENU_INFO_MAP[MENU_ID.BOOKMARK].translationId,
+            },
+            component: BookmarkContainer,
+            children: [
+                {
+                    path: '/',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                    meta: { lsbVisible: true, menuId: MENU_ID.BOOKMARK },
+                    props: true,
+                    component: BookmarkPage,
+                },
+                {
+                    path: 'detail',
+                    props: true,
+                    component: BookmarkDetailContainer,
+                    children: [
+                        {
+                            path: ':group?',
+                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
+                            meta: { lsbVisible: true },
+                            props: true,
+                            component: BookmarkDetailPage,
+                            children: [
+                                {
+                                    path: ':folder?',
+                                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+                                    meta: { lsbVisible: true },
+                                    props: true,
+                                    component: BookmarkDetailPage,
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        },
         {
             path: 'domain-settings',
             name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS._NAME),

@@ -30,6 +30,7 @@ const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
     dataSourceList: computed<DataSourceItem[]>(() => dataSourcesPageGetters.dataSourceList),
+    dataSourceListTotalCount: computed<number>(() => dataSourcesPageState.dataSourceListTotalCount),
     selectedIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
     dataSourceListPageStart: computed<number>(() => dataSourcesPageState.dataSourceListPageStart),
     dataSourceListPageLimit: computed<number>(() => dataSourcesPageState.dataSourceListPageLimit),
@@ -133,6 +134,7 @@ const fetchDataSourceList = async () => {
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
                          :loading="state.loading"
+                         :total-count="storeState.dataSourceListTotalCount"
                          :style="{height: `${props.tableHeight}px`}"
                          @change="handleChange"
                          @refresh="fetchDataSourceList"

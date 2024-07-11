@@ -1849,7 +1849,7 @@
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "ワークスペース全体でこのダッシュボードの共有を解除してもよろしいですか？"
 		},
 		"FORM": {
-			"ALT_E_CLONE_DASHBOARD": "",
+			"ALT_E_CLONE_DASHBOARD": "ダッシュボードのクローンに失敗しました",
 			"ALT_E_CREATE_DASHBOARD": "ダッシュボードの作成に失敗しました",
 			"ALT_E_DELETE_DASHBOARD": "ダッシュボードの削除に失敗しました",
 			"ALT_E_EDIT_NAME": "ダッシュボード名の更新に失敗しました",
@@ -2134,7 +2134,7 @@
 		"BOOKMARK_MORE": "もっと見る",
 		"BOOKMARK_MY": "私の",
 		"BOOKMARK_MY_BOOKMARK": "マイブックマーク",
-		"BOOKMARK_SEARCH": "検索",
+		"BOOKMARK_SEARCH": "フォルダ検索",
 		"BOOKMARK_SELECTED": "{count}個 選択されました",
 		"BOOKMARK_SHARED": "共有",
 		"BOOKMARK_SHARED_BOOKMARK": "共有ブックマーク",
@@ -2214,8 +2214,20 @@
 			"TITLE": "アプリ"
 		},
 		"BOOKMARK": {
+			"ADD_GLOBAL_BOOKMARK": "グローバルブックマークを追加",
+			"ADD_LINK": "リンク 追加",
+			"ALL": "すべて",
 			"ALL_BOOKMARK": "すべてのブックマーク",
-			"GLOBAL_BOOKMARK": "グローバルブックマーク"
+			"CREATE_FOLDER": "フォルダーを作成する",
+			"DELETE": "削除",
+			"EDIT": "編集",
+			"FOLDER": "フォルダ",
+			"GLOBAL_BOOKMARK": "グローバルブックマーク",
+			"GLOBAL_NOTIFICATION": "グローバルブックマークはすべてのワークスペースホームの上部に表示され、管理者のみが管理します。",
+			"GO_TO_WORKSPACE": "このワークスペースに切り替え",
+			"LINK": "リンク",
+			"TOGGLE_MORE": "もっと見る",
+			"TYPE": "タイプ"
 		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "管理者Email",
