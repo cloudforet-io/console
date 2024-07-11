@@ -1,14 +1,9 @@
-import { faker } from '@faker-js/faker';
-import type { ArgTypes } from '@storybook/addons';
-
-
-export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
+export const getCollapsiblePanelArgTypes = () => ({
     /* props */
     'v-model': {
         name: 'v-model',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'boolean',
@@ -22,9 +17,8 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
     },
     isCollapsed: {
         name: 'isCollapsed',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Collapsed state of toggle button.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -34,15 +28,12 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     lineClamp: {
         name: 'lineClamp',
-        type: { name: 'number' },
+        type: 'number',
         description: 'It refers to the number of content lines to be displayed in the collapsed state.',
-        defaultValue: 2,
         table: {
             type: {
                 summary: 'number',
@@ -52,25 +43,20 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
                 summary: 2,
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     /* slot */
     defaultSlot: {
         name: 'default',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Slot for contents.',
-        defaultValue: faker.lorem.sentence(40),
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* event */
     onUpdateIsCollapsed: {
