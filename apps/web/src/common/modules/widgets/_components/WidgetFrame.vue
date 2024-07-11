@@ -135,12 +135,13 @@ const handleToggleWidth = () => {
              class="action-button-wrapper"
              :class="{ 'selected': state.etcMenuVisible }"
         >
-            <p-select-dropdown style-type="icon-button"
+            <p-select-dropdown style-type="tertiary-icon-button"
                                button-icon="ic_ellipsis-horizontal"
                                class="etc-button"
                                :menu="state.etcMenuItems"
                                :selected="[]"
                                :visible-menu.sync="state.etcMenuVisible"
+                               size="sm"
                                menu-position="right"
                                reset-selection-on-menu-close
                                @select="handleSelectEtcMenu"
@@ -321,9 +322,6 @@ const handleToggleWidth = () => {
         padding: 0.25rem;
         &.selected {
             display: block;
-        }
-        .etc-button {
-            @apply border border-gray-200 rounded-full;
         }
     }
 }

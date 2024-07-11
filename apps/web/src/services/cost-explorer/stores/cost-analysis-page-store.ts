@@ -49,10 +49,6 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        managedGroupByItems: computed<GroupByItem[]>(() => {
-            if (_state.isAdminMode) return Object.values(GROUP_BY_ITEM_MAP);
-            return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
-        }),
     });
     const state = reactive({
         granularity: GRANULARITY.MONTHLY as Granularity,
@@ -77,7 +73,12 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             }
             return 'USD';
         }),
-        defaultGroupByItems: computed(() => {
+        defaultGroupByItems: computed<GroupByItem[]>(() => [...getters.managedGroupByItems, ...getters.additionalInfoGroupByItems]),
+        managedGroupByItems: computed<GroupByItem[]>(() => {
+            if (_state.isAdminMode) return Object.values(GROUP_BY_ITEM_MAP);
+            return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
+        }),
+        additionalInfoGroupByItems: computed<GroupByItem[]>(() => {
             let additionalInfoGroupBy: GroupByItem[] = [];
             if (costQuerySetState.selectedDataSourceId) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
@@ -89,7 +90,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
                     }));
                 }
             }
-            return [..._state.managedGroupByItems, ...sortBy(additionalInfoGroupBy, 'label')];
+            return [...sortBy(additionalInfoGroupBy, 'label')];
         }),
         consoleFilters: computed<ConsoleFilter[]>(() => {
             const results: ConsoleFilter[] = [];
@@ -193,7 +194,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
                     .filter((d) => d !== GROUP_BY.WORKSPACE);
             }
         } else {
-            state.enabledFiltersProperties = _state.managedGroupByItems.map((d) => d.name);
+            state.enabledFiltersProperties = getters.managedGroupByItems.map((d) => d.name);
         }
     };
     const saveQuery = async (name: string): Promise<CostQuerySetModel|undefined> => {
