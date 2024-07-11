@@ -7,9 +7,13 @@ import {
     PPaneLayout, PDivider, PTextButton, PCheckbox, PToggleButton, PFieldGroup, PTextInput, PButton, PTooltip, PI,
 } from '@spaceone/design-system';
 
-import { i18n as _i18n } from '@/translations';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
+import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config/api-verbs/update';
+import type { DomainConfigModel } from '@/schema/config/domain-config/model';
+import { i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -18,25 +22,23 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { DormancyConfig } from '@/services/preference/types/domain-settings-type';
 
-const domainConfigStore = useDomainSettingsStore();
-const domainConfigGetters = domainConfigStore.getters;
+const DORMANCY_CONFIG_NAME = 'identity:dormancy:workspace';
 
-const storeState = reactive({
-    dormancyConfig: computed<DormancyConfig|undefined>((() => domainConfigGetters.dormancyConfig)),
-});
 const state = reactive({
-    isChanged: computed<boolean>(() => {
-        if ([cost.value, storeState.dormancyConfig].every((d) => !d)) return false;
-        return (cost.value !== storeState.dormancyConfig?.cost.toString())
-            || (state.checkbox !== storeState.dormancyConfig?.send_email);
-    }),
-    statusToggle: false,
     toggleText: computed<string>(() => (state.statusToggle
         ? 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_TOGGLE_ENABLED'
         : 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_TOGGLE_DISABLED'
     )),
-    checkbox: false,
     attributes: { type: 'number' },
+
+    dormancyConfig: {} as DormancyConfig,
+    isChanged: computed<boolean>(() => {
+        if ([cost.value, state.dormancyConfig].every((d) => !d)) return false;
+        return (cost.value !== state.dormancyConfig?.cost.toString())
+            || (state.checkbox !== state.dormancyConfig?.send_email);
+    }),
+    statusToggle: false,
+    checkbox: false,
 });
 
 const {
@@ -58,28 +60,23 @@ const {
 const handleChangeToggleButton = async (value: boolean) => {
     if (value) return;
     try {
-        await domainConfigStore.updateDomainSettings({
-            dormancy_config: {
-                enabled: false,
-                cost: storeState.dormancyConfig?.cost || 0,
-                send_email: storeState.dormancyConfig?.send_email || false,
-            },
+        await updateDomainDormancy({
+            enabled: false,
+            cost: state.dormancyConfig?.cost || 0,
+            send_email: state.dormancyConfig?.send_email || false,
         });
-        await domainConfigStore.fetchDomainSettings();
+        await fetchDomainSettings();
         showSuccessMessage(_i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_DORMANCY_TOGGLE'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
-
 const handleSaveConfig = async () => {
     try {
-        await domainConfigStore.updateDomainSettings({
-            dormancy_config: {
-                enabled: true,
-                cost: Number(cost.value),
-                send_email: state.checkbox,
-            },
+        await updateDomainDormancy({
+            enabled: true,
+            cost: Number(cost.value),
+            send_email: state.checkbox,
         });
         showSuccessMessage(_i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_DORMANCY'), '');
     } catch (e) {
@@ -87,14 +84,44 @@ const handleSaveConfig = async () => {
     }
 };
 
-watch(() => domainConfigGetters.dormancyConfig, (config) => {
+const createDomainDormancy = async (data: DormancyConfig) => {
+    await SpaceConnector.client.config.domainConfig.create<DomainConfigUpdateParameters, DomainConfigModel>({
+        name: DORMANCY_CONFIG_NAME,
+        data,
+    });
+};
+const updateDomainDormancy = async (data: DormancyConfig) => {
+    if (!state.dormancyConfig) {
+        await createDomainDormancy(data);
+        return;
+    }
+    await SpaceConnector.client.config.domainConfig.update<DomainConfigUpdateParameters, DomainConfigModel>({
+        name: DORMANCY_CONFIG_NAME,
+        data,
+    });
+};
+const fetchDomainSettings = async () => {
+    try {
+        const res = await SpaceConnector.client.config.domainConfig.list<DomainConfigListParameters, ListResponse<DomainConfigModel>>({
+            name: DORMANCY_CONFIG_NAME,
+        });
+        state.dormancyConfig = res.results?.[0].data ?? null;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.dormancyConfig = null;
+    }
+};
+
+watch(() => state.dormancyConfig, (config) => {
+    if (!config) return;
     state.statusToggle = config?.enabled || false;
     state.checkbox = config?.send_email || false;
     setForm('cost', config?.cost?.toString() || '');
 }, { immediate: true });
 
-onMounted(() => {
-    initForm();
+onMounted(async () => {
+    await initForm();
+    await fetchDomainSettings();
 });
 </script>
 
