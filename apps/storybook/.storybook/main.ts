@@ -9,8 +9,10 @@ function getAbsolutePath(value) {
 const config: StorybookConfig = {
   staticDirs: ['../public'],
   stories: [
-    '../../../packages/mirinae/src/yubeom/**/*.mdx',
-    '../../../packages/mirinae/src/yubeom/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/data-display/board/**/*.mdx',
+    '../../../packages/mirinae/src/data-display/badge/**/*.mdx',
+    '../../../packages/mirinae/src/data-display/board/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/data-display/badge/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
