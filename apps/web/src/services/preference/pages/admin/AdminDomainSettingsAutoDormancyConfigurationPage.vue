@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PPaneLayout, PDivider, PTextButton, PCheckbox, PToggleButton, PFieldGroup, PTextInput, PButton, PTooltip, PI,
@@ -7,9 +9,27 @@ import {
 
 import { i18n as _i18n } from '@/translations';
 
+import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import type { DormancyConfig } from '@/services/preference/types/domain-settings-type';
+
+const domainConfigStore = useDomainSettingsStore();
+const domainConfigGetters = domainConfigStore.getters;
+
+const storeState = reactive({
+    dormancyConfig: computed<DormancyConfig|undefined>((() => domainConfigGetters.dormancyConfig)),
+});
 const state = reactive({
+    isChanged: computed<boolean>(() => {
+        if ([cost.value, storeState.dormancyConfig].every((d) => !d)) return false;
+        return (cost.value !== storeState.dormancyConfig?.cost.toString())
+            || (state.checkbox !== storeState.dormancyConfig?.send_email);
+    }),
     statusToggle: false,
     toggleText: computed<string>(() => (state.statusToggle
         ? 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_TOGGLE_ENABLED'
@@ -35,9 +55,47 @@ const {
     },
 });
 
-(() => {
+const handleChangeToggleButton = async (value: boolean) => {
+    if (value) return;
+    try {
+        await domainConfigStore.updateDomainSettings({
+            dormancy_config: {
+                enabled: false,
+                cost: storeState.dormancyConfig?.cost || 0,
+                send_email: storeState.dormancyConfig?.send_email || false,
+            },
+        });
+        await domainConfigStore.fetchDomainSettings();
+        showSuccessMessage(_i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_DORMANCY_TOGGLE'), '');
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const handleSaveConfig = async () => {
+    try {
+        await domainConfigStore.updateDomainSettings({
+            dormancy_config: {
+                enabled: true,
+                cost: Number(cost.value),
+                send_email: state.checkbox,
+            },
+        });
+        showSuccessMessage(_i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_DORMANCY'), '');
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+watch(() => domainConfigGetters.dormancyConfig, (config) => {
+    state.statusToggle = config?.enabled || false;
+    state.checkbox = config?.send_email || false;
+    setForm('cost', config?.cost?.toString() || '');
+}, { immediate: true });
+
+onMounted(() => {
     initForm();
-})();
+});
 </script>
 
 <template>
@@ -46,6 +104,7 @@ const {
             <div class="toggle-wrapper">
                 <p-toggle-button :value.sync="state.statusToggle"
                                  class="toggle-button"
+                                 @change-toggle="handleChangeToggleButton"
                 />
                 <p class="toggle-text">
                     <strong class="title">{{ $t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_TOGGLE') }}</strong>
@@ -95,19 +154,21 @@ const {
                             </p-tooltip>
                         </template>
                         <template #default="{invalid}">
-                            <p-text-input :value="cost"
-                                          :invalid="invalid"
-                                          :disabled="!state.statusToggle"
-                                          type="number"
-                                          masking-mode
-                                          placeholder="$ USD"
-                                          class="cost-input"
-                                          @update:value="setForm('cost', $event)"
-                            />
+                            <div class="cost-input">
+                                <p-text-input :value="cost"
+                                              :invalid="invalid"
+                                              :disabled="!state.statusToggle"
+                                              type="number"
+                                              masking-mode
+                                              class="cost-input"
+                                              @update:value="setForm('cost', $event)"
+                                />
+                                <span class="placeholder">$ USD</span>
+                            </div>
                         </template>
                     </p-field-group>
                     <p-divider />
-                    <p-checkbox :value.sync="state.checkbox"
+                    <p-checkbox v-model="state.checkbox"
                                 :disabled="!state.statusToggle"
                     >
                         {{ $t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_CHECKBOX') }}
@@ -121,8 +182,9 @@ const {
                 </div>
             </div>
             <p-button v-if="state.statusToggle"
-                      :disabled="!isAllValid"
+                      :disabled="!isAllValid || !state.isChanged"
                       class="save-button"
+                      @click="handleSaveConfig"
             >
                 {{ $t('IAM.DOMAIN_SETTINGS.SAVE_CHANGE') }}
             </p-button>
@@ -156,7 +218,7 @@ const {
             }
         }
         .cost-wrapper {
-            @apply relative flex text-label-md bg-gray-100 border border-gray-200;
+            @apply relative flex text-label-md border border-gray-200;
             border-radius: 0.375rem;
             padding: 1.5rem;
             gap: 1.5rem;
@@ -177,20 +239,13 @@ const {
                 .icon {
                     margin-top: -0.25rem;
                 }
-
-                &.disabled {
-                    @apply bg-gray-100;
-
-                    /* custom design-system component - p-field-group */
-                    :deep(.p-field-group) {
-                        .title-wrapper {
-                            .title {
-                                @apply text-gray-600;
-                            }
-                        }
-                    }
-                    .tooltip, .cost-input {
-                        @apply cursor-not-allowed;
+                .cost-input {
+                    @apply relative;
+                    width: 15rem;
+                    .placeholder {
+                        @apply absolute text-label-md text-gray-400 text-right;
+                        top: 0.5rem;
+                        right: 0.625rem;
                     }
                 }
 
@@ -210,11 +265,21 @@ const {
                         -webkit-appearance: none;
                         margin: 0;
                     }
+                }
+            }
+            &.disabled {
+                @apply bg-gray-100;
 
-                    input::placeholder {
-                        @apply absolute text-right;
-                        right: 0.125rem;
+                /* custom design-system component - p-field-group */
+                :deep(.p-field-group) {
+                    .title-wrapper {
+                        .title {
+                            @apply text-gray-600;
+                        }
                     }
+                }
+                .tooltip, .cost-input {
+                    @apply cursor-not-allowed;
                 }
             }
         }
