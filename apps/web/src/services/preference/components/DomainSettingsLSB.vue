@@ -30,6 +30,14 @@ const state = reactive({
             label: i18n.t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION'),
             to: { name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME) },
             hideFavorite: true,
+            highlightTag: 'new',
+        },
+        {
+            type: MENU_ITEM_TYPE.ITEM,
+            label: i18n.t('IAM.DOMAIN_SETTINGS.ANOMALY_DETECTION_CONFIGURATION'),
+            to: { name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME) },
+            hideFavorite: true,
+            highlightTag: 'new',
         },
     ]),
 });

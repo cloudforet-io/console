@@ -7,6 +7,7 @@ export const PREFERENCE_ROUTE = {
         DOMAIN_INFORMATION: { _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.DOMAIN_SETTINGS}.domain_information` },
         APPEARANCE: { _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.DOMAIN_SETTINGS}.appearance` },
         AUTO_DORMANCY_CONFIGURATION: { _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.DOMAIN_SETTINGS}.auto_dormancy_configuration` },
+        ANOMALY_DETECTION_DOMAIN_CONFIGURATION: { _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.DOMAIN_SETTINGS}.anomaly_detection_domain_configuration` },
     },
     BOOKMARK: {
         _NAME: `${MENU_ID.PREFERENCE}.${MENU_ID.BOOKMARK}`,
