@@ -8,9 +8,6 @@ import { i18n } from '@/translations';
 
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
-import { BOOKMARK_TYPE } from '@/services/preference/constants/bookmark-constant';
-
-
 export const getWorkspaceInfo = (id: string, workspaceList: WorkspaceModel[]): WorkspaceModel|undefined => {
     if (!id) return undefined;
     return workspaceList.find((i) => i.workspace_id === id);
@@ -23,13 +20,6 @@ export const makeSearchQueryTagsHandler = (queryTags: QueryItem[]) => {
         const keyName = key?.name;
 
         switch (keyName) {
-        case 'type':
-            if (value.name === BOOKMARK_TYPE.LINK) {
-                filters.push({ k: 'data.link', v: null, o: '!=' });
-            } else if (value.name === BOOKMARK_TYPE.FOLDER) {
-                filters.push({ k: 'data.link', v: null, o: '=' });
-            }
-            break;
         case 'name':
             filters.push({ k: 'data.name', v: value.name, o: '=' });
             break;

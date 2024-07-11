@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { computed, reactive, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown, PLink,
+    PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown, PLink, PSelectStatus,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
-import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { KeyItemSet, ValueHandlerMap, ValueItem } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
-import { makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -40,22 +39,22 @@ const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 
+const route = useRoute();
 const router = useRouter();
 
 const storeState = reactive({
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
+    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
     workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
-    bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
     loading: computed<boolean>(() => bookmarkPageState.loading),
+    selectedType: computed<string>(() => bookmarkPageState.selectedType),
     searchFilter: computed<ConsoleFilter[]>(() => bookmarkPageState.searchFilter),
 });
 const tableState = reactive({
-    items: computed(() => (storeState.searchFilter.length === 0 ? storeState.bookmarkList.filter((i) => !i.folder) : storeState.bookmarkList)),
     fields: computed(() => [
         {
             name: 'name',
@@ -83,25 +82,38 @@ const tableState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
         items: [
-            { name: 'type', label: 'Type' },
             { name: 'name', label: 'Name' },
             { name: 'scope', label: 'Scope' },
             { name: 'link', label: 'Link' },
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        type: makeEnumValueHandler(BOOKMARK_TYPE),
         name: makeValueHandler(storeState.entireBookmarkList, 'name'),
         scope: makeValueHandler(storeState.entireBookmarkList, 'scope'),
         link: makeValueHandler(storeState.entireBookmarkList, 'link'),
     })),
+    typeField: computed<ValueItem[]>(() => ([
+        { label: i18n.t('IAM.BOOKMARK.ALL') as string, name: 'All' },
+        { label: i18n.t('IAM.BOOKMARK.LINK') as string, name: BOOKMARK_TYPE.LINK },
+        { label: i18n.t('IAM.BOOKMARK.FOLDER') as string, name: BOOKMARK_TYPE.FOLDER },
+    ])),
+});
+const state = reactive({
+    folder: computed<string>(() => route.params.folder),
 });
 
 const getFolderInfo = (id: string): BookmarkItem|undefined => {
     if (!id) return undefined;
     return storeState.bookmarkFolderList.find((i) => i.id === id);
 };
-
+const handleSelectType = (value: string) => {
+    bookmarkPageStore.setSelectedType(value);
+    if (value === 'All') {
+        fetchBookmarkList();
+    } else {
+        fetchBookmarkList(value);
+    }
+};
 const handleUpdateSelectIndex = async (indices: number[]) => {
     bookmarkPageStore.setSelectedBookmarkIndices(indices);
 };
@@ -183,15 +195,17 @@ const getDropdownMenu = (item: BookmarkItem) => {
     return defaultSets;
 };
 
-const fetchBookmarkList = async () => {
-    await bookmarkPageStore.fetchBookmarkList();
+const fetchBookmarkList = async (selectedType?: string) => {
+    await bookmarkPageStore.fetchBookmarkList(selectedType);
 };
 
-(async () => {
+watch(() => route.params, async () => {
     bookmarkPageStore.setParams(undefined);
     await bookmarkPageStore.setSelectedBookmarkIndices([]);
+    await bookmarkPageStore.setBookmarkListPageStart(0);
+    await bookmarkPageStore.setSelectedType('All');
     await fetchBookmarkList();
-})();
+}, { immediate: true });
 </script>
 
 <template>
@@ -211,8 +225,8 @@ const fetchBookmarkList = async () => {
                              :page-size-options="PageSizeOptions"
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
-                             :total-count="storeState.bookmarkTotalCount"
-                             :items="tableState.items"
+                             :total-count="bookmarkPageGetters.entireBookmarkList.length"
+                             :items="storeState.bookmarkList"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              :get-row-selectable="getRowSelectable"
@@ -220,6 +234,22 @@ const fetchBookmarkList = async () => {
                              @refresh="fetchBookmarkList"
                              @update:select-index="handleUpdateSelectIndex"
             >
+                <template v-if="!state.folder"
+                          #toolbox-bottom
+                >
+                    <div class="select-type-wrapper">
+                        <span>{{ $t('IAM.BOOKMARK.TYPE') }}</span>
+                        <p-select-status v-for="(item, idx) in tableState.typeField"
+                                         :key="idx"
+                                         :selected="storeState.selectedType"
+                                         class="mr-2"
+                                         :value="item.name"
+                                         @change="handleSelectType"
+                        >
+                            {{ item.label }}
+                        </p-select-status>
+                    </div>
+                </template>
                 <template #col-name-format="{value, item}">
                     <div class="col-name"
                          @click="handleClickName(item)"
@@ -363,10 +393,19 @@ const fetchBookmarkList = async () => {
             @apply block truncate;
             max-width: 12rem;
         }
+        .select-type-wrapper {
+            @apply flex items-center text-label-md text-gray-600;
+            gap: 1rem;
+            margin-left: 1rem;
+            margin-bottom: 1rem;
+        }
     }
 
     /* custom design-system component - p-toolbox-table */
     :deep(.p-toolbox-table) {
+        .p-toolbox {
+            padding-bottom: 0;
+        }
         .table-container {
             padding-bottom: 2.5rem;
         }

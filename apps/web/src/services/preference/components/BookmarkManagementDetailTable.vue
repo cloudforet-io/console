@@ -42,7 +42,6 @@ const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
-    bookmarkTotalCount: computed<number>(() => bookmarkPageState.bookmarkTotalCount),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
@@ -53,12 +52,6 @@ const storeState = reactive({
 const state = reactive({
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
-    bookmarkList: computed<BookmarkItem[]>(() => {
-        if (state.folder) {
-            return storeState.bookmarkList;
-        }
-        return storeState.searchFilter.length === 0 ? storeState.bookmarkList.filter((i) => !i.folder) : storeState.bookmarkList;
-    }),
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -194,8 +187,9 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
     if (!bookmarkFolderList || bookmarkFolderList?.length === 0) return;
     await bookmarkPageStore.setParams(params);
     await bookmarkPageStore.setSelectedBookmarkIndices([]);
+    await bookmarkPageStore.setBookmarkListPageStart(0);
+    await bookmarkPageStore.setSelectedType('All');
     await fetchBookmarkList();
-    bookmarkPageStore.setSelectedType('All');
 }, { immediate: true });
 </script>
 
@@ -216,8 +210,8 @@ watch([() => route.params, () => storeState.bookmarkFolderList], async ([params,
                              :page-size-options="PageSizeOptions"
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
-                             :total-count="storeState.bookmarkTotalCount"
-                             :items="state.bookmarkList"
+                             :total-count="bookmarkPageGetters.entireBookmarkList.length"
+                             :items="storeState.bookmarkList"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              @change="handleChange"
