@@ -16,6 +16,7 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/data-display/collapsible/collapsible-list/**/*.mdx',
     '../../../packages/mirinae/src/data-display/collapsible/collapsible-panel/**/*.mdx',
     '../../../packages/mirinae/src/data-display/collapsible/collapsible-toggle/**/*.mdx',
+    '../../../packages/mirinae/src/data-display/dynamic/dynamic-field/**/*.mdx',
     '../../../packages/mirinae/src/data-display/board/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/badge/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/board-item/**/*.stories.@(js|jsx|ts|tsx)',
@@ -23,6 +24,7 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/data-display/collapsible/collapsible-list/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/collapsible/collapsible-panel/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/collapsible/collapsible-toggle/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/data-display/dynamic/dynamic-field/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
