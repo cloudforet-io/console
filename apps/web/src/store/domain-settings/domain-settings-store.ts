@@ -14,18 +14,7 @@ import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DormancyConfig } from '@/services/preference/types/domain-settings-type';
-
-interface DomainSettingsData {
-    display_name?: string;
-    admin_email?: string;
-    timezone?: string;
-    language?: string;
-    wordtype_logo_url?: string;
-    symbol_favicon_url?: string;
-    login_page_image_url?: string;
-    dormancy_config?: DormancyConfig
-}
+import type { DomainSettingsData } from '@/services/preference/types/domain-settings-type';
 
 export const useDomainSettingsStore = defineStore('domain-config', () => {
     const state = reactive({
@@ -40,7 +29,6 @@ export const useDomainSettingsStore = defineStore('domain-config', () => {
         wordtypeLogoUrl: computed<string|undefined>(() => state.domainConfig?.data?.wordtype_logo_url),
         symbolFaviconUrl: computed<string|undefined>(() => state.domainConfig?.data?.symbol_favicon_url),
         loginPageImageUrl: computed<string|undefined>(() => state.domainConfig?.data?.login_page_image_url),
-        dormancyConfig: computed<DormancyConfig|undefined>(() => state.domainConfig?.data?.dormancy_config),
     });
 
     /* Actions */
