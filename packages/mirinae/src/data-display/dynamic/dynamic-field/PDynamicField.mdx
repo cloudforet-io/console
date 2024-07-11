@@ -1,0 +1,307 @@
+{/* PDynamicField.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PDynamicFieldStories from './PDynamicField.stories';
+
+<Meta of={PDynamicFieldStories} />
+
+
+# Dynamic Field
+<br/>
+<br/>
+
+Dynamic fields provide several types to display data.
+
+<br/>
+<br/>
+
+## Types
+
+The types that can be displayed as dynamic fields are as follows.
+
+- [text](#text-type)
+- [badge](#badge-type)
+- [datetime](#datetime-type)
+- [dict](#dict-type)
+- [state](#state-type)
+- [enum](#enum-type)
+- [size](#size-type)
+- [more](#more-type)
+- list (deprecated)
+
+<br/>
+
+## Options
+
+Additional options for displaying data by type can be set.
+
+Each type is slightly different, but there are also **common options**.
+
+### Common Options
+
+- link
+  - ex) https://google.com/
+- sortable
+  - Can be sorted by the field, default true
+- sort_key
+  - Sorting key for each field (default sort key: key)
+- key_depth
+  - If the data is an object type, it is the depth of the key to be displayed.
+  - `Null`: Explore the entire object based on the dot (.) delimiter.
+  - `1`: When it comes to `data.compute.instance_type`, only explore up to "data" as an object, and consider `compute.instance_type` as a key.
+  - `2`: In the case of `tags.aws.k8s.io.labels`, only explore up to "tags.aws" as an object, and consider `k8s.io.labels` as a key.
+- translation_id
+  - Translation key for the label of the field(optional)
+- default
+  - Used to display the default value when is undefined
+- delimiter
+  - When data is an array type, it is a delimiter between array values.
+- is_optional
+  - false (default) : Fields that are displayed by default even if the user does not select them
+  - true : Fields that are not visible to the user by default, but can be changed through the Custom Table feature.
+- field_description
+  - Description of the field
+- postfix
+  - the value after value
+  - ex) 70 + '%'
+- prefix
+  - the value before value
+  - ex) '$' + 3000
+- disable_copy
+  - false (default): Show copy icon
+  - true : Hide copy icon
+
+```typescript
+interface CommonOptions {
+    link?: string;
+    sortable?: boolean;
+    sort_key?: string;
+    width?: string;
+    translation_id?: string;
+    default?: any;
+    delimiter?: string;
+    postfix?: string;
+    prefix?: string;
+    field_description?: string;
+    disable_copy?: boolean;
+}
+````
+
+## Type Options
+
+In the ```options``` props, data display metadata is injected for each field. <br/>
+On the other hand, properties that do not need to be added to options are injected into the ```typeOptions``` props because they do not change for each field.<br/>
+For example, ```timezone``` is not the property of the ```options``` props but of \`typeOptions\` props because ```timezone``` will be all the same to all fields.
+
+```typescript
+interface DynamicFieldTypeOptions {
+    timezone?: string;
+    displayKey?: string;
+}
+```
+
+<br/>
+
+## Field Handler
+
+If you want to replace a value of field's ```props```, give ```handler```.<br/>
+This is useful when there are mutual influences depending on given props, such as when the ```type``` or ```options``` are changed by ```data```.<br/>
+
+
+### When field handler works?
+
+**Handler works every time each props value are changed**.<br/>
+
+
+### Parameter of field handler
+
+It takes **all dynamic field props object as a parameter** and returns **an object containing only changed dynamic field props**.<br/>
+Then, the returned object will be merged with the original props values.<br/>
+
+
+### Usage of ExtraData props with field handler
+
+When you want to change field props values through a handler, and you need **additional data other than field props**, use ```extraData``` props.<br/>
+
+For example, let's say you have the following props.<br/>
+
+```json5
+ { type: 'text', data: 'hello' }
+```
+
+If you want to attach 'world!', you can do it through a field handler as below.<br/>
+
+```javascript
+ const handler = ({data}) => {
+    return {
+        data: `${data} world!`
+    }
+ }
+```
+
+If you need data that is unknown at the time you inject the handler, props and handler function will be defined as below.<br/>
+
+```json5
+ { type: 'text', data: 'hello', extraData: 'world!' }
+```
+
+```javascript
+ const handler = ({data, extraData}) => {
+    return {
+        data: `${data} ${extraData}`
+    }
+ }
+```
+
+If you give ```extraData``` props, **the handler will be executed when changes of ```extraData``` props are detected.** <br/>
+<br/>
+
+
+### Field handler doesn't work recursively
+
+If the type is ```enum``` or the given data is iterable, field handler wouldn't be passed to the child.<br/>
+It will be invoked only at the parent level.<br/>
+For example, <br/>
+
+```json5
+[
+    {
+        type: 'enum',
+        data: 'first',
+        options: {
+            first: { type: 'badge', data: 'a' },
+            second: { type: 'badge', data: 'b' }
+        },
+        handler: ...
+    }
+]
+```
+
+in this case, field handler will be invoked once with parent item.<br/>
+
+<br/>
+
+# Dynamic Field by Each Type
+
+<br/>
+
+<br/>
+<br/>
+
+## Text Type
+The ```text``` type is the default type of the dynamic field.<br/>
+It's options are the same with the common options.
+<Canvas of={PDynamicFieldStories.TextType} />
+
+<br/>
+
+## Badge Type
+It's options are:
+
+```typescript
+interface BadgeOptions extends CommonOptions {
+    outline_color?: string;
+    shape?: string;
+    background_color?: string;
+    text_color?: string;
+}
+```
+<Canvas of={PDynamicFieldStories.BadgeType} />
+
+<br/>
+
+## Datetime Type
+It's options are:
+
+```typescript
+enum DATETIME_SOURCE_TYPE {
+    iso8601 = 'iso8601',
+    timestamp = 'timestamp'
+}
+
+interface DatetimeOptions extends CommonOptions {
+    source_type: keyof typeof DATETIME_SOURCE_TYPE;
+    source_format?: string;
+    display_format?: string;
+}
+```
+<Canvas of={PDynamicFieldStories.DatetimeType} />
+
+<br/>
+
+## Dict Type
+It's options are the same with the common options.
+<Canvas of={PDynamicFieldStories.DictType} />
+
+
+<br/>
+
+## State Type
+It's options are:
+
+```typescript
+interface StateOptions extends CommonOptions {
+    icon?: {
+        image?: string;
+        color?: string;
+    };
+    text_color?: string;
+}
+```
+<Canvas of={PDynamicFieldStories.StateType} />
+
+<br/>
+
+## Enum Type
+It's options are:
+
+```typescript
+interface EnumItem {
+    name?: string;
+    type: DynamicFieldType;
+    options?: DynamicFieldOptions;
+    default?: any;
+}
+interface EnumOptions {
+    items?: EnumItem|string;
+    default?: any;
+}
+```
+<Canvas of={PDynamicFieldStories.EnumType} />
+
+<br/>
+
+## Size Type
+It's options are:
+
+```typescript
+interface SizeOptions extends CommonOptions {
+    display_unit?: 'BYTES | KB | MB | GB | TB | PB';
+    source_unit?: 'BYTES | KB | MB | GB | TB | PB';
+}
+```
+<Canvas of={PDynamicFieldStories.SizeType} />
+
+<br/>
+
+## More Type
+It's options are:
+
+```typescript
+interface MoreOptions extends CommonOptions {
+    sub_key?: string;
+    layout: DynamicLayout;
+}
+```
+<Canvas of={PDynamicFieldStories.MoreType} />
+
+<br/>
+
+# Playground
+<Canvas of={PDynamicFieldStories.Playground} />
+<Controls of={PDynamicFieldStories.Playground} />
+
+
+
+
