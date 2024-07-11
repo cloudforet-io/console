@@ -19,7 +19,7 @@ interface BadgeProps {
     outlineColor?: string;
     shape?: BadgeShape;
     fontWeight?: BadgeFontWeight;
-    defaultSlot?: 'badge';
+    defaultSlot?: string;
 }
 
 const props = withDefaults(defineProps<BadgeProps>(), {
