@@ -215,21 +215,6 @@ onUnmounted(() => {
                     >
                         {{ widgetSize.label }}
                     </p-select-button>
-                    <p-divider vertical
-                               class="divider"
-                    />
-                    <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
-                              style-type="substitutive"
-                              icon-left="ic_refresh"
-                              class="apply-button"
-                              :disabled="state.disableApplyButton"
-                              @click="handleUpdateWidgetOptions"
-                    >
-                        {{ $t('COMMON.WIDGETS.APPLY') }}
-                        <div v-if="state.isWidgetFieldChanged"
-                             class="update-dot"
-                        />
-                    </p-button>
                 </div>
             </div>
             <div class="widget-wrapper"
@@ -259,6 +244,20 @@ onUnmounted(() => {
                                                :widget-validation-invalid="optionsInvalid"
                                                :widget-validation-invalid-text="optionsInvalidText"
         />
+        <portal to="apply-button">
+            <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
+                      style-type="substitutive"
+                      icon-left="ic_refresh"
+                      class="apply-button"
+                      :disabled="state.disableApplyButton"
+                      @click="handleUpdateWidgetOptions"
+            >
+                {{ $t('COMMON.WIDGETS.APPLY') }}
+                <div v-if="state.isWidgetFieldChanged"
+                     class="update-dot"
+                />
+            </p-button>
+        </portal>
     </div>
 </template>
 
@@ -315,16 +314,16 @@ onUnmounted(() => {
                 }
             }
         }
-        .apply-button {
-            position: relative;
-            .update-dot {
-                @apply absolute bg-blue-500 rounded-full border-2 border-white;
-                width: 0.75rem;
-                height: 0.75rem;
-                right: -0.375rem;
-                top: -0.375rem;
-            }
-        }
+    }
+}
+.apply-button {
+    position: relative;
+    .update-dot {
+        @apply absolute bg-blue-500 rounded-full border-2 border-white;
+        width: 0.75rem;
+        height: 0.75rem;
+        right: -0.375rem;
+        top: -0.375rem;
     }
 }
 </style>

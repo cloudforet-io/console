@@ -152,6 +152,7 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                       #footer
             >
                 <div class="footer-wrapper">
+                    <portal-target name="apply-button" />
                     <p-button :style-type="widgetGenerateState.overlayStep === 1 ? 'substitutive' : 'primary'"
                               :icon-right="widgetGenerateState.overlayStep === 1 ? 'ic_arrow-right' : undefined"
                               :disabled="!state.isAllValid"
