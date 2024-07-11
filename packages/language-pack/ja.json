@@ -2609,6 +2609,7 @@
 		},
 		"WORKSPACES": {
 			"ACTION": "作業",
+			"ALL": "すべて",
 			"CREATE": "作成",
 			"CREATE_WORKSPACE": "ワークスペースの作成",
 			"CREATE_WORKSPACE_TEXT_LENGTH": "ワークスペース名の最大長は80文字です。",
@@ -2620,6 +2621,7 @@
 			},
 			"DISABLE": "無効化",
 			"DISABLE_WORKSPACE": "選択したワークスペースを無効にしてもよろしいですか？",
+			"DORMANT": "",
 			"EDIT": "編集",
 			"EDIT_WORKSPACE": "ワークスペースを編集",
 			"ENABLE": "有効化",
@@ -2634,6 +2636,7 @@
 				"REQUIRED_NAME": "名前を入力してください"
 			},
 			"REQUIRED_ENABLE_WORKSPACE": "少なくとも1つのワークスペースを有効にする必要があります。",
+			"STATE": "状態",
 			"WORKSPACES": "ワークスペース"
 		}
 	},

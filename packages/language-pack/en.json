@@ -2609,6 +2609,7 @@
 		},
 		"WORKSPACES": {
 			"ACTION": "Action",
+			"ALL": "All",
 			"CREATE": "Create",
 			"CREATE_WORKSPACE": "Create Workspace",
 			"CREATE_WORKSPACE_TEXT_LENGTH": "80 characters is the max length of a workspace name.",
@@ -2618,11 +2619,12 @@
 			"DETAIL": {
 				"USERS": "Users"
 			},
-			"DISABLE": "Disable",
+			"DISABLE": "Disabled",
 			"DISABLE_WORKSPACE": "Are you sure you want to disable the selected workspace?",
+			"DORMANT": "Dormant",
 			"EDIT": "Edit",
 			"EDIT_WORKSPACE": "Edit Workspace",
-			"ENABLE": "Enable",
+			"ENABLE": "Enabled",
 			"ENABLE_WORKSPACE": "Are you sure you want to enable the selected workspace?",
 			"FORM": {
 				"DUPLICATED_NAME": "Workspace name is duplicated.",
@@ -2634,6 +2636,7 @@
 				"REQUIRED_NAME": "Please enter name"
 			},
 			"REQUIRED_ENABLE_WORKSPACE": "At least one workspace must be enabled.",
+			"STATE": "State",
 			"WORKSPACES": "Workspaces"
 		}
 	},
