@@ -56,14 +56,15 @@ const state = reactive({
     warningModalVisible: false,
     warningModalTitle: computed(() => {
         if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_TITLE');
-        if (widgetGenerateState.widget?.state === 'INACTIVE') return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_TITLE');
+        if (widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged) return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_TITLE');
         return '';
     }),
     warningModalDescription: computed(() => {
         if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_DESC');
-        if (widgetGenerateState.widget?.state === 'INACTIVE') return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_DESC');
+        if (widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged) return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_DESC');
         return '';
     }),
+    isWidgetOptionsChanged: false,
 });
 
 /* Api */
@@ -101,7 +102,7 @@ const handleClickContinue = async () => {
     widgetGenerateStore.setShowOverlay(false);
 };
 const handleUpdateVisible = (value: boolean) => {
-    if (!value && (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE')) {
+    if (!value && (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged)) {
         state.warningModalVisible = true;
         return;
     }
@@ -115,6 +116,9 @@ const handleConfirmWarningModal = async () => {
     if (widgetGenerateState.widget?.state === 'CREATING') await deleteWidget(widgetGenerateState.widgetId);
     widgetGenerateStore.reset();
     widgetGenerateStore.setShowOverlay(false);
+};
+const handleWatchOptionsChanged = (isChanged: boolean) => {
+    state.isWidgetOptionsChanged = isChanged;
 };
 
 /* Watcher */
@@ -137,7 +141,9 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                           @close="handleUpdateVisible"
         >
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
-            <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2" />
+            <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2"
+                                       @watch-options-changed="handleWatchOptionsChanged"
+            />
             <template v-if="widgetGenerateState.overlayType !== 'EXPAND'"
                       #footer
             >
