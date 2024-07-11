@@ -1,7 +1,3 @@
-import { faker } from '@faker-js/faker';
-import type { ArgTypes } from '@storybook/addons';
-import { range } from 'lodash';
-
 import {
     COLLAPSIBLE_LIST_THEME,
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
@@ -9,13 +5,12 @@ import {
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
 
 
-export const getCollapsibleListArgTypes = (): ArgTypes => ({
+export const getCollapsibleListArgTypes = () => ({
     /* props */
     items: {
         name: 'items',
-        type: { name: 'array' },
+        type: 'array',
         description: 'List items. Array of `string` or `{title?: string; data: string;}`.',
-        defaultValue: range(10).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(60) })),
         table: {
             type: {
                 summary: 'array',
@@ -25,15 +20,12 @@ export const getCollapsibleListArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     unfoldedIndices: {
         name: 'unfoldedIndices',
-        type: { name: 'array' },
+        type: 'array',
         description: 'Array of collapsed item\'s index. sync props.',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'array',
@@ -43,15 +35,12 @@ export const getCollapsibleListArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     lineClamp: {
         name: 'lineClamp',
-        type: { name: 'number' },
+        type: 'number',
         description: 'It refers to the number of content lines to be displayed in the collapsed state.',
-        defaultValue: 2,
         table: {
             type: {
                 summary: 'number',
@@ -61,15 +50,12 @@ export const getCollapsibleListArgTypes = (): ArgTypes => ({
                 summary: 2,
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     multiUnfoldable: {
         name: 'multiUnfoldable',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to allow multiple items to unfold at the same time.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -79,15 +65,12 @@ export const getCollapsibleListArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     togglePosition: {
         name: 'togglePosition',
-        type: { name: 'string' },
+        type: 'string',
         description: `Toggle position. ${Object.values(COLLAPSIBLE_LIST_TOGGLE_POSITION)} are available.`,
-        defaultValue: COLLAPSIBLE_LIST_TOGGLE_POSITION.title,
         table: {
             type: {
                 summary: 'string',
@@ -97,16 +80,13 @@ export const getCollapsibleListArgTypes = (): ArgTypes => ({
                 summary: COLLAPSIBLE_LIST_TOGGLE_POSITION.title,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(COLLAPSIBLE_LIST_TOGGLE_POSITION),
-        },
+        control: 'select',
+        options: Object.values(COLLAPSIBLE_LIST_TOGGLE_POSITION),
     },
     toggleType: {
         name: 'toggleType',
-        type: { name: 'string' },
+        type: 'string',
         description: 'type of collapsible toggle button.',
-        defaultValue: COLLAPSIBLE_TOGGLE_TYPE.text,
         table: {
             type: {
                 summary: 'string',
@@ -116,16 +96,13 @@ export const getCollapsibleListArgTypes = (): ArgTypes => ({
                 summary: COLLAPSIBLE_TOGGLE_TYPE.text,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(COLLAPSIBLE_TOGGLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(COLLAPSIBLE_TOGGLE_TYPE),
     },
     theme: {
         name: 'theme',
-        type: { name: 'string' },
+        type: 'string',
         description: `${Object.values(COLLAPSIBLE_LIST_THEME)} are available.`,
-        defaultValue: COLLAPSIBLE_LIST_THEME.plain,
         table: {
             type: {
                 summary: 'string',
@@ -135,16 +112,13 @@ export const getCollapsibleListArgTypes = (): ArgTypes => ({
                 summary: COLLAPSIBLE_LIST_THEME.plain,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(COLLAPSIBLE_LIST_THEME),
-        },
+        control: 'select',
+        options: Object.values(COLLAPSIBLE_LIST_THEME),
     },
     'v-model': {
         name: 'v-model',
-        type: { name: 'array' },
+        type: 'array',
         description: 'Two way binding for `unfoldedIndices` props with `update:unfoldedIndices` event.',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'array',
@@ -159,48 +133,39 @@ export const getCollapsibleListArgTypes = (): ArgTypes => ({
     /* slot */
     titleSlot: {
         name: 'title',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Slot for title.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     noStyledTitleSlot: {
         name: 'no-styled-title',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Slot for title without style.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     defaultSlot: {
         name: 'default',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Slot for contents.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* event */
     onUpdateUnfoldedIndices: {

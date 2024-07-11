@@ -13,10 +13,12 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/data-display/badge/**/*.mdx',
     '../../../packages/mirinae/src/data-display/board-item/**/*.mdx',
     '../../../packages/mirinae/src/data-display/cards/**/*.mdx',
+    '../../../packages/mirinae/src/data-display/collapsible/collapsible-list/**/*.mdx',
     '../../../packages/mirinae/src/data-display/board/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/badge/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/board-item/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/cards/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/data-display/collapsible/collapsible-list/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
