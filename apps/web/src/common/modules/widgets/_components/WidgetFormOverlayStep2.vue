@@ -165,6 +165,9 @@ const handleUpdateWidgetOptions = async () => {
 const handleMountWidgetComponent = () => {
     state.mounted = true;
 };
+const handleEditWidget = () => {
+    widgetGenerateStore.setOverlayType('EDIT');
+};
 
 /* Watcher */
 watch(() => widgetGenerateState.widget?.size, (widgetSize) => {
@@ -204,6 +207,14 @@ onUnmounted(() => {
                                class="divider"
                     />
                     <dashboard-variables-v2 disable-save-button />
+                    <p-button v-if="widgetGenerateState.overlayType === 'EXPAND'"
+                              style-type="tertiary"
+                              icon-left="ic_edit"
+                              class="edit-button"
+                              @click="handleEditWidget"
+                    >
+                        {{ $t('COMMON.WIDGETS.EDIT_WIDGET') }}
+                    </p-button>
                 </div>
                 <div v-if="widgetGenerateState.overlayType !== 'EXPAND'"
                      class="widget-size-wrapper"
@@ -291,6 +302,10 @@ onUnmounted(() => {
                 .dashboard-variables-select-dropdown {
                     @apply relative flex items-center flex-wrap;
                     gap: 0.5rem;
+                }
+                .edit-button {
+                    position: absolute;
+                    right: 4.5rem;
                 }
             }
             .widget-size-wrapper {

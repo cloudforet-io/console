@@ -124,9 +124,6 @@ const handleConfirmWarningModal = async () => {
 const handleWatchOptionsChanged = (isChanged: boolean) => {
     state.isWidgetOptionsChanged = isChanged;
 };
-const handleEditWidget = () => {
-    widgetGenerateStore.setOverlayType('EDIT');
-};
 const handleKeyDown = (e: KeyboardEvent) => {
     if (e.code === 'Escape' && widgetGenerateState.overlayType === 'EXPAND') {
         widgetGenerateStore.setShowOverlay(false);
@@ -157,16 +154,6 @@ onMounted(() => {
                           :hide-header="widgetGenerateState.overlayType === 'EXPAND'"
                           @close="handleUpdateVisible"
         >
-            <template #title-right-extra>
-                <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
-                          style-type="tertiary"
-                          icon-left="ic_edit"
-                          size="lg"
-                          @click="handleEditWidget"
-                >
-                    {{ $t('COMMON.WIDGETS.EDIT_WIDGET') }}
-                </p-button>
-            </template>
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
             <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2"
                                        @watch-options-changed="handleWatchOptionsChanged"
