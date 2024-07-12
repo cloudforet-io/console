@@ -206,7 +206,6 @@ const handleToggleWidth = () => {
             >
                 <p-icon-button style-type="tertiary"
                                :name="state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all'"
-                               size="sm"
                                shape="square"
                                class="width-toggle-button"
                                @click="handleToggleWidth"
