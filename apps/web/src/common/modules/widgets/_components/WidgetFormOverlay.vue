@@ -99,9 +99,13 @@ const handleClickContinue = async () => {
         widgetGenerateStore.setOverlayStep(2);
         return;
     }
+    if (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged) {
+        state.warningModalVisible = true;
+        return;
+    }
     widgetGenerateStore.setShowOverlay(false);
 };
-const handleUpdateVisible = (value: boolean) => {
+const handleCloseOverlay = (value: boolean) => {
     if (!value && (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged)) {
         state.warningModalVisible = true;
         return;
@@ -138,7 +142,7 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                           style-type="primary"
                           size="full"
                           :title="state.sidebarTitle"
-                          @close="handleUpdateVisible"
+                          @close="handleCloseOverlay"
         >
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
             <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2"
