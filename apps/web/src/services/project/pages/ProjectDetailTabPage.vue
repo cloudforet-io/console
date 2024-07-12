@@ -195,7 +195,7 @@ onUnmounted(() => {
 }
 .page-inner {
     height: 100%;
-    max-width: 1368px;
+    max-width: 85.5rem;
 }
 
 .p-tab {
