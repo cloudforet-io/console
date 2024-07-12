@@ -8,9 +8,9 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, '../../packages/mirinae/src'),
-            "@storybook/blocks": path.resolve(__dirname, "./node_modules/@storybook/blocks"),
-            'react': path.resolve(__dirname, './node_modules/react'),
-            'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
+            // "@storybook/blocks": path.resolve(__dirname, "../../node_modules/@storybook/blocks"),
+            // 'react': path.resolve(__dirname, '../../node_modules/react'),
+            // 'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
         },
     },
     optimizeDeps: {

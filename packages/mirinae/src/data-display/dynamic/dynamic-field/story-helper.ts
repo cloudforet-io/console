@@ -1,8 +1,6 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
-export const getDynamicFieldArgTypes = (): ArgTypes => ({
+export const getDynamicFieldArgTypes = () => ({
     type: {
         name: 'type',
         type: 'string',

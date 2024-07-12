@@ -1,55 +1,10 @@
-import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import PDynamicLayout from './PDynamicLayout.vue';
-import { I18nConnector } from '@/translations'
-import { getDynamicLayoutArgTypes } from './story-helper';
+{/* PDynamicLayout.mdx */}
 
-<Meta title='Data Display/Dynamic/Dynamic Layout/0. Documentation'
-      argTypes={getDynamicLayoutArgTypes()}/>
+import { Canvas, Meta, Controls } from '@storybook/blocks';
 
+{/* // import * as PDynamicLayoutStories from './PDynamicLayout.stories'; */}
 
-export const Template = (args, { argTypes }) => ({
-    props: Object.keys(argTypes),
-    components: { PDynamicLayout },
-    i18n: I18nConnector.i18n,
-    template: `
-            <p-dynamic-layout :name="name" :type="type"
-                              :options="options"
-                              :data="data"
-                              :type-options="{
-                                  loading,
-                                  totalCount,
-                                  timezone,
-                                  selectIndex,
-                                  selectable,
-                                  multiSelect,
-                                  invalid,
-                                  colCopy,
-                                  excelVisible,
-                                  settingsVisible,
-                                  keyItemSets,
-                                  valueHandlerMap,
-                                  language,
-                                  popupVisible,
-                              }"
-                              :fetch-options="{
-                                  sortBy,
-                                  sortDesc,
-                                  pageStart,
-                                  pageLimit,
-                                  queryTags,
-                                  searchText
-                              }"
-                              class="w-full"
-                              @fetch="onFetch"
-                              @select="onSelect"
-                              @export="onExport"
-                              @click-settings="onClickSettings"
-                              @click-row="onClickRow"
-                              @update-popup-visible="onUpdatePopupVisible"
-            >
-            </p-dynamic-layout>
-    `,
-});
+<Meta title="Data Display/Dynamic/Dynamic Layout/0. Documentation" />
 
 
 # Dynamic Layout
@@ -59,7 +14,6 @@ The way to display the data is determined by the type of the layout. <br/>
 There are several types of layouts, and each type has its own options. <br/>
 
 ## Supported Types
-
 | Type               | Description                                |
 |--------------------|--------------------------------------------|
 | item               | key / value                                |
@@ -71,7 +25,7 @@ There are several types of layouts, and each type has its own options. <br/>
 | markdown           | -                                          |
 | html               | -                                          |
 | popup              | modal view                                 |
-| list               | list(<dynamic_layout>)                     |
+| list               | list(<dynamic_layout />)                   |
 
 <br/>
 
@@ -88,13 +42,13 @@ So, `options` is fixed, and `type-options` can be changed by the user's behavior
 | root_path       | string                            | The path for the data that is used to render the layout.                                                          |
 | translation_id  | string                            | Reserved code for translation.                                                                                    |
 | fields          | DynamicField[]                    | Fields to display. It is used as a template for each item.                                                        |
-| markdown        | string or { [language]: string; } | Markdown string to display.                                                                                       |
+| markdown        | `string or { [language]: string; }` | Markdown string to display.                                                                                       |
 | layouts         | DynamicLayout[]                   | List of layouts to display data with multiple layouts.                                                            |
 | search          | SearchSchema                      | Search schema that is used in query search.                                                                       |
 | disable_search  | boolean                           | If the type of the layout is available for search, and this is set to true, the search bar will not be displayed. |
 | headers         | string[]                          | Header names for raw table.                                                                                       |
 | layout          | DynamicLayout                     | Dynamic layout schema to display in popup.                                                                        |
-| default_sort    | { key: string; desc?: boolean; }  | Default sort option that will be applied when the table or query search table is loaded.                          |
+| default_sort    | `{ key: string; desc?: boolean; }`  | Default sort option that will be applied when the table or query search table is loaded.                          |
 
 <br/>
 <br/>
@@ -295,6 +249,3 @@ interface DynamicLayoutEventListeners {
 
 <br/>
 <br/>
-
-
-<ArgsTable story="Playground" />
