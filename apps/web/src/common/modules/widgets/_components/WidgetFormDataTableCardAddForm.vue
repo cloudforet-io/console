@@ -151,10 +151,13 @@ const costFilterState = reactive({
     }),
     additionalInfoGroupByItems: computed<MenuItem[]>(() => {
         const dataSource = storeState.costDataSources[props.sourceId ?? ''];
-        return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys.map((key) => ({
-            name: `additional_info.${key}`,
-            label: key,
-        })), 'label') : [];
+        const additionalInfo = dataSource?.data?.plugin_info?.metadata?.additional_info ?? {};
+        return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys
+            .filter((key) => !additionalInfo[key] || additionalInfo[key]?.visible)
+            .map((key) => ({
+                name: `additional_info.${key}`,
+                label: key,
+            })), 'label') : [];
     }),
     tagsFilterItems: [] as MenuItem[],
 });
