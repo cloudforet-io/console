@@ -152,7 +152,7 @@ onMounted(() => {
                           size="full"
                           :title="state.sidebarTitle"
                           :hide-header="widgetGenerateState.overlayType === 'EXPAND'"
-                          @close="handleUpdateVisible"
+                          @close="handleCloseOverlay"
         >
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
             <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2"
