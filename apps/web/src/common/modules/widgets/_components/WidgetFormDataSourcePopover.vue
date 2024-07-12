@@ -187,6 +187,7 @@ const handleConfirmDataSource = async () => {
         if (createdWidget) {
             widgetGenerateStore.setWidgetForm(createdWidget);
         }
+        state.showPopover = false;
     }
 
     if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADDED) {
@@ -228,6 +229,7 @@ const handleConfirmDataSource = async () => {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
         });
+        state.showPopover = false;
         if (!widgetGenerateState.selectedDataTableId && result) {
             widgetGenerateStore.setSelectedDataTableId(result?.data_table_id);
             await widgetGenerateStore.loadDataTable({
@@ -235,7 +237,6 @@ const handleConfirmDataSource = async () => {
             });
         }
     }
-    state.showPopover = false;
     state.loading = false;
 };
 
