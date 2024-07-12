@@ -2,12 +2,15 @@
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
+
 import {
-    PPaneLayout, PToggleButton, PFieldTitle, PTextInput, PSelectDropdown, PI, PButton, PIconButton,
+    PPaneLayout, PToggleButton, PFieldTitle, PTextInput, PSelectDropdown, PI, PButton, PIconButton, PCheckbox, PLazyImg,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+
+import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 
 import { NOTIFY_LEVEL_MAP } from '@/services/cost-explorer/constants/anomaly-detection-constant';
 import type { NotificationRule } from '@/services/cost-explorer/types/anomaly-detection-type';
@@ -106,7 +109,7 @@ const handleDeleteRule = (index:number) => {
                 </div>
             </div>
             <div class="overflow-wrapper">
-                <div class="cost-wrapper notification-rules-wrapper"
+                <div class="notification-rules section-wrapper"
                      :class="{ disabled: !state.statusToggle }"
                 >
                     <p-field-title size="lg"
@@ -185,12 +188,27 @@ const handleDeleteRule = (index:number) => {
                     </div>
                 </div>
             </div>
-            <div class="cost-wrapper"
+            <div class="recipients section-wrapper"
                  :class="{ disabled: !state.statusToggle }"
             >
-                <p-field-title size="lg"
-                               :label="$t('IAM.DOMAIN_SETTINGS.RECIPIENTS')"
+                <div v-if="!state.statusToggle"
+                     class="disabled-layer"
                 />
+                <div class="recipient-header">
+                    <p-field-title size="lg"
+                                   class="mb-1"
+                                   :label="$t('IAM.DOMAIN_SETTINGS.RECIPIENTS')"
+                    />
+                    <p class="recipients-desc">
+                        {{ $t('IAM.DOMAIN_SETTINGS.ANOMALY_DETECTION_CONF_RECIPIENTS_DESC') }}
+                    </p>
+                </div>
+                <div class="check-role">
+                    <p-checkbox v-model="state.recipients" /><span class="owner-img"><p-lazy-img :src="WorkspaceOwnerImage"
+                                                                                                 width="1.25rem"
+                                                                                                 height="1.25rem"
+                    /></span><span class="owner-text">Workspace Owner Role</span>
+                </div>
             </div>
         </div>
     </p-pane-layout>
@@ -220,27 +238,27 @@ const handleDeleteRule = (index:number) => {
             overflow-x: auto;
         }
 
-        .notification-rules-wrapper {
-            min-width: 38.25rem;
+        .disabled-layer {
+            @apply absolute inset-0 bg-gray-150 rounded-lg;
+            opacity: 0.45;
+            z-index: 10;
+
+            &:hover {
+                cursor: not-allowed;
+            }
         }
-        .cost-wrapper {
+
+        .section-wrapper {
             @apply relative flex flex-col text-label-md border border-gray-200;
             padding: 1.5rem;
             gap: 1.5rem;
             border-radius: 0.375rem;
+        }
 
+        .notification-rules {
+            min-width: 38.25rem;
             .notification-rules-container {
                 @apply flex flex-col;
-
-                .disabled-layer {
-                    @apply absolute inset-0 bg-gray-150 rounded-lg;
-                    opacity: 0.45;
-                    z-index: 10;
-
-                    &:hover {
-                        cursor: not-allowed;
-                    }
-                }
 
                 .notification-align {
                     @apply grid gap-3;
@@ -258,6 +276,30 @@ const handleDeleteRule = (index:number) => {
 
                 .add-btn {
                     width: 6rem;
+                }
+            }
+        }
+
+        .recipients {
+            @apply relative flex flex-col text-label-md border border-gray-200;
+
+            .recipients-desc {
+                @apply text-paragraph-md text-gray-900;
+            }
+
+            .check-role {
+                @apply flex gap-1 items-center;
+
+                .owner-img {
+                    @apply rounded-full;
+                    overflow: hidden;
+                    display: inline-block;
+                    height: 1.25rem;
+                    width: 1.25rem;
+                }
+
+                .owner-text {
+                    @apply text-label-md text-gray-900;
                 }
             }
         }
