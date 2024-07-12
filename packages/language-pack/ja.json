@@ -1490,7 +1490,8 @@
 				"LESS_THAN_PREVIOUS_YEAR": "前年よりも少ない",
 				"MORE_THAN_PREVIOUS_DAY": "前日よりも多い",
 				"MORE_THAN_PREVIOUS_MONTH": "前月よりも多い",
-				"MORE_THAN_PREVIOUS_YEAR": "前年よりも多い"
+				"MORE_THAN_PREVIOUS_YEAR": "前年よりも多い",
+				"NO_CHANGE": "変化なし"
 			},
 			"NUMBER_FIELD_VALIDATION": "値は {max} 以下でなければなりません。",
 			"PERIOD": "期間",

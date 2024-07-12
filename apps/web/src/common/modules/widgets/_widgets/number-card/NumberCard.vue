@@ -34,6 +34,8 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { IconValue, ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
+import { gray } from '@/styles/colors';
+
 
 type Data = ListResponse<{
     [key: string]: string|number;
@@ -67,6 +69,9 @@ const state = reactive({
     iconName: computed<string|undefined>(() => (props.widgetOptions?.icon as IconValue)?.icon?.name),
     iconColor: computed<string>(() => (props.widgetOptions?.icon as IconValue)?.color),
     comparisonColor: computed<string|undefined>(() => {
+        const _comparison = state.currentValue - state.previousValue;
+        if (!_comparison) return gray[700];
+
         const _target = (props.widgetOptions?.comparison as ComparisonValue[])?.[0];
         if (state.currentValue > state.previousValue) {
             return _target?.increaseColor;
@@ -81,7 +86,8 @@ const state = reactive({
         if (state.previousValue > 0) {
             _percentage = (_comparison / state.previousValue * 100).toFixed(2);
         }
-        const _fixedAmount = numberFormatter(_comparison, { notation: 'compact' }) || '--';
+        let _fixedAmount = numberFormatter(_comparison, { notation: 'compact' });
+        if (!_fixedAmount || _fixedAmount === '0') _fixedAmount = '--';
         if (_format === 'all') {
             return `${_fixedAmount} (${_percentage}%)`;
         }
@@ -92,6 +98,8 @@ const state = reactive({
     }),
     comparisonText: computed(() => {
         const _comparison = state.currentValue - state.previousValue;
+        if (!_comparison) return i18n.t('COMMON.WIDGETS.NUMBER_CARD.NO_CHANGE');
+
         let _text;
         if (_comparison < 0) {
             if (state.granularity === 'YEARLY') {
@@ -197,7 +205,8 @@ defineExpose<WidgetExpose<Data>>({
             <div v-if="props.widgetOptions?.comparison"
                  class="comparison-wrapper"
             >
-                <p-i :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled-alt' : 'ic_caret-down-filled-alt'"
+                <p-i v-if="state.currentValue !== state.previousValue"
+                     :name="(state.currentValue > state.previousValue) ? 'ic_caret-up-filled-alt' : 'ic_caret-down-filled-alt'"
                      :color="state.comparisonColor"
                      width="1rem"
                      height="1rem"
@@ -229,7 +238,7 @@ defineExpose<WidgetExpose<Data>>({
         @apply text-paragraph-md text-gray-500;
     }
     .comparison-wrapper {
-        @apply text-label-sm;
+        @apply text-label-sm text-gray-700;
         padding-top: 0.5rem;
     }
 }
