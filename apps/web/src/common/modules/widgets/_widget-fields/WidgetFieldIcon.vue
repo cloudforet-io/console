@@ -3,7 +3,7 @@ import { onMounted, reactive, watch } from 'vue';
 
 import {
     PFieldTitle, PSelectDropdown, PToggleButton, PI, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';

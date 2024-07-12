@@ -37,8 +37,9 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { PBadge } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+
+import { PBadge } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

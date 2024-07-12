@@ -3,18 +3,6 @@ import { debouncedWatch } from '@vueuse/core';
 import { reactive, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import {
-    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge,
-} from '@spaceone/design-system';
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type {
-    DynamicLayoutEventListener, DynamicLayoutFetchOptions,
-    DynamicLayoutFieldHandler,
-} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
-import type {
-    DynamicLayout,
-    DynamicLayoutOptions,
-} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { isEmpty, get, cloneDeep } from 'lodash';
 
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
@@ -22,6 +10,18 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge,
+} from '@cloudforet/mirinae';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type {
+    DynamicLayoutEventListener, DynamicLayoutFetchOptions,
+    DynamicLayoutFieldHandler,
+} from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
+import type {
+    DynamicLayout,
+    DynamicLayoutOptions,
+} from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';

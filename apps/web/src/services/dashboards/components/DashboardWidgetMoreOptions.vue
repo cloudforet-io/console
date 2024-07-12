@@ -4,11 +4,12 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
+import { chain, cloneDeep, isEqual } from 'lodash';
+
 import {
     PButton, PContextMenu, useContextMenuController,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
-import { chain, cloneDeep, isEqual } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import type { WidgetOptionsSchemaProperty } from '@/schema/dashboard/_types/widget-type';
 

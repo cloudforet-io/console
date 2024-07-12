@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton, PHeading, PIconButton, screens,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 const props = defineProps<{
     title: TranslateResult;

@@ -2,9 +2,9 @@
 import { reactive, computed } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PHeading, PToggleButton, PButtonModal } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PHeading, PToggleButton, PButtonModal } from '@cloudforet/mirinae';
+
 
 import type {
     CostDataSourceUpdatePermissionsParameters,

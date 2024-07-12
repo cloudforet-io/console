@@ -7,7 +7,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PDivider, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';

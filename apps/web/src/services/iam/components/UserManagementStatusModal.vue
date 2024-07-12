@@ -5,12 +5,12 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import {
-    PStatus, PTableCheckModal,
-} from '@spaceone/design-system';
 import { cloneDeep, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PStatus, PTableCheckModal,
+} from '@cloudforet/mirinae';
 
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';

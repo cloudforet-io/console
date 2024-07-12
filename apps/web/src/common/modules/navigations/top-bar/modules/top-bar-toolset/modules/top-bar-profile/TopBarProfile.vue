@@ -6,10 +6,11 @@ import {
 import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import ejs from 'ejs';
+
 import {
     PI, PDivider, PButton, PCopyButton, PTooltip,
-} from '@spaceone/design-system';
-import ejs from 'ejs';
+} from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';

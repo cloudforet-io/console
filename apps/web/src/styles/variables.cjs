@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const spaceoneTailwindConfig = require('@spaceone/design-system/tailwind.config.cjs');
+const spaceoneTailwindConfig = require('@cloudforet/mirinae/tailwind.config.cjs');
 /**
  * Usage: https://github.com/postcss/postcss-simple-vars
  * */

@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PLazyImg, PI } from '@spaceone/design-system';
+import { PLazyImg, PI } from '@cloudforet/mirinae';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 

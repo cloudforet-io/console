@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 
-import { PI, PLazyImg } from '@spaceone/design-system';
+import { PI, PLazyImg } from '@cloudforet/mirinae';
 
 import type { LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
 

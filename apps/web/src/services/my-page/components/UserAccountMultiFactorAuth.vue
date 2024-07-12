@@ -5,7 +5,7 @@ import {
 
 import {
     PI, PTextInput, PFieldGroup, PToggleButton, PSelectDropdown, PFieldTitle,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

@@ -4,11 +4,11 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PDataTable } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PDataTable } from '@cloudforet/mirinae';
 import { byteFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';

@@ -6,12 +6,12 @@ import {
 import { color } from '@amcharts/amcharts5';
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import {
-    PDataLoader, PSkeleton,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
+import {
+    PDataLoader, PSkeleton,
+} from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';

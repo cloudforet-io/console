@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PEmpty, PButton } from '@spaceone/design-system';
+import { PEmpty, PButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

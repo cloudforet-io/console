@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PIconButton, PI, PToggleButton } from '@spaceone/design-system';
+import { PIconButton, PI, PToggleButton } from '@cloudforet/mirinae';
 
 import { MENU_ID } from '@/lib/menu/config';
 

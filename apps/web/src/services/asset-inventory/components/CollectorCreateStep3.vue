@@ -47,7 +47,7 @@ import { computed, reactive } from 'vue';
 
 import {
     PButton, PTextButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 

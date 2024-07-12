@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PEmpty } from '@spaceone/design-system';
+import { PEmpty } from '@cloudforet/mirinae';
 
 interface Props {
     inputText?: string;

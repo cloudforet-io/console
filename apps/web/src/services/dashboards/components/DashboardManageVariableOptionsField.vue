@@ -4,7 +4,7 @@ import draggable from 'vuedraggable';
 
 import {
     PButton, PFieldGroup, PIconButton, PTextInput, PI, useProxyValue,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import getRandomId from '@/lib/random-id-generator';
 import type { VariableModelConfigType } from '@/lib/variable-models';

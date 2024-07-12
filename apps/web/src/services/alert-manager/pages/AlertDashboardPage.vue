@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PHeading } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PHeading } from '@cloudforet/mirinae';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';

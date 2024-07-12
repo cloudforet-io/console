@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PBadge, PButton, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type {
     ProjectChannelSetSubscriptionParameters,

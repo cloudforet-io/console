@@ -2,13 +2,14 @@
 import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    PLink, PButton, PIconButton, PHeading, PLazyImg,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { render } from 'ejs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PLink, PButton, PIconButton, PHeading, PLazyImg,
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+
 
 import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';

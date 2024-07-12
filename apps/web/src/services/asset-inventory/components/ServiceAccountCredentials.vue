@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PPaneLayout, PHeading, PButton,
-} from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PPaneLayout, PHeading, PButton,
+} from '@cloudforet/mirinae';
 
 import type {
     ServiceAccountDeleteSecretDataParameters,

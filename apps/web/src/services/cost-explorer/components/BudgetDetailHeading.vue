@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PDivider, PHeading, PIconButton } from '@spaceone/design-system';
+import { PDivider, PHeading, PIconButton } from '@cloudforet/mirinae';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';

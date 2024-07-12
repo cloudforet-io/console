@@ -3,8 +3,8 @@ import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PCheckbox, PI, PRadio, PSelectDropdown, PTree, PBadge,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { SpaceRouter } from '@/router';
 

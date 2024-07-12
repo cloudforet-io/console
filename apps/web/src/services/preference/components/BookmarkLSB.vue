@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router/composables';
 
 import {
     PTextInput, PTextHighlighting, PEmpty,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

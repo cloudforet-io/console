@@ -1,4 +1,4 @@
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import type { ApiQueryHelper } from '@/space-connector/helper';
 import type { Query } from '@/space-connector/type';

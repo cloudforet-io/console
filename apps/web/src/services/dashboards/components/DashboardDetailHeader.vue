@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PSkeleton, PSelectDropdown, PButtonModal, PI, PBadge,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { PublicDashboardShareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/share';
 import type { PublicDashboardUnshareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/unshare';

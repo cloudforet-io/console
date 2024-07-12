@@ -3,9 +3,10 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
-import type { DATA_TYPE } from '@spaceone/design-system/types/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
+
+import { PButtonModal, PDatetimePicker, PFieldGroup } from '@cloudforet/mirinae';
+import type { DATA_TYPE } from '@cloudforet/mirinae/types/inputs/datetime-picker/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

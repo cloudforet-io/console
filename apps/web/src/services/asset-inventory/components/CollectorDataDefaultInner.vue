@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { PLazyImg } from '@spaceone/design-system';
+import { PLazyImg } from '@cloudforet/mirinae';
 
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import {

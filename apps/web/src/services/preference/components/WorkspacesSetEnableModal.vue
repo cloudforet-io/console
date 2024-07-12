@@ -2,12 +2,10 @@
 
 import { computed, reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PDataTable, PStatus,
-} from '@spaceone/design-system';
-
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+} from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';

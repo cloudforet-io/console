@@ -1,4 +1,4 @@
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import type { RoleType } from '@/schema/identity/role/type';
 import type { UserModel } from '@/schema/identity/user/model';

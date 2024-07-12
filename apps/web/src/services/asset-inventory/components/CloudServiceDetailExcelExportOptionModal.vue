@@ -3,11 +3,6 @@ import {
     defineProps, defineEmits, reactive, computed, watch,
 } from 'vue';
 
-import {
-    PButtonModal, PCheckboxGroup, PCheckbox, PDataLoader,
-} from '@spaceone/design-system';
-import type { DynamicField } from '@spaceone/design-system/src/data-display/dynamic/dynamic-field/type/field-schema';
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { cloneDeep } from 'lodash';
 
 import { isTableTypeInDynamicLayoutType } from '@cloudforet/core-lib/component-util/dynamic-layout';
@@ -15,6 +10,11 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+import {
+    PButtonModal, PCheckboxGroup, PCheckbox, PDataLoader,
+} from '@cloudforet/mirinae';
+import type { DynamicField } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportOption, ExportParameter } from '@/schema/_common/api-verbs/export';

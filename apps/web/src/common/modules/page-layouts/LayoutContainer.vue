@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { screens } from '@spaceone/design-system';
+import { screens } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

@@ -5,11 +5,12 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { isEmpty, startCase, toLower } from 'lodash';
+
 import {
     PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip, PLazyImg,
-} from '@spaceone/design-system';
-import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
-import { isEmpty, startCase, toLower } from 'lodash';
+} from '@cloudforet/mirinae';
+import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
 
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';

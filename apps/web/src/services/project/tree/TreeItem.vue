@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import type { SetupContext } from 'vue/types/v3-setup-context';
 
-import { PI, PSpinner } from '@spaceone/design-system';
+import { PI, PSpinner } from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

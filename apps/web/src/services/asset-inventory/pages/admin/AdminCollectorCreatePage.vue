@@ -55,7 +55,7 @@ export default defineComponent({
 // eslint-disable-next-line import/no-duplicates
 import { computed, reactive, defineExpose } from 'vue';
 
-import { PCenteredLayoutHeader } from '@spaceone/design-system';
+import { PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

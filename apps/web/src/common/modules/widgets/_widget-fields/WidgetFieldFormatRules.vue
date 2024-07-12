@@ -3,10 +3,11 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PButton, PFieldGroup, PIconButton, PTextInput,
-} from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';

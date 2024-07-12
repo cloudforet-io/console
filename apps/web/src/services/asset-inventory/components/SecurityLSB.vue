@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { PDataLoader } from '@spaceone/design-system';
+import { PDataLoader } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

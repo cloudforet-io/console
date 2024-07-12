@@ -4,13 +4,13 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    PStatus, PToolboxTable, PHeading, PTooltip, PButton,
-} from '@spaceone/design-system';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PStatus, PToolboxTable, PHeading, PTooltip, PButton,
+} from '@cloudforet/mirinae';
 
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';

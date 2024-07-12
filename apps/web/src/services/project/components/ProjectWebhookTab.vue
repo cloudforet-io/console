@@ -5,6 +5,13 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute } from 'vue-router/composables';
 
+
+import {
+    makeDistinctValueHandler, makeEnumValueHandler,
+} from '@cloudforet/core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable,
     PHeading,
@@ -15,16 +22,9 @@ import {
     PCopyButton,
     PSelectDropdown,
     PTableCheckModal,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
-
-import {
-    makeDistinctValueHandler, makeEnumValueHandler,
-} from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookDeleteParameters } from '@/schema/monitoring/webhook/api-verbs/delete';

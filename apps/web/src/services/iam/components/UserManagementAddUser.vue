@@ -5,12 +5,12 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown, PBadge,
-} from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown, PBadge,
+} from '@cloudforet/mirinae';
 
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';

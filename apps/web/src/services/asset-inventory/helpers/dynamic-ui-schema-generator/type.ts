@@ -1,5 +1,5 @@
-import type { ItemOptions } from '@spaceone/design-system/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { QuerySearchTableOptions } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { ItemOptions } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { QuerySearchTableOptions } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import type { SchemaModel } from '@/schema/identity/schema/model';
 

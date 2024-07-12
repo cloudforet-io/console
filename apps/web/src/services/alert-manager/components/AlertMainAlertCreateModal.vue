@@ -4,11 +4,11 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PButtonModal, PFieldGroup, PRadio, PTextarea, PTextInput,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { AlertCreateParameters } from '@/schema/monitoring/alert/api-verbs/create';
 import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';

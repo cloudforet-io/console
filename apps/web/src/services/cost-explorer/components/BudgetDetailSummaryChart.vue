@@ -4,9 +4,9 @@ import {
 } from 'vue';
 
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+import { PDataLoader, PSkeleton } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';

@@ -6,8 +6,8 @@ import type { Location } from 'vue-router/types/router';
 
 import {
     PPaneLayout, PLink, PI, PTextButton, PPopover,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 

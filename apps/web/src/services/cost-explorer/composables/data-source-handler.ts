@@ -1,10 +1,11 @@
-import type { KeyItem } from '@spaceone/design-system/src/inputs/search/query-search/type';
-import type { ValueHandler, KeyDataType } from '@spaceone/design-system/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { cloneDeep, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+import type { KeyItem } from '@cloudforet/mirinae/src/inputs/search/query-search/type';
+import type { ValueHandler, KeyDataType } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 

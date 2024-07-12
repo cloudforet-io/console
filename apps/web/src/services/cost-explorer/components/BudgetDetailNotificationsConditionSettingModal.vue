@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PButtonModal, PTextInput, PLink, PButton, PSelectDropdown, PIconButton,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';

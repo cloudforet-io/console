@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router/composables';
 
-import { PLazyImg, PTextButton } from '@spaceone/design-system';
-
+import { PLazyImg, PTextButton } from '@cloudforet/mirinae';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

@@ -52,11 +52,11 @@ import {
     computed, reactive, toRefs, watch, onMounted, onUnmounted, defineComponent,
 } from 'vue';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import {
     PI, PCheckbox, PTab,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
 import { store } from '@/store';
 

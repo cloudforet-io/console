@@ -4,7 +4,7 @@ import {
     computed, nextTick, reactive, ref, watch,
 } from 'vue';
 
-import { PI, screens } from '@spaceone/design-system';
+import { PI, screens } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

@@ -6,13 +6,14 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PButton, PSelectDropdown, PContextMenu, PIconButton, useContextMenuController,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import {
     cloneDeep, isEmpty, unset,
 } from 'lodash';
+
+import {
+    PFieldGroup, PButton, PSelectDropdown, PContextMenu, PIconButton, useContextMenuController,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 

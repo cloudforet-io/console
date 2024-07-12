@@ -6,7 +6,7 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PI, PLazyImg, PTooltip } from '@spaceone/design-system';
+import { PI, PLazyImg, PTooltip } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 
