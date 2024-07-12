@@ -3,11 +3,11 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectCard, PIconModal, PDefinitionTable, PButton, PLink,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { Tags } from '@/schema/_common/model';

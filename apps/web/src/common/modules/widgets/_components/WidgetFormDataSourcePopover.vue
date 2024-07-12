@@ -4,12 +4,12 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPopover, PSelectCard, PI,
-} from '@spaceone/design-system';
-import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
+} from '@cloudforet/mirinae';
+import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';

@@ -5,9 +5,9 @@ import {
 
 import {
     PI, PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton,
-} from '@spaceone/design-system';
-import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
@@ -135,12 +135,13 @@ const handleToggleWidth = () => {
              class="action-button-wrapper"
              :class="{ 'selected': state.etcMenuVisible }"
         >
-            <p-select-dropdown style-type="icon-button"
+            <p-select-dropdown style-type="tertiary-icon-button"
                                button-icon="ic_ellipsis-horizontal"
                                class="etc-button"
                                :menu="state.etcMenuItems"
                                :selected="[]"
                                :visible-menu.sync="state.etcMenuVisible"
+                               size="sm"
                                menu-position="right"
                                reset-selection-on-menu-close
                                @select="handleSelectEtcMenu"
@@ -321,9 +322,6 @@ const handleToggleWidth = () => {
         padding: 0.25rem;
         &.selected {
             display: block;
-        }
-        .etc-button {
-            @apply border border-gray-200 rounded-full;
         }
     }
 }

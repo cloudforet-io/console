@@ -3,8 +3,8 @@ import {
     computed, onMounted, reactive, ref, toRefs,
 } from 'vue';
 
-import { PTab, PI, PTooltip } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+import { PTab, PI, PTooltip } from '@cloudforet/mirinae';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import { store } from '@/store';
 

@@ -4,12 +4,12 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import {
-    PButton, PDataLoader, PDivider, PI, PPaneLayout, PBadge, PPopover, PTextButton,
-} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButton, PDataLoader, PDivider, PI, PPaneLayout, PBadge, PPopover, PTextButton,
+} from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';

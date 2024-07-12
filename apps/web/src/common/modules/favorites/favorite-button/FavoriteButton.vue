@@ -3,7 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PI } from '@spaceone/design-system';
+import { PI } from '@cloudforet/mirinae';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';

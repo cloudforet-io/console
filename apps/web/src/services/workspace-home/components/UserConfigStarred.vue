@@ -4,9 +4,9 @@ import { computed, reactive, watch } from 'vue';
 
 import {
     PFieldTitle, PSelectDropdown, PI, PPagination, PLink, screens,
-} from '@spaceone/design-system';
-import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 

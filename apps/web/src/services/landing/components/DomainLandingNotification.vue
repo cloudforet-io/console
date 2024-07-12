@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PI, PLink } from '@spaceone/design-system';
+import { PI, PLink } from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';

@@ -21,7 +21,7 @@ import { useRouter } from 'vue-router/composables';
 
 import {
     PButton, PHeading,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

@@ -4,7 +4,7 @@ import type { Location } from 'vue-router';
 
 import {
     PDivider, PI, PBadge,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 

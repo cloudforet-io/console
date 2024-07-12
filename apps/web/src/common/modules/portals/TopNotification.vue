@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PNotificationBar } from '@spaceone/design-system';
+import { PNotificationBar } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

@@ -3,7 +3,7 @@ import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PButton, screens, PTextButton } from '@spaceone/design-system';
+import { PButton, screens, PTextButton } from '@cloudforet/mirinae';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 

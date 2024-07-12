@@ -3,10 +3,6 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import {
-    PSelectButton, PCollapsibleToggle, PDataTable, PI, PIconButton, PSkeleton, PSelectDropdown, PLazyImg,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import type { LineSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
@@ -15,6 +11,10 @@ import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PSelectButton, PCollapsibleToggle, PDataTable, PI, PIconButton, PSkeleton, PSelectDropdown, PLazyImg,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';

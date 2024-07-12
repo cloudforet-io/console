@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import {
     PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -68,6 +68,10 @@ const state = reactive({
         {
             name: 'title',
             label: 'Title',
+        },
+        {
+            name: 'webhook_id',
+            label: 'Webhook ID',
         },
         {
             name: 'description',

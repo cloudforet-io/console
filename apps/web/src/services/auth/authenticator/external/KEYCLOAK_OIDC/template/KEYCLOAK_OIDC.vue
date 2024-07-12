@@ -18,7 +18,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PButton } from '@spaceone/design-system';
+import { PButton } from '@cloudforet/mirinae';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 

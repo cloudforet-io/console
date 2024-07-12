@@ -101,11 +101,11 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PCollapsibleToggle, PI, PIconButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

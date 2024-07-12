@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PI, PTooltip } from '@spaceone/design-system';
+import { PI, PTooltip } from '@cloudforet/mirinae';
 
 import { gray, peacock } from '@/styles/colors';
 

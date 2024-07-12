@@ -3,8 +3,9 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { get } from 'lodash';
+
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 

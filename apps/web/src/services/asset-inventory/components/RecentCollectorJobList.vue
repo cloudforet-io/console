@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import dayjs from 'dayjs';
+
 import {
     PTooltip, PI, PEmpty, PLink, PDataLoader,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import dayjs from 'dayjs';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

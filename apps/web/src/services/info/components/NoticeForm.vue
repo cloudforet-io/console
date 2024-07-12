@@ -8,8 +8,8 @@ import {
     PFieldGroup,
     PPaneLayout, PRadio, PRadioGroup,
     PTextInput,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';

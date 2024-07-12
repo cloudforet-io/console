@@ -5,8 +5,9 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { getTextHighlightRegex, PDataLoader, PDivider } from '@spaceone/design-system';
 import { debounce } from 'lodash';
+
+import { getTextHighlightRegex, PDataLoader, PDivider } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

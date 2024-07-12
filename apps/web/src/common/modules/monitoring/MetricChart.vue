@@ -4,9 +4,6 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import {
-    PDataLoader, PSkeleton, PSpinner, PTooltip,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import type { LineSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
@@ -15,6 +12,9 @@ import type {
 } from 'echarts/core';
 import { isEmpty, throttle } from 'lodash';
 
+import {
+    PDataLoader, PSkeleton, PSpinner, PTooltip,
+} from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { MonitoringResourceType, Unit } from '@/common/components/charts/metric-chart/type';

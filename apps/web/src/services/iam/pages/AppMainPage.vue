@@ -3,10 +3,11 @@ import {
     computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PHorizontalLayout, PHeading, PButton, PTab,
-} from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';

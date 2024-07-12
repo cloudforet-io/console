@@ -3,12 +3,13 @@ import {
     computed, onMounted, reactive, toRef, watch,
 } from 'vue';
 
+import { debounce } from 'lodash';
+
 import {
     PFieldTitle, PContextMenu, useContextMenuController,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { debounce } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 

@@ -3,12 +3,12 @@
 import { computed, reactive, watch } from 'vue';
 import draggable from 'vuedraggable';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PButtonModal, PCheckbox, PDataLoader, PSearch,
-} from '@spaceone/design-system';
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
+} from '@cloudforet/mirinae';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

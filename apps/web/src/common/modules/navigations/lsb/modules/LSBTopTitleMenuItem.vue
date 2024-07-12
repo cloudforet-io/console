@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PLazyImg } from '@spaceone/design-system';
+import { PLazyImg } from '@cloudforet/mirinae';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 

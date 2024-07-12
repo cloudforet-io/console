@@ -1,4 +1,4 @@
-import { getTextHighlightRegex } from '@spaceone/design-system';
+import { getTextHighlightRegex } from '@cloudforet/mirinae';
 
 import type {
     ListResponse, ListQuery, IEnumVariableModel,

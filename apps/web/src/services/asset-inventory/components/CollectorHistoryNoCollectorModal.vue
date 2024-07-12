@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { PButtonModal, PI } from '@spaceone/design-system';
+import { PButtonModal, PI } from '@cloudforet/mirinae';
 
 const props = defineProps<{
     visible?: boolean;

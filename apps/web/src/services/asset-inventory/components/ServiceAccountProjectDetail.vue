@@ -29,8 +29,8 @@ import { computed, reactive, toRefs } from 'vue';
 
 import {
     PLink, PI, PTooltip,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { SpaceRouter } from '@/router';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';

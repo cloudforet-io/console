@@ -44,11 +44,11 @@
 import type { SetupContext } from 'vue';
 import { defineComponent } from 'vue';
 
-import {
-    PBadge,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+import {
+    PBadge,
+} from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 interface Props {

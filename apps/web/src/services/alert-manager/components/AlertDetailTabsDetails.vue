@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { map } from 'lodash';
+
 import {
     PDefinitionTable, PHeading,
-} from '@spaceone/design-system';
-import { map } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

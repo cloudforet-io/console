@@ -37,7 +37,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PI, PLink } from '@spaceone/design-system';
+import { PI, PLink } from '@cloudforet/mirinae';
 
 export default {
     name: 'InfoButton',

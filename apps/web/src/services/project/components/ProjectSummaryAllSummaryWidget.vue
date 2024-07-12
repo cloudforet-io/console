@@ -7,9 +7,6 @@ import type { Location } from 'vue-router';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import {
-    PBalloonTab, PSelectButton, PDataLoader, PSkeleton, PSpinner,
-} from '@spaceone/design-system';
 import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
 import {
@@ -20,6 +17,9 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PBalloonTab, PSelectButton, PDataLoader, PSkeleton, PSpinner,
+} from '@cloudforet/mirinae';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';

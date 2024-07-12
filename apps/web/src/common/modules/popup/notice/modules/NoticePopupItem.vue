@@ -2,11 +2,10 @@
 import { computedAsync } from '@vueuse/core';
 import { reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PDivider, PButton,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+} from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';

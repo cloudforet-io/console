@@ -3,11 +3,11 @@ import {
     reactive, watch,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { EventRuleCreateParameters } from '@/schema/monitoring/event-rule/api-verbs/create';
 import type { EventRuleGetParameters } from '@/schema/monitoring/event-rule/api-verbs/get';

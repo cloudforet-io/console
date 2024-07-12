@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PButton, PCollapsibleToggle, PFieldGroup, PI, PTextInput, PTextButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 // CAUTION: To prevent the issue of i18n imported in the template not being applied in the 'script setup' structure.

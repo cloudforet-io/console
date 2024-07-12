@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import {
-    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier,
-} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier,
+} from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

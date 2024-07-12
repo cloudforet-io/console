@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router/composables';
 
 import {
     PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

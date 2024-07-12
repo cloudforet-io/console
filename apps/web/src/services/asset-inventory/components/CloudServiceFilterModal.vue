@@ -67,10 +67,11 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { sum } from 'lodash';
+
 import {
     PButtonModal, PCollapsibleList, PTag,
-} from '@spaceone/design-system';
-import { sum } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

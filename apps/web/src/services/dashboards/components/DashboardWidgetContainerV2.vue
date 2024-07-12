@@ -4,10 +4,10 @@ import {
     reactive, ref, watch, computed, onBeforeUnmount,
 } from 'vue';
 
-import { PDataLoader, PEmpty, PButton } from '@spaceone/design-system';
 import { debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PDataLoader, PEmpty, PButton } from '@cloudforet/mirinae';
 
 import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';

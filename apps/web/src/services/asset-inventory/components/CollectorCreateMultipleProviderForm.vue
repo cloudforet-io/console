@@ -44,7 +44,7 @@ import {
 
 import {
     PFieldTitle, PRadioGroup, PRadio, PSelectDropdown,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';

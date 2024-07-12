@@ -4,12 +4,12 @@ import {
     computed, reactive, onMounted,
 } from 'vue';
 
-import { PButton, PHeading, PDataLoader } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PButton, PHeading, PDataLoader } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

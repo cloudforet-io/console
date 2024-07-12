@@ -62,9 +62,9 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PI, PProgressBar, PLink } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+import { PI, PProgressBar, PLink } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';

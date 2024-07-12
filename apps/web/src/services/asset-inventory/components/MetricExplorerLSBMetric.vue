@@ -4,11 +4,12 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { isEmpty } from 'lodash';
+
 import {
     PDataLoader, PIconButton, PLazyImg, PSearch, PEmpty, PTooltip,
-} from '@spaceone/design-system';
-import type { TreeDisplayMap, TreeNode } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
-import { isEmpty } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -145,8 +146,11 @@ watch(() => route.params, () => {
 }, { immediate: true });
 
 /* Watcher */
-watch(() => storeState.selectedNamespace, (selectedNamespace) => {
-    if (!isEmpty(selectedNamespace)) metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
+watch(() => storeState.selectedNamespace, async (selectedNamespace) => {
+    if (!isEmpty(selectedNamespace)) {
+        await allReferenceStore.load('metric', { force: true });
+        await metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
+    }
 }, { immediate: true });
 </script>
 

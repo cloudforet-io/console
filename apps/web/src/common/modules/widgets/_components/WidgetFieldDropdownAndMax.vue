@@ -6,8 +6,8 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput, PTooltip, PI,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 

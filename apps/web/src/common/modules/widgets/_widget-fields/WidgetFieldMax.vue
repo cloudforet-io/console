@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive } from 'vue';
 
-import { PFieldGroup, PTextInput } from '@spaceone/design-system';
+import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { MaxOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';

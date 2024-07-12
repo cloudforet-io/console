@@ -3,7 +3,7 @@ import { computed, onMounted, reactive } from 'vue';
 
 import {
     PTextInput, PFieldGroup, PRadio, PDivider, PRadioGroup, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

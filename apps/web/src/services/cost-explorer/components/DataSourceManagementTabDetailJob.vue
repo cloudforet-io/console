@@ -3,14 +3,14 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PButtonModal,
     PToolboxTable, PHeading, PI, PTextEditor,
-} from '@spaceone/design-system';
-import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+} from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { CostJobStatus } from '@/schema/cost-analysis/job/type';
 import { i18n } from '@/translations';

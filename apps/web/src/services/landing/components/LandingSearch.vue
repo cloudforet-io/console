@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PSearch } from '@spaceone/design-system';
+import { PSearch } from '@cloudforet/mirinae';
 
 const emit = defineEmits<{(e: 'search', value: string): void;
 }>();

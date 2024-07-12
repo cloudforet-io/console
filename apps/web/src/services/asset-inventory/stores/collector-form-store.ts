@@ -1,7 +1,7 @@
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type {

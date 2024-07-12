@@ -1,7 +1,8 @@
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
-import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
+
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import type {

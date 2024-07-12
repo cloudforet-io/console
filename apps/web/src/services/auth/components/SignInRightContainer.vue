@@ -37,7 +37,7 @@ import type { Vue } from 'vue/types/vue';
 
 import {
     PI, screens,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

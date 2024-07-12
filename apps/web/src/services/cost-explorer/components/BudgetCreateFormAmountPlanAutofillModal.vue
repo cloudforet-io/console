@@ -3,8 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
-
+import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';

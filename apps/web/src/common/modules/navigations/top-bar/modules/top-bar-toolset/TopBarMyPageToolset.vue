@@ -17,7 +17,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PTooltip } from '@spaceone/design-system';
+import { PTooltip } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

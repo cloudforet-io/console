@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import dayjs from 'dayjs';
+
 import {
     PButtonModal, PFieldGroup, PDatetimePicker, useProxyValue,
-} from '@spaceone/design-system';
-import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
-import dayjs from 'dayjs';
+} from '@cloudforet/mirinae';
+import { DATA_TYPE } from '@cloudforet/mirinae/src/inputs/datetime-picker/type';
 
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 

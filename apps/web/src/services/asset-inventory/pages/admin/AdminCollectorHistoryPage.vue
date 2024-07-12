@@ -4,12 +4,6 @@ import {
 } from 'vue';
 import type { RawLocation } from 'vue-router';
 
-import {
-    PHeading, PPagination, PLazyImg, PLink,
-    PSelectButtonGroup, PStatus, PToolboxTable,
-} from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
@@ -19,6 +13,12 @@ import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-searc
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PHeading, PPagination, PLazyImg, PLink,
+    PSelectButtonGroup, PStatus, PToolboxTable,
+} from '@cloudforet/mirinae';
+import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';

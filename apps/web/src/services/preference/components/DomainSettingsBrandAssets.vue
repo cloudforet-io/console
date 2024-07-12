@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PPaneLayout, PFieldTitle, PTextInput, PButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

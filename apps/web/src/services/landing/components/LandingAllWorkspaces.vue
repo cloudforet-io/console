@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { sortBy } from 'lodash';
+
 import {
     PFieldTitle, PButton,
-} from '@spaceone/design-system';
-import { sortBy } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 

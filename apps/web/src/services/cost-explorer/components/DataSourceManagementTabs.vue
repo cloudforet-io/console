@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PTab } from '@spaceone/design-system';
+import { PTab } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

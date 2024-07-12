@@ -49,7 +49,7 @@ export const getWidgetBasedOnDate = (granularity: string, end?: string): string 
  * @description Get date fields based on granularity, start, end
  * @example ('MONTHLY', '2024-03', '2024-06') ['2024-03', '2024-04', '2024-05', '2024-06']
  */
-export const getWidgetDateFields = (granularity: string, start: string, end: string): string[] => {
+export const getWidgetDateFields = (granularity: string, start?: string, end?: string): string[] => {
     const _timeUnit = getTimeUnit(granularity);
     const _dateFormat = getDateFormat(granularity);
 
@@ -78,10 +78,10 @@ export const getWidgetDateRange = (granularity: string, basedOnDate: string, sub
 
 export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, field: string, val?: string) => {
     if (!val) return '';
-    if (field === 'Workspace') {
+    if (field === 'Workspace' || field === 'workspace_id') {
         return allReferenceTypeInfo.workspace.referenceMap[val]?.label ?? val;
     }
-    if (field === 'Project') {
+    if (field === 'Project' || field === 'project_id') {
         return allReferenceTypeInfo.project.referenceMap[val]?.label ?? val;
     }
     if (field === 'Region') {

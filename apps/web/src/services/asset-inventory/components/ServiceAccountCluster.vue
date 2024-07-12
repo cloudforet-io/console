@@ -5,7 +5,7 @@ import {
 
 import {
     PPaneLayout, PHeading, PButton, PEmpty, PDataLoader, PButtonModal, PDoubleCheckModal, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import type { AgentModel } from '@/schema/identity/agent/model';
 import { i18n as _i18n } from '@/translations';
