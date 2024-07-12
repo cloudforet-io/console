@@ -23,6 +23,7 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<IconOptions, Ic
     widgetFieldSchema: () => ({
         options: {
             default: 'ic_circle-filled',
+            toggle: false,
         },
     }),
 });
@@ -32,7 +33,7 @@ const DEFAULT_COLOR:string = gray[900];
 
 const state = reactive({
     proxyValue: useProxyValue<IconValue|undefined>('value', props, emit),
-    toggleValue: !!props.value,
+    toggleValue: props.widgetFieldSchema.options?.toggle ?? false,
     visibleMenu: false,
     selectedIcon: DEFAULT_ICON as Icon,
     iconList: [
@@ -118,7 +119,7 @@ const checkValue = ():boolean => {
 watch(() => state.proxyValue, (changed) => {
     if (changed === undefined) state.toggleValue = false;
     emit('update:is-valid', checkValue());
-}, { immediate: true });
+});
 
 const initValue = () => {
     if (props.value !== undefined) {

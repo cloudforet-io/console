@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptio
 });
 
 const state = reactive({
-    toggleValue: !!props.value,
+    toggleValue: !!props.widgetFieldSchema.options?.toggle ?? false,
     proxyValue: useProxyValue<ComparisonValue[]|undefined>('value', props, emit),
     // compareWith: computed(() => {
     //     const granularity = props.widgetFieldSchema.options?.granularity ?? GRANULARITY.DAILY;
@@ -96,7 +96,7 @@ const checkValue = ():boolean => {
 watch(() => state.proxyValue, (changed) => {
     if (changed === undefined) state.toggleValue = false;
     emit('update:is-valid', checkValue());
-}, { immediate: true });
+});
 
 const initValue = () => {
     if (props.value !== undefined) {
