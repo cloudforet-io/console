@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, onUnmounted, reactive,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
@@ -8,18 +10,21 @@ import {
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PSelectDropdown, PStatus, PToolboxTable, PLink, PSelectStatus,
+    PSelectDropdown, PStatus, PToolboxTable, PLink, PSelectStatus, PI, PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type {
     ValueItem,
 } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
-import { iso8601Formatter } from '@cloudforet/utils';
+import { iso8601Formatter, numberFormatter } from '@cloudforet/utils';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -28,8 +33,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
+import { gray } from '@/styles/colors';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
 import {
     EXCEL_TABLE_FIELDS,
     WORKSPACE_SEARCH_HANDLERS, WORKSPACE_STATE,
@@ -51,6 +60,8 @@ const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
 
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
+const costReportPageStore = useCostReportPageStore();
+const constReportPageGetters = costReportPageStore.getters;
 
 const route = useRoute();
 
@@ -75,6 +86,7 @@ const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
     selectedType: computed<string>(() => workspacePageState.selectedType),
     searchFilters: computed<ConsoleFilter[]>(() => workspacePageState.searchFilters),
+    currency: computed<Currency|undefined>(() => constReportPageGetters.currency),
 });
 const state = reactive({
     typeField: computed<ValueItem[]>(() => ([
@@ -123,14 +135,32 @@ const handleSelectDropdown = (name: string) => {
 
 const handleSelectType = async (value: string) => {
     const filters = workspaceListApiQueryHelper.filters;
-    const statusFilter = storeState.searchFilters.findIndex((filter) => filter.k === 'state');
-    if (statusFilter === -1) {
-        filters.push({ k: 'state', v: value, o: '=' });
-    } else if (value === 'ALL') {
-        filters.splice(statusFilter, 1);
+    const statusFilterIndex = storeState.searchFilters.findIndex((filter) => filter.k === 'state');
+    const dormantFilterIndex = storeState.searchFilters.findIndex((filter) => filter.k === 'is_dormant');
+
+    const isDormantSelected = value === WORKSPACE_STATE.DORMANT;
+    const isAllSelected = value === 'ALL';
+
+    if (isDormantSelected) {
+        if (statusFilterIndex !== -1) filters.splice(statusFilterIndex, 1);
+        if (dormantFilterIndex === -1) {
+            filters.push({ k: 'is_dormant', v: true, o: '=' });
+        } else {
+            filters[dormantFilterIndex].v = true;
+        }
     } else {
-        filters[statusFilter].v = value;
+        if (dormantFilterIndex !== -1) filters.splice(dormantFilterIndex, 1);
+        if (statusFilterIndex === -1 && !isAllSelected) {
+            filters.push({ k: 'state', v: value, o: '=' });
+        } else if (statusFilterIndex !== -1) {
+            if (isAllSelected) {
+                filters.splice(statusFilterIndex, 1);
+            } else {
+                filters[statusFilterIndex].v = value;
+            }
+        }
     }
+
     workspaceListApiQueryHelper.setFilters(filters);
     workspacePageStore.$patch((_state) => {
         _state.selectedType = value;
@@ -178,6 +208,20 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
     params: {
         workspaceId: item?.workspace_id,
     },
+});
+const getServiceAccountRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
+    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+    params: {
+        workspaceId: item?.workspace_id,
+    },
+});
+
+onMounted(async () => {
+    await costReportPageStore.fetchCostReportConfig();
+});
+
+onUnmounted(async () => {
+    await costReportPageStore.$reset();
 });
 </script>
 
@@ -229,6 +273,41 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
                                    @select="handleSelectDropdown"
                 />
             </template>
+            <template #th-state-format="{ field }">
+                <div class="th-tooltip">
+                    <span>{{ field.label }}</span>
+                    <p-tooltip
+                        :contents="$t('IAM.WORKSPACES.TOOLTIP_STATE')"
+                        position="bottom"
+                        class="tooltip-wrapper"
+                        content-class="custom-tooltip-content"
+                    >
+                        <p-i name="ic_info-circle"
+                             class="title-tooltip"
+                             height="1rem"
+                             width="1rem"
+                             :color="gray[500]"
+                        />
+                    </p-tooltip>
+                </div>
+            </template>
+            <template #th-cost_info-format="{ field }">
+                <div class="th-tooltip">
+                    <span>{{ field.label }}</span>
+                    <p-tooltip
+                        :contents="$t('IAM.WORKSPACES.TOOLTIP_COST')"
+                        position="bottom"
+                        class="tooltip-wrapper"
+                    >
+                        <p-i name="ic_info-circle"
+                             class="title-tooltip"
+                             height="1rem"
+                             width="1rem"
+                             :color="gray[500]"
+                        />
+                    </p-tooltip>
+                </div>
+            </template>
             <template #col-name-format="{value, item}">
                 <div class="col-name">
                     <workspace-logo-icon :text="value"
@@ -243,16 +322,31 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
                 </div>
             </template>
             <template #col-state-format="{value}">
-                <p-status v-bind="userStateFormatter(value)"
+                <p-status v-bind="workspaceStateFormatter(value)"
                           class="capitalize"
                 />
             </template>
             <template #col-users-format="{value, item}">
                 <p-link :text="value"
                         action-icon="internal-link"
+                        :disabled="item.state === WORKSPACE_STATE.DISABLE || item.is_dormant"
                         new-tab
                         :to="getUserRouteLocationByWorkspaceName(item)"
                 />
+            </template>
+            <template #col-service_account_count-format="{value, item}">
+                <p-link :text="value || 0"
+                        action-icon="internal-link"
+                        :disabled="item.state === WORKSPACE_STATE.DISABLE || item.is_dormant"
+                        new-tab
+                        :to="getServiceAccountRouteLocationByWorkspaceName(item)"
+                />
+            </template>
+            <template #col-cost_info-format="{value}">
+                <p>
+                    <span>{{ CURRENCY_SYMBOL[storeState.currency] }}</span>
+                    {{ numberFormatter(value?.month) || 0 }}
+                </p>
             </template>
             <template #col-created_at-format="{value}">
                 {{ iso8601Formatter(value, storeState.timezone) }}
@@ -276,6 +370,23 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
         margin-top: -0.5rem;
         margin-left: 1rem;
         margin-bottom: 1rem;
+    }
+    .th-tooltip {
+        @apply flex items-center;
+        gap: 0.25rem;
+        .tooltip-wrapper {
+            margin-top: -0.125rem;
+        }
+    }
+}
+</style>
+
+<style lang="postcss">
+/* custom design-system component - p-tooltip */
+.p-tooltip {
+    .tooltip-inner {
+        white-space: pre-line;
+        max-width: 16rem;
     }
 }
 </style>

@@ -16,4 +16,11 @@ export interface WorkspaceModel {
     role_id?: string;
     role_type?: string;
     role_name?: string;
+    is_dormant?: boolean;
+    dormant_ttl?: number;
+    service_account_count?: number;
+    cost_info?: {
+        month: number;
+        day: number;
+    };
 }
