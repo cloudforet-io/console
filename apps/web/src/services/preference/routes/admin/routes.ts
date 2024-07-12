@@ -12,6 +12,7 @@ const DomainSettingsContainer = () => import('@/services/preference/components/D
 const AdminDomainSettingsBaseInformationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsDomainInformationPage.vue');
 const AdminDomainSettingsBrandAssetsPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsAppearancePage.vue');
 const AdminDomainSettingsAutoDormancyConfigurationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsAutoDormancyConfigurationPage.vue');
+const AdminDomainSettingsAnomalyDetectionConfigurationPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsAnomalyDetectionConfigurationPage.vue');
 const WorkspacesPage = () => import('@/services/preference/pages/admin/AdminWorkspacesPage.vue');
 const BookmarkContainer = () => import('@/services/preference/components/BookmarkContainer.vue');
 const BookmarkPage = () => import('@/services/preference/pages/admin/AdminBookmarkPage.vue');
@@ -111,6 +112,12 @@ const adminPreferenceRoutes: RouteConfig = {
                     name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME),
                     meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.AUTO_DORMANCY_CONFIGURATION].translationId },
                     component: AdminDomainSettingsAutoDormancyConfigurationPage,
+                },
+                {
+                    path: '/anomaly-detection-configuration',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME),
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION].translationId },
+                    component: AdminDomainSettingsAnomalyDetectionConfigurationPage,
                 },
             ],
         },

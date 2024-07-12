@@ -969,6 +969,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"ADD": "추가",
 			"DOWNLOAD": "다운로드",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "데스크탑",
@@ -1644,6 +1645,19 @@
 			"UNABLE_TO_LOAD_WIDGET": "위젯 표시 불가"
 		}
 	},
+	"COST_EXPLORER": {
+		"ANOMALY_DETECTION": {
+			"NOTIFICATION_RULES": {
+				"AMOUNT": "",
+				"NOTIFY_LEVEL": "",
+				"SELECT_LEVEL": "",
+				"SELECT_UNIT": "",
+				"THRESHOLD": "",
+				"UNIT": "",
+				"VARIATION": ""
+			}
+		}
+	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
 			"CREATE": "생성",
@@ -2243,6 +2257,11 @@
 			"ALT_S_UPDATE_DORMANCY": "",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "타임존 & 언어 수정 완료",
 			"APPEARANCE": "",
+			"ANOMALY_DETECTION_CONFIGURATION": "",
+			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "",
+			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "",
+			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "",
+			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "",
 			"AUTO_DORMANCY_CONFIGURATION": "",
 			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "",
 			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "비용 리포트",
@@ -2263,6 +2282,8 @@
 			"DOMAIN_NAME_IMAGE_DESCRIPTION": "",
 			"EMAIL_INVALID": "잘못된 이메일 형식입니다.",
 			"LANGUAGE": "언어",
+			"NOTIFICATION_RULES": "",
+			"RECIPIENTS": "",
 			"SAVE_CHANGE": "변경사항 저장",
 			"SAVE_CHANGES": "변경사항 저장",
 			"SEND_CODE": "인증 코드 전송",
