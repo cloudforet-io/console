@@ -1411,6 +1411,8 @@
 					"RESET_DESC": "Resetting the data options will revert all inputs to their most recent values. This action cannot be undone.",
 					"RESET_HEADER": "Are you sure you want to reset the data options?"
 				},
+				"EMPTY_DESC": "Click the [+] button to add new data or transform data using various methods such as Concatenate, Join, Query, and Evaluate.",
+				"EMPTY_TITLE": "Add Data to Get Started",
 				"FORM": {
 					"ADDITIONAL_LABELS": "Additional Labels",
 					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "This name is already being used.",
@@ -1442,6 +1444,7 @@
 					"UPDATE_DATA_TALBE_INVALID_WARNING": "Unable to apply changes. Please check the form.",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "'{first_data}' cannot be joined with '{second_data}' because the two data tables have one or more identical data fields."
 				},
+				"GUIDE_LINK_TEXT": "How to create a widget?",
 				"TRANSFORM": "Transform Data"
 			},
 			"DEFAULT_WIDTH": "Default Width",
