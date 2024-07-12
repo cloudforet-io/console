@@ -193,7 +193,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="sidebar-contents">
+    <div class="sidebar-contents"
+         :class="{ 'expand': widgetGenerateState.overlayType === 'EXPAND' }"
+    >
         <div class="left-part">
             <div class="dashboard-settings-wrapper">
                 <div class="toolbox-wrapper">
@@ -313,6 +315,12 @@ onUnmounted(() => {
                     height: 100%;
                 }
             }
+        }
+    }
+    &.expand {
+        .left-part {
+            @apply border-none;
+            padding: 1.5rem 0;
         }
     }
 }
