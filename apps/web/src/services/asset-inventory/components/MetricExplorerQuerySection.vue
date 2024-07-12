@@ -7,11 +7,11 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPopover, PBadge, PTooltip, PIconButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { MetricRunParameters } from '@/schema/inventory/metric/api-verbs/run';
 

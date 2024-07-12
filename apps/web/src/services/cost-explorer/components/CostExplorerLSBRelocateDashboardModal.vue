@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router/composables';
 
-import { PButton, PDivider } from '@spaceone/design-system';
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { PButton, PDivider } from '@cloudforet/mirinae';
+
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 

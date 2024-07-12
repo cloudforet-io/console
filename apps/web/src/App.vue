@@ -6,11 +6,11 @@ import {
 import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar, PDataLoader,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
 import { store } from '@/store';
 

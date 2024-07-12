@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PDataLoader, PTextButton, PI } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
+
+import { PDataLoader, PTextButton, PI } from '@cloudforet/mirinae';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 

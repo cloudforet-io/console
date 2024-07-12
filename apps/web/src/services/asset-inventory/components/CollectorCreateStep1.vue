@@ -71,13 +71,13 @@ import {
     onMounted, reactive, watch, ref,
 } from 'vue';
 
-import {
-    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle, PEmpty,
-} from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle, PEmpty,
+} from '@cloudforet/mirinae';
 
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

@@ -5,11 +5,12 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { clone, isEmpty } from 'lodash';
+
 import {
     PI, screens, PButton, PTextButton, PTooltip,
-} from '@spaceone/design-system';
-import type { ContextMenuType } from '@spaceone/design-system/src/inputs/context-menu/type';
-import { clone, isEmpty } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { ContextMenuType } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import { store } from '@/store';
 

@@ -2,10 +2,11 @@
 import { computed, reactive, onMounted } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { range } from 'lodash';
+
 import {
     PRadio, PSelectButton, PSelectDropdown,
-} from '@spaceone/design-system';
-import { range } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import type { ChannelSchedule, ChannelScheduleDayOfWeek } from '@/schema/notification/type';
 import { store } from '@/store';

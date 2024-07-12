@@ -3,19 +3,19 @@ import {
     onMounted, computed, reactive, watch,
 } from 'vue';
 
-import { PToolbox, PButton, PDataLoader } from '@spaceone/design-system';
-import type {
-    KeyItemSet,
-    QueryItem,
-    ValueHandler,
-    ValueHandlerMap,
-} from '@spaceone/design-system/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PToolbox, PButton, PDataLoader } from '@cloudforet/mirinae';
+import type {
+    KeyItemSet,
+    QueryItem,
+    ValueHandler,
+    ValueHandlerMap,
+} from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

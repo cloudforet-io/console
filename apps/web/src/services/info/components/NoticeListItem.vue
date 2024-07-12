@@ -4,8 +4,9 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PI, PSkeleton, PBadge } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+
+import { PI, PSkeleton, PBadge } from '@cloudforet/mirinae';
 
 import type { PostModel } from '@/schema/board/post/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';

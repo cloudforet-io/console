@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { PSelectDropdown } from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PSelectDropdown } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';

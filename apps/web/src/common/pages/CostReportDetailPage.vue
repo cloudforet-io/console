@@ -2,12 +2,12 @@
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PLink, PDataTable, PIconButton } from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep, sortBy, sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PLink, PDataTable, PIconButton } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';

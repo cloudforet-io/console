@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PToolbox } from '@spaceone/design-system';
-import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { PToolbox } from '@cloudforet/mirinae';
+import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+
 
 import CloudServiceExcelExportOptionModal from '@/services/asset-inventory/components/CloudServiceExcelExportOptionModal.vue';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';

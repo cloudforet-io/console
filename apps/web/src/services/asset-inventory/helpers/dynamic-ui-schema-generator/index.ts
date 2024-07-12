@@ -1,7 +1,7 @@
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserConfigCreateParameters } from '@/schema/config/user-config/api-verbs/create';

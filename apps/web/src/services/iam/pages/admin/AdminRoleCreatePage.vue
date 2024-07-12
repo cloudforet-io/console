@@ -2,9 +2,9 @@
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PHeading, PButton } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PHeading, PButton } from '@cloudforet/mirinae';
+
 
 import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
 import type { RoleModel } from '@/schema/identity/role/model';

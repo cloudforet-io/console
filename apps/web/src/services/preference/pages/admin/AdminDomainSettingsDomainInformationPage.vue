@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PPaneLayout, PFieldTitle, PCopyButton, PButton, PSelectDropdown,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { map } from 'lodash';
+
+import {
+    PPaneLayout, PFieldTitle, PButton, PSelectDropdown,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

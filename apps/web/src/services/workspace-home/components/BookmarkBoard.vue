@@ -6,9 +6,9 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PLazyImg, PI, PEmpty, PCheckbox, PBoardItem, PSelectDropdown,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
-import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';

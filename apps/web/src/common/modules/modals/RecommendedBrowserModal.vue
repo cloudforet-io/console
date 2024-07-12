@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, computed } from 'vue';
 
-import { PButtonModal, PCheckbox } from '@spaceone/design-system';
-
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+import { PButtonModal, PCheckbox } from '@cloudforet/mirinae';
+
 
 import { i18n } from '@/translations';
 

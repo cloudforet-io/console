@@ -5,13 +5,14 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import {
-    PBadge, PButtonModal, PPaneLayout, PIconButton, PI,
-} from '@spaceone/design-system';
-import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import { find, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PBadge, PButtonModal, PPaneLayout, PIconButton, PI,
+} from '@cloudforet/mirinae';
+import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
+
 
 import type { ProjectDeleteParameters } from '@/schema/identity/project/api-verbs/delete';
 import type { ProjectModel } from '@/schema/identity/project/model';

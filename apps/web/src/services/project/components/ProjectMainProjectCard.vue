@@ -3,7 +3,7 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PI, PBadge, PTextHighlighting } from '@spaceone/design-system';
+import { PI, PBadge, PTextHighlighting } from '@cloudforet/mirinae';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';

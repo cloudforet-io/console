@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PTextarea, PFieldGroup,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';

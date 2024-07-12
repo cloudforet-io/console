@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { PButton, PSkeleton, PDivider } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+
+import { PButton, PSkeleton, PDivider } from '@cloudforet/mirinae';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { languages } from '@/store/modules/user/config';

@@ -3,12 +3,12 @@ import {
     reactive, onActivated,
 } from 'vue';
 
-import {
-    PHorizontalLayout, PHeading,
-} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PHorizontalLayout, PHeading,
+} from '@cloudforet/mirinae';
 
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 import type { JobModel } from '@/schema/inventory/job/model';

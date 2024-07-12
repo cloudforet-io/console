@@ -3,11 +3,12 @@ import {
     computed, defineEmits, reactive, watch,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PTextButton, PSelectDropdown, PStatus, PDataLoader,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

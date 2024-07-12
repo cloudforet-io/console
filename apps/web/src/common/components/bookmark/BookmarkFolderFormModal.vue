@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';

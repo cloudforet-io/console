@@ -3,10 +3,10 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';

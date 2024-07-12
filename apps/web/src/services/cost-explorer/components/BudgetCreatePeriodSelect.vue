@@ -3,8 +3,9 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+
+import { PDatetimePicker, PFieldGroup } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

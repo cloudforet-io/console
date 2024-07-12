@@ -4,7 +4,7 @@ import {
     reactive,
 } from 'vue';
 
-import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
+import { PPaneLayout, PStatus, PI } from '@cloudforet/mirinae';
 
 
 import type { JobModel } from '@/schema/inventory/job/model';

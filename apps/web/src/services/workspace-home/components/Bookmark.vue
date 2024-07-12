@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { screens } from '@spaceone/design-system';
+import { screens } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

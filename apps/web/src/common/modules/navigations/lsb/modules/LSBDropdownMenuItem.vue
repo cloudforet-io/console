@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PSelectDropdown } from '@spaceone/design-system';
+import { PSelectDropdown } from '@cloudforet/mirinae';
 
 import type { LSBItem } from '@/common/modules/navigations/lsb/type';
 

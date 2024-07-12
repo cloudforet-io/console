@@ -5,11 +5,6 @@ import {
 
 import { Root } from '@amcharts/amcharts5';
 import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
-import {
-    PSelectButton, PDatePagination, PDataTable, PSkeleton, PTextButton, PI, PTooltip,
-} from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
-import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import {
@@ -17,6 +12,11 @@ import {
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PSelectButton, PDatePagination, PDataTable, PSkeleton, PTextButton, PI, PTooltip,
+} from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import type { SelectButtonType } from '@cloudforet/mirinae/types/inputs/buttons/select-button-group/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';

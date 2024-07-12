@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 
 import {
     PDivider, PFieldTitle, PLink, PSpinner,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

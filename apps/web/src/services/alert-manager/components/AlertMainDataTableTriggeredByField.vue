@@ -4,11 +4,11 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PLink } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { PLink } from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+
+
 
 import type { ReferenceItem } from '@/store/reference/type';
 

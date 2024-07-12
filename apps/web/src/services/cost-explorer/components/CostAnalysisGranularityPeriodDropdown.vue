@@ -3,11 +3,12 @@ import {
     computed, reactive,
 } from 'vue';
 
+import dayjs from 'dayjs';
+
 import {
     PSelectDropdown, PBadge,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import dayjs from 'dayjs';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 

@@ -1,4 +1,4 @@
-import type { DynamicFieldProps } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type';
+import type { DynamicFieldProps } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type';
 
 import { SpaceRouter } from '@/router';
 

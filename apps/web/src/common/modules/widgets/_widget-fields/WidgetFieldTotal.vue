@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive } from 'vue';
 
-import { PFieldTitle, PToggleButton, PCheckbox } from '@spaceone/design-system';
+import { PFieldTitle, PToggleButton, PCheckbox } from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { TotalOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';

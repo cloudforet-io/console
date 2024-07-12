@@ -2,16 +2,16 @@
 import { reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PFieldGroup, PEmpty, PSelectDropdown, PFieldTitle, PToggleButton, PDivider, PButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';

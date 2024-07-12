@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import {
-    PButton, PPaneLayout, PSelectDropdown, PI, PBadge,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+import {
+    PButton, PPaneLayout, PSelectDropdown, PI, PBadge,
+} from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';

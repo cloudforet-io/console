@@ -4,12 +4,12 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    PI, PIconButton, PPaneLayout, PButton,
-} from '@spaceone/design-system';
 import { get } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PI, PIconButton, PPaneLayout, PButton,
+} from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';

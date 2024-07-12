@@ -6,6 +6,8 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { sumBy } from 'lodash';
+
 import {
     PButton,
     PFieldTitle,
@@ -16,10 +18,9 @@ import {
     PContextMenu,
     useContextMenuController,
     PSelectButtonGroup,
-} from '@spaceone/design-system';
-import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
-import type { ValueItem } from '@spaceone/design-system/src/inputs/search/query-search/type';
-import { sumBy } from 'lodash';
+} from '@cloudforet/mirinae';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { ValueItem } from '@cloudforet/mirinae/src/inputs/search/query-search/type';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';

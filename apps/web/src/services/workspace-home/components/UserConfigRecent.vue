@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PFieldTitle } from '@spaceone/design-system';
+import { PFieldTitle } from '@cloudforet/mirinae';
 
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';

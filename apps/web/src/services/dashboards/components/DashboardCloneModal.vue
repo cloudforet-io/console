@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';

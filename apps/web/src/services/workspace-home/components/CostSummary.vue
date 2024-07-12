@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PDivider, PFieldTitle, PLink, PSpinner,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { isEmpty, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PDivider, PFieldTitle, PLink, PSpinner,
+} from '@cloudforet/mirinae';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { UserConfigModel } from '@/schema/config/user-config/model';

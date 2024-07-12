@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PI } from '@spaceone/design-system';
 import { get, filter } from 'lodash';
+
+import { PI } from '@cloudforet/mirinae';
 
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 

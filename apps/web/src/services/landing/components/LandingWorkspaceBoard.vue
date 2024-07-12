@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router/composables';
 
-import { PBoard, PI } from '@spaceone/design-system';
-import { BOARD_STYLE_TYPE } from '@spaceone/design-system/src/data-display/board/type';
+import { PBoard, PI } from '@cloudforet/mirinae';
+import { BOARD_STYLE_TYPE } from '@cloudforet/mirinae/src/data-display/board/type';
 
 
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';

@@ -4,11 +4,12 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea, PButtonModal,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';

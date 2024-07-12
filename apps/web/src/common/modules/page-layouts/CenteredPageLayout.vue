@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PCenteredLayout } from '@spaceone/design-system';
+import { PCenteredLayout } from '@cloudforet/mirinae';
 
 import { ROOT_ROUTE } from '@/router/constant';
 

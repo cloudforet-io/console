@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PDataLoader, PDivider,
-    PPagination, PToolbox,
-    PButton,
-} from '@spaceone/design-system';
-import type { ValueItem } from '@spaceone/design-system/src/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PDataLoader, PDivider,
+    PPagination, PToolbox,
+    PButton,
+} from '@cloudforet/mirinae';
+import type { ValueItem } from '@cloudforet/mirinae/src/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 
 import {
     PI, PTooltip, PFieldTitle, PToggleButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

@@ -4,13 +4,13 @@ import {
     defineProps, nextTick, reactive, ref,
 } from 'vue';
 
-import { PDataLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader, PSkeleton, PProgressBar } from '@cloudforet/mirinae';
 
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 

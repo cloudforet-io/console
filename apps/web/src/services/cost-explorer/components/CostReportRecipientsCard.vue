@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PTooltip, PI, PToggleButton, PLink,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import type {

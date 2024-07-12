@@ -92,12 +92,12 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 import type { Vue } from 'vue/types/vue';
 
-import { PButton, PDataLoader, PIconButton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButton, PDataLoader, PIconButton } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import type { UserProfileResetPasswordParameters } from '@/schema/identity/user-profile/api-verbs/reset-password';

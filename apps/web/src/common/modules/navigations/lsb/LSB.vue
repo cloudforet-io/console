@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router/composables';
 
 import {
     PI, PLazyImg,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import getRandomId from '@/lib/random-id-generator';

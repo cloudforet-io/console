@@ -3,11 +3,13 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PTextarea, PTextInput,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+
 
 import type { WorkspaceCreateParameters } from '@/schema/identity/workspace/api-verbs/create';
 import type { WorkspaceUpdateParameters } from '@/schema/identity/workspace/api-verbs/update';

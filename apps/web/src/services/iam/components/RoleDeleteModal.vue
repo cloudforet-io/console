@@ -3,9 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PDataTable } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PDataTable } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
