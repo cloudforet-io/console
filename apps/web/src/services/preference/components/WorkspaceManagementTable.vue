@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router/composables';
 import {
     getApiQueryWithToolboxOptions,
 } from '@cloudforet/core-lib/component-util/toolbox';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PSelectDropdown, PStatus, PToolboxTable, PLink, PSelectStatus,
@@ -72,6 +73,8 @@ if (route.query.selectedWorkspaceId) {
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    selectedType: computed<string>(() => workspacePageState.selectedType),
+    searchFilters: computed<ConsoleFilter[]>(() => workspacePageState.searchFilters),
 });
 const state = reactive({
     typeField: computed<ValueItem[]>(() => ([
@@ -80,7 +83,6 @@ const state = reactive({
         { label: i18n.t('IAM.WORKSPACES.DISABLE') as string, name: WORKSPACE_STATE.DISABLE },
         { label: i18n.t('IAM.WORKSPACES.DORMANT') as string, name: WORKSPACE_STATE.DORMANT },
     ])),
-    selectedType: 'ALL',
 });
 
 const dropdownMenu = computed<MenuItem[]>(() => ([
@@ -120,7 +122,21 @@ const handleSelectDropdown = (name: string) => {
 };
 
 const handleSelectType = async (value: string) => {
-    state.selectedType = value;
+    const filters = workspaceListApiQueryHelper.filters;
+    const statusFilter = storeState.searchFilters.findIndex((filter) => filter.k === 'state');
+    if (statusFilter === -1) {
+        filters.push({ k: 'state', v: value, o: '=' });
+    } else if (value === 'ALL') {
+        filters.splice(statusFilter, 1);
+    } else {
+        filters[statusFilter].v = value;
+    }
+    workspaceListApiQueryHelper.setFilters(filters);
+    workspacePageStore.$patch((_state) => {
+        _state.selectedType = value;
+        _state.searchFilters = workspaceListApiQueryHelper.filters;
+    });
+    await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
 };
 const handleSelect = (index: number[]) => {
     workspacePageStore.$patch({ selectedIndices: index });
@@ -196,7 +212,7 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
                     <span class="mr-2">{{ $t('IAM.WORKSPACES.STATE') }}</span>
                     <p-select-status v-for="(item, idx) in state.typeField"
                                      :key="idx"
-                                     :selected="state.selectedType"
+                                     :selected="storeState.selectedType"
                                      class="mr-2"
                                      :value="item.name"
                                      @change="handleSelectType"
