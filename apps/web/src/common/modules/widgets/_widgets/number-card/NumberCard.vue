@@ -188,6 +188,12 @@ defineExpose<WidgetExpose<Data>>({
                       :class="[props.size]"
                 >{{ numberFormatter(state.currentValue, { notation: 'compact' }) }}</span>
             </div>
+            <div v-if="state.currentValue && state.currentValue > 1000"
+                 class="original-value"
+                 :class="state.iconName && 'pl-10'"
+            >
+                ({{ numberFormatter(state.currentValue) }})
+            </div>
             <div v-if="props.widgetOptions?.comparison"
                  class="comparison-wrapper"
             >
@@ -218,6 +224,9 @@ defineExpose<WidgetExpose<Data>>({
                 font-size: 8rem;
             }
         }
+    }
+    .original-value {
+        @apply text-paragraph-md text-gray-500;
     }
     .comparison-wrapper {
         @apply text-label-sm;
