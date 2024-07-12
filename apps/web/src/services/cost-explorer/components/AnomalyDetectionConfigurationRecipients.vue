@@ -4,8 +4,8 @@ import { useRoute } from 'vue-router/composables';
 
 import {
     PHeading, PButton, PDefinitionTable, PBadge,
-} from '@spaceone/design-system';
-import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
+} from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 
 import AnomalyDetectionConfigurationRecipientsForm
     from '@/services/cost-explorer/components/AnomalyDetectionConfigurationRecipientsForm.vue';

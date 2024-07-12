@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PHeading } from '@spaceone/design-system';
+import { PHeading } from '@cloudforet/mirinae';
 
 import AnomalyDetectionPolicyRuleCard from '@/services/cost-explorer/components/AnomalyDetectionPolicyRuleCard.vue';
 </script>

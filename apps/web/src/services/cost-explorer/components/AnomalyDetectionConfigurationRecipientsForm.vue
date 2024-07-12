@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import {
-    PFieldGroup, PSelectDropdown, PTextHighlighting, PBadge, PButton,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PFieldGroup, PSelectDropdown, PTextHighlighting, PBadge, PButton,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';

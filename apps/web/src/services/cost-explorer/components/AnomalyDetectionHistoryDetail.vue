@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
     PLink,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import AnomalyDetectionHistoryDetailTrend
     from '@/services/cost-explorer/components/AnomalyDetectionHistoryDetailTrend.vue';

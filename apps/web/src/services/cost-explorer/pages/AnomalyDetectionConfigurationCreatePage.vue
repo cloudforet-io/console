@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PHeading, PButton } from '@spaceone/design-system';
+import { PHeading, PButton } from '@cloudforet/mirinae';
 
 import AnomalyDetectionConfigurationInformation
     from '@/services/cost-explorer/components/AnomalyDetectionConfigurationInformation.vue';

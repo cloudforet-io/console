@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router/composables';
 
-import { PHeading, PButton } from '@spaceone/design-system';
+import { PHeading, PButton } from '@cloudforet/mirinae';
 
 import AnomalyDetectionConfigurationTable
     from '@/services/cost-explorer/components/AnomalyDetectionConfigurationTable.vue';
