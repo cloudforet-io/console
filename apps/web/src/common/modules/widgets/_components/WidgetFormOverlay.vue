@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -127,6 +127,11 @@ const handleWatchOptionsChanged = (isChanged: boolean) => {
 const handleEditWidget = () => {
     widgetGenerateStore.setOverlayType('EDIT');
 };
+const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.code === 'Escape' && widgetGenerateState.overlayType === 'EXPAND') {
+        widgetGenerateStore.setShowOverlay(false);
+    }
+};
 
 /* Watcher */
 watch(() => widgetGenerateState.showOverlay, async (val) => {
@@ -136,6 +141,10 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
     } else if (val && widgetGenerateState.overlayType !== 'ADD') {
         await widgetGenerateStore.listDataTable();
     }
+});
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeyDown);
 });
 </script>
 
