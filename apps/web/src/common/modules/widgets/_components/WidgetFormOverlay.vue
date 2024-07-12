@@ -5,7 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, PButtonModal, POverlayLayout,
+    PButton, PButtonModal, POverlayLayout, PTextButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -65,6 +65,11 @@ const state = reactive({
         return '';
     }),
     isWidgetOptionsChanged: false,
+    guideLink: computed(() => {
+        const locale = i18n.locale;
+        if (locale === 'en') return 'https://cloudforet.io/docs/guides/dashboards';
+        return `https://cloudforet.io/${i18n.locale}/docs/guides/dashboards`;
+    }),
 });
 
 /* Api */
@@ -129,6 +134,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
         widgetGenerateStore.setShowOverlay(false);
     }
 };
+const handleClickGuideLink = () => { window.open(state.guideLink, '_blank'); };
+
 
 /* Watcher */
 watch(() => widgetGenerateState.showOverlay, async (val) => {
@@ -154,6 +161,18 @@ onMounted(() => {
                           :hide-header="widgetGenerateState.overlayType === 'EXPAND'"
                           @close="handleCloseOverlay"
         >
+            <template #title-right-extra>
+                <div v-if="widgetGenerateState.overlayType !== 'EDIT'"
+                     class="guide-button-wrapper"
+                >
+                    <p-text-button style-type="highlight"
+                                   icon-right="ic_external-link"
+                                   @click="handleClickGuideLink"
+                    >
+                        {{ $t('COMMON.WIDGETS.DATA_TABLE.GUIDE_LINK_TEXT') }}
+                    </p-text-button>
+                </div>
+            </template>
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
             <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2"
                                        @watch-options-changed="handleWatchOptionsChanged"
@@ -197,5 +216,8 @@ onMounted(() => {
     justify-content: right;
     gap: 0.5rem;
     padding-right: 1.5rem;
+}
+.guide-button-wrapper {
+    padding-left: 0.5rem;
 }
 </style>

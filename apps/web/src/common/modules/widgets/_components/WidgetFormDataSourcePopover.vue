@@ -431,7 +431,7 @@ watch(() => state.showPopover, (val) => {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        width: 21.5rem;
+        width: 26rem;
         padding: 1rem;
     }
     .data-source-popper-operator-wrapper {
