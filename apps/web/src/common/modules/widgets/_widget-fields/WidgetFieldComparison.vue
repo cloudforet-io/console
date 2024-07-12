@@ -93,10 +93,9 @@ const checkValue = ():boolean => {
     return true;
 };
 
-watch(() => state.proxyValue, (changed) => {
-    if (changed === undefined) state.toggleValue = false;
+watch(() => state.proxyValue, () => {
     emit('update:is-valid', checkValue());
-});
+}, { immediate: true });
 
 const initValue = () => {
     if (props.value !== undefined) {
