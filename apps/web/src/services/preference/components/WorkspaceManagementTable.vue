@@ -269,6 +269,7 @@ onUnmounted(async () => {
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :menu="dropdownMenu"
                                    reset-selection-on-menu-close
+                                   reset-selected-on-unmounted
                                    :placeholder="$t('IAM.WORKSPACES.ACTION')"
                                    @select="handleSelectDropdown"
                 />
@@ -321,8 +322,8 @@ onUnmounted(async () => {
                     />
                 </div>
             </template>
-            <template #col-state-format="{value}">
-                <p-status v-bind="workspaceStateFormatter(value)"
+            <template #col-state-format="{value, item}">
+                <p-status v-bind="workspaceStateFormatter(item.is_dormant ? WORKSPACE_STATE.DORMANT : value)"
                           class="capitalize"
                 />
             </template>

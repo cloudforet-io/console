@@ -2635,18 +2635,20 @@
 			"CREATE_WORKSPACE": "Create Workspace",
 			"CREATE_WORKSPACE_TEXT_LENGTH": "80 characters is the max length of a workspace name.",
 			"DELETE": "Delete",
-			"DELETE_WORKSPACE": "Delete",
-			"DELETE_WORKSPACE_DESC": "You cannot undo this action.",
+			"DELETE_WORKSPACE": "Delete Workspace",
+			"DELETE_WORKSPACE_DESC": "Are you sure you want to delete the workspace below?\nYou can’t undo this action.",
 			"DETAIL": {
 				"USERS": "Users"
 			},
 			"DISABLE": "Disabled",
-			"DISABLE_WORKSPACE": "Are you sure you want to disable the selected workspace?",
+			"DISABLE_WORKSPACE": "Disable Workspace",
+			"DISABLE_WORKSPACE_DESC": "Are you sure you want to disable the workspace below?",
 			"DORMANT": "Dormant",
 			"EDIT": "Edit",
 			"EDIT_WORKSPACE": "Edit Workspace",
 			"ENABLE": "Enabled",
-			"ENABLE_WORKSPACE": "Are you sure you want to enable the selected workspace?",
+			"ENABLE_WORKSPACE": "Enable Workspace",
+			"ENABLE_WORKSPACE_DESC": "Are you sure you want to enable the workspace below?",
 			"FORM": {
 				"DUPLICATED_NAME": "Workspace name is duplicated.",
 				"LABEL_DESC": "Description",
@@ -2658,6 +2660,8 @@
 			},
 			"REQUIRED_ENABLE_WORKSPACE": "At least one workspace must be enabled.",
 			"STATE": "State",
+			"TOOLTIP_COST": "based on Cost Report",
+			"TOOLTIP_STATE": "With ‘Auto Dormancy Configuration’ turned on, workspaces with a total cost lower than the user-defined threshold will automatically be set to dormant. The threshold can be changed in [Preferences > Domain Settings > Auto Dormancy Configuration].",
 			"WORKSPACES": "Workspaces"
 		}
 	},

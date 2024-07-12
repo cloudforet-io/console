@@ -24,7 +24,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { gray } from '@/styles/colors';
 
-import { getWorkspaceInfo } from '@/services/preference/composables/bookmark-data-helper';
+import { getWorkspaceInfo } from '@/services/preference/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
