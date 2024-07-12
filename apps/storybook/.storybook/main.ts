@@ -17,6 +17,7 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/data-display/collapsible/collapsible-panel/**/*.mdx',
     '../../../packages/mirinae/src/data-display/collapsible/collapsible-toggle/**/*.mdx',
     '../../../packages/mirinae/src/data-display/dynamic/dynamic-field/**/*.mdx',
+    '../../../packages/mirinae/src/data-display/dynamic/dynamic-layout/**/*.mdx',
     '../../../packages/mirinae/src/data-display/board/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/badge/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/board-item/**/*.stories.@(js|jsx|ts|tsx)',
@@ -25,6 +26,7 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/data-display/collapsible/collapsible-panel/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/collapsible/collapsible-toggle/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/dynamic/dynamic-field/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/data-display/dynamic/dynamic-layout/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
@@ -32,7 +34,8 @@ const config: StorybookConfig = {
     getAbsolutePath("@storybook/addon-interactions"),
     getAbsolutePath("@storybook/addon-designs"),
     getAbsolutePath("@storybook/addon-storysource"),
-    getAbsolutePath("@storybook/addon-a11y")
+    getAbsolutePath("@storybook/addon-a11y"),
+    getAbsolutePath("@storybook/addon-mdx-gfm"),
   ],
   framework: {
     name: getAbsolutePath("@storybook/vue-vite") as "@storybook/vue-vite",

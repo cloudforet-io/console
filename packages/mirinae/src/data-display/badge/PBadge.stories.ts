@@ -53,7 +53,8 @@ const Template: Story = {
                     :shape="shape"
                     :font-weight="fontWeight"
                 >{{$props.defaultSlot}}</p-badge>
-            </div>`,
+            </div>
+        `,
     }),
 };
 
