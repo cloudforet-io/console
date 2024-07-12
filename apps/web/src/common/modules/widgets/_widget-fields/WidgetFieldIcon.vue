@@ -38,6 +38,8 @@ const state = reactive({
     iconList: [
         { name: 'ic_circle-filled', label: 'Circle' },
         { name: 'ic_coin-filled', label: 'Coin' },
+        { name: 'ic_yen-filled', label: 'Yen' },
+        { name: 'ic_won-filled', label: 'Won' },
         { name: 'ic_lock-filled', label: 'Lock' },
         { name: 'ic_spanner-filled', label: 'Spanner' },
         { name: 'ic_home-filled', label: 'Home' },
