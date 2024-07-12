@@ -2,13 +2,13 @@
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    PSelectDropdown, PBadge, PEmpty, PButton, PTextHighlighting,
-} from '@spaceone/design-system';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSelectDropdown, PBadge, PEmpty, PButton, PTextHighlighting,
+} from '@cloudforet/mirinae';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';

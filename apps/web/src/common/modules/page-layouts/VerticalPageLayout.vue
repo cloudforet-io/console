@@ -5,7 +5,7 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { PVerticalLayout } from '@spaceone/design-system';
+import { PVerticalLayout } from '@cloudforet/mirinae';
 
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 

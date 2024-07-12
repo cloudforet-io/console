@@ -2,7 +2,7 @@
 import { reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PIconButton, PI } from '@spaceone/design-system';
+import { PIconButton, PI } from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 
 import {
     PIconButton, PI, PTextInput, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

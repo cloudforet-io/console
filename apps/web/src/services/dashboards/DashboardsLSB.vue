@@ -6,7 +6,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PIconButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';

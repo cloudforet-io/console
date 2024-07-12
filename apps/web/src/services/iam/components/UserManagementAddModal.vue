@@ -4,10 +4,10 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PButtonModal } from '@spaceone/design-system';
 import { cloneDeep, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButtonModal } from '@cloudforet/mirinae';
 
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';

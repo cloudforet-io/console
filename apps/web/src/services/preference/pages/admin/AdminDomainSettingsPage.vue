@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {
     PHeading,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
 

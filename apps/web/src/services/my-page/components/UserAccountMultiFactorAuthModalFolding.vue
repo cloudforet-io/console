@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PTextButton, PCollapsibleToggle } from '@spaceone/design-system';
+import { PTextButton, PCollapsibleToggle } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

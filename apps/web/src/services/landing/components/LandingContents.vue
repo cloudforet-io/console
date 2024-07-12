@@ -5,10 +5,11 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { sortBy } from 'lodash';
+
 import {
     PButton, PDataLoader, PDivider, screens,
-} from '@spaceone/design-system';
-import { sortBy } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';

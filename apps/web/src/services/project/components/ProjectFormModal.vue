@@ -2,13 +2,14 @@
 import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    PButtonModal, PFieldGroup, PI, PSelectDropdown, PTextInput,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PButtonModal, PFieldGroup, PI, PSelectDropdown, PTextInput,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
 import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';

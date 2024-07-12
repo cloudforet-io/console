@@ -3,11 +3,12 @@ import {
     computed, reactive,
 } from 'vue';
 
+import { sortBy } from 'lodash';
+
 import {
     PFieldTitle, PContextMenu,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { sortBy } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 

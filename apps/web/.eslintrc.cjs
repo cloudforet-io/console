@@ -20,7 +20,7 @@ module.exports = {
                         position: 'before',
                     },
                     {
-                        pattern: '{@spaceone/design-system/**}',
+                        pattern: '{@cloudforet/mirinae/**}',
                         group: 'external',
                         position: 'after',
                     },

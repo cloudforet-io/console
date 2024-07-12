@@ -4,7 +4,7 @@ import {
     computed, onUnmounted, reactive,
 } from 'vue';
 
-import { screens } from '@spaceone/design-system';
+import { screens } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

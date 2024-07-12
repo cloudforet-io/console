@@ -4,13 +4,13 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PFieldGroup, PTextInput, PJsonSchemaForm,
-} from '@spaceone/design-system';
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PFieldGroup, PTextInput, PJsonSchemaForm,
+} from '@cloudforet/mirinae';
+import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { NotificationLevel } from '@/schema/notification/notification/type';

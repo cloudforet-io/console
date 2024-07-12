@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {
     PPaneLayout,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 interface Props {
     displayBlockInMobile?: boolean;

@@ -1,4 +1,4 @@
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import type { Tags } from '@/schema/_common/model';
 import type { MonitoringType } from '@/schema/monitoring/data-source/type';

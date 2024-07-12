@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { PFieldGroup, PTextInput } from '@spaceone/design-system';
-
+import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';

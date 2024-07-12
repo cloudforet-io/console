@@ -26,7 +26,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton, PCenteredLayoutHeader,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';

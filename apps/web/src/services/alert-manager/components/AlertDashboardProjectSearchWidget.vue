@@ -4,15 +4,15 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import {
-    PPaneLayout, PToolbox, PI, PDataLoader,
-} from '@spaceone/design-system';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PPaneLayout, PToolbox, PI, PDataLoader,
+} from '@cloudforet/mirinae';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

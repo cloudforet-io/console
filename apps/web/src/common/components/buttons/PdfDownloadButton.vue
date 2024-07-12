@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TranslateResult } from 'vue-i18n';
 
-import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
+import { PPopover, PIconButton, PButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

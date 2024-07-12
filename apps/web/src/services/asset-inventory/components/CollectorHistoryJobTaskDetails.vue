@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onActivated, reactive } from 'vue';
 
-import { PTab } from '@spaceone/design-system';
+import { PTab } from '@cloudforet/mirinae';
 
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 import { i18n } from '@/translations';

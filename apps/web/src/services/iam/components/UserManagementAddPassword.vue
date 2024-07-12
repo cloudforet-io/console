@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PTextInput, PFieldGroup, PToggleButton, PDivider, PFieldTitle, PButton, PCopyButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

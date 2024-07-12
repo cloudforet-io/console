@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PPaneLayout, PHeading } from '@spaceone/design-system';
+import { PPaneLayout, PHeading } from '@cloudforet/mirinae';
 
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';

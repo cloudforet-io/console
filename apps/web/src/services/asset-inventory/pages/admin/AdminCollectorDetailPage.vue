@@ -93,12 +93,12 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import {
-    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal,
-} from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal,
+} from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import type { CollectorDeleteParameters } from '@/schema/inventory/collector/api-verbs/delete';

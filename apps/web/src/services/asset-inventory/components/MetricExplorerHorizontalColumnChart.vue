@@ -1,98 +1,151 @@
 <script lang="ts" setup>
+import { useResizeObserver } from '@vueuse/core/index';
 import {
-    nextTick, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 
-import type * as am5xy from '@amcharts/amcharts5/xy';
-import { cloneDeep, isEmpty } from 'lodash';
+import type { LineSeriesOption } from 'echarts/charts';
+import type { EChartsType } from 'echarts/core';
+import { init } from 'echarts/core';
+import {
+    isEmpty, orderBy, sum, throttle,
+} from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
 
-import { useAmcharts5 } from '@/common/composables/amcharts5';
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 
-import type { RealtimeChartData } from '@/services/asset-inventory/types/asset-analysis-type';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import {
+    getReferenceLabel,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
+
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+import {
+    useAllReferenceTypeInfoStore,
+} from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
 interface Props {
     loading: boolean;
-    chart: null | am5xy.XYChart;
-    chartData: RealtimeChartData[];
-    colorSet?: string[];
+    data?: AnalyzeResponse<MetricDataAnalyzeResult>;
+    legend?: Record<string, boolean>;
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
-    chart: null,
-    chartData: () => ([]),
-    legends: () => ([]),
-    colorSet: () => ([]),
+    data: () => ({}),
+    legend: () => ({}),
 });
-const emit = defineEmits<{(e: 'update:chart', value): void;
+const emit = defineEmits<{(event: 'update:legends', val: Record<string, boolean>): void;
 }>();
-
+const LIMIT = 15;
 const chartContext = ref<HTMLElement | null>(null);
-const chartHelper = useAmcharts5(chartContext);
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+const storeState = reactive({
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
+});
+const state = reactive({
+    proxyLegend: useProxyValue('legend', props, emit),
+    chart: null as EChartsType | null,
+    yAxisData: [],
+    chartData: [],
+    parsedGroupBy: computed<string>(() => metricExplorerPageState.selectedChartGroupBy?.replace('labels.', '') || ''),
+    chartOptions: computed<LineSeriesOption>(() => ({
+        grid: {
+            left: 0,
+            right: '25%',
+            containLabel: true,
+        },
+        legend: {
+            type: 'scroll',
+            show: true,
+            icon: 'circle',
+            orient: 'vertical',
+            itemWidth: 10,
+            itemHeight: 10,
+            left: '77%',
+            top: 0,
+            selected: state.proxyLegend,
+            formatter: (val) => getReferenceLabel(storeState.allReferenceTypeInfo, state.parsedGroupBy, val),
+        },
+        tooltip: {
+            formatter: (params) => {
+                const _name = getReferenceLabel(storeState.allReferenceTypeInfo, state.parsedGroupBy, params.name);
+                const _value = numberFormatter(params.value) || '';
+                return `${params.marker} ${_name}: <b>${_value}</b>`;
+            },
+        },
+        xAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: (val) => numberFormatter(val, { notation: 'compact' }),
+            },
+        },
+        yAxis: {
+            type: 'category',
+            data: state.yAxisData,
+            axisLabel: {
+                formatter: (val) => getReferenceLabel(storeState.allReferenceTypeInfo, state.parsedGroupBy, val),
+            },
+        },
+        series: state.chartData,
+    })),
+});
 
-const drawChart = () => {
-    // create chart and axis
-    const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
-    const _chartData = cloneDeep(props.chartData).reverse();
-    yAxis.data.setAll(_chartData);
+const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
+    if (isEmpty(rawData)) return;
 
-    const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
-        name: '{category}',
-        valueXField: 'value',
-        categoryYField: 'category',
-        xAxis,
-        yAxis,
-        baseAxis: yAxis,
-        stroke: undefined,
-    };
+    const _orderedData = orderBy(rawData.results || [], 'count', 'desc');
 
-    // create series
-    const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
+    const _yAxisData = _orderedData.map((d) => d[state.parsedGroupBy]).slice(0, LIMIT);
+    const _etcValue = sum(_orderedData.slice(LIMIT).map((d) => d.count));
+    if (_etcValue) _yAxisData.push('etc');
+    state.yAxisData = _yAxisData;
 
-    // set color
-    if (!isEmpty(props.chartData?.[0]?.colorSettings)) {
-        series.columns.template.setAll({
-            templateField: 'colorSettings',
+    state.chartData = state.yAxisData.map((d) => ({
+        name: d,
+        type: 'bar',
+        stack: true,
+        barMaxWidth: 50,
+        data: state.yAxisData.map((v) => {
+            if (d === v && d === 'etc') return _etcValue;
+            const _data = _orderedData.find((od) => d === v && od[state.parsedGroupBy] === v);
+            return _data?.count || 0;
+        }),
+    }));
+
+    // init legend
+    const _legend: Record<string, boolean> = {};
+    if (isEmpty(state.proxyLegend)) {
+        const _series = state.chartData.map((d) => d.name);
+        _series.forEach((d) => {
+            _legend[d] = true;
         });
-    } else {
-        series.columns.template.adapters.add('fill', (fill, target) => {
-            const _index = series.columns.indexOf(target);
-            return props.colorSet[_index];
-        });
+        state.proxyLegend = _legend;
     }
 
-    // set tooltip if showPassFindings is true
-    const tooltip = chartHelper.createTooltip();
-    tooltip.label.adapters.add('text', (_, target) => {
-        let fieldName;
-        chart.series.each((s) => {
-            fieldName = s.get('valueXField') || '';
-        });
-        const targetName = target.dataItem?.dataContext?.category;
-        const value = target.dataItem?.dataContext?.[fieldName];
-        return `[fontSize: 14px;}]${targetName}:[/] [fontSize: 14px; bold]${numberFormatter(value)}[/]`;
+    state.chart = init(chartContext.value);
+    state.chart.setOption(state.chartOptions, true);
+    state.chart.on('legendselectchanged', (d) => {
+        state.proxyLegend = d.selected;
     });
-    series.set('tooltip', tooltip);
-
-    // add series to chart
-    chart.series.push(series);
-
-    // set data to series
-    series.data.setAll(_chartData);
-
-    return chart;
 };
 
-watch([() => chartContext.value, () => props.loading, () => props.chartData], async ([_chartContext, loading, chartData]) => {
-    if (_chartContext && !loading && chartData.length) {
-        chartHelper.refreshRoot();
-        await nextTick();
-        const chart = drawChart();
-        emit('update:chart', chart);
+watch([() => chartContext.value, () => props.loading, () => props.data], async ([_chartContext, loading, data]) => {
+    if (_chartContext && !loading) {
+        drawChart(data);
     }
 }, { immediate: false });
+watch(() => state.proxyLegend, () => {
+    state.chart.setOption(state.chartOptions, true);
+});
+useResizeObserver(chartContext, throttle(() => {
+    state.chart?.resize();
+}, 500));
 </script>
 
 <template>

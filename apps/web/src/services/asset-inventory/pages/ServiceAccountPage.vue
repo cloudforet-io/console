@@ -5,19 +5,19 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import {
-    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg,
-} from '@spaceone/design-system';
-import type {
-    DynamicLayoutEventListener,
-    DynamicLayoutFieldHandler,
-} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
-import type { DynamicLayoutOptions, SearchSchema } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg,
+} from '@cloudforet/mirinae';
+import type {
+    DynamicLayoutEventListener,
+    DynamicLayoutFieldHandler,
+} from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
+import type { DynamicLayoutOptions, SearchSchema } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';

@@ -13,9 +13,9 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { PDoubleCheckModal } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PDoubleCheckModal } from '@cloudforet/mirinae';
+
 
 import type { BudgetDeleteParameters } from '@/schema/cost-analysis/budget/api-verbs/delete';
 

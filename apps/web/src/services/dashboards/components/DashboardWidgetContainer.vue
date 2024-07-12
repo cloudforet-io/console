@@ -4,8 +4,9 @@ import {
     reactive, ref, watch, computed, toRef, onBeforeUnmount, nextTick,
 } from 'vue';
 
-import { PDataLoader } from '@spaceone/design-system';
 import { debounce } from 'lodash';
+
+import { PDataLoader } from '@cloudforet/mirinae';
 
 import WidgetFullModeModal from '@/services/dashboards/components/WidgetFullModeModal.vue';
 import {

@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
-import type {
-    AutocompleteHandler, SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
+import type {
+    AutocompleteHandler, SelectDropdownMenuItem,
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';

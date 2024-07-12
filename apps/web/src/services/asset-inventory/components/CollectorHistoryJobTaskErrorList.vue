@@ -64,7 +64,7 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { PDataTable, PHeading, PCollapsibleToggle } from '@spaceone/design-system';
+import { PDataTable, PHeading, PCollapsibleToggle } from '@cloudforet/mirinae';
 
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 

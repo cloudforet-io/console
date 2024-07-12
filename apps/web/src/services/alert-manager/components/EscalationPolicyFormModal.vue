@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PButtonModal } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButtonModal } from '@cloudforet/mirinae';
+
 
 import type { EscalationPolicyCreateParameters } from '@/schema/monitoring/escalation-policy/api-verbs/create';
 import type { EscalationPolicyUpdateParameters } from '@/schema/monitoring/escalation-policy/api-verbs/update';

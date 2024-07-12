@@ -5,7 +5,7 @@ import {
 
 import {
     PI, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
 import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';

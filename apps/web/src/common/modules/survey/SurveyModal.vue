@@ -57,9 +57,9 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { PButtonModal, PSelectCard } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButtonModal, PSelectCard } from '@cloudforet/mirinae';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserConfigCreateParameters } from '@/schema/config/user-config/api-verbs/create';

@@ -3,12 +3,12 @@ import {
     computed, defineExpose, reactive,
 } from 'vue';
 
-import {
-    PI,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PI,
+} from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

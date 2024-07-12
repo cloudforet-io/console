@@ -1,10 +1,10 @@
-import type { QueryTag as Tag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
+import type { QueryTag as Tag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
 import type {
     KeyItem,
     KeyItemSet,
     OperatorType,
     QueryItem,
-} from '@spaceone/design-system/types/inputs/search/query-search/type';
+} from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';

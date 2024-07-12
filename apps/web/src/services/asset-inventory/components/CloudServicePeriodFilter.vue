@@ -15,8 +15,9 @@ import {
     reactive, toRefs,
 } from 'vue';
 
-import { PTag } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+
+import { PTag } from '@cloudforet/mirinae';
 
 import type { Period } from '@/services/asset-inventory/types/type';
 

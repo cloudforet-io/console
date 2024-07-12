@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PCard } from '@spaceone/design-system';
+import { PCard } from '@cloudforet/mirinae';
 
 import BudgetDetailSummaryChart
     from '@/services/cost-explorer/components/BudgetDetailSummaryChart.vue';

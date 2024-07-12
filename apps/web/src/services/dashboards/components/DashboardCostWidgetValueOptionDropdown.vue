@@ -4,16 +4,17 @@ import {
     reactive, watch, ref, toRef,
 } from 'vue';
 
-import {
-    PIconButton, PBadge, PContextMenu, PI, useContextMenuController,
-} from '@spaceone/design-system';
-import type {
-    AutocompleteHandler,
-    SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PIconButton, PBadge, PContextMenu, PI, useContextMenuController,
+} from '@cloudforet/mirinae';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import { i18n } from '@/translations';
 

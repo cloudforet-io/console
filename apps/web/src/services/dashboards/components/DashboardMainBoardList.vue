@@ -2,12 +2,12 @@
 import { computed, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import {
     PBadge, PBoard, PI, PLabel,
-} from '@spaceone/design-system';
-import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
+} from '@cloudforet/mirinae';
+import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { i18n } from '@/translations';
 

@@ -82,11 +82,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import {
-    PDefinitionTable, PI, PLazyImg, PStatus,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+import {
+    PDefinitionTable, PI, PLazyImg, PStatus,
+} from '@cloudforet/mirinae';
 import { durationFormatter } from '@cloudforet/utils';
 
 import type { JobModel } from '@/schema/inventory/job/model';

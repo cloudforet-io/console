@@ -4,15 +4,15 @@ import {
 } from 'vue';
 
 import type { AxisRenderer, DateAxis } from '@amcharts/amcharts5/xy';
-import {
-    PDivider, PDataLoader, PI, PSkeleton,
-} from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PDivider, PDataLoader, PI, PSkeleton,
+} from '@cloudforet/mirinae';
 
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 

@@ -4,13 +4,13 @@ import {
 } from 'vue';
 import type { ComputedRef } from 'vue';
 
-import type { SearchSchema } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { KeyItem, KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
-
 import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler, makeCloudServiceTagValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+import type { SearchSchema } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { KeyItem, KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+
 
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

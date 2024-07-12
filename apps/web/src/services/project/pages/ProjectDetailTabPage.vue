@@ -4,13 +4,13 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import {
-    PBadge, PDataLoader, PTab,
-} from '@spaceone/design-system';
-import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find, isEmpty } from 'lodash';
 
+import {
+    PBadge, PDataLoader, PTab,
+} from '@cloudforet/mirinae';
+import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ProjectModel } from '@/schema/identity/project/model';

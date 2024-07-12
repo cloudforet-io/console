@@ -4,10 +4,11 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { isEmpty } from 'lodash';
+
 import {
     PDivider,
-} from '@spaceone/design-system';
-import { isEmpty } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 

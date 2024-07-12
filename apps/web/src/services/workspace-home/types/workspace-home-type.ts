@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import type { ReferenceMap } from '@/store/reference/type';
