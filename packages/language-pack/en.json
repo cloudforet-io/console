@@ -969,6 +969,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"ADD": "Add",
 			"DOWNLOAD": "Download",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "desktop",
@@ -1644,6 +1645,19 @@
 			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget"
 		}
 	},
+	"COST_EXPLORER": {
+		"ANOMALY_DETECTION": {
+			"NOTIFICATION_RULES": {
+				"AMOUNT": "Amount",
+				"NOTIFY_LEVEL": "Notify Level",
+				"SELECT_LEVEL": "Select Level",
+				"SELECT_UNIT": "Select Unit",
+				"THRESHOLD": "Threshold",
+				"UNIT": "Unit",
+				"VARIATION": "Variation"
+			}
+		}
+	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
 			"CREATE": "Create",
@@ -2242,6 +2256,11 @@
 			"ALT_S_UPDATE_DISPLAY_NAME": "Display name successfully updated",
 			"ALT_S_UPDATE_DORMANCY": "Auto dormancy configuration successfully changed",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "Timezone & language successfully updated",
+			"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
+			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "When anomaly costs are detected, an email will be sent to all users with the Workspace Owner role type for each Workspace ",
+			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "With Anomaly Detection Configuration turned on,",
+			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "notifications will be sent to particular recipients associated with each workspace when an anomaly in cost is detected.",
+			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "Enable Anomaly Detection Configuration",
 			"APPEARANCE": "Appearance",
 			"AUTO_DORMANCY_CONFIGURATION": "Auto Dormancy Configuration",
 			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "Send notification email reminders consistently for 3 days.",
@@ -2263,6 +2282,8 @@
 			"DOMAIN_NAME_IMAGE_DESCRIPTION": "The name displayed in the browser tab. If left blank, the default is ‘SpaceONE’. Choose a name that is easy to recognize and reflects the domain's function or brand.",
 			"EMAIL_INVALID": "Invalid e-mail format.",
 			"LANGUAGE": "Language",
+			"NOTIFICATION_RULES": "Notification Rules",
+			"RECIPIENTS": "Recipients",
 			"SAVE_CHANGE": "Save Change",
 			"SAVE_CHANGES": "Save Changes",
 			"SEND_CODE": "Send Code",

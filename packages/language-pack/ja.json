@@ -969,6 +969,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"ADD": "追加",
 			"DOWNLOAD": "ダウンロード",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "デスクトップ",
@@ -1644,6 +1645,19 @@
 			"UNABLE_TO_LOAD_WIDGET": "ウィジェット表示不可"
 		}
 	},
+	"COST_EXPLORER": {
+		"ANOMALY_DETECTION": {
+			"NOTIFICATION_RULES": {
+				"AMOUNT": "",
+				"NOTIFY_LEVEL": "",
+				"SELECT_LEVEL": "",
+				"SELECT_UNIT": "",
+				"THRESHOLD": "",
+				"UNIT": "",
+				"VARIATION": ""
+			}
+		}
+	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
 			"CREATE": "作成",
@@ -2242,6 +2256,11 @@
 			"ALT_S_UPDATE_DISPLAY_NAME": "表示名が正常に更新されました",
 			"ALT_S_UPDATE_DORMANCY": "",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "タイムゾーンと言語が正常に更新されました",
+			"ANOMALY_DETECTION_CONFIGURATION": "",
+			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "",
+			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "",
+			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "",
+			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "",
 			"APPEARANCE": "",
 			"AUTO_DORMANCY_CONFIGURATION": "",
 			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "",
@@ -2263,6 +2282,8 @@
 			"DOMAIN_NAME_IMAGE_DESCRIPTION": "",
 			"EMAIL_INVALID": "無効なメール形式です",
 			"LANGUAGE": "言語",
+			"NOTIFICATION_RULES": "",
+			"RECIPIENTS": "",
 			"SAVE_CHANGE": "変更事項保存",
 			"SAVE_CHANGES": "変更事項保存",
 			"SEND_CODE": "認証コードを送信",
