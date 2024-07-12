@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PHeading, PIconButton, PButtonModal, PFieldGroup, PTextInput,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

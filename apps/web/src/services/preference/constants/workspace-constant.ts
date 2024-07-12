@@ -1,7 +1,5 @@
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
-
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-
+import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 

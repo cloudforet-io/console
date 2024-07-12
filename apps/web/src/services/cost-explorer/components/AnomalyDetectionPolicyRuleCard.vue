@@ -3,7 +3,7 @@ import { reactive } from 'vue';
 
 import {
     PCard, PI, PDivider, PButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { NOTIFY_LEVEL, NOTIFY_LEVEL_MAP } from '@/services/cost-explorer/constants/anomaly-detection-constant';
 

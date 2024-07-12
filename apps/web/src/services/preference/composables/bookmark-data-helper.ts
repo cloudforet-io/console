@@ -1,7 +1,6 @@
-import type { QueryItem, ValueItem } from '@spaceone/design-system/src/inputs/search/query-search/type';
-import type { ValueHandler } from '@spaceone/design-system/types/inputs/search/query-search/type';
-
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type { QueryItem, ValueItem } from '@cloudforet/mirinae/src/inputs/search/query-search/type';
+import type { ValueHandler } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';

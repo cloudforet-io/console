@@ -5,11 +5,12 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { at } from 'lodash';
+
 import {
     PHeading, PButton, PContextMenu, PI, PIconButton,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
-import { at } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';

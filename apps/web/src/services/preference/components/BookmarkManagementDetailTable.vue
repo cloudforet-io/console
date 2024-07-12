@@ -2,18 +2,17 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectStatus, PSelectDropdown,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
-import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 import type {
     KeyItemSet,
     ValueHandlerMap,
     ValueItem,
-} from '@spaceone/design-system/types/inputs/search/query-search/type';
-
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+} from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 import { i18n } from '@/translations';
 

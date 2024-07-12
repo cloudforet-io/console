@@ -3,8 +3,8 @@ import { computed, reactive } from 'vue';
 
 import {
     PFieldGroup, PTextInput, PSelectDropdown, PButton, PBoardItem, PBadge, PLink,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { i18n } from '@/translations';
 

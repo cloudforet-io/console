@@ -4,9 +4,9 @@ import { useRoute } from 'vue-router/composables';
 
 import {
     PHeading, PButton, PDefinitionTable, PLink, PLazyImg,
-} from '@spaceone/design-system';
-import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+} from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';

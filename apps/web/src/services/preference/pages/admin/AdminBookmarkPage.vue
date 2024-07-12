@@ -3,9 +3,10 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PHeading, PButton, PContextMenu } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { at } from 'lodash';
+
+import { PHeading, PButton, PContextMenu } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 

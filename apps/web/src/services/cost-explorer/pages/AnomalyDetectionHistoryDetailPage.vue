@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
     PHeading, PBadge, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import AnomalyDetectionHistoryDetail from '@/services/cost-explorer/components/AnomalyDetectionHistoryDetail.vue';
 import {

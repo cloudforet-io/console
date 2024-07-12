@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router/composables';
 
 import {
     PHeading,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -14,6 +14,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
 
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
+
 
 const domainConfigStore = useDomainSettingsStore();
 

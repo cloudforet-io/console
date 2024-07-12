@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PHeading, PSelectDropdown, PBadge } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+
+import { PHeading, PSelectDropdown, PBadge } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 
