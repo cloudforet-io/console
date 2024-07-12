@@ -56,23 +56,23 @@ const Template: Story = {
         i18n: I18nConnector.i18n,
         components: { PCollapsibleList },
         template: `
-        <div class="h-full w-full overflow p-8">
-            <p-collapsible-list
-                :items="items"
-                v-model="proxyUnfoldedIndices"
-                :line-clamp="lineClamp"
-                :multi-unfoldable="multiUnfoldable"
-                :toggle-position="togglePosition"
-                :toggle-type="toggleType"
-                :theme="theme"
-                @update:unfoldedIndices="onUpdateUnfoldedIndices"
-            >
-                <template v-if="titleSlot" #title>
-                    <div v-html="titleSlot" />
-                </template>
-                <div v-if="defaultSlot" v-html="defaultSlot" />
-            </p-collapsible-list>
-        </div>
+            <div class="h-full w-full overflow p-8">
+                <p-collapsible-list
+                    :items="items"
+                    v-model="proxyUnfoldedIndices"
+                    :line-clamp="lineClamp"
+                    :multi-unfoldable="multiUnfoldable"
+                    :toggle-position="togglePosition"
+                    :toggle-type="toggleType"
+                    :theme="theme"
+                    @update:unfoldedIndices="onUpdateUnfoldedIndices"
+                >
+                    <template v-if="titleSlot" #title>
+                        <div v-html="titleSlot" />
+                    </template>
+                    <div v-if="defaultSlot" v-html="defaultSlot" />
+                </p-collapsible-list>
+            </div>
         `,
         setup(props, { emit }) {
             const state = reactive({

@@ -18,6 +18,7 @@
     "@storybook/addon-essentials": "^7.6.10",
     "@storybook/addon-interactions": "^7.6.10",
     "@storybook/addon-links": "^7.6.10",
+    "@storybook/addon-mdx-gfm": "^7.6.10",
     "@storybook/addon-storysource": "^7.6.10",
     "@storybook/blocks": "^7.6.10",
     "@storybook/manager-api": "^7.6.10",
@@ -32,7 +33,7 @@
     "tsconfig": "*",
     "vue-component-type-helpers": "^2.0.26"
   },
-  "resolutions": {
+  "peerDependencies": {
     "react": "18.3.1",
     "react-dom": "18.3.1"
   }

@@ -20,7 +20,7 @@ const meta : Meta<PDynamicFieldPropsAndCustomArgs> = {
         data: 'data',
         extraData: {},
         typeOptions: {},
-        handler: undefined,
+        handler: (props) => props,
     },
 };
 
@@ -263,54 +263,56 @@ export const SizeType: Story = {
 };
 
 export const MoreType: Story = {
-    components: { PDynamicField },
-    template: `
-        <div>
-            <p>field type: more > layout: popup > layout: raw</p>
-            <p-dynamic-field type="more" :options="rawOptions" :data="data" :type-options="typeOptions" />
-            <br><br>
-            <p>field type: more > layout: popup > layout: item</p>
-            <p-dynamic-field type="more" :options="itemOptions" :data="data" :type-options="typeOptions" />
-            <br><br>
-        </div>
-    `,
-    setup() {
-        return {
-            rawOptions: {
-                sub_key: 'info',
-                layout: {
-                    type: 'popup',
-                    options: {
-                        layout: {
-                            type: 'raw',
-                            options: {},
-                        },
-                    },
-                },
-                postfix: '(Jung)',
-            },
-            itemOptions: {
-                layout: {
-                    type: 'popup',
-                    options: {
-                        layout: {
-                            type: 'items',
-                            options: {
-                                fields: [
-                                    { key: 'id', label: 'ID', type: 'text' },
-                                    { key: 'name', label: 'Name', type: 'text' },
-                                    { key: 'info', label: 'Info', type: 'dict' },
-                                ],
+    render: () => ({
+        components: { PDynamicField },
+        template: `
+            <div>
+                <p>field type: more > layout: popup > layout: raw</p>
+                <p-dynamic-field type="more" :options="rawOptions" :data="data" :type-options="typeOptions" />
+                <br><br>
+                <p>field type: more > layout: popup > layout: item</p>
+                <p-dynamic-field type="more" :options="itemOptions" :data="data" :type-options="typeOptions" />
+                <br><br>
+            </div>
+        `,
+        setup() {
+            return {
+                rawOptions: {
+                    sub_key: 'info',
+                    layout: {
+                        type: 'popup',
+                        options: {
+                            layout: {
+                                type: 'raw',
+                                options: {},
                             },
                         },
                     },
+                    postfix: '(Jung)',
                 },
-                postfix: '(Jung)',
-            },
-            data: { id: 'j', name: 'sulmo', info: { weight: '83.5 kg', height: '179.3cm' } },
-            typeOptions: { displayKey: 'name' },
-        };
-    },
+                itemOptions: {
+                    layout: {
+                        type: 'popup',
+                        options: {
+                            layout: {
+                                type: 'items',
+                                options: {
+                                    fields: [
+                                        { key: 'id', label: 'ID', type: 'text' },
+                                        { key: 'name', label: 'Name', type: 'text' },
+                                        { key: 'info', label: 'Info', type: 'dict' },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    postfix: '(Jung)',
+                },
+                data: { id: 'j', name: 'sulmo', info: { weight: '83.5 kg', height: '179.3cm' } },
+                typeOptions: { displayKey: 'name' },
+            };
+        },
+    })
 };
 
 export const Playground: Story = {

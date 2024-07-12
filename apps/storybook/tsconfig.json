@@ -5,7 +5,9 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["../../packages/mirinae/src/*"]
-        }
+        },
+        "allowImportingTsExtensions": true,
+        "noEmit": true
     },
     "include": [
         "**/*.ts",
