@@ -64,7 +64,6 @@ const handleChangeToggleButton = async (value: boolean) => {
             cost: state.dormancyConfig?.cost || 0,
             send_email: state.dormancyConfig?.send_email || false,
         });
-        await fetchDomainSettings();
         showSuccessMessage(_i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_DORMANCY_TOGGLE'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -92,12 +91,14 @@ const createDomainDormancy = async (data: DormancyConfig) => {
 const updateDomainDormancy = async (data: DormancyConfig) => {
     if (!state.dormancyConfig) {
         await createDomainDormancy(data);
-        return;
+    } else {
+        await SpaceConnector.client.config.domainConfig.update<DomainConfigUpdateParameters, DomainConfigModel>({
+            name: DORMANCY_CONFIG_NAME,
+            data,
+        });
     }
-    await SpaceConnector.client.config.domainConfig.update<DomainConfigUpdateParameters, DomainConfigModel>({
-        name: DORMANCY_CONFIG_NAME,
-        data,
-    });
+
+    await fetchDomainSettings();
 };
 const fetchDomainSettings = async () => {
     try {
