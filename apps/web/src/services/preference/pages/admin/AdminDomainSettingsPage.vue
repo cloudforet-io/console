@@ -10,7 +10,6 @@ import DomainSettingsBrandAssets from '@/services/preference/components/DomainSe
 import DomainSettingsTimezoneAndLanguage
     from '@/services/preference/components/DomainSettingsTimezoneAndLanguage.vue';
 
-
 const domainConfigStore = useDomainSettingsStore();
 
 (async () => {
