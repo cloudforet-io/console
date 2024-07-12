@@ -30,6 +30,16 @@ export const NOTIFY_LEVEL_MAP = {
     },
 } as const;
 
+export const NOTIFICATION_UNIT = {
+    percentage: 'PERCENTAGE',
+    fixedAmount: 'FIXED_AMOUNT',
+} as const;
+
+export const NOTIFICATION_VARIATION = {
+    gte: 'gte',
+    lte: 'lte',
+} as const;
+
 // Configurations
 export const DETECTION_CONFIGURATION_HANDLERS = {
     keyItemSets: [
