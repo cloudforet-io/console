@@ -226,6 +226,11 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         border-spacing: 0;
         padding: 0;
     }
+    thead {
+        @apply sticky;
+        top: 0;
+        z-index: 1;
+    }
 
     th {
         @apply text-label-sm text-gray-700 border-t border-b-2 border-gray-200 bg-white;
