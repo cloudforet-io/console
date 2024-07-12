@@ -431,7 +431,7 @@ watch(() => state.showPopover, (val) => {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        width: 26rem;
+        width: 21.5rem;
         padding: 1rem;
     }
     .data-source-popper-operator-wrapper {
@@ -459,7 +459,7 @@ watch(() => state.showPopover, (val) => {
         display: flex;
         flex-direction: column;
         min-width: 43.5rem;
-        height: 30rem;
+        height: 26rem;
         .top-part {
             display: flex;
             width: 100%;
@@ -545,7 +545,7 @@ watch(() => state.showPopover, (val) => {
 :deep(.p-context-menu) {
     border: none;
     .menu-container {
-        height: 23.25rem;
+        height: 19.25rem;
     }
 }
 </style>

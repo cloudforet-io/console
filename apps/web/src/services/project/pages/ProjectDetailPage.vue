@@ -300,6 +300,7 @@ onUnmounted(() => {
     margin-top: -0.25rem;
 }
 .top-wrapper {
+    max-width: 85.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
