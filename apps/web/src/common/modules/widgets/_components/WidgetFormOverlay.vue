@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -31,7 +31,7 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const state = reactive({
     sidebarTitle: computed(() => {
-        if (widgetGenerateState.overlayType === 'EXPAND') return i18n.t('COMMON.WIDGETS.EXPAND_WIDGET');
+        if (widgetGenerateState.overlayType === 'EXPAND') return undefined;
         let _title = i18n.t('COMMON.WIDGETS.ADD_WIDGET');
         if (widgetGenerateState.overlayType === 'EDIT') {
             _title = i18n.t('COMMON.WIDGETS.EDIT_WIDGET');
@@ -124,6 +124,11 @@ const handleConfirmWarningModal = async () => {
 const handleWatchOptionsChanged = (isChanged: boolean) => {
     state.isWidgetOptionsChanged = isChanged;
 };
+const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.code === 'Escape' && widgetGenerateState.overlayType === 'EXPAND') {
+        widgetGenerateStore.setShowOverlay(false);
+    }
+};
 
 /* Watcher */
 watch(() => widgetGenerateState.showOverlay, async (val) => {
@@ -134,14 +139,19 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
         await widgetGenerateStore.listDataTable();
     }
 });
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeyDown);
+});
 </script>
 
 <template>
     <div>
         <p-overlay-layout :visible="widgetGenerateState.showOverlay"
-                          style-type="primary"
+                          :style-type="widgetGenerateState.overlayType === 'EXPAND' ? 'secondary' : 'primary'"
                           size="full"
                           :title="state.sidebarTitle"
+                          :hide-header="widgetGenerateState.overlayType === 'EXPAND'"
                           @close="handleCloseOverlay"
         >
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
@@ -152,6 +162,7 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                       #footer
             >
                 <div class="footer-wrapper">
+                    <portal-target name="apply-button" />
                     <p-button :style-type="widgetGenerateState.overlayStep === 1 ? 'substitutive' : 'primary'"
                               :icon-right="widgetGenerateState.overlayStep === 1 ? 'ic_arrow-right' : undefined"
                               :disabled="!state.isAllValid"

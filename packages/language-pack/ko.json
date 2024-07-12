@@ -1490,7 +1490,8 @@
 				"LESS_THAN_PREVIOUS_YEAR": "전년 대비 하락",
 				"MORE_THAN_PREVIOUS_DAY": "전일 대비 상승",
 				"MORE_THAN_PREVIOUS_MONTH": "전월 대비 상승",
-				"MORE_THAN_PREVIOUS_YEAR": "전년 대비 상승"
+				"MORE_THAN_PREVIOUS_YEAR": "전년 대비 상승",
+				"NO_CHANGE": "변화 없음"
 			},
 			"NUMBER_FIELD_VALIDATION": "값은 {max} 이하이어야 합니다.",
 			"PERIOD": "기간",
