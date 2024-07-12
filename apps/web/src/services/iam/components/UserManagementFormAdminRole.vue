@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PFieldGroup, PEmpty, PSelectDropdown, PFieldTitle, PButton, PToggleButton,
-} from '@spaceone/design-system';
-import type {
-    AutocompleteHandler,
-    SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PFieldGroup, PEmpty, PSelectDropdown, PFieldTitle, PButton, PToggleButton,
+} from '@cloudforet/mirinae';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';

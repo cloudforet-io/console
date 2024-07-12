@@ -3,10 +3,11 @@ import {
     computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
+import { cloneDeep, isEqual } from 'lodash';
+
 import {
     PDivider, PSelectButton, PButton,
-} from '@spaceone/design-system';
-import { cloneDeep, isEqual } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import type {
     DashboardOptions, DashboardVars,

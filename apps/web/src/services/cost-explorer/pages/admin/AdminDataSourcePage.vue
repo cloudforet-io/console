@@ -5,7 +5,7 @@ import {
 
 import {
     PHeading, PHorizontalLayout, PLink, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

@@ -2,7 +2,7 @@
 
 import { computed, reactive } from 'vue';
 
-import { PDataTable, PLink } from '@spaceone/design-system';
+import { PDataTable, PLink } from '@cloudforet/mirinae';
 
 import config from '@/lib/config';
 

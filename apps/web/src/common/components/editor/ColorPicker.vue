@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PI, PSelectDropdown } from '@spaceone/design-system';
 import type { Editor } from '@tiptap/core';
+
+import { PI, PSelectDropdown } from '@cloudforet/mirinae';
 
 import {
     blue, coral, gray, green, peacock, red, violet, yellow,

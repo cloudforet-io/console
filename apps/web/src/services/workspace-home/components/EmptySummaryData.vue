@@ -2,8 +2,9 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PI, PTextButton } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
+
+import { PI, PTextButton } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';

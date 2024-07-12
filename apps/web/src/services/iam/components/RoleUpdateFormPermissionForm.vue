@@ -3,8 +3,9 @@ import {
     computed, reactive, ref, watch, watchEffect,
 } from 'vue';
 
-import { PPaneLayout, PHeading } from '@spaceone/design-system';
 import { find, isEqual } from 'lodash';
+
+import { PPaneLayout, PHeading } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';

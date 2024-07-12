@@ -3,11 +3,11 @@ import {
     computed, reactive,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PTextInput,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { WebhookUpdateParameters } from '@/schema/monitoring/webhook/api-verbs/update';
 import { i18n } from '@/translations';

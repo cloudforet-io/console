@@ -143,15 +143,15 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import {
-    PLazyImg, PSkeleton, PI, PDataLoader, PEmpty,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PLazyImg, PSkeleton, PI, PDataLoader, PEmpty,
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

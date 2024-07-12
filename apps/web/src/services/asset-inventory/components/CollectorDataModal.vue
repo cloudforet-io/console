@@ -35,10 +35,10 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
-import { PButtonModal } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';

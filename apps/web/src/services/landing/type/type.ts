@@ -1,4 +1,4 @@
-import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
+import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 

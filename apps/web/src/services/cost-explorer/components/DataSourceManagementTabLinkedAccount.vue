@@ -4,14 +4,14 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PButton, PHeading,
-} from '@spaceone/design-system';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButton, PHeading,
+} from '@cloudforet/mirinae';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import { i18n } from '@/translations';
 

@@ -7,7 +7,7 @@ import draggable from 'vuedraggable';
 
 import {
     PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';

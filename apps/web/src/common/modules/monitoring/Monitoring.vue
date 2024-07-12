@@ -108,10 +108,6 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import {
-    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 import {
     debounce, find, capitalize, chain, range, sortBy, get,
@@ -120,6 +116,10 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { MONITORING_TYPE } from '@/schema/monitoring/data-source/constant';
 import { store } from '@/store';

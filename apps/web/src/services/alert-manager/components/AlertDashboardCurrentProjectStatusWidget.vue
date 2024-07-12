@@ -3,12 +3,12 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import type { PieSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PDataLoader, PSkeleton } from '@cloudforet/mirinae';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 

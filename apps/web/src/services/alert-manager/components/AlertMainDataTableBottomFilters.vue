@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PCheckbox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
+import { PCheckbox, PSelectButton, PSelectStatus } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

@@ -3,9 +3,9 @@ import type { Location } from 'vue-router';
 
 import {
     PBoard, PLabel, PTextHighlighting, PI, PLink,
-} from '@spaceone/design-system';
-import type { BoardSet } from '@spaceone/design-system/src/data-display/board/type';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+} from '@cloudforet/mirinae';
+import type { BoardSet } from '@cloudforet/mirinae/src/data-display/board/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 

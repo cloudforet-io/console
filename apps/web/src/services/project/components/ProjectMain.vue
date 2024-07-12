@@ -3,12 +3,12 @@
 import { computed, onMounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import {
-    PFieldTitle, PToolbox, PEmpty,
-} from '@spaceone/design-system';
 import { uniq } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PFieldTitle, PToolbox, PEmpty,
+} from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';

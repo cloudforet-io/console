@@ -6,8 +6,8 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PFieldTitle, PI, PBoardItem,
-} from '@spaceone/design-system';
-import type { IconSet } from '@spaceone/design-system/src/data-display/board-item/type';
+} from '@cloudforet/mirinae';
+import type { IconSet } from '@cloudforet/mirinae/src/data-display/board-item/type';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';

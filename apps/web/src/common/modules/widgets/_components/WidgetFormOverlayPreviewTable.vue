@@ -4,13 +4,13 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PToolbox, PI, PSelectDropdown, PEmpty, PSpinner,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
-import type { ToolboxOptions } from '@spaceone/design-system/src/navigation/toolbox/type';
 import bytes from 'bytes';
 
+import {
+    PToolbox, PI, PSelectDropdown, PEmpty, PSpinner,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/src/navigation/toolbox/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Page } from '@/schema/_common/type';

@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { PI } from '@spaceone/design-system';
+import { PI } from '@cloudforet/mirinae';
 
 export default {
     name: 'FNB',

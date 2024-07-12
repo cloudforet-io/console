@@ -4,12 +4,12 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PDataTable, PHeading, PButton,
-} from '@spaceone/design-system';
 import { get, camelCase } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PDataTable, PHeading, PButton,
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

@@ -4,10 +4,11 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { get } from 'lodash';
+
 import {
     PRadioGroup, PRadio, PLazyImg,
-} from '@spaceone/design-system';
-import { get } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

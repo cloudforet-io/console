@@ -7,7 +7,7 @@ import {
 
 import {
     PFieldGroup, PIconButton, PLabel, PTextInput,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

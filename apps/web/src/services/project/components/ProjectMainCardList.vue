@@ -3,15 +3,15 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PSkeleton, PI, PToolbox, PDataLoader, PEmpty, PBadge,
-} from '@spaceone/design-system';
 import { uniq } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSkeleton, PI, PToolbox, PDataLoader, PEmpty, PBadge,
+} from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';

@@ -5,11 +5,12 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
+import dayjs from 'dayjs';
+
 import {
     PLink, PButton, PDivider, PIconButton, PI, PTooltip,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import dayjs from 'dayjs';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { GRANULARITY, WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';

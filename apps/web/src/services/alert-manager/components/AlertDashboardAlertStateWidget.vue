@@ -3,15 +3,15 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckbox, PIconButton,
-} from '@spaceone/design-system';
 import { find, sum } from 'lodash';
 
 import { getAllPage, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckbox, PIconButton,
+} from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

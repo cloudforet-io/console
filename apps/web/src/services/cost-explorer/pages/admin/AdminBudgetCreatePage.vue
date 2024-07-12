@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PHeading } from '@spaceone/design-system';
+import { PHeading } from '@cloudforet/mirinae';
 
 import BudgetCreateForm from '@/services/cost-explorer/components/BudgetCreateForm.vue';
 </script>

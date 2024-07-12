@@ -3,10 +3,11 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PDivider,
-} from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

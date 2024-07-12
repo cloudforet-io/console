@@ -5,8 +5,8 @@ import {
 
 import {
     PEmpty, PStatus, PTab, PDataTable, PBadge,
-} from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+} from '@cloudforet/mirinae';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import { i18n } from '@/translations';
 

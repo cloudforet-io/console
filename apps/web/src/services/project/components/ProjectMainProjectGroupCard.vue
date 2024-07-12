@@ -3,7 +3,7 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PI, PTextHighlighting } from '@spaceone/design-system';
+import { PI, PTextHighlighting } from '@cloudforet/mirinae';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';

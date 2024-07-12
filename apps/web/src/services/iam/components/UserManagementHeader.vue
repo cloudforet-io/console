@@ -2,8 +2,9 @@
 import { watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PHeading, PButton } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
+
+import { PHeading, PButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

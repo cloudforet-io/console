@@ -4,7 +4,6 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PDataLoader } from '@spaceone/design-system';
 import {
     isEqual, uniqWith,
 } from 'lodash';
@@ -13,6 +12,7 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';

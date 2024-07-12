@@ -3,15 +3,15 @@ import {
     computed, reactive,
 } from 'vue';
 
-import {
-    PDataLoader,
-} from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Sort, Query } from '@cloudforet/core-lib/space-connector/type';
+import {
+    PDataLoader,
+} from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';

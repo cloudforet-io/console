@@ -5,16 +5,15 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PHeading, PButton, PSelectDropdown, PToolbox,
-} from '@spaceone/design-system';
-import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-
-import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PHeading, PButton, PSelectDropdown, PToolbox,
+} from '@cloudforet/mirinae';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { RESOURCE_GROUP } from '@/schema/_common/constant';

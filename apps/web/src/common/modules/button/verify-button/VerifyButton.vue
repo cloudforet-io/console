@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PButton, PI } from '@spaceone/design-system';
+import { PButton, PI } from '@cloudforet/mirinae';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 

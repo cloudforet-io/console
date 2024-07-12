@@ -3,14 +3,14 @@ import {
     onMounted, reactive, computed,
 } from 'vue';
 
-import {
-    PI,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PI,
+} from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';

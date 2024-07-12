@@ -2,9 +2,9 @@
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PIconButton, PHeading } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PIconButton, PHeading } from '@cloudforet/mirinae';
+
 
 import type { AlertDeleteParameters } from '@/schema/monitoring/alert/api-verbs/delete';
 import { i18n } from '@/translations';

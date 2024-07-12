@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
-import { PEmpty, PFieldTitle, PSearch } from '@spaceone/design-system';
-import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
+import { PEmpty, PFieldTitle, PSearch } from '@cloudforet/mirinae';
+import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
 

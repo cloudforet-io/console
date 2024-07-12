@@ -5,7 +5,7 @@ import {
 
 import {
     PSelectDropdown, PFieldGroup,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { COLOR_SCHEMA } from '@/common/modules/widgets/_constants/widget-field-constant';

@@ -2,7 +2,7 @@
 import { useWindowSize } from '@vueuse/core/index';
 import { computed, reactive } from 'vue';
 
-import { screens } from '@spaceone/design-system';
+import { screens } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

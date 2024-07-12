@@ -1,10 +1,10 @@
 import type { ComputedRef } from 'vue';
 import { computed, reactive, watch } from 'vue';
 
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { IdentityJobListParameters } from '@/schema/identity/job/api-verbs/list';

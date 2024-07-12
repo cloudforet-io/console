@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PSelectButton, PSelectDropdown,
-} from '@spaceone/design-system';
-import type {
-    AutocompleteHandler,
-    SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { xor } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import {
+    PSelectButton, PSelectDropdown,
+} from '@cloudforet/mirinae';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 

@@ -68,8 +68,8 @@ import { useRouter } from 'vue-router/composables';
 
 import {
     PLink, PLazyImg, PLabel, PI, PTooltip,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 
 import type { PluginModel } from '@/schema/repository/plugin/model';

@@ -1,4 +1,4 @@
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 

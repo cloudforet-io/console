@@ -5,11 +5,11 @@ import {
     defineProps, reactive, ref, watch,
 } from 'vue';
 
-import {
-    PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
-} from '@spaceone/design-system';
 import { throttle } from 'lodash';
 
+import {
+    PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
+} from '@cloudforet/mirinae';
 import { numberFormatter, getValueByPath } from '@cloudforet/utils';
 
 import { CURRENCY } from '@/store/modules/settings/config';

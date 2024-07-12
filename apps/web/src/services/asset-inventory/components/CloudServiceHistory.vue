@@ -99,10 +99,6 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import {
-    PHeading, PToolbox, PDataLoader, PBadge, PSpinner,
-} from '@spaceone/design-system';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
@@ -112,6 +108,10 @@ import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PHeading, PToolbox, PDataLoader, PBadge, PSpinner,
+} from '@cloudforet/mirinae';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

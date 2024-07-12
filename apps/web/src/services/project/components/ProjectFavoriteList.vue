@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI } from '@spaceone/design-system';
+import { PI } from '@cloudforet/mirinae';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 

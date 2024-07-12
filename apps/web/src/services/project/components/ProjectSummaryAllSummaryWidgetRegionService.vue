@@ -4,9 +4,6 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import {
-    PSkeleton, PDataLoader,
-} from '@spaceone/design-system';
 import type { PieSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
@@ -14,6 +11,9 @@ import { range, orderBy, isEmpty } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PSkeleton, PDataLoader,
+} from '@cloudforet/mirinae';
 import { byteFormatter } from '@cloudforet/utils';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

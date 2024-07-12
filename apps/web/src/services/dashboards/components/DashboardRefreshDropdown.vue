@@ -5,8 +5,8 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PIconButton, PSelectDropdown } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { PIconButton, PSelectDropdown } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { REFRESH_INTERVAL_OPTIONS_MAP } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { RefreshIntervalOption } from '@/schema/dashboard/_types/dashboard-type';

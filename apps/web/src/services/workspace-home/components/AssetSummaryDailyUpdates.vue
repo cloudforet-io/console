@@ -4,10 +4,11 @@ import {
     computed, reactive, ref,
 } from 'vue';
 
-import { PFieldTitle, PIconButton, PEmpty } from '@spaceone/design-system';
 import {
     groupBy, map, sumBy,
 } from 'lodash';
+
+import { PFieldTitle, PIconButton, PEmpty } from '@cloudforet/mirinae';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';

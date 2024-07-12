@@ -3,17 +3,16 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton,
     PDataTable, PHeading, PI, PSelectDropdown, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

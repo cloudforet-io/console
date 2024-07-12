@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
     PBadge, PButton, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 

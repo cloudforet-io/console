@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI, PTreeView } from '@spaceone/design-system';
+import { PI, PTreeView } from '@cloudforet/mirinae';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
