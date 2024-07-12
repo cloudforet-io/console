@@ -43,6 +43,9 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+
+const emit = defineEmits<{(event: 'watch-options-changed', value: boolean): void;}>();
+
 const state = reactive({
     mounted: false,
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
@@ -69,6 +72,7 @@ const state = reactive({
         const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widgetGenerateState.widget?.widget_type;
         const _isNameChanged = widgetGenerateState.title !== widgetGenerateState.widget?.name;
         const _isDescriptionChanged = widgetGenerateState.description !== widgetGenerateState.widget?.description;
+        emit('watch-options-changed', _isOptionsChanged || _isTypeChanged || _isNameChanged || _isDescriptionChanged);
         return _isOptionsChanged || _isTypeChanged || _isNameChanged || _isDescriptionChanged;
     }),
     disableApplyButton: computed<boolean>(() => {
