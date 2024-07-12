@@ -1,19 +1,34 @@
 <script lang="ts" setup>
 import type { ComputedRef } from 'vue';
-import { computed, reactive } from 'vue';
-
-
 import {
-    PPaneLayout, PToggleButton, PFieldTitle, PTextInput, PSelectDropdown, PI, PButton, PIconButton, PCheckbox, PLazyImg,
-} from '@spaceone/design-system';
+    computed, onMounted, reactive, watch,
+} from 'vue';
+
+
 import { cloneDeep } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PPaneLayout, PToggleButton, PFieldTitle, PTextInput, PSelectDropdown, PI, PButton, PIconButton, PCheckbox, PLazyImg,
+} from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
+import type { DomainConfigGetParameters } from '@/schema/config/domain-config/api-verbs/get';
+import type { DomainConfigSetParameters } from '@/schema/config/domain-config/api-verbs/set';
+import type { DomainConfigModel } from '@/schema/config/domain-config/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { NOTIFY_LEVEL_MAP } from '@/services/cost-explorer/constants/anomaly-detection-constant';
-import type { NotificationRule } from '@/services/cost-explorer/types/anomaly-detection-type';
+import type {
+    NotificationRule,
+    NotificationUnit,
+    NotificationVariation,
+    NotifyLevel,
+} from '@/services/cost-explorer/types/anomaly-detection-type';
+
+const CONFIG_NAME = 'anomaly_detection_configuration';
 
 const state = reactive<{
     statusToggle: boolean;
@@ -24,38 +39,7 @@ const state = reactive<{
     recipients: boolean;
         }>({
             statusToggle: false,
-            notificationRules: [
-                {
-                    threshold: 5,
-                    unit: 'PERCENTAGE',
-                    variation: ['gte'],
-                    notifyLevel: 'INFO',
-                },
-                {
-                    threshold: 10,
-                    unit: 'PERCENTAGE',
-                    variation: ['gte'],
-                    notifyLevel: 'MINOR',
-                },
-                {
-                    threshold: 5,
-                    unit: 'PERCENTAGE',
-                    variation: ['gte'],
-                    notifyLevel: 'MODERATE',
-                },
-                {
-                    threshold: 10,
-                    unit: 'PERCENTAGE',
-                    variation: ['gte'],
-                    notifyLevel: 'MAJOR',
-                },
-                {
-                    threshold: 20,
-                    unit: 'PERCENTAGE',
-                    variation: ['gte'],
-                    notifyLevel: 'CRITICAL',
-                },
-            ],
+            notificationRules: [{ variation: ['gte', 'lte'] }],
             unitMenu: computed(() => [
                 { label: 'Percentage (%)', name: 'PERCENTAGE' },
                 { label: 'Fixed Amount', name: 'CURRENCY' },
@@ -76,10 +60,17 @@ const state = reactive<{
 
 const handleUpdateNotificationRules = (key: keyof NotificationRule, value: NotificationRule[keyof NotificationRule], index: number) => {
     const clonedNotificationRules = cloneDeep(state.notificationRules);
-    clonedNotificationRules[index] = {
-        ...clonedNotificationRules[index],
-        [key]: value,
-    };
+    if (key === 'variation') {
+        clonedNotificationRules[index] = {
+            ...clonedNotificationRules[index],
+            variation: JSON.parse(value as string),
+        };
+    } else {
+        clonedNotificationRules[index] = {
+            ...clonedNotificationRules[index],
+            [key]: value,
+        };
+    }
     state.notificationRules = clonedNotificationRules;
 };
 
@@ -90,6 +81,73 @@ const handleAddNotificationRule = () => {
 const handleDeleteRule = (index:number) => {
     state.notificationRules = cloneDeep(state.notificationRules).filter((_, i) => i !== index);
 };
+
+
+interface NotificationRuleConfig {
+    threshold: number;
+    unit_type: NotificationUnit;
+    variations: NotificationVariation[];
+    severity: NotifyLevel;
+}
+interface AnomalyDetectionConfig {
+    enabled: boolean;
+    notification_rules: NotificationRuleConfig[];
+    recipients?: {
+        role_type: string[];
+    };
+}
+
+const fetchConfig = async ():Promise<AnomalyDetectionConfig|undefined> => {
+    try {
+        const data = await SpaceConnector.clientV2.config.domainConfig.get<DomainConfigGetParameters, DomainConfigModel<AnomalyDetectionConfig>>({
+            name: CONFIG_NAME,
+        });
+        return data.data;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return undefined;
+    }
+};
+const filterNotificationRulesAndRemovedUnSelectedItem = (notificationRules: Partial<NotificationRule>[]):NotificationRuleConfig[] => notificationRules.map((rule) => ({
+    threshold: rule.threshold,
+    unit_type: rule.unit,
+    variations: rule.variation,
+    severity: rule.notifyLevel,
+})).filter((r): r is NotificationRuleConfig => r.threshold !== undefined && r.unit_type !== undefined && r.variations !== undefined && r.severity !== undefined);
+
+const setConfig = async () => {
+    const params: DomainConfigSetParameters<AnomalyDetectionConfig> = {
+        name: CONFIG_NAME,
+        data: {
+            enabled: state.statusToggle,
+            notification_rules: filterNotificationRulesAndRemovedUnSelectedItem(state.notificationRules),
+            recipients: { role_type: state.recipients ? ['WORKSPACE_OWNER'] : [] },
+        },
+    };
+    try {
+        await SpaceConnector.clientV2.config.domainConfig.set<DomainConfigSetParameters<AnomalyDetectionConfig>, DomainConfigModel>(params);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+watch([() => state.statusToggle, () => state.notificationRules, () => state.recipients], async () => {
+    await setConfig();
+});
+
+onMounted(async () => {
+    const savedConfig = await fetchConfig();
+    if (savedConfig) {
+        state.statusToggle = savedConfig.enabled;
+        state.notificationRules = savedConfig.notification_rules.map((rule) => ({
+            threshold: rule.threshold,
+            unit: rule.unit_type,
+            variation: rule.variations,
+            notifyLevel: rule.severity,
+        }));
+        state.recipients = savedConfig.recipients?.role_type.includes('WORKSPACE_OWNER') ?? false;
+    }
+});
 
 </script>
 
