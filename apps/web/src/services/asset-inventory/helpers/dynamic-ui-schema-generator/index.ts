@@ -13,6 +13,7 @@ import type { SchemaModel } from '@/schema/identity/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { ACCOUNT_STATE_COLOR } from '@/services/asset-inventory/constants/service-account-constant';
 import { getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
 import type { GetSchemaParams, ResourceType, QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
@@ -99,3 +100,10 @@ export const getServiceAccountTableSchema = async ({
 
     return schemaData;
 };
+
+const colorBindFactory = (colorMapping, textFnc) => (value) => ({
+    text: textFnc(value),
+    ...colorMapping[value],
+});
+
+export const stateFormatter = colorBindFactory(ACCOUNT_STATE_COLOR, (value) => value.toLowerCase());

@@ -1,23 +1,25 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    computed, reactive, watch,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { sum, values } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg,
+    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg, PStatus,
 } from '@cloudforet/mirinae';
 import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayoutOptions, SearchSchema } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -31,6 +33,8 @@ import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap, ProviderItem } from '@/store/reference/provider-reference-store';
 
@@ -53,9 +57,11 @@ import {
     PROVIDER_ACCOUNT_NAME,
 } from '@/services/asset-inventory/constants/service-account-constant';
 import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agent-mode-helper';
+import { stateFormatter } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import type { QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
+import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 const { width } = useWindowSize();
 
@@ -64,6 +70,8 @@ const route = useRoute();
 const { query } = router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
+const costReportPageStore = useCostReportPageStore();
+const constReportPageGetters = costReportPageStore.getters;
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountSchemaState = serviceAccountSchemaStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -72,6 +80,7 @@ const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
+    currency: computed<Currency|undefined>(() => constReportPageGetters.currency),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -303,6 +312,15 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
     listServiceAccountData();
 }, { immediate: true });
 
+onMounted(async () => {
+    if (tableState.isWorkspaceMember) return;
+    await costReportPageStore.fetchCostReportConfig();
+});
+
+onUnmounted(async () => {
+    await costReportPageStore.$reset();
+});
+
 (async () => {
     serviceAccountSchemaState.selectedAccountType = tableState.accountTypeList[0].name;
     if (state.selectedProvider) await serviceAccountSchemaStore.setProviderSchema(state.selectedProvider);
@@ -375,6 +393,20 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                 <template #col-schedule.state-format="{value}">
                     <auto-sync-state v-if="value"
                                      :state="value"
+                    />
+                </template>
+                <template #col-asset_info-format="{value}">
+                    <span>{{ sum(values(value)) }}</span>
+                </template>
+                <template #col-cost_info-format="{value}">
+                    <p>
+                        <span>{{ CURRENCY_SYMBOL[state.currency] }}</span>
+                        {{ numberFormatter(value?.month) || 0 }}
+                    </p>
+                </template>
+                <template #col-state-format="{value}">
+                    <p-status v-bind="stateFormatter(value)"
+                              class="capitalize"
                     />
                 </template>
                 <template #col-is_managed-format="{item}">

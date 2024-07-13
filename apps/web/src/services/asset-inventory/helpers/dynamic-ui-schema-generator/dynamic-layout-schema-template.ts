@@ -141,6 +141,21 @@ export const getDefaultTableSchema = (dynamicFields: DynamicField[], options: {
                     },
                 },
                 {
+                    key: 'state',
+                    name: 'State',
+                    type: 'state',
+                },
+                {
+                    key: 'asset_info',
+                    name: 'Asset',
+                    type: 'text',
+                },
+                {
+                    key: 'cost_info',
+                    name: 'Cost',
+                    type: 'text',
+                },
+                {
                     key: 'is_managed',
                     name: 'Auto Sync',
                     type: 'text',
