@@ -203,6 +203,16 @@ onUnmounted(() => {
         }
     }
 
+    /* custom design-system component - p-data-loader */
+    :deep(.p-data-loader) {
+        .data-loader-container {
+            overflow: visible;
+            .data-wrapper {
+                overflow-y: visible;
+            }
+        }
+    }
+
     @screen mobile {
         min-width: 19.5rem;
         max-width: 22.5rem;

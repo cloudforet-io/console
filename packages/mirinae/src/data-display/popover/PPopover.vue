@@ -20,7 +20,7 @@
                                color="inherit"
                                size="sm"
                                class="close-icon"
-                               @click="handleClickCloseIcon"
+                               @click.stop="handleClickCloseIcon"
                 />
             </div>
             <div v-if="!hideArrow"
@@ -157,6 +157,7 @@ export default defineComponent<PopoverProps>({
             else hidePopover();
         };
         const handleClickCloseIcon = () => {
+            emit('close');
             hidePopover();
         };
         const handleClickOutside = () => {

@@ -7,9 +7,9 @@ export interface WorkspaceModel {
     name: string;
     state: WorkspaceState;
     tags: Tags;
-    is_managed: boolean;
-    reference_id: string;
-    trusted_account_id: string;
+    is_managed?: boolean;
+    reference_id?: string;
+    trusted_account_id?: string;
     created_by: string;
     domain_id: string;
     created_at: string;
@@ -23,4 +23,5 @@ export interface WorkspaceModel {
         month: number;
         day: number;
     };
+    dormant_updated_at?: string;
 }
