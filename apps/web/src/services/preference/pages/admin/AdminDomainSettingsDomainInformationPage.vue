@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import { map } from 'lodash';
 
 import {
-    PPaneLayout, PFieldTitle, PButton, PSelectDropdown,
+    PPaneLayout, PFieldTitle, PButton, PSelectDropdown, PCopyButton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -78,7 +78,7 @@ watch(() => domainConfigGetters.language, (val) => {
 </script>
 
 <template>
-    <p-pane-layout class="admin-domain-settings-base-information-page">
+    <p-pane-layout class="admin-domain-settings-domain-information-page">
         <div class="content-wrapper">
             <div class="field-wrapper">
                 <p-field-title :label="$t('IAM.DOMAIN_SETTINGS.DOMAIN_ID')" />
@@ -94,7 +94,7 @@ watch(() => domainConfigGetters.language, (val) => {
                     <p-copy-button :value="storeState.domainName" />
                 </p>
             </div>
-            <div class="field-wrapper">
+            <div class="field-wrapper dropdown">
                 <p-field-title :label="$t('IAM.DOMAIN_SETTINGS.TIMEZONE')" />
                 <p-select-dropdown :menu="state.timezoneMenuList"
                                    :selected.sync="state.selectedTimezone"
@@ -103,7 +103,7 @@ watch(() => domainConfigGetters.language, (val) => {
                                    is-filterable
                 />
             </div>
-            <div class="field-wrapper">
+            <div class="field-wrapper dropdown">
                 <p-field-title :label="$t('IAM.DOMAIN_SETTINGS.LANGUAGE')" />
                 <p-select-dropdown :menu="state.languageMenuList"
                                    :selected.sync="state.selectedLanguage"
@@ -123,10 +123,9 @@ watch(() => domainConfigGetters.language, (val) => {
 </template>
 
 <style lang="postcss" scoped>
-.admin-domain-settings-base-information-page {
+.admin-domain-settings-domain-information-page {
     .content-wrapper {
         @apply flex flex-col;
-        width: 15rem;
         gap: 1.5rem;
         padding: 1rem;
         .field-wrapper {
@@ -138,6 +137,9 @@ watch(() => domainConfigGetters.language, (val) => {
             .p-field-title {
                 padding-bottom: 0.25rem;
             }
+        }
+        .dropdown {
+            width: 15rem;
         }
     }
     .save-button {
