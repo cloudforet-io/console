@@ -2238,6 +2238,7 @@
 			"FOLDER": "Folder",
 			"GLOBAL_BOOKMARK": "Global Bookmark",
 			"GLOBAL_NOTIFICATION": "Global bookmarks are displayed at the top of every workspace home and are managed only by admins.",
+			"GO_TO_SETTINGS": "Go to settings",
 			"GO_TO_WORKSPACE": "Go to this Workspace",
 			"LINK": "Link",
 			"TOGGLE_MORE": "show more",

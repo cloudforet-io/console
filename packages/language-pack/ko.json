@@ -2238,6 +2238,7 @@
 			"FOLDER": "폴더",
 			"GLOBAL_BOOKMARK": "글로벌 북마크",
 			"GLOBAL_NOTIFICATION": "글로벌 북마크는 모든 워크스페이스 홈의 상단에 표시되며 Admin에 의해 관리됩니다.",
+			"GO_TO_SETTINGS": "",
 			"GO_TO_WORKSPACE": "이 워크스페이스로 이동하기",
 			"LINK": "링크",
 			"TOGGLE_MORE": "더보기",
