@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -332,10 +332,6 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
 onMounted(async () => {
     if (tableState.isWorkspaceMember) return;
     await costReportPageStore.fetchCostReportConfig();
-});
-
-onUnmounted(async () => {
-    await costReportPageStore.$reset();
 });
 
 (async () => {

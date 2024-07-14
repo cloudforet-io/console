@@ -174,6 +174,18 @@ export const getDefaultTableSchema = (dynamicFields: DynamicField[], options: {
                     name: 'Auto Sync',
                     type: 'text',
                 },
+                {
+                    key: 'trusted_account_id',
+                    name: 'Trusted Account',
+                    type: 'text',
+                    reference: {
+                        resource_type: 'identity.TrustedAccount',
+                        reference_key: 'trusted_account_id',
+                    },
+                    options: {
+                        disable_copy: true,
+                    },
+                },
             ]) || []),
             {
                 key: 'created_at',
