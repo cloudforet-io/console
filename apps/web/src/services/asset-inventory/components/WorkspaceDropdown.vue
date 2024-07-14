@@ -1,12 +1,11 @@
 <script setup lang="ts">
-
 import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButton, PSelectDropdown } from '@cloudforet/mirinae';
+import { PButton, PSelectDropdown, PStatus } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
 
 
@@ -19,6 +18,8 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const PAGE_SIZE = 10;
@@ -45,6 +46,7 @@ const state = reactive({
                 name: _workspace.workspace_id,
                 label: _workspace.name,
                 tags: _workspace.tags,
+                is_dormant: _workspace.is_dormant,
             })),
             { type: 'button', label: 'Create', name: 'create' },
         ];
@@ -162,6 +164,10 @@ watch(() => state.searchText, debounce(async (searchText) => {
                                          size="xs"
                     />
                     <span class="label-text">{{ item.label }}</span>
+                    <p-status v-if="item?.is_dormant"
+                              v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                              class="capitalize state"
+                    />
                 </div>
             </div>
         </template>
@@ -178,6 +184,9 @@ watch(() => state.searchText, debounce(async (searchText) => {
 
         .label {
             @apply flex items-center gap-2;
+        }
+        .state {
+            @apply text-label-sm;
         }
         .label-text {
             @apply truncate;
