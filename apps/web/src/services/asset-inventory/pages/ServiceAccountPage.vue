@@ -12,24 +12,26 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg, PStatus,
+    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg, PStatus, PTooltip, PI,
 } from '@cloudforet/mirinae';
 import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayoutOptions, SearchSchema } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { ValueItem } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import { ACCOUNT_TYPE, SERVICE_ACCOUNT_STATE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -50,6 +52,8 @@ import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynami
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
+
+import { gray } from '@/styles/colors';
 
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import {
@@ -151,6 +155,14 @@ const tableState = reactive({
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
     adminModeFilter: computed(() => (state.isAdminMode ? [{ k: 'resource_group', v: 'DOMAIN', o: '=' }] : [])),
+    typeField: computed<ValueItem[]>(() => ([
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALL') as string, name: 'ALL' },
+        { label: i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVE') as string, name: SERVICE_ACCOUNT_STATE.ACTIVE },
+        { label: i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.INACTIVE') as string, name: SERVICE_ACCOUNT_STATE.INACTIVE },
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.PENDING') as string, name: SERVICE_ACCOUNT_STATE.PENDING },
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.DELETE') as string, name: SERVICE_ACCOUNT_STATE.DELETED },
+    ])),
+    selectedType: 'ALL',
 });
 
 const searchFilter = new ApiQueryHelper();
@@ -169,6 +181,7 @@ const getQuery = () => {
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters([
             { k: 'provider', v: state.selectedProvider, o: '=' },
+            tableState.selectedType !== 'ALL' && { k: 'state', v: tableState.selectedType, o: '=' },
             ...tableState.adminModeFilter,
             ...tableState.searchFilters,
         ]);
@@ -271,6 +284,10 @@ const handleDynamicLayoutFetch = (changed) => {
 };
 const handleVisibleCustomFieldModal = (visible) => {
     tableState.visibleCustomFieldModal = visible;
+};
+const handleSelectType = async (value: string) => {
+    tableState.selectedType = value;
+    await listServiceAccountData();
 };
 
 /** ******* Page Init ******* */
@@ -390,21 +407,62 @@ onUnmounted(async () => {
                               @click-settings="handleClickSettings"
                               @click-row="handleClickRow"
             >
+                <template v-if="!tableState.isTrustedAccount"
+                          #toolbox-bottom
+                >
+                    <div class="select-type-wrapper">
+                        <span class="mr-2">{{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.STATE') }}</span>
+                        <p-select-status v-for="(item, idx) in tableState.typeField"
+                                         :key="idx"
+                                         :selected="tableState.selectedType"
+                                         class="mr-2"
+                                         :value="item.name"
+                                         @change="handleSelectType"
+                        >
+                            {{ item.label }}
+                        </p-select-status>
+                    </div>
+                </template>
+                <template v-if="!tableState.isTrustedAccount"
+                          #th-cost_info-format="{ field }"
+                >
+                    <div class="th-tooltip">
+                        <span>{{ field.label }}</span>
+                        <p-tooltip
+                            :contents="$t('IDENTITY.SERVICE_ACCOUNT.TOOLTIP_COST')"
+                            position="bottom"
+                            class="tooltip-wrapper"
+                        >
+                            <p-i name="ic_info-circle"
+                                 class="title-tooltip"
+                                 height="1rem"
+                                 width="1rem"
+                                 :color="gray[500]"
+                            />
+                        </p-tooltip>
+                    </div>
+                </template>
                 <template #col-schedule.state-format="{value}">
                     <auto-sync-state v-if="value"
                                      :state="value"
                     />
                 </template>
-                <template #col-asset_info-format="{value}">
+                <template v-if="!tableState.isTrustedAccount"
+                          #col-asset_info-format="{value}"
+                >
                     <span>{{ sum(values(value)) }}</span>
                 </template>
-                <template #col-cost_info-format="{value}">
+                <template v-if="!tableState.isTrustedAccount"
+                          #col-cost_info-format="{value}"
+                >
                     <p>
                         <span>{{ CURRENCY_SYMBOL[state.currency] }}</span>
                         {{ numberFormatter(value?.month) || 0 }}
                     </p>
                 </template>
-                <template #col-state-format="{value}">
+                <template v-if="!tableState.isTrustedAccount"
+                          #col-state-format="{value}"
+                >
                     <p-status v-bind="stateFormatter(value)"
                               class="capitalize"
                     />
@@ -460,6 +518,21 @@ onUnmounted(async () => {
     .p-data-table {
         .row-height-fixed {
             cursor: pointer;
+        }
+    }
+    .select-type-wrapper {
+        @apply flex items-center text-label-md text-gray-600;
+        gap: 0.5rem;
+        margin-top: -0.5rem;
+        margin-left: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .th-tooltip {
+        @apply flex items-center;
+        gap: 0.25rem;
+        .tooltip-wrapper {
+            margin-top: -0.125rem;
         }
     }
 }
