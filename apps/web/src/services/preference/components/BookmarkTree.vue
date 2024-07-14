@@ -18,7 +18,7 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { gray } from '@/styles/colors';
 
-import { getWorkspaceInfo } from '@/services/preference/composables/bookmark-data-helper';
+import { getWorkspaceInfo } from '@/services/preference/composables/refined-table-data';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 import type { TreeNode } from '@/services/project/tree/type';

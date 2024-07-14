@@ -2635,18 +2635,20 @@
 			"CREATE_WORKSPACE": "ワークスペースの作成",
 			"CREATE_WORKSPACE_TEXT_LENGTH": "ワークスペース名の最大長は80文字です。",
 			"DELETE": "削除",
-			"DELETE_WORKSPACE": "削除",
-			"DELETE_WORKSPACE_DESC": "この操作は取り消すことができません。",
+			"DELETE_WORKSPACE": "",
+			"DELETE_WORKSPACE_DESC": "",
 			"DETAIL": {
 				"USERS": "ユーザー"
 			},
 			"DISABLE": "無効化",
-			"DISABLE_WORKSPACE": "選択したワークスペースを無効にしてもよろしいですか？",
+			"DISABLE_WORKSPACE": "",
+			"DISABLE_WORKSPACE_DESC": "",
 			"DORMANT": "",
 			"EDIT": "編集",
 			"EDIT_WORKSPACE": "ワークスペースを編集",
 			"ENABLE": "有効化",
-			"ENABLE_WORKSPACE": "選択したワークスペースを有効にしますか？",
+			"ENABLE_WORKSPACE": "",
+			"ENABLE_WORKSPACE_DESC": "",
 			"FORM": {
 				"DUPLICATED_NAME": "ワークスペース名が重複しています。",
 				"LABEL_DESC": "説明",
@@ -2658,6 +2660,8 @@
 			},
 			"REQUIRED_ENABLE_WORKSPACE": "少なくとも1つのワークスペースを有効にする必要があります。",
 			"STATE": "状態",
+			"TOOLTIP_COST": "",
+			"TOOLTIP_STATE": "",
 			"WORKSPACES": "ワークスペース"
 		}
 	},

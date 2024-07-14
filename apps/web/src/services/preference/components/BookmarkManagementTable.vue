@@ -23,10 +23,12 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import {
-    getWorkspaceInfo,
     makeSearchQueryTagsHandler,
     makeValueHandler,
 } from '@/services/preference/composables/bookmark-data-helper';
+import {
+    getWorkspaceInfo,
+} from '@/services/preference/composables/refined-table-data';
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/preference/constants/bookmark-constant';
 import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
