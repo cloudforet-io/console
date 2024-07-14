@@ -9,15 +9,29 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI, PButtonModal, PTextEditor, PTooltip,
+    PPaneLayout,
+    PHeading,
+    PDataTable,
+    PLink,
+    PToolbox,
+    PButton,
+    PI,
+    PButtonModal,
+    PTextEditor,
+    PTooltip,
+    PStatus,
+    PDivider,
+    PSelectStatus,
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+import type { ValueItem } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
+import { SERVICE_ACCOUNT_STATE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -33,7 +47,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { green, red } from '@/styles/colors';
 
-import { getAccountFields } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
+import { getAccountFields, stateFormatter } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
@@ -92,10 +106,20 @@ const state = reactive({
                 name: field.key,
                 type: 'text',
             })),
+            { name: 'state', label: 'State', sortable: false },
             { name: 'workspace_id', label: 'Workspace', sortable: false },
             { name: 'project_id', label: 'Project', sortable: false },
+            { name: 'created_at', label: 'Created', sortable: false },
         ];
     }),
+    typeField: computed<ValueItem[]>(() => ([
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALL') as string, name: 'ALL' },
+        { label: i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVE') as string, name: SERVICE_ACCOUNT_STATE.ACTIVE },
+        { label: i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.INACTIVE') as string, name: SERVICE_ACCOUNT_STATE.INACTIVE },
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.PENDING') as string, name: SERVICE_ACCOUNT_STATE.PENDING },
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.DELETE') as string, name: SERVICE_ACCOUNT_STATE.DELETED },
+    ])),
+    selectedType: 'ALL',
 });
 
 const apiQueryHelper = new ApiQueryHelper().setSort(state.sortBy, state.sortDesc).setPageLimit(state.pageLimit).setFilters([
@@ -118,7 +142,6 @@ const getAttachedGeneralAccountList = async () => {
         state.loading = false;
     }
 };
-
 const handleChange = async (options?: ToolboxOptions) => {
     try {
         state.loading = true;
@@ -140,7 +163,6 @@ const handleChange = async (options?: ToolboxOptions) => {
         state.loading = false;
     }
 };
-
 const handleSort = async (sortBy, sortDesc) => {
     state.sortBy = sortBy;
     state.sortDesc = sortDesc;
@@ -151,7 +173,6 @@ const handleSort = async (sortBy, sortDesc) => {
         ErrorHandler.handleError(e);
     }
 };
-
 const handleSync = async () => {
     try {
         state.syncReqLoading = true;
@@ -170,14 +191,31 @@ const handleSync = async () => {
 const handleViewSyncError = () => {
     state.errorModalVisible = true;
 };
-
 const handleCloseErrorModal = () => {
     state.errorModalVisible = false;
+};
+const handleSelectType = async (value: string) => {
+    state.selectedType = value;
+    const statusFilterIndex = apiQuery.filter?.findIndex((filter) => filter.k === 'state') || -1;
+
+    const isAllSelected = value === 'ALL';
+
+    if (statusFilterIndex === -1 && !isAllSelected) {
+        apiQuery.filter?.push({ k: 'state', v: value, o: 'eq' });
+    } else if (apiQuery.filter && statusFilterIndex !== -1) {
+        if (isAllSelected) {
+            apiQuery.filter?.splice(statusFilterIndex, 1);
+        } else {
+            apiQuery.filter[statusFilterIndex].v = value;
+        }
+    }
+    await getAttachedGeneralAccountList();
 };
 
 const init = async () => {
     await getAttachedGeneralAccountList();
 };
+
 
 let syncCheckInterval;
 watch(() => state.isSyncing, async (isSyncing) => {
@@ -227,26 +265,44 @@ watch(() => state.trustedAccountId, async (ta) => {
         </p-heading>
         <div class="content-wrapper">
             <div class="content-header">
-                <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled"
-                     class="left"
-                >
-                    <span v-if="state.lastSuccessSynced">{{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.LAST_SYNCED') }}: {{
-                        dayjs(state.lastSuccessSynced).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss')
-                    }}</span>
-                    <p-i v-if="['SUCCESS', 'FAILURE'].includes(state.lastSyncJob?.status)"
-                         :name="(state.lastSyncJob?.status === 'FAILURE') ? 'ic_error-filled' : 'ic_check'"
-                         :color="(state.lastSyncJob?.status === 'FAILURE') ? red[400] : green[600]"
-                         width="1rem"
-                         height="1rem"
-                         class="icon-info"
+                <div class="left-wrapper">
+                    <div class="select-type-wrapper">
+                        <span class="mr-2">{{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.STATE') }}</span>
+                        <p-select-status v-for="(item, idx) in state.typeField"
+                                         :key="idx"
+                                         :selected="state.selectedType"
+                                         class="mr-2"
+                                         :value="item.name"
+                                         @change="handleSelectType"
+                        >
+                            {{ item.label }}
+                        </p-select-status>
+                    </div>
+                    <p-divider vertical
+                               class="divider"
                     />
-                    <p-button v-if="state.lastSyncJob?.status === 'FAILURE'"
-                              style-type="tertiary"
-                              size="sm"
-                              @click="handleViewSyncError"
+                    <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled"
+                         class="auto-sync-wrapper"
                     >
-                        {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.ERROR_FOUND') }}
-                    </p-button>
+                        <span v-if="state.lastSuccessSynced">
+                            <span class="label">{{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.LAST_SYNCED') }}</span>
+                            {{ dayjs(state.lastSuccessSynced).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+                        </span>
+                        <p-i v-if="['SUCCESS', 'FAILURE'].includes(state.lastSyncJob?.status)"
+                             :name="(state.lastSyncJob?.status === 'FAILURE') ? 'ic_error-filled' : 'ic_check'"
+                             :color="(state.lastSyncJob?.status === 'FAILURE') ? red[400] : green[600]"
+                             width="1rem"
+                             height="1rem"
+                             class="icon-info"
+                        />
+                        <p-button v-if="state.lastSyncJob?.status === 'FAILURE'"
+                                  style-type="tertiary"
+                                  size="sm"
+                                  @click="handleViewSyncError"
+                        >
+                            {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.ERROR_FOUND') }}
+                        </p-button>
+                    </div>
                 </div>
                 <p-toolbox :searchable="false"
                            :total-count="state.totalCount"
@@ -286,6 +342,11 @@ watch(() => state.trustedAccountId, async (ta) => {
                         /><span>{{ userWorkspaceStore.getters.workspaceMap[value]?.name }}</span>
                     </span>
                 </template>
+                <template #col-state-format="{value}">
+                    <p-status v-bind="stateFormatter(value)"
+                              class="capitalize"
+                    />
+                </template>
                 <template #col-project_id-format="{value, item}">
                     <span class="project-id-wrapper">
                         <router-link :to="{ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: value, workspaceId: item.workspace_id } }"
@@ -299,6 +360,9 @@ watch(() => state.trustedAccountId, async (ta) => {
                             />
                         </router-link>
                     </span>
+                </template>
+                <template #col-created_at-format="{value}">
+                    {{ dayjs(value.data).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
                 </template>
             </p-data-table>
         </div>
@@ -330,11 +394,27 @@ watch(() => state.trustedAccountId, async (ta) => {
         @apply mb-16 pt-2;
 
         .content-header {
-            @apply flex justify-between items-center px-4;
-
-            .left {
-                @apply mb-4 flex gap-1 items-center;
+            @apply flex justify-between items-center px-4 text-label-md;
+            .left-wrapper {
+                @apply flex items-center;
                 flex-shrink: 0;
+                margin-bottom: 1rem;
+                gap: 0.5rem;
+                .select-type-wrapper {
+                    @apply flex items-center text-gray-600;
+                    gap: 0.5rem;
+                }
+                .divider {
+                    height: 0.875rem;
+                }
+                .auto-sync-wrapper {
+                    @apply flex gap-1 items-center;
+                    margin-left: 0.5rem;
+                    .label {
+                        @apply text-gray-600;
+                        margin-right: 1rem;
+                    }
+                }
             }
         }
     }
