@@ -7,7 +7,7 @@ const colorBindFactory = (colorMapping, textFnc) => (value) => ({
     ...colorMapping[value],
 });
 
-export const workspaceStateFormatter = colorBindFactory(WORKSPACE_STATE_COLOR, (value) => value.toLowerCase());
+export const workspaceStateFormatter = colorBindFactory(WORKSPACE_STATE_COLOR, (value) => value?.toLowerCase());
 
 export const getWorkspaceInfo = (id: string, workspaceList: WorkspaceModel[]): WorkspaceModel|undefined => {
     if (!id) return undefined;

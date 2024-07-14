@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI, PTreeView } from '@cloudforet/mirinae';
+import { PI, PTreeView, PTextButton } from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';

@@ -1,6 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 
-type WorkspaceState = 'ENABLED' | 'DISABLED';
+export type WorkspaceState = 'ENABLED' | 'DISABLED' | 'DORMANT';
 
 export interface WorkspaceModel {
     workspace_id: string;

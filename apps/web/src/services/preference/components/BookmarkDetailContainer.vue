@@ -8,7 +8,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { at } from 'lodash';
 
 import {
-    PHeading, PButton, PContextMenu, PI, PIconButton,
+    PHeading, PButton, PContextMenu, PI, PIconButton, PStatus,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
@@ -24,7 +24,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { gray } from '@/styles/colors';
 
-import { getWorkspaceInfo } from '@/services/preference/composables/refined-table-data';
+import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
@@ -69,8 +69,9 @@ const state = reactive({
         if (state.group === 'global') {
             return i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARK');
         }
-        return getWorkspaceInfo(state.group, storeState.workspaceList)?.name || '';
+        return state.workspaceInfo?.name || '';
     }),
+    workspaceInfo: computed<WorkspaceModel|undefined>(() => getWorkspaceInfo(state.group, storeState.workspaceList)),
 });
 
 const handleClickCreateButton = () => {
@@ -89,11 +90,17 @@ const handleClickGoBackButton = () => {
     });
 };
 const handleClickWorkspaceButton = () => {
+    if (!state.workspaceInfo?.is_dormant) {
+        window.open(router.resolve({
+            name: WORKSPACE_HOME_ROUTE._NAME,
+            params: {
+                workspaceId: state.group,
+            },
+        }).href, '_blank');
+        return;
+    }
     window.open(router.resolve({
-        name: WORKSPACE_HOME_ROUTE._NAME,
-        params: {
-            workspaceId: state.group,
-        },
+        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
     }).href, '_blank');
 };
 const handleClickDeleteButton = () => {
@@ -146,8 +153,8 @@ const handleSelectMenuItem = (value: MenuItem) => {
                          height="1.5rem"
                     />
                     <workspace-logo-icon v-else
-                                         :text="getWorkspaceInfo(state.group, storeState.workspaceList)?.name || ''"
-                                         :theme="getWorkspaceInfo(state.group, storeState.workspaceList)?.tags?.theme"
+                                         :text="state.workspaceInfo?.name || ''"
+                                         :theme="state.workspaceInfo?.tags?.theme"
                                          size="sm"
                     />
                 </div>
@@ -161,10 +168,14 @@ const handleSelectMenuItem = (value: MenuItem) => {
                     />
                 </div>
             </template>
-            <template v-if="state.folder && state.group === 'global'"
-                      #title-right-extra
-            >
-                <div class="title-extra">
+            <template #title-right-extra>
+                <p-status v-if="state.workspaceInfo?.is_dormant"
+                          v-bind="workspaceStateFormatter( WORKSPACE_STATE.DORMANT)"
+                          class="capitalize state"
+                />
+                <div v-if="state.folder && state.group === 'global'"
+                     class="title-extra"
+                >
                     <p-icon-button name="ic_edit-text"
                                    style-type="transparent"
                                    @click="handleClickEditFolderButton"
@@ -201,12 +212,13 @@ const handleSelectMenuItem = (value: MenuItem) => {
                         />
                     </div>
                 </div>
-                <p-button v-else-if="getWorkspaceInfo(state.group, storeState.workspaceList).state === WORKSPACE_STATE.ENABLE"
+                <p-button v-else-if="state.workspaceInfo?.state !== WORKSPACE_STATE.DISABLE"
                           style-type="tertiary"
-                          icon-right="ic_arrow-right-up"
+                          :icon-right="!state.workspaceInfo?.is_dormant ? 'ic_arrow-right-up' : undefined"
+                          :icon-left="state.workspaceInfo?.is_dormant ? 'ic_settings' : undefined"
                           @click="handleClickWorkspaceButton"
                 >
-                    {{ $t('IAM.BOOKMARK.GO_TO_WORKSPACE') }}
+                    {{ !state.workspaceInfo?.is_dormant? $t('IAM.BOOKMARK.GO_TO_WORKSPACE') : $t('IAM.BOOKMARK.GO_TO_SETTINGS') }}
                 </p-button>
             </template>
         </p-heading>
@@ -234,6 +246,12 @@ const handleSelectMenuItem = (value: MenuItem) => {
         }
         .title-extra {
             @apply flex items-center;
+        }
+        .state {
+            @apply text-label-md border border-coral-300;
+            padding-right: 0.5rem;
+            padding-left: 0.5rem;
+            border-radius: 6.25rem;
         }
     }
 }
