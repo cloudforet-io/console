@@ -68,6 +68,7 @@ const handlers = {
         title: 'Properties',
         items: [
             { name: 'name', label: 'Name' },
+            { name: 'webhook_id', label: 'Webhook ID' },
             { name: 'state', label: 'State' },
             { name: 'plugin_info.plugin_id', label: 'Plugin' },
             { name: 'webhook_url', label: 'Webhook URL' },
@@ -117,6 +118,7 @@ const state = reactive({
     ] as MenuItem[])),
     fields: [
         { name: 'name', label: 'Name' },
+        { name: 'webhook_id', label: 'Webhook ID' },
         { name: 'state', label: 'State' },
         { name: 'plugin_info.plugin_id', label: 'Type' },
         { name: 'plugin_info.version', label: 'Version' },

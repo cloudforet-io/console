@@ -4,21 +4,18 @@ import { useRoute } from 'vue-router/composables';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import { debounce, isEmpty, sumBy } from 'lodash';
+import { cloneDeep, debounce, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { PEmpty, PSelectButton, PSkeleton } from '@cloudforet/mirinae';
+import {
+    PEmpty, PSelectButton, PSkeleton, PSelectDropdown, PButton,
+} from '@cloudforet/mirinae';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 
-import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
-
-import { BASIC_CHART_COLORS, MASSIVE_CHART_COLORS } from '@/styles/colorsets';
-
-import MetricExplorerChartLegends from '@/services/asset-inventory/components/MetricExplorerChartLegends.vue';
 import MetricExplorerDonutChart from '@/services/asset-inventory/components/MetricExplorerDonutChart.vue';
 import MetricExplorerHorizontalColumnChart
     from '@/services/asset-inventory/components/MetricExplorerHorizontalColumnChart.vue';
@@ -27,16 +24,11 @@ import MetricExplorerTreeMapChart from '@/services/asset-inventory/components/Me
 import { CHART_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import {
     getFilteredRealtimeData,
-    getMetricChartLegends,
-    getRefinedMetricRealtimeChartData,
-    getRefinedMetricXYChartData,
 } from '@/services/asset-inventory/helpers/asset-analysis-chart-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
     ChartType,
-    Legend,
     MetricDataAnalyzeResult,
-    Period,
     RealtimeChartData,
     XYChartData,
 } from '@/services/asset-inventory/types/asset-analysis-type';
@@ -49,7 +41,6 @@ const SELECT_BUTTON_ITEMS = [
     { name: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
     { name: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
 ];
-const OTHER_CATEGORY = 'Others';
 
 const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
@@ -60,7 +51,7 @@ const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     data: undefined as undefined|AnalyzeResponse<MetricDataAnalyzeResult>,
     chartData: [] as Array<XYChartData|RealtimeChartData>,
-    legends: [] as Legend[],
+    legend: {} as Record<string, boolean>,
     chart: null as XYChart|am5percent.PieChart| null,
     periodText: computed<string>(() => {
         if (isEmpty(metricExplorerPageState.period)) return '';
@@ -69,18 +60,10 @@ const state = reactive({
         }
         return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
     }),
-    chartColorSet: computed(() => {
-        const _isMassive = state.legends.length > BASIC_CHART_COLORS.length;
-        const _index = SELECT_BUTTON_ITEMS.findIndex((item) => item.name === metricExplorerPageState.selectedChartType);
-        const _sliceIndex = _isMassive ? _index * 4 : _index * 2;
-        let _colorSet = MASSIVE_CHART_COLORS;
-        if (!_isMassive) {
-            _colorSet = BASIC_CHART_COLORS;
-        }
-        const firstPart = _colorSet.slice(_sliceIndex);
-        const secondPart = _colorSet.slice(0, _sliceIndex);
-        return firstPart.concat(secondPart).slice(0, state.legends.length);
-    }),
+    chartGroupByMenuItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys
+        .filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key))
+        .map((d) => ({ name: d.key, label: d.name }))),
+    showHideAll: computed(() => Object.values(state.legend).some((d) => d)),
 });
 
 /* Util */
@@ -94,30 +77,6 @@ const setPeriodText = () => {
         periodText = `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
     }
     metricExplorerPageStore.setPeriodText(periodText);
-};
-const getRefinedDonutChartData = (res: AnalyzeResponse<MetricDataAnalyzeResult>): AnalyzeResponse<MetricDataAnalyzeResult> => {
-    const _results: MetricDataAnalyzeResult[] = [];
-    const _totalAmount = sumBy(res.results, 'count');
-    const _thresholdValue = _totalAmount * 0.02;
-    let _othersValueSum = 0;
-    const _refinedGroupByKey = metricExplorerPageState.selectedChartGroupBy?.replace('labels.', '') as string;
-    res.results?.forEach((d) => {
-        if (typeof d.count === 'number' && (d.count < _thresholdValue)) {
-            _othersValueSum += d.count;
-        } else {
-            _results.push(d);
-        }
-    });
-    if (_othersValueSum > 0) {
-        _results.push({
-            [_refinedGroupByKey]: OTHER_CATEGORY,
-            count: _othersValueSum,
-        });
-    }
-    return {
-        more: res.more,
-        results: _results,
-    };
 };
 
 /* Api */
@@ -166,22 +125,8 @@ const setChartData = debounce(async (analyze = true) => {
         if (!rawData) return;
         state.data = rawData;
     }
-    if (metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT) {
-        state.data = getRefinedDonutChartData(state.data as AnalyzeResponse<MetricDataAnalyzeResult>);
-    }
 
     setPeriodText();
-
-    const _granularity = metricExplorerPageState.granularity;
-    const _period = metricExplorerPageState.period as Period;
-    const _groupBy = metricExplorerPageState.selectedChartGroupBy;
-
-    state.legends = getMetricChartLegends(metricExplorerPageGetters.labelKeysReferenceMap, metricExplorerPageState.selectedChartType, state.data, _groupBy);
-    if (metricExplorerPageGetters.isRealtimeChart) {
-        state.chartData = getRefinedMetricRealtimeChartData(metricExplorerPageGetters.labelKeysReferenceMap, state.data, _groupBy);
-    } else {
-        state.chartData = getRefinedMetricXYChartData(state.data, _granularity, _period, _groupBy);
-    }
     state.loading = false;
 }, 300);
 
@@ -194,20 +139,28 @@ const handleSelectButton = (selected: ChartType|string) => {
         || (!metricExplorerPageGetters.isRealtimeChart && !timeSeriesChartList.includes(selected))) {
         analyzeData = true;
     }
+    state.legend = {};
     setChartData(analyzeData);
     metricExplorerPageStore.setSelectedChartType(selected);
 };
-const handleToggleSeries = (index: number) => {
-    toggleSeries(state.chart as XYChart, index);
+const handleChartGroupByItem = (groupBy?: string) => {
+    metricExplorerPageStore.setSelectedChartGroupBy(groupBy);
 };
-const handleAllSeries = (type: string) => {
-    if (type === 'show') {
-        showAllSeries(state.chart as XYChart);
+const handleToggleAllLegends = () => {
+    const _legend = cloneDeep(state.legend);
+    if (state.showHideAll) {
+        Object.keys(_legend).forEach((d) => {
+            _legend[d] = false;
+        });
     } else {
-        hideAllSeries(state.chart as XYChart);
+        Object.keys(_legend).forEach((d) => {
+            _legend[d] = true;
+        });
     }
+    state.legend = _legend;
 };
 
+/* Watcher */
 watch([
     () => state.currentMetricId,
     () => metricExplorerPageState.metricInitiated,
@@ -217,6 +170,7 @@ watch([
     () => metricExplorerPageGetters.consoleFilters,
 ], async ([metricId, metricInitiated]) => {
     if (!metricId || !metricInitiated) return;
+    state.legend = {};
     await setChartData();
 }, { immediate: true });
 watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
@@ -225,11 +179,24 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
         metricExplorerPageStore.setRefreshMetricData(false);
     }
 }, { immediate: false });
+watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
+    if (!after.length) {
+        metricExplorerPageStore.setSelectedChartGroupBy(undefined);
+    } else if (!after.filter((d) => d === metricExplorerPageState.selectedChartGroupBy).length) {
+        metricExplorerPageStore.setSelectedChartGroupBy(after[0]);
+    }
+});
 </script>
 
 <template>
     <div class="metric-explorer-chart">
         <div class="top-part">
+            <p-select-dropdown :menu="state.chartGroupByMenuItems"
+                               :selected="metricExplorerPageState.selectedChartGroupBy"
+                               :disabled="!metricExplorerPageState.selectedGroupByList.length"
+                               class="group-by-select-dropdown"
+                               @select="handleChartGroupByItem"
+            />
             <div class="select-button-wrapper">
                 <p-select-button v-for="item in SELECT_BUTTON_ITEMS"
                                  :key="`chart-select-button-${item.name}`"
@@ -244,58 +211,54 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
             </div>
         </div>
         <div class="bottom-part">
-            <div class="left-part">
-                <p-skeleton v-if="state.loading"
-                            height="100%"
-                />
-                <template v-else-if="state.chartData.length">
-                    <metric-explorer-line-chart
-                        v-if="!metricExplorerPageGetters.isRealtimeChart"
-                        :loading="state.loading"
-                        :chart.sync="state.chart"
-                        :chart-data="state.chartData"
-                        :legends="state.legends"
-                        :color-set="state.chartColorSet"
-                        :stacked="metricExplorerPageState.selectedChartType === CHART_TYPE.LINE_AREA"
-                    />
-                    <metric-explorer-donut-chart
-                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT"
-                        :loading="state.loading"
-                        :chart.sync="state.chart"
-                        :chart-data="state.chartData"
-                        :legends="state.legends"
-                        :color-set="state.chartColorSet"
-                    />
-                    <metric-explorer-tree-map-chart
-                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.TREEMAP"
-                        :loading="state.loading"
-                        :chart-data="state.chartData"
-                        :legends="state.legends"
-                    />
-                    <metric-explorer-horizontal-column-chart
-                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN"
-                        :loading="state.loading"
-                        :chart.sync="state.chart"
-                        :chart-data="state.chartData"
-                        :color-set="state.chartColorSet"
-                    />
-                </template>
-                <p-empty v-else
-                         class="empty-wrapper"
+            <div class="bottom-right-part">
+                <p v-if="state.data?.more"
+                   class="too-many-text"
                 >
-                    <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_DATA') }}</span>
-                </p-empty>
+                    {{ $t('INVENTORY.METRIC_EXPLORER.SHOWING_TOP_15') }}
+                </p>
+                <p-button size="sm"
+                          style-type="tertiary"
+                          :disabled="isEmpty(state.legend)"
+                          @click="handleToggleAllLegends"
+                >
+                    {{ state.showHideAll ? $t('INVENTORY.METRIC_EXPLORER.HIDE_ALL') : $t('INVENTORY.METRIC_EXPLORER.SHOW_ALL') }}
+                </p-button>
             </div>
-            <div class="right-part">
-                <metric-explorer-chart-legends :legends.sync="state.legends"
-                                               :loading="state.loading"
-                                               :more="state.data?.more"
-                                               :color-set="state.chartColorSet"
-                                               @toggle-series="handleToggleSeries"
-                                               @show-all-series="handleAllSeries('show')"
-                                               @hide-all-series="handleAllSeries('hide')"
+            <p-skeleton v-if="state.loading"
+                        height="100%"
+            />
+            <template v-else-if="!isEmpty(state.data)">
+                <metric-explorer-line-chart
+                    v-if="!metricExplorerPageGetters.isRealtimeChart"
+                    :loading="state.loading"
+                    :data="state.data"
+                    :legend.sync="state.legend"
+                    :stacked="metricExplorerPageState.selectedChartType === CHART_TYPE.LINE_AREA"
                 />
-            </div>
+                <metric-explorer-donut-chart
+                    v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT"
+                    :loading="state.loading"
+                    :data="state.data"
+                    :legend.sync="state.legend"
+                />
+                <metric-explorer-tree-map-chart
+                    v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.TREEMAP"
+                    :loading="state.loading"
+                    :data="state.data"
+                />
+                <metric-explorer-horizontal-column-chart
+                    v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN"
+                    :loading="state.loading"
+                    :data="state.data"
+                    :legend.sync="state.legend"
+                />
+            </template>
+            <p-empty v-else
+                     class="empty-wrapper"
+            >
+                <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_DATA') }}</span>
+            </p-empty>
         </div>
     </div>
 </template>
@@ -307,26 +270,35 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
     margin-bottom: 1rem;
     .top-part {
         display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        padding-bottom: 0.75rem;
+        justify-content: space-between;
+        text-align: right;
         .select-button-wrapper {
             display: flex;
+            justify-content: flex-end;
             gap: 0.375rem;
+            padding-bottom: 0.5rem;
+        }
+        .group-by-select-dropdown {
+            width: 23%;
         }
     }
     .bottom-part {
-        @apply grid grid-cols-12;
-        grid-gap: 1rem;
-        .left-part {
-            @apply col-span-9;
-            height: 25rem;
-            .empty-wrapper {
-                height: 100%;
-            }
+        height: 25rem;
+        margin-top: 1rem;
+        .bottom-right-part {
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 0.5rem;
         }
-        .right-part {
-            @apply col-span-3;
+        .too-many-text {
+            @apply text-gray-400;
+            font-size: 0.75rem;
+            padding-right: 0.5rem;
+        }
+        .empty-wrapper {
+            height: 100%;
         }
 
         /* custom design-system component - p-text-editor */

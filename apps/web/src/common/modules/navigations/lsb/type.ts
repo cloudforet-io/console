@@ -46,6 +46,7 @@ export interface LSBItem {
     currentPath?: string;
     isBackLink?: boolean;
     isSub?: boolean;
+    initialCollapsed?: boolean; // for collapsible LSB item
 }
 
 export interface LSBCollapsibleItem<T = any> extends LSBItem {
