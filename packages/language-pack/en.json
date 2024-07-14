@@ -2722,6 +2722,7 @@
 			"MAIN": {
 				"ACTION": "Action",
 				"ADD": "Add",
+				"ALL": "All",
 				"ALT_E_CHANGE_PROJECT": "Failed to Change Project",
 				"ALT_E_DELETE_ACCOUNT": "Failed to Delete Account",
 				"ALT_E_RELEASE_PROJECT": "Failed to Release Project",
@@ -2734,15 +2735,21 @@
 				"CONSOLE": "Connect to Console",
 				"CREATE": "Create",
 				"DELETE": "Delete",
+				"MANAGED_INFO": "This status settings can be changed in admin mode. ",
 				"NO_SELECTED_ACCOUNT": "Select a service account for more details.",
+				"PENDING": "Pending",
 				"PROVIDERS_TITLE": "Service Providers",
+				"STATE": "State",
 				"TAB_CREDENTIALS": "Credentials",
 				"TAB_DETAILS": "Details",
 				"TAB_MEMBER": "Related Member",
 				"TAB_SELECTED_DATA": "Selected Data",
 				"TAB_TAG": "Tag",
-				"TITLE": "{provider} Accounts"
-			}
+				"TITLE": "{provider} Accounts",
+				"USAGE_OVERVIEW": "Usage Overview",
+				"VIEW_IN_ADMIN_MODE": "View in Admin Mode"
+			},
+			"TOOLTIP_COST": "based on Cost Report"
 		},
 		"TAGS_PLACEHOLDER": "key1:value1 key2:value2",
 		"USER": {

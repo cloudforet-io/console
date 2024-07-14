@@ -2722,6 +2722,7 @@
 			"MAIN": {
 				"ACTION": "作業",
 				"ADD": "追加",
+				"ALL": "すべて",
 				"ALT_E_CHANGE_PROJECT": "プロジェクト変更に失敗",
 				"ALT_E_DELETE_ACCOUNT": "アカウント削除に失敗",
 				"ALT_E_RELEASE_PROJECT": "プロジェクト解除に失敗",
@@ -2734,15 +2735,21 @@
 				"CONSOLE": "コンソール接続",
 				"CREATE": "作成",
 				"DELETE": "削除",
+				"MANAGED_INFO": "",
 				"NO_SELECTED_ACCOUNT": "サービスアカウントを選択すると、詳細を見ることができます。",
+				"PENDING": "保留中",
 				"PROVIDERS_TITLE": "サービスプロバイダー",
+				"STATE": "状態",
 				"TAB_CREDENTIALS": "暗号化キー",
 				"TAB_DETAILS": "詳細情報",
 				"TAB_MEMBER": "関連するメンバー",
 				"TAB_SELECTED_DATA": "選択したデータ",
 				"TAB_TAG": "タグ",
-				"TITLE": "{provider}アカウント"
-			}
+				"TITLE": "{provider}アカウント",
+				"USAGE_OVERVIEW": "利用概要",
+				"VIEW_IN_ADMIN_MODE": "管理者モードで確認"
+			},
+			"TOOLTIP_COST": ""
 		},
 		"TAGS_PLACEHOLDER": "key1:value1 key2:value2",
 		"USER": {
