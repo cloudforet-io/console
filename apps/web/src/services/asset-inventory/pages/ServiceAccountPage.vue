@@ -1,36 +1,42 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { sum, values } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg,
+    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg, PStatus, PTooltip, PI,
 } from '@cloudforet/mirinae';
 import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayoutOptions, SearchSchema } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { ValueItem } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import { ACCOUNT_TYPE, SERVICE_ACCOUNT_STATE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap, ProviderItem } from '@/store/reference/provider-reference-store';
 
@@ -47,15 +53,19 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
+import { gray } from '@/styles/colors';
+
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
 } from '@/services/asset-inventory/constants/service-account-constant';
 import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agent-mode-helper';
+import { stateFormatter } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import type { QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
+import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 const { width } = useWindowSize();
 
@@ -64,6 +74,8 @@ const route = useRoute();
 const { query } = router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
+const costReportPageStore = useCostReportPageStore();
+const constReportPageGetters = costReportPageStore.getters;
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountSchemaState = serviceAccountSchemaStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -72,6 +84,7 @@ const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
+    currency: computed<Currency|undefined>(() => constReportPageGetters.currency),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -142,6 +155,14 @@ const tableState = reactive({
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
     adminModeFilter: computed(() => (state.isAdminMode ? [{ k: 'resource_group', v: 'DOMAIN', o: '=' }] : [])),
+    typeField: computed<ValueItem[]>(() => ([
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALL') as string, name: 'ALL' },
+        { label: i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVE') as string, name: SERVICE_ACCOUNT_STATE.ACTIVE },
+        { label: i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.INACTIVE') as string, name: SERVICE_ACCOUNT_STATE.INACTIVE },
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.PENDING') as string, name: SERVICE_ACCOUNT_STATE.PENDING },
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.DELETE') as string, name: SERVICE_ACCOUNT_STATE.DELETED },
+    ])),
+    selectedType: 'ALL',
 });
 
 const searchFilter = new ApiQueryHelper();
@@ -160,6 +181,7 @@ const getQuery = () => {
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters([
             { k: 'provider', v: state.selectedProvider, o: '=' },
+            tableState.selectedType !== 'ALL' && { k: 'state', v: tableState.selectedType, o: '=' },
             ...tableState.adminModeFilter,
             ...tableState.searchFilters,
         ]);
@@ -263,6 +285,10 @@ const handleDynamicLayoutFetch = (changed) => {
 const handleVisibleCustomFieldModal = (visible) => {
     tableState.visibleCustomFieldModal = visible;
 };
+const handleSelectType = async (value: string) => {
+    tableState.selectedType = value;
+    await listServiceAccountData();
+};
 
 /** ******* Page Init ******* */
 
@@ -302,6 +328,11 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
     if (state.currentGrantInfo.scope === 'USER') return;
     listServiceAccountData();
 }, { immediate: true });
+
+onMounted(async () => {
+    if (tableState.isWorkspaceMember) return;
+    await costReportPageStore.fetchCostReportConfig();
+});
 
 (async () => {
     serviceAccountSchemaState.selectedAccountType = tableState.accountTypeList[0].name;
@@ -372,9 +403,64 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                               @click-settings="handleClickSettings"
                               @click-row="handleClickRow"
             >
+                <template v-if="!tableState.isTrustedAccount"
+                          #toolbox-bottom
+                >
+                    <div class="select-type-wrapper">
+                        <span class="mr-2">{{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.STATE') }}</span>
+                        <p-select-status v-for="(item, idx) in tableState.typeField"
+                                         :key="idx"
+                                         :selected="tableState.selectedType"
+                                         class="mr-2"
+                                         :value="item.name"
+                                         @change="handleSelectType"
+                        >
+                            {{ item.label }}
+                        </p-select-status>
+                    </div>
+                </template>
+                <template v-if="!tableState.isTrustedAccount"
+                          #th-cost_info-format="{ field }"
+                >
+                    <div class="th-tooltip">
+                        <span>{{ field.label }}</span>
+                        <p-tooltip
+                            :contents="$t('IDENTITY.SERVICE_ACCOUNT.TOOLTIP_COST')"
+                            position="bottom"
+                            class="tooltip-wrapper"
+                        >
+                            <p-i name="ic_info-circle"
+                                 class="title-tooltip"
+                                 height="1rem"
+                                 width="1rem"
+                                 :color="gray[500]"
+                            />
+                        </p-tooltip>
+                    </div>
+                </template>
                 <template #col-schedule.state-format="{value}">
                     <auto-sync-state v-if="value"
                                      :state="value"
+                    />
+                </template>
+                <template v-if="!tableState.isTrustedAccount"
+                          #col-asset_info-format="{value}"
+                >
+                    <span>{{ sum(values(value)) }}</span>
+                </template>
+                <template v-if="!tableState.isTrustedAccount"
+                          #col-cost_info-format="{value}"
+                >
+                    <p>
+                        <span>{{ CURRENCY_SYMBOL[state.currency] }}</span>
+                        {{ numberFormatter(value?.month) || 0 }}
+                    </p>
+                </template>
+                <template v-if="!tableState.isTrustedAccount"
+                          #col-state-format="{value}"
+                >
+                    <p-status v-bind="stateFormatter(value)"
+                              class="capitalize"
                     />
                 </template>
                 <template #col-is_managed-format="{item}">
@@ -428,6 +514,21 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
     .p-data-table {
         .row-height-fixed {
             cursor: pointer;
+        }
+    }
+    .select-type-wrapper {
+        @apply flex items-center text-label-md text-gray-600;
+        gap: 0.5rem;
+        margin-top: -0.5rem;
+        margin-left: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .th-tooltip {
+        @apply flex items-center;
+        gap: 0.25rem;
+        .tooltip-wrapper {
+            margin-top: -0.125rem;
         }
     }
 }

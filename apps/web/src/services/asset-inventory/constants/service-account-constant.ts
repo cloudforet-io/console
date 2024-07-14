@@ -1,10 +1,31 @@
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 
+import * as styles from '@/styles/colors';
+
 // TRUSTED-MANAGED is not added as a constant because it is used only as a style option.
 export const ACCOUNT_TYPE_BADGE_OPTION = {
     [ACCOUNT_TYPE.GENERAL]: { label: 'General Account', styleType: 'gray200' },
     [ACCOUNT_TYPE.TRUSTED]: { label: 'Trusted Account', styleType: 'blue200' },
     'TRUSTED-MANAGED': { label: 'Trusted Account - Managed', styleType: 'primary3' },
+} as const;
+
+export const ACCOUNT_STATE_COLOR = {
+    ACTIVE: {
+        iconColor: styles.green[600],
+        textColor: styles.gray[900],
+    },
+    DELETED: {
+        iconColor: styles.red[500],
+        textColor: styles.gray[900],
+    },
+    PENDING: {
+        iconColor: styles.yellow[500],
+        textColor: styles.gray[900],
+    },
+    INACTIVE: {
+        iconColor: styles.gray[400],
+        textColor: styles.gray[400],
+    },
 } as const;
 
 export const PROVIDER_ACCOUNT_NAME = {

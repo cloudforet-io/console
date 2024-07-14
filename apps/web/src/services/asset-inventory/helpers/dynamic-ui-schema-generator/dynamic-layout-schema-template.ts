@@ -51,15 +51,29 @@ export const getDefaultDetailSchema = (fields: DynamicField[], options: {
                 name: field.name,
                 type: 'text',
             })),
-            ...((!options.isTrustedAccount && [{
-                key: 'project_id',
-                name: 'Project',
-                type: 'text',
-                reference: {
-                    resource_type: 'identity.Project',
-                    reference_key: 'project_id',
+            ...((!options.isTrustedAccount && [
+                {
+                    key: 'project_id',
+                    name: 'Project',
+                    type: 'text',
+                    reference: {
+                        resource_type: 'identity.Project',
+                        reference_key: 'project_id',
+                    },
                 },
-            }]) || []),
+                {
+                    key: 'trusted_account_id',
+                    name: 'Trusted Account',
+                    type: 'text',
+                    reference: {
+                        resource_type: 'identity.TrustedAccount',
+                        reference_key: 'trusted_account_id',
+                    },
+                    options: {
+                        disable_copy: true,
+                    },
+                },
+            ]) || []),
             {
                 key: 'created_at',
                 name: 'Created',
@@ -141,9 +155,36 @@ export const getDefaultTableSchema = (dynamicFields: DynamicField[], options: {
                     },
                 },
                 {
+                    key: 'state',
+                    name: 'State',
+                    type: 'state',
+                },
+                {
+                    key: 'asset_info',
+                    name: 'Asset',
+                    type: 'text',
+                },
+                {
+                    key: 'cost_info',
+                    name: 'Cost',
+                    type: 'text',
+                },
+                {
                     key: 'is_managed',
                     name: 'Auto Sync',
                     type: 'text',
+                },
+                {
+                    key: 'trusted_account_id',
+                    name: 'Trusted Account',
+                    type: 'text',
+                    reference: {
+                        resource_type: 'identity.TrustedAccount',
+                        reference_key: 'trusted_account_id',
+                    },
+                    options: {
+                        disable_copy: true,
+                    },
                 },
             ]) || []),
             {
