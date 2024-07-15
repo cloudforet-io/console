@@ -76,18 +76,33 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         defaultGroupByItems: computed<GroupByItem[]>(() => [...getters.managedGroupByItems, ...getters.additionalInfoGroupByItems]),
         managedGroupByItems: computed<GroupByItem[]>(() => {
             if (_state.isAdminMode) return Object.values(GROUP_BY_ITEM_MAP);
-            return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
+            const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
+            const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
+            let _additionalInfoGroupBy: GroupByItem[] = [];
+            if (metadataAdditionalInfo) {
+                _additionalInfoGroupBy = Object.entries(metadataAdditionalInfo)
+                    .filter(([, value]) => value?.visible)
+                    .map(([key, value]) => ({
+                        name: `additional_info.${key}`,
+                        label: value?.name,
+                    }));
+            }
+            const _managedGroupByItems = Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
+            return [..._managedGroupByItems, ..._additionalInfoGroupBy];
         }),
         additionalInfoGroupByItems: computed<GroupByItem[]>(() => {
             let additionalInfoGroupBy: GroupByItem[] = [];
             if (costQuerySetState.selectedDataSourceId) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-                const additionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys;
-                if (targetDataSource && additionalInfoKeys?.length) {
-                    additionalInfoGroupBy = additionalInfoKeys.map((d) => ({
-                        name: `additional_info.${d}`,
-                        label: d,
-                    }));
+                const costAdditionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys; // HACK: will be deprecated
+                if (!targetDataSource) return [];
+                if (costAdditionalInfoKeys?.length) {
+                    additionalInfoGroupBy = costAdditionalInfoKeys
+                        .filter((d) => !getters.managedGroupByItems.find((item) => item.label === d))
+                        .map((d) => ({
+                            name: `additional_info.${d}`,
+                            label: d,
+                        }));
                 }
             }
             return [...sortBy(additionalInfoGroupBy, 'label')];
