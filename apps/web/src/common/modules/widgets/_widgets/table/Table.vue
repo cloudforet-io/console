@@ -28,6 +28,7 @@ import {
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getWidgetDataTable, sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -173,7 +174,6 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Helper */
-const isDateField = (fieldName: DateFieldType) => Object.values(DATE_FIELD).includes(fieldName);
 const getWidgetTableDateFields = (
     dateField: DateFieldType,
     granularity: Granularity|undefined,
@@ -293,6 +293,13 @@ watch(() => state.data, () => {
             if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
             [...state.tableDataField, 'sub_total'].forEach((field) => {
                 totalDataItem[field] = results.reduce((acc, cur) => acc + cur[field], 0);
+                if (field !== 'sub_total' && hasComparisonInfo) {
+                    const comparisionFieldName = `comparison_${field}`;
+                    totalDataItem[comparisionFieldName] = {
+                        target: totalDataItem[field],
+                        subject: results.reduce((acc, cur) => acc + cur[comparisionFieldName].subject, 0),
+                    };
+                }
             });
             results.push(totalDataItem);
         }
@@ -334,8 +341,8 @@ watch(() => state.data, () => {
 
         const comparisonData = [...state.comparisonData?.results ?? []];
         const baseData = [...state.data?.results ?? []];
+        const hasComparisonOption = state.comparisonInfo?.format && state.isComparisonEnabled;
         const results = baseData.map((d) => {
-            const hasComparisonOption = state.comparisonInfo?.format && state.isComparisonEnabled;
             const dynamicFieldData = d[state.tableDataCriteria] ?? [];
             const dynamicFieldDataFilteredByAvailableField = dynamicFieldData.filter((item) => availableDataFieldsExceptDateField.includes(item[state.tableDataField]));
             const sortedAndFilteredData = sortBy(
@@ -376,10 +383,22 @@ watch(() => state.data, () => {
             const totalDataItem: TableDataItem = {};
             const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
             if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
-            const fieldForTotal = results?.[0]?.[state.tableDataCriteria]?.filter((item) => !item[state.tableDataField].startsWith('comparison_')) ?? [];
+            const fieldForTotal = results?.[0]?.[state.tableDataCriteria] ?? [];
             totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
-                const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === item[state.tableDataField])?.value || 0), 0);
-                return { [state.tableDataField]: item[state.tableDataField], value: totalValue };
+                const fieldName = item[state.tableDataField];
+                if (fieldName.startsWith('comparison_')) {
+                    const targetTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.target || 0), 0);
+                    const subjectTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.subject || 0), 0);
+                    return {
+                        [state.tableDataField]: fieldName,
+                        value: {
+                            target: targetTotalValue,
+                            subject: subjectTotalValue,
+                        },
+                    };
+                }
+                const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value || 0), 0);
+                return { [state.tableDataField]: fieldName, value: totalValue };
             });
             results.push(totalDataItem);
         }
