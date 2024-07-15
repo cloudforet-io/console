@@ -1,0 +1,33 @@
+{/* PMarkdown.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PMarkdownStories from './PMarkdown.stories';
+
+<Meta of={PMarkdownStories} />
+
+# Markdown
+<br/>
+<br/>
+
+## String Markdown
+<Canvas of={PMarkdownStories.StringMarkdown} />
+
+<br/>
+<br/>
+
+## Object Markdown
+<Canvas of={PMarkdownStories.ObjectMarkdown} />
+
+<br/>
+<br/>
+
+## Data Combining
+<Canvas of={PMarkdownStories.DataCombining} />
+
+## Playground
+<Canvas of={PMarkdownStories.Playground} />
+<Controls of={PMarkdownStories.Playground} />
+
+<br/>
+<br/>
