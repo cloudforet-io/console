@@ -6,7 +6,7 @@ import {
 import { cloneDeep } from 'lodash';
 
 import {
-    PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PDivider,
+    PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PDivider, PI, PTooltip,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -15,7 +15,11 @@ import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { ComparisonOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
-import type { ComparisonFormat, ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    ComparisonFormat,
+    ComparisonValue, GroupByValue,
+    TableDataFieldValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const emit = defineEmits<WidgetFieldComponentEmit<ComparisonValue[]|undefined>>();
@@ -31,6 +35,19 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptio
 const state = reactive({
     toggleValue: !!props.widgetFieldSchema.options?.toggle || !!props.value || false,
     proxyValue: useProxyValue<ComparisonValue[]|undefined>('value', props, emit),
+    disabled: computed(() => { // NOTE: EXCEPTION FOR ONLY TABLE WIDGET
+        const tableDataField = props.allValueMap.tableDataField as TableDataFieldValue;
+        if (!tableDataField) return false;
+        const groupByField = props.allValueMap.groupBy as GroupByValue;
+        return tableDataField?.value === 'Date'
+            || Array.isArray(tableDataField?.value) && tableDataField?.value?.includes('Date')
+            || Array.isArray(groupByField?.value) && groupByField.value?.includes('Date');
+    }),
+    infoText: computed(() => {
+        const tableDataField = props.allValueMap.tableDataField as TableDataFieldValue;
+        if (tableDataField) return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
+        return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP');
+    }),
     // compareWith: computed(() => {
     //     const granularity = props.widgetFieldSchema.options?.granularity ?? GRANULARITY.DAILY;
     //     if (granularity === GRANULARITY.MONTHLY) return i18n.t('COMMON.WIDGETS.COMPARISON.PREVIOUS_MONTH');
@@ -125,9 +142,18 @@ onMounted(() => {
 <template>
     <div class="widget-field-total">
         <div class="field-header">
-            <p-field-title>{{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}</p-field-title>
+            <p-field-title>
+                {{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}
+                <p-tooltip :contents="state.infoText">
+                    <p-i name="ic_info-circle"
+                         width="0.875rem"
+                         height="0.875rem"
+                    />
+                </p-tooltip>
+            </p-field-title>
             <p-toggle-button :value="state.toggleValue"
-                             @update:value="handleUpdateToggle"
+                             :disabled="state.disabled"
+                             @change-toggle="handleUpdateToggle"
             />
         </div>
         <div v-if="state.toggleValue"

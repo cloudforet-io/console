@@ -1383,6 +1383,8 @@
 				"FIXED": "固定金額",
 				"FORMAT": "フォーマット",
 				"INCREASE": "増加する",
+				"INFO_TOOLTIP": "",
+				"INFO_TOOLTIP_TABLE": "",
 				"NAME_INVALID_TEXT": "少なくとも1つの文字を書いてください。",
 				"PERCENT": "比率",
 				"PREVIOUS_DAY": "前日",

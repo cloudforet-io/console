@@ -1383,6 +1383,8 @@
 				"FIXED": "금액 고정",
 				"FORMAT": "포멧",
 				"INCREASE": "증가",
+				"INFO_TOOLTIP": "",
+				"INFO_TOOLTIP_TABLE": "",
 				"NAME_INVALID_TEXT": "한 글자 이상 입력해주세요.",
 				"PERCENT": "비율",
 				"PREVIOUS_DAY": "전",
