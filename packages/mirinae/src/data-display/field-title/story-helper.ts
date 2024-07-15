@@ -1,17 +1,14 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import {
     FIELD_TITLE_COLOR,
     FIELD_TITLE_SIZE,
     FIELD_TITLE_TEXT_WEIGHT,
 } from '@/data-display/field-title/config';
 
-export const getLabelArgTypes = (): ArgTypes => ({
+export const getLabelArgTypes = () => ({
     label: {
         name: 'label',
-        type: { name: 'string' },
+        type: 'string',
         description: 'text to display.',
-        defaultValue: 'Field Title',
         table: {
             type: {
                 summary: 'string',
@@ -21,15 +18,12 @@ export const getLabelArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     description: {
         name: 'description',
-        type: { name: 'string' },
+        type: 'string',
         description: 'description for the title.',
-        defaultValue: 'description for the title!',
         table: {
             type: {
                 summary: 'string',
@@ -39,15 +33,12 @@ export const getLabelArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     size: {
         name: 'size',
-        type: { name: 'string' },
+        type: 'string',
         description: 'size of field title label.',
-        defaultValue: FIELD_TITLE_SIZE.md,
         table: {
             type: {
                 summary: 'string',
@@ -57,16 +48,13 @@ export const getLabelArgTypes = (): ArgTypes => ({
                 summary: FIELD_TITLE_SIZE.md,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(FIELD_TITLE_SIZE),
-        },
+        control: 'select',
+        options: Object.keys(FIELD_TITLE_SIZE),
     },
     fontWeight: {
         name: 'fontWeight',
-        type: { name: 'string' },
+        type: 'string',
         description: 'font weight of field title label.',
-        defaultValue: FIELD_TITLE_TEXT_WEIGHT.bold,
         table: {
             type: {
                 summary: 'string',
@@ -76,16 +64,13 @@ export const getLabelArgTypes = (): ArgTypes => ({
                 summary: FIELD_TITLE_TEXT_WEIGHT.bold,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(FIELD_TITLE_TEXT_WEIGHT),
-        },
+        control: 'select',
+        options: Object.keys(FIELD_TITLE_TEXT_WEIGHT),
     },
     color: {
         name: 'color',
-        type: { name: 'string' },
+        type: 'string',
         description: 'color of field title label.',
-        defaultValue: FIELD_TITLE_COLOR.dark,
         table: {
             type: {
                 summary: 'string',
@@ -95,16 +80,13 @@ export const getLabelArgTypes = (): ArgTypes => ({
                 summary: FIELD_TITLE_COLOR.dark,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(FIELD_TITLE_COLOR),
-        },
+        control: 'select',
+        options: Object.keys(FIELD_TITLE_COLOR),
     },
     inline: {
         name: 'inline',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to display the title in inline mode.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -114,15 +96,12 @@ export const getLabelArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     /* slots */
     defaultSlot: {
         name: 'default',
         description: 'Slot for field-title.',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
@@ -132,14 +111,11 @@ export const getLabelArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     leftSlot: {
         name: 'left',
         description: 'Left side slot for field-title.',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
@@ -153,7 +129,6 @@ export const getLabelArgTypes = (): ArgTypes => ({
     rightSlot: {
         name: 'right',
         description: 'Right side slot for field-title.',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
@@ -167,7 +142,6 @@ export const getLabelArgTypes = (): ArgTypes => ({
     bottomSlot: {
         name: 'bottom',
         description: 'Bottom side slot for field-title.',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
