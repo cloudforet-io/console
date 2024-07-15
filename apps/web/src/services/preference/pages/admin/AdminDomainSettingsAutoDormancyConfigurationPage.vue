@@ -17,18 +17,28 @@ import { i18n as _i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import type { DormancyConfig } from '@/services/preference/types/domain-settings-type';
 
 const DORMANCY_CONFIG_NAME = 'identity:dormancy:workspace';
 
+const costReportPageStore = useCostReportPageStore();
+const constReportPageGetters = costReportPageStore.getters;
+
 const router = useRouter();
 
+const storeState = reactive({
+    currency: computed<Currency|undefined>(() => constReportPageGetters.currency),
+});
 const state = reactive({
     toggleText: computed<string>(() => (state.statusToggle
         ? 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_TOGGLE_ENABLED'
@@ -133,6 +143,7 @@ watch(() => state.dormancyConfig, (config) => {
 onMounted(async () => {
     await initForm();
     await fetchDomainSettings();
+    await costReportPageStore.fetchCostReportConfig();
 });
 </script>
 
@@ -201,7 +212,7 @@ onMounted(async () => {
                                               class="cost-input"
                                               @update:value="setForm('cost', $event)"
                                 />
-                                <span class="placeholder">$ USD</span>
+                                <span class="placeholder">{{ CURRENCY_SYMBOL[storeState.currency] }} {{ storeState.currency }}</span>
                             </div>
                         </template>
                     </p-field-group>

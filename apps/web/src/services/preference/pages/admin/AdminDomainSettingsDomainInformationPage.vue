@@ -27,7 +27,6 @@ const storeState = reactive({
     domainConfig: computed(() => store.state.domain.config),
 });
 const state = reactive({
-
     isChanged: computed(() => {
         if ([state.selectedTimezone, state.selectedLanguage,
             domainConfigGetters.timezone, domainConfigGetters.language]
