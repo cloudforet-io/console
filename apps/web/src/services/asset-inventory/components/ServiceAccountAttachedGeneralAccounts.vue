@@ -115,7 +115,7 @@ const state = reactive({
     typeField: computed<ValueItem[]>(() => ([
         { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALL') as string, name: 'ALL' },
         { label: i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVE') as string, name: SERVICE_ACCOUNT_STATE.ACTIVE },
-        { label: i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.INACTIVE') as string, name: SERVICE_ACCOUNT_STATE.INACTIVE },
+        // { label: i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.INACTIVE') as string, name: SERVICE_ACCOUNT_STATE.INACTIVE },
         { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.PENDING') as string, name: SERVICE_ACCOUNT_STATE.PENDING },
         { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.DELETE') as string, name: SERVICE_ACCOUNT_STATE.DELETED },
     ])),
@@ -335,12 +335,15 @@ watch(() => state.trustedAccountId, async (ta) => {
                     </p-link>
                 </template>
                 <template #col-workspace_id-format="{value}">
-                    <span class="workspace-id-wrapper">
+                    <span v-if="userWorkspaceStore.getters.workspaceMap[value]"
+                          class="workspace-id-wrapper"
+                    >
                         <workspace-logo-icon :text="userWorkspaceStore.getters.workspaceMap[value]?.name || ''"
                                              :theme="userWorkspaceStore.getters.workspaceMap[value]?.tags?.theme"
                                              size="xs"
                         /><span>{{ userWorkspaceStore.getters.workspaceMap[value]?.name }}</span>
                     </span>
+                    <span v-else>-</span>
                 </template>
                 <template #col-state-format="{value}">
                     <p-status v-bind="stateFormatter(value)"

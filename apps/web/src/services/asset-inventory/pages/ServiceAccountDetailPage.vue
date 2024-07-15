@@ -40,7 +40,6 @@ import ServiceAccountCredentials
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory/components/ServiceAccountDeleteModal.vue';
 import ServiceAccountEditModal from '@/services/asset-inventory/components/ServiceAccountEditModal.vue';
-import ServiceAccountUsageOverview from '@/services/asset-inventory/components/ServiceAccountUsageOverview.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
@@ -229,10 +228,11 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                        :editable="state.isEditable"
                                        @refresh="handleRefresh"
             />
-            <service-account-usage-overview v-if="!state.isTrustedAccount"
-                                            :service-account-loading="state.loading"
-                                            :service-account-id="props.serviceAccountId"
-            />
+            <!--            TODO: To be implemented after further discussion-->
+            <!--            <service-account-usage-overview v-if="!state.isTrustedAccount"-->
+            <!--                                            :service-account-loading="state.loading"-->
+            <!--                                            :service-account-id="props.serviceAccountId"-->
+            <!--            />-->
         </div>
         <service-account-delete-modal :visible.sync="state.deleteModalVisible"
                                       :service-account-type="state.serviceAccountType"
