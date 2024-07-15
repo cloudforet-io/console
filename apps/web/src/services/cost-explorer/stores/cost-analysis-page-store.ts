@@ -94,9 +94,18 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             let additionalInfoGroupBy: GroupByItem[] = [];
             if (costQuerySetState.selectedDataSourceId) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-                const costAdditionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys; // HACK: will be deprecated
                 if (!targetDataSource) return [];
-                if (costAdditionalInfoKeys?.length) {
+
+                const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
+                if (metadataAdditionalInfo) {
+                    additionalInfoGroupBy = Object.entries(metadataAdditionalInfo)
+                        .filter(([, value]) => !value?.visible)
+                        .map(([key, value]) => ({
+                            name: `additional_info.${key}`,
+                            label: value?.name,
+                        }));
+                } else { // HACK: will be deprecated
+                    const costAdditionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys;
                     additionalInfoGroupBy = costAdditionalInfoKeys
                         .filter((d) => !getters.managedGroupByItems.find((item) => item.label === d))
                         .map((d) => ({

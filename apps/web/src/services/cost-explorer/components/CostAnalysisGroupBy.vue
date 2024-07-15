@@ -83,7 +83,6 @@ const setSelectedAdditionalInfoGroupBy = (groupBy?: string[]) => {
     if (!groupBy) return;
     state.selectedAdditionalGroupByMenu = groupBy
         .filter((d) => d.startsWith('additional_info.'))
-        .filter((d) => !costAnalysisPageGetters.managedGroupByItems.find((item) => item.name === d))
         .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
 };
 
@@ -162,7 +161,8 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
                                @clear-selection="handleClearTagsGroupBy"
             />
         </div>
-        <p-select-dropdown :menu="costAnalysisPageGetters.additionalInfoGroupByItems"
+        <p-select-dropdown v-if="costAnalysisPageGetters.additionalInfoGroupByItems.length"
+                           :menu="costAnalysisPageGetters.additionalInfoGroupByItems"
                            :selected.sync="state.selectedAdditionalGroupByMenu"
                            style-type="tertiary-icon-button"
                            button-icon="ic_ellipsis-horizontal"
