@@ -1,6 +1,7 @@
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import type { DateFieldType } from '@/common/modules/widgets/types/widget-data-type';
 
 
 export const getDefaultMenuItemIndex = (menuItems: MenuItem[], idx = 0, excludeDateField = false): number => {
@@ -21,3 +22,6 @@ export const getInitialSelectedMenuItem = (menuItems: MenuItem[], data: string[]
     if (isDataIncluded) return data;
     return menuItems[defaultIdx]?.name;
 };
+
+export const isDateField = (fieldName?: DateFieldType) => fieldName && Object.values(DATE_FIELD).includes(fieldName);
+export const isIncludingDateField = (fieldNames: string[]) => Object.values(DATE_FIELD).some((field) => fieldNames.includes(field));
