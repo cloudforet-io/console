@@ -1446,7 +1446,7 @@
 					"UPDATE_DATA_TALBE_INVALID_WARNING": "변경 사항 반영 실패. 입력 폼을 다시 한번 확인해 주세요. ",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "선택한 '{first_data}', '{second_data}' 두 데이터는 한 개 이상의 동일한 데이터 필드가 있어 Join을 수행할 수 없습니다. "
 				},
-				"GUIDE_LINK_TEXT": "",
+				"GUIDE_LINK_TEXT": "Widget 생성 방법 가이드",
 				"TRANSFORM": "데이터 병합/변환"
 			},
 			"DEFAULT_WIDTH": "기본 너비",
@@ -1468,8 +1468,8 @@
 			"FORM": {
 				"CREATING_WIDGET_WARNING_MODAL_DESC": "이 창을 닫으면 생성 중인 모든 데이터가 삭제됩니다.",
 				"CREATING_WIDGET_WARNING_MODAL_TITLE": "저장되지 않은 데이터",
-				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "",
-				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "",
+				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "변경사항이 적용되지 않으며, 가장 최근 저장된 상태로 되돌아갑니다.",
+				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "변경사항 적용 안됨",
 				"WIDGET_VALIDATION_WARNING_DESC": "차트가 정상적으로 표시 되려면 필수 필드에 값이 올바르게 선택되었는지 확인해주세요.",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "데이터 테이블에서 'Region' 필드를 추가해주세요. ",
 				"WIDGET_VALIDATION_WARNING_TITLE": "잘못 선택된 필드 존재"

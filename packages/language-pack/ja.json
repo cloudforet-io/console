@@ -1446,7 +1446,7 @@
 					"UPDATE_DATA_TALBE_INVALID_WARNING": "変更を適用できません。フォームを確認してください。",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "'{first_data}' と '{second_data}' を結合できません。両方のデータテーブルに同一のデータフィールドが1つ以上あります。"
 				},
-				"GUIDE_LINK_TEXT": "",
+				"GUIDE_LINK_TEXT": "ウィジェットの作成方法",
 				"TRANSFORM": "データを変換"
 			},
 			"DEFAULT_WIDTH": "デフォルト幅",
@@ -1468,8 +1468,8 @@
 			"FORM": {
 				"CREATING_WIDGET_WARNING_MODAL_DESC": "終了してもよろしいですか？ このウィンドウを閉じると、生成中のデータがすべて破棄されます。",
 				"CREATING_WIDGET_WARNING_MODAL_TITLE": "保存されていないデータ",
-				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "",
-				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "",
+				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "すべてのオプションは、最後に保存された状態にリセットされます。",
+				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "未適用の変更",
 				"WIDGET_VALIDATION_WARNING_DESC": "チャートを正常に表示するには、必須フィールドに正しい値が選択されているか確認してください。",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "データテーブルに「地域」フィールドを追加してください。",
 				"WIDGET_VALIDATION_WARNING_TITLE": "空欄または誤った値が選択されたフィールドが存在します。"
