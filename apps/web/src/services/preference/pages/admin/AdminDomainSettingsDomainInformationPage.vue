@@ -99,7 +99,6 @@ watch(() => domainConfigGetters.language, (val) => {
                 <p-select-dropdown :menu="state.timezoneMenuList"
                                    :selected.sync="state.selectedTimezone"
                                    :page-size="10"
-                                   show-delete-all-button
                                    is-filterable
                 />
             </div>
@@ -108,7 +107,6 @@ watch(() => domainConfigGetters.language, (val) => {
                 <p-select-dropdown :menu="state.languageMenuList"
                                    :selected.sync="state.selectedLanguage"
                                    :page-size="10"
-                                   show-delete-all-button
                                    is-filterable
                 />
             </div>

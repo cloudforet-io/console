@@ -16,6 +16,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 const router = useRouter();
 const domainConfigStore = useDomainSettingsStore();
 const domainConfigGetters = domainConfigStore.getters;
+
 const state = reactive({
     isChanged: computed<boolean>(() => {
         if ([state.wordtypeLogoUrl, state.symbolFaviconUrl, state.loginPageImageUrl, state.displayName,
@@ -68,14 +69,16 @@ watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
             <div class="field-wrapper">
                 <div class="left-part">
                     <p-field-title label="Display Name" />
-                    <p-text-input :value.sync="state.displayName" />
+                    <p-text-input :value.sync="state.displayName"
+                                  :placeholder="domainConfigGetters.displayName"
+                    />
                     <div class="description">
                         {{ $t('IAM.DOMAIN_SETTINGS.DOMAIN_NAME_IMAGE_DESCRIPTION') }}
                     </div>
                 </div>
                 <div class="right-part">
-                    <img src="@/assets/images/domain-settings/display_name_image.png"
-                         alt="Symbol & Favicon image sample"
+                    <img src="@/assets/images/domain-settings/display_name_example_min.png"
+                         alt="Domain Name image sample"
                     >
                 </div>
             </div>
