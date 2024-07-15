@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -25,12 +25,12 @@ import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 
 const bookmarkPageStore = useBookmarkPageStore();
-const bookmarkPageGetters = bookmarkPageStore.getters;
+const bookmarkPageState = bookmarkPageStore.state;
 
 const route = useRoute();
 
 const storeState = reactive({
-    allBookmarkFolderItems: computed<BookmarkItem[]>(() => bookmarkPageGetters.allBookmarkFolderItems),
+    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
 });
 
 const state = reactive({
@@ -60,28 +60,20 @@ const state = reactive({
             id: 'bookmark',
         },
     ]),
-    bookmarkFilteredByKeyword: computed<LSBItem[]>(() => storeState.allBookmarkFolderItems.filter((folder) => (folder.name as string)?.includes(state.bookmarkKeyword))
+    bookmarkFilteredByKeyword: computed<LSBItem[]>(() => storeState.bookmarkFolderList.filter((folder) => (folder.name as string)?.includes(state.bookmarkKeyword))
         .map((folder) => ({
             type: MENU_ITEM_TYPE.ITEM,
             label: folder.name,
             id: folder.id,
             icon: { name: 'ic_folder', color: gray[900] },
             to: {
-                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
                 params: {
-                    folder: folder.id || '',
+                    group: folder.workspaceId || 'global',
+                    folder: folder.name as string || '',
                 },
             },
         }))),
-});
-
-
-onUnmounted(() => {
-    bookmarkPageStore.resetState();
-});
-
-onMounted(async () => {
-    await bookmarkPageStore.fetchPublicBookmarkList();
 });
 </script>
 
@@ -97,18 +89,20 @@ onMounted(async () => {
         </template>
         <template #slot-bookmark>
             <template v-if="state.bookmarkKeyword">
-                <l-s-b-router-menu-item v-for="(_item, idx) of state.bookmarkFilteredByKeyword"
-                                        :key="idx"
-                                        :item="_item"
-                                        :idx="`search-${idx}`"
-                                        :current-path="state.currentPath"
-                                        is-hide-favorite
-                >
-                    <p-text-highlighting class="search-result-text"
-                                         :term="state.bookmarkKeyword"
-                                         :text="_item.label"
-                    />
-                </l-s-b-router-menu-item>
+                <div class="router-menu-wrapper">
+                    <l-s-b-router-menu-item v-for="(_item, idx) of state.bookmarkFilteredByKeyword"
+                                            :key="idx"
+                                            :item="_item"
+                                            :idx="`search-${idx}`"
+                                            :current-path="state.currentPath"
+                                            is-hide-favorite
+                    >
+                        <p-text-highlighting class="search-result-text"
+                                             :term="state.bookmarkKeyword"
+                                             :text="_item.label"
+                        />
+                    </l-s-b-router-menu-item>
+                </div>
                 <p-empty v-if="state.bookmarkKeyword && !state.bookmarkFilteredByKeyword.length"
                          class="search-empty"
                 >
@@ -135,6 +129,11 @@ onMounted(async () => {
         @apply text-paragraph-md;
         white-space: pre;
         margin-top: 0.75rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .router-menu-wrapper {
+        @apply flex flex-col;
     }
 }
 </style>

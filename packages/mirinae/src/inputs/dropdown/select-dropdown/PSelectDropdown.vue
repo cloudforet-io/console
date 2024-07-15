@@ -349,7 +349,7 @@ defineExpose({ reloadMenu });
                 <slot name="dropdown-left-area" />
             </template>
         </dropdown-button>
-        <p-context-menu v-show="state.proxyVisibleMenu"
+        <p-context-menu v-if="state.proxyVisibleMenu"
                         ref="menuRef"
                         :class="{
                             'dropdown-context-menu': true,

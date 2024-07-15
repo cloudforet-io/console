@@ -10,36 +10,47 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType, RadioType } from '@/common/components/bookmark/type/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
-import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
+    bookmarkList: BookmarkItem[],
+    filterByFolder?: TranslateResult,
+    selectedBookmark?: BookmarkItem,
 }
 
 const props = withDefaults(defineProps<Props>(), {
     bookmarkFolderList: undefined,
+    bookmarkList: () => [],
+    filterByFolder: undefined,
+    selectedBookmark: undefined,
 });
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
+
+const emit = defineEmits<{(e: 'confirm', isEdit?: boolean, name?: string): void; }>();
 
 const storeState = reactive({
-    filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
-    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
-    isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
-    modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
-    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
+    isAdminMode: computed(() => appContextGetters.isAdminMode),
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+
+    modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
+    bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
     loading: false,
-    bookmark: computed<string|undefined|TranslateResult>(() => storeState.selectedBookmark?.name || storeState.filterByFolder),
+    bookmark: computed<string|undefined|TranslateResult>(() => props.selectedBookmark?.name || props.filterByFolder),
     radioMenuList: computed<RadioType[]>(() => {
         const menu: RadioType[] = [{
             label: i18n.t('HOME.BOOKMARK_MY_BOOKMARK'),
@@ -91,18 +102,14 @@ const handleConfirm = async () => {
     try {
         if (storeState.modal.isEdit) {
             await bookmarkStore.updateBookmarkFolder({
-                id: storeState.selectedBookmark?.id,
+                id: props.selectedBookmark?.id,
                 name: name.value,
+                bookmarkList: props.bookmarkList,
             });
-            if (storeState.isFileFullMode) {
-                await bookmarkStore.setSelectedBookmark({
-                    ...storeState.selectedBookmark,
-                    name: name.value,
-                });
-            }
         } else {
             await bookmarkStore.createBookmarkFolder(name.value, state.scope);
         }
+        emit('confirm', storeState.modal.isEdit, name.value);
         await handleClose();
     } finally {
         state.loading = false;
@@ -155,7 +162,7 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
-                <p-field-group v-if="!storeState.modal.isEdit"
+                <p-field-group v-if="!storeState.isAdminMode && !storeState.modal.isEdit"
                                class="scope-wrapper"
                                :label="$t('HOME.FORM_SCOPE')"
                                required

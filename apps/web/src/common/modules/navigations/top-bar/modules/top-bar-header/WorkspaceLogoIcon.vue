@@ -70,8 +70,9 @@ const state = reactive({
             font-size: 0.625rem;
             line-height: 0.78125rem;
         }
-        .corporate-logo {
+        &.corporate-logo {
             font-size: 0.425rem;
+            line-height: 0.9375rem;
         }
     }
     &.xs {

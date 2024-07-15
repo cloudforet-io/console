@@ -12,9 +12,6 @@ import {
     PStatus, PToolboxTable, PHeading, PTooltip, PButton,
 } from '@cloudforet/mirinae';
 
-
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import {
@@ -22,7 +19,7 @@ import {
 } from '@/services/iam/composables/refined-table-data';
 import { USER_STATE } from '@/services/iam/constants/user-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
-import { WORKSPACES_USER_SEARCH_HANDLERS } from '@/services/preference/constants/workspace-constant';
+import { WORKSPACE_STATE, WORKSPACES_USER_SEARCH_HANDLERS } from '@/services/preference/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
 
 const workspacePageStore = useWorkspacePageStore();
@@ -91,7 +88,12 @@ const handleChange = async (options: any = {}) => {
     });
 };
 const handleClickButton = () => {
-    window.open(router.resolve({ name: makeAdminRouteName(IAM_ROUTE.USER._NAME) }).href, '_blank');
+    window.open(router.resolve({
+        name: IAM_ROUTE.USER._NAME,
+        params: {
+            workspaceId: storeState.currentWorkspace?.workspace_id,
+        },
+    }).href, '_blank');
 };
 
 watch(() => workspacePageStore.selectedWorkspaces, async () => {
@@ -110,6 +112,7 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
             <template #extra>
                 <div class="heading-toolset">
                     <p-button style-type="tertiary"
+                              :disabled="storeState.currentWorkspace.state === WORKSPACE_STATE.DISABLE || storeState.currentWorkspace.is_dormant"
                               icon-left="ic_settings"
                               @click="handleClickButton"
                     >

@@ -27,7 +27,7 @@ export interface SelectOptions {
 }
 
 export type LSBIcon = string | { name: string; color?: string; };
-export type hightlightTagType = 'new' | 'beta' | 'update';
+export type highlightTagType = 'new' | 'beta' | 'update';
 
 export interface LSBItem {
     type: MenuItemType;
@@ -35,7 +35,7 @@ export interface LSBItem {
     id?: MenuId | string; // It can be change MenuId or etc.
     foldable?: boolean;
     to?: Location;
-    highlightTag?: hightlightTagType;
+    highlightTag?: highlightTagType;
     hideFavorite?: boolean;
     favoriteOptions?: FavoriteOptions;
     icon?: LSBIcon;

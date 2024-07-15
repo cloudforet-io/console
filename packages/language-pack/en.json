@@ -396,6 +396,53 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"ANOMALY_DETECTION": {
+				"CANCEL": "Cancel",
+				"CONFIG": {
+					"AND_MORE": "...and more",
+					"BASE_INFORMATION": "Base Information",
+					"COL_CATEGORY": "Category",
+					"COL_CATEGORY_PLACEHOLDER": "Select Category",
+					"COL_DATASOURCE_PLACEHOLDER": "Select Data Source",
+					"COL_DATA_SOURCE": "Data Source",
+					"COL_ITEM": "Item",
+					"COL_ITEM_PLACEHOLDER": "Select Item",
+					"COL_NAME": "Name",
+					"COL_NAME_PLACEHOLDER": "Detection Configuration Name",
+					"COL_POLICY": "Policy",
+					"COL_SEND_TO": "Send to",
+					"COL_SEND_TO_PLACEHOLDER": "Select Workspace Owner",
+					"CREATE_TITLE": "Create Detection Configuration",
+					"DETECTED": "Detected",
+					"LAST_12_MONTHS": "Last 12 Months",
+					"MODAL_DELETE_DESC": "Are you sure you want to delete this detection configuration?",
+					"MODAL_DELETE_TITLE": "Delete Detection Configuration",
+					"MODAL_EDIT_TITLE": "Edit Detection Configuration Name",
+					"NAME_REQUIRED": "Please enter name.",
+					"NO_RULES": "No rules",
+					"RECIPIENTS": "Recipients",
+					"RULE": "rule",
+					"RULES": "rules",
+					"TITLE": "Detection Configuration",
+					"TREND_TITLE": "Detection Configuration Trend",
+					"USERS": "Users",
+					"VIEW_HISTORY": "View History",
+					"VIEW_POLICY": "View this Policy"
+				},
+				"CREATE": "Create",
+				"EDIT": "Edit",
+				"HISTORY": {
+					"ALL": "All",
+					"CUSTOM": "Custom",
+					"LAST_MONTH": "Last Month",
+					"THIS_MONTH": "This Month",
+					"TITLE": "Anomaly Detection History"
+				},
+				"POLICY": {
+					"TITLE": "Policy Management"
+				},
+				"SAVE_CHANGES": "Save Changes"
+			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "Failed to Create Budget",
 				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "The selected data source ({dataSourceName}) already has a budget created for the same target ({name}).",
@@ -922,6 +969,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"ADD": "Add",
 			"DOWNLOAD": "Download",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "desktop",
@@ -1603,6 +1651,19 @@
 			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget"
 		}
 	},
+	"COST_EXPLORER": {
+		"ANOMALY_DETECTION": {
+			"NOTIFICATION_RULES": {
+				"AMOUNT": "Amount",
+				"NOTIFY_LEVEL": "Notify Level",
+				"SELECT_LEVEL": "Select Level",
+				"SELECT_UNIT": "Select Unit",
+				"THRESHOLD": "Threshold",
+				"UNIT": "Unit",
+				"VARIATION": "Variation"
+			}
+		}
+	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
 			"CREATE": "Create",
@@ -2093,7 +2154,7 @@
 		"BOOKMARK_MORE": "More",
 		"BOOKMARK_MY": "My",
 		"BOOKMARK_MY_BOOKMARK": "My bookmark",
-		"BOOKMARK_SEARCH": "Search",
+		"BOOKMARK_SEARCH": "Search Folder",
 		"BOOKMARK_SELECTED": "{count} selected",
 		"BOOKMARK_SHARED": "Shared",
 		"BOOKMARK_SHARED_BOOKMARK": "Shared bookmarks",
@@ -2173,28 +2234,63 @@
 			"TITLE": "App"
 		},
 		"BOOKMARK": {
+			"ADD_GLOBAL_BOOKMARK": "Add Global Bookmark",
+			"ADD_LINK": "Add Link",
+			"ALL": "All",
 			"ALL_BOOKMARK": "All Bookmarks",
-			"GLOBAL_BOOKMARK": "Global Bookmark"
+			"CREATE_FOLDER": "Create Folder",
+			"DELETE": "Delete",
+			"EDIT": "Edit",
+			"FOLDER": "Folder",
+			"GLOBAL_BOOKMARK": "Global Bookmark",
+			"GLOBAL_NOTIFICATION": "Global bookmarks are displayed at the top of every workspace home and are managed only by admins.",
+			"GO_TO_SETTINGS": "Go to settings",
+			"GO_TO_WORKSPACE": "Go to this Workspace",
+			"LINK": "Link",
+			"TOGGLE_MORE": "show more",
+			"TYPE": "Type"
 		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "Admin email",
+			"ALT_E_EMPTY_COST": "Please enter cost threshold.",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "Failed to update admin email",
 			"ALT_E_UPDATE_BRAND_ASSETS": "Failed to update brand assets",
 			"ALT_E_UPDATE_DISPLAY_NAME": "Failed to update display name",
 			"ALT_E_UPDATE_TIMEZONE_AND_LANGUAGE": "Failed to update timezone/language",
+			"ALT_S_DORMANCY_TOGGLE": "Dormancy configuration successfully changed",
 			"ALT_S_UPDATE_ADMIN_EMAIL": "Admin email successfully updated",
 			"ALT_S_UPDATE_BRAND_ASSETS": "Brand assets successfully updated",
 			"ALT_S_UPDATE_DISPLAY_NAME": "Display name successfully updated",
+			"ALT_S_UPDATE_DORMANCY": "Dormancy configuration successfully changed",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "Timezone & language successfully updated",
-			"BASE_INFORMATION": "Base Information",
-			"BRAND_ASSETS": "Brand Assets",
+			"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
+			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "When anomaly costs are detected, an email will be sent to all users with the Workspace Owner role type for each Workspace.",
+			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "With Anomaly Detection Configuration turned on,",
+			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "notifications will be sent to particular recipients associated with each workspace when an anomaly in cost is detected.",
+			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "Enable Anomaly Detection Configuration",
+			"APPEARANCE": "Appearance",
+			"AUTO_DORMANCY_CONFIGURATION": "Dormancy Configuration",
+			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "Send notification emails whenever the threshold falls below.",
+			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "Cost Report",
+			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD": "Cost Threshold",
+			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD_DESC": "Set up a currency in the cost report",
+			"AUTO_DORMANCY_CONFIGURATION_SAVE_DESC": "Dormancy configuration\nsuccessfully changed",
+			"AUTO_DORMANCY_CONFIGURATION_TOGGLE": "Enable Dormancy Configuration",
+			"AUTO_DORMANCY_CONFIGURATION_TOGGLE_DISABLED": "With Dormancy Configuration turned on, workspaces with a total {emphasis} This helps in managing inactive workspaces without manual intervention.",
+			"AUTO_DORMANCY_CONFIGURATION_TOGGLE_DISABLED_EMPHASIS": "cost lower than the user-defined threshold will automatically be set to dormant.",
+			"AUTO_DORMANCY_CONFIGURATION_TOGGLE_ENABLED": "If the total cost of a workspace {emphasis} the workspace will automatically enter a dormant state.",
+			"AUTO_DORMANCY_CONFIGURATION_TOGGLE_ENABLED_EMPHASIS": "falls below the threshold for 3 consecutive times,",
 			"CHANGE": "Change",
 			"CHANGE_ADMIN_EMAIL": "Change Admin Email",
 			"DISPLAY_NAME": "Display Name",
 			"DOMAIN_ID": "Domain ID",
+			"DOMAIN_INFORMATION": "Domain Information",
 			"DOMAIN_NAME": "Domain Name",
+			"DOMAIN_NAME_IMAGE_DESCRIPTION": "The name displayed in the browser tab. If left blank, the default is ‘SpaceONE’. Choose a name that is easy to recognize and reflects the domain's function or brand.",
 			"EMAIL_INVALID": "Invalid e-mail format.",
 			"LANGUAGE": "Language",
+			"NOTIFICATION_RULES": "Notification Rules",
+			"RECIPIENTS": "Recipients",
 			"SAVE_CHANGE": "Save Change",
 			"SAVE_CHANGES": "Save Changes",
 			"SEND_CODE": "Send Code",
@@ -2541,21 +2637,25 @@
 		},
 		"WORKSPACES": {
 			"ACTION": "Action",
+			"ALL": "All",
 			"CREATE": "Create",
 			"CREATE_WORKSPACE": "Create Workspace",
 			"CREATE_WORKSPACE_TEXT_LENGTH": "80 characters is the max length of a workspace name.",
 			"DELETE": "Delete",
-			"DELETE_WORKSPACE": "Delete",
-			"DELETE_WORKSPACE_DESC": "You cannot undo this action.",
+			"DELETE_WORKSPACE": "Delete Workspace",
+			"DELETE_WORKSPACE_DESC": "Are you sure you want to delete the workspace below?\nYou can’t undo this action.",
 			"DETAIL": {
 				"USERS": "Users"
 			},
-			"DISABLE": "Disable",
-			"DISABLE_WORKSPACE": "Are you sure you want to disable the selected workspace?",
+			"DISABLE": "Disabled",
+			"DISABLE_WORKSPACE": "Disable Workspace",
+			"DISABLE_WORKSPACE_DESC": "Are you sure you want to disable the workspace below?",
+			"DORMANT": "Dormant",
 			"EDIT": "Edit",
 			"EDIT_WORKSPACE": "Edit Workspace",
-			"ENABLE": "Enable",
-			"ENABLE_WORKSPACE": "Are you sure you want to enable the selected workspace?",
+			"ENABLE": "Enabled",
+			"ENABLE_WORKSPACE": "Enable Workspace",
+			"ENABLE_WORKSPACE_DESC": "Are you sure you want to enable the workspace below?",
 			"FORM": {
 				"DUPLICATED_NAME": "Workspace name is duplicated.",
 				"LABEL_DESC": "Description",
@@ -2566,6 +2666,9 @@
 				"REQUIRED_NAME": "Please enter name"
 			},
 			"REQUIRED_ENABLE_WORKSPACE": "At least one workspace must be enabled.",
+			"STATE": "State",
+			"TOOLTIP_COST": "based on Cost Report",
+			"TOOLTIP_STATE": "With ‘Dormancy Configuration’ turned on, workspaces with a total cost lower than the user-defined threshold will automatically be set to dormant. The threshold can be changed in [Preferences > Domain Settings > Auto Dormancy Configuration].",
 			"WORKSPACES": "Workspaces"
 		}
 	},
@@ -2630,6 +2733,7 @@
 			"MAIN": {
 				"ACTION": "Action",
 				"ADD": "Add",
+				"ALL": "All",
 				"ALT_E_CHANGE_PROJECT": "Failed to Change Project",
 				"ALT_E_DELETE_ACCOUNT": "Failed to Delete Account",
 				"ALT_E_RELEASE_PROJECT": "Failed to Release Project",
@@ -2642,15 +2746,21 @@
 				"CONSOLE": "Connect to Console",
 				"CREATE": "Create",
 				"DELETE": "Delete",
+				"MANAGED_INFO": "This status settings can be changed in admin mode. ",
 				"NO_SELECTED_ACCOUNT": "Select a service account for more details.",
+				"PENDING": "Pending",
 				"PROVIDERS_TITLE": "Service Providers",
+				"STATE": "State",
 				"TAB_CREDENTIALS": "Credentials",
 				"TAB_DETAILS": "Details",
 				"TAB_MEMBER": "Related Member",
 				"TAB_SELECTED_DATA": "Selected Data",
 				"TAB_TAG": "Tag",
-				"TITLE": "{provider} Accounts"
-			}
+				"TITLE": "{provider} Accounts",
+				"USAGE_OVERVIEW": "Usage Overview",
+				"VIEW_IN_ADMIN_MODE": "View in Admin Mode"
+			},
+			"TOOLTIP_COST": "based on Cost Report"
 		},
 		"TAGS_PLACEHOLDER": "key1:value1 key2:value2",
 		"USER": {
@@ -3384,6 +3494,10 @@
 			"TITLE": "Gather all your multi-cloud assets here {domain_icon} in the Management Console to elevate {boost_icon} your efficiency and productivity.",
 			"WELCOME_TITLE": "Welcome to the Cloud Management Console!"
 		},
+		"DORMANT_WORKSPACE": "Dormant Workspace",
+		"DORMANT_WORKSPACE_POPOVER": "Your workspace went dormant on {date} because its cost is lower than the threshold set by your administrators.",
+		"DORMANT_WORKSPACE_POPOVER_ADMIN": "{name} went dormant on {date} because its cost is lower than the threshold.",
+		"GO_TO_DORMANT_CONFIG": "Go to Dormancy Config",
 		"NOT_FOUND_ACCESS_WORKSPACE": "There are no accessible workspaces.",
 		"NOT_FOUND_DESC": "Looks like you don’t have any workspace.",
 		"RECENT": "Recent Visits",
@@ -3476,6 +3590,7 @@
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "Service Account",
 		"CONSOLE_HOME": "Console Home",
 		"COST_EXPLORER": "Cost Explorer",
+		"COST_EXPLORER_ANOMALY_DETECTION": "Anomaly Detection",
 		"COST_EXPLORER_BUDGET": "Budget",
 		"COST_EXPLORER_COST_ANALYSIS": "Cost Analysis",
 		"COST_EXPLORER_DASHBOARD": "Dashboard",

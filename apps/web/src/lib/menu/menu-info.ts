@@ -80,6 +80,13 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
         icon: 'ic_service_cost-analysis',
     },
+    [MENU_ID.ANOMALY_DETECTION]: {
+        menuId: MENU_ID.ANOMALY_DETECTION,
+        routeName: COST_EXPLORER_ROUTE.ANOMALY_DETECTION._NAME,
+        translationId: 'MENU.COST_EXPLORER_ANOMALY_DETECTION',
+        highlightTag: 'new',
+        icon: 'ic_anomaly_detection',
+    },
     [MENU_ID.BUDGET]: {
         menuId: MENU_ID.BUDGET,
         routeName: COST_EXPLORER_ROUTE.BUDGET._NAME,
@@ -158,6 +165,29 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS._NAME,
         translationId: 'MENU.ADMINISTRATION_DOMAIN_SETTINGS',
         icon: 'ic_service_domain-settings',
+    },
+
+    [MENU_ID.DOMAIN_INFORMATION]: {
+        menuId: MENU_ID.DOMAIN_INFORMATION,
+        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.DOMAIN_INFORMATION._NAME,
+        translationId: 'IAM.DOMAIN_SETTINGS.DOMAIN_INFORMATION',
+    },
+
+    [MENU_ID.APPEARANCE]: {
+        menuId: MENU_ID.APPEARANCE,
+        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.APPEARANCE._NAME,
+        translationId: 'IAM.DOMAIN_SETTINGS.APPEARANCE',
+    },
+
+    [MENU_ID.AUTO_DORMANCY_CONFIGURATION]: {
+        menuId: MENU_ID.AUTO_DORMANCY_CONFIGURATION,
+        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME,
+        translationId: 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION',
+    },
+    [MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION]: {
+        menuId: MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION,
+        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
+        translationId: 'IAM.DOMAIN_SETTINGS.ANOMALY_DETECTION_CONFIGURATION',
     },
     [MENU_ID.WORKSPACES]: {
         menuId: MENU_ID.WORKSPACES,
