@@ -121,10 +121,12 @@ const handleToggleWidth = () => {
                                 <span>--</span>
                             </template>
                         </div>
-                        <div class="metadata-item-row">
+                        <div v-if="props.description"
+                             class="metadata-item-row"
+                        >
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.DESCRIPTION') }}</span>
                             <div class="description">
-                                {{ props.description || '--' }}
+                                {{ props.description }}
                             </div>
                         </div>
                     </div>
@@ -206,7 +208,6 @@ const handleToggleWidth = () => {
             >
                 <p-icon-button style-type="tertiary"
                                :name="state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all'"
-                               size="sm"
                                shape="square"
                                class="width-toggle-button"
                                @click="handleToggleWidth"

@@ -32,12 +32,14 @@ const DEFAULT_COLOR:string = gray[900];
 
 const state = reactive({
     proxyValue: useProxyValue<IconValue|undefined>('value', props, emit),
-    toggleValue: !!props.value,
+    toggleValue: !!props.widgetFieldSchema?.options?.toggle ?? false,
     visibleMenu: false,
     selectedIcon: DEFAULT_ICON as Icon,
     iconList: [
         { name: 'ic_circle-filled', label: 'Circle' },
         { name: 'ic_coin-filled', label: 'Coin' },
+        { name: 'ic_yen-filled', label: 'Yen' },
+        { name: 'ic_won-filled', label: 'Won' },
         { name: 'ic_lock-filled', label: 'Lock' },
         { name: 'ic_spanner-filled', label: 'Spanner' },
         { name: 'ic_home-filled', label: 'Home' },
@@ -115,8 +117,7 @@ const checkValue = ():boolean => {
     return true;
 };
 
-watch(() => state.proxyValue, (changed) => {
-    if (changed === undefined) state.toggleValue = false;
+watch(() => state.proxyValue, () => {
     emit('update:is-valid', checkValue());
 }, { immediate: true });
 

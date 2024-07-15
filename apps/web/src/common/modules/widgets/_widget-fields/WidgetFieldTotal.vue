@@ -37,7 +37,7 @@ const handleUpdateValue = (value: boolean) => {
 const handleUpdateToggle = (value: boolean) => {
     state.proxyValue = {
         toggleValue: value,
-        freeze: false,
+        freeze: props.widgetFieldSchema.options?.default ?? false,
     };
     if (value) emit('update:value', state.proxyValue);
     else {

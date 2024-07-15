@@ -75,6 +75,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                 only: ['project_id', 'name', 'project_group_id', 'users', 'project_type'],
             },
         };
+        await allReferenceStore.load('project_group', { force: true });
         const res = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>(params);
 
         const projectReferenceMap: ProjectReferenceMap = {};

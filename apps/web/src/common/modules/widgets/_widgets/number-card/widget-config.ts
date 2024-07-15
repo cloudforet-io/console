@@ -12,8 +12,16 @@ const numberCard: WidgetConfig = {
         dataField: {},
     },
     optionalFieldsSchema: {
-        icon: {},
-        comparison: {},
+        icon: {
+            options: {
+                toggle: true,
+            },
+        },
+        comparison: {
+            options: {
+                toggle: true,
+            },
+        },
     },
 };
 

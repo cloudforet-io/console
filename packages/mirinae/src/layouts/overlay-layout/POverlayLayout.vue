@@ -10,6 +10,7 @@ interface Props {
     styleType?: 'primary' | 'secondary';
     size?: 'md' | 'lg' | 'full';
     isFixedSize?: boolean;
+    hideHeader?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -18,14 +19,16 @@ const props = withDefaults(defineProps<Props>(), {
     styleType: 'primary',
     size: 'md',
     isFixedSize: false,
+    hideHeader: false,
 });
 
-const emit = defineEmits<{(e: 'update:visible'): void;
+const emit = defineEmits<{(e: 'update:visible', val: boolean): void;
     (e: 'close'): void;
 }>();
 
 const handleClose = () => {
     emit('close');
+    emit('update:visible', false);
 };
 </script>
 
@@ -46,19 +49,20 @@ const handleClose = () => {
                      'fixed-size': props.isFixedSize,
                  }"
             >
-                <div class="header">
+                <div v-if="!props.hideHeader"
+                     class="header"
+                >
                     <div class="title-wrapper">
                         <h2 class="title-text">
                             {{ props.title }}
                         </h2> <slot name="title-right-extra" />
                     </div>
-
-                    <p-icon-button class="close-button"
-                                   name="ic_close"
-                                   size="lg"
-                                   @click="handleClose"
-                    />
                 </div>
+                <p-icon-button class="close-button"
+                               name="ic_close"
+                               size="lg"
+                               @click="handleClose"
+                />
                 <div class="contents">
                     <slot />
                 </div>
@@ -90,7 +94,7 @@ const handleClose = () => {
         >.header {
             @apply flex justify-between items-center;
             flex-shrink: 0;
-            padding: 1.5rem 1.5rem 1rem 1.5rem;
+            padding: 1.75rem 4.5rem 1.25rem 1.5rem;
 
             .title-wrapper {
                 @apply flex items-center;
@@ -139,6 +143,11 @@ const handleClose = () => {
                 width: 100%;
             }
         }
+    }
+    .close-button {
+        position: fixed;
+        top: 1.5rem;
+        right: 1.5rem;
     }
 
     /* transition */

@@ -280,6 +280,7 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                 <p-badge v-if="props.projectGroupSelectOptions && state.selectedItems.some((d) => d.name === props.projectGroupSelectOptions.currentProjectGroupId)"
                          badge-type="subtle"
                          style-type="gray200"
+                         class="current-badge"
                 >
                     {{ $t('COMMON.PROJECT_SELECT_DROPDOWN.CURRENT') }}
                 </p-badge>
@@ -350,6 +351,9 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
 
 <style lang="postcss" scoped>
 .project-select-dropdown {
+    .current-badge {
+        white-space: nowrap;
+    }
     .button-wrapper {
         padding: 0.5rem;
 
