@@ -1,13 +1,8 @@
-import type { ArgTypes } from '@storybook/addons';
-
-import mock from '@/data-display/markdown/mock';
-
-export const getMarkdownArgTypes = (): ArgTypes => ({
+export const getMarkdownArgTypes = () => ({
     markdown: {
         name: 'markdown',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Markdown data',
-        defaultValue: mock.markdown,
         table: {
             type: {
                 summary: '`string` or `object`',
@@ -17,15 +12,12 @@ export const getMarkdownArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     data: {
         name: 'data',
-        type: { name: 'object' },
+        type: 'object',
         description: 'Variable data to be rendered combined with markdown. Use the ejs.render function internally.',
-        defaultValue: mock.data,
         table: {
             type: {
                 summary: 'object',
@@ -35,15 +27,12 @@ export const getMarkdownArgTypes = (): ArgTypes => ({
                 summary: undefined,
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     language: {
         name: 'language',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Language for display markdown',
-        defaultValue: 'en',
         table: {
             type: {
                 summary: 'string',
@@ -53,16 +42,13 @@ export const getMarkdownArgTypes = (): ArgTypes => ({
                 summary: 'en',
             },
         },
-        control: {
-            type: 'select',
-            options: ['en', 'ko'],
-        },
+        control: 'select',
+        options: ['en', 'ko'],
     },
     removeSpacing: {
         name: 'removeSpacing',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to remove spacing(margins or paddings) or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -72,8 +58,6 @@ export const getMarkdownArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
 });
