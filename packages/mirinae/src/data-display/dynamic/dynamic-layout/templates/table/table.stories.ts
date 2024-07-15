@@ -1,12 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
-import { I18nConnector } from '@/translations';
+
 
 import mock from '@/data-display/dynamic/dynamic-layout/mock';
-
-import { getDynamicLayoutTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/table/story-helper';
-
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import { getDynamicLayoutTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/table/story-helper';
+import { I18nConnector } from '@/translations';
 
 type PDynamicLayoutPropsAndCustomArgs = ComponentProps<typeof PDynamicLayout>;
 
@@ -14,13 +13,17 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
     title: 'Data Display/Dynamic/Dynamic Layout/- [Table] Table',
     component: PDynamicLayout,
     argTypes: {
-        ...getDynamicLayoutTableArgTypes()
-        // 'item-content': { table: { disable: true } },
+        ...getDynamicLayoutTableArgTypes(),
+        type: { table: { disable: true } },
+        fetchOptions: { table: { disable: true } },
+        typeOptions: { table: { disable: true } },
+        fieldHandler: { table: { disable: true } },
+        slot: { table: { disable: true } },
     },
     args: {
         name: 'Base Information',
-        options: mock.list.options,
-        data: mock.list.data,
+        options: mock.table.options,
+        data: mock.table.data,
         loading: false,
         totalCount: 0,
         timezone: 'UTC',
@@ -31,13 +34,13 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
         colCopy: false,
         excelVisible: false,
         settingsVisible: false,
-        sortBy: false,
+        sortBy: undefined,
         sortDesc: undefined,
         pageStart: undefined,
         pageLimit: undefined,
-        searchText: ''
-    }
-}
+        searchText: '',
+    },
+};
 
 export default meta;
 type Story = StoryObj<typeof PDynamicLayout>;
@@ -83,5 +86,5 @@ const Template: Story = {
 };
 
 export const Playground: Story = {
-    ...Template
-}
+    ...Template,
+};

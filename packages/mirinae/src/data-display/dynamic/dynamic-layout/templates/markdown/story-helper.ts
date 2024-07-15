@@ -13,11 +13,9 @@ export const getDynamicLayoutMarkdownArgTypes = () => {
 
     const language = {
         ...argTypes.language,
-        control: {
-            type: 'select',
-            options: ['en', 'ko', 'ch'],
-        }
-    }
+        control: 'select',
+        options: ['en', 'ko', 'ch'],
+    };
 
     return {
         name: argTypes.name,

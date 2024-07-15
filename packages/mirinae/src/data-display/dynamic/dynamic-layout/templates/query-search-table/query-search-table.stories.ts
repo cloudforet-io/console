@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from '@storybook/vue';
-import type { ComponentProps } from 'vue-component-type-helpers';
-import { I18nConnector } from '@/translations';
-import { reactive, toRefs } from "vue";
+import { reactive, toRefs } from 'vue';
 
 import { faker } from '@faker-js/faker';
+import type { Meta, StoryObj } from '@storybook/vue';
+import { range } from 'lodash';
+import type { ComponentProps } from 'vue-component-type-helpers';
 
 import mock, { getQueryTags } from '@/data-display/dynamic/dynamic-layout/mock';
-
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 import { getDynamicLayoutQuerySearchTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/story-helper';
+import { I18nConnector } from '@/translations';
 
 type PDynamicLayoutPropsAndCustomArgs = ComponentProps<typeof PDynamicLayout>;
 
@@ -16,17 +16,25 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
     title: 'Data Display/Dynamic/Dynamic Layout/- [Table] Query Search Table',
     component: PDynamicLayout,
     argTypes: {
-        ...getDynamicLayoutQuerySearchTableArgTypes()
-        // 'item-content': { table: { disable: true } },
+        ...getDynamicLayoutQuerySearchTableArgTypes(),
+        slot: { table: { disable: true } },
+        type: { table: { disable: true } },
+        fetchOptions: { table: { disable: true } },
+        typeOptions: { table: { disable: true } },
+        fieldHandler: { table: { disable: true } },
     },
     args: {
         name: 'Base Information',
-        options: mock.list.options,
-        data: mock.list.data,
+        options: mock.querySearchTable.options,
+        data: mock.querySearchTable.data,
         loading: false,
         totalCount: 0,
         timezone: 'UTC',
         selectIndex: [],
+        selectable: false,
+        multiSelect: true,
+        invalid: false,
+        colCopy: false,
         excelVisible: false,
         settingsVisible: false,
         keyItemSets: [],
@@ -36,8 +44,8 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
         pageStart: undefined,
         pageLimit: undefined,
         queryTags: getQueryTags(),
-    }
-}
+    },
+};
 
 export default meta;
 type Story = StoryObj<typeof PDynamicLayout>;
@@ -105,7 +113,7 @@ export const Basic: Story = {
             const state = reactive({
                 typeOptions: {
                     loading: true,
-                    totalCount: 0
+                    totalCount: 0,
                 },
                 options: {
                     fields: [{
@@ -142,15 +150,15 @@ export const Basic: Story = {
                         },
                     }],
                 },
-                data: null
-            })
+                data: null,
+            });
             const fetchData = async (options = {}) => {
                 state.typeOptions.loading = true;
                 state.data = await new Promise((resolve) => {
                     setTimeout(() => {
                         state.typeOptions.totalCount = faker.datatype.number({ min: 0 });
                         resolve(range(options.pageLimit || 15)
-                            .map(d => ({
+                            .map(() => ({
                                 // eslint-disable-next-line camelcase
                                 server_id: faker.datatype.uuid(),
                                 data: {
@@ -160,10 +168,10 @@ export const Basic: Story = {
                                         instance_state: faker.helpers.arrayElements(['ACTIVE', 'DISCONNECTED']),
                                     },
                                     collection_info: {
-                                        change_history: range(faker.datatype.number({ min: 0, max: 10 })).map(d => ({job_id: faker.datatype.uuid()}))
-                                    }
+                                        change_history: range(faker.datatype.number({ min: 0, max: 10 })).map(() => ({ job_id: faker.datatype.uuid() })),
+                                    },
                                 },
-                            })))
+                            })));
                     }, 1000);
                 });
                 state.typeOptions.loading = false;
@@ -172,11 +180,11 @@ export const Basic: Story = {
             return {
                 ...toRefs(state),
                 fetchData,
-            }
-        }
-    })
-}
+            };
+        },
+    }),
+};
 
 export const Playground: Story = {
-    ...Template
-}
+    ...Template,
+};
