@@ -1383,6 +1383,8 @@
 				"FIXED": "Fixed Amount",
 				"FORMAT": "Format",
 				"INCREASE": "Increase",
+				"INFO_TOOLTIP": "Compare based on granularity.",
+				"INFO_TOOLTIP_TABLE": "Compare based on granularity.\nIn Table Widget, cannot be performed\nif the Data field or Group by is set to date.",
 				"NAME_INVALID_TEXT": "Please write at least one letter.",
 				"PERCENT": "Percentage",
 				"PREVIOUS_DAY": "Previous Day",
