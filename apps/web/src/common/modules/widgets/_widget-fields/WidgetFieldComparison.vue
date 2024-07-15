@@ -14,6 +14,7 @@ import { i18n } from '@/translations';
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { isDateField, isIncludingDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type { ComparisonOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 import type {
     ComparisonFormat,
@@ -39,9 +40,9 @@ const state = reactive({
         const tableDataField = props.allValueMap.tableDataField as TableDataFieldValue;
         if (!tableDataField) return false;
         const groupByField = props.allValueMap.groupBy as GroupByValue;
-        return tableDataField?.value === 'Date'
-            || Array.isArray(tableDataField?.value) && tableDataField?.value?.includes('Date')
-            || Array.isArray(groupByField?.value) && groupByField.value?.includes('Date');
+        return !Array.isArray(tableDataField?.value) && isDateField(tableDataField?.value)
+            || Array.isArray(tableDataField?.value) && isIncludingDateField(tableDataField?.value)
+            || Array.isArray(groupByField?.value) && isIncludingDateField(groupByField.value);
     }),
     infoText: computed(() => {
         const tableDataField = props.allValueMap.tableDataField as TableDataFieldValue;
