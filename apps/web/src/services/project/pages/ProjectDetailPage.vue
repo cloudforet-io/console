@@ -29,6 +29,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
@@ -43,6 +44,7 @@ import ProjectMainProjectGroupMoveModal from '@/services/project/components/Proj
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+
 
 interface Props {
     id?: string;
@@ -68,6 +70,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+    favoriteItems: computed(() => favoriteGetters.projectItems),
 });
 const state = reactive({
     item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
@@ -113,6 +116,7 @@ const state = reactive({
         ];
         return route.name ? !excludeRoutes.includes(route.name) : true;
     }),
+    isStarred: computed(() => storeState.favoriteItems.some((item) => item.itemId === projectDetailPageState.projectId)),
 });
 
 // Member modal
@@ -223,6 +227,10 @@ onUnmounted(() => {
                              width="1.25rem"
                              height="1.25rem"
                         /><span class="title-text">{{ state.item?.name }}</span>
+                        <favorite-button :item-id="projectDetailPageState.projectId"
+                                         :favorite-type="FAVORITE_TYPE.PROJECT"
+                                         scale="0.8"
+                        />
                     </div>
                     <div class="button-wrapper">
                         <template v-if="projectPageState.isWorkspaceOwner">
@@ -301,6 +309,7 @@ onUnmounted(() => {
     margin-top: -0.25rem;
 }
 .top-wrapper {
+    max-width: 85.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -309,10 +318,13 @@ onUnmounted(() => {
         padding: 0.75rem 1rem;
         .title-wrapper {
             @apply text-label-lg font-bold text-peacock-800 truncate;
+            display: flex;
+            align-items: center;
 
             .title-text {
                 margin-left: 0.375rem;
                 line-height: 1.25rem;
+                padding-right: 0.375rem;
             }
         }
 

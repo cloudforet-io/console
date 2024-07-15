@@ -1411,6 +1411,8 @@
 					"RESET_DESC": "재설정 시, 모든 입력값이 가장 마지막 입력값으로 되돌아갑니다. 이 작업은 취소할 수 없습니다.",
 					"RESET_HEADER": "데이터 옵션을 리셋하시겠습니까?"
 				},
+				"EMPTY_DESC": "[+] 버튼으로 새로운 데이터를 추가하거나, \nConcatenate, Join, Query, Evaluate과 같은 다양한 방법으로 데이터를 변경하세요.",
+				"EMPTY_TITLE": "데이터를 추가해주세요",
 				"FORM": {
 					"ADDITIONAL_LABELS": "레이블 필드 추가",
 					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "이미 사용 중인 이름입니다.",
@@ -1442,6 +1444,7 @@
 					"UPDATE_DATA_TALBE_INVALID_WARNING": "변경 사항 반영 실패. 입력 폼을 다시 한번 확인해 주세요. ",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "선택한 '{first_data}', '{second_data}' 두 데이터는 한 개 이상의 동일한 데이터 필드가 있어 Join을 수행할 수 없습니다. "
 				},
+				"GUIDE_LINK_TEXT": "",
 				"TRANSFORM": "데이터 병합/변환"
 			},
 			"DEFAULT_WIDTH": "기본 너비",
@@ -1490,7 +1493,8 @@
 				"LESS_THAN_PREVIOUS_YEAR": "전년 대비 하락",
 				"MORE_THAN_PREVIOUS_DAY": "전일 대비 상승",
 				"MORE_THAN_PREVIOUS_MONTH": "전월 대비 상승",
-				"MORE_THAN_PREVIOUS_YEAR": "전년 대비 상승"
+				"MORE_THAN_PREVIOUS_YEAR": "전년 대비 상승",
+				"NO_CHANGE": "변화 없음"
 			},
 			"NUMBER_FIELD_VALIDATION": "값은 {max} 이하이어야 합니다.",
 			"PERIOD": "기간",

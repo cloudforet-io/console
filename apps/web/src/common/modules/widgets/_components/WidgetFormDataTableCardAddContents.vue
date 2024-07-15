@@ -399,7 +399,9 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 <style lang="scss" scoped>
 .widget-form-data-table-card-add-contents {
     @apply border border-gray-200 rounded-lg w-full bg-white;
-    width: 24rem;
+    width: 25vw;
+    min-width: 21rem;
+    max-width: 24rem;
     padding-top: 0.125rem;
     margin-bottom: 2rem;
 
@@ -417,7 +419,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 
     .card-header {
         @apply bg-gray-100 rounded-lg border border-gray-200;
-        width: 23.5rem;
+        width: calc(100% - 0.5rem);
         padding: 0.75rem;
         margin: auto;
     }

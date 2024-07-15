@@ -89,6 +89,23 @@ export const getOverlayLayoutArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    hideHeader: {
+        name: 'hideHeader',
+        description: 'Whether to hide the header or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            defaultValue: {
+                summary: false,
+            },
+            category: 'props',
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     // slots
     defaultSlot: {
         name: 'default',

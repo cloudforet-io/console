@@ -296,7 +296,7 @@ defineExpose({
                                :width="widget.width"
                                :widget-options="widget.options"
                                :mode="store.state.display.visibleSidebar ? 'edit-layout' : 'view'"
-                               :loading="getWidgetLoading(widget.widget_id)"
+                               :loading="getWidgetLoading()"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"

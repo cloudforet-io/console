@@ -27,8 +27,18 @@ const table: WidgetConfig = {
     },
     optionalFieldsSchema: {
         comparison: {},
-        subTotal: {},
-        total: {},
+        subTotal: {
+            options: {
+                toggle: false,
+                default: true,
+            },
+        },
+        total: {
+            options: {
+                toggle: false,
+                default: true,
+            },
+        },
         // NOTE: rollback after progress developed
         // progressBar: {
         //     options: {
