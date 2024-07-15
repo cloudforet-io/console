@@ -1,11 +1,9 @@
-import type { ArgTypes } from '@storybook/vue';
-
 import {
     BADGE_FONT_WEIGHT, BADGE_SHAPE, BADGE_STYLE_TYPE, BADGE_TYPE,
 } from '@/data-display/badge/type';
 
 
-export const getBadgesArgTypes = (): ArgTypes => ({
+export const getBadgesArgTypes = () => ({
     badgeType: {
         name: 'badgeType',
         type: 'string',
@@ -121,7 +119,7 @@ export const getBadgesArgTypes = (): ArgTypes => ({
         description: 'Slot for contents of badge',
         table: {
             type: {
-                summary: 'string',
+                summary: null,
             },
             category: 'slots',
         },

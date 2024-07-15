@@ -1,13 +1,10 @@
-import type { ArgTypes } from '@storybook/addons';
-
-import mock from '@/data-display/dynamic/dynamic-layout/mock';
 import { getDynamicLayoutArgTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';
 
-export const getDynamicLayoutQuerySearchTableArgTypes = (): ArgTypes => {
+export const getDynamicLayoutQuerySearchTableArgTypes = () => {
     const argTypes = getDynamicLayoutArgTypes();
 
-    argTypes.data.defaultValue = mock.querySearchTable.data;
-    argTypes.options.defaultValue = mock.querySearchTable.options;
+    // argTypes.data.defaultValue = mock.querySearchTable.data;
+    // argTypes.options.defaultValue = mock.querySearchTable.options;
 
     return {
         name: argTypes.name,

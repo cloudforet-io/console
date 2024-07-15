@@ -1,0 +1,50 @@
+{/* PCard.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PCardStories from './PCard.stories';
+
+<Meta of={PCardStories} />
+
+
+# Card
+<br/>
+<br/>
+
+## Basic
+<Canvas of={PCardStories.Basic} />
+
+<br/>
+<br/>
+
+## Without Header
+
+<br/>
+
+If you give ```false``` to ```header``` props and don't give ```header``` slot, the header will be not displayed.<br/>
+<Canvas of={PCardStories.WithoutHeader} />
+
+<br/>
+<br/>
+
+## Style Types
+<Canvas of={PCardStories.StyleTypes} />
+
+<br/>
+<br/>
+
+## Size
+<Canvas of={PCardStories.Size} />
+
+<br/>
+<br/>
+
+## Slots
+<Canvas of={PCardStories.Slots} />
+
+<br/>
+<br/>
+
+## Playground
+<Canvas of={PCardStories.Playground} />
+<Controls of={PCardStories.Playground} />

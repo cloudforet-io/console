@@ -1,14 +1,11 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
-export const getDynamicFieldArgTypes = (): ArgTypes => ({
+export const getDynamicFieldArgTypes = () => ({
     type: {
         name: 'type',
-        type: { name: 'string' },
+        type: 'string',
         description: `The type of dynamic field. <br/>
                     Available types: ${dynamicFieldTypes}`,
-        defaultValue: `${dynamicFieldTypes[0]}`,
         table: {
             type: {
                 summary: 'string',
@@ -18,16 +15,13 @@ export const getDynamicFieldArgTypes = (): ArgTypes => ({
                 summary: `'${dynamicFieldTypes[0]}'`,
             },
         },
-        control: {
-            type: 'select',
-            options: dynamicFieldTypes,
-        },
+        control: 'select',
+        options: dynamicFieldTypes,
     },
     options: {
         name: 'options',
-        type: { name: 'object' },
+        type: 'object',
         description: 'The options for field. Different by each type.',
-        defaultValue: {},
         table: {
             type: {
                 summary: 'object',
@@ -37,15 +31,12 @@ export const getDynamicFieldArgTypes = (): ArgTypes => ({
                 summary: '{}',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     data: {
         name: 'data',
-        type: { name: 'any' },
+        type: 'any',
         description: 'Data to display.',
-        defaultValue: 'data',
         table: {
             type: {
                 summary: 'any',
@@ -55,16 +46,13 @@ export const getDynamicFieldArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     extraData: {
         name: 'extraData',
-        type: { name: 'any' },
+        type: 'any',
         description: `Extra data that is just passed to each field. <br/>
                     It's useful when you want to reformat the data with handler.`,
-        defaultValue: {},
         table: {
             type: {
                 summary: 'any',
@@ -74,15 +62,12 @@ export const getDynamicFieldArgTypes = (): ArgTypes => ({
                 summary: '{}',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     typeOptions: {
         name: 'typeOptions',
-        type: { name: 'any' },
+        type: 'any',
         description: 'Options that is the same with all fields even in recursive fields like enum type.',
-        defaultValue: {},
         table: {
             type: {
                 summary: 'any',
@@ -92,15 +77,12 @@ export const getDynamicFieldArgTypes = (): ArgTypes => ({
                 summary: '{}',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     handler: {
         name: 'handler',
-        type: { name: 'function' },
+        type: 'function',
         description: 'handler that reformat the data or options to display field.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -110,8 +92,6 @@ export const getDynamicFieldArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
 });
