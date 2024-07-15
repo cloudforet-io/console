@@ -1,13 +1,21 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
 
-export const getProgressBarArgTypes = (): ArgTypes => ({
+export const getProgressBarDefaultArgs = () => ({
+    percentage: 50,
+    label: undefined,
+    size: PROGRESS_BAR_SIZE.md,
+    color: 'undefined',
+    gradient: undefined,
+    disableAnimation: false,
+    height: 'undefined',
+    labelSlot: '',
+});
+
+export const getProgressBarArgTypes = () => ({
     percentage: {
         name: 'percentage',
-        type: { name: 'number' },
+        type: 'number',
         description: 'Progress percentage',
-        defaultValue: 50,
         table: {
             type: {
                 summary: 'number',
@@ -17,15 +25,12 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
                 summary: 0,
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     label: {
         name: 'label',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Label text',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -35,15 +40,12 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     size: {
         name: 'size',
-        type: { name: 'string' },
+        type: 'string',
         description: `Progress Bar size. ${Object.values(PROGRESS_BAR_SIZE)} are available.`,
-        defaultValue: PROGRESS_BAR_SIZE.md,
         table: {
             type: {
                 summary: 'string',
@@ -53,16 +55,13 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
                 summary: `"${PROGRESS_BAR_SIZE.md}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(PROGRESS_BAR_SIZE),
-        },
+        control: 'select',
+        options: Object.values(PROGRESS_BAR_SIZE),
     },
     color: {
         name: 'color',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Color of tracker bar',
-        defaultValue: 'undefined',
         table: {
             type: {
                 summary: 'string',
@@ -72,15 +71,12 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'color',
-        },
+        control: 'color',
     },
     gradient: {
         name: 'gradient',
-        type: { name: 'object' },
+        type: 'object',
         description: 'Gradient Color & Gradient Starting point of tracker bar.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'object',
@@ -90,15 +86,12 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     disableAnimation: {
         name: 'disableAnimation',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to disable animation or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -108,15 +101,12 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     height: {
         name: 'height',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Height of progress bar',
-        defaultValue: 'undefined',
         table: {
             type: {
                 summary: 'string',
@@ -126,15 +116,12 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* slots */
     labelSlot: {
         name: 'label',
         description: 'Slot for label.',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
@@ -144,8 +131,6 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
 });
