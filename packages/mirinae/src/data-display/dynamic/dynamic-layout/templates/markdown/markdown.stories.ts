@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
-import { I18nConnector } from '@/translations';
 
-import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
-import { getDynamicLayoutMarkdownArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/markdown/story-helper';
 
+import mock from '@/data-display/dynamic/dynamic-layout/mock';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import { getDynamicLayoutMarkdownArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/markdown/story-helper';
+import { I18nConnector } from '@/translations';
 
 type PDynamicLayoutPropsAndCustomArgs = ComponentProps<typeof PDynamicLayout>;
 
@@ -14,17 +14,19 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
     component: PDynamicLayout,
     argTypes: {
         ...getDynamicLayoutMarkdownArgTypes(),
-        // 'item-content': { table: { disable: true } },
-    },
-    parameters: {
+        slot: { table: { disable: true } },
+        type: { table: { disable: true } },
+        fetchOptions: { table: { disable: true } },
+        typeOptions: { table: { disable: true } },
+        fieldHandler: { table: { disable: true } },
     },
     args: {
         name: 'Base Information',
-        options: mock.list.options,
-        data: mock.list.data,
-        language: false,
-    }
-}
+        options: mock.markdown.options,
+        data: mock.markdown.data,
+        language: 'en',
+    },
+};
 
 export default meta;
 type Story = StoryObj<typeof PDynamicLayout>;
@@ -63,7 +65,7 @@ there is {{ data.security_group_rules | length }} rules in your instance
                 \`\`\`json
                 {{data.security_group_rules}}
                 \`\`\`
-            `
+            `,
         },
         data: {
             data: {
@@ -82,11 +84,11 @@ there is {{ data.security_group_rules | length }} rules in your instance
                         prtocol: 'TCP',
                         remote: '172.16.0.0/16',
                     },
-                ]
-            }
+                ],
+            },
         },
-    }
-}
+    },
+};
 
 export const WithLanguage: Story = {
     ...Template,
@@ -94,9 +96,9 @@ export const WithLanguage: Story = {
         language: {
             control: {
                 type: 'select',
-                options: ['en', 'ko', 'ch']
-            }
-        }
+                options: ['en', 'ko', 'ch'],
+            },
+        },
     },
     args: {
         type: 'markdown',
@@ -104,11 +106,11 @@ export const WithLanguage: Story = {
             markdown: {
                 en: '### Support English',
                 ko: '### 한국어 지원',
-            }
-        }
-    }
-}
+            },
+        },
+    },
+};
 
 export const Playground: Story = {
-    ...Template
-}
+    ...Template,
+};

@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
-import { I18nConnector } from '@/translations';
-
-import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-
-import { getDynamicLayoutListArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/list/story-helper';
 
 import mock, { getQueryTags } from '@/data-display/dynamic/dynamic-layout/mock';
+import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import { getDynamicLayoutListArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/list/story-helper';
+import { I18nConnector } from '@/translations';
+
+
 
 type PDynamicLayoutPropsAndCustomArgs = ComponentProps<typeof PDynamicLayout>;
 
@@ -15,13 +15,16 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
     component: PDynamicLayout,
     argTypes: {
         ...getDynamicLayoutListArgTypes(),
-        // 'item-content': { table: { disable: true } },
+        type: { table: { disable: true } },
+        fetchOptions: { table: { disable: true } },
+        typeOptions: { table: { disable: true } },
+        slot: { table: { disable: true } },
     },
     args: {
         name: 'Base Information',
         options: mock.list.options,
         data: mock.list.data,
-        fieldHandler: undefined,
+        fieldHandler: (props) => props,
         loading: false,
         totalCount: 0,
         timezone: 'UTC',
@@ -41,10 +44,9 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
         pageStart: undefined,
         pageLimit: undefined,
         queryTags: getQueryTags(),
-        control: 'object',
         searchText: '',
-    }
-}
+    },
+};
 
 export default meta;
 type Story = StoryObj<typeof PDynamicLayout>;
@@ -91,5 +93,5 @@ const Template: Story = {
 };
 
 export const Playground: Story = {
-    ...Template
-}
+    ...Template,
+};

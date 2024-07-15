@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
-import { I18nConnector } from '@/translations';
 
-import { getDynamicLayoutRawArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/raw/story-helper';
+
 
 import mock from '@/data-display/dynamic/dynamic-layout/mock';
-
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import { getDynamicLayoutRawArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/raw/story-helper';
+import { I18nConnector } from '@/translations';
 
 type PDynamicLayoutPropsAndCustomArgs = ComponentProps<typeof PDynamicLayout>;
 
@@ -15,15 +15,19 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
     component: PDynamicLayout,
     argTypes: {
         ...getDynamicLayoutRawArgTypes(),
-        // 'item-content': { table: { disable: true } },
+        type: { table: { disable: true } },
+        fetchOptions: { table: { disable: true } },
+        typeOptions: { table: { disable: true } },
+        fieldHandler: { table: { disable: true } },
+        slot: { table: { disable: true } },
     },
     args: {
         name: 'Base Information',
         options: mock.list.options,
         data: mock.list.data,
         loading: false,
-    }
-}
+    },
+};
 
 export default meta;
 type Story = StoryObj<typeof PDynamicLayout>;
@@ -49,6 +53,6 @@ const Template: Story = {
     }),
 };
 
-export const Palyground: Story = {
-    ...Template
-}
+export const Playground: Story = {
+    ...Template,
+};
