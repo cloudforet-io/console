@@ -2,6 +2,7 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -14,14 +15,19 @@ import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 import { i18n as _i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { DormancyConfig } from '@/services/preference/types/domain-settings-type';
 
 const DORMANCY_CONFIG_NAME = 'identity:dormancy:workspace';
+
+const router = useRouter();
 
 const state = reactive({
     toggleText: computed<string>(() => (state.statusToggle
@@ -56,6 +62,11 @@ const {
     },
 });
 
+const handleClickReportButton = () => {
+    window.open(router.resolve({
+        name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME),
+    }).href, '_blank');
+};
 const handleChangeToggleButton = async (value: boolean) => {
     if (value) return;
     try {
@@ -169,7 +180,7 @@ onMounted(async () => {
                                    required
                     >
                         <template #label-extra>
-                            <p-tooltip :contents="!state.statusToggle ? '' : $t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD_DESC')"
+                            <p-tooltip :contents="$t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD_DESC')"
                                        position="top-start"
                                        class="tooltip"
                             >
@@ -195,14 +206,16 @@ onMounted(async () => {
                         </template>
                     </p-field-group>
                     <p-divider />
-                    <p-checkbox v-model="state.checkbox"
-                                :disabled="!state.statusToggle"
-                    >
-                        {{ $t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_CHECKBOX') }}
-                    </p-checkbox>
+                    <div class="checkbox">
+                        <p-checkbox v-model="state.checkbox"
+                                    :disabled="!state.statusToggle"
+                        />
+                        <span>{{ $t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_CHECKBOX') }}</span>
+                    </div>
                     <p-text-button icon-left="ic_service_cost-report"
                                    style-type="highlight"
                                    class="cost-report-button"
+                                   @click="handleClickReportButton"
                     >
                         {{ $t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_COST_REPORT') }}
                     </p-text-button>
@@ -238,6 +251,7 @@ onMounted(async () => {
                 }
                 .toggle-text-desc {
                     @apply text-gray-600;
+                    max-width: 47rem;
                     .emphasis {
                         @apply text-gray-900 font-medium;
                     }
@@ -259,6 +273,10 @@ onMounted(async () => {
                 @apply flex flex-col;
                 flex: 1;
                 gap: 1.25rem;
+                .checkbox {
+                    @apply flex items-center;
+                    gap: 0.25rem;
+                }
                 .cost-report-button {
                     @apply absolute;
                     top: 1.5rem;
@@ -306,7 +324,7 @@ onMounted(async () => {
                         }
                     }
                 }
-                .tooltip, .cost-input {
+                .cost-input {
                     @apply cursor-not-allowed;
                 }
             }

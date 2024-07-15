@@ -313,6 +313,7 @@ onMounted(async () => {
                     />
                     <p-link :text="value"
                             action-icon="internal-link"
+                            :disabled="item.state === WORKSPACE_STATE.DISABLE || item.is_dormant"
                             new-tab
                             :to="getWorkspaceRouteLocationByWorkspaceName(item)"
                     />
