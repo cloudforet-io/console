@@ -1383,6 +1383,8 @@
 				"FIXED": "固定金額",
 				"FORMAT": "フォーマット",
 				"INCREASE": "増加する",
+				"INFO_TOOLTIP": "",
+				"INFO_TOOLTIP_TABLE": "",
 				"NAME_INVALID_TEXT": "少なくとも1つの文字を書いてください。",
 				"PERCENT": "比率",
 				"PREVIOUS_DAY": "前日",
@@ -1411,6 +1413,8 @@
 					"RESET_DESC": "データオプションをリセットすると、すべての入力が最新の値に戻ります。この操作は元に戻せません。",
 					"RESET_HEADER": "データオプションをリセットしてもよろしいですか？"
 				},
+				"EMPTY_DESC": "[+] ボタンを使用して新しいデータを追加するか 連結、\n結合、クエリ、評価などのさまざまな方法を使用してデータを変更してください。",
+				"EMPTY_TITLE": "データを追加して開始する",
 				"FORM": {
 					"ADDITIONAL_LABELS": "追加ラベル",
 					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "この名前はすでに使用されています。",
@@ -1442,6 +1446,7 @@
 					"UPDATE_DATA_TALBE_INVALID_WARNING": "変更を適用できません。フォームを確認してください。",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "'{first_data}' と '{second_data}' を結合できません。両方のデータテーブルに同一のデータフィールドが1つ以上あります。"
 				},
+				"GUIDE_LINK_TEXT": "",
 				"TRANSFORM": "データを変換"
 			},
 			"DEFAULT_WIDTH": "デフォルト幅",
@@ -1463,6 +1468,8 @@
 			"FORM": {
 				"CREATING_WIDGET_WARNING_MODAL_DESC": "終了してもよろしいですか？ このウィンドウを閉じると、生成中のデータがすべて破棄されます。",
 				"CREATING_WIDGET_WARNING_MODAL_TITLE": "保存されていないデータ",
+				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "",
+				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "",
 				"WIDGET_VALIDATION_WARNING_DESC": "チャートを正常に表示するには、必須フィールドに正しい値が選択されているか確認してください。",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "データテーブルに「地域」フィールドを追加してください。",
 				"WIDGET_VALIDATION_WARNING_TITLE": "空欄または誤った値が選択されたフィールドが存在します。"
@@ -1488,7 +1495,8 @@
 				"LESS_THAN_PREVIOUS_YEAR": "前年よりも少ない",
 				"MORE_THAN_PREVIOUS_DAY": "前日よりも多い",
 				"MORE_THAN_PREVIOUS_MONTH": "前月よりも多い",
-				"MORE_THAN_PREVIOUS_YEAR": "前年よりも多い"
+				"MORE_THAN_PREVIOUS_YEAR": "前年よりも多い",
+				"NO_CHANGE": "変化なし"
 			},
 			"NUMBER_FIELD_VALIDATION": "値は {max} 以下でなければなりません。",
 			"PERIOD": "期間",

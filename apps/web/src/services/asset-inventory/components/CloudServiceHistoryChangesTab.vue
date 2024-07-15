@@ -78,7 +78,7 @@ import {
 
 import {
     PHeading, PCard, PContextMenu, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import vueDiff from '@/common/components/forms/vue-diff/Diff.vue';
 

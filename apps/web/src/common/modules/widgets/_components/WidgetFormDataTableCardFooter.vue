@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PButton } from '@spaceone/design-system';
+import { PButton } from '@cloudforet/mirinae';
 
 interface Props {
    disabled: boolean;

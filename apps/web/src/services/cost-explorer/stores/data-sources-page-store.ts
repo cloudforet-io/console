@@ -19,9 +19,9 @@ import type {
 } from '@/schema/cost-analysis/data-source-account/model';
 import type { CostDataSourceGetParameters } from '@/schema/cost-analysis/data-source/api-verbs/get';
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
+import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
 import type { CostJobModel } from '@/schema/cost-analysis/job/model';
-import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
 import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -173,7 +173,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         fetchDataSourceList: async (params?: CostDataSourceListParameters) => {
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<DataSourceModel>>(params);
+                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>(params);
                 const analyzeDataList = await actions.fetchLinkedAccountAnalyze();
                 state.dataSourceList = (results || []).map((item) => {
                     const matchingItem = analyzeDataList?.find((entry) => entry.data_source_id === item.data_source_id);
@@ -195,7 +195,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         fetchDataSourceItem: async (params?: CostDataSourceListParameters) => {
             try {
-                state.selectedDataSourceItem = await SpaceConnector.clientV2.costAnalysis.dataSource.get<CostDataSourceGetParameters, DataSourceModel>(params);
+                state.selectedDataSourceItem = await SpaceConnector.clientV2.costAnalysis.dataSource.get<CostDataSourceGetParameters, CostDataSourceModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.selectedDataSourceItem = {} as DataSourceItem;

@@ -2,11 +2,11 @@
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout, PHeading, PLink,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProviderModel } from '@/schema/identity/provider/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';

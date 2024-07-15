@@ -4,12 +4,12 @@ import {
 } from 'vue';
 
 import type { Series } from '@amcharts/amcharts5';
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PDataLoader, PSkeleton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

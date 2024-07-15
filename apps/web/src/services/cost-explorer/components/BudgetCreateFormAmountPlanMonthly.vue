@@ -3,9 +3,10 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PButton, PDivider, PFieldTitle } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+
+import { PButton, PDivider, PFieldTitle } from '@cloudforet/mirinae';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';

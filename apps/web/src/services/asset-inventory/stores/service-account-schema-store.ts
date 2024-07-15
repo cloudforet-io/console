@@ -3,11 +3,11 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import { defineStore } from 'pinia';
 
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProviderModel } from '@/schema/identity/provider/model';

@@ -16,7 +16,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import { getTextHighlightRegex } from '@spaceone/design-system';
+import { getTextHighlightRegex } from '@cloudforet/mirinae';
 
 const STYLE_TYPE = ['primary', 'secondary'] as const;
 type StyleType = typeof STYLE_TYPE[number];

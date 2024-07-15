@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 
 import {
     PButtonModal, PTextEditor, PButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';

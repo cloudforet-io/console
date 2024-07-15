@@ -23,7 +23,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PI, PButton } from '@spaceone/design-system';
+import { PI, PButton } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

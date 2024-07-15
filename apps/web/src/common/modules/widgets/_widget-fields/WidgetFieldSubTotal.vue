@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive } from 'vue';
 
-import { PFieldTitle, PToggleButton, PCheckbox } from '@spaceone/design-system';
+import { PFieldTitle, PToggleButton, PCheckbox } from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { TotalOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
@@ -37,7 +37,7 @@ const handleUpdateValue = (value: boolean) => {
 const handleUpdateToggle = (value: boolean) => {
     state.proxyValue = {
         toggleValue: value,
-        freeze: false,
+        freeze: props.widgetFieldSchema.options?.default ?? false,
     };
     if (value) emit('update:value', state.proxyValue);
     else {

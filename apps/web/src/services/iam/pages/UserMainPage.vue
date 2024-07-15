@@ -3,9 +3,9 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
-import { PHorizontalLayout } from '@spaceone/design-system';
-
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PHorizontalLayout } from '@cloudforet/mirinae';
+
 
 import { store } from '@/store';
 

@@ -24,7 +24,7 @@
 
 import { reactive, watch } from 'vue';
 
-import { PFieldGroup } from '@spaceone/design-system';
+import { PFieldGroup } from '@cloudforet/mirinae';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';

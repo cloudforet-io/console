@@ -1,4 +1,4 @@
-import type { DynamicFieldOptions } from '@spaceone/design-system/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicFieldOptions } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-field/type/field-schema';
 
 import type { Reference } from '@/lib/reference/type';
 

@@ -3,12 +3,12 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 import { isEqual } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
@@ -399,7 +399,9 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 <style lang="scss" scoped>
 .widget-form-data-table-card-add-contents {
     @apply border border-gray-200 rounded-lg w-full bg-white;
-    width: 24rem;
+    width: 25vw;
+    min-width: 21rem;
+    max-width: 24rem;
     padding-top: 0.125rem;
     margin-bottom: 2rem;
 
@@ -417,7 +419,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 
     .card-header {
         @apply bg-gray-100 rounded-lg border border-gray-200;
-        width: 23.5rem;
+        width: calc(100% - 0.5rem);
         padding: 0.75rem;
         margin: auto;
     }

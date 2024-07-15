@@ -3,15 +3,16 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PSelectButton, PSelectDropdown, PSkeleton,
-} from '@spaceone/design-system';
-import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PSelectButton, PSelectDropdown, PSkeleton,
+} from '@cloudforet/mirinae';
+import type { SelectButtonType } from '@cloudforet/mirinae/types/inputs/buttons/select-button-group/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';

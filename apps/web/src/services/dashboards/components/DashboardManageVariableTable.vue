@@ -4,10 +4,11 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { cloneDeep, isEqual } from 'lodash';
+
 import {
     PBadge, PDataTable, PSelectStatus, PToggleButton, PCollapsiblePanel, PIconButton,
-} from '@spaceone/design-system';
-import { cloneDeep, isEqual } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import type {
     DashboardVariableSchemaProperty,

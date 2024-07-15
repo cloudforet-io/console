@@ -2,8 +2,9 @@
 import type Vue from 'vue';
 import { computed, getCurrentInstance, reactive } from 'vue';
 
-import { PI, PTextButton, PDivider } from '@spaceone/design-system';
 import { isEqual, xor } from 'lodash';
+
+import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 

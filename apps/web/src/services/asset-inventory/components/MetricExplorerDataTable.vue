@@ -2,8 +2,6 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { PTextPagination, PToolboxTable } from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
 
@@ -14,6 +12,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PTextPagination, PToolboxTable } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
@@ -26,6 +26,7 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { getReferenceLabel } from '@/common/modules/widgets/_helpers/widget-date-helper';
 
 import { GRANULARITY, SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import {
@@ -35,6 +36,10 @@ import {
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+import {
+    useAllReferenceTypeInfoStore,
+} from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
 const DATE_FORMAT_MAP = {
@@ -48,6 +53,10 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+const storeState = reactive({
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
+});
 const state = reactive({
     loading: false,
     currentMetricId: computed<string>(() => route.params.metricId),
@@ -101,7 +110,8 @@ const getRefinedColumnValue = (field, value) => {
         }
         return numberFormatter(value, { notation: 'compact' }) || 0;
     }
-    return metricExplorerPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
+    const _label = metricExplorerPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
+    return getReferenceLabel(storeState.allReferenceTypeInfo, field.name, _label);
 };
 
 /* Api */

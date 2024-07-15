@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router/composables';
 
-import { PEmpty, PButton } from '@spaceone/design-system';
+import { PEmpty, PButton } from '@cloudforet/mirinae';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 

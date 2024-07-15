@@ -7,13 +7,13 @@ import { useRouter } from 'vue-router/composables';
 import { Root } from '@amcharts/amcharts5';
 import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import { PSkeleton } from '@spaceone/design-system';
 import { cloneDeep, uniqBy } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PSkeleton } from '@cloudforet/mirinae';
 
 import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 

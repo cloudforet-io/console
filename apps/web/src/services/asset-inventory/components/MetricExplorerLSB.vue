@@ -5,11 +5,12 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { isEmpty, startCase, toLower } from 'lodash';
+
 import {
     PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip, PLazyImg,
-} from '@spaceone/design-system';
-import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
-import { isEmpty, startCase, toLower } from 'lodash';
+} from '@cloudforet/mirinae';
+import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
 
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
@@ -221,6 +222,7 @@ const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceIte
                 type: MENU_ITEM_TYPE.COLLAPSIBLE,
                 label,
                 icon,
+                initialCollapsed: true,
                 subItems: [{
                     label: namespace.name,
                     name: namespace.key,
@@ -339,6 +341,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                                                      class="category-menu-item"
                                                      :item="item"
                                                      is-sub-item
+                                                     :override-collapsed="item.initialCollapsed"
                         >
                             <template #left-image>
                                 <img v-if="item.icon === 'COMMON'"

@@ -4,10 +4,11 @@ import {
     computed, onBeforeMount, onBeforeUnmount, reactive, toRef,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PButton, PBadge, PI,
-} from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import type {
     DashboardOptions,

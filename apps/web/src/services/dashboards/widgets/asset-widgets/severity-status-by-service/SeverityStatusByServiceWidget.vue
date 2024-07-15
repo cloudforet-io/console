@@ -3,12 +3,12 @@ import {
     computed, defineExpose, defineProps, reactive,
 } from 'vue';
 
-import { PDataLoader } from '@spaceone/design-system';
 import { min } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader } from '@cloudforet/mirinae';
 
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 

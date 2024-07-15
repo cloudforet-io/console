@@ -3,7 +3,7 @@ import {
     reactive, watch,
 } from 'vue';
 
-import { PTextButton } from '@spaceone/design-system';
+import { PTextButton } from '@cloudforet/mirinae';
 
 import type { Tags } from '@/schema/_common/model';
 

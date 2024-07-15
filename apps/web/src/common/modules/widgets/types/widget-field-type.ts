@@ -73,6 +73,7 @@ export interface LegendOptions { // toggle button
 
 export interface IconOptions {
     default?: string; // e.g. 'ic_coin-filled'
+    toggle?: boolean;
 }
 
 export interface SubTotalOptions {

@@ -3,8 +3,8 @@ import { computed, reactive } from 'vue';
 
 import {
     PI, PFieldGroup, PSelectDropdown, PTextInput, PButton, PIconButton,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
 
 import getRandomId from '@/lib/random-id-generator';
 

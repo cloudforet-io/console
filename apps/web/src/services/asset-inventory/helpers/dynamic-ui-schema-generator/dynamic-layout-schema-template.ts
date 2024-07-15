@@ -1,6 +1,6 @@
-import type { SearchSchema } from '@spaceone/design-system/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { DEFINITION_TABLE_STYLE_TYPE } from '@spaceone/design-system/src/data-display/tables/definition-table/config';
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { SearchSchema } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import { DEFINITION_TABLE_STYLE_TYPE } from '@cloudforet/mirinae/src/data-display/tables/definition-table/config';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 import type { ItemLayout, QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 

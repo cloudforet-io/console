@@ -1383,6 +1383,8 @@
 				"FIXED": "Fixed Amount",
 				"FORMAT": "Format",
 				"INCREASE": "Increase",
+				"INFO_TOOLTIP": "Compare based on granularity.",
+				"INFO_TOOLTIP_TABLE": "Compare based on granularity.\nIn Table Widget, cannot be performed\nif the Data field or Group by is set to date.",
 				"NAME_INVALID_TEXT": "Please write at least one letter.",
 				"PERCENT": "Percentage",
 				"PREVIOUS_DAY": "Previous Day",
@@ -1411,6 +1413,8 @@
 					"RESET_DESC": "Resetting the data options will revert all inputs to their most recent values. This action cannot be undone.",
 					"RESET_HEADER": "Are you sure you want to reset the data options?"
 				},
+				"EMPTY_DESC": "Click the [+] button to add new data or transform data using various methods such as Concatenate, Join, Query, and Evaluate.",
+				"EMPTY_TITLE": "Add Data to Get Started",
 				"FORM": {
 					"ADDITIONAL_LABELS": "Additional Labels",
 					"ADDITIONAL_LABELS_DUPLICATED_INVALID_TEXT": "This name is already being used.",
@@ -1442,6 +1446,7 @@
 					"UPDATE_DATA_TALBE_INVALID_WARNING": "Unable to apply changes. Please check the form.",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "'{first_data}' cannot be joined with '{second_data}' because the two data tables have one or more identical data fields."
 				},
+				"GUIDE_LINK_TEXT": "How to create a widget?",
 				"TRANSFORM": "Transform Data"
 			},
 			"DEFAULT_WIDTH": "Default Width",
@@ -1463,6 +1468,8 @@
 			"FORM": {
 				"CREATING_WIDGET_WARNING_MODAL_DESC": "Are you sure you want to exit? Closing this window will discard any data currently being generated.",
 				"CREATING_WIDGET_WARNING_MODAL_TITLE": "Unsaved Data",
+				"INACTIVE_WIDGET_WARNING_MODAL_DESC": "Note that all options will be reset to their previously saved state.",
+				"INACTIVE_WIDGET_WARNING_MODAL_TITLE": "There are unapplied changes",
 				"WIDGET_VALIDATION_WARNING_DESC": "To illustrate chart properly, check the form below and set the correct values.",
 				"WIDGET_VALIDATION_WARNING_DESC_GEO_MAP": "The ‘Region’ field is missing from the Data Table.",
 				"WIDGET_VALIDATION_WARNING_TITLE": "Empty or incorrect values"
@@ -1488,7 +1495,8 @@
 				"LESS_THAN_PREVIOUS_YEAR": "less than previous year",
 				"MORE_THAN_PREVIOUS_DAY": "more than previous day",
 				"MORE_THAN_PREVIOUS_MONTH": "more than previous month",
-				"MORE_THAN_PREVIOUS_YEAR": "more than previous year"
+				"MORE_THAN_PREVIOUS_YEAR": "more than previous year",
+				"NO_CHANGE": "No change"
 			},
 			"NUMBER_FIELD_VALIDATION": "The value must be {max} or less.",
 			"PERIOD": "Period",

@@ -4,10 +4,10 @@ import {
     reactive, ref, watch, computed, onBeforeUnmount,
 } from 'vue';
 
-import { PDataLoader, PEmpty, PButton } from '@spaceone/design-system';
 import { debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PDataLoader, PEmpty, PButton } from '@cloudforet/mirinae';
 
 import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
@@ -296,7 +296,7 @@ defineExpose({
                                :width="widget.width"
                                :widget-options="widget.options"
                                :mode="store.state.display.visibleSidebar ? 'edit-layout' : 'view'"
-                               :loading="getWidgetLoading(widget.widget_id)"
+                               :loading="getWidgetLoading()"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay"

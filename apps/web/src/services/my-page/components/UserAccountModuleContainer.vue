@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { PPaneLayout } from '@spaceone/design-system';
+import { PPaneLayout } from '@cloudforet/mirinae';
 
 interface Props {
     title?: string

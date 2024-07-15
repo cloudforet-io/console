@@ -1,9 +1,9 @@
 import { computed, reactive } from 'vue';
 
-import type { TreeNode } from '@spaceone/design-system/types/data-display/tree/type';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/type';
 
 import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
 import type { ProjectGroupDeleteParameters } from '@/schema/identity/project-group/api-verbs/delete';

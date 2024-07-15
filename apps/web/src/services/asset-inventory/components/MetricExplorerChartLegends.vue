@@ -3,10 +3,11 @@ import {
     computed, defineEmits, reactive, watch,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PTextButton, PSelectDropdown, PStatus, PDataLoader,
-} from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

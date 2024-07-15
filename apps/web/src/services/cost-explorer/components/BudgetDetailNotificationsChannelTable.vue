@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PBadge, PDataTable } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PBadge, PDataTable } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

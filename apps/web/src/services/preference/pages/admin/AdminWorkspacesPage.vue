@@ -4,12 +4,12 @@ import Vue, {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import {
-    PButton, PHeading, PHorizontalLayout,
-} from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButton, PHeading, PHorizontalLayout,
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

@@ -34,6 +34,7 @@ export const Template = (args, { argTypes }) => ({
         <p-select-dropdown
             :style-type="styleType"
             :appearance-type="appearanceType"
+            :size="size"
             :disabled="disabled"
             :invalid="invalid"
             :placeholder="placeholder"
@@ -125,12 +126,55 @@ export const Template = (args, { argTypes }) => ({
                             <th>rounded</th>
                             <th>transparent</th>
                             <th>icon-button</th>
+                            <th>tertiary-icon-button</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <th v-for="styleType in styleTypes" :key="styleType" class="font-normal">
                                 <p-select-dropdown :menu="menuItems" :styleType="styleType" class="my-2 mx-auto"/>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th v-for="styleType in styleTypes" :key="styleType" class="font-normal">
+                                <p-select-dropdown size="sm" :menu="menuItems" :styleType="styleType" class="my-2 mx-auto"/>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
+            setup() {
+                return {
+                    menuItems,
+                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+## Size
+
+<Canvas>
+    <Story name="Size" height={'300px'}>
+        {{
+            components: { PSelectDropdown },
+            template: `
+                <table class="w-full border-separate border-spacing-1">
+                    <thead>
+                        <tr>
+                            <th>md</th>
+                            <th>sm</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>
+                                <p-select-dropdown :menu="menuItems" size="md" class="my-2 mx-auto"/>
+                            </th>
+                            <th>
+                                <p-select-dropdown :menu="menuItems" size="sm" class="my-2 mx-auto"/>
                             </th>
                         </tr>
                     </tbody>
@@ -157,12 +201,15 @@ export const Template = (args, { argTypes }) => ({
         <div>
             <p class="text-label-lg font-bold my-3">Single select with 'basic', 'badge', 'stack' appearance type</p>
             <p-select-dropdown :menu="menuItems" :selected="singleSelected" />
+            <p-select-dropdown size="sm" :menu="menuItems" :selected="singleSelected" />
             <br/>
             <p class="text-label-lg font-bold my-3">Multi select with 'basic' appearance type</p>
             <p-select-dropdown :menu="menuItems" :selected="multiSelected"  multi-selectable />
+            <p-select-dropdown size="sm" :menu="menuItems" :selected="multiSelected"  multi-selectable />
             <br/>
             <p class="text-label-lg font-bold my-3">Multi select with 'badge' appearance type</p>
             <p-select-dropdown :menu="menuItems" :selected="multiSelected" multi-selectable appearance-type="badge" />
+            <p-select-dropdown size="sm" :menu="menuItems" :selected="multiSelected" multi-selectable appearance-type="badge" />
             <br/>
             <p class="text-label-lg font-bold my-3">Multi select with 'stack' appearance type</p>
             <p-select-dropdown :menu="menuItems" :selected="multiSelected" multi-selectable appearance-type="stack" />
@@ -172,7 +219,7 @@ export const Template = (args, { argTypes }) => ({
             setup() {
                 const state = reactive({
                     singleSelected: [menuItems.find(d => !d.type || d.type === 'item')],
-                    multiSelected: menuItems.filter(d => !d.type || d.type === 'item').splice(0, 15),
+                    multiSelected: menuItems.filter(d => !d.type || d.type === 'item').splice(0, 5),
                 })
                 return {
                     menuItems,
@@ -197,6 +244,7 @@ export const Template = (args, { argTypes }) => ({
                                         <th>rounded</th>
                                         <th>transparent</th>
                                         <th>icon-button</th>
+                                        <th>tertiary-icon-button</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -233,6 +281,7 @@ export const Template = (args, { argTypes }) => ({
                             <th>rounded</th>
                             <th>transparent</th>
                             <th>icon-button</th>
+                            <th>tertiary-icon-button</th>
                         </tr>
                     </thead>
                     <tbody>

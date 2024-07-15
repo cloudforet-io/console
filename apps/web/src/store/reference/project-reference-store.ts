@@ -6,22 +6,21 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ProjectType } from '@/schema/identity/project/type';
 // eslint-disable-next-line import/no-cycle
 import { store } from '@/store';
 
-
+// eslint-disable-next-line import/no-cycle
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface ProjectResourceItemData {
@@ -38,26 +37,14 @@ export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-
-const _listProjectGroup = async (): Promise<ProjectGroupModel[]> => {
-    try {
-        const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
-            query: {
-                only: ['project_group_id', 'name'],
-            },
-        });
-        return res?.results ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
 export const useProjectReferenceStore = defineStore('reference-project', () => {
-    const _state = reactive({
-        projectGroupList: [] as ProjectGroupModel[],
-    });
+    const allReferenceStore = useAllReferenceStore();
     const state = reactive({
         items: null as ProjectReferenceMap | null,
+    });
+
+    const _getters = reactive({
+        projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     });
 
     const getters = reactive({
@@ -88,14 +75,14 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                 only: ['project_id', 'name', 'project_group_id', 'users', 'project_type'],
             },
         };
+        await allReferenceStore.load('project_group', { force: true });
         const res = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>(params);
 
-        _state.projectGroupList = await _listProjectGroup();
         const projectReferenceMap: ProjectReferenceMap = {};
 
         // eslint-disable-next-line no-restricted-syntax
         res?.results?.forEach((projectInfo) => {
-            const projectGroup = _state.projectGroupList.find((d) => d.project_group_id === projectInfo.project_group_id);
+            const projectGroup = Object.values(_getters.projectGroup ?? {}).find((d) => d.key === projectInfo.project_group_id);
             projectReferenceMap[projectInfo.project_id] = {
                 key: projectInfo.project_id,
                 label: (projectGroup)
@@ -103,7 +90,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                 name: projectInfo.name,
                 data: {
                     groupInfo: (projectGroup) ? {
-                        id: projectGroup.project_group_id,
+                        id: projectGroup.key,
                         name: projectGroup.name,
                     } : undefined,
                     users: projectInfo.users || [],
@@ -117,7 +104,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
     };
 
     const sync = async (project: ProjectModel) => {
-        const projectGroup = _state.projectGroupList.find((d) => d.project_group_id === project.project_group_id);
+        const projectGroup = Object.values(_getters.projectGroup ?? {}).find((d) => d.key === project.project_group_id);
         state.items = {
             ...state.items,
             [project.project_id]: {
@@ -127,7 +114,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                 name: project.name,
                 data: {
                     groupInfo: (projectGroup) ? {
-                        id: projectGroup.project_group_id,
+                        id: projectGroup.key,
                         name: projectGroup.name,
                     } : undefined,
                     users: project.users || [],

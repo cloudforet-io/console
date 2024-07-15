@@ -6,8 +6,8 @@ import {
 
 import {
     PContextMenu, PI, useContextMenuController, PButtonModal,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 
@@ -77,7 +77,7 @@ const {
     targetRef,
     contextMenuRef,
     useReorderBySelection: true,
-    useFixedStyle: true,
+    // useFixedStyle: true,
     menu: toRef(state, 'menuItems'),
     selected: toRef(state, 'selectedItems'),
     pageSize: 10,

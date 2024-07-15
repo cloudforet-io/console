@@ -3,7 +3,7 @@ import { computed, onMounted, reactive } from 'vue';
 
 import {
     PFieldGroup, PTextInput,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

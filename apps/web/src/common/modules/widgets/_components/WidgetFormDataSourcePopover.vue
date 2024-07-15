@@ -4,12 +4,12 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPopover, PSelectCard, PI,
-} from '@spaceone/design-system';
-import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
+} from '@cloudforet/mirinae';
+import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
@@ -187,6 +187,7 @@ const handleConfirmDataSource = async () => {
         if (createdWidget) {
             widgetGenerateStore.setWidgetForm(createdWidget);
         }
+        state.showPopover = false;
     }
 
     if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADDED) {
@@ -228,6 +229,7 @@ const handleConfirmDataSource = async () => {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
         });
+        state.showPopover = false;
         if (!widgetGenerateState.selectedDataTableId && result) {
             widgetGenerateStore.setSelectedDataTableId(result?.data_table_id);
             await widgetGenerateStore.loadDataTable({
@@ -235,7 +237,6 @@ const handleConfirmDataSource = async () => {
             });
         }
     }
-    state.showPopover = false;
     state.loading = false;
 };
 
@@ -459,7 +460,7 @@ watch(() => state.showPopover, (val) => {
         display: flex;
         flex-direction: column;
         min-width: 43.5rem;
-        height: 30rem;
+        height: 26rem;
         .top-part {
             display: flex;
             width: 100%;
@@ -545,7 +546,7 @@ watch(() => state.showPopover, (val) => {
 :deep(.p-context-menu) {
     border: none;
     .menu-container {
-        height: 23.25rem;
+        height: 19.25rem;
     }
 }
 </style>

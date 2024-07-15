@@ -224,7 +224,6 @@ export default defineComponent<ContextMenuItemProps>({
     }
     > .left-icon {
         margin-right: 0.25rem;
-        margin-top: 0.25rem;
         flex-shrink: 0;
     }
     > .label-wrapper {

@@ -1,4 +1,4 @@
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { VariableModel } from '@/lib/variable-models/_base/types';
 

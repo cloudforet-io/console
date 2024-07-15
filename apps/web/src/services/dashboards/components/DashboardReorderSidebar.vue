@@ -6,8 +6,8 @@ import {
 import draggable from 'vuedraggable';
 
 import {
-    PI,
-} from '@spaceone/design-system';
+    PI, PButton,
+} from '@cloudforet/mirinae';
 
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
@@ -90,6 +90,16 @@ onUnmounted(() => {
                         </div>
                     </div>
                 </draggable>
+            </div>
+        </portal>
+        <portal to="widget-footer">
+            <div class="footer-wrapper">
+                <p-button style-type="substitutive"
+                          icon-left="ic_check"
+                          @click="store.dispatch('display/hideSidebar')"
+                >
+                    {{ $t('DASHBOARDS.DETAIL.DONE_EDITING') }}
+                </p-button>
             </div>
         </portal>
     </div>

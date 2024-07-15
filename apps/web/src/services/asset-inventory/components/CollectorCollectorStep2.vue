@@ -58,7 +58,7 @@ import {
 
 import {
     PButton, PTextButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';

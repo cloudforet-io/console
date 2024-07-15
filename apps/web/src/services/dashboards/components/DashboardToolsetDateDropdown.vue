@@ -3,10 +3,11 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PSelectDropdown } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { cloneDeep, range } from 'lodash';
+
+import { PSelectDropdown } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { DateRange, DashboardOptions } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';

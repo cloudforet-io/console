@@ -3,13 +3,13 @@ import {
     computed, reactive,
 } from 'vue';
 
-import {
-    PButton, PButtonModal, PI, PTextEditor, PToolbox, PEmpty,
-} from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButton, PButtonModal, PI, PTextEditor, PToolbox, PEmpty,
+} from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { EventListParameters } from '@/schema/monitoring/event/api-verbs/list';

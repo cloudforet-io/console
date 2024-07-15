@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PButton } from '@spaceone/design-system';
+import { PButton } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

@@ -4,12 +4,12 @@ import { computed, reactive, ref } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     useContextMenuController, PHeading, PIconButton, PButton, PContextMenu, PI,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { MetricExampleDeleteParameters } from '@/schema/inventory/metric-example/api-verbs/delete';

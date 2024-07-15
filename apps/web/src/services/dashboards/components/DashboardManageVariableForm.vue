@@ -5,7 +5,7 @@ import {
 
 import {
     PButton, PFieldGroup, PSelectDropdown, PTextInput, useProxyValue,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';

@@ -4,12 +4,13 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { range, sortBy } from 'lodash';
+
 import {
     PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PFieldTitle,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
-import { range, sortBy } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/inputs/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 
@@ -151,10 +152,19 @@ const costFilterState = reactive({
     }),
     additionalInfoGroupByItems: computed<MenuItem[]>(() => {
         const dataSource = storeState.costDataSources[props.sourceId ?? ''];
-        return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys.map((key) => ({
-            name: `additional_info.${key}`,
-            label: key,
-        })), 'label') : [];
+        const additionalInfo = dataSource?.data?.plugin_info?.metadata?.additional_info;
+        if (!dataSource) return [];
+        if (additionalInfo) {
+            return sortBy(Object.entries(additionalInfo).map(([k]) => ({
+                name: `additional_info.${k}`,
+                label: k,
+            })), 'label');
+        }
+        return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys
+            .map((key) => ({
+                name: `additional_info.${key}`,
+                label: key,
+            })), 'label') : [];
     }),
     tagsFilterItems: [] as MenuItem[],
 });

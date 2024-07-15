@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { PI, PLazyImg } from '@spaceone/design-system';
+import { PI, PLazyImg } from '@cloudforet/mirinae';
 
 import type { MappingItem } from '@/common/components/mapping-method/type';
 

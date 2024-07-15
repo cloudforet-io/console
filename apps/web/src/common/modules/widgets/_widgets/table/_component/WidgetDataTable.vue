@@ -2,9 +2,9 @@
 
 import { computed, reactive } from 'vue';
 
-import { PI, PTooltip } from '@spaceone/design-system';
 import bytes from 'bytes';
 
+import { PI, PTooltip } from '@cloudforet/mirinae';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Currency } from '@/store/modules/settings/type';
@@ -225,6 +225,11 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         border-collapse: separate;
         border-spacing: 0;
         padding: 0;
+    }
+    thead {
+        @apply sticky;
+        top: 0;
+        z-index: 1;
     }
 
     th {

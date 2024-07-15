@@ -4,10 +4,10 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { PButtonTab, PButton } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButtonTab, PButton } from '@cloudforet/mirinae';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectAlertConfigCreateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/create';

@@ -6,13 +6,14 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PButton, PSelectDropdown, PContextMenu, PIconButton, useContextMenuController,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import {
     cloneDeep, isEmpty, unset,
 } from 'lodash';
+
+import {
+    PFieldGroup, PButton, PSelectDropdown, PContextMenu, PIconButton, useContextMenuController,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
@@ -128,7 +129,7 @@ const {
 } = useContextMenuController({
     targetRef,
     contextMenuRef,
-    useFixedStyle: true,
+    // useFixedStyle: true,
     useReorderBySelection: true,
     menu: toRef(state, 'filterItems'),
     selected: toRef(state, 'selectedItems'),
@@ -167,6 +168,7 @@ const handleSelectAddFilterMenuItem = (item: MenuItem, _: any, isSelected: boole
         state.selectedItems = state.selectedItems.filter((d) => d !== item.name);
         resetFilterByKey(item.name);
     }
+    hideContextMenu();
 };
 const handleDeleteFilter = (key: string) => {
     state.selectedItems = state.selectedItems.filter((d) => d.name !== key);
@@ -314,7 +316,6 @@ onMounted(() => {
                                            multi-selectable
                                            appearance-type="badge"
                                            show-select-marker
-                                           use-fixed-menu-style
                                            :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
                                            :show-delete-all-button="false"
                                            :page-size="10"

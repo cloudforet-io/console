@@ -33,8 +33,9 @@
 import { useElementSize } from '@vueuse/core';
 import { computed, reactive, ref } from 'vue';
 
-import { PLazyImg, PButton } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
+
+import { PLazyImg, PButton } from '@cloudforet/mirinae';
 
 import type { ReferenceItem } from '@/store/reference/type';
 

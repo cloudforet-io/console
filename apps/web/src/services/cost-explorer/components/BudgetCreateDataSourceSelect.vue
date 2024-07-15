@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { PFieldGroup, PSelectDropdown, PLazyImg } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { PFieldGroup, PSelectDropdown, PLazyImg } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';

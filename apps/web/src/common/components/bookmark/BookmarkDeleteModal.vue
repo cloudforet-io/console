@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PButtonModal, PI, PLazyImg } from '@spaceone/design-system';
+import { PButtonModal, PI, PLazyImg } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

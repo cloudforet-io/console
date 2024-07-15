@@ -4,7 +4,7 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { PDivider, PContextMenu, PDataLoader } from '@spaceone/design-system';
+import { PDivider, PContextMenu, PDataLoader } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

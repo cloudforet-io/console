@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount } from 'vue';
 
-import { PHeading } from '@spaceone/design-system';
+import { PHeading } from '@cloudforet/mirinae';
 
 import NoticeForm from '@/services/info/components/NoticeForm.vue';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';

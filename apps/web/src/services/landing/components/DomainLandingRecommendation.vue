@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router/composables';
 
 import {
     PLink, PDivider, PCard, PButton, PI, screens,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PLazyImg, PI, PTextHighlighting } from '@spaceone/design-system';
+import { PLazyImg, PI, PTextHighlighting } from '@cloudforet/mirinae';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import type { ReferenceData } from '@/lib/helper/config-data-helper';

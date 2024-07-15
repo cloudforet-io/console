@@ -5,7 +5,7 @@ import {
 
 import {
     PFieldGroup, PHeading, PSkeleton, PTextInput, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

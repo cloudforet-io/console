@@ -2,12 +2,13 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PSelectDropdown, PTextButton } from '@spaceone/design-system';
+import { cloneDeep, isEmpty } from 'lodash';
+
+import { PSelectDropdown, PTextButton } from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep, isEmpty } from 'lodash';
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';

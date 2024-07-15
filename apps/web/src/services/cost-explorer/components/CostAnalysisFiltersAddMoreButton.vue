@@ -4,11 +4,12 @@ import {
     computed, defineEmits, reactive, ref, toRef, watch,
 } from 'vue';
 
+import { debounce } from 'lodash';
+
 import {
     PButton, PContextMenu, useContextMenuController,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { debounce } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import CostTagKeyVariableModel from '@/lib/variable-models/managed-model/custom-resource-model/cost-tag-key-variable-model';
 
@@ -28,7 +29,9 @@ const costAnalysisPageState = costAnalysisPageStore.state;
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
         const tagsMenuItems = state.tagsMenuItems;
-        if (!tagsMenuItems.length) return costAnalysisPageGetters.defaultGroupByItems;
+        if (!tagsMenuItems.length) {
+            return costAnalysisPageGetters.defaultGroupByItems;
+        }
         return [
             ...costAnalysisPageGetters.defaultGroupByItems,
             { type: 'header', label: 'Tags', name: 'tags' },

@@ -5,8 +5,9 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI, PTreeView } from '@spaceone/design-system';
 import { isEqual } from 'lodash';
+
+import { PI, PTreeView } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

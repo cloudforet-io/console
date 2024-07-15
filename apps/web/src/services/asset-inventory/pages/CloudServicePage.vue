@@ -3,11 +3,6 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
-import {
-    PDataLoader, PDivider, PButton, PHeading, PEmpty,
-} from '@spaceone/design-system';
-import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { isEmpty } from 'lodash';
 
 import {
@@ -18,6 +13,11 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import {
+    PDataLoader, PDivider, PButton, PHeading, PEmpty,
+} from '@cloudforet/mirinae';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import { SpaceRouter } from '@/router';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';

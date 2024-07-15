@@ -4,10 +4,8 @@ import { computed, reactive } from 'vue';
 
 import {
     PIconButton, PI, PTextInput, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -58,7 +56,6 @@ const handleSelectDataTable = async (dataTableId: string) => {
     await widgetGenerateStore.loadDataTable({
         data_table_id: dataTableId,
     });
-    widgetGenerateStore.setSelectedPreviewGranularity(GRANULARITY.MONTHLY);
 };
 const handleUpdateDataTableName = (value: string) => {
     if (value.length <= 60) {

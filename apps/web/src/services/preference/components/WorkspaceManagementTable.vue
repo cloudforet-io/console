@@ -3,15 +3,14 @@ import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PSelectDropdown, PStatus, PToolboxTable, PLink,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-
-import {
     getApiQueryWithToolboxOptions,
 } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSelectDropdown, PStatus, PToolboxTable, PLink,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';

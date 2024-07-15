@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {
     PHeading,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
 
@@ -9,7 +9,6 @@ import DomainSettingsBaseInformation from '@/services/preference/components/Doma
 import DomainSettingsBrandAssets from '@/services/preference/components/DomainSettingsBrandAssets.vue';
 import DomainSettingsTimezoneAndLanguage
     from '@/services/preference/components/DomainSettingsTimezoneAndLanguage.vue';
-
 
 const domainConfigStore = useDomainSettingsStore();
 

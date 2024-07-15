@@ -5,14 +5,15 @@ import {
 } from 'vue';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import {
-    PCollapsibleToggle, PDataTable, PSkeleton,
-} from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import {
     cloneDeep, find, sortBy, sumBy,
 } from 'lodash';
+
+import {
+    PCollapsibleToggle, PDataTable, PSkeleton,
+} from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 

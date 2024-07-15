@@ -3,13 +3,14 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PSelectDropdown, PTextButton,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import {
+    PSelectDropdown, PTextButton,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import { VariableModelFactory } from '@/lib/variable-models';
 import type {

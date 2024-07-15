@@ -3,9 +3,9 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PButton, PFieldGroup, PTextInput } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButton, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
+
 
 import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
 import type { TokenIssueModel } from '@/schema/identity/token/model';

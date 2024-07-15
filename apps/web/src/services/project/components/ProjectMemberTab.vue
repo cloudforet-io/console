@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PHeading, PI, PTableCheckModal, PToolboxTable,
-} from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+} from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';

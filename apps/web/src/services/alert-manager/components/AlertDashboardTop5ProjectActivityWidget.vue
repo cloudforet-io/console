@@ -4,14 +4,14 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import {
-    PLink, PSelectStatus, PStatus, PSkeleton,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PLink, PSelectStatus, PStatus, PSkeleton,
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

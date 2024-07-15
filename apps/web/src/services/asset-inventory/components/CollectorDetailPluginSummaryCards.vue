@@ -2,8 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PCopyButton, PFieldTitle } from '@spaceone/design-system';
-
+import { PCopyButton, PFieldTitle } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { CollectorModel } from '@/schema/inventory/collector/model';

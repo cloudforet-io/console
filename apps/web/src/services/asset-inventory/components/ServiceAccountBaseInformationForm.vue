@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PFieldGroup, PJsonSchemaForm, PTextInput,
-} from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PFieldGroup, PJsonSchemaForm, PTextInput,
+} from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';

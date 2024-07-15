@@ -3,17 +3,17 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PButton, PHeading, PI, PToolboxTable, PSelectDropdown, PBadge, PTextButton,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import dayjs from 'dayjs';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButton, PHeading, PI, PToolboxTable, PSelectDropdown, PBadge, PTextButton,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 import { i18n } from '@/translations';
 
