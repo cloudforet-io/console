@@ -168,6 +168,7 @@ const handleSelectAddFilterMenuItem = (item: MenuItem, _: any, isSelected: boole
         state.selectedItems = state.selectedItems.filter((d) => d !== item.name);
         resetFilterByKey(item.name);
     }
+    hideContextMenu();
 };
 const handleDeleteFilter = (key: string) => {
     state.selectedItems = state.selectedItems.filter((d) => d.name !== key);
