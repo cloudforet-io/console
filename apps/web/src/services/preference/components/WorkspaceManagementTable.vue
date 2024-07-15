@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, onMounted, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -218,10 +218,6 @@ const getServiceAccountRouteLocationByWorkspaceName = (item: WorkspaceTableModel
 
 onMounted(async () => {
     await costReportPageStore.fetchCostReportConfig();
-});
-
-onUnmounted(async () => {
-    await costReportPageStore.$reset();
 });
 </script>
 

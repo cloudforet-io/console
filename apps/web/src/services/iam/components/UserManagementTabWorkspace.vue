@@ -141,11 +141,11 @@ const fetchWorkspaceList = async () => {
             state.items = [];
             return;
         }
-        const result: TableItem[] = [];
+        const _results: TableItem[] = [];
         (results ?? []).forEach((k) => {
             const workspaceInfo = workspaceResults?.find((w) => w.workspace_id === k.workspace_id);
             if (!workspaceInfo || workspaceInfo?.state === WORKSPACE_STATE.DISABLE) return;
-            result.push({
+            _results.push({
                 workspace: {
                     name: workspaceInfo?.name || '',
                     id: k.workspace_id,
@@ -160,7 +160,7 @@ const fetchWorkspaceList = async () => {
                 is_dormant: workspaceInfo?.is_dormant || false,
             });
         });
-        state.items = result;
+        state.items = _results;
     } catch (e) {
         state.items = [];
     } finally {

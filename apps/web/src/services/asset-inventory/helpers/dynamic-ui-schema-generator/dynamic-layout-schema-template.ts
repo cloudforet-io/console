@@ -53,6 +53,11 @@ export const getDefaultDetailSchema = (fields: DynamicField[], options: {
             })),
             ...((!options.isTrustedAccount && [
                 {
+                    key: 'state',
+                    name: 'State',
+                    type: 'text',
+                },
+                {
                     key: 'project_id',
                     name: 'Project',
                     type: 'text',
@@ -158,16 +163,6 @@ export const getDefaultTableSchema = (dynamicFields: DynamicField[], options: {
                     key: 'state',
                     name: 'State',
                     type: 'state',
-                },
-                {
-                    key: 'asset_info',
-                    name: 'Asset',
-                    type: 'text',
-                },
-                {
-                    key: 'cost_info',
-                    name: 'Cost',
-                    type: 'text',
                 },
                 {
                     key: 'is_managed',
