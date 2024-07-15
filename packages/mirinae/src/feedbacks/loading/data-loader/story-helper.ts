@@ -81,8 +81,7 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
     },
     disableEmptyCase: {
         name: 'disableEmptyCase',
-        type: { name: 'boolean' },
-        defaultValue: false,
+        type: 'boolean',
         table: {
             type: {
                 summary: 'boolean',
@@ -92,10 +91,25 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
+    // disableEmptyCase: {
+    //     name: 'disableEmptyCase',
+    //     type: { name: 'boolean' },
+    //     defaultValue: false,
+    //     table: {
+    //         type: {
+    //             summary: 'boolean',
+    //         },
+    //         category: 'props',
+    //         defaultValue: {
+    //             summary: false,
+    //         },
+    //     },
+    //     control: {
+    //         type: 'boolean',
+    //     },
+    // },
     showDataFromScratch: {
         name: 'showDataFromScratch',
         type: { name: 'boolean' },
@@ -203,7 +217,6 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
     loaderSlot: {
         name: 'loader',
         description: 'Slot to replace loader.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -231,7 +244,6 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
     noDataSlot: {
         name: 'noData',
         description: 'Slot to replace no data display.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
