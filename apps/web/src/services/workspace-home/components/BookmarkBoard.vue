@@ -368,7 +368,6 @@ const checkSelectedId = (id?: string) => {
 
             .text-wrapper {
                 max-width: calc(100% - 2.5rem);
-                line-height: 1rem;
                 .title-wrapper {
                     @apply flex items-center;
                     gap: 0.25rem;
@@ -438,6 +437,8 @@ const checkSelectedId = (id?: string) => {
                 }
 
                 .board-item {
+                    min-height: initial;
+                    max-height: initial;
                     .image-wrapper {
                         width: 1.25rem;
                         height: 1.25rem;
