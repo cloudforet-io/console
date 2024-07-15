@@ -155,7 +155,7 @@ const costFilterState = reactive({
         const additionalInfo = dataSource?.data?.plugin_info?.metadata?.additional_info;
         if (!dataSource) return [];
         if (additionalInfo) {
-            return sortBy(Object.entries(additionalInfo).filter(([, v]) => !!v.visible).map(([k]) => ({
+            return sortBy(Object.entries(additionalInfo).map(([k]) => ({
                 name: `additional_info.${k}`,
                 label: k,
             })), 'label');
