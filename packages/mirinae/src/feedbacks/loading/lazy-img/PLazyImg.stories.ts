@@ -19,7 +19,8 @@ const meta : Meta<PLazyImgPropsAndCustomArgs> = {
     component: PLazyImg,
     argTypes: {
         ...getLazyImgArgTypes(),
-        // 'item-content': { table: { disable: true } },
+        error: { table: { disable: true } },
+        preloader: { table: { disable: true } },
     },
     parameters: {
         design: {
