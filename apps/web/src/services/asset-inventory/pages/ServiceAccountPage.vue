@@ -5,8 +5,6 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { sum, values } from 'lodash';
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -442,11 +440,6 @@ onMounted(async () => {
                     <auto-sync-state v-if="value"
                                      :state="value"
                     />
-                </template>
-                <template v-if="!tableState.isTrustedAccount"
-                          #col-asset_info-format="{value}"
-                >
-                    <span>{{ sum(values(value)) }}</span>
                 </template>
                 <template v-if="!tableState.isTrustedAccount"
                           #col-cost_info-format="{value}"
