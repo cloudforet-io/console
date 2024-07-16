@@ -1,0 +1,44 @@
+{/* PLazyImg.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PLazyImgStories from './PLazyImg.stories';
+
+<Meta of={PLazyImgStories} />
+
+
+# Lazy Image
+
+<br/>
+<br/>
+
+## Basic
+<Canvas of={PLazyImgStories.Basic} />
+
+<br/>
+<br/>
+
+## Failed to Load Image
+<Canvas of={PLazyImgStories.FailedtoLoadImage} />
+
+<br/>
+<br/>
+
+## Custom Loader
+<Canvas of={PLazyImgStories.CustomLoader} />
+
+<br/>
+<br/>
+
+## Manual Control
+<Canvas of={PLazyImgStories.ManualControl} />
+
+<br/>
+<br/>
+
+## Playground
+<Canvas of={PLazyImgStories.Playground} />
+<Controls of={PLazyImgStories.Playground} />
+
+<br/>
+<br/>
