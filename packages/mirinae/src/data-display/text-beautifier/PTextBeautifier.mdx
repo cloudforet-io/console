@@ -1,0 +1,26 @@
+{/* PTextBeautifier.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PTextBeautifierStories from './PTextBeautifier.stories';
+
+<Meta of={PTextBeautifierStories} />
+
+
+# Text Beautifier
+
+The `TextBeautifier` component helps the user to read and detect text easily.<br/>
+For example, when the url pattern is detected in text, `TextBeautifier` component converts it into `a` tag.
+
+<br/>
+<br/>
+
+## Basic
+<Canvas of={PTextBeautifierStories.Basic} />
+
+## Playground
+<Canvas of={PTextBeautifierStories.Playground} />
+<Controls of={PTextBeautifierStories.Playground} />
+
+<br/>
+<br/>
