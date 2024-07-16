@@ -1,15 +1,28 @@
 import { faker } from '@faker-js/faker';
-import type { ArgTypes } from '@storybook/addons';
 import { range } from 'lodash';
 
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 
-export const getDataLoaderArgTypes = (): ArgTypes => ({
+export const getDataLoaderDefaultArgs = () => ({
+    loading: true,
+    data: range(15).map(() => faker.lorem.lines()),
+    loaderType: LOADER_TYPES.spinner,
+    spinnerSize: SPINNER_SIZE.xl,
+    disableEmptyCase: false,
+    showDataFromScratch: false,
+    minLoadingTime: 0,
+    lazyLoadingTime: 0,
+    loaderBackdropOpacity: 0.5,
+    loaderBackdropColor: 'white',
+    disableTransition: false,
+    defaultSlot: undefined,
+});
+
+export const getDataLoaderArgTypes = () => ({
     loading: {
         name: 'loading',
-        type: { name: 'boolean' },
-        defaultValue: true,
+        type: 'boolean',
         table: {
             type: {
                 summary: 'boolean',
@@ -19,15 +32,12 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     data: {
         name: 'data',
-        type: { name: 'object' },
+        type: 'object',
         description: 'Data to display',
-        defaultValue: range(15).map(() => faker.lorem.lines()),
         table: {
             type: {
                 summary: 'object, array',
@@ -37,15 +47,12 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: undefined,
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     loaderType: {
         name: 'loaderType',
-        type: { name: 'string' },
+        type: 'string',
         description: `Loader type. ${Object.values(LOADER_TYPES)} are available.`,
-        defaultValue: LOADER_TYPES.spinner,
         table: {
             type: {
                 summary: 'string',
@@ -55,16 +62,13 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: LOADER_TYPES.spinner,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(LOADER_TYPES),
-        },
+        control: 'select',
+        options: Object.values(LOADER_TYPES),
     },
     spinnerSize: {
         name: 'spinnerSize',
-        type: { name: 'string' },
+        type: 'string',
         description: `Spinner loader size. It works only when \`loaderType\` props is ${LOADER_TYPES.spinner}.`,
-        defaultValue: SPINNER_SIZE.xl,
         table: {
             type: {
                 summary: 'string',
@@ -74,10 +78,8 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: SPINNER_SIZE.xl,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(SPINNER_SIZE),
-        },
+        control: 'select',
+        options: Object.values(SPINNER_SIZE),
     },
     disableEmptyCase: {
         name: 'disableEmptyCase',
@@ -93,28 +95,10 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
         },
         control: 'boolean',
     },
-    // disableEmptyCase: {
-    //     name: 'disableEmptyCase',
-    //     type: { name: 'boolean' },
-    //     defaultValue: false,
-    //     table: {
-    //         type: {
-    //             summary: 'boolean',
-    //         },
-    //         category: 'props',
-    //         defaultValue: {
-    //             summary: false,
-    //         },
-    //     },
-    //     control: {
-    //         type: 'boolean',
-    //     },
-    // },
     showDataFromScratch: {
         name: 'showDataFromScratch',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show data from scratch or after fetching data at least once.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -124,14 +108,11 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     minLoadingTime: {
         name: 'minLoadingTime',
-        type: { name: 'number' },
-        defaultValue: 0,
+        type: 'number',
         table: {
             type: {
                 summary: 'number',
@@ -141,14 +122,11 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: 0,
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     lazyLoadingTime: {
         name: 'lazyLoadingTime',
-        type: { name: 'number' },
-        defaultValue: 0,
+        type: 'number',
         table: {
             type: {
                 summary: 'number',
@@ -158,14 +136,11 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: 0,
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     loaderBackdropOpacity: {
         name: 'loaderBackdropOpacity',
-        type: { name: 'number' },
-        defaultValue: 0.5,
+        type: 'number',
         table: {
             type: {
                 summary: 'number',
@@ -175,14 +150,11 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: 0.5,
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     loaderBackdropColor: {
         name: 'loaderBackdropColor',
-        type: { name: 'string' },
-        defaultValue: 'white',
+        type: 'string',
         table: {
             type: {
                 summary: 'string',
@@ -192,14 +164,11 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: 'white',
             },
         },
-        control: {
-            type: 'color',
-        },
+        control: 'color',
     },
     disableTransition: {
         name: 'disableTransition',
-        type: { name: 'boolean' },
-        defaultValue: false,
+        type: 'boolean',
         table: {
             type: {
                 summary: 'boolean',
@@ -209,9 +178,7 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     /* slots */
     loaderSlot: {
@@ -230,7 +197,6 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
     defaultSlot: {
         name: 'default',
         description: 'Slot to insert data display elements.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

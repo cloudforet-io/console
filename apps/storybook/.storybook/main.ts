@@ -13,8 +13,10 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/data-display/**/*.stories.@(js|jsx|ts|tsx)',
 
     '../../../packages/mirinae/src/feedbacks/alert/**/*.mdx',
+    '../../../packages/mirinae/src/feedbacks/loading/**/*.mdx',
 
     '../../../packages/mirinae/src/feedbacks/alert/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/feedbacks/loading/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
