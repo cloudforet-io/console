@@ -260,10 +260,8 @@ const handleToggleWidth = () => {
         .metadata-content {
             @apply text-label-md;
             display: flex;
-            line-height: unset;
             flex-direction: column;
             gap: 0.5rem;
-            min-height: 6.25rem;
             max-height: 20rem;
             min-width: 20rem;
             max-width: 25rem;

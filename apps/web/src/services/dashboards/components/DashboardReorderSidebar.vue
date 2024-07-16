@@ -50,6 +50,10 @@ const handleChangeWidgetOrder = async () => {
     });
     dashboardDetailStore.setDashboardLayouts(_updatedLayouts);
 };
+const getWidgetDefaultName = (widgetType: string): string => {
+    const _config = getWidgetConfig(widgetType);
+    return _config?.meta?.title || widgetType;
+};
 
 watch(() => dashboardDetailState.dashboardId, (after, before) => {
     if (after !== before) {
@@ -86,7 +90,9 @@ onUnmounted(() => {
                                  width="1rem"
                                  height="1rem"
                             />
-                            <span class="text">{{ widget.name }}</span>
+                            <span class="text"
+                                  :class="{ 'text-gray-400': !widget.name }"
+                            >{{ widget.name || getWidgetDefaultName(widget.widget_type) }}</span>
                         </div>
                     </div>
                 </draggable>

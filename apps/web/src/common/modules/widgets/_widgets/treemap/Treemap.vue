@@ -36,6 +36,8 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { CategoryByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 
 type Data = ListResponse<{
     [key: string]: string|number;
@@ -51,6 +53,7 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartData: [],
     chartOptions: computed<TreemapSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
         tooltip: {
             trigger: 'item',
             position: 'inside',
