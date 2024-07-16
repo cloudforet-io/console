@@ -1,14 +1,27 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { SizeMapping } from '@/feedbacks/modals/type';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
-export const getIconModalArgTypes = (): ArgTypes => ({
+export const getIconModalDefaultArgs = () => ({
+    size: 'sm',
+    visible: false,
+    iconName: 'ic_service_dashboard',
+    iconColor: undefined,
+    emoji: '',
+    headerTitle: 'Header Title',
+    headerDesc: 'Header Description',
+    buttonText: 'close',
+    buttonStyleType: BUTTON_STYLE.primary,
+    backdrop: true,
+    hideButton: false,
+    customHeader: 'Title',
+    body: 'Modal Content',
+});
+
+export const getIconModalArgTypes = () => ({
     size: {
         name: 'size',
-        type: { name: 'string' },
+        type: 'string',
         description: `Modal size. ${Object.keys(SizeMapping).map((d) => `\`${d}\``).join(', ')} are available.`,
-        defaultValue: 'sm',
         table: {
             type: {
                 summary: 'string',
@@ -18,16 +31,14 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: 'sm',
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(SizeMapping),
-        },
+        control: 'select',
+        options: Object.keys(SizeMapping),
     },
     visible: {
         name: 'visible',
-        type: { name: 'boolean', required: true },
+        type: 'boolean',
+        required: true,
         description: 'Whether to show modal or not. sync prop.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -37,15 +48,12 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     iconName: {
         name: 'iconName',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Icon name.',
-        defaultValue: 'ic_service_dashboard',
         table: {
             type: {
                 summary: 'string',
@@ -55,15 +63,12 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     iconColor: {
         name: 'iconColor',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Values can be given in the order of stroke and fill. Consider space as a delimiter. Giving one thing applies to both. e.g. "inherit transparent"',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -73,15 +78,12 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     emoji: {
         name: 'emoji',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Emoji.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'string',
@@ -91,15 +93,12 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     headerTitle: {
         name: 'headerTitle',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Header Title',
-        defaultValue: 'Header Title',
         table: {
             type: {
                 summary: 'string',
@@ -109,15 +108,12 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: 'Header Title',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     headerDesc: {
         name: 'headerDesc',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Header description.',
-        defaultValue: 'Header Description',
         table: {
             type: {
                 summary: 'string',
@@ -127,15 +123,12 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     buttonText: {
         name: 'buttonText',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Button Text.',
-        defaultValue: 'close',
         table: {
             type: {
                 summary: 'string',
@@ -145,15 +138,12 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: 'close',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     buttonStyleType: {
         name: 'styleType',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Button style of modal button.',
-        defaultValue: BUTTON_STYLE.primary,
         table: {
             type: {
                 summary: 'string',
@@ -163,16 +153,13 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: BUTTON_STYLE.primary,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(BUTTON_STYLE),
-        },
+        control: 'select',
+        options: Object.values(BUTTON_STYLE),
     },
     backdrop: {
         name: 'backdrop',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show backdrop or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -182,15 +169,12 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     hideButton: {
         name: 'hideButton',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to use default button or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -200,15 +184,12 @@ export const getIconModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     // slots
     customHeader: {
         name: 'customHeader',
         description: 'Slot for custom header content',
-        defaultValue: 'Title',
         table: {
             type: {
                 summary: 'Title',
@@ -220,7 +201,6 @@ export const getIconModalArgTypes = (): ArgTypes => ({
     body: {
         name: 'body',
         description: 'Slot for body content',
-        defaultValue: 'Modal Content',
         table: {
             type: {
                 summary: 'Modal Content',
