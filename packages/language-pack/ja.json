@@ -2120,6 +2120,10 @@
 		}
 	},
 	"HOME": {
+		"ACCOUNT_SUMMARY": "アカウント概要",
+		"ACCOUNT_SUMMARY_BY_PROVIDER": "プロバイダー別サービスアカウント",
+		"ACCOUNT_SUMMARY_CHART_TITLE": "全サービスアカウント",
+		"ACCOUNT_SUMMARY_SHOW_MORE": "サービスアカウントをもっと表示",
 		"ACTIVATION_REQUIRED": "アクティベーションが必要です",
 		"ACTIVATION_REQUIRED_DESC": "これにはコスト分析、予算、コストレポートが含まれます。",
 		"ALT_E_DUPLICATED_NAME": "重複した名前です。",
@@ -3374,7 +3378,7 @@
 			"AGENT": {
 				"ACTIVATE": "有性化",
 				"ACTIVATE_MODAL_TEXT": "クラスターを有性化しますか？",
-				"ACTIVE": "Active",
+				"ACTIVE": "アクティブ",
 				"CLUSTER_DETAIL_HEADER": "クラスター詳細情報",
 				"CONNECT_CLUSTER": "クラスター接続",
 				"CONNECT_CLUSTER_HEADER": "クラスター接続",
