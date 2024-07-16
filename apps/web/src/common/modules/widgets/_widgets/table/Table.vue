@@ -9,6 +9,7 @@ import { orderBy, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import { PTextPagination } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
@@ -165,6 +166,12 @@ const state = reactive({
     }),
     dataInfo: computed<DataInfo|undefined>(() => state.dataTable?.data_info),
     sortBy: [],
+    thisPage: 1,
+    pageSize: computed<number>(() => (props.size === 'full' ? 30 : 10)),
+    allPage: computed(() => {
+        const totalCount = state.data?.total_count ?? 0;
+        return Math.ceil(totalCount / state.pageSize) || 1;
+    }),
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -242,6 +249,10 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
                 field_group: _field_group,
                 fields: _fields,
                 sort: state.sortBy.length ? state.sortBy : _sort,
+                page: {
+                    start: (state.pageSize * (state.thisPage - 1)) + 1,
+                    limit: state.pageSize,
+                },
             },
             vars: props.dashboardVars,
         });
@@ -256,7 +267,10 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
     }
 };
 const loadWidget = async (manualLoad?: boolean): Promise<Data|APIErrorToast> => {
-    if (!manualLoad) state.sortBy = [];
+    if (!manualLoad) {
+        state.sortBy = [];
+        state.thisPage = 1;
+    }
     const res = await fetchWidget();
     const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget(true) : null;
     if (typeof res === 'function') return res;
@@ -265,7 +279,15 @@ const loadWidget = async (manualLoad?: boolean): Promise<Data|APIErrorToast> => 
     return state.data;
 };
 
-watch(() => state.sortBy, async () => {
+const handleManualLoadWidget = async () => {
+    await loadWidget(true);
+};
+const handleUpdateThisPage = async (_thisPage: number) => {
+    state.thisPage = _thisPage;
+    await loadWidget(true);
+};
+
+watch([() => props.size], async () => {
     await loadWidget(true);
 });
 
@@ -443,6 +465,14 @@ defineExpose<WidgetExpose<Data>>({
                                    :granularity="state.granularity"
                                    :data-info="state.dataInfo"
                                    :sort-by.sync="state.sortBy"
+                                   :this-page.sync="state.thisPage"
+                                   @load="handleManualLoadWidget"
+                />
+            </div>
+            <div class="table-pagination-wrapper">
+                <p-text-pagination :this-page="state.thisPage"
+                                   :all-page="state.allPage"
+                                   @pageChange="handleUpdateThisPage"
                 />
             </div>
         </div>
@@ -452,10 +482,16 @@ defineExpose<WidgetExpose<Data>>({
 <style lang="postcss" scoped>
 .table-wrapper {
     @apply flex justify-center h-full;
-    max-height: 100%;
+    max-height: calc(100% - 1.5rem);
+    height: calc(100% - 1.5rem);
+
     overflow: hidden;
     .data-table {
         height: 100%;
     }
+}
+.table-pagination-wrapper {
+    @apply flex justify-center items-center;
+    height: 1.5rem;
 }
 </style>
