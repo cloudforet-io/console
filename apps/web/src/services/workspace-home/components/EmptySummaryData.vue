@@ -13,7 +13,9 @@ import type { RoleInfo } from '@/store/modules/user/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import { green, peacock, violet } from '@/styles/colors';
+import {
+    green, indigo, peacock, violet,
+} from '@/styles/colors';
 
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type { EmptyData, SummaryDataType } from '@/services/workspace-home/types/workspace-home-type';
@@ -52,6 +54,12 @@ const state = reactive({
                 color: peacock[800],
             };
         }
+        if (props.type === SUMMARY_DATA_TYPE.ACCOUNT) {
+            return {
+                name: 'ic_service_service-account',
+                color: indigo[700],
+            };
+        }
         if (state.isWorkspaceMember && isEmpty(storeState.projects)) {
             return {
                 name: 'ic_service_project',
@@ -69,7 +77,7 @@ const state = reactive({
 <template>
     <div class="empty-summary-data"
          :style="{ backgroundImage: `url(${props.imageUrl})` }"
-         :class="{[props.type]: true, 'no-project-data': state.isWorkspaceMember && isEmpty(storeState.projects)}"
+         :class="{[props.type.toLowerCase()]: true, 'no-project-data': state.isWorkspaceMember && isEmpty(storeState.projects)}"
     >
         <div class="icon-wrapper">
             <p-i class="menu-icon"
@@ -115,6 +123,14 @@ const state = reactive({
             .title {
                 @apply text-violet-700;
             }
+        }
+    }
+    &.account {
+        .icon-wrapper {
+            @apply bg-indigo-100;
+        }
+        .title {
+            @apply text-indigo-700;
         }
     }
     .icon-wrapper {

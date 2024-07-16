@@ -8,6 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PPaneLayout, PDivider, PTextButton, PCheckbox, PToggleButton, PFieldGroup, PTextInput, PButton, PTooltip, PI,
 } from '@cloudforet/mirinae';
+import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
@@ -64,14 +65,18 @@ const {
     initForm,
     isAllValid,
 } = useFormValidator({
-    cost: '',
+    cost: undefined as string|undefined,
 }, {
-    cost: (val: string) => {
-        if (state.statusToggle && !val.trim()) return _i18n.t('IAM.DOMAIN_SETTINGS.ALT_E_EMPTY_COST');
+    cost: (val?: string) => {
+        if (state.statusToggle && !val?.trim()) return _i18n.t('IAM.DOMAIN_SETTINGS.ALT_E_EMPTY_COST');
         return true;
     },
 });
 
+const handleUpdateCost = (value?: string) => {
+    const _cost = getNumberFromString(value);
+    setForm('cost', numberFormatter(_cost));
+};
 const handleClickReportButton = () => {
     window.open(router.resolve({
         name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME),
@@ -137,7 +142,7 @@ watch(() => state.dormancyConfig, (config) => {
     if (!config) return;
     state.statusToggle = config?.enabled || false;
     state.checkbox = config?.send_email || false;
-    setForm('cost', config?.cost?.toString() || '');
+    setForm('cost', numberFormatter(config?.cost));
 }, { immediate: true });
 
 onMounted(async () => {
@@ -204,25 +209,23 @@ onMounted(async () => {
                         </template>
                         <template #default="{invalid}">
                             <div class="cost-input">
-                                <p-text-input :value="cost"
+                                <p-text-input :value="state.statusToggle ? cost : undefined"
                                               :invalid="invalid"
                                               :disabled="!state.statusToggle"
-                                              type="number"
                                               masking-mode
                                               class="cost-input"
-                                              @update:value="setForm('cost', $event)"
+                                              @update:value="handleUpdateCost"
                                 />
                                 <span class="placeholder">{{ CURRENCY_SYMBOL[storeState.currency] }} {{ storeState.currency }}</span>
                             </div>
                         </template>
                     </p-field-group>
-                    <p-divider />
-                    <div class="checkbox">
-                        <p-checkbox v-model="state.checkbox"
-                                    :disabled="!state.statusToggle"
-                        />
+                    <p-divider class="divider" />
+                    <p-checkbox v-model="state.checkbox"
+                                :disabled="!state.statusToggle"
+                    >
                         <span>{{ $t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_CHECKBOX') }}</span>
-                    </div>
+                    </p-checkbox>
                     <p-text-button icon-left="ic_service_cost-report"
                                    style-type="highlight"
                                    class="cost-report-button"
@@ -281,12 +284,22 @@ onMounted(async () => {
                 margin-bottom: auto;
             }
             .cost-content-wrapper {
-                @apply flex flex-col;
                 flex: 1;
                 gap: 1.25rem;
-                .checkbox {
-                    @apply flex items-center;
-                    gap: 0.25rem;
+                .divider {
+                    @apply block;
+                    width: 100%;
+                    margin-top: 1.25rem;
+                    margin-bottom: 1.25rem;
+                }
+
+                /* custom design-system component - p-checkbox */
+                :deep(.p-checkbox) {
+                    @apply items-center;
+                    width: auto;
+                    .text {
+                        margin-left: 0.25rem;
+                    }
                 }
                 .cost-report-button {
                     @apply absolute;
