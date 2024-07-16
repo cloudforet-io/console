@@ -1355,6 +1355,7 @@
 			"CANCEL": "キャンセル",
 			"CHANGE_DATA_MODAL_DESCRIPTION": "下記に設定されたすべてのオプションがリセットされます。",
 			"CHANGE_DATA_MODAL_TITLE": "データを変更しますか？",
+			"CLONE": "複製",
 			"CLOUD_SERVICE": {
 				"HELP": "サービスしている主要なクラウドサービスリストを表示します",
 				"NO_DATA": "クラウドリソースがありません。",
@@ -1814,6 +1815,7 @@
 			"ALT_E_EDIT_NAME": "ダッシュボード名の更新に失敗しました",
 			"ALT_E_UPDATE_DASHBOARD_NAME": "ダッシュボード名の更新に失敗しました",
 			"ALT_S_DELETE_DASHBOARD": "ダッシュボードが正常に削除されました",
+			"ALT_S_EDIT_NAME": "ダッシュボード名を編集しました",
 			"CLONE_TITLE": "ダッシュボードの複製",
 			"CUSTOM_DATE_FROM": "スタート",
 			"CUSTOM_DATE_TITLE": "期間選択",

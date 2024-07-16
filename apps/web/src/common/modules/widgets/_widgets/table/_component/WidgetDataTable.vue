@@ -216,7 +216,6 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
 <style scoped lang="postcss">
 .widget-data-table {
     @apply bg-white h-full w-full relative;
-    max-width: 81.5rem;
     max-height: 100%;
     overflow: auto;
 

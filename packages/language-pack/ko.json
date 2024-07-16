@@ -1355,6 +1355,7 @@
 			"CANCEL": "취소",
 			"CHANGE_DATA_MODAL_DESCRIPTION": "아래 설정된 모든 옵션이 재설정됩니다.",
 			"CHANGE_DATA_MODAL_TITLE": "데이터를 변경하시겠습니까?",
+			"CLONE": "복제",
 			"CLOUD_SERVICE": {
 				"HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
 				"NO_DATA": "클라우드 리소스가 없습니다.",
@@ -1814,6 +1815,7 @@
 			"ALT_E_EDIT_NAME": "대시보드 이름 수정 실패",
 			"ALT_E_UPDATE_DASHBOARD_NAME": "대시보드 이름 수정 실패",
 			"ALT_S_DELETE_DASHBOARD": "대시보드 삭제 완료",
+			"ALT_S_EDIT_NAME": "대시보드 이름 수정 성공",
 			"CLONE_TITLE": "대시보드 복제",
 			"CUSTOM_DATE_FROM": "시작",
 			"CUSTOM_DATE_TITLE": "기간 선택",

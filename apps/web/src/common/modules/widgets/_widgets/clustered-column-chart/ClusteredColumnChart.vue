@@ -56,6 +56,11 @@ const state = reactive({
     xAxisData: [],
     chartData: [],
     chartOptions: computed<BarSeriesOption>(() => ({
+        grid: {
+            left: 10,
+            right: 10,
+            containLabel: true,
+        },
         legend: {
             type: 'scroll',
             show: state.showLegends,
