@@ -1,32 +1,42 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
-import { isEmpty } from 'lodash';
+import { countBy, isEmpty, map } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PStatus, PFieldTitle, PLazyImg, PDivider, PLink,
+    PStatus, PFieldTitle, PLazyImg, PDivider, PLink, PSpinner, PProgressBar,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import { stateFormatter } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
+import { serviceAccountStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type { EmptyData } from '@/services/workspace-home/types/workspace-home-type';
+
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
     serviceAccount: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
+    provider: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
 });
 const state = reactive({
+    loading: true,
     emptyData: computed<EmptyData>(() => {
         let result = {} as EmptyData;
         if (isEmpty(storeState.serviceAccount)) {
@@ -39,6 +49,41 @@ const state = reactive({
         }
         return result;
     }),
+    items: [] as ServiceAccountModel[],
+    itemsTotalCount: 0,
+    itemsByState: computed(() => {
+        const stateCounts = countBy(state.items, 'state');
+        return map(stateCounts, (count, i) => ({
+            state: i,
+            count,
+        }));
+    }),
+    itemsByProvider: computed(() => {
+        const providerCounts = countBy(state.items, 'provider');
+        return map(providerCounts, (count, i) => ({
+            provider: i,
+            count,
+        }));
+    }),
+});
+
+const fetchServiceAccountList = async () => {
+    state.loading = true;
+    try {
+        const { results, total_count } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>();
+        state.items = results || [];
+        state.itemsTotalCount = total_count;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.items = [];
+        state.itemsTotalCount = 0;
+    } finally {
+        state.loading = false;
+    }
+};
+
+onMounted(() => {
+    fetchServiceAccountList();
 });
 </script>
 
@@ -48,89 +93,91 @@ const state = reactive({
                        size="lg"
                        class="main-title"
         />
-        <div v-if="!isEmpty(storeState.serviceAccount)"
-             class="content-container"
+        <div v-if="state.loading"
+             class="loading"
         >
-            <div class="content-wrapper">
-                <div class="total-content-wrapper">
-                    <div class="total-chart" />
-                    <div class="info-wrapper">
-                        <p class="title">
-                            {{ $t('HOME.ACCOUNT_SUMMARY_CHART_TITLE') }}
-                        </p>
-                        <div class="info">
-                            <span class="total-count">812</span>
-                            <p-status v-bind="stateFormatter('ACTIVE')"
-                                      class="capitalize"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div class="main-content">
-                    <strong class="title">{{ $t('HOME.ACCOUNT_SUMMARY_BY_PROVIDER') }}</strong>
-                    <div class="content">
-                        <div class="chart" />
-                        <div class="provider-list-wrapper">
-                            <div class="provider-item">
-                                <div class="image-wrapper">
-                                    <p-lazy-img :src="assetUrlConverter('')"
-                                                width="1.5rem"
-                                                height="1.5rem"
-                                                class="provider-image"
-                                    />
-                                </div>
-                                <div class="percent-wrapper">
-                                    <div class="info">
-                                        <span>aws</span>
-                                        <p>
-                                            <span>
-                                                <span class="percent">50</span>%
-                                            </span>
-                                            <span class="count">(406)</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="provider-item">
-                                <div class="image-wrapper">
-                                    <p-lazy-img :src="assetUrlConverter('')"
-                                                width="1.5rem"
-                                                height="1.5rem"
-                                                class="provider-image"
-                                    />
-                                </div>
-                                <div class="percent-wrapper">
-                                    <div class="info">
-                                        <span>aws</span>
-                                        <p>
-                                            <span>
-                                                <span class="percent">50</span>%
-                                            </span>
-                                            <span class="count">(406)</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="route-wrapper">
-                <p-divider class="divider" />
-                <p-link highlight
-                        :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
-                        action-icon="internal-link"
-                        class="link"
-                >
-                    {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
-                </p-link>
-            </div>
+            <p-spinner size="lg" />
         </div>
-        <empty-summary-data v-else
-                            :image-url="require('/images/home/img_workspace-home_account-summary_empty-state-background.png')"
-                            :empty-data="state.emptyData"
-                            :type="SUMMARY_DATA_TYPE.ACCOUNT"
-        />
+        <div v-else>
+            <div v-if="!isEmpty(storeState.serviceAccount)"
+                 class="content-container"
+            >
+                <div class="content-wrapper">
+                    <div class="total-content-wrapper">
+                        <div class="total-chart" />
+                        <div class="info-wrapper">
+                            <p class="title">
+                                {{ $t('HOME.ACCOUNT_SUMMARY_CHART_TITLE') }}
+                            </p>
+                            <div class="info">
+                                <span class="total-count">{{ state.itemsTotalCount }}</span>
+                                <div v-for="(item, idx) in state.itemsByState"
+                                     :key="idx"
+                                     class="state-wrapper"
+                                >
+                                    <p-status :key="idx"
+                                              class="capitalize state"
+                                              v-bind="serviceAccountStateSummaryFormatter(item.state)"
+                                    />
+                                    <span>{{ item.count }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="main-content">
+                        <strong class="title">{{ $t('HOME.ACCOUNT_SUMMARY_BY_PROVIDER') }}</strong>
+                        <div class="content">
+                            <div class="chart" />
+                            <div class="provider-list-wrapper">
+                                <div v-for="(item, idx) in state.itemsByProvider"
+                                     :key="idx"
+                                     class="provider-item"
+                                >
+                                    <div class="image-wrapper">
+                                        <p-lazy-img :src="assetUrlConverter(storeState.provider[item.provider].icon)"
+                                                    width="1.5rem"
+                                                    height="1.5rem"
+                                                    class="provider-image"
+                                        />
+                                    </div>
+                                    <div class="percent-wrapper">
+                                        <div class="info">
+                                            <span>{{ storeState.provider[item.provider].label }}</span>
+                                            <p>
+                                                <span>
+                                                    <span class="percent">{{ (item.count / state.itemsTotalCount) * 100 }}</span>%
+                                                </span>
+                                                <span class="count">({{ item.count }})</span>
+                                            </p>
+                                        </div>
+                                        <p-progress-bar :percentage="(item.count / state.itemsTotalCount) * 100"
+                                                        :color="storeState.provider[item.provider].color"
+                                                        size="md"
+                                                        height="0.375rem"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="route-wrapper">
+                    <p-divider class="divider" />
+                    <p-link highlight
+                            :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                            action-icon="internal-link"
+                            class="link"
+                    >
+                        {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
+                    </p-link>
+                </div>
+            </div>
+            <empty-summary-data v-else
+                                :image-url="require('/images/home/img_workspace-home_account-summary_empty-state-background.png')"
+                                :empty-data="state.emptyData"
+                                :type="SUMMARY_DATA_TYPE.ACCOUNT"
+            />
+        </div>
     </div>
 </template>
 
@@ -141,13 +188,19 @@ const state = reactive({
     .main-title {
         padding-left: 1rem;
     }
+    .loading {
+        @apply flex items-center justify-center;
+        min-height: 27.5rem;
+    }
     .content-container {
         @apply flex flex-col;
         flex: 1;
         .content-wrapper {
             @apply flex flex-col;
             flex: 1;
-            padding: 1.375rem 1.5rem 2rem;
+            padding-top: 1.375rem;
+            padding-right: 1.5rem;
+            padding-left: 1.5rem;
             .total-content-wrapper {
                 @apply flex;
                 margin-bottom: 2.5rem;
@@ -169,6 +222,12 @@ const state = reactive({
                         .total-count {
                             @apply font-medium text-display-sm;
                         }
+                        .state-wrapper {
+                            @apply flex items-center text-label-sm;
+                            .state {
+                                margin-right: 0.25rem;
+                            }
+                        }
                     }
                 }
             }
@@ -182,9 +241,11 @@ const state = reactive({
                         @apply bg-gray;
                         width: 13.375rem;
                         height: 13.375rem;
+                        margin-bottom: 2.625rem;
                     }
                     .provider-list-wrapper {
-                        @apply flex flex-col;
+                        @apply flex flex-col overflow-y-auto;
+                        height: 16.025rem;
                         flex: 1;
                         gap: 0.625rem;
                         padding-right: 0.5rem;
