@@ -165,8 +165,8 @@ const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
 
     // init legend
     const _legend: Record<string, boolean> = {};
-    if (isEmpty(state.proxyLegend)) {
-        const _series = state.chartData.map((d) => d.name);
+    if (metricExplorerPageState.selectedChartGroupBy && isEmpty(state.proxyLegend)) {
+        const _series = state.chartData?.map((d) => d.name);
         _series.forEach((d) => {
             _legend[d] = true;
         });
