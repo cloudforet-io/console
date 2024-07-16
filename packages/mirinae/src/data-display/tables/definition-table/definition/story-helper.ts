@@ -1,11 +1,25 @@
-import type { ArgTypes } from '@storybook/addons';
+export const getDefinitionDefaultArgs = () => ({
+    name: 'name',
+    label: 'label',
+    data: 'data',
+    disableCopy: false,
+    formatter: undefined,
+    block: false,
+    copyValue: undefined,
+    copyValueFormatter: undefined,
+    autoKeyWidth: false,
+    customKeyWidth: undefined,
+    defaultSlot: undefined,
+    keySlot: undefined,
+    extraSlot: undefined,
 
-export const getDefinitionArgTypes = (): ArgTypes => ({
+});
+
+export const getDefinitionArgTypes = () => ({
     name: {
         name: 'name',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Name of key.',
-        defaultValue: 'name',
         table: {
             type: {
                 summary: 'string',
@@ -15,15 +29,12 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     label: {
         name: 'label',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Label of key.',
-        defaultValue: 'label',
         table: {
             type: {
                 summary: 'string',
@@ -33,15 +44,12 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     data: {
         name: 'data',
-        type: { name: 'any' },
+        type: 'any',
         description: 'Data for value.',
-        defaultValue: 'data',
         table: {
             type: {
                 summary: 'any',
@@ -51,15 +59,12 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     disableCopy: {
         name: 'disableCopy',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to disable copy button or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -69,15 +74,12 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     formatter: {
         name: 'formatter',
-        type: { name: 'function' },
+        type: 'function',
         description: 'A function that receives `data` props and all props as arguments, and returns display data for value.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -90,9 +92,8 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     },
     block: {
         name: 'block',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show value with full width or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -105,9 +106,8 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     },
     copyValue: {
         name: 'copyValue',
-        type: { name: 'string, number' },
+        type: 'string, number',
         description: 'If the displayed data and the value to be copied are different, give the value to be copied.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string, number',
@@ -120,9 +120,8 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     },
     copyValueFormatter: {
         name: 'copyValueFormatter',
-        type: { name: 'function' },
+        type: 'function',
         description: 'Use it with the same purpose of `copyValue` props. Arguments are the same with the `formatter` props.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -135,9 +134,8 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     },
     autoKeyWidth: {
         name: 'autoKeyWidth',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Make key width auto',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'string',
@@ -150,9 +148,8 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     },
     customKeyWidth: {
         name: 'customKeyWidth',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Custom Width of key',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -167,7 +164,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     defaultSlot: {
         name: 'default',
         description: 'Slot for value.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -181,7 +177,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     keySlot: {
         name: 'copy',
         description: 'Slot for key.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -195,7 +190,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     extraSlot: {
         name: 'extra',
         description: 'Slot for right space of value.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
