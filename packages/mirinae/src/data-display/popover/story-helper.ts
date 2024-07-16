@@ -1,23 +1,19 @@
 import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';
 
-export const getPopoverDefaultArgs = () => {
-    const args = {
-        isVisible: false,
-        tag: 'span',
-        position: POPOVER_PLACEMENT.BOTTOM_END,
-        trigger: POPOVER_TRIGGER.CLICK,
-        ignoreTargetClick: true,
-        ignoreOutsideClick: false,
-        hidePadding: false,
-        hideCloseButton: false,
-        hideArrow: false,
-        'v-model': false,
-        defaultSlot: undefined,
-        contentRefSlot: undefined,
-    };
-
-    return args;
-};
+export const getPopoverDefaultArgs = () => ({
+    isVisible: false,
+    tag: 'span',
+    position: POPOVER_PLACEMENT.BOTTOM_END,
+    trigger: POPOVER_TRIGGER.CLICK,
+    ignoreTargetClick: true,
+    ignoreOutsideClick: false,
+    hidePadding: false,
+    hideCloseButton: false,
+    hideArrow: false,
+    'v-model': false,
+    defaultSlot: undefined,
+    contentRefSlot: undefined,
+});
 
 export const getPopoverArgTypes = () => {
     const argTypes = {

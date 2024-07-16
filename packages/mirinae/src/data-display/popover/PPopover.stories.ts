@@ -18,7 +18,8 @@ const meta : Meta<PPopoverPropsAndCustomArgs> = {
     component: PPopover,
     argTypes: {
         ...getPopoverArgTypes(),
-        // 'item-content': { table: { disable: true } },
+        default: { table: { disable: true } },
+        content: { table: { disable: true } },
     },
     parameters: {
         design: {
@@ -33,7 +34,6 @@ const meta : Meta<PPopoverPropsAndCustomArgs> = {
 
 export default meta;
 type Story = StoryObj<typeof PPopover>;
-
 
 const Template: Story = {
     render: (args, { argTypes }) => ({
