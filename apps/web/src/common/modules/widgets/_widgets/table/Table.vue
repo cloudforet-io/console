@@ -164,6 +164,7 @@ const state = reactive({
         return basicFields;
     }),
     dataInfo: computed<DataInfo|undefined>(() => state.dataTable?.data_info),
+    sortBy: [],
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -240,7 +241,7 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
                 group_by: _groupBy,
                 field_group: _field_group,
                 fields: _fields,
-                sort: _sort,
+                sort: state.sortBy.length ? state.sortBy : _sort,
             },
             vars: props.dashboardVars,
         });
@@ -254,14 +255,19 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
         state.loading = false;
     }
 };
-const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
-    const res = data ?? await fetchWidget();
+const loadWidget = async (manualLoad?: boolean): Promise<Data|APIErrorToast> => {
+    if (!manualLoad) state.sortBy = [];
+    const res = await fetchWidget();
     const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget(true) : null;
     if (typeof res === 'function') return res;
     state.data = res;
     state.comparisonData = comparisonRes;
     return state.data;
 };
+
+watch(() => state.sortBy, async () => {
+    await loadWidget(true);
+});
 
 // Data Converting
 watch(() => state.data, () => {
@@ -436,6 +442,7 @@ defineExpose<WidgetExpose<Data>>({
                                    :total-info="state.totalInfo"
                                    :granularity="state.granularity"
                                    :data-info="state.dataInfo"
+                                   :sort-by.sync="state.sortBy"
                 />
             </div>
         </div>
