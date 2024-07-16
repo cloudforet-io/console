@@ -54,5 +54,5 @@ export interface WidgetFrameEmit {
 export type WidgetOverlayType = 'ADD'|'EDIT'|'EXPAND';
 
 export interface WidgetExpose<Data = any> {
-    loadWidget: (data?: Data) => Promise<Data|APIErrorToast>;
+    loadWidget: (...args: any) => Promise<Data|APIErrorToast>;
 }
