@@ -172,9 +172,9 @@ const drawChart = async (rawData: WidgetLoadData|null) => {
 
     state.chartData = _seriesData;
 };
-const loadWidget = async (data?: WidgetLoadData): Promise<WidgetLoadData|APIErrorToast> => {
+const loadWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
     state.loading = true;
-    const res = data ?? await fetchWidget();
+    const res = await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     await drawChart(state.data);
