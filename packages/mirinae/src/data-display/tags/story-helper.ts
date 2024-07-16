@@ -1,13 +1,24 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { getTagItemWithFullArg } from '@/data-display/tags/mock';
 
-export const getTagArgTypes = (): ArgTypes => ({
+export const getTagDefaultArgs = () => ({
+    keyItem: getTagItemWithFullArg().keyItem,
+    valueItem: getTagItemWithFullArg().valueItem,
+    categoryItem: getTagItemWithFullArg().categoryItem,
+    deletable: true,
+    outline: false,
+    selected: false,
+    invalid: false,
+    errorMessage: 'This is error message.',
+    categorySlot: '',
+    keySlot: '',
+    valueSlot: '',
+});
+
+export const getTagArgTypes = () => ({
     keyItem: {
         name: 'keyItem',
-        type: { name: 'object' },
+        type: 'object',
         description: "The value for tag's key content",
-        defaultValue: getTagItemWithFullArg().keyItem,
         table: {
             type: {
                 summary: 'object',
@@ -20,9 +31,8 @@ export const getTagArgTypes = (): ArgTypes => ({
     },
     valueItem: {
         name: 'valueItem',
-        type: { name: 'object' },
+        type: 'object',
         description: "The value for tag's value content",
-        defaultValue: getTagItemWithFullArg().valueItem,
         table: {
             type: {
                 summary: 'object',
@@ -35,9 +45,8 @@ export const getTagArgTypes = (): ArgTypes => ({
     },
     categoryItem: {
         name: 'categoryItem',
-        type: { name: 'object' },
+        type: 'object',
         description: "The value for tag's category content",
-        defaultValue: getTagItemWithFullArg().categoryItem,
         table: {
             type: {
                 summary: 'object',
@@ -50,9 +59,8 @@ export const getTagArgTypes = (): ArgTypes => ({
     },
     deletable: {
         name: 'deletable',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Deletable when true',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -62,15 +70,12 @@ export const getTagArgTypes = (): ArgTypes => ({
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     outline: {
         name: 'outline',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Outlined when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -80,15 +85,12 @@ export const getTagArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     selected: {
         name: 'selected',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'selected when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -98,15 +100,12 @@ export const getTagArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     invalid: {
         name: 'invalid',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Show error icon when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -116,15 +115,12 @@ export const getTagArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     errorMessage: {
         name: 'errorMessage',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Error Message',
-        defaultValue: 'This is error message.',
         table: {
             type: {
                 summary: 'string',
@@ -134,9 +130,7 @@ export const getTagArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* slots */
     defaultSlot: {
@@ -153,44 +147,35 @@ export const getTagArgTypes = (): ArgTypes => ({
     categorySlot: {
         name: 'category',
         description: 'Slot to replace category item',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     keySlot: {
         name: 'key',
         description: 'Slot to replace key item',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     valueSlot: {
         name: 'value',
         description: 'Slot to replace value item',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* events */
     onDelete: {
