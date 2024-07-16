@@ -1,11 +1,18 @@
-import type { ArgTypes } from '@storybook/addons';
+export const getTextListDeafultArgs = () => ({
+    items: ['hi', 'hello'],
+    delimiter: ', ',
+    subKey: undefined,
+    link: undefined,
+    linkTarget: undefined,
+    defaultSlot: undefined,
+    delimiterSlot: undefined,
+});
 
-export const getTextListArgTypes = (): ArgTypes => ({
+export const getTextListArgTypes = () => ({
     items: {
         name: 'items',
-        type: { name: 'array' },
+        type: 'array',
         description: 'Array of string or object to display as text.',
-        defaultValue: ['hi', 'hello'],
         table: {
             type: {
                 summary: 'array',
@@ -15,15 +22,12 @@ export const getTextListArgTypes = (): ArgTypes => ({
                 summary: '"[]"',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     delimiter: {
         name: 'delimiter',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Delimiter to place between text.',
-        defaultValue: ', ',
         table: {
             type: {
                 summary: 'string',
@@ -33,15 +37,12 @@ export const getTextListArgTypes = (): ArgTypes => ({
                 summary: '", "',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     subKey: {
         name: 'subKey',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Subkey to get object value.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -51,15 +52,12 @@ export const getTextListArgTypes = (): ArgTypes => ({
                 summary: '"undefined"',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     link: {
         name: 'link',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Link address to link to text.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -69,15 +67,12 @@ export const getTextListArgTypes = (): ArgTypes => ({
                 summary: '"undefined"',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     linkTarget: {
         name: 'linkTarget',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Anchor\'s target when there is a link.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -87,15 +82,12 @@ export const getTextListArgTypes = (): ArgTypes => ({
                 summary: '"undefined"',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     // slots
     defaultSlot: {
         name: 'default',
         description: '',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -106,7 +98,6 @@ export const getTextListArgTypes = (): ArgTypes => ({
     delimiterSlot: {
         name: 'delimiter',
         description: 'Slot for delimiter.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -116,8 +107,6 @@ export const getTextListArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
 });
