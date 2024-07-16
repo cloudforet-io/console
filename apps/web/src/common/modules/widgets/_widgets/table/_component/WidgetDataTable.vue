@@ -4,6 +4,7 @@ import { computed, reactive } from 'vue';
 
 import bytes from 'bytes';
 
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { PI, PTooltip } from '@cloudforet/mirinae';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
@@ -11,6 +12,7 @@ import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -29,6 +31,7 @@ interface Props {
   size?: WidgetSize;
   widgetId: string;
   dataInfo?: DataInfo;
+  sortBy: Query['sort'];
   fieldType: TableDataFieldValue['fieldType'];
   criteria?: string;
   dataField?: string|string[];
@@ -39,6 +42,7 @@ interface Props {
   totalInfo?: TotalValue;
 }
 const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void}>();
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
@@ -46,6 +50,10 @@ const storeState = reactive({
     workspace: computed(() => allReferenceStore.getters.workspace),
     region: computed(() => allReferenceStore.getters.region),
     serviceAccount: computed(() => allReferenceStore.getters.serviceAccount),
+});
+
+const state = reactive({
+    proxySortBy: useProxyValue('sortBy', props, emit),
 });
 
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
@@ -131,6 +139,33 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
     return `• Unit: ${dataInfo?.unit ?? '-'} \n• ${props.criteria}: ${numberFormatter(dynamicDataItem?.value) || 0}`;
 };
 
+const getSortIcon = (field: TableWidgetField) => {
+    let _fieldName = field.name;
+    if (field.name === 'sub_total' && props.criteria) _fieldName = `_total_${props.criteria}`;
+    if (!state.proxySortBy.some((d) => d.key === _fieldName)) {
+        return 'ic_caret-down';
+    }
+    return state.proxySortBy[0]?.desc ? 'ic_caret-down-filled' : 'ic_caret-up-filled';
+};
+
+const handleClickSort = async (sortKey: string) => {
+    let _sortKey = sortKey;
+    if (sortKey === 'sub_total' && props.criteria) _sortKey = `_total_${props.criteria}`;
+    let resultSortBy: { key: string; desc: boolean }[];
+    if (state.proxySortBy.length && state.proxySortBy[0].key === _sortKey) {
+        resultSortBy = [{ key: _sortKey, desc: !state.proxySortBy[0].desc }];
+    } else {
+        resultSortBy = [{ key: _sortKey, desc: true }];
+    }
+    state.proxySortBy = resultSortBy;
+    // state.thisPage = 1;
+};
+const isSortable = (field: TableWidgetField) => {
+    const isDynamicDataField = props.fieldType === 'dynamicField' && field.fieldInfo?.type === 'dataField' && field.name !== 'sub_total';
+    const isStaticSubTotal = props.fieldType === 'staticField' && field.name === 'sub_total';
+    return !isDynamicDataField && !isStaticSubTotal;
+};
+
 </script>
 
 <template>
@@ -168,6 +203,11 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
                                      height="0.875rem"
                                 />
                             </p-tooltip>
+                            <p-i v-else-if="isSortable(field)"
+                                 :name="getSortIcon(field)"
+                                 class="sort-icon"
+                                 @click="handleClickSort(field.name)"
+                            />
                         </span>
                     </th>
                 </tr>
@@ -249,7 +289,7 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         }
 
         .th-contents {
-            @apply flex items-center pl-4 gap-1;
+            @apply flex items-center justify-between pl-4 gap-1;
             .comparison-info {
                 min-width: 0.875rem;
             }
@@ -259,6 +299,11 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
             }
             &.sub-total {
                 @apply font-bold text-gray-700;
+            }
+
+            .sort-icon {
+                @apply text-gray-500 float-right my-px;
+                &:hover { cursor: pointer; }
             }
         }
     }
