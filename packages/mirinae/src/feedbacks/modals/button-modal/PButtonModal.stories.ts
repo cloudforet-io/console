@@ -21,7 +21,6 @@ const meta : Meta<PButtonModalPropsAndCustomArgs> = {
     component: PButtonModal,
     argTypes: {
         ...getButtonModalArgTypes(),
-        // 'item-content': { table: { disable: true } },
     },
     parameters: {
         centered: { disable: true },
