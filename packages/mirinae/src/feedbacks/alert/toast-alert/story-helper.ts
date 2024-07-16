@@ -1,13 +1,14 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { TOAST_GROUP } from '@/feedbacks/alert/toast-alert/config';
 
-export const getToastAlertArgTypes = (): ArgTypes => ({
+export const getToastAlertDefaultArgs = () => ({
+    group: TOAST_GROUP.toastTopCenter,
+});
+
+export const getToastAlertArgTypes = () => ({
     group: {
         name: 'group',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Name of target toast group.',
-        defaultValue: TOAST_GROUP.toastTopCenter,
         table: {
             type: {
                 summary: 'string',
@@ -17,9 +18,7 @@ export const getToastAlertArgTypes = (): ArgTypes => ({
                 summary: `"${TOAST_GROUP.toastTopCenter}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(TOAST_GROUP),
-        },
+        control: 'select',
+        options: Object.values(TOAST_GROUP),
     },
 });
