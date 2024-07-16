@@ -1,17 +1,29 @@
-import type { ArgTypes } from '@storybook/addons';
+import { getDataTableArgsType, getDataTableDefaultArgs } from '@/data-display/tables/data-table/story-helper';
+import { getToolboxArgTypes, getToolboxDefaultArgs } from '@/navigation/toolbox/story-helper';
 
-import { getDataTableArgsType } from '@/data-display/tables/data-table/story-helper';
-import { getToolboxArgTypes } from '@/navigation/toolbox/story-helper';
+export const getToolboxTableDefaultArgs = () => {
+    const args = {
+        ...getDataTableDefaultArgs(),
+        ...getToolboxDefaultArgs(),
+        toolboxTopSlot: undefined,
+        toolboxBottomSlot: undefined,
+        toolboxLeftSlot: undefined,
+        toolboxTableBottomSlot: undefined,
+    };
 
-export const getToolboxTableArgTypes = (): ArgTypes => {
-    const argTypes: ArgTypes = {
+    delete args.leftAreaSlot;
+
+    return args;
+};
+
+export const getToolboxTableArgTypes = () => {
+    const argTypes = {
         ...getDataTableArgsType(),
         ...getToolboxArgTypes(),
         /* slots */
         toolboxTopSlot: {
             name: 'toolbox-top',
             description: 'Slot for top area of toolbox.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -21,14 +33,11 @@ export const getToolboxTableArgTypes = (): ArgTypes => {
                     summary: null,
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         toolboxBottomSlot: {
             name: 'toolbox-bottom',
             description: 'Slot for bottom area of toolbox.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -38,14 +47,11 @@ export const getToolboxTableArgTypes = (): ArgTypes => {
                     summary: null,
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         toolboxLeftSlot: {
             name: 'toolbox-left',
             description: 'Slot for left area of toolbox.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -55,9 +61,7 @@ export const getToolboxTableArgTypes = (): ArgTypes => {
                     summary: null,
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         toolboxTableBottomSlot: {
             name: 'toolbox-table-bottom',
@@ -72,9 +76,7 @@ export const getToolboxTableArgTypes = (): ArgTypes => {
                     summary: null,
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
     };
 
