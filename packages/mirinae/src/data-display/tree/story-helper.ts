@@ -1,11 +1,20 @@
-import type { ArgTypes } from '@storybook/addons';
+export const getTreeDefaultArgs = () => ({
+    toggleOptions: {},
+    selectOptions: {},
+    editOptions: {},
+    dragOptions: {},
+    dataGetter: undefined,
+    dataSetter: undefined,
+    dataFetcher: undefined,
+    fetchOnInit: false,
+    getClassNames: undefined,
+});
 
-export const getTreeArgTypes = (): ArgTypes => ({
+export const getTreeArgTypes = () => ({
     toggleOptions: {
         name: 'toggleOptions',
-        type: { name: 'object' },
+        type: 'object',
         description: 'Options for toggle.',
-        defaultValue: {},
         table: {
             type: {
                 summary: 'object',
@@ -15,15 +24,12 @@ export const getTreeArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     selectOptions: {
         name: 'selectOptions',
-        type: { name: 'object' },
+        type: 'object',
         description: 'Options for toggle.',
-        defaultValue: {},
         table: {
             type: {
                 summary: 'object',
@@ -33,15 +39,12 @@ export const getTreeArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     editOptions: {
         name: 'editOptions',
-        type: { name: 'object' },
+        type: 'object',
         description: 'Options for inline edit.',
-        defaultValue: {},
         table: {
             type: {
                 summary: 'object',
@@ -51,15 +54,12 @@ export const getTreeArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     dragOptions: {
         name: 'dragOptions',
-        type: { name: 'object' },
+        type: 'object',
         description: 'Options for drag and drop.',
-        defaultValue: {},
         table: {
             type: {
                 summary: 'object',
@@ -69,15 +69,12 @@ export const getTreeArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     dataGetter: {
         name: 'dataGetter',
-        type: { name: 'function' },
+        type: 'function',
         description: 'Function that returns data to display.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -87,15 +84,12 @@ export const getTreeArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     dataSetter: {
         name: 'dataSetter',
-        type: { name: 'function' },
+        type: 'function',
         description: 'Function for setting children or node\'s data.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -105,15 +99,12 @@ export const getTreeArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     dataFetcher: {
         name: 'dataFetcher',
-        type: { name: 'function' },
+        type: 'function',
         description: 'Function for fetching nodes.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -123,15 +114,12 @@ export const getTreeArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     fetchOnInit: {
         name: 'fetchOnInit',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to fetch data on init tree or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -141,15 +129,12 @@ export const getTreeArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     getClassNames: {
         name: 'getClassNames',
-        type: { name: 'function' },
+        type: 'function',
         description: 'Function that returns class object to each node.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -159,8 +144,6 @@ export const getTreeArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
 });
