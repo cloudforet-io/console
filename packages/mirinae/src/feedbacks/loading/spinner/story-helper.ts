@@ -1,13 +1,15 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { SPINNER_SIZE, SPINNER_STYLE_TYPE } from '@/feedbacks/loading/spinner/type';
 
-export const getSpinnerArgTypes = (): ArgTypes => ({
+export const getSpinnerDefaultArgs = () => ({
+    size: SPINNER_SIZE.md,
+    styleType: SPINNER_STYLE_TYPE.gray,
+});
+
+export const getSpinnerArgTypes = () => ({
     size: {
         name: 'size',
-        type: { name: 'string' },
+        type: 'string',
         description: 'spinner size',
-        defaultValue: SPINNER_SIZE.md,
         table: {
             type: {
                 summary: 'string',
@@ -17,16 +19,13 @@ export const getSpinnerArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'select',
-            options: Object.values(SPINNER_SIZE),
-        },
+        control: 'select',
+        options: Object.values(SPINNER_SIZE),
     },
     styleType: {
         name: 'styleType',
-        type: { name: 'string' },
+        type: 'string',
         description: 'spinner style ',
-        defaultValue: SPINNER_STYLE_TYPE.gray,
         table: {
             type: {
                 summary: 'string',
@@ -36,9 +35,7 @@ export const getSpinnerArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'select',
-            options: Object.values(SPINNER_STYLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(SPINNER_STYLE_TYPE),
     },
 });
