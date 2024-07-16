@@ -14,7 +14,6 @@ const meta : Meta<PProgressBarPropsAndCustomArgs> = {
     component: PProgressBar,
     argTypes: {
         ...getProgressBarArgTypes(),
-        // 'item-content': { table: { disable: true } },
     },
     parameters: {
         design: {
