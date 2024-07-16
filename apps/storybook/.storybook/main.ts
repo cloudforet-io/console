@@ -28,6 +28,7 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/data-display/status/**/*.mdx',
     '../../../packages/mirinae/src/data-display/tables/data-table/**/*.mdx',
     '../../../packages/mirinae/src/data-display/tables/definition-table/**/*.mdx',
+    '../../../packages/mirinae/src/data-display/tables/toolbox-table/**/*.mdx',
 
     '../../../packages/mirinae/src/data-display/board/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/badge/**/*.stories.@(js|jsx|ts|tsx)',
@@ -48,6 +49,7 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/data-display/status/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/tables/data-table/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/data-display/tables/definition-table/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/data-display/tables/toolbox-table/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
