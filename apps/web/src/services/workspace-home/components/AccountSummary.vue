@@ -245,7 +245,7 @@ onMounted(() => {
                             action-icon="internal-link"
                             class="link"
                     >
-                        {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
+                        {{ $t('HOME.ACCOUNT_SUMMARY_SHOW_MORE') }}
                     </p-link>
                 </div>
             </div>
