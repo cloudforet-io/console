@@ -69,7 +69,8 @@ const Template: Story = {
                 defaultContentValue: faker.lorem.sentence(10),
             });
             const handleClick = () => {
-                // alert('default slot clicked');
+                /* eslint-disable no-alert */
+                alert('default slot clicked');
             };
             return {
                 ...toRefs(state),
