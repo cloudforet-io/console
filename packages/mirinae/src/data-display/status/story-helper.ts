@@ -1,16 +1,26 @@
-import type { ArgTypes } from '@storybook/addons';
 import icon from 'vue-svgicon';
 
 import { themes } from '@/data-display/status/config';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
 
-export const getStatusArgTypes = (): ArgTypes => ({
+export const getStatusDefaultArgs = () => ({
+    theme: 'green',
+    icon: undefined,
+    text: 'Enabled',
+    textColor: undefined,
+    iconColor: undefined,
+    disableIcon: false,
+    iconSize: 1,
+    iconAnimation: undefined,
+    defaultSlot: '',
+});
+
+export const getStatusArgTypes = () => ({
     theme: {
         name: 'theme',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Status theme',
-        defaultValue: 'green',
         table: {
             type: {
                 summary: 'string',
@@ -20,14 +30,12 @@ export const getStatusArgTypes = (): ArgTypes => ({
                 summary: 'null',
             },
         },
-        control: {
-            type: 'select',
-            options: [null, ...themes],
-        },
+        control: 'select',
+        options: [null, ...themes],
     },
     icon: {
         name: 'icon',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Icon name',
         defaultValue: null,
         table: {
@@ -39,16 +47,13 @@ export const getStatusArgTypes = (): ArgTypes => ({
                 summary: 'null',
             },
         },
-        control: {
-            type: 'select',
-            options: [null, ...Object.keys(icon.icons)],
-        },
+        control: 'select',
+        options: [null, ...Object.keys(icon.icons)],
     },
     text: {
         name: 'text',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Text',
-        defaultValue: 'Enabled',
         table: {
             type: {
                 summary: 'string',
@@ -58,15 +63,12 @@ export const getStatusArgTypes = (): ArgTypes => ({
                 summary: 'Enabled',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     textColor: {
         name: 'textColor',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Text color',
-        defaultValue: null,
         table: {
             type: {
                 summary: 'string',
@@ -76,15 +78,12 @@ export const getStatusArgTypes = (): ArgTypes => ({
                 summary: 'null',
             },
         },
-        control: {
-            type: 'color',
-        },
+        control: 'color',
     },
     iconColor: {
         name: 'iconColor',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Icon color',
-        defaultValue: null,
         table: {
             type: {
                 summary: 'string',
@@ -94,15 +93,12 @@ export const getStatusArgTypes = (): ArgTypes => ({
                 summary: 'null',
             },
         },
-        control: {
-            type: 'color',
-        },
+        control: 'color',
     },
     disableIcon: {
         name: 'disableIcon',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Disable icon when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -112,15 +108,12 @@ export const getStatusArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     iconSize: {
         name: 'iconSize',
-        type: { name: 'number' },
+        type: 'number',
         description: 'Icon size',
-        defaultValue: 1,
         table: {
             type: {
                 summary: 'number',
@@ -130,15 +123,12 @@ export const getStatusArgTypes = (): ArgTypes => ({
                 summary: 1,
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     iconAnimation: {
         name: 'iconAnimation',
-        type: { name: 'string' },
+        type: 'string',
         description: `Animation type. ${Object.values(ANIMATION_TYPE).map((d) => `'${d}'`)} are available.`,
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -148,15 +138,12 @@ export const getStatusArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(ANIMATION_TYPE),
-        },
+        control: 'select',
+        options: Object.values(ANIMATION_TYPE),
     },
     defaultSlot: {
         name: 'default',
         description: 'Slot for text.',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
@@ -166,8 +153,6 @@ export const getStatusArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
 });
