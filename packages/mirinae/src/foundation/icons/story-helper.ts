@@ -1,16 +1,27 @@
-import type { ArgTypes } from '@storybook/addons';
 import icon from 'vue-svgicon';
 
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
 export const getAllAvailableIcons = () => Object.keys(icon.icons);
 
-export const getIconsArgTypes = (): ArgTypes => ({
+export const getIconDefaultArgs = () => ({
+    name: '',
+    dir: undefined,
+    fill: true,
+    width: '1.5rem',
+    height: '1.5rem',
+    scale: undefined,
+    color: undefined,
+    original: true,
+    title: undefined,
+    animation: undefined,
+});
+
+export const getIconsArgTypes = () => ({
     name: {
         name: 'name',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The name of icon.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'string',
@@ -20,15 +31,12 @@ export const getIconsArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     dir: {
         name: 'dir',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The direction of icon.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -38,15 +46,12 @@ export const getIconsArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     fill: {
         name: 'fill',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to fill icon or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -56,15 +61,12 @@ export const getIconsArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     width: {
         name: 'width',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The width of icon.',
-        defaultValue: '1.5rem',
         table: {
             type: {
                 summary: 'string',
@@ -74,15 +76,12 @@ export const getIconsArgTypes = (): ArgTypes => ({
                 summary: '"1.5rem"',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     height: {
         name: 'height',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The height of icon.',
-        defaultValue: '1.5rem',
         table: {
             type: {
                 summary: 'string',
@@ -92,15 +91,12 @@ export const getIconsArgTypes = (): ArgTypes => ({
                 summary: '"1.5rem"',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     scale: {
         name: 'scale',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The scale of icon.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -110,15 +106,12 @@ export const getIconsArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     color: {
         name: 'color',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Values can be given in the order of stroke and fill. Consider space as a delimiter. Giving one thing applies to both. e.g. "inherit transparent"',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -128,15 +121,12 @@ export const getIconsArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     original: {
         name: 'original',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to use original icon or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -146,15 +136,12 @@ export const getIconsArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     title: {
         name: 'title',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The title of icon.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -164,15 +151,12 @@ export const getIconsArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     animation: {
         name: 'animation',
-        type: { name: 'string' },
+        type: 'string',
         description: `Animation type. ${Object.values(ANIMATION_TYPE).map((d) => `'${d}'`)} are available.`,
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -182,9 +166,7 @@ export const getIconsArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(ANIMATION_TYPE),
-        },
+        control: 'select',
+        options: Object.values(ANIMATION_TYPE),
     },
 });
