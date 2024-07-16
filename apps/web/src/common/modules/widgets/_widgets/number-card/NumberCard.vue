@@ -198,7 +198,7 @@ defineExpose<WidgetExpose<Data>>({
             </div>
             <div v-if="state.currentValue && state.currentValue > 1000"
                  class="original-value"
-                 :class="state.iconName && 'pl-10'"
+                 :class="state.iconName && 'pl-9'"
             >
                 ({{ numberFormatter(state.currentValue) }})
             </div>
