@@ -2120,6 +2120,10 @@
 		}
 	},
 	"HOME": {
+		"ACCOUNT_SUMMARY": "Account Summary",
+		"ACCOUNT_SUMMARY_BY_PROVIDER": "Service Account by Provider",
+		"ACCOUNT_SUMMARY_CHART_TITLE": "Total Service Account",
+		"ACCOUNT_SUMMARY_SHOW_MORE": "Show More Service Account",
 		"ACTIVATION_REQUIRED": "Activation Required",
 		"ACTIVATION_REQUIRED_DESC": "This contains Cost Analysis, Budget, and Cost Report.",
 		"ALT_E_DUPLICATED_NAME": "Folder name is duplicated.",
@@ -2745,7 +2749,7 @@
 				"CHECK_MODAL_DELETE_TITLE": "Delete Service Account",
 				"CONSOLE": "Connect to Console",
 				"CREATE": "Create",
-				"DELETE": "Delete",
+				"DELETE": "Deleted",
 				"MANAGED_INFO": "This status settings can be changed in admin mode. ",
 				"NO_SELECTED_ACCOUNT": "Select a service account for more details.",
 				"PENDING": "Pending",
