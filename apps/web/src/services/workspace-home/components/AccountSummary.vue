@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, ref, watch,
+} from 'vue';
 
+import type { PieSeriesOption } from 'echarts/charts';
+import type { EChartsType } from 'echarts/core';
+import { init } from 'echarts/core';
 import { countBy, isEmpty, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -30,6 +35,9 @@ import type { EmptyData } from '@/services/workspace-home/types/workspace-home-t
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+
+const totalChartContext = ref<HTMLElement|null>(null);
+const providerChartContext = ref<HTMLElement|null>(null);
 
 const storeState = reactive({
     serviceAccount: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
@@ -65,6 +73,58 @@ const state = reactive({
             count,
         }));
     }),
+    totalChartData: computed(() => state.itemsByState.map((item) => ({
+        name: item.state,
+        value: item.count,
+        itemStyle: {
+            color: serviceAccountStateSummaryFormatter(item.state).iconColor,
+        },
+    }))),
+    totalChart: null as EChartsType | null,
+    totalChartOptions: computed<PieSeriesOption>(() => ({
+        width: 56,
+        height: 56,
+        tooltip: { show: false },
+        series: [
+            {
+                name: 'Service Account Total Count',
+                type: 'pie',
+                radius: ['40%', '100%'],
+                label: undefined,
+                emphasis: undefined,
+                labelLine: {
+                    show: false,
+                },
+                data: state.totalChartData,
+            },
+        ],
+    })),
+    providerChartData: computed(() => state.itemsByProvider.map((item) => ({
+        name: item.provider,
+        value: item.count,
+        itemStyle: {
+            color: storeState.provider[item.provider].color,
+        },
+    }))),
+    providerChart: null as EChartsType | null,
+    providerChartOptions: computed<PieSeriesOption>(() => ({
+        width: 214,
+        height: 214,
+        tooltip: { show: false },
+        series: [
+            {
+                name: 'Service Account Count By Provider',
+                type: 'pie',
+                radius: ['40%', '80%'],
+                label: undefined,
+                emphasis: undefined,
+                labelLine: {
+                    show: false,
+                },
+                data: state.providerChartData,
+            },
+        ],
+    })),
 });
 
 const fetchServiceAccountList = async () => {
@@ -81,6 +141,19 @@ const fetchServiceAccountList = async () => {
         state.loading = false;
     }
 };
+
+watch([() => state.totalChartData, () => totalChartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.totalChart = init(totalChartContext.value);
+        state.totalChart.setOption(state.totalChartOptions, true);
+    }
+}, { immediate: true });
+watch([() => state.providerChartData, () => providerChartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.providerChart = init(providerChartContext.value);
+        state.providerChart.setOption(state.providerChartOptions, true);
+    }
+}, { immediate: true });
 
 onMounted(() => {
     fetchServiceAccountList();
@@ -104,7 +177,9 @@ onMounted(() => {
             >
                 <div class="content-wrapper">
                     <div class="total-content-wrapper">
-                        <div class="total-chart" />
+                        <div ref="totalChartContext"
+                             class="total-chart"
+                        />
                         <div class="info-wrapper">
                             <p class="title">
                                 {{ $t('HOME.ACCOUNT_SUMMARY_CHART_TITLE') }}
@@ -127,7 +202,9 @@ onMounted(() => {
                     <div class="main-content">
                         <strong class="title">{{ $t('HOME.ACCOUNT_SUMMARY_BY_PROVIDER') }}</strong>
                         <div class="content">
-                            <div class="chart" />
+                            <div ref="providerChartContext"
+                                 class="chart"
+                            />
                             <div class="provider-list-wrapper">
                                 <div v-for="(item, idx) in state.itemsByProvider"
                                      :key="idx"
@@ -206,7 +283,6 @@ onMounted(() => {
                 margin-bottom: 2.5rem;
                 gap: 1rem;
                 .total-chart {
-                    @apply bg-gray;
                     width: 3.5rem;
                     height: 3.5rem;
                 }
@@ -238,7 +314,6 @@ onMounted(() => {
                     @apply flex items-start;
                     gap: 1rem;
                     .chart {
-                        @apply bg-gray;
                         width: 13.375rem;
                         height: 13.375rem;
                         margin-bottom: 2.625rem;
