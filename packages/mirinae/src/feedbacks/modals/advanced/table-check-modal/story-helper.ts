@@ -1,15 +1,27 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { getUserFields, getUsers } from '@/data-display/tables/data-table/mock';
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import { SizeMapping } from '@/feedbacks/modals/type';
 
-export const getTableCheckModalArgTypes = (): ArgTypes => ({
+export const getTableCheckModalDefaultArgs = () => ({
+    modalSize: 'md',
+    visible: false,
+    headerTitle: 'This is header title.',
+    subTitle: 'This is sub title.',
+    themeColor: 'primary',
+    fields: getUserFields(),
+    items: getUsers(),
+    loading: false,
+    defaultSlot: undefined,
+    subTitleSlot: undefined,
+    subTitleFormatSlot: undefined,
+    onConfirm: undefined,
+});
+
+export const getTableCheckModalArgTypes = () => ({
     modalSize: {
         name: 'modalSize',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Size of modal.',
-        defaultValue: 'md',
         table: {
             type: {
                 summary: 'string',
@@ -19,16 +31,13 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
                 summary: '"md"',
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(SizeMapping),
-        },
+        control: 'select',
+        options: Object.keys(SizeMapping),
     },
     visible: {
         name: 'visible',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show modal or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -38,15 +47,12 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     headerTitle: {
         name: 'headerTitle',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Header title of modal.',
-        defaultValue: 'This is header title.',
         table: {
             type: {
                 summary: 'string',
@@ -56,15 +62,12 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
                 summary: '"undefined"',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     subTitle: {
         name: 'headerTitle',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Sub title of modal.',
-        defaultValue: 'This is sub title.',
         table: {
             type: {
                 summary: 'string',
@@ -74,15 +77,12 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
                 summary: '"undefined"',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     themeColor: {
         name: 'themeColor',
-        type: { name: 'string' },
+        type: 'string',
         description: `Modal themes. ${THEME_COLORS.map((d) => `\`${d}\``).join(', ')} are available.`,
-        defaultValue: 'primary',
         table: {
             type: {
                 summary: 'string',
@@ -92,16 +92,14 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
                 summary: 'primary',
             },
         },
-        control: {
-            type: 'select',
-            options: THEME_COLORS,
-        },
+        control: 'select',
+        options: THEME_COLORS,
     },
     fields: {
         name: 'fields',
-        type: { name: 'array', required: true },
+        type: 'array',
+        required: true,
         description: 'Table columns. Array of field type object or string.',
-        defaultValue: getUserFields(),
         table: {
             type: {
                 summary: 'array',
@@ -111,15 +109,12 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     items: {
         name: 'items',
-        type: { name: 'array' },
+        type: 'array',
         description: 'Table data array.',
-        defaultValue: getUsers(),
         table: {
             type: {
                 summary: 'array',
@@ -129,15 +124,12 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     loading: {
         name: 'loading',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show loader or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -147,16 +139,13 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
 
     // slots
     defaultSlot: {
         name: 'default',
         description: '',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -167,7 +156,6 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
     subTitleSlot: {
         name: 'sub-title',
         description: '',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -178,7 +166,6 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
     subTitleFormatSlot: {
         name: 'sub-title-format',
         description: '',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -191,7 +178,6 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
     onConfirm: {
         name: 'confirm',
         description: 'Emitted when confirm button is clicked.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
