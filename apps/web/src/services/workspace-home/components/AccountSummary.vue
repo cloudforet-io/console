@@ -12,6 +12,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PStatus, PFieldTitle, PLazyImg, PDivider, PLink, PSpinner, PProgressBar,
 } from '@cloudforet/mirinae';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
@@ -31,7 +32,6 @@ import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryD
 import { serviceAccountStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type { EmptyData } from '@/services/workspace-home/types/workspace-home-type';
-
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -110,7 +110,15 @@ const state = reactive({
     providerChartOptions: computed<PieSeriesOption>(() => ({
         width: 214,
         height: 214,
-        tooltip: { show: false },
+        tooltip: {
+            trigger: 'item',
+            position: 'right',
+            formatter: (params) => {
+                const _name = storeState.provider[params.name].label;
+                const _value = numberFormatter(params.value) || '';
+                return `${params.marker} ${_name}: <b>${_value}</b> (${(params.value / state.itemsTotalCount) * 100}%)`;
+            },
+        },
         series: [
             {
                 name: 'Service Account Count By Provider',
