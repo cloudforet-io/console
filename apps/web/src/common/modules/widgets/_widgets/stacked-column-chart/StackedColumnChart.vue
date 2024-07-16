@@ -38,6 +38,8 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type { StackByValue, XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 
 type Data = ListResponse<{
     [key: string]: string|number;
@@ -54,6 +56,12 @@ const state = reactive({
     chartData: [],
     chart: null as EChartsType | null,
     chartOptions: computed<BarSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
+        grid: {
+            left: 10,
+            right: 10,
+            containLabel: true,
+        },
         legend: {
             type: 'scroll',
             show: state.showLegends,
