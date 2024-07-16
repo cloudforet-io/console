@@ -49,7 +49,8 @@ export const WORKSPACE_HOME_DATA_TYPE = {
 
 export const SUMMARY_DATA_TYPE = {
     ASSET: 'Asset',
-    COST: 'cost',
+    COST: 'Cost',
+    ACCOUNT: 'Account',
 } as const;
 
 
