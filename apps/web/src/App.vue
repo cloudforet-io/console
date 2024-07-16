@@ -14,7 +14,7 @@ import {
 
 import { store } from '@/store';
 
-import { CostReportDetailPath } from '@/router/constant';
+import { EXTERNAL_PAGE_ROUTE } from '@/router/constant';
 import { getRouteScope } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -79,7 +79,7 @@ const goToSignIn = async () => {
 };
 const showsBrowserRecommendation = () => {
     const currentPath = window.location.pathname;
-    if (currentPath === CostReportDetailPath) return false;
+    if (currentPath === `/${EXTERNAL_PAGE_ROUTE.COST_REPORT_DETAIL._NAME}`) return false;
     return (!supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation'));
 };
 
