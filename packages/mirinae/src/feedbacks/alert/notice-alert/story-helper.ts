@@ -1,13 +1,14 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { NOTICE_GROUP } from '@/feedbacks/alert/notice-alert/config';
 
-export const getNoticeAlertArgTypes = (): ArgTypes => ({
+export const getNoticeAlertDefaultArgs = () => ({
+    group: NOTICE_GROUP.noticeBottomRight,
+});
+
+export const getNoticeAlertArgTypes = () => ({
     group: {
         name: 'group',
-        type: { name: 'string' },
+        type: 'string',
         description: '',
-        defaultValue: NOTICE_GROUP.noticeBottomRight,
         table: {
             type: {
                 summary: 'string',
@@ -17,9 +18,7 @@ export const getNoticeAlertArgTypes = (): ArgTypes => ({
                 summary: `"${NOTICE_GROUP.noticeBottomRight}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(NOTICE_GROUP),
-        },
+        control: 'select',
+        options: Object.values(NOTICE_GROUP),
     },
 });
