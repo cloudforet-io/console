@@ -14,9 +14,11 @@ const config: StorybookConfig = {
 
     '../../../packages/mirinae/src/feedbacks/alert/**/*.mdx',
     '../../../packages/mirinae/src/feedbacks/loading/**/*.mdx',
+    '../../../packages/mirinae/src/feedbacks/notification-bar/**/*.mdx',
 
     '../../../packages/mirinae/src/feedbacks/alert/**/*.stories.@(js|jsx|ts|tsx)',
     '../../../packages/mirinae/src/feedbacks/loading/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/feedbacks/notification-bar/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
