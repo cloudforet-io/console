@@ -50,7 +50,7 @@ const state = reactive({
     dormancyConfig: {} as DormancyConfig,
     isChanged: computed<boolean>(() => {
         if ([cost.value, state.dormancyConfig].every((d) => !d)) return false;
-        return (cost.value !== state.dormancyConfig?.cost.toString())
+        return (getNumberFromString(cost.value) !== state.dormancyConfig?.cost)
             || (state.checkbox !== state.dormancyConfig?.send_email);
     }),
     statusToggle: false,
@@ -83,14 +83,17 @@ const handleClickReportButton = () => {
     }).href, '_blank');
 };
 const handleChangeToggleButton = async (value: boolean) => {
-    if (value) return;
     try {
         await updateDomainDormancy({
-            enabled: false,
+            enabled: value,
             cost: state.dormancyConfig?.cost || 0,
             send_email: state.dormancyConfig?.send_email || false,
         });
-        showSuccessMessage(_i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_DORMANCY_TOGGLE'), '');
+        if (value) {
+            showSuccessMessage(_i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_DORMANCY_TOGGLE_ENABLE'), '');
+        } else {
+            showSuccessMessage(_i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_DORMANCY_TOGGLE_DISABLE'), '');
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -99,7 +102,7 @@ const handleSaveConfig = async () => {
     try {
         await updateDomainDormancy({
             enabled: true,
-            cost: Number(cost.value),
+            cost: getNumberFromString(cost.value) || 0,
             send_email: state.checkbox,
         });
         showSuccessMessage(_i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_DORMANCY'), '');

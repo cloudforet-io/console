@@ -1,5 +1,5 @@
 import type { Tags } from '@/schema/_common/model';
-import type { ServiceAccountType, ServiceAccountAssetInfoType, ServiceAccountCostInfoType } from '@/schema/identity/service-account/type';
+import type { ServiceAccountType } from '@/schema/identity/service-account/type';
 
 export interface ServiceAccountModel {
     service_account_id: string;
@@ -20,7 +20,7 @@ export interface ServiceAccountModel {
     created_at: string;
     last_synced_at: string;
     state: ServiceAccountType;
-    asset_info: ServiceAccountAssetInfoType;
-    cost_info: ServiceAccountCostInfoType;
+    // asset_info: ServiceAccountAssetInfoType;
+    // cost_info: ServiceAccountCostInfoType;
 }
 
