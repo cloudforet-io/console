@@ -1,14 +1,43 @@
-import type { ArgTypes } from '@storybook/addons';
-
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import { SizeMapping } from '@/feedbacks/modals/type';
 
-export const getButtonModalArgTypes = (): ArgTypes => ({
+export const getButtonModalDefaultArgs = () => ({
+    visible: false,
+    backdrop: true,
+    size: 'md',
+    themeColor: 'primary',
+    headerTitle: 'Header Title',
+    hideHeader: false,
+    hideBody: false,
+    hideFooter: false,
+    hideHeaderCloseButton: false,
+    footerResetButtonVisible: false,
+    hideFooterCloseButton: false,
+    hideFooterConfirmButton: false,
+    loading: false,
+    disabled: false,
+    absolute: 0,
+    modalBodyId: undefined,
+    'v-model': false,
+    header: 'Modal Header',
+    body: 'Modal Content',
+    'footer-extra': undefined,
+    'reset-button': 'Reset',
+    'close-button': 'Cancel',
+    'confirm-button': 'Confirm',
+    onConfirm: undefined,
+    onCancel: undefined,
+    onReturn: undefined,
+    onClose: undefined,
+    onUpdateVisible: undefined,
+});
+
+export const getButtonModalArgTypes = () => ({
     visible: {
         name: 'visible',
-        type: { name: 'boolean', required: true },
+        type: 'boolean',
+        required: true,
         description: 'Whether to show modal or not. sync prop.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -18,15 +47,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     backdrop: {
         name: 'backdrop',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show backdrop or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -36,15 +62,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     size: {
         name: 'size',
-        type: { name: 'string' },
+        type: 'string',
         description: `Modal size. ${Object.keys(SizeMapping).map((d) => `\`${d}\``).join(', ')} are available.`,
-        defaultValue: 'md',
         table: {
             type: {
                 summary: 'string',
@@ -54,16 +77,13 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: 'md',
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(SizeMapping),
-        },
+        control: 'select',
+        options: Object.keys(SizeMapping),
     },
     themeColor: {
         name: 'themeColor',
-        type: { name: 'string' },
+        type: 'string',
         description: `Modal themes. ${THEME_COLORS.map((d) => `\`${d}\``).join(', ')} are available.`,
-        defaultValue: 'primary',
         table: {
             type: {
                 summary: 'string',
@@ -73,16 +93,13 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: 'primary',
             },
         },
-        control: {
-            type: 'select',
-            options: THEME_COLORS,
-        },
+        control: 'select',
+        options: THEME_COLORS,
     },
     headerTitle: {
         name: 'headerTitle',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Header Title',
-        defaultValue: 'Header Title',
         table: {
             type: {
                 summary: 'string',
@@ -92,15 +109,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: 'Header Title',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     hideHeader: {
         name: 'hideHeader',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to hide header or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -110,15 +124,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     hideBody: {
         name: 'hideBody',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to hide body or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -128,15 +139,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     hideFooter: {
         name: 'hideFooter',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to hide footer or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -146,15 +154,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     hideHeaderCloseButton: {
         name: 'hideHeaderCloseButton',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to hide close button in header or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -164,15 +169,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     footerResetButtonVisible: {
         name: 'footerResetButtonVisible',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show reset button in footer or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -182,15 +184,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     hideFooterCloseButton: {
         name: 'hideFooterCloseButton',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to hide footer close button or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -200,15 +199,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     hideFooterConfirmButton: {
         name: 'hideFooterConfirmButton',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to hide footer confirm button or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -218,15 +214,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     loading: {
         name: 'loading',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Show Loading in confirm button',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -236,15 +229,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     disabled: {
         name: 'disabled',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Disable confirm button or Not',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -254,15 +244,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     absolute: {
         name: 'absolute',
-        type: { name: 'number' },
+        type: 'number',
         description: 'set position by absolute, with [{top: {absolute}rem}, {left: {absolute}rem}]',
-        defaultValue: 0,
         table: {
             type: {
                 summary: 'number',
@@ -272,15 +259,12 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: 0,
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     modalBodyId: {
         name: 'modalBodyId',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Applied when utilizing the id value of the body, as in the usage within the select-dropdown component',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -290,16 +274,14 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
                 summary: undefined,
             },
         },
-        control: {
-            type: 'string',
-        },
+        control: 'string',
     },
     // model
     'v-model': {
         name: 'v-model',
-        type: { name: 'boolean', required: false },
+        type: 'boolean',
+        required: false,
         description: 'Two way binding for `visible` props with `update:visible` event.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -315,7 +297,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     header: {
         name: 'header',
         description: 'Slot for header',
-        defaultValue: 'Modal Header',
         table: {
             type: {
                 summary: 'Modal Header',
@@ -327,7 +308,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     body: {
         name: 'body',
         description: 'Slot for body content',
-        defaultValue: 'Modal Content',
         table: {
             type: {
                 summary: 'Modal Content',
@@ -339,7 +319,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     'footer-extra': {
         name: 'footer-extra',
         description: 'Slot for Extra contents in Footer',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -351,7 +330,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     'reset-button': {
         name: 'reset-button',
         description: 'Slot for changing text in reset button',
-        defaultValue: 'Reset',
         table: {
             type: {
                 summary: 'Reset',
@@ -363,7 +341,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     'close-button': {
         name: 'cancel-button',
         description: 'Slot for changing text in cancel button',
-        defaultValue: 'Cancel',
         table: {
             type: {
                 summary: 'Cancel',
@@ -375,7 +352,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     'confirm-button': {
         name: 'confirm-button',
         description: 'Slot for changing text in confirm button',
-        defaultValue: 'Confirm',
         table: {
             type: {
                 summary: 'Confirm',
@@ -388,7 +364,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     onConfirm: {
         name: 'confirm',
         description: 'Emitted when confirm button is clicked.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -399,7 +374,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     onCancel: {
         name: 'cancel',
         description: 'Emitted when click cancel button or close button',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -410,7 +384,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     onReturn: {
         name: 'return',
         description: 'Emitted when click reset button',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -421,7 +394,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     onClose: {
         name: 'close',
         description: 'Emitted when close modal',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -432,7 +404,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     onUpdateVisible: {
         name: 'update:visible',
         description: 'Emitted when update visible',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
