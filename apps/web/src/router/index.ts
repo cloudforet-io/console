@@ -35,9 +35,9 @@ const grantAndLoadByCurrentScope = async (scope: GrantScope, workspaceId?: strin
     };
 
     await SpaceRouter.router.app?.$store.dispatch('user/grantRoleAndLoadReferenceData', grantRequest);
-    const grantAcessFailStatus = SpaceRouter.router.app?.$store.state.error.grantAccessFailStatus;
+    const grantAccessFailStatus = SpaceRouter.router.app?.$store.state.error.grantAccessFailStatus;
     return {
-        failStatus: !!grantAcessFailStatus,
+        failStatus: !!grantAccessFailStatus,
     };
 };
 export class SpaceRouter {
