@@ -1501,6 +1501,7 @@
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
 			"DONE": "완료",
+			"DONUT": "",
 			"EDIT": "편집",
 			"EDIT_WIDGET": "위젯 수정",
 			"EXPAND": "확장",
@@ -1574,6 +1575,8 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "지난 7일 ~ 예정 일정"
 			},
+			"PIE": "",
+			"PIE_CHART_TYPE": "",
 			"PREVIEW_TABLE_EMPTY_DESC": "여기에 데이터 구성의 미리보기가 표시됩니다.",
 			"PREVIEW_TABLE_EMPTY_TITLE": "데이터를 추가해 주세요.",
 			"REQUIRED_FIELDS_ARE_MISSING": "필수 필드 중 입력 누락 존재",
@@ -2082,7 +2085,7 @@
 						"PROGRESS_CARD_DESC": "이 차트를 올바르게 표시하려면, 데이터에 최소 2개 이상의 데이터 필드가 있어야 합니다. ",
 						"TITLE": "추가 필드가 필요합니다."
 					},
-					"WIDGET_INFO": "위젯 기본 정보",
+					"WIDGET_HEADER": "",
 					"X_AXIS": "X축",
 					"Y_AXIS": "Y축"
 				}

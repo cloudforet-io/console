@@ -1501,6 +1501,7 @@
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
 			"DONE": "Done",
+			"DONUT": "Donut",
 			"EDIT": "Edit",
 			"EDIT_WIDGET": "Edit Widget",
 			"EXPAND": "Expand",
@@ -1574,6 +1575,8 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "Upcoming and Past 7 days"
 			},
+			"PIE": "Pie",
+			"PIE_CHART_TYPE": "Pie Chart Type",
 			"PREVIEW_TABLE_EMPTY_DESC": "The preview will be displayed here.",
 			"PREVIEW_TABLE_EMPTY_TITLE": "To get started, add your data.",
 			"REQUIRED_FIELDS_ARE_MISSING": "Required fields are missing.",
@@ -2082,7 +2085,7 @@
 						"PROGRESS_CARD_DESC": "To illustrate this chart properly, the data requires at least 2 data fields.",
 						"TITLE": "Additional fields are required"
 					},
-					"WIDGET_INFO": "Widget Info",
+					"WIDGET_HEADER": "Widget Header",
 					"X_AXIS": "X-Axis",
 					"Y_AXIS": "Y-Axis"
 				}
