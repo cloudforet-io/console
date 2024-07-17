@@ -1,12 +1,25 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getFileUploaderArgs = (): Args => ({
+    uploadedFiles: [],
+    serverEndpoint: '',
+    'v-model': [],
+});
+
+export const getFileUploaderParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/',
+    },
+});
 
 export const getFileUploaderArgTypes = (): ArgTypes => ({
     /* props */
     uploadedFiles: {
         name: 'uploadedFiles',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: 'Array of uploaded files',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'array',
@@ -19,9 +32,8 @@ export const getFileUploaderArgTypes = (): ArgTypes => ({
     },
     serverEndpoint: {
         name: 'serverEndpoint',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Server Endpoint for uploading files',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'string',
@@ -34,9 +46,7 @@ export const getFileUploaderArgTypes = (): ArgTypes => ({
     },
     'v-model': {
         name: 'v-model',
-        type: { name: 'any' },
         description: 'Two way binding for `uploadedFiles` props with `update:uploadedFiles` event.',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'any',
