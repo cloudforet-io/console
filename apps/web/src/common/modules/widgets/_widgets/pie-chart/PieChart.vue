@@ -88,7 +88,7 @@ const state = reactive({
         series: [
             {
                 type: 'pie',
-                ...state.chartType === 'pie' ? {} : { radius: ['30%', '70%'] },
+                ...(state.chartType === 'pie' ? {} : { radius: ['30%', '70%'] }),
                 center: props.size === 'full' ? ['40%', '50%'] : ['30%', '50%'],
                 data: state.chartData,
                 emphasis: {
