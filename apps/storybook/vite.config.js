@@ -8,10 +8,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, '../../packages/mirinae/src'),
-            // fs: path.resolve(__dirname, 'fsMock.js')
-            // "@storybook/blocks": path.resolve(__dirname, "../../node_modules/@storybook/blocks"),
-            // 'react': path.resolve(__dirname, '../../node_modules/react'),
-            // 'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
+            'vue/dist/vue.esm': path.resolve(__dirname, '../../node_modules/vue/dist/vue.esm.js'),
         },
     },
     optimizeDeps: {
