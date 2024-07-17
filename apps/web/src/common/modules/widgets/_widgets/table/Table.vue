@@ -481,7 +481,7 @@ defineExpose<WidgetExpose<Data>>({
 
 <style lang="postcss" scoped>
 .table-wrapper {
-    @apply flex justify-center h-full;
+    @apply flex justify-center w-full;
     max-height: calc(100% - 1.5rem);
     height: calc(100% - 1.5rem);
 

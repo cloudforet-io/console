@@ -238,7 +238,7 @@ onMounted(() => {
                      color="inherit transparent"
                      class="arrow-button"
                 />
-                <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.WIDGET_INFO') }}</span>
+                <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.WIDGET_HEADER') }}</span>
             </div>
             <div class="form-wrapper no-gap">
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.TITLE')"
