@@ -192,12 +192,10 @@ const handleEditWidget = () => {
 const isResizing = (event) => {
     if (displayState.resizing) {
         if (displayState.clientX === null) {
-            console.log('?!?!?');
             displayState.clientX = event.clientX;
             return;
         }
         const delta = displayState.clientX - event.clientX;
-        console.log(delta);
         const width = displayState.rightPartWidth + delta;
         if (!(width <= displayState.minWidth || width > displayState.maxWidth)) {
             displayState.rightPartWidth = width;
