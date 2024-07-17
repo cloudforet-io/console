@@ -27,8 +27,12 @@ export const EXTERNAL_PAGE_ROUTE = {
     COST_REPORT_DETAIL: {
         _NAME: 'cost-report-detail',
     },
+    ALERT_PUBLIC_DETAIL: {
+        _NAME: 'alert-public-detail',
+    },
 } as const;
 
 export const EXTERNAL_PAGES = [
     EXTERNAL_PAGE_ROUTE.COST_REPORT_DETAIL._NAME,
+    EXTERNAL_PAGE_ROUTE.ALERT_PUBLIC_DETAIL._NAME,
 ];

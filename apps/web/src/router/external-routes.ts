@@ -2,6 +2,7 @@ import type { RouteConfig } from 'vue-router';
 
 import { EXTERNAL_PAGE_ROUTE } from '@/router/constant';
 
+import AlertPublicDetailPage from '@/common/pages/AlertPublicDetailPage.vue';
 import CostReportDetailPage from '@/common/pages/CostReportDetailPage.vue';
 
 export const externalRoutes: RouteConfig[] = [
@@ -14,5 +15,13 @@ export const externalRoutes: RouteConfig[] = [
             language: route.query.language,
         }),
         component: CostReportDetailPage,
+    },
+    {
+        path: '/alert-public-detail',
+        name: EXTERNAL_PAGE_ROUTE.ALERT_PUBLIC_DETAIL._NAME,
+        props: (route) => ({
+            alertUrl: route.query.monitoring_url,
+        }),
+        component: AlertPublicDetailPage,
     },
 ];
