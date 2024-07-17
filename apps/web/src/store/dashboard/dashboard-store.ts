@@ -108,7 +108,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const publicDashboardApiQueryHelper = new ApiQueryHelper();
-    const load = async () => {
+    const load = async (isProject?: string) => {
         publicDashboardApiQueryHelper.setFilters([]);
         if (_state.isAdminMode) {
             publicDashboardApiQueryHelper.addFilter({
@@ -124,6 +124,14 @@ export const useDashboardStore = defineStore('dashboard', () => {
             });
         }
 
+        if (isProject) {
+            publicDashboardApiQueryHelper.addFilter({
+                k: 'project_id',
+                v: '*',
+                o: '=',
+            });
+        }
+
         const _publicDashboardParams = {
             query: {
                 ...publicDashboardApiQueryHelper.data,
@@ -131,6 +139,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
         };
         state.loading = true;
         if (_state.isAdminMode) {
+            await fetchDashboard('PUBLIC', _publicDashboardParams);
+        } else if (isProject) {
             await fetchDashboard('PUBLIC', _publicDashboardParams);
         } else {
             await Promise.allSettled([

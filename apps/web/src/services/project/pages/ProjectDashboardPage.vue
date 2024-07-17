@@ -1,90 +1,97 @@
 <script lang="ts" setup>
 import {
-    reactive,
+    reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
-import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
-import ProjectSummaryAlertWidget from '@/services/project/components/ProjectSummaryAlertWidget.vue';
-import ProjectSummaryAllSummaryWidget from '@/services/project/components/ProjectSummaryAllSummaryWidget.vue';
-import ProjectSummaryBillingWidget from '@/services/project/components/ProjectSummaryBillingWidget.vue';
-import ProjectSummaryPersonalHealthDashboardWidget from '@/services/project/components/ProjectSummaryPersonalHealthDashboardWidget.vue';
-import ProjectSummaryServiceAccountsWidget from '@/services/project/components/ProjectSummaryServiceAccountsWidget.vue';
-import ProjectSummaryTrustedAdvisorWidget from '@/services/project/components/ProjectSummaryTrustedAdvisorWidget.vue';
+import DashboardRefreshDropdown from '@/services/dashboards/components/DashboardRefreshDropdown.vue';
+import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
+import DashboardWidgetContainerV2 from '@/services/dashboards/components/DashboardWidgetContainerV2.vue';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 interface Props {
     id: string;
 }
 const props = defineProps<Props>();
+
+const dashboardStore = useDashboardStore();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailGetters = dashboardDetailStore.getters;
+const dashboardDetailState = dashboardDetailStore.state;
+
+
 const state = reactive({
     hasAlertConfig: false,
+    dashboardVariablesLoading: false,
+    currentDashboardId: undefined as string|undefined,
 });
 
-/* api */
-const getProjectAlertConfig = async () => {
+
+const handleUpdateDashboardVariables = async (params) => {
+    if (!state.currentDashboardId) return;
+    state.dashboardVariablesLoading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.monitoring.projectAlertConfig.list<ProjectAlertConfigListParameters, ListResponse<ProjectAlertConfigModel>>({
-            project_id: props.id,
-        });
-        state.hasAlertConfig = !!results?.length;
+        const updatedDashboard = await dashboardStore.updateDashboard(state.currentDashboardId, params);
+        dashboardDetailStore.setDashboardInfo(updatedDashboard);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.dashboardVariablesLoading = false;
+    }
+};
+const handleRefresh = async () => {
+    await dashboardDetailStore.listDashboardWidgets();
+};
+
+/* api */
+
+const listProjectDashboard = async () => {
+    await dashboardStore.load(props.id);
+};
+const getDashboardData = async (dashboardId: string) => {
+    try {
+        await dashboardDetailStore.getDashboardInfo(dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
 
 (async () => {
-    await Promise.allSettled([
-        getProjectAlertConfig(),
-    ]);
+    await listProjectDashboard();
 })();
+
+watch(() => state.currentDashboardId, async (dashboardId, prevDashboardId) => {
+    if (!dashboardId) return;
+    /* NOTE: The dashboard data is reset in first entering case */
+    if (dashboardId && !prevDashboardId) { // this includes all three cases
+        dashboardDetailStore.reset();
+    }
+    await getDashboardData(dashboardId);
+}, { immediate: true });
+
 </script>
 
 <template>
-    <div class="grid grid-cols-12 project-dashboard-page">
-        <project-summary-all-summary-widget
-            class="col-span-12"
-            :project-id="props.id"
-        />
-        <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <project-summary-alert-widget
-                v-if="state.hasAlertConfig"
-                class="col-span-12"
-                :project-id="props.id"
-            />
-            <project-summary-billing-widget
-                class="col-span-12"
-                :project-id="props.id"
-            />
-            <project-summary-personal-health-dashboard-widget
-                class="col-span-12"
-                :project-id="props.id"
-            />
-            <project-summary-service-accounts-widget
-                class="col-span-12 service-accounts-table"
-                :project-id="props.id"
-            />
-        </div>
-        <div class="col-span-12 lg:col-span-3 grid grid-cols-12 right-part">
-            <daily-updates class="col-span-12 daily-updates"
-                           :project-id="props.id"
-            />
-            <cloud-services class="col-span-12 cloud-services"
-                            :more-info="true"
-                            :project-id="props.id"
-            />
-            <project-summary-trusted-advisor-widget
-                class="col-span-12 trusted-advisor"
-                :project-id="props.id"
-            />
+    <div class="project-dashboard-page">
+        <div v-if="state.currentDashboardId"
+             class="dashboard-wrapper"
+        >
+            <div class="dashboard-selectors">
+                <dashboard-variables-v2 class="variable-selector-wrapper"
+                                        :disable-save-button="dashboardDetailGetters.disableManageButtons"
+                                        :loading="state.dashboardVariablesLoading"
+                                        @update="handleUpdateDashboardVariables"
+                />
+                <dashboard-refresh-dropdown :dashboard-id="state.currentDashboardId"
+                                            :loading="dashboardDetailState.loadingWidgets"
+                                            @refresh="handleRefresh"
+                />
+            </div>
+            <dashboard-widget-container-v2 ref="widgetContainerRef" />
         </div>
     </div>
 </template>
@@ -100,36 +107,19 @@ const getProjectAlertConfig = async () => {
 }
 
 .project-dashboard-page {
-    grid-gap: 1rem;
     padding: 2rem 1rem 0;
 
-    .left-part, .right-part {
-        display: grid;
-        grid-auto-rows: max-content;
-        row-gap: 1rem;
-    }
+    .dashboard-wrapper {
+        .dashboard-selectors {
+            @apply relative flex justify-between items-start z-10;
+            padding-bottom: 1.25rem;
 
-    .cloud-services {
-        @apply border border-gray-200 rounded-md;
-        min-height: 25rem;
-        max-height: 35rem;
-
-        @screen tablet {
-            height: 26rem;
+            .variable-selector-wrapper {
+                @apply relative flex items-center flex-wrap;
+                gap: 0.5rem;
+                padding-right: 1rem;
+            }
         }
-    }
-
-    .trusted-advisor {
-        @apply border border-gray-200 rounded-md;
-    }
-
-    .service-accounts-table {
-        @apply border border-gray-200 rounded-md;
-    }
-
-    .daily-updates {
-        @apply border border-gray-200 rounded-md;
-        max-height: 35rem;
     }
 }
 </style>
