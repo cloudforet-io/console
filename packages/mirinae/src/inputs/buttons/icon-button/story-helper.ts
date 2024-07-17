@@ -1,16 +1,28 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args } from '@storybook/vue';
 import icon from 'vue-svgicon';
 
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import { ICON_BUTTON_SHAPE, ICON_BUTTON_STYLE_TYPE } from '@/inputs/buttons/icon-button/type';
 
+export const getIconButtonDefaultArgs = (): Args => ({
+    name: 'ic_refresh',
+    styleType: ICON_BUTTON_STYLE_TYPE.transparent,
+    size: 'md',
+    disabled: false,
+    activated: false,
+    loading: false,
+    outline: false,
+    color: 'inherit',
+    animation: undefined,
+    shape: ICON_BUTTON_SHAPE.circle,
+    default: 'button',
+});
 
 export const getIconButtonArgTypes = (): ArgTypes => ({
     name: {
         name: 'name',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Icon name',
-        defaultValue: 'ic_refresh',
         table: {
             type: {
                 summary: 'string',
@@ -20,16 +32,13 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
                 summary: 'ic_refresh',
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(icon.icons),
-        },
+        control: 'select',
+        options: Object.keys(icon.icons),
     },
     styleType: {
         name: 'styleType',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Button style',
-        defaultValue: ICON_BUTTON_STYLE_TYPE.transparent,
         table: {
             type: {
                 summary: 'string',
@@ -39,16 +48,13 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
                 summary: ICON_BUTTON_STYLE_TYPE.transparent,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(ICON_BUTTON_STYLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(ICON_BUTTON_STYLE_TYPE),
     },
     size: {
         name: 'size',
-        type: { name: ' string' },
+        type: 'string',
         description: 'Button size',
-        defaultValue: 'md',
         table: {
             type: {
                 summary: 'string',
@@ -58,16 +64,13 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
                 summary: 'md',
             },
         },
-        control: {
-            type: 'select',
-            options: ['md', 'sm', 'lg'],
-        },
+        control: 'select',
+        options: ['md', 'sm', 'lg'],
     },
     disabled: {
         name: 'disabled',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Disabled when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -77,15 +80,12 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     activated: {
         name: 'activated',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Activated when true (only works with gray-border style)',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -95,15 +95,12 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     loading: {
         name: 'loading',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show loader or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -113,15 +110,12 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     outline: {
         name: 'outline',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Outlined when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -131,15 +125,12 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     color: {
         name: 'color',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Color of icon',
-        defaultValue: 'inherit',
         table: {
             type: {
                 summary: 'string',
@@ -149,15 +140,12 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
                 summary: 'inherit',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     animation: {
         name: 'animation',
-        type: { name: 'string' },
+        type: 'string',
         description: `Animation type. ${Object.values(ANIMATION_TYPE).map((d) => `'${d}'`)} are available.`,
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -167,16 +155,13 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(ANIMATION_TYPE),
-        },
+        control: 'select',
+        options: Object.values(ANIMATION_TYPE),
     },
     shape: {
         name: 'shape',
-        type: { name: 'string' },
+        type: 'string',
         description: `Shape of icon button. ${Object.values(ICON_BUTTON_SHAPE).map((d) => `'${d}'`)} are available.`,
-        defaultValue: ICON_BUTTON_SHAPE.circle,
         table: {
             type: {
                 summary: 'string',
@@ -186,25 +171,20 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
                 summary: ICON_BUTTON_SHAPE.circle,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(ICON_BUTTON_SHAPE),
-        },
+        control: 'select',
+        options: Object.values(ICON_BUTTON_SHAPE),
     },
     // slots
-    defaultSlot: {
+    default: {
         name: 'default',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Slot to replace icon',
-        defaultValue: 'button',
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
 });
