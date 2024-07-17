@@ -23,6 +23,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.DASHBOARDS,
         routeName: DASHBOARDS_ROUTE._NAME,
         translationId: 'MENU.DASHBOARDS',
+        highlightTag: 'update',
         icon: 'ic_service_dashboard',
     },
     [MENU_ID.PROJECT]: {
@@ -53,7 +54,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.SECURITY,
         routeName: ASSET_INVENTORY_ROUTE.SECURITY._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SECURITY',
-        highlightTag: 'new',
         icon: 'ic_service_security',
     },
     [MENU_ID.COLLECTOR]: {
@@ -80,6 +80,13 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
         icon: 'ic_service_cost-analysis',
     },
+    [MENU_ID.ANOMALY_DETECTION]: {
+        menuId: MENU_ID.ANOMALY_DETECTION,
+        routeName: COST_EXPLORER_ROUTE.ANOMALY_DETECTION._NAME,
+        translationId: 'MENU.COST_EXPLORER_ANOMALY_DETECTION',
+        highlightTag: 'new',
+        icon: 'ic_anomaly_detection',
+    },
     [MENU_ID.BUDGET]: {
         menuId: MENU_ID.BUDGET,
         routeName: COST_EXPLORER_ROUTE.BUDGET._NAME,
@@ -90,7 +97,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.COST_REPORT,
         routeName: COST_EXPLORER_ROUTE.COST_REPORT._NAME,
         translationId: 'MENU.COST_EXPLORER_REPORT',
-        highlightTag: 'new',
         icon: 'ic_service_cost-report',
     },
     [MENU_ID.DATA_SOURCES]: {
@@ -157,7 +163,31 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.DOMAIN_SETTINGS,
         routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS._NAME,
         translationId: 'MENU.ADMINISTRATION_DOMAIN_SETTINGS',
+        highlightTag: 'update',
         icon: 'ic_service_domain-settings',
+    },
+
+    [MENU_ID.DOMAIN_INFORMATION]: {
+        menuId: MENU_ID.DOMAIN_INFORMATION,
+        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.DOMAIN_INFORMATION._NAME,
+        translationId: 'IAM.DOMAIN_SETTINGS.DOMAIN_INFORMATION',
+    },
+
+    [MENU_ID.APPEARANCE]: {
+        menuId: MENU_ID.APPEARANCE,
+        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.APPEARANCE._NAME,
+        translationId: 'IAM.DOMAIN_SETTINGS.APPEARANCE',
+    },
+
+    [MENU_ID.AUTO_DORMANCY_CONFIGURATION]: {
+        menuId: MENU_ID.AUTO_DORMANCY_CONFIGURATION,
+        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME,
+        translationId: 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION',
+    },
+    [MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION]: {
+        menuId: MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION,
+        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
+        translationId: 'IAM.DOMAIN_SETTINGS.ANOMALY_DETECTION_CONFIGURATION',
     },
     [MENU_ID.WORKSPACES]: {
         menuId: MENU_ID.WORKSPACES,

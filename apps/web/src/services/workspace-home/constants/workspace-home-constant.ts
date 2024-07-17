@@ -1,5 +1,7 @@
 import { i18n } from '@/translations';
 
+import * as styles from '@/styles/colors';
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -49,7 +51,26 @@ export const WORKSPACE_HOME_DATA_TYPE = {
 
 export const SUMMARY_DATA_TYPE = {
     ASSET: 'Asset',
-    COST: 'cost',
+    COST: 'Cost',
+    ACCOUNT: 'Account',
+} as const;
+export const SERVICE_ACCOUNT_SUMMARY_STATE_COLOR = {
+    ACTIVE: {
+        iconColor: styles.green[600],
+        textColor: styles.gray[700],
+    },
+    DELETED: {
+        iconColor: styles.red[500],
+        textColor: styles.gray[700],
+    },
+    PENDING: {
+        iconColor: styles.yellow[500],
+        textColor: styles.gray[700],
+    },
+    INACTIVE: {
+        iconColor: styles.gray[400],
+        textColor: styles.gray[700],
+    },
 } as const;
 
 

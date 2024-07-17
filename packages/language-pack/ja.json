@@ -396,6 +396,53 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"ANOMALY_DETECTION": {
+				"CANCEL": "取消",
+				"CONFIG": {
+					"AND_MORE": "…その他",
+					"BASE_INFORMATION": "基本情報",
+					"COL_CATEGORY": "カテゴリー",
+					"COL_CATEGORY_PLACEHOLDER": "カテゴリーを選択",
+					"COL_DATASOURCE_PLACEHOLDER": "データソースを選択",
+					"COL_DATA_SOURCE": "データソース",
+					"COL_ITEM": "アイテム",
+					"COL_ITEM_PLACEHOLDER": "アイテムを選択",
+					"COL_NAME": "名前",
+					"COL_NAME_PLACEHOLDER": "異常検知設定の名前",
+					"COL_POLICY": "ポリシー",
+					"COL_SEND_TO": "送信",
+					"COL_SEND_TO_PLACEHOLDER": "Workspace Ownerを選択",
+					"CREATE_TITLE": "異常検知設定を作成します",
+					"DETECTED": "検出されました",
+					"LAST_12_MONTHS": "過去12ヶ月間",
+					"MODAL_DELETE_DESC": "この異常検知設定を削除しますか？",
+					"MODAL_DELETE_TITLE": "異常検知設定の削除",
+					"MODAL_EDIT_TITLE": "異常検知設定名の編集",
+					"NAME_REQUIRED": "名前を入力してください",
+					"NO_RULES": "ルールなし",
+					"RECIPIENTS": "受信者",
+					"RULE": "ルール",
+					"RULES": "ルール",
+					"TITLE": "異常検知設定",
+					"TREND_TITLE": "異常検知設定のトレンド",
+					"USERS": "ユーザー",
+					"VIEW_HISTORY": "履歴を表示する",
+					"VIEW_POLICY": "このポリシーを表示する"
+				},
+				"CREATE": "作成",
+				"EDIT": "編集",
+				"HISTORY": {
+					"ALL": "すべて",
+					"CUSTOM": "カスタム",
+					"LAST_MONTH": "直近の月",
+					"THIS_MONTH": "今月",
+					"TITLE": "コスト異常検知履歴"
+				},
+				"POLICY": {
+					"TITLE": "ポリシー管理"
+				},
+				"SAVE_CHANGES": "変更事項保存"
+			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "予算の作成に失敗しました",
 				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "選択したデータソース（{dataSourceName}）には、すでに同じターゲット（{name}）の予算が作成されています。",
@@ -922,6 +969,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"ADD": "追加",
 			"DOWNLOAD": "ダウンロード",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "デスクトップ",
@@ -1603,6 +1651,19 @@
 			"UNABLE_TO_LOAD_WIDGET": "ウィジェット表示不可"
 		}
 	},
+	"COST_EXPLORER": {
+		"ANOMALY_DETECTION": {
+			"NOTIFICATION_RULES": {
+				"AMOUNT": "アカウント",
+				"NOTIFY_LEVEL": "通知レベル",
+				"SELECT_LEVEL": "レベル選択",
+				"SELECT_UNIT": "ユニットを選択してください",
+				"THRESHOLD": "閾値",
+				"UNIT": "ユニット",
+				"VARIATION": "変動"
+			}
+		}
+	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
 			"CREATE": "作成",
@@ -1808,7 +1869,7 @@
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "ワークスペース全体でこのダッシュボードの共有を解除してもよろしいですか？"
 		},
 		"FORM": {
-			"ALT_E_CLONE_DASHBOARD": "",
+			"ALT_E_CLONE_DASHBOARD": "ダッシュボードのクローンに失敗しました",
 			"ALT_E_CREATE_DASHBOARD": "ダッシュボードの作成に失敗しました",
 			"ALT_E_DELETE_DASHBOARD": "ダッシュボードの削除に失敗しました",
 			"ALT_E_EDIT_NAME": "ダッシュボード名の更新に失敗しました",
@@ -2059,6 +2120,10 @@
 		}
 	},
 	"HOME": {
+		"ACCOUNT_SUMMARY": "アカウント概要",
+		"ACCOUNT_SUMMARY_BY_PROVIDER": "プロバイダー別サービスアカウント",
+		"ACCOUNT_SUMMARY_CHART_TITLE": "全サービスアカウント",
+		"ACCOUNT_SUMMARY_SHOW_MORE": "サービスアカウントをもっと表示",
 		"ACTIVATION_REQUIRED": "アクティベーションが必要です",
 		"ACTIVATION_REQUIRED_DESC": "これにはコスト分析、予算、コストレポートが含まれます。",
 		"ALT_E_DUPLICATED_NAME": "重複した名前です。",
@@ -2093,7 +2158,7 @@
 		"BOOKMARK_MORE": "もっと見る",
 		"BOOKMARK_MY": "私の",
 		"BOOKMARK_MY_BOOKMARK": "マイブックマーク",
-		"BOOKMARK_SEARCH": "検索",
+		"BOOKMARK_SEARCH": "フォルダ検索",
 		"BOOKMARK_SELECTED": "{count}個 選択されました",
 		"BOOKMARK_SHARED": "共有",
 		"BOOKMARK_SHARED_BOOKMARK": "共有ブックマーク",
@@ -2173,28 +2238,64 @@
 			"TITLE": "アプリ"
 		},
 		"BOOKMARK": {
+			"ADD_GLOBAL_BOOKMARK": "グローバルブックマークを追加",
+			"ADD_LINK": "リンク 追加",
+			"ALL": "すべて",
 			"ALL_BOOKMARK": "すべてのブックマーク",
-			"GLOBAL_BOOKMARK": "グローバルブックマーク"
+			"CREATE_FOLDER": "フォルダーを作成する",
+			"DELETE": "削除",
+			"EDIT": "編集",
+			"FOLDER": "フォルダ",
+			"GLOBAL_BOOKMARK": "グローバルブックマーク",
+			"GLOBAL_NOTIFICATION": "グローバルブックマークはすべてのワークスペースホームの上部に表示され、管理者のみが管理します。",
+			"GO_TO_SETTINGS": "設定しに行きます",
+			"GO_TO_WORKSPACE": "このワークスペースに切り替え",
+			"LINK": "リンク",
+			"TOGGLE_MORE": "もっと見る",
+			"TYPE": "タイプ"
 		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "管理者Email",
+			"ALT_E_EMPTY_COST": "コストの閾値を入力してください。",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "管理者メールの更新に失敗しました",
 			"ALT_E_UPDATE_BRAND_ASSETS": "ブランドアセットの更新に失敗しました",
 			"ALT_E_UPDATE_DISPLAY_NAME": "表示名の更新に失敗しました",
 			"ALT_E_UPDATE_TIMEZONE_AND_LANGUAGE": "タイムゾーン/言語の更新に失敗しました",
+			"ALT_S_DORMANCY_TOGGLE_DISABLE": "休眠設定の無効化が完了しました",
+			"ALT_S_DORMANCY_TOGGLE_ENABLE": "休眠設定の有効化が完了しました",
 			"ALT_S_UPDATE_ADMIN_EMAIL": "管理者メールが正常に更新されました",
 			"ALT_S_UPDATE_BRAND_ASSETS": "ブランドアセットが正常に更新されました",
 			"ALT_S_UPDATE_DISPLAY_NAME": "表示名が正常に更新されました",
+			"ALT_S_UPDATE_DORMANCY": "休眠設定の更新が完了しました",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "タイムゾーンと言語が正常に更新されました",
-			"BASE_INFORMATION": "基本情報",
-			"BRAND_ASSETS": "ブランドアセット",
+			"ANOMALY_DETECTION_CONFIGURATION": "異常コスト検知設定",
+			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "異常コストが検出されると、各ワークスペースのWorkspace Owner役割を持つすべてのユーザーにメールが送信されます。",
+			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "異常コスト検出を有効にすると、",
+			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "異常コストが検出されたときに各ワークスペースに特定の受信者に通知が送信されます。",
+			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "異常コスト検出を有効化",
+			"APPEARANCE": "スタイル設定",
+			"AUTO_DORMANCY_CONFIGURATION": "休止設定",
+			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "閾値よりもコストが低くなるたびに通知メールを送信します。",
+			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "コストレポート",
+			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD": "コスト閾値",
+			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD_DESC": "コストレポートで通貨を設定してください。",
+			"AUTO_DORMANCY_CONFIGURATION_SAVE_DESC": "休止設定が正常に変更されました。",
+			"AUTO_DORMANCY_CONFIGURATION_TOGGLE": "休止設定を有効にする",
+			"AUTO_DORMANCY_CONFIGURATION_TOGGLE_DISABLED": "休止構成がオンになっている場合、ワークスペース全体の{emphasis}これにより、手動での介入なしに非アクティブなワークスペースを管理するのに役立ちます。",
+			"AUTO_DORMANCY_CONFIGURATION_TOGGLE_DISABLED_EMPHASIS": "ユーザーが定義した閾値よりも低いコストの場合、自動的に休止状態に設定されます。",
+			"AUTO_DORMANCY_CONFIGURATION_TOGGLE_ENABLED": "ワークスペースの総費用が{emphasis}を下回る場合、ワークスペースは自動的に休止状態に入ります。",
+			"AUTO_DORMANCY_CONFIGURATION_TOGGLE_ENABLED_EMPHASIS": "3回連続で閾値を下回る場合",
 			"CHANGE": "変更",
 			"CHANGE_ADMIN_EMAIL": "管理者メールの変更",
 			"DISPLAY_NAME": "表示名",
 			"DOMAIN_ID": "ドメインID",
+			"DOMAIN_INFORMATION": "ドメイン情報",
 			"DOMAIN_NAME": "ドメイン名",
+			"DOMAIN_NAME_IMAGE_DESCRIPTION": "ブラウザタブに表示される名前で空白にする場合、デフォルトは「Space ONE」です。 認識しやすいドメインの機能やブランドを反映する名前を入力できます。",
 			"EMAIL_INVALID": "無効なメール形式です",
 			"LANGUAGE": "言語",
+			"NOTIFICATION_RULES": "通知ルール",
+			"RECIPIENTS": "受信者",
 			"SAVE_CHANGE": "変更事項保存",
 			"SAVE_CHANGES": "変更事項保存",
 			"SEND_CODE": "認証コードを送信",
@@ -2541,21 +2642,25 @@
 		},
 		"WORKSPACES": {
 			"ACTION": "作業",
+			"ALL": "すべて",
 			"CREATE": "作成",
 			"CREATE_WORKSPACE": "ワークスペースの作成",
 			"CREATE_WORKSPACE_TEXT_LENGTH": "ワークスペース名の最大長は80文字です。",
 			"DELETE": "削除",
-			"DELETE_WORKSPACE": "削除",
-			"DELETE_WORKSPACE_DESC": "この操作は取り消すことができません。",
+			"DELETE_WORKSPACE": "ワークスペースの削除",
+			"DELETE_WORKSPACE_DESC": "以下のワークスペースを削除しますか？\nこの作業はキャンセルできません。",
 			"DETAIL": {
 				"USERS": "ユーザー"
 			},
 			"DISABLE": "無効化",
-			"DISABLE_WORKSPACE": "選択したワークスペースを無効にしてもよろしいですか？",
+			"DISABLE_WORKSPACE": "ワークスペースの非アクティブ化",
+			"DISABLE_WORKSPACE_DESC": "以下のワークスペースを無効にしますか？",
+			"DORMANT": "休止",
 			"EDIT": "編集",
 			"EDIT_WORKSPACE": "ワークスペースを編集",
 			"ENABLE": "有効化",
-			"ENABLE_WORKSPACE": "選択したワークスペースを有効にしますか？",
+			"ENABLE_WORKSPACE": "ワークスペースのアクティブ化",
+			"ENABLE_WORKSPACE_DESC": "以下のワークスペースを有効にしますか？",
 			"FORM": {
 				"DUPLICATED_NAME": "ワークスペース名が重複しています。",
 				"LABEL_DESC": "説明",
@@ -2566,6 +2671,9 @@
 				"REQUIRED_NAME": "名前を入力してください"
 			},
 			"REQUIRED_ENABLE_WORKSPACE": "少なくとも1つのワークスペースを有効にする必要があります。",
+			"STATE": "状態",
+			"TOOLTIP_COST": "コストレポートに基づいて",
+			"TOOLTIP_STATE": "休眠設定が有効になると、ユーザーが定義した閾値よりも総コストが低いワークスペースは自動的に休眠状態に切り替えられます。閾値は[設定 > ドメイン設定 > 休眠ポリシー設定]で変更できます。",
 			"WORKSPACES": "ワークスペース"
 		}
 	},
@@ -2630,6 +2738,7 @@
 			"MAIN": {
 				"ACTION": "作業",
 				"ADD": "追加",
+				"ALL": "すべて",
 				"ALT_E_CHANGE_PROJECT": "プロジェクト変更に失敗",
 				"ALT_E_DELETE_ACCOUNT": "アカウント削除に失敗",
 				"ALT_E_RELEASE_PROJECT": "プロジェクト解除に失敗",
@@ -2642,15 +2751,21 @@
 				"CONSOLE": "コンソール接続",
 				"CREATE": "作成",
 				"DELETE": "削除",
+				"MANAGED_INFO": "管理者モードでのみ状態を変更できます。",
 				"NO_SELECTED_ACCOUNT": "サービスアカウントを選択すると、詳細を見ることができます。",
+				"PENDING": "保留中",
 				"PROVIDERS_TITLE": "サービスプロバイダー",
+				"STATE": "状態",
 				"TAB_CREDENTIALS": "暗号化キー",
 				"TAB_DETAILS": "詳細情報",
 				"TAB_MEMBER": "関連するメンバー",
 				"TAB_SELECTED_DATA": "選択したデータ",
 				"TAB_TAG": "タグ",
-				"TITLE": "{provider}アカウント"
-			}
+				"TITLE": "{provider}アカウント",
+				"USAGE_OVERVIEW": "利用概要",
+				"VIEW_IN_ADMIN_MODE": "管理者モードで確認"
+			},
+			"TOOLTIP_COST": "コストレポートに基づいて"
 		},
 		"TAGS_PLACEHOLDER": "key1:value1 key2:value2",
 		"USER": {
@@ -3264,7 +3379,7 @@
 			"AGENT": {
 				"ACTIVATE": "有性化",
 				"ACTIVATE_MODAL_TEXT": "クラスターを有性化しますか？",
-				"ACTIVE": "Active",
+				"ACTIVE": "アクティブ",
 				"CLUSTER_DETAIL_HEADER": "クラスター詳細情報",
 				"CONNECT_CLUSTER": "クラスター接続",
 				"CONNECT_CLUSTER_HEADER": "クラスター接続",
@@ -3384,6 +3499,10 @@
 			"TITLE": "マルチクラウド資産を管理コンソールに{domain_icon} すべて集めて表示し、効率性と生産性を{boost_icon}向上させましょう。",
 			"WELCOME_TITLE": "クラウド管理コンソールへようこそ！"
 		},
+		"DORMANT_WORKSPACE": "休止ワークスペース",
+		"DORMANT_WORKSPACE_POPOVER": "このワークスペースは{date}に管理者が設定した閾値よりもコストが低いため、休止状態に切り替えられました。",
+		"DORMANT_WORKSPACE_POPOVER_ADMIN": "{name}で発生した費用が閾値を下回ったため、{date}に休止状態に移行されました。",
+		"GO_TO_DORMANT_CONFIG": "休止設定ページに移動します",
 		"NOT_FOUND_ACCESS_WORKSPACE": "アクセス可能なワークスペースがありません。",
 		"NOT_FOUND_DESC": "まだ作成されたワークスペースがありません。",
 		"RECENT": "最近のアクセス",
@@ -3476,6 +3595,7 @@
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "サービスアカウント",
 		"CONSOLE_HOME": "コンソールホーム",
 		"COST_EXPLORER": "費用管理",
+		"COST_EXPLORER_ANOMALY_DETECTION": "異常コスト検知",
 		"COST_EXPLORER_BUDGET": "予算",
 		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
 		"COST_EXPLORER_DASHBOARD": "ダッシュボード",

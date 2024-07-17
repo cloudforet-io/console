@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router/composables';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PFieldGroup, PEmpty, PSelectDropdown, PFieldTitle, PToggleButton, PDivider, PButton,
+    PFieldGroup, PEmpty, PSelectDropdown, PFieldTitle, PToggleButton, PDivider, PButton, PStatus,
 } from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,
@@ -24,10 +24,13 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import type { AddModalMenuItem } from '@/services/iam/types/user-type';
+import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 interface Props {
@@ -135,9 +138,11 @@ const fetchListWorkspaces = async (inputText: string) => {
         const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
             query: workspaceListApiQueryHelper.data,
         });
-        workspaceState.menuItems = (results ?? []).map((role) => ({
-            label: role.name,
-            name: role.workspace_id,
+        workspaceState.menuItems = (results ?? []).map((workspace) => ({
+            label: workspace.name,
+            name: workspace.workspace_id,
+            tags: workspace.tags,
+            is_dormant: workspace.is_dormant,
         }));
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -192,6 +197,23 @@ watch(() => state.proxyIsSetAdminRole, () => {
                                    class="workspace-select-dropdown"
                                    :class="{'no-data': workspaceState.menuItems.length === 0 && !workspaceState.loading}"
                 >
+                    <template #menu-item--format="{item}">
+                        <div class="menu-item-wrapper"
+                             :class="{'is-dormant': item?.is_dormant}"
+                        >
+                            <div class="label">
+                                <workspace-logo-icon :text="item?.label || ''"
+                                                     :theme="item?.tags?.theme"
+                                                     size="xs"
+                                />
+                                <span class="label-text">{{ item.label }}</span>
+                                <p-status v-if="item?.is_dormant"
+                                          v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                                          class="capitalize state"
+                                />
+                            </div>
+                        </div>
+                    </template>
                     <template #no-data-area>
                         <p-empty v-if="workspaceState.menuItems.length === 0 && !workspaceState.loading"
                                  image-size="sm"
@@ -353,6 +375,28 @@ watch(() => state.proxyIsSetAdminRole, () => {
         gap: 0.75rem;
         .workspace-role-form {
             margin-bottom: 0;
+            .workspace-select-dropdown {
+                .menu-item-wrapper {
+                    @apply flex justify-between;
+                    max-width: 100%;
+
+                    .label {
+                        @apply flex items-center gap-2;
+                    }
+                    .state {
+                        @apply text-label-sm;
+                    }
+                    .label-text {
+                        @apply truncate;
+                        max-width: 36.875rem;
+                    }
+                    &.is-dormant {
+                        .label-text {
+                            max-width: 31.25rem;
+                        }
+                    }
+                }
+            }
         }
     }
     .admin-role-form-view {

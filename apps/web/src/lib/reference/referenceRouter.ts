@@ -122,6 +122,11 @@ const routerMap: RouterMap = {
             name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
             formatter: serviceAccountLinkFormatter,
         },
+    'identity.TrustedAccount':
+        {
+            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+            formatter: serviceAccountLinkFormatter,
+        },
     'inventory.CloudService':
         {
             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,

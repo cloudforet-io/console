@@ -1,17 +1,22 @@
 <script setup lang="ts">
+import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PBoard, PI } from '@cloudforet/mirinae';
-import { BOARD_STYLE_TYPE } from '@cloudforet/mirinae/src/data-display/board/type';
+import dayjs from 'dayjs';
 
+import {
+    PBoard, PI, PPopover, PStatus, PLink,
+} from '@cloudforet/mirinae';
+import { BOARD_STYLE_TYPE } from '@cloudforet/mirinae/src/data-display/board/type';
 
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -22,22 +27,33 @@ import { gray } from '@/styles/colors';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet, BoardType } from '@/services/landing/type/type';
+import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 interface Props {
     boardSets: WorkspaceBoardSet[],
     boardType?: BoardType,
+    isDomainAdmin?: boolean,
 }
 
 const props = withDefaults(defineProps<Props>(), {
     boardSets: () => ([]),
     boardType: undefined,
+    isDomainAdmin: undefined,
 });
 
 const landingPageStore = useLandingPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const router = useRouter();
+
+const state = reactive({
+    popoverVisible: false,
+    selectedPopoverItem: '',
+});
+
 const roleTypeImageFormatter = (roleType: RoleType): string => {
     switch (roleType) {
     case ROLE_TYPE.WORKSPACE_OWNER:
@@ -50,6 +66,11 @@ const roleTypeImageFormatter = (roleType: RoleType): string => {
 };
 
 const handleClickBoardItem = (item: WorkspaceBoardSet) => {
+    if (item.is_dormant) {
+        state.popoverVisible = true;
+        state.selectedPopoverItem = item.workspace_id;
+        return;
+    }
     landingPageStore.setLoading(true);
     userWorkspaceStore.setCurrentWorkspace(item.workspace_id);
     router.replace({ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: item.workspace_id } });
@@ -64,14 +85,59 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
              @item-click="handleClickBoardItem"
     >
         <template #item-content="{board}">
-            <div class="workspace-board-item-wrapper">
+            <div class="workspace-board-item-wrapper"
+                 :class="{'is-dormant': board.is_dormant}"
+            >
                 <workspace-logo-icon :text="board?.name || ''"
                                      :theme="board?.tags?.theme"
                                      :size="props.boardType === BOARD_TYPE.ALL_WORKSPACE ? 'sm' : 'md'"
                 />
                 <div class="text-wrapper">
                     <p class="workspace-name">
-                        {{ board?.name }}
+                        <span class="name">{{ board?.name }}</span>
+                        <p-popover v-if="state.selectedPopoverItem === board.workspace_id"
+                                   :is-visible="state.popoverVisible"
+                                   ignore-outside-click
+                                   trigger="click"
+                                   relative-style
+                                   position="top"
+                                   class="dormant-popover"
+                                   @close="state.popoverVisible = false"
+                        >
+                            <template #content>
+                                <div class="popover-content">
+                                    <strong class="title">{{ $t('LADING.DORMANT_WORKSPACE') }}</strong>
+                                    <img alt="cost-threshold-chart"
+                                         src="/images/domain-settings/img_auto-dormancy-configuration_cost-threshold-chart.png"
+                                         srcset="/images/domain-settings/img_auto-dormancy-configuration_cost-threshold-chart@2x.png 2x,
+                                            /images/domain-settings/img_auto-dormancy-configuration_cost-threshold-chart@3x.png 3x"
+                                         class="cost-threshold-chart"
+                                    >
+                                    <i18n :path="props.isDomainAdmin ? 'LADING.DORMANT_WORKSPACE_POPOVER_ADMIN' : 'LADING.DORMANT_WORKSPACE_POPOVER'"
+                                          tag="span"
+                                          class="desc"
+                                    >
+                                        <template #date>
+                                            <span class="date">{{ dayjs(board?.dormant_updated_at).format('YYYY-MM-DD') }}</span>
+                                        </template>
+                                        <template v-if="props.isDomainAdmin"
+                                                  #name
+                                        >
+                                            <span>{{ board.name }}</span>
+                                        </template>
+                                    </i18n>
+                                    <p-link :text="$t('LADING.GO_TO_DORMANT_CONFIG')"
+                                            highlight
+                                            :to="{
+                                                name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME)
+                                            }"
+                                    />
+                                </div>
+                            </template>
+                        </p-popover><p-status v-if="board.is_dormant"
+                                              v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                                              class="capitalize"
+                        />
                     </p>
                     <div v-if="board?.role_type"
                          class="workspace-info"
@@ -131,6 +197,31 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                 @apply truncate;
                 width: 100%;
             }
+            .dormant-popover {
+                .popover-content {
+                    @apply flex flex-col;
+                    gap: 0.5rem;
+                    width: 13rem;
+                    .title {
+                        @apply text-coral-500;
+                    }
+                    .desc {
+                        @apply block text-paragraph-md text-gray-500;
+                        white-space: pre-line;
+                        max-width: 13rem;
+                        .date {
+                            @apply text-gray-900;
+                        }
+                    }
+                }
+            }
+
+            /* custom design-system component - p-popover */
+            :deep(.p-popover) {
+                .visible {
+                    z-index: 1000;
+                }
+            }
         }
         .toolset-wrapper {
             @apply flex items-center;
@@ -142,11 +233,23 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                 }
             }
         }
-        &:hover {
-            .toolset-wrapper {
-                :deep(.favorite-btn) {
-                    &:not(.active) {
-                        @apply block;
+
+        &.is-dormant {
+            .workspace-name {
+                @apply flex;
+                .name {
+                    @apply truncate block;
+                    width: 9.5rem;
+                }
+            }
+        }
+        &:not(.is-dormant) {
+            &:hover {
+                .toolset-wrapper {
+                    :deep(.favorite-btn) {
+                        &:not(.active) {
+                            @apply block;
+                        }
                     }
                 }
             }

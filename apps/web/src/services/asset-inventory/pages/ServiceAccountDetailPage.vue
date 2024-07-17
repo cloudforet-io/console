@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { render } from 'ejs';
@@ -11,11 +13,13 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -39,6 +43,7 @@ import ServiceAccountEditModal from '@/services/asset-inventory/components/Servi
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
+import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 const router = useRouter();
 
@@ -46,6 +51,7 @@ const props = defineProps<{
     serviceAccountId?: string;
 }>();
 
+const costReportPageStore = useCostReportPageStore();
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
@@ -59,14 +65,15 @@ const storeState = reactive({
         ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
         : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     loading: true,
-    item: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
+    originServiceAccountItem: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
     isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     attachedGeneralAccounts: [] as ServiceAccountModel[],
-    providerId: computed(() => state.item?.provider),
+    providerId: computed(() => state.originServiceAccountItem?.provider),
     provider: computed(() => {
         if (!state.loading) {
             return storeState.providers[state.providerId] || undefined;
@@ -78,7 +85,7 @@ const state = reactive({
     isKubernetesAgentMode: computed(() => state.providerKey === 'kubernetes'),
     consoleLink: computed(() => {
         try {
-            if (storeState.providerExternalLink) return render(storeState.providerExternalLink, state.item);
+            if (storeState.providerExternalLink) return render(storeState.providerExternalLink, state.originServiceAccountItem);
         } catch (e) {
             console.warn('Failed to render external link. Please check the accountID value.');
             return '';
@@ -87,7 +94,7 @@ const state = reactive({
     }),
     deleteModalVisible: false,
     editModalVisible: false,
-    isManagedTrustedAccount: computed(() => state.item.workspace_id === '*'),
+    isManagedTrustedAccount: computed(() => state.originServiceAccountItem.workspace_id === '*'),
     isEditable: computed(() => !state.isManagedTrustedAccount || storeState.isAdminMode),
 });
 
@@ -134,6 +141,12 @@ const handleClickBackbutton = () => {
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: state.providerKey },
     }));
 };
+
+onMounted(async () => {
+    if (storeState.isWorkspaceMember) return;
+    await costReportPageStore.fetchCostReportConfig();
+});
+
 watch(() => state.providerId, async (provider) => {
     serviceAccountPageStore.setProvider(provider ?? '');
     await serviceAccountSchemaStore.setProviderSchema(provider ?? '');
@@ -153,7 +166,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
 
 <template>
     <div class="service-account-detail-page">
-        <p-heading :title="state.item.name"
+        <p-heading :title="state.originServiceAccountItem.name"
                    show-back-button
                    class="page-title"
                    @click-back-button="handleClickBackbutton"
@@ -215,18 +228,23 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                        :editable="state.isEditable"
                                        @refresh="handleRefresh"
             />
+            <!--            TODO: To be implemented after further discussion-->
+            <!--            <service-account-usage-overview v-if="!state.isTrustedAccount"-->
+            <!--                                            :service-account-loading="state.loading"-->
+            <!--                                            :service-account-id="props.serviceAccountId"-->
+            <!--            />-->
         </div>
         <service-account-delete-modal :visible.sync="state.deleteModalVisible"
                                       :service-account-type="state.serviceAccountType"
-                                      :service-account-data="state.item"
+                                      :service-account-data="state.originServiceAccountItem"
                                       :attached-general-accounts="state.attachedGeneralAccounts"
                                       :is-agent-mode="state.isKubernetesAgentMode"
         />
-        <service-account-edit-modal v-if="state.item?.name"
-                                    :key="state.item?.name"
+        <service-account-edit-modal v-if="state.originServiceAccountItem?.name"
+                                    :key="state.originServiceAccountItem?.name"
                                     :visible.sync="state.editModalVisible"
                                     :is-trusted-account="state.isTrustedAccount"
-                                    :service-account="state.item"
+                                    :service-account="state.originServiceAccountItem"
         />
     </div>
 </template>
@@ -269,6 +287,9 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             @apply col-span-12;
         }
         .service-account-credentials {
+            @apply col-span-12;
+        }
+        .service-account-usage-overview {
             @apply col-span-12;
         }
     }

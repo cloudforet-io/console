@@ -26,6 +26,7 @@ interface WorkspacePageState {
     pageLimit: number,
     searchFilters: ConsoleFilter[],
     roleBindings: RoleBindingModel[],
+    selectedType: string,
     // workspace users
     workspaceUsersLoading: boolean,
     workspaceUsers: WorkspaceUserModel[],
@@ -51,6 +52,7 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
         pageLimit: 15,
         searchFilters: [],
         roleBindings: [],
+        selectedType: 'ALL',
         // workspace users
         workspaceUsersLoading: false,
         workspaceUsers: [],
