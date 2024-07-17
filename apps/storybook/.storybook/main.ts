@@ -17,6 +17,9 @@ const config: StorybookConfig = {
     
     '../../../packages/mirinae/src/foundation/**/*.mdx',
     '../../../packages/mirinae/src/foundation/**/*.stories.@(js|jsx|ts|tsx)',
+    
+    '../../../packages/mirinae/src/inputs/buttons/**/*.mdx',
+    '../../../packages/mirinae/src/inputs/buttons/**/*.stories.@(js|jsx|ts|tsx)',
 
   ],
   addons: [
