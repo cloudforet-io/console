@@ -23,6 +23,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.DASHBOARDS,
         routeName: DASHBOARDS_ROUTE._NAME,
         translationId: 'MENU.DASHBOARDS',
+        highlightTag: 'update',
         icon: 'ic_service_dashboard',
     },
     [MENU_ID.PROJECT]: {
@@ -53,7 +54,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.SECURITY,
         routeName: ASSET_INVENTORY_ROUTE.SECURITY._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SECURITY',
-        highlightTag: 'new',
         icon: 'ic_service_security',
     },
     [MENU_ID.COLLECTOR]: {
@@ -97,7 +97,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.COST_REPORT,
         routeName: COST_EXPLORER_ROUTE.COST_REPORT._NAME,
         translationId: 'MENU.COST_EXPLORER_REPORT',
-        highlightTag: 'new',
         icon: 'ic_service_cost-report',
     },
     [MENU_ID.DATA_SOURCES]: {
@@ -164,6 +163,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.DOMAIN_SETTINGS,
         routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS._NAME,
         translationId: 'MENU.ADMINISTRATION_DOMAIN_SETTINGS',
+        highlightTag: 'update',
         icon: 'ic_service_domain-settings',
     },
 
