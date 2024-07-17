@@ -1,4 +1,5 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
 
@@ -20,7 +21,6 @@ const getArgTypes = (category: string, info: [string, string][]) => {
         argTypes[name] = {
             name: argName,
             description: argDescription,
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -35,12 +35,36 @@ const getArgTypes = (category: string, info: [string, string][]) => {
     return argTypes;
 };
 
+export const getContextMenuItemArgs = (): Args => ({
+    name: 'name',
+    label: 'label',
+    link: '',
+    to: undefined,
+    disabled: false,
+    selected: false,
+    selectMarker: undefined,
+    ellipsis: false,
+    highlightTerm: 'highlight',
+    icon: undefined,
+    iconColor: undefined,
+    imageUrl: undefined,
+    default: null,
+    'text-list': null,
+    'all native events': null,
+});
+
+export const getContextMenuItemParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
+
 export const getContextMenuItemArgTypes = (): ArgTypes => ({
     name: {
         name: 'name',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The key of item. must be unique.',
-        defaultValue: 'name',
         table: {
             type: {
                 summary: 'string',
@@ -50,15 +74,12 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     label: {
         name: 'label',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The display label of item.',
-        defaultValue: 'label',
         table: {
             type: {
                 summary: 'string',
@@ -68,13 +89,11 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     link: {
         name: 'link',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The external link of item.',
         defaultValue: '',
         table: {
@@ -86,15 +105,12 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     to: {
         name: 'to',
-        type: { name: 'object' },
+        type: { name: 'object' } as SBType,
         description: 'Vue Router `Location`.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'object',
@@ -104,15 +120,12 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     disabled: {
         name: 'disabled',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether the item is clickable(selectable) or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -122,15 +135,12 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     selected: {
         name: 'selected',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether the item is selected or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -140,15 +150,12 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     selectMarker: {
         name: 'selectMarker',
-        type: { name: 'string' },
+        type: 'string',
         description: `Whether to show checkbox, radio, or nothing. ${SELECT_MARKERS.map((d) => `\`${d}\``).join(', ')}, \`undefined\` are available.`,
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -158,16 +165,13 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'select',
-            options: [...SELECT_MARKERS, undefined],
-        },
+        control: 'select',
+        options: [...SELECT_MARKERS, undefined],
     },
     ellipsis: {
         name: 'ellipsis',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to ellipsis label text or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -177,15 +181,12 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     highlightTerm: {
         name: 'highlightTerm',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The term for highlighting part of the label.',
-        defaultValue: 'highlight',
         table: {
             type: {
                 summary: 'string',
@@ -195,15 +196,12 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     icon: {
         name: 'icon',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Icon in Left Content Area.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -213,15 +211,12 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     iconColor: {
         name: 'iconColor',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Color of icon in Left Content Area.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -231,15 +226,12 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     imageUrl: {
         name: 'imageUrl',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Image url in Left Content Area.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -249,10 +241,12 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     ...getArgTypes('slots', slots),
     ...getArgTypes('events', events),
+
+    // default
+    default: { table: { disable: true } },
+    'text-list': { table: { disable: true } },
 });
