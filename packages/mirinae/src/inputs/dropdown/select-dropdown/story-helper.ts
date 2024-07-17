@@ -1,6 +1,6 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
-import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
+import { getContextMenuArgTypes, getContextMenuArgs } from '@/inputs/context-menu/story-helper';
 import {
     CONTEXT_MENU_POSITION,
     SELECT_DROPDOWN_APPEARANCE_TYPE,
@@ -8,13 +8,39 @@ import {
 } from '@/inputs/dropdown/select-dropdown/type';
 
 
+const extraArgs: Args = {
+    styleType: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
+    appearanceType: SELECT_DROPDOWN_APPEARANCE_TYPE.BASIC,
+    size: 'md',
+    disabled: false,
+    invalid: false,
+    placeholder: undefined,
+    selectionLabel: undefined,
+    selectionHighlight: false,
+    showAlertDot: false,
+    showDeleteAllButton: true,
+    useFixedMenuStyle: false,
+    buttonIcon: undefined,
+    isFixedWidth: false,
+    resetSelectionOnMenuClose: false,
+    isFilterable: false,
+    visibleMenu: false,
+    menuPosition: CONTEXT_MENU_POSITION.LEFT,
+    indexMode: false,
+    parentId: undefined,
+    disableHandler: false,
+    pageSize: 10,
+    resetSelectedOnUnmounted: true,
+    initSelectedWithHandler: true,
+    hideHeaderWithoutItems: false,
+};
+
 const extraArgTypes: ArgTypes = {
     /* props */
     styleType: {
         name: 'styleType',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Style type to display selected items.',
-        defaultValue: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
         table: {
             type: {
                 summary: 'string',
@@ -24,16 +50,13 @@ const extraArgTypes: ArgTypes = {
                 summary: `'${SELECT_DROPDOWN_STYLE_TYPE.DEFAULT}'`,
             },
         },
-        control: {
-            type: 'select',
-            options: SELECT_DROPDOWN_STYLE_TYPE,
-        },
+        control: 'select',
+        options: SELECT_DROPDOWN_STYLE_TYPE,
     },
     appearanceType: {
         name: 'appearanceType',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Appearance type to display selected items.',
-        defaultValue: SELECT_DROPDOWN_APPEARANCE_TYPE.BASIC,
         table: {
             type: {
                 summary: 'string',
@@ -43,16 +66,13 @@ const extraArgTypes: ArgTypes = {
                 summary: `'${SELECT_DROPDOWN_APPEARANCE_TYPE.BASIC}'`,
             },
         },
-        control: {
-            type: 'select',
-            options: SELECT_DROPDOWN_APPEARANCE_TYPE,
-        },
+        control: 'select',
+        options: SELECT_DROPDOWN_APPEARANCE_TYPE,
     },
     size: {
         name: 'size',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Size of dropdown button.',
-        defaultValue: 'md',
         table: {
             type: {
                 summary: 'string',
@@ -62,16 +82,13 @@ const extraArgTypes: ArgTypes = {
                 summary: 'md',
             },
         },
-        control: {
-            type: 'select',
-            options: ['md', 'sm'],
-        },
+        control: 'select',
+        options: ['md', 'sm'],
     },
     disabled: {
         name: 'disabled',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to disable selection or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -81,15 +98,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     invalid: {
         name: 'invalid',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to apply invalid style or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -99,15 +113,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     placeholder: {
         name: 'placeholder',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Search input placeholder.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -117,15 +128,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     selectionLabel: {
         name: 'selectionLabel',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Label to display selected items.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -135,15 +143,12 @@ const extraArgTypes: ArgTypes = {
                 summary: undefined,
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     selectionHighlight: {
         name: 'selectionHighlight',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to highlight or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -153,15 +158,12 @@ const extraArgTypes: ArgTypes = {
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     showAlertDot: {
         name: 'showAlertDot',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show alert or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -171,15 +173,12 @@ const extraArgTypes: ArgTypes = {
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     showDeleteAllButton: {
         name: 'showDeleteAllButton',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show delete all button or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -189,15 +188,12 @@ const extraArgTypes: ArgTypes = {
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     useFixedMenuStyle: {
         name: 'useFixedMenuStyle',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to use position fixed style on menu or not. ',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -207,15 +203,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     buttonIcon: {
         name: 'buttonIcon',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Icons for dropdown right button. Useful when `type` props is `icon-button`.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -225,15 +218,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     isFixedWidth: {
         name: 'isFixedWidth',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to fix width.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -243,15 +233,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     resetSelectionOnMenuClose: {
         name: 'resetSelectionOnMenuClose',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'reset selection when menu close.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -261,15 +248,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     isFilterable: {
         name: 'isFilterable',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to be filterable or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -279,15 +263,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     visibleMenu: {
         name: 'visibleMenu',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Use this prop when you want to control menu visibility manually. this is `sync` prop with event `update:visible-menu`.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -297,15 +278,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     menuPosition: {
         name: 'menuPosition',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Position of Context menu',
-        defaultValue: CONTEXT_MENU_POSITION.LEFT,
         table: {
             type: {
                 summary: 'string',
@@ -315,16 +293,13 @@ const extraArgTypes: ArgTypes = {
                 summary: CONTEXT_MENU_POSITION.LEFT,
             },
         },
-        control: {
-            type: 'select',
-            options: [...Object.values(CONTEXT_MENU_POSITION)],
-        },
+        control: 'select',
+        options: [...Object.values(CONTEXT_MENU_POSITION)],
     },
     indexMode: {
         name: 'indexMode',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to `selected` props works with item\'s index or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -334,15 +309,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     parentId: {
         name: 'parentId',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The property to automatically hide the context menu when scrolling, if the Select-Dropdown\'s parent component exists.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -352,13 +324,11 @@ const extraArgTypes: ArgTypes = {
                 summary: undefined,
             },
         },
-        control: {
-            type: 'select',
-        },
+        control: 'select',
     },
     handler: {
         name: 'handler',
-        type: { name: 'function, array of function' },
+        type: 'function',
         description: 'Handler that returns auto-completion menu according to input value. If no value is given, the default handler is executed.',
         defaultValue: undefined,
         table: {
@@ -370,15 +340,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'undefined',
             },
         },
-        control: {
-            type: null,
-        },
+        control: null,
     },
     disableHandler: {
         name: 'disableHandler',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to execute handler automatically or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -388,15 +355,12 @@ const extraArgTypes: ArgTypes = {
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     pageSize: {
         name: 'pageSize',
-        type: { name: 'number' },
+        type: 'number',
         description: 'Page size to show items.',
-        defaultValue: 10,
         table: {
             type: {
                 summary: 'number',
@@ -406,16 +370,13 @@ const extraArgTypes: ArgTypes = {
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'number',
-            options: { min: 0 },
-        },
+        control: 'number',
+        options: { min: 0 },
     },
     resetSelectedOnUnmounted: {
         name: 'resetSelectedOnUnmounted',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to reset selected items when unmounted or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -425,15 +386,12 @@ const extraArgTypes: ArgTypes = {
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     initSelectedWithHandler: {
         name: 'initSelectedWithHandler',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to initialize selected items with handler or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -443,15 +401,12 @@ const extraArgTypes: ArgTypes = {
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     hideHeaderWithoutItems: {
         name: 'hideHeaderWithoutItems',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to hide the header when there are no items that indicate the name of the header.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -461,9 +416,7 @@ const extraArgTypes: ArgTypes = {
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
 
     /* events */
@@ -711,7 +664,60 @@ const initContextMenuArgTypes = (): ArgTypes => {
     return argTypes;
 };
 
+const initSelectDropdownArgs = (): Args => {
+    const contextMenuArgs = getContextMenuArgs();
+    const contextMenuArgTypes = getContextMenuArgTypes();
+
+    const args: Args = {
+        menu: contextMenuArgs.menu,
+        loading: contextMenuArgs.loading,
+        selected: contextMenuArgs.selected,
+        multiSelectable: contextMenuArgs.multiSelectable,
+        searchText: contextMenuArgs.searchText,
+        readonly: contextMenuArgs.readonly,
+        showSelectHeader: contextMenuArgs.showSelectHeader,
+        showSelectMarker: contextMenuArgs.showSelectMarker,
+    };
+
+    Object.keys(contextMenuArgs).forEach((k) => {
+        const item = contextMenuArgTypes[k];
+        if (item.table?.category === 'slots') {
+            args[`menu-${k}`] = null;
+        }
+    });
+
+    return args;
+};
+
+export const getSelectDropdownArgs = (): Args => ({
+    ...extraArgs,
+    ...initSelectDropdownArgs(),
+});
+
 export const getSelectDropdownArgTypes = (): ArgTypes => ({
     ...extraArgTypes,
     ...initContextMenuArgTypes(),
+    'update:visible-menu': { table: { disable: true } },
+    'update:search-text': { table: { disable: true } },
+    'update:selected': { table: { disable: true } },
+    select: { table: { disable: true } },
+    'delete-tag': { table: { disable: true } },
+    'click-show-more': { table: { disable: true } },
+    'clear-selection': { table: { disable: true } },
+    'click-done': { table: { disable: true } },
+    'click-button': { table: { disable: true } },
+    /* eslint-disable no-template-curly-in-string */
+    '`dropdown-${slot}`': { table: { disable: true } },
+    'dropdown-left-area': { table: { disable: true } },
+    'context-menu-header': { table: { disable: true } },
+    'no-data-area': { table: { disable: true } },
+    /* eslint-disable no-template-curly-in-string */
+    '`menu-${slot}`': { table: { disable: true } },
+});
+
+export const getSelectDropdownParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
 });
