@@ -283,6 +283,7 @@ onUnmounted(() => {
     padding: 0 1.5rem 1rem 1.5rem;
     .left-part {
         @apply bg-gray-100 border border-gray-150 rounded-md;
+        max-width: 75%;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
