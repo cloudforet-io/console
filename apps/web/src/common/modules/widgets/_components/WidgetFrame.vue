@@ -106,8 +106,8 @@ const handleToggleWidth = () => {
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.FULL_DATA_LINK') }}</span>
                             <template v-if="props.fullDataLinkList?.length">
                                 <div class="full-data-link-wrapper">
-                                    <p-link v-for="fullDataLink in props.fullDataLinkList"
-                                            :key="`${fullDataLink?.name}-${fullDataLink?.location}`"
+                                    <p-link v-for="(fullDataLink, idx) in props.fullDataLinkList"
+                                            :key="`${idx}-${fullDataLink?.name}`"
                                             new-tab
                                             highlight
                                             action-icon="internal-link"
@@ -260,6 +260,7 @@ const handleToggleWidth = () => {
         .metadata-content {
             @apply text-label-md;
             display: flex;
+            line-height: normal;
             flex-direction: column;
             gap: 0.5rem;
             max-height: 20rem;
