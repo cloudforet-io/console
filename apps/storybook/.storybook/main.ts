@@ -24,6 +24,9 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/inputs/checkbox/**/*.mdx',
     '../../../packages/mirinae/src/inputs/checkbox/**/*.stories.@(js|jsx|ts|tsx)',
 
+    '../../../packages/mirinae/src/inputs/checkbox-group/**/*.mdx',
+    '../../../packages/mirinae/src/inputs/checkbox-group/**/*.stories.@(js|jsx|ts|tsx)',
+
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
