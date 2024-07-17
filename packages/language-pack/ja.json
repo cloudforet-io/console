@@ -1501,6 +1501,7 @@
 			"DEFAULT_WIDTH": "デフォルト幅",
 			"DELETE": "削除",
 			"DONE": "完了",
+			"DONUT": "",
 			"EDIT": "編集",
 			"EDIT_WIDGET": "ウィジェット編集",
 			"EXPAND": "展開する",
@@ -1574,6 +1575,8 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "過去7日〜予定日程"
 			},
+			"PIE": "",
+			"PIE_CHART_TYPE": "",
 			"PREVIEW_TABLE_EMPTY_DESC": "プレビューがここに表示されます。",
 			"PREVIEW_TABLE_EMPTY_TITLE": "データを追加してください。",
 			"REQUIRED_FIELDS_ARE_MISSING": "必須フィールドが欠落しています。",
@@ -2082,7 +2085,7 @@
 						"PROGRESS_CARD_DESC": "このグラフを適切に表示するには、少なくとも2つのデータフィールドが必要です。",
 						"TITLE": "追加のフィールドが必要です。"
 					},
-					"WIDGET_INFO": "ウィジェット情報",
+					"WIDGET_HEADER": "",
 					"X_AXIS": "X軸",
 					"Y_AXIS": "Y軸"
 				}
