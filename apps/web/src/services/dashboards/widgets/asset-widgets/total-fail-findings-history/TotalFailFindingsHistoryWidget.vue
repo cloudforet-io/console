@@ -4,15 +4,15 @@ import {
 } from 'vue';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
-import {
-    PI, PDataLoader, PProgressBar,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PI, PDataLoader, PProgressBar,
+} from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';

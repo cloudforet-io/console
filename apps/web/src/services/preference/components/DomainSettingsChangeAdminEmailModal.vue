@@ -3,7 +3,7 @@ import { reactive, watch } from 'vue';
 
 import {
     PButton, PButtonModal, PFieldGroup, PTextInput,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

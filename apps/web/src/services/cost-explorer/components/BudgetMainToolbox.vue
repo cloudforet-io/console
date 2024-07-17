@@ -4,11 +4,6 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider, PTextPagination,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
 
 import { getPageStart, getThisPage } from '@cloudforet/core-lib/component-util/pagination';
@@ -19,6 +14,11 @@ import {
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { Sort } from '@cloudforet/core-lib/space-connector/type';
+import {
+    PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider, PTextPagination,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import { i18n } from '@/translations';
 

@@ -4,10 +4,11 @@ import Vue, {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PButton, PHeading, PI, PIconButton, PTextButton,
-} from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';

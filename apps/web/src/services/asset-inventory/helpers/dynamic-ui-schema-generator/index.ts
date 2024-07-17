@@ -1,7 +1,7 @@
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserConfigCreateParameters } from '@/schema/config/user-config/api-verbs/create';
@@ -13,6 +13,7 @@ import type { SchemaModel } from '@/schema/identity/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { ACCOUNT_STATE_COLOR } from '@/services/asset-inventory/constants/service-account-constant';
 import { getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
 import type { GetSchemaParams, ResourceType, QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
@@ -99,3 +100,10 @@ export const getServiceAccountTableSchema = async ({
 
     return schemaData;
 };
+
+const colorBindFactory = (colorMapping, textFnc) => (value) => ({
+    text: textFnc(value),
+    ...colorMapping[value],
+});
+
+export const stateFormatter = colorBindFactory(ACCOUNT_STATE_COLOR, (value) => value.toLowerCase());

@@ -6,7 +6,8 @@ export interface Icon {
 }
 // Field Value Options
 export interface IconValue {
-    icon: Icon; color: string
+    icon: Icon;
+    color: string;
 }
 
 export type ComparisonFormat = 'all'|'percent'|'fixed';

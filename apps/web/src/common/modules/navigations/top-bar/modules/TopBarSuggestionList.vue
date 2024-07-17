@@ -5,7 +5,7 @@ import {
 
 import {
     PContextMenu, PI, PTooltip, PTextHighlighting, PLazyImg, PIconButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

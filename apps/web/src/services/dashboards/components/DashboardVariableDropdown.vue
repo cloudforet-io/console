@@ -4,25 +4,31 @@ import {
 } from 'vue';
 
 import {
-    PSelectDropdown,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type {
-    AutocompleteHandler,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import {
     cloneDeep, flattenDeep,
 } from 'lodash';
 
-import type { DashboardVariableSchemaProperty, DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
+import {
+    PSelectDropdown, PStatus,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type {
+    AutocompleteHandler,
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
+import type { DashboardVariableSchemaProperty, DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ReferenceMap } from '@/store/reference/type';
 
 import { VariableModelFactory } from '@/lib/variable-models';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 
 interface Props {
     dashboardVariables?: DashboardVariables;
@@ -41,7 +47,12 @@ const props = withDefaults(defineProps<Props>(), {
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetters = userWorkspaceStore.getters;
 
+const storeState = reactive({
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+});
 const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any|null,
@@ -152,7 +163,27 @@ watch([() => props.property, () => props.dashboardVariables], async ([property])
                            :show-delete-all-button="false"
                            :page-size="10"
                            @update:selected="handleSelectOption"
-        />
+        >
+            <template v-if="props.propertyName === 'workspace'"
+                      #menu-item--format="{item}"
+            >
+                <div class="menu-item-wrapper"
+                     :class="{'is-dormant': getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant}"
+                >
+                    <div class="label">
+                        <workspace-logo-icon :text="item?.label || ''"
+                                             :theme="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.tags?.theme"
+                                             size="xs"
+                        />
+                        <span class="label-text">{{ item.label }}</span>
+                        <p-status v-if="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant"
+                                  v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                                  class="capitalize state"
+                        />
+                    </div>
+                </div>
+            </template>
+        </p-select-dropdown>
     </div>
 </template>
 
@@ -168,6 +199,26 @@ watch([() => props.property, () => props.dashboardVariables], async ([property])
             min-width: 7rem;
             width: max-content;
             max-width: 22.5rem;
+        }
+    }
+    .menu-item-wrapper {
+        @apply flex justify-between;
+        max-width: 18rem;
+
+        .label {
+            @apply flex items-center gap-2;
+        }
+        .state {
+            @apply text-label-sm;
+        }
+        .label-text {
+            @apply truncate;
+            max-width: 8.375rem;
+        }
+        &.is-dormant {
+            .label-text {
+                max-width: 4.125rem;
+            }
         }
     }
 }

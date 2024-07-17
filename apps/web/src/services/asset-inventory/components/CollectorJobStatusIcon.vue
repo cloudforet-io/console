@@ -64,7 +64,7 @@
 <script setup lang="ts">
 import type { LocaleMessage } from 'vue-i18n';
 
-import { PTooltip, PI } from '@spaceone/design-system';
+import { PTooltip, PI } from '@cloudforet/mirinae';
 
 
 import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';

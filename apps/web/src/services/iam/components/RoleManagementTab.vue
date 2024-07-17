@@ -5,9 +5,8 @@ import {
 
 import {
     PEmpty, PTab, PDataTable,
-} from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
+} from '@cloudforet/mirinae';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';

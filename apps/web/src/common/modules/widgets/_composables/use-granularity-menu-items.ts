@@ -3,8 +3,9 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { get } from 'lodash';
+
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 
@@ -80,11 +81,11 @@ export const useGranularityMenuItem = (props: WidgetFieldComponentProps<WidgetFi
             if (state.isDateSeparated) {
                 const dateRemovedLabelsMenuItem = originLabelsMenuItem.filter((item) => item.name !== DATE_FIELD.DATE);
                 if (state.granularity === 'MONTHLY') {
-                    return dateRemovedLabelsMenuItem.filter((item) => item.name !== DATE_FIELD.DAY);
+                    return dateRemovedLabelsMenuItem.filter((item) => item.name !== DATE_FIELD.DAY && item.name !== DATE_FIELD.YEAR);
                 } if (state.granularity === 'YEARLY') {
                     return dateRemovedLabelsMenuItem.filter((item) => item.name !== DATE_FIELD.DAY && item.name !== DATE_FIELD.MONTH);
                 }
-                return dateRemovedLabelsMenuItem;
+                return dateRemovedLabelsMenuItem.filter((item) => item.name !== DATE_FIELD.MONTH && item.name !== DATE_FIELD.YEAR);
             }
             return originLabelsMenuItem;
         }),

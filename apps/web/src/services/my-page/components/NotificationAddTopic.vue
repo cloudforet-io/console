@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PRadio, PCheckbox } from '@spaceone/design-system';
+import { PRadio, PCheckbox } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

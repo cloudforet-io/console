@@ -5,8 +5,8 @@ import {
 
 import {
     PLabel, PI, PFieldGroup, PTextInput,
-} from '@spaceone/design-system';
-import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
+} from '@cloudforet/mirinae';
+import type { InputItem } from '@cloudforet/mirinae/types/inputs/input/text-input/type';
 
 import { i18n } from '@/translations';
 

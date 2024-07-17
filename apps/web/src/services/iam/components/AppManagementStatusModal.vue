@@ -3,11 +3,11 @@ import {
     computed, reactive,
 } from 'vue';
 
-import {
-    PButtonModal, PDefinitionTable, PStatus,
-} from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
+import {
+    PButtonModal, PDefinitionTable, PStatus,
+} from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { AppModel } from '@/schema/identity/app/model';

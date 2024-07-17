@@ -2,13 +2,13 @@
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    PSelectDropdown, PBadge, PEmpty, PButton, PTextHighlighting,
-} from '@spaceone/design-system';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSelectDropdown, PBadge, PEmpty, PButton, PTextHighlighting, PStatus,
+} from '@cloudforet/mirinae';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
@@ -21,6 +21,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import type { WorkspaceDropdownMenuItem, NoticeFormType } from '@/services/info/types/notice-type';
+import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 interface Props {
@@ -68,10 +70,11 @@ const fetchListWorkspaces = async (inputText: string) => {
         const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
             query: workspaceListApiQueryHelper.data,
         });
-        state.menuItems = (results ?? []).map((role) => ({
-            label: role.name,
-            name: role.workspace_id,
-            tags: role.tags,
+        state.menuItems = (results ?? []).map((workspace) => ({
+            label: workspace.name,
+            name: workspace.workspace_id,
+            tags: workspace.tags,
+            is_dormant: workspace.is_dormant,
         }));
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -136,6 +139,10 @@ const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
                                      :text="item.label"
                                      :term="state.searchText"
                 />
+                <p-status v-if="item?.is_dormant"
+                          v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                          class="capitalize state"
+                />
             </div>
         </template>
         <template #no-data-area>
@@ -175,6 +182,9 @@ const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
     .menu-item-wrapper {
         @apply flex items-center;
         gap: 0.25rem;
+        .state {
+            @apply text-label-sm;
+        }
     }
     .selected-workspace-wrapper {
         @apply flex items-center;

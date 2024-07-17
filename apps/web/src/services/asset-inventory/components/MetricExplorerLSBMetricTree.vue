@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
 
-import { PTreeView, PI, PTextHighlighting } from '@spaceone/design-system';
-import type { TreeDisplayMap, TreeNode } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
+import { PTreeView, PI, PTextHighlighting } from '@cloudforet/mirinae';
+import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';

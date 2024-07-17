@@ -5,10 +5,11 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute } from 'vue-router/composables';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PButton, PHeading,
-} from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import type {

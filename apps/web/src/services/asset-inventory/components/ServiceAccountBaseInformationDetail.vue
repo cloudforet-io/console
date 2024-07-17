@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { PDynamicLayout } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+
+import { PDynamicLayout, PStatus } from '@cloudforet/mirinae';
 
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import { store } from '@/store';
@@ -11,6 +12,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
+import { stateFormatter } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import type { ItemLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
@@ -70,6 +72,11 @@ watch(() => serviceAccountPageState.selectedProvider, async (provider) => {
         >
             <template #data-created_at="item">
                 {{ dayjs(item.data).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+            </template>
+            <template #data-state="{value}">
+                <p-status v-bind="stateFormatter(value)"
+                          class="capitalize"
+                />
             </template>
         </p-dynamic-layout>
     </div>

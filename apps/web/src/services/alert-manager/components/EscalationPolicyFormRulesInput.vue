@@ -3,14 +3,14 @@ import {
     reactive, watch,
 } from 'vue';
 
-import {
-    PLink, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio, PFieldGroup,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PLink, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio, PFieldGroup,
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';

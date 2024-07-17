@@ -22,7 +22,7 @@ export default defineComponent({
 import { defineComponent, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PSpinner } from '@spaceone/design-system';
+import { PSpinner } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

@@ -6,13 +6,13 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 import { useRoute } from 'vue-router/composables';
 
-import {
-    PDivider, PI, PEmpty, PPaneLayout, PLazyImg, PDataLoader,
-} from '@spaceone/design-system';
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PDivider, PI, PEmpty, PPaneLayout, PLazyImg, PDataLoader,
+} from '@cloudforet/mirinae';
+import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { Tags } from '@/schema/_common/model';

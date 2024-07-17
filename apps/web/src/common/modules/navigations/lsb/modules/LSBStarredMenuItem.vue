@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PI } from '@spaceone/design-system';
+import { PI } from '@cloudforet/mirinae';
 
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem } from '@/common/modules/navigations/lsb/type';

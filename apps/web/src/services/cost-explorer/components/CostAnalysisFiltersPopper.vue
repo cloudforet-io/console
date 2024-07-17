@@ -3,13 +3,17 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PSelectDropdown, PTextButton,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import {
+    PSelectDropdown, PTextButton, PStatus,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { VariableModelFactory } from '@/lib/variable-models';
 import type {
@@ -26,16 +30,20 @@ import {
 } from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import CostAnalysisFiltersAddMoreButton
     from '@/services/cost-explorer/components/CostAnalysisFiltersAddMoreButton.vue';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
-
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetters = userWorkspaceStore.getters;
 
 interface VariableOption {
     key: ManagedVariableModelKey;
@@ -60,6 +68,9 @@ const props = defineProps<{
     visible: boolean;
 }>();
 
+const storeState = reactive({
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+});
 const state = reactive({
     loading: true,
     enabledFilters: computed<SelectDropdownMenuItem[]>(() => {
@@ -200,7 +211,27 @@ watch(() => props.visible, (visible) => {
             :show-delete-all-button="false"
             :page-size="10"
             @update:selected="handleUpdateFiltersDropdown(groupBy.name, $event)"
-        />
+        >
+            <template v-if="groupBy.name === GROUP_BY.WORKSPACE"
+                      #menu-item--format="{item}"
+            >
+                <div class="menu-item-wrapper"
+                     :class="{'is-dormant': getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant}"
+                >
+                    <div class="label">
+                        <workspace-logo-icon :text="item?.label || ''"
+                                             :theme="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.tags?.theme"
+                                             size="xs"
+                        />
+                        <span class="label-text">{{ item.label }}</span>
+                        <p-status v-if="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant"
+                                  v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                                  class="capitalize state"
+                        />
+                    </div>
+                </div>
+            </template>
+        </p-select-dropdown>
         <cost-analysis-filters-add-more-button @disable-filter="handleDisabledFilters(false, $event)"
                                                @disable-all-filters="handleDisabledFilters(true, $event)"
         />
@@ -227,6 +258,27 @@ watch(() => props.visible, (visible) => {
         display: inline-block;
         vertical-align: middle;
         padding: 0.5rem 0;
+    }
+
+    .menu-item-wrapper {
+        @apply flex justify-between;
+        max-width: 18rem;
+
+        .label {
+            @apply flex items-center gap-2;
+        }
+        .state {
+            @apply text-label-sm;
+        }
+        .label-text {
+            @apply truncate;
+            max-width: 8.375rem;
+        }
+        &.is-dormant {
+            .label-text {
+                max-width: 4.125rem;
+            }
+        }
     }
 }
 

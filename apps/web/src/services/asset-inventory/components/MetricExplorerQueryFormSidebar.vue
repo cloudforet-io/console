@@ -3,11 +3,11 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PTextInput, PTextEditor, PButton, POverlayLayout,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { MetricCreateParameters } from '@/schema/inventory/metric/api-verbs/create';
@@ -175,7 +175,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                           style-type="primary"
                           size="lg"
                           :title="state.sidebarTitle"
-                          @update:visible="handleClose"
+                          @close="handleClose"
         >
             <div class="sidebar-contents">
                 <p-field-group v-if="metricExplorerPageState.metricQueryFormMode === 'CREATE'"

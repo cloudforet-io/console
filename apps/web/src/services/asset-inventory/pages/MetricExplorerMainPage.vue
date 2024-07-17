@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router/composables';
 
 import {
     PDivider, PHeading, PPaneLayout, PButton, PCard, PI, PLazyImg, PBadge,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import MetricImgAlert from '@/assets/images/metric/img_alert.png';
 import MetricImgHowToUse from '@/assets/images/metric/img_how-to-use.png';

@@ -2,10 +2,6 @@
 import { computed, reactive, watch } from 'vue';
 import type { Location } from 'vue-router';
 
-import {
-    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PCollapsibleToggle,
-} from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
@@ -16,6 +12,10 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PCollapsibleToggle,
+} from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 

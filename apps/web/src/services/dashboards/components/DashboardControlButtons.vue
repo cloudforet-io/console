@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PButton } from '@spaceone/design-system';
+import { PButton } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 
@@ -42,9 +42,10 @@ const handleClickWidgetReorder = () => {
         <p-button :icon-left="store.state.display.visibleSidebar ? 'ic_check' : 'ic_edit'"
                   :style-type="store.state.display.visibleSidebar ? 'substitutive' : 'tertiary'"
                   size="sm"
+                  :disabled="store.state.display.visibleSidebar"
                   @click="handleClickWidgetReorder"
         >
-            {{ store.state.display.visibleSidebar ? $t('DASHBOARDS.DETAIL.DONE_EDITING') : $t('DASHBOARDS.DETAIL.EDIT_LAYOUT') }}
+            {{ $t('DASHBOARDS.DETAIL.EDIT_LAYOUT') }}
         </p-button>
     </div>
 </template>

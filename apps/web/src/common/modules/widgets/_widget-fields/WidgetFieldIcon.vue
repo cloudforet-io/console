@@ -3,7 +3,7 @@ import { onMounted, reactive, watch } from 'vue';
 
 import {
     PFieldTitle, PSelectDropdown, PToggleButton, PI, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -32,12 +32,14 @@ const DEFAULT_COLOR:string = gray[900];
 
 const state = reactive({
     proxyValue: useProxyValue<IconValue|undefined>('value', props, emit),
-    isEnable: !!props.value,
+    toggleValue: !!props.widgetFieldSchema?.options?.toggle ?? false,
     visibleMenu: false,
     selectedIcon: DEFAULT_ICON as Icon,
     iconList: [
         { name: 'ic_circle-filled', label: 'Circle' },
         { name: 'ic_coin-filled', label: 'Coin' },
+        { name: 'ic_yen-filled', label: 'Yen' },
+        { name: 'ic_won-filled', label: 'Won' },
         { name: 'ic_lock-filled', label: 'Lock' },
         { name: 'ic_spanner-filled', label: 'Spanner' },
         { name: 'ic_home-filled', label: 'Home' },
@@ -69,7 +71,7 @@ const state = reactive({
 });
 
 const handleUpdateValue = (value: boolean) => {
-    state.isEnable = value;
+    state.toggleValue = value;
     if (!value) {
         state.proxyValue = undefined;
     } else {
@@ -109,7 +111,7 @@ const handleUpdateColor = (color: string) => {
 };
 
 const checkValue = ():boolean => {
-    if (state.isEnable) {
+    if (state.toggleValue) {
         return !!(state.proxyValue?.color && state.iconList.find((icon) => icon.name === state.proxyValue?.icon?.name));
     }
     return true;
@@ -132,7 +134,7 @@ const initValue = () => {
 };
 
 onMounted(() => {
-    if (!state.isEnable) state.proxyValue = undefined;
+    if (!state.toggleValue) state.proxyValue = undefined;
     else {
         initValue();
     }
@@ -144,11 +146,11 @@ onMounted(() => {
     <div class="widget-field-icon">
         <div class="field-header">
             <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ICON') }}</p-field-title>
-            <p-toggle-button :value="state.isEnable"
+            <p-toggle-button :value="state.toggleValue"
                              @update:value="handleUpdateValue"
             />
         </div>
-        <div v-if="state.isEnable"
+        <div v-if="state.toggleValue"
              class="contents"
         >
             <p-select-dropdown class="w-full"

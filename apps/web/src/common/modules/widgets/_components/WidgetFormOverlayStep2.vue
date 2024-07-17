@@ -3,14 +3,16 @@ import {
     computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
+import { cloneDeep, isEqual } from 'lodash';
+
 import {
     PDivider, PSelectButton, PButton,
-} from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import type {
     DashboardOptions, DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
+import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
@@ -42,14 +44,17 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+
+const emit = defineEmits<{(event: 'watch-options-changed', value: boolean): void;}>();
+
 const state = reactive({
     mounted: false,
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     selectedWidgetType: widgetGenerateState.widget?.widget_type as WidgetType,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
-        { label: 'Full', name: 'FULL' },
-        { label: 'Actual', name: 'ACTUAL' },
+        { label: i18n.t('COMMON.WIDGETS.FULL'), name: 'FULL' },
+        { label: i18n.t('COMMON.WIDGETS.ACTUAL'), name: 'ACTUAL' },
     ],
     selectedWidgetSize: 'ACTUAL',
     widgetSize: computed(() => {
@@ -68,6 +73,7 @@ const state = reactive({
         const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widgetGenerateState.widget?.widget_type;
         const _isNameChanged = widgetGenerateState.title !== widgetGenerateState.widget?.name;
         const _isDescriptionChanged = widgetGenerateState.description !== widgetGenerateState.widget?.description;
+        emit('watch-options-changed', _isOptionsChanged || _isTypeChanged || _isNameChanged || _isDescriptionChanged);
         return _isOptionsChanged || _isTypeChanged || _isNameChanged || _isDescriptionChanged;
     }),
     disableApplyButton: computed<boolean>(() => {
@@ -121,11 +127,11 @@ const isWidgetOptionsChanged = (
     let _isChanged = false;
     Object.entries(widgetForm).forEach(([k, v]) => {
         if (_isChanged) return;
-        if (typeof v === 'object') {
+        if (typeof v === 'object' && !Array.isArray(v)) {
             _isChanged = isWidgetOptionsChanged(_isChanged, v, widgetOptions?.[k]);
             return;
         }
-        _isChanged = widgetOptions?.[k] !== v;
+        _isChanged = !isEqual(widgetOptions?.[k], v);
     });
     return _isChanged;
 };
@@ -160,6 +166,9 @@ const handleUpdateWidgetOptions = async () => {
 const handleMountWidgetComponent = () => {
     state.mounted = true;
 };
+const handleEditWidget = () => {
+    widgetGenerateStore.setOverlayType('EDIT');
+};
 
 /* Watcher */
 watch(() => widgetGenerateState.widget?.size, (widgetSize) => {
@@ -188,7 +197,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="sidebar-contents">
+    <div class="sidebar-contents"
+         :class="{ 'expand': widgetGenerateState.overlayType === 'EXPAND' }"
+    >
         <div class="left-part">
             <div class="dashboard-settings-wrapper">
                 <div class="toolbox-wrapper">
@@ -197,6 +208,14 @@ onUnmounted(() => {
                                class="divider"
                     />
                     <dashboard-variables-v2 disable-save-button />
+                    <p-button v-if="widgetGenerateState.overlayType === 'EXPAND'"
+                              style-type="tertiary"
+                              icon-left="ic_edit"
+                              class="edit-button"
+                              @click="handleEditWidget"
+                    >
+                        {{ $t('COMMON.WIDGETS.EDIT_WIDGET') }}
+                    </p-button>
                 </div>
                 <div v-if="widgetGenerateState.overlayType !== 'EXPAND'"
                      class="widget-size-wrapper"
@@ -210,21 +229,6 @@ onUnmounted(() => {
                     >
                         {{ widgetSize.label }}
                     </p-select-button>
-                    <p-divider vertical
-                               class="divider"
-                    />
-                    <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
-                              style-type="substitutive"
-                              icon-left="ic_refresh"
-                              class="apply-button"
-                              :disabled="state.disableApplyButton"
-                              @click="handleUpdateWidgetOptions"
-                    >
-                        {{ $t('COMMON.WIDGETS.APPLY') }}
-                        <div v-if="state.isWidgetFieldChanged"
-                             class="update-dot"
-                        />
-                    </p-button>
                 </div>
             </div>
             <div class="widget-wrapper"
@@ -254,6 +258,20 @@ onUnmounted(() => {
                                                :widget-validation-invalid="optionsInvalid"
                                                :widget-validation-invalid-text="optionsInvalidText"
         />
+        <portal to="apply-button">
+            <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
+                      style-type="substitutive"
+                      icon-left="ic_refresh"
+                      class="apply-button"
+                      :disabled="state.disableApplyButton"
+                      @click="handleUpdateWidgetOptions"
+            >
+                {{ $t('COMMON.WIDGETS.APPLY') }}
+                <div v-if="state.isWidgetFieldChanged"
+                     class="update-dot"
+                />
+            </p-button>
+        </portal>
     </div>
 </template>
 
@@ -286,6 +304,10 @@ onUnmounted(() => {
                     @apply relative flex items-center flex-wrap;
                     gap: 0.5rem;
                 }
+                .edit-button {
+                    position: absolute;
+                    right: 4.5rem;
+                }
             }
             .widget-size-wrapper {
                 display: flex;
@@ -310,16 +332,22 @@ onUnmounted(() => {
                 }
             }
         }
-        .apply-button {
-            position: relative;
-            .update-dot {
-                @apply absolute bg-blue-500 rounded-full border-2 border-white;
-                width: 0.75rem;
-                height: 0.75rem;
-                right: -0.375rem;
-                top: -0.375rem;
-            }
+    }
+    &.expand {
+        .left-part {
+            @apply border-none;
+            padding: 1.5rem 0;
         }
+    }
+}
+.apply-button {
+    position: relative;
+    .update-dot {
+        @apply absolute bg-blue-500 rounded-full border-2 border-white;
+        width: 0.75rem;
+        height: 0.75rem;
+        right: -0.375rem;
+        top: -0.375rem;
     }
 }
 </style>

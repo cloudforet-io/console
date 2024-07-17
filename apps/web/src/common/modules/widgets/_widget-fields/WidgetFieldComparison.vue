@@ -3,18 +3,24 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
-import {
-    PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PDivider,
-} from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
+
+import {
+    PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PDivider, PI, PTooltip,
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { isDateField, isIncludingDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type { ComparisonOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
-import type { ComparisonFormat, ComparisonValue, TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    ComparisonFormat,
+    ComparisonValue, GroupByValue,
+    TableDataFieldValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const emit = defineEmits<WidgetFieldComponentEmit<ComparisonValue[]|undefined>>();
@@ -28,8 +34,21 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptio
 });
 
 const state = reactive({
-    toggleValue: !!props.value,
+    toggleValue: !!props.widgetFieldSchema.options?.toggle || !!props.value || false,
     proxyValue: useProxyValue<ComparisonValue[]|undefined>('value', props, emit),
+    disabled: computed(() => { // NOTE: EXCEPTION FOR ONLY TABLE WIDGET
+        const tableDataField = props.allValueMap.tableDataField as TableDataFieldValue;
+        if (!tableDataField) return false;
+        const groupByField = props.allValueMap.groupBy as GroupByValue;
+        return !Array.isArray(tableDataField?.value) && isDateField(tableDataField?.value)
+            || Array.isArray(tableDataField?.value) && isIncludingDateField(tableDataField?.value)
+            || Array.isArray(groupByField?.value) && isIncludingDateField(groupByField.value);
+    }),
+    infoText: computed(() => {
+        const tableDataField = props.allValueMap.tableDataField as TableDataFieldValue;
+        if (tableDataField) return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
+        return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP');
+    }),
     // compareWith: computed(() => {
     //     const granularity = props.widgetFieldSchema.options?.granularity ?? GRANULARITY.DAILY;
     //     if (granularity === GRANULARITY.MONTHLY) return i18n.t('COMMON.WIDGETS.COMPARISON.PREVIOUS_MONTH');
@@ -93,9 +112,14 @@ const checkValue = ():boolean => {
     return true;
 };
 
-watch([() => state.proxyValue, () => state.toggleValue], () => {
+watch(() => state.proxyValue, () => {
     emit('update:is-valid', checkValue());
 }, { immediate: true });
+
+watch(() => props.value, (changed) => {
+    if (changed === undefined) state.toggleValue = false;
+    emit('update:is-valid', checkValue());
+});
 
 const initValue = () => {
     if (props.value !== undefined) {
@@ -106,15 +130,6 @@ const initValue = () => {
         state.proxyValue = undefined;
     }
 };
-
-watch(() => props.allValueMap, (after, before) => {
-    const afterTableField = after.tableDataField as TableDataFieldValue;
-    const beforeTableField = before.tableDataField as TableDataFieldValue;
-    if (afterTableField && afterTableField.fieldType !== beforeTableField?.fieldType) {
-        state.toggleValue = false;
-        state.proxyValue = undefined;
-    }
-});
 
 onMounted(() => {
     if (!state.toggleValue) state.proxyValue = undefined;
@@ -128,9 +143,18 @@ onMounted(() => {
 <template>
     <div class="widget-field-total">
         <div class="field-header">
-            <p-field-title>{{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}</p-field-title>
+            <p-field-title>
+                {{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}
+                <p-tooltip :contents="state.infoText">
+                    <p-i name="ic_info-circle"
+                         width="0.875rem"
+                         height="0.875rem"
+                    />
+                </p-tooltip>
+            </p-field-title>
             <p-toggle-button :value="state.toggleValue"
-                             @update:value="handleUpdateToggle"
+                             :disabled="state.disabled"
+                             @change-toggle="handleUpdateToggle"
             />
         </div>
         <div v-if="state.toggleValue"

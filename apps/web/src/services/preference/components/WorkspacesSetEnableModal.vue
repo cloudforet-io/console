@@ -1,23 +1,22 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
-import {
-    PButtonModal, PDataTable, PStatus,
-} from '@spaceone/design-system';
-
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { iso8601Formatter } from '@cloudforet/utils';
+import {
+    PButtonModal, PStatus,
+} from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
-import { WORKSPACE_STATE, WORKSPACE_TABLE_FIELDS } from '@/services/preference/constants/workspace-constant';
+import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
 
 type WorkspaceStateType = typeof WORKSPACE_STATE[keyof typeof WORKSPACE_STATE];
@@ -36,6 +35,8 @@ const emit = defineEmits<{(e: ':update:visible'): void,
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetters = userWorkspaceStore.getters;
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -46,10 +47,17 @@ const state = reactive({
         }
         return i18n.t('IAM.WORKSPACES.DISABLE_WORKSPACE');
     }),
+    headerDescription: computed(() => {
+        if (props.enableModalType === WORKSPACE_STATE.ENABLE) {
+            return i18n.t('IAM.WORKSPACES.ENABLE_WORKSPACE_DESC');
+        }
+        return i18n.t('IAM.WORKSPACES.DISABLE_WORKSPACE_DESC');
+    }),
 });
 
 const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageStore.selectedWorkspaces[0]),
 });
 
 const handleConfirm = async () => {
@@ -57,11 +65,11 @@ const handleConfirm = async () => {
     try {
         if (props.enableModalType === WORKSPACE_STATE.ENABLE) {
             await SpaceConnector.clientV2.identity.workspace.enable({
-                workspace_id: workspacePageStore.selectedWorkspaces[0]?.workspace_id ?? '',
+                workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
             });
         } else {
             await SpaceConnector.clientV2.identity.workspace.disable({
-                workspace_id: workspacePageStore.selectedWorkspaces[0]?.workspace_id ?? '',
+                workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
             });
         }
         state.proxyVisible = false;
@@ -82,7 +90,7 @@ const handleClose = () => {
 <template>
     <p-button-modal class="workspaces-set-enable-modal"
                     :header-title="state.headerTitle"
-                    size="md"
+                    size="sm"
                     :fade="true"
                     :backdrop="true"
                     :visible.sync="state.proxyVisible"
@@ -93,24 +101,78 @@ const handleClose = () => {
                     @cancel="handleClose"
     >
         <template #body>
-            <p-data-table class="role-data-table"
-                          :items="workspacePageStore.selectedWorkspaces"
-                          :fields="WORKSPACE_TABLE_FIELDS"
-                          :loading="state.loading"
-                          :table-custom-style="{ maxHeight: 'calc(100vh - 17.5rem)' }"
-            >
-                <template #col-state-format="{value}">
-                    <p-status v-bind="userStateFormatter(value)"
-                              class="capitalize"
+            <div>
+                <p class="header-description">
+                    {{ state.headerDescription }}
+                </p>
+                <div class="content">
+                    <workspace-logo-icon :text="storeState.selectedWorkspace?.name || ''"
+                                         :theme="storeState.selectedWorkspace?.tags?.theme"
+                                         size="sm"
                     />
-                </template>
-                <template #col-created_at-format="{value}">
-                    {{ iso8601Formatter(value, storeState.timezone) }}
-                </template>
-            </p-data-table>
+                    <div class="content-info">
+                        <p class="title-wrapper">
+                            <span class="title">{{ storeState.selectedWorkspace?.name || '' }}</span>
+                            <p-status v-bind="workspaceStateFormatter(storeState.selectedWorkspace?.is_dormant ? WORKSPACE_STATE.DORMANT : storeState.selectedWorkspace?.state)"
+                                      class="capitalize status"
+                                      :class="{[storeState.selectedWorkspace?.is_dormant ? 'dormant' : storeState.selectedWorkspace?.state.toLowerCase()]: true}"
+                            />
+                        </p>
+                        <p v-if="storeState.selectedWorkspace?.tags?.description"
+                           class="desc"
+                        >
+                            {{ storeState.selectedWorkspace?.tags?.description }}
+                        </p>
+                    </div>
+                </div>
+            </div>
         </template>
         <template #confirm-button>
             {{ enableModalType === WORKSPACE_STATE.ENABLE ? $t('IAM.WORKSPACES.ENABLE') : $t('IAM.WORKSPACES.DISABLE') }}
         </template>
     </p-button-modal>
 </template>
+
+<style lang="postcss" scoped>
+.workspaces-set-enable-modal {
+    .header-description {
+        @apply text-paragraph-lg;
+        padding-bottom: 1rem;
+    }
+    .content {
+        @apply flex items-center bg-gray-100;
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        gap: 0.75rem;
+        .content-info {
+            @apply flex flex-col;
+            gap: 0.125rem;
+            .title-wrapper {
+                @apply flex items-center;
+                gap: 0.5rem;
+                .title {
+                    @apply font-bold;
+                }
+                .status {
+                    @apply flex items-center border text-label-md;
+                    padding-right: 0.5rem;
+                    padding-left: 0.5rem;
+                    border-radius: 6.25rem;
+                    &.enabled {
+                        @apply border-green-400;
+                    }
+                    &.disabled {
+                        @apply border-gray-300;
+                    }
+                    &.dormant {
+                        @apply border-coral-300;
+                    }
+                }
+            }
+            .desc {
+                @apply text-label-md text-gray-600;
+            }
+        }
+    }
+}
+</style>

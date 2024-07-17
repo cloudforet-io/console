@@ -5,7 +5,7 @@ import {
 
 import {
     PI, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
 import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';
@@ -14,11 +14,13 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const dataTableContentsRef = ref<HTMLElement|null>(null);
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
+    selectedDataTable: computed(() => widgetGenerateGetters.selectedDataTable),
 });
 
 const displayState = reactive({
@@ -122,6 +124,16 @@ onMounted(async () => {
                                                      :item="dataTable"
                         />
                         <widget-form-data-source-popover />
+                        <div v-if="!storeState.dataTables.length"
+                             class="empty-data-table-guide"
+                        >
+                            <p class="title">
+                                {{ $t('COMMON.WIDGETS.DATA_TABLE.EMPTY_TITLE') }}
+                            </p>
+                            <p class="description">
+                                {{ $t('COMMON.WIDGETS.DATA_TABLE.EMPTY_DESC') }}
+                            </p>
+                        </div>
                     </div>
                 </div>
                 <div class="gradation-bottom-area" />
@@ -172,6 +184,7 @@ onMounted(async () => {
             //margin-bottom: 1.125rem;
             overflow: hidden;
             .data-table-scroll-wrapper {
+                @apply relative;
                 height: 100%;
                 width: 100%;
                 overflow: auto;
@@ -180,6 +193,23 @@ onMounted(async () => {
                     padding: 1.25rem;
                     height: auto;
                     width: auto;
+
+                    .empty-data-table-guide {
+                        @apply flex flex-col items-center justify-center absolute;
+                        left: calc(50% - 15.375rem);
+                        top: calc(50% - 2.25rem);
+                        width: 30.75rem;
+                        height: 4.5rem;
+                        gap: 0.5rem;
+                        .title {
+                            @apply text-display-sm text-gray-700;
+                        }
+                        .description {
+                            @apply text-label-md text-gray-700;
+                            white-space: pre;
+                            text-align: center;
+                        }
+                    }
                 }
             }
 

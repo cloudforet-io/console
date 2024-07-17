@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { PI, PTextButton, PDivider } from '@spaceone/design-system';
 import { isEqual } from 'lodash';
+
+import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
 import type { DashboardVariableSchemaProperty, DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
 

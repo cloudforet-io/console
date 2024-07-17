@@ -6,7 +6,7 @@ import {
 
 import {
     PButton, PPopover, PIconButton, screens,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 
 import type { JobModel } from '@/schema/inventory/job/model';

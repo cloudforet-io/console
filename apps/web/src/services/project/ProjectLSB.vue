@@ -3,10 +3,11 @@ import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 
+import { find } from 'lodash';
+
 import {
     PTextInput, PTextHighlighting, PEmpty, PBadge,
-} from '@spaceone/design-system';
-import { find } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';

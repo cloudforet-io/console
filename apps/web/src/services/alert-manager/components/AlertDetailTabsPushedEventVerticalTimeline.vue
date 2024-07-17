@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { PCollapsiblePanel } from '@spaceone/design-system';
-
+import { PCollapsiblePanel } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 const props = defineProps<{

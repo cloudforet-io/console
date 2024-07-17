@@ -5,9 +5,9 @@ import {
 
 import {
     PI, PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton,
-} from '@spaceone/design-system';
-import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
@@ -121,10 +121,12 @@ const handleToggleWidth = () => {
                                 <span>--</span>
                             </template>
                         </div>
-                        <div class="metadata-item-row">
+                        <div v-if="props.description"
+                             class="metadata-item-row"
+                        >
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.DESCRIPTION') }}</span>
                             <div class="description">
-                                {{ props.description || '--' }}
+                                {{ props.description }}
                             </div>
                         </div>
                     </div>
@@ -135,12 +137,13 @@ const handleToggleWidth = () => {
              class="action-button-wrapper"
              :class="{ 'selected': state.etcMenuVisible }"
         >
-            <p-select-dropdown style-type="icon-button"
+            <p-select-dropdown style-type="tertiary-icon-button"
                                button-icon="ic_ellipsis-horizontal"
                                class="etc-button"
                                :menu="state.etcMenuItems"
                                :selected="[]"
                                :visible-menu.sync="state.etcMenuVisible"
+                               size="sm"
                                menu-position="right"
                                reset-selection-on-menu-close
                                @select="handleSelectEtcMenu"
@@ -205,7 +208,6 @@ const handleToggleWidth = () => {
             >
                 <p-icon-button style-type="tertiary"
                                :name="state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all'"
-                               size="sm"
                                shape="square"
                                class="width-toggle-button"
                                @click="handleToggleWidth"
@@ -321,9 +323,6 @@ const handleToggleWidth = () => {
         padding: 0.25rem;
         &.selected {
             display: block;
-        }
-        .etc-button {
-            @apply border border-gray-200 rounded-full;
         }
     }
 }

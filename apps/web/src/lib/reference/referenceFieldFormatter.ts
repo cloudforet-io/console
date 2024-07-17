@@ -1,4 +1,4 @@
-import type { DynamicFieldProps } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type';
+import type { DynamicFieldProps } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type';
 
 import { SpaceRouter } from '@/router';
 
@@ -42,6 +42,12 @@ const formatterMap: FormatterMap = {
     }),
     'identity.ServiceAccount': (data, reference) => ({
         data: allReferenceStore.getters.serviceAccount[data]?.label || data,
+        options: {
+            link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
+        },
+    }),
+    'identity.TrustedAccount': (data, reference) => ({
+        data: allReferenceStore.getters.trustedAccount[data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },

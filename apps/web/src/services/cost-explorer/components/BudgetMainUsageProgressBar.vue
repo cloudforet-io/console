@@ -10,7 +10,7 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import { PProgressBar } from '@spaceone/design-system';
+import { PProgressBar } from '@cloudforet/mirinae';
 
 import { indigo, red, yellow } from '@/styles/colors';
 

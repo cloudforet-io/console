@@ -1,16 +1,15 @@
 <script setup lang="ts">
-
 import {
     computed, reactive, watch,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PTextarea, PTextInput,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { WorkspaceCreateParameters } from '@/schema/identity/workspace/api-verbs/create';
 import type { WorkspaceUpdateParameters } from '@/schema/identity/workspace/api-verbs/update';
@@ -21,13 +20,13 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { WORKSPACE_LOGO_ICON_THEMES } from '@/common/modules/navigations/top-bar/constants/constant';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
-
 
 interface Props {
     visible: boolean;
@@ -47,6 +46,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 const userWorkspaceStore = useUserWorkspaceStore();
+const bookmarkStore = useBookmarkStore();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -113,6 +113,9 @@ const handleConfirm = async () => {
                 },
             });
             showSuccessMessage(i18n.t('Workspace successfully created'), '');
+            await bookmarkStore.createDefaultBookmark({
+                workspaceId: response.workspace_id,
+            });
             emit('confirm', {
                 id: response.workspace_id,
                 name: response.name,

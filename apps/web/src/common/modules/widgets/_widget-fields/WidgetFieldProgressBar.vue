@@ -3,11 +3,12 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PFieldGroup, PTextInput, PToggleButton, PSelectDropdown, PButton, PIconButton,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -130,8 +131,9 @@ const initValue = () => {
     }
 };
 
-watch(() => state.isAllValid, (value) => {
-    emit('update:is-valid', value);
+watch([() => state.isAllValid, () => state.proxyValue], ([isAllValid, value]) => {
+    if (value === undefined) state.toggleValue = false;
+    emit('update:is-valid', isAllValid);
 }, { immediate: true });
 
 onMounted(() => {

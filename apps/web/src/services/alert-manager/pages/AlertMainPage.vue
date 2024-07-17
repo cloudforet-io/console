@@ -4,9 +4,9 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PHeading } from '@spaceone/design-system';
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { PHeading } from '@cloudforet/mirinae';
+
 
 import { i18n } from '@/translations';
 

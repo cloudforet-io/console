@@ -6,11 +6,12 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import {
     cloneDeep, debounce, union, merge,
 } from 'lodash';
+
+import { PButton, PContextMenu, useContextMenuController } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { DashboardVariableSchemaProperty, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 

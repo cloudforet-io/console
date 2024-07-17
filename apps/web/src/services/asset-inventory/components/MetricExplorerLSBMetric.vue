@@ -4,11 +4,12 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { isEmpty } from 'lodash';
+
 import {
     PDataLoader, PIconButton, PLazyImg, PSearch, PEmpty, PTooltip,
-} from '@spaceone/design-system';
-import type { TreeDisplayMap, TreeNode } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
-import { isEmpty } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

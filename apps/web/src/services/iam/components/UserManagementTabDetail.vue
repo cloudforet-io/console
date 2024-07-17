@@ -3,13 +3,13 @@ import {
     computed, reactive,
 } from 'vue';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PButton,
     PDefinitionTable, PHeading, PI, PStatus,
-} from '@spaceone/design-system';
-import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
-import { cloneDeep } from 'lodash';
-
+} from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';

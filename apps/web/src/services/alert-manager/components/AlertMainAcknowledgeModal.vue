@@ -3,7 +3,7 @@ import {
     reactive, watch,
 } from 'vue';
 
-import { PButtonModal, PCheckbox } from '@spaceone/design-system';
+import { PButtonModal, PCheckbox } from '@cloudforet/mirinae';
 
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';

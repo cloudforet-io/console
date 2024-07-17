@@ -4,7 +4,7 @@ import {
     computed, reactive, ref,
 } from 'vue';
 
-import { PIconButton } from '@spaceone/design-system';
+import { PIconButton } from '@cloudforet/mirinae';
 
 import AssetSummaryProviderItem from '@/services/workspace-home/components/AssetSummaryProviderItem.vue';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';

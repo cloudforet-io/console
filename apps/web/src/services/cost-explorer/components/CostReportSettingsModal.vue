@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PButtonModal, PFieldGroup, PSelectDropdown, PBadge, PTextInput, PCheckbox, PI,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 import { map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PButtonModal, PFieldGroup, PSelectDropdown, PBadge, PTextInput, PCheckbox, PI,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { CostReportConfigUpdateParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/update';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';

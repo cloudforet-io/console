@@ -5,12 +5,13 @@ import Vue, {
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
+import { clone, sortBy } from 'lodash';
+
 import {
     PSelectDropdown, PTooltip, PI, PButton, PDivider, PTextHighlighting, PEmpty,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
-import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
-import { clone, sortBy } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
@@ -148,7 +149,7 @@ const checkFavoriteItem = (id: string) => {
     return !!item;
 };
 const menuHandler = async (inputText: string) => {
-    const _workspaceList = storeState.workspaceList.filter((w) => w.name.toLowerCase()?.includes(inputText.toLowerCase()));
+    const _workspaceList = storeState.workspaceList.filter((w) => w.name.toLowerCase()?.includes(inputText.toLowerCase()) && !w.is_dormant);
     return {
         results: inputText ? formatMenuItems(_workspaceList) : [
             ...filterStarredItems(storeState.favoriteItems),

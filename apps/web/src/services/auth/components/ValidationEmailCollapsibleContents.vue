@@ -37,10 +37,10 @@
 
 import { computed, reactive } from 'vue';
 
-import { PTextButton, PDataLoader } from '@spaceone/design-system';
-
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PTextButton, PDataLoader } from '@cloudforet/mirinae';
+
+
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

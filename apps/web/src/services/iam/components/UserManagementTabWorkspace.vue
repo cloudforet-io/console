@@ -3,17 +3,16 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton,
-    PDataTable, PHeading, PI, PSelectDropdown, PTooltip,
-} from '@spaceone/design-system';
+    PDataTable, PHeading, PLink, PSelectDropdown, PStatus, PTooltip,
+} from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -26,7 +25,7 @@ import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel, WorkspaceState } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -37,6 +36,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserManagementRemoveModal from '@/services/iam/components/UserManagementRemoveModal.vue';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 interface WorkspaceItem {
@@ -52,6 +53,8 @@ interface TableItem {
     workspace: WorkspaceItem;
     role_binding: RoleBindingItem;
     created_at: string;
+    is_dormant: boolean;
+    state?: WorkspaceState
 }
 interface Props {
     activeTab: string;
@@ -79,6 +82,7 @@ const state = reactive({
 const tableState = reactive({
     fields: computed(() => [
         { name: 'workspace', label: i18n.t('IAM.USER.MAIN.WORKSPACE') as string },
+        { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE') as string },
         { name: 'role_binding', label: i18n.t('IAM.USER.MAIN.ROLE') as string, sortable: false },
         { name: 'created_at', label: i18n.t('IAM.USER.MAIN.INVITED') as string, sortable: false },
         { name: 'remove_button', label: ' ', sortable: false },
@@ -137,18 +141,26 @@ const fetchWorkspaceList = async () => {
             state.items = [];
             return;
         }
-        state.items = (results ?? []).map((k) => ({
-            workspace: {
-                name: workspaceResults?.find((w) => w.workspace_id === k.workspace_id)?.name || '',
-                id: k.workspace_id,
-            },
-            role_binding: {
-                type: k.role_type,
-                name: userPageState.roles.find((r) => r.role_id === k.role_id)?.name || '',
-                role_binding_id: k.role_binding_id,
-            },
-            created_at: k.created_at,
-        }));
+        const _results: TableItem[] = [];
+        (results ?? []).forEach((k) => {
+            const workspaceInfo = workspaceResults?.find((w) => w.workspace_id === k.workspace_id);
+            if (!workspaceInfo || workspaceInfo?.state === WORKSPACE_STATE.DISABLE) return;
+            _results.push({
+                workspace: {
+                    name: workspaceInfo?.name || '',
+                    id: k.workspace_id,
+                },
+                role_binding: {
+                    type: k.role_type,
+                    name: userPageState.roles.find((r) => r.role_id === k.role_id)?.name || '',
+                    role_binding_id: k.role_binding_id,
+                },
+                created_at: k.created_at,
+                state: workspaceInfo?.state || undefined,
+                is_dormant: workspaceInfo?.is_dormant || false,
+            });
+        });
+        state.items = _results;
     } catch (e) {
         state.items = [];
     } finally {
@@ -243,19 +255,20 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                       sortable
                       @changeSort="handleChangeSort"
         >
-            <template #col-workspace-format="{value}">
+            <template #col-workspace-format="{value, item}">
                 <span class="workspace-id-wrapper">
-                    <router-link :to="{ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: value.id } }"
-                                 target="_blank"
-                    >
-                        <span>{{ value.name }}</span>
-                        <p-i name="ic_arrow-right-up"
-                             width="0.75rem"
-                             height="0.75rem"
-                             class="icon-link"
-                        />
-                    </router-link>
+                    <p-link :to="{ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: value.id } }"
+                            new-tab
+                            :disabled="item.is_dormant"
+                            :text="value.name"
+                            action-icon="internal-link"
+                    />
                 </span>
+            </template>
+            <template #col-state-format="{value, item}">
+                <p-status v-bind="workspaceStateFormatter(item.is_dormant ? WORKSPACE_STATE.DORMANT : value)"
+                          class="capitalize"
+                />
             </template>
             <template #col-role_binding-format="{value, rowIndex}">
                 <span class="role-type">

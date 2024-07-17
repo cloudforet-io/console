@@ -1,8 +1,8 @@
-import { getTextHighlightRegex } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { getTextHighlightRegex } from '@cloudforet/mirinae';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type {

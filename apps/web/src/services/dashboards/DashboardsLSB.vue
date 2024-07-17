@@ -6,7 +6,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PIconButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
@@ -179,7 +179,7 @@ const state = reactive({
             { type: MENU_ITEM_TYPE.DIVIDER },
             {
                 type: MENU_ITEM_TYPE.TOP_TITLE,
-                label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'),
+                label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARD'),
             },
         ];
 
@@ -263,7 +263,8 @@ callApiWithGrantGuard();
         <template v-if="storeState.isWorkspaceOwner"
                   #slot-shared
         >
-            <l-s-b-collapsible-menu-item class="category-menu-item mt-1"
+            <l-s-b-collapsible-menu-item v-if="state.sharedSubItem.length"
+                                         class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
                                              label: $t('DASHBOARDS.LNB.SHARED'),
@@ -281,7 +282,8 @@ callApiWithGrantGuard();
             </l-s-b-collapsible-menu-item>
         </template>
         <template #slot-private>
-            <l-s-b-collapsible-menu-item class="category-menu-item mt-1"
+            <l-s-b-collapsible-menu-item v-if="state.privateSubItem.length"
+                                         class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
                                              label: $t('DASHBOARDS.LNB.PRIVATE'),
@@ -299,7 +301,8 @@ callApiWithGrantGuard();
             </l-s-b-collapsible-menu-item>
         </template>
         <template #slot-deprecated>
-            <l-s-b-collapsible-menu-item class="category-menu-item mt-1"
+            <l-s-b-collapsible-menu-item v-if="state.deprecatedSubItem.length"
+                                         class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
                                              label: $t('DASHBOARDS.LNB.DEPRECATED'),

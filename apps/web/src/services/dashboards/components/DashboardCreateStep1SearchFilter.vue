@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import {
     PFieldTitle, PCheckboxGroup, PCheckbox, PLazyImg, PSelectDropdown,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginItem } from '@/store/reference/plugin-reference-store';

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { PButtonModal, PRadio, PRadioGroup } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButtonModal, PRadio, PRadioGroup } from '@cloudforet/mirinae';
+
 
 import type { ProjectGroupChangeParentGroupParameters } from '@/schema/identity/project-group/api-verbs/change-parent-group';
 import type { ProjectChangeProjectGroupParameters } from '@/schema/identity/project/api-verbs/change-project-group';

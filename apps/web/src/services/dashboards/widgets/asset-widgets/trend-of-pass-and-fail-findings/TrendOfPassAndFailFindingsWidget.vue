@@ -3,7 +3,6 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
 
-import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
@@ -11,6 +10,7 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader } from '@cloudforet/mirinae';
 
 import { ASSET_DATA_FIELD_MAP, WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';

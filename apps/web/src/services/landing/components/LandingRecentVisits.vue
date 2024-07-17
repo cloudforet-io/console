@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PFieldTitle } from '@spaceone/design-system';
+import { PFieldTitle } from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
@@ -25,7 +25,7 @@ const state = reactive({
     recentBoardSets: computed<WorkspaceBoardSet[]>(() => {
         const orderList: WorkspaceBoardSet[] = [];
         props.recentVisits?.forEach((recentItem) => {
-            const matchingObj = props.workspaceList.find((workspaceItem) => workspaceItem.workspace_id === recentItem.itemId);
+            const matchingObj = props.workspaceList.find((workspaceItem) => !workspaceItem.is_dormant && workspaceItem.workspace_id === recentItem.itemId);
             if (matchingObj) {
                 orderList.push({
                     ...matchingObj,

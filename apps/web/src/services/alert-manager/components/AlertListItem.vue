@@ -3,11 +3,12 @@ import {
     computed, reactive,
 } from 'vue';
 
+import dayjs from 'dayjs';
+
 import {
     PI, PBadge, PLink,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import dayjs from 'dayjs';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';

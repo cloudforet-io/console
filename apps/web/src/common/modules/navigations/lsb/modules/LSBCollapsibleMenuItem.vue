@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 
-import { PI, PLazyImg } from '@spaceone/design-system';
+import { PI, PLazyImg } from '@cloudforet/mirinae';
 
 import type { LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
 
@@ -66,6 +66,7 @@ watch(() => props.overrideCollapsed, (changedCollapsed) => {
 <style scoped lang="postcss">
 .l-s-b-collapsible-menu-item {
     @apply flex flex-col text-label-md;
+    width: 100%;
     overflow: hidden;
     .collapsible-title {
         @apply flex items-center font-bold;

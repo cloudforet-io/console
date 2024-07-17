@@ -4,13 +4,13 @@ import {
     reactive, watch, watchEffect,
 } from 'vue';
 
-import {
-    PCard, PI, PDatePagination,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PCard, PI, PDatePagination,
+} from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

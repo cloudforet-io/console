@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router/composables';
 
 import {
     PHeading, PDivider, PEmpty, PButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

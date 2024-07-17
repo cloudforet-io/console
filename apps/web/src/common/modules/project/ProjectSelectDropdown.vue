@@ -3,8 +3,8 @@ import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PCheckbox, PI, PRadio, PSelectDropdown, PTree, PBadge,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { SpaceRouter } from '@/router';
 
@@ -280,6 +280,7 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                 <p-badge v-if="props.projectGroupSelectOptions && state.selectedItems.some((d) => d.name === props.projectGroupSelectOptions.currentProjectGroupId)"
                          badge-type="subtle"
                          style-type="gray200"
+                         class="current-badge"
                 >
                     {{ $t('COMMON.PROJECT_SELECT_DROPDOWN.CURRENT') }}
                 </p-badge>
@@ -350,6 +351,9 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
 
 <style lang="postcss" scoped>
 .project-select-dropdown {
+    .current-badge {
+        white-space: nowrap;
+    }
     .button-wrapper {
         padding: 0.5rem;
 

@@ -3,7 +3,7 @@ import { watch } from 'vue';
 
 import {
     PPaneLayout, PHeading, PFieldGroup, PTextInput,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
+import { xor } from 'lodash';
+
 import {
     PSelectButton,
-} from '@spaceone/design-system';
-import { xor } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 

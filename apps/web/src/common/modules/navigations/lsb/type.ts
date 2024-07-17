@@ -1,7 +1,7 @@
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 
 import type { MenuId } from '@/lib/menu/config';
@@ -27,7 +27,7 @@ export interface SelectOptions {
 }
 
 export type LSBIcon = string | { name: string; color?: string; };
-export type hightlightTagType = 'new' | 'beta' | 'update';
+export type highlightTagType = 'new' | 'beta' | 'update';
 
 export interface LSBItem {
     type: MenuItemType;
@@ -35,7 +35,7 @@ export interface LSBItem {
     id?: MenuId | string; // It can be change MenuId or etc.
     foldable?: boolean;
     to?: Location;
-    highlightTag?: hightlightTagType;
+    highlightTag?: highlightTagType;
     hideFavorite?: boolean;
     favoriteOptions?: FavoriteOptions;
     icon?: LSBIcon;

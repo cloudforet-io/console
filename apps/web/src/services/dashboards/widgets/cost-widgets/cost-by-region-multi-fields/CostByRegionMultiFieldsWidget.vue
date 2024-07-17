@@ -6,13 +6,13 @@ import { useRouter } from 'vue-router/composables';
 
 import type { Circle } from '@amcharts/amcharts5';
 import { Template } from '@amcharts/amcharts5';
-import { PDataLoader } from '@spaceone/design-system';
 import { uniqBy } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader } from '@cloudforet/mirinae';
 
 import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 

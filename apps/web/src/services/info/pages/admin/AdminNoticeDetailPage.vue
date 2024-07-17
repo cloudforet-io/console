@@ -4,9 +4,9 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PButton, PHeading } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButton, PHeading } from '@cloudforet/mirinae';
+
 
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { PostSendParameters } from '@/schema/board/post/api-verbs/send';

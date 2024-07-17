@@ -3,10 +3,10 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PButtonModal, PDefinitionTable, PLink } from '@spaceone/design-system';
-
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButtonModal, PDefinitionTable, PLink } from '@cloudforet/mirinae';
+
+
 
 import type { CostReportSendParameters } from '@/schema/cost-analysis/cost-report/api-verbs/send';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';

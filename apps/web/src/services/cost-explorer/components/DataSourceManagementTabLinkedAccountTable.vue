@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PToolboxTable, PBadge, PSelectDropdown, PI, PTooltip, PSelectStatus,
-} from '@spaceone/design-system';
-import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
-import type {
-    AutocompleteHandler, SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { isObject } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PToolboxTable, PBadge, PSelectDropdown, PI, PTooltip, PSelectStatus, PStatus,
+} from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type {
+    AutocompleteHandler, SelectDropdownMenuItem,
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostDataSourceAccountModel } from '@/schema/cost-analysis/data-source-account/model';
@@ -36,6 +37,8 @@ import {
 } from '@/services/cost-explorer/composables/data-source-handler';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
+import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
@@ -137,6 +140,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
         const refinedMenuItems = (results ?? []).map((i) => ({
             label: i.name,
             name: i.workspace_id,
+            is_dormant: i.is_dormant,
         }));
         const totalCount = pageStart - 1 + Number(pageLimit);
         const slicedResults = refinedMenuItems?.slice(pageStart - 1, totalCount);
@@ -241,10 +245,15 @@ watch(() => tableState.selectedFilter, (selectedFilter) => {
                                              size="xs"
                         />
                         <span>{{ item.label }}</span>
-                        <span class="state"
-                              :class="[getWorkspaceInfo(item.name)?.state.toLowerCase()]"
+                        <span v-if="getWorkspaceInfo(item.name)?.tags?.description"
+                              class="description"
+                        >
+                            - {{ getWorkspaceInfo(item.name)?.tags?.description }}
+                        </span>
+                        <p-status v-if="item?.is_dormant"
+                                  v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                                  class="capitalize state"
                         />
-                        <span class="description">{{ getWorkspaceInfo(item.name)?.tags?.description }}</span>
                     </div>
                 </template>
             </p-select-dropdown>
@@ -313,15 +322,7 @@ watch(() => tableState.selectedFilter, (selectedFilter) => {
             @apply flex items-center;
             gap: 0.375rem;
             .state {
-                @apply rounded-full;
-                width: 0.5rem;
-                height: 0.5rem;
-                &.enabled {
-                    @apply bg-green-600;
-                }
-                &.disabled {
-                    @apply bg-gray-300;
-                }
+                @apply text-label-sm;
             }
             .description {
                 @apply text-label-md text-gray-500;

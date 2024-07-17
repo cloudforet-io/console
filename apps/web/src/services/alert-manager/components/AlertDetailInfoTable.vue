@@ -3,12 +3,11 @@ import {
     computed, reactive,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PPaneLayout, PDefinitionTable, PLink, PBadge,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { AlertSeverity } from '@/schema/monitoring/alert/type';

@@ -12,7 +12,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import { PBadge } from '@spaceone/design-system';
+import { PBadge } from '@cloudforet/mirinae';
 
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { AccountType } from '@/schema/identity/service-account/type';

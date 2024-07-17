@@ -4,16 +4,16 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
-} from '@spaceone/design-system';
-import type {
-    HandlerResponse, KeyDataType, KeyItem, KeyItemSet, ValueHandler, ValueMenuItem,
-} from '@spaceone/design-system/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import {
+    PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
+} from '@cloudforet/mirinae';
+import type {
+    HandlerResponse, KeyDataType, KeyItem, KeyItemSet, ValueHandler, ValueMenuItem,
+} from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+
 
 import { SpaceRouter } from '@/router';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';

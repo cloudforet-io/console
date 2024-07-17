@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PButton, POverlayLayout,
-} from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PButton, PButtonModal, POverlayLayout, PTextButton,
+} from '@cloudforet/mirinae';
+
 
 import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
@@ -31,7 +31,7 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const state = reactive({
     sidebarTitle: computed(() => {
-        if (widgetGenerateState.overlayType === 'EXPAND') return i18n.t('COMMON.WIDGETS.EXPAND_WIDGET');
+        if (widgetGenerateState.overlayType === 'EXPAND') return undefined;
         let _title = i18n.t('COMMON.WIDGETS.ADD_WIDGET');
         if (widgetGenerateState.overlayType === 'EDIT') {
             _title = i18n.t('COMMON.WIDGETS.EDIT_WIDGET');
@@ -52,6 +52,23 @@ const state = reactive({
             return widgetGenerateGetters.isAllWidgetFormValid;
         }
         return false;
+    }),
+    warningModalVisible: false,
+    warningModalTitle: computed(() => {
+        if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_TITLE');
+        if (widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged) return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_TITLE');
+        return '';
+    }),
+    warningModalDescription: computed(() => {
+        if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_DESC');
+        if (widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged) return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_DESC');
+        return '';
+    }),
+    isWidgetOptionsChanged: false,
+    guideLink: computed(() => {
+        const locale = i18n.locale;
+        if (locale === 'en') return 'https://cloudforet.io/docs/guides/dashboards';
+        return `https://cloudforet.io/${i18n.locale}/docs/guides/dashboards`;
     }),
 });
 
@@ -87,41 +104,84 @@ const handleClickContinue = async () => {
         widgetGenerateStore.setOverlayStep(2);
         return;
     }
+    if (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged) {
+        state.warningModalVisible = true;
+        return;
+    }
     widgetGenerateStore.setShowOverlay(false);
 };
-const handleUpdateVisible = (value: boolean) => {
+const handleCloseOverlay = (value: boolean) => {
+    if (!value && (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged)) {
+        state.warningModalVisible = true;
+        return;
+    }
     widgetGenerateStore.setShowOverlay(value);
 };
+const handleCloseWarningModal = () => {
+    state.warningModalVisible = false;
+};
+const handleConfirmWarningModal = async () => {
+    state.warningModalVisible = false;
+    if (widgetGenerateState.widget?.state === 'CREATING') await deleteWidget(widgetGenerateState.widgetId);
+    widgetGenerateStore.reset();
+    widgetGenerateStore.setShowOverlay(false);
+};
+const handleWatchOptionsChanged = (isChanged: boolean) => {
+    state.isWidgetOptionsChanged = isChanged;
+};
+const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.code === 'Escape' && widgetGenerateState.overlayType === 'EXPAND') {
+        widgetGenerateStore.setShowOverlay(false);
+    }
+};
+const handleClickGuideLink = () => { window.open(state.guideLink, '_blank'); };
+
 
 /* Watcher */
 watch(() => widgetGenerateState.showOverlay, async (val) => {
-    if (!val) {
-        if (widgetGenerateState.widget?.state === 'CREATING') {
-            await deleteWidget(widgetGenerateState.widgetId);
-        } else {
-            widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
-        }
+    if (!val && widgetGenerateState.widget?.state !== 'CREATING') {
+        widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
         widgetGenerateStore.reset();
-    } else if (widgetGenerateState.overlayType !== 'ADD') {
+    } else if (val && widgetGenerateState.overlayType !== 'ADD') {
         await widgetGenerateStore.listDataTable();
     }
+});
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeyDown);
 });
 </script>
 
 <template>
     <div>
         <p-overlay-layout :visible="widgetGenerateState.showOverlay"
-                          style-type="primary"
+                          :style-type="widgetGenerateState.overlayType === 'EXPAND' ? 'secondary' : 'primary'"
                           size="full"
                           :title="state.sidebarTitle"
-                          @update:visible="handleUpdateVisible"
+                          :hide-header="widgetGenerateState.overlayType === 'EXPAND'"
+                          @close="handleCloseOverlay"
         >
+            <template #title-right-extra>
+                <div v-if="widgetGenerateState.overlayType !== 'EDIT'"
+                     class="guide-button-wrapper"
+                >
+                    <p-text-button style-type="highlight"
+                                   icon-right="ic_external-link"
+                                   @click="handleClickGuideLink"
+                    >
+                        {{ $t('COMMON.WIDGETS.DATA_TABLE.GUIDE_LINK_TEXT') }}
+                    </p-text-button>
+                </div>
+            </template>
             <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
-            <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2" />
+            <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2"
+                                       @watch-options-changed="handleWatchOptionsChanged"
+            />
             <template v-if="widgetGenerateState.overlayType !== 'EXPAND'"
                       #footer
             >
                 <div class="footer-wrapper">
+                    <portal-target name="apply-button" />
                     <p-button :style-type="widgetGenerateState.overlayStep === 1 ? 'substitutive' : 'primary'"
                               :icon-right="widgetGenerateState.overlayStep === 1 ? 'ic_arrow-right' : undefined"
                               :disabled="!state.isAllValid"
@@ -132,6 +192,19 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
                 </div>
             </template>
         </p-overlay-layout>
+        <p-button-modal :header-title="state.warningModalTitle"
+                        :visible.sync="state.warningModalVisible"
+                        size="sm"
+                        :fade="true"
+                        :backdrop="true"
+                        theme-color="alert"
+                        @confirm="handleConfirmWarningModal"
+                        @cancel="handleCloseWarningModal"
+        >
+            <template #body>
+                <p>{{ state.warningModalDescription }}</p>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
@@ -143,5 +216,8 @@ watch(() => widgetGenerateState.showOverlay, async (val) => {
     justify-content: right;
     gap: 0.5rem;
     padding-right: 1.5rem;
+}
+.guide-button-wrapper {
+    padding-left: 0.5rem;
 }
 </style>

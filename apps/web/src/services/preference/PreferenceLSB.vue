@@ -7,6 +7,7 @@ import { clone } from 'lodash';
 import { MENU_ID } from '@/lib/menu/config.js';
 
 import BookmarkLSB from '@/services/preference/components/BookmarkLSB.vue';
+import DomainSettingsLSB from '@/services/preference/components/DomainSettingsLSB.vue';
 
 const route = useRoute();
 
@@ -22,5 +23,6 @@ const state = reactive({
 <template>
     <fragment>
         <bookmark-l-s-b v-if="state.menuId === MENU_ID.BOOKMARK" />
+        <domain-settings-l-s-b v-if="state.menuId === MENU_ID.DOMAIN_SETTINGS" />
     </fragment>
 </template>

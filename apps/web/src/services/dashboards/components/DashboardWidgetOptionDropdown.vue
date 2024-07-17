@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import {
-    getTextHighlightRegex,
-    PFieldGroup, PIconButton, PSelectDropdown, PToggleButton,
-} from '@spaceone/design-system';
-import type {
-    AutocompleteHandler,
-    SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep, get } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import {
+    getTextHighlightRegex,
+    PFieldGroup, PIconButton, PSelectDropdown, PToggleButton,
+} from '@cloudforet/mirinae';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 import type {

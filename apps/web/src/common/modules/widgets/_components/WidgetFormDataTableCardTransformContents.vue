@@ -7,7 +7,7 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
@@ -17,7 +17,9 @@ import WidgetFormDataTableCardHeaderTitle
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
 import WidgetFormDataTableCardTransformForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
-import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DATA_TABLE_TYPE,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
     DataTableAlertModalMode, QueryCondition, EvalFormula, TransformDataTableInfo,
@@ -256,8 +258,6 @@ const handleUpdateDataTable = async () => {
             return null;
         }));
     }
-
-    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
 };
 
 /* Utils */
@@ -311,7 +311,9 @@ onMounted(() => {
 <style lang="postcss" scoped>
 .widget-form-data-table-card-transform-contents {
     @apply border border-gray-200 rounded-lg w-full bg-white;
-    width: 24rem;
+    width: 25vw;
+    min-width: 21rem;
+    max-width: 24rem;
     padding-top: 0.125rem;
     margin-bottom: 2rem;
 
@@ -329,7 +331,7 @@ onMounted(() => {
 
     .card-header {
         @apply bg-gray-100 rounded-lg border border-gray-200;
-        width: 23.5rem;
+        width: calc(100% - 0.5rem);
         padding: 0.75rem;
         margin: auto;
     }

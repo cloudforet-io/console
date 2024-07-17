@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
-import type {
-    AutocompleteHandler, SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PFieldGroup, PSelectDropdown, PStatus } from '@cloudforet/mirinae';
+import type {
+    AutocompleteHandler, SelectDropdownMenuItem,
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
@@ -20,7 +21,11 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
+import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 
 
 const emit = defineEmits<{(e: 'update', target: string, isValid: boolean): void; }>();
@@ -73,7 +78,12 @@ const workspaceHandler: AutocompleteHandler = async (keyword: string) => {
             },
         });
         return {
-            results: results?.map((d) => ({ name: d.workspace_id, label: d.name })) ?? [],
+            results: results?.map((d) => ({
+                name: d.workspace_id,
+                label: d.name,
+                is_dormant: d.is_dormant,
+                tags: d.tags,
+            })) ?? [],
             totalCount: total_count ?? 0,
         };
     } catch (e) {
@@ -117,7 +127,25 @@ watch([() => selectedTargets.value, () => isAllValid.value], debounce(([targets,
                                use-fixed-menu-style
                                :page-size="10"
                                @update:selected="handleSelectWorkspace"
-            />
+            >
+                <template #menu-item--format="{item}">
+                    <div class="menu-item-wrapper"
+                         :class="{'is-dormant': item?.is_dormant}"
+                    >
+                        <div class="label">
+                            <workspace-logo-icon :text="item?.label || ''"
+                                                 :theme="item?.tags?.theme"
+                                                 size="xs"
+                            />
+                            <span class="label-text">{{ item.label }}</span>
+                            <p-status v-if="item?.is_dormant"
+                                      v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                                      class="capitalize state"
+                            />
+                        </div>
+                    </div>
+                </template>
+            </p-select-dropdown>
             <project-select-dropdown v-else
                                      :selected-project-ids="selectedTargets"
                                      :invalid="invalidState.selectedTargets"
@@ -133,6 +161,26 @@ watch([() => selectedTargets.value, () => isAllValid.value], debounce(([targets,
 <style lang="postcss" scoped>
 .budget-create-target-select {
     width: 30rem;
+    .menu-item-wrapper {
+        @apply flex justify-between;
+        max-width: 100%;
+
+        .label {
+            @apply flex items-center gap-2;
+        }
+        .state {
+            @apply text-label-sm;
+        }
+        .label-text {
+            @apply truncate;
+            max-width: 23.75rem;
+        }
+        &.is-dormant {
+            .label-text {
+                max-width: 18.75rem;
+            }
+        }
+    }
 }
 
 @screen mobile {

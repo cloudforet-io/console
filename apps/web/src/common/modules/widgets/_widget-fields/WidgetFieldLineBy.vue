@@ -3,9 +3,10 @@ import {
     computed, onMounted, reactive,
 } from 'vue';
 
-import { PFieldGroup, PToggleButton } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
+
+import { PFieldGroup, PToggleButton } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import WidgetFieldDropdownAndMax from '@/common/modules/widgets/_components/WidgetFieldDropdownAndMax.vue';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
@@ -122,7 +123,7 @@ onMounted(() => {
 
 .toggle-box {
     text-align: right;
-    width: calc(100% - 51px);
+    width: 100%;
 }
 
 </style>
