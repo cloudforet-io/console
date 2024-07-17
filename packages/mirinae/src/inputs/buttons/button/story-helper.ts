@@ -14,7 +14,7 @@ export const getButtonDefaultArgs = (): Args => ({
     iconLeft: undefined,
     iconRight: undefined,
     default: 'button',
-    handleClick: () => console.log('click'),
+    handleClick: "() => console.log('click')",
 });
 
 export const getButtonArgTypes = (): ArgTypes => ({
