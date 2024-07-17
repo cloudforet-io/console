@@ -16,7 +16,6 @@ import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { i18n, setI18nLocale } from '@/translations';
 
-import AlertResponder from '@/services/alert-manager/components/AlertDetailResponder.vue';
 import {
     ALERT_SEVERITY_COLORS,
     ALERT_SEVERITY_LABELS,
@@ -321,14 +320,6 @@ const calculateTime = (time) => {
                         </p-tab>
                     </div>
                 </div>
-                <div class="sub-contents-wrapper">
-                    <div class="sub-contents">
-                        <alert-responder :id="state.alertId"
-                                         class="responder"
-                                         :alert-data="state.alertData"
-                        />
-                    </div>
-                </div>
             </section>
         </div>
         <div class="view-footer" />
@@ -352,7 +343,7 @@ const calculateTime = (time) => {
             justify-content: center;
 
             .main-contents-wrapper {
-                @apply col-span-8;
+                @apply col-span-12;
                 .main-contents {
                     display: flex;
                     flex-direction: column;
