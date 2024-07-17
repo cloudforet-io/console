@@ -1,13 +1,20 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args } from '@storybook/vue';
 
 import { SIZE } from '@/inputs/buttons/copy-button/type';
+
+export const getCopyButtonDefaultArgs = (): Args => ({
+    value: 'Please, place any string to copy by button next to.',
+    size: SIZE.md,
+    autoHideIcon: false,
+    copyManually: false,
+    defaultSlot: 'Please, place any string to copy by button next to.',
+});
 
 export const getCopyButtonArgTypes = (): ArgTypes => ({
     value: {
         name: 'value',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Text to be copied',
-        defaultValue: 'Please, place any string to copy by button next to.',
         table: {
             type: {
                 summary: 'string',
@@ -17,15 +24,12 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
                 summary: 'null',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     size: {
         name: 'size',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Copy button size',
-        defaultValue: SIZE.md,
         table: {
             type: {
                 summary: 'string',
@@ -35,16 +39,13 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
                 summary: SIZE.md,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(SIZE),
-        },
+        control: 'select',
+        options: Object.values(SIZE),
     },
     autoHideIcon: {
         name: 'autoHideIcon',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to auto hide icon when there is not text to copy or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -54,15 +55,12 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     copyManually: {
         name: 'copyManually',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to copy manually by event or not. When it is `true`, this component just emit `copy` event, and do nothing.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -72,24 +70,19 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     // slots
     defaultSlot: {
         name: 'default',
         description: 'Slot for contents of copy button',
-        defaultValue: 'Please, place any string to copy by button next to.',
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     // events
     onCopy: {
