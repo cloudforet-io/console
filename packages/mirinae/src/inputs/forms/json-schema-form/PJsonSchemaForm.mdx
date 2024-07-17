@@ -1,0 +1,109 @@
+{/* PJsonSchemaForm.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PJsonSchemaFormStories from './PJsonSchemaForm.stories';
+
+<Meta of={PJsonSchemaFormStories} />
+
+
+
+# Json Schema Form
+
+It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-format](https://www.npmjs.com/package/ajv-formats).
+
+
+## Supported Types & Formats & Keyword
+
+
+### Types
+|Type|Validator|UI Component|
+|-|-|-|
+|string|ajv|[Text Input](?path=/docs/inputs-input--basic)|
+|number|ajv|[Text Input](?path=/docs/inputs-input--basic)|
+|integer|ajv|[Text Input](?path=/docs/inputs-input--basic)|
+|array|ajv|[Text Input](?path=/docs/inputs-input--basic) or [Filterable Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)(with enum keyword)|
+|boolean|ajv|[Toggle](?path=/docs/inputs-buttons-toggle-button--toggle-button-basic)|
+|object|self| Json Schema Form |
+
+### Formats
+**string type only**
+
+|Format|Validator|UI Component|
+|-|-|-|
+|password|ajv-format|[Text Input](?path=/docs/inputs-input--basic)|
+|generate_id|custom|GenerateIdFormat (Internal Component)|
+|pem_key|custom||
+
+### Keywords
+|Keywords|Validator|UI Component|Description|
+|-|-|-|-|
+|markdown|custom|[Markdown](?path=/docs/data-display-markdown--string-markdown)|-|
+|json|custom|[Text Editor](?path=/docs/inputs-text-editor--basic)|json input mode. works only with `object` type|
+|enum|custom|[Select Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|supports `string` type only|
+|items|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|supports `array` type only|
+|menuItems|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|supports `array` type only|
+|reference|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|It represents reference information. supports `{ resource_type: string, reference_key?: string}` type only|
+|order|custom|-|order of properties. string[]|
+|disabled|custom|all|If the input event of the form is disabled, it will still be reflected in the formData if there is a default value.|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Basic
+<Canvas of={PJsonSchemaFormStories.Basic} />
+
+<br/>
+<br/>
+
+## Language
+
+If it is a markdown case, translation is supported.
+<Canvas of={PJsonSchemaFormStories.Language} />
+
+<br/>
+<br/>
+
+
+## Reset on Schema Change
+<Canvas of={PJsonSchemaFormStories.ResetonSchemaChange} />
+
+<br/>
+<br/>
+
+## Validation Mode
+
+- all: It performs all validation from the beginning.
+- input: It performs validation after the user first input event.
+- none: It does not perform validation.
+<Canvas of={PJsonSchemaFormStories.ValidationMode} />
+
+<br/>
+<br/>
+
+## Json Input Mode
+<Canvas of={PJsonSchemaFormStories.JsonInputMode} />
+
+<br/>
+<br/>
+
+
+## Uniform Width
+<Canvas of={PJsonSchemaFormStories.UniformWidth} />
+
+## Playground
+<Canvas of={PJsonSchemaFormStories.Playground} />
+<Controls of={PJsonSchemaFormStories.Playground} />
+
+<br/>
+<br/>
