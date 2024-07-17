@@ -33,6 +33,9 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/inputs/datetime-picker/**/*.mdx',
     '../../../packages/mirinae/src/inputs/datetime-picker/**/*.stories.@(js|jsx|ts|tsx)',
 
+    '../../../packages/mirinae/src/inputs/dropdown/**/*.mdx',
+    '../../../packages/mirinae/src/inputs/dropdown/**/*.stories.@(js|jsx|ts|tsx)',
+
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
