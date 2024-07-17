@@ -1,4 +1,3 @@
-import type { SBType } from '@storybook/types';
 import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 export const getCheckboxArgs = (): Args => ({
@@ -24,7 +23,6 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
-        type: { name: 'array' } as SBType,
         description: 'Two way binding for `selected` props with `change` event.',
         table: {
             type: {
