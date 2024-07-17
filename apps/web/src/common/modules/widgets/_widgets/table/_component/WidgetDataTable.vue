@@ -45,7 +45,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
   (e: 'update:this-page', value: number): void;
-  (e: 'load'): Promise<void>;
+  (e: 'load'): void;
 }>();
 const allReferenceStore = useAllReferenceStore();
 
@@ -164,7 +164,7 @@ const handleClickSort = async (sortKey: string) => {
     }
     state.proxySortBy = resultSortBy;
     state.proxyThisPage = 1;
-    await emit('load');
+    emit('load');
 };
 const isSortable = (field: TableWidgetField) => {
     const isDynamicDataField = props.fieldType === 'dynamicField' && field.fieldInfo?.type === 'dataField' && field.name !== 'sub_total';
