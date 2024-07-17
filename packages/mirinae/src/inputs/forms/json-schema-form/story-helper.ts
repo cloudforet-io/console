@@ -1,15 +1,41 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { getDefaultFormData, getDefaultSchema } from '@/inputs/forms/json-schema-form/mock';
 import { VALIDATION_MODES } from '@/inputs/forms/json-schema-form/type';
 import { supportLanguages } from '@/translations';
 
+export const getJsonSchemaFormArgs = (): Args => ({
+    schema: getDefaultSchema(),
+    formData: getDefaultFormData(),
+    language: supportLanguages[0],
+    validationMode: VALIDATION_MODES[0],
+    resetOnSchemaChange: false,
+    customErrorMap: null,
+    referenceHandler: undefined,
+    useFixedMenuStyle: false,
+    uniformWidth: false,
+    labelExtraSlot: null,
+    dropdownExtraSlot: null,
+    inputExtraSlot: null,
+    onChange: null,
+    onValidate: null,
+    onUpdateFormData: null,
+});
+
+export const getJsonSchemaFormParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A180989',
+    },
+});
+
 export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     schema: {
         name: 'schema',
-        type: { name: 'object', required: true },
+        type: { name: 'object' } as SBType,
+        required: true,
         description: 'The json schema of form.',
-        defaultValue: getDefaultSchema(),
         table: {
             type: {
                 summary: 'object',
@@ -19,15 +45,13 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
                 summary: '{}',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     formData: {
         name: 'formData',
-        type: { name: 'object', required: true },
+        type: { name: 'object' } as SBType,
+        required: true,
         description: 'Input data of form. This is `sync` prop with `update:form-data` event.',
-        defaultValue: getDefaultFormData(),
         table: {
             type: {
                 summary: 'object',
@@ -37,14 +61,11 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
                 summary: '{}',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     language: {
         name: 'language',
-        type: { name: 'string' },
-        defaultValue: supportLanguages[0],
+        type: 'string',
         table: {
             type: {
                 summary: 'string',
@@ -58,13 +79,12 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     },
     validationMode: {
         name: 'validationMode',
-        type: { name: 'string' },
+        type: 'string',
         description: `Validation mode. ${VALIDATION_MODES} are available. <br/>
         \`input\`:  Show validation results only for fields where input occurred.  <br/>
         \`all\`:  Show the validation results of all fields.  <br/>
         \`none\`:  Do not show validation results.  <br/>
         `,
-        defaultValue: VALIDATION_MODES[0],
         table: {
             type: {
                 summary: 'string',
@@ -74,16 +94,13 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
                 summary: 'input',
             },
         },
-        control: {
-            type: 'select',
-            options: VALIDATION_MODES,
-        },
+        control: 'select',
+        options: VALIDATION_MODES,
     },
     resetOnSchemaChange: {
         name: 'resetOnSchemaChange',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to reset validation state and input occurred state when schema prop is changed.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -93,15 +110,12 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     customErrorMap: {
         name: 'customErrorMap',
-        type: { name: 'object' },
+        type: { name: 'object' } as SBType,
         description: 'Error map for custom error messages.',
-        defaultValue: null,
         table: {
             type: {
                 summary: 'object',
@@ -111,15 +125,12 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
                 summary: '{}',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     referenceHandler: {
         name: 'referenceHandler',
-        type: { name: 'function' },
+        type: { name: 'function' } as SBType,
         description: 'Handler that returns auto-completion menu according to input value.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -133,9 +144,8 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     },
     useFixedMenuStyle: {
         name: 'useFixedMenuStyle',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to use position fixed style on dropdown form\'s menu or not. ',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -145,15 +155,12 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     uniformWidth: {
         name: 'uniformWidth',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'It ensures that all input forms have the same width, creating a consistent and visually appealing layout.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -163,15 +170,12 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     // slots
     labelExtraSlot: {
         name: 'label-extra',
         description: 'Slot for add something into right area of label',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -181,14 +185,11 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     dropdownExtraSlot: {
         name: 'dropdown-extra',
         description: 'Slot for add something into right area of selected item of `PSelectDropdown` or `PFilterableDropdown`.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -198,14 +199,11 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     inputExtraSlot: {
         name: 'input-extra',
         description: 'Slot for add something into right area of input',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -215,9 +213,7 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     // events
     onChange: {
@@ -226,7 +222,6 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
         Event Parameters: <br/>
          - isValid: \`boolean\` <br/>
          - formData: \`object\``,
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -239,7 +234,6 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
         description: `Emitted after validation occurred. <br/>
         Event Parameters: <br/>
          - isValid: \`boolean\``,
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -252,7 +246,6 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
         description: `Emitted when form data is updated. <br/>
         Event Parameters: <br/>
          - formData: \`object\``,
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
