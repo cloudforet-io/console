@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import { map } from 'lodash';
 
 import {
-    PHeading, PPaneLayout, PFieldTitle, PButton, PSelectDropdown,
+    PPaneLayout, PFieldTitle, PButton, PSelectDropdown, PCopyButton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -19,11 +19,11 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 const domainConfigStore = useDomainSettingsStore();
 const domainConfigGetters = domainConfigStore.getters;
-
 const storeState = reactive({
+    domainId: computed<string>(() => store.state.domain.domainId),
+    domainName: computed<string>(() => store.state.domain.name),
     domainConfig: computed(() => store.state.domain.config),
 });
 const state = reactive({
@@ -36,12 +36,12 @@ const state = reactive({
     }),
     selectedTimezone: undefined as string | undefined,
     selectedLanguage: undefined as LanguageCode | undefined,
-    languageMenuList: map(languages, (d, k) => ({
+    languageMenuList: computed<SelectDropdownMenuItem[]>(() => map(languages, (d, k) => ({
         type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
-    })) as SelectDropdownMenuItem[],
-    timezoneMenuList: map(timezoneList, (d) => ({
+    }))),
+    timezoneMenuList: computed<SelectDropdownMenuItem[]>(() => map(timezoneList, (d) => ({
         type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
-    })) as SelectDropdownMenuItem[],
+    }))),
     config: computed(() => ({
         ...storeState.domainConfig,
         settings: {
@@ -77,26 +77,35 @@ watch(() => domainConfigGetters.language, (val) => {
 </script>
 
 <template>
-    <p-pane-layout>
-        <p-heading heading-type="sub"
-                   :title="$t('IAM.DOMAIN_SETTINGS.TIMEZONE_AND_LANGUAGE')"
-        />
+    <p-pane-layout class="admin-domain-settings-domain-information-page">
         <div class="content-wrapper">
             <div class="field-wrapper">
+                <p-field-title :label="$t('IAM.DOMAIN_SETTINGS.DOMAIN_ID')" />
+                <p class="input-wrapper">
+                    {{ storeState.domainId }}
+                    <p-copy-button :value="storeState.domainId" />
+                </p>
+            </div>
+            <div class="field-wrapper">
+                <p-field-title :label="$t('IAM.DOMAIN_SETTINGS.DOMAIN_NAME')" />
+                <p class="input-wrapper">
+                    {{ storeState.domainName }}
+                    <p-copy-button :value="storeState.domainName" />
+                </p>
+            </div>
+            <div class="field-wrapper dropdown">
                 <p-field-title :label="$t('IAM.DOMAIN_SETTINGS.TIMEZONE')" />
                 <p-select-dropdown :menu="state.timezoneMenuList"
                                    :selected.sync="state.selectedTimezone"
                                    :page-size="10"
-                                   show-delete-all-button
                                    is-filterable
                 />
             </div>
-            <div class="field-wrapper">
+            <div class="field-wrapper dropdown">
                 <p-field-title :label="$t('IAM.DOMAIN_SETTINGS.LANGUAGE')" />
                 <p-select-dropdown :menu="state.languageMenuList"
                                    :selected.sync="state.selectedLanguage"
                                    :page-size="10"
-                                   show-delete-all-button
                                    is-filterable
                 />
             </div>
@@ -111,19 +120,27 @@ watch(() => domainConfigGetters.language, (val) => {
 </template>
 
 <style lang="postcss" scoped>
-.content-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 28.75rem;
-    padding: 1rem;
-    .field-wrapper {
-        .p-field-title {
-            padding-bottom: 0.25rem;
+.admin-domain-settings-domain-information-page {
+    .content-wrapper {
+        @apply flex flex-col;
+        gap: 1.5rem;
+        padding: 1rem;
+        .field-wrapper {
+            .input-wrapper {
+                @apply flex items-center;
+                gap: 0.25rem;
+                padding-top: 0.25rem;
+            }
+            .p-field-title {
+                padding-bottom: 0.25rem;
+            }
+        }
+        .dropdown {
+            width: 15rem;
         }
     }
-}
-.save-button {
-    margin: 1.25rem 1rem;
+    .save-button {
+        margin: 0.5rem 1rem 3rem;
+    }
 }
 </style>

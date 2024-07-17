@@ -135,8 +135,12 @@ const getComparisonValueIcon = (item: TableDataItem, field: TableWidgetField): {
 const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
     if (field.fieldInfo?.type === 'labelField' || field.fieldInfo?.additionalType === 'comparison') return '';
     if (props.fieldType === 'staticField') {
-        const dataInfo = props.dataInfo?.[field.name || ''];
-        return `• Unit: ${dataInfo?.unit ?? '-'} \n• ${field.name}: ${numberFormatter(item[field.name])}`;
+        let _unit;
+        if (field.name === 'sub_total') {
+            const filteredFieldWithUnit = (props.dataField as string[])?.filter((_field) => props.dataInfo?.[_field]?.unit);
+            _unit = filteredFieldWithUnit.map((_field) => (props.dataInfo ?? {})[_field]?.unit).join(', ');
+        } else _unit = props.dataInfo?.[field.name || '']?.unit;
+        return `• Unit: ${_unit ?? '-'} \n• ${field.name}: ${numberFormatter(item[field.name])}`;
     }
     const dataInfo = props.dataInfo?.[props.criteria || ''];
     const dynamicData = item[props.criteria || ''] ?? [];
@@ -328,7 +332,7 @@ const isSortable = (field: TableWidgetField) => {
                 background-color: rgba(theme('colors.gray.200'), 0.7);
                 td {
                     &.sub-total {
-                        background-color: rgba(theme('colors.violet.200'), 0.7);
+                        background-color: rgba(theme('colors.violet.200'), 1);
                     }
                 }
             }

@@ -46,6 +46,12 @@ const formatterMap: FormatterMap = {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
+    'identity.TrustedAccount': (data, reference) => ({
+        data: allReferenceStore.getters.trustedAccount[data]?.label || data,
+        options: {
+            link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
+        },
+    }),
     'inventory.Region': (data) => ({
         data: allReferenceStore.getters.region[data]?.label || data,
     }),

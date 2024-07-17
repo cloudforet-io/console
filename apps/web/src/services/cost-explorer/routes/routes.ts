@@ -21,6 +21,12 @@ const BudgetMainPage = () => import('@/services/cost-explorer/pages/BudgetMainPa
 const BudgetCreatePage = () => import('@/services/cost-explorer/pages/BudgetCreatePage.vue');
 const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDetailPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
+// const AnomalyDetectionConfigurationPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionConfigurationPage.vue');
+// const AnomalyDetectionConfigurationCreatePage = () => import('@/services/cost-explorer/pages/AnomalyDetectionConfigurationCreatePage.vue');
+// const AnomalyDetectionConfigurationDetailPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionConfigurationDetailPage.vue');
+// const AnomalyDetectionPolicyPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionPolicyPage.vue');
+// const AnomalyDetectionHistoryPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionHistoryPage.vue');
+// const AnomalyDetectionHistoryDetailPage = () => import('@/services/cost-explorer/pages/AnomalyDetectionHistoryDetailPage.vue');
 
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
@@ -94,6 +100,90 @@ const costExplorerRoutes: RouteConfig = {
                 },
             ],
         },
+        // {
+        //     path: 'anomaly-detection',
+        //     name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION._NAME,
+        //     meta: {
+        //         menuId: MENU_ID.ANOMALY_DETECTION,
+        //         translationId: MENU_INFO_MAP[MENU_ID.ANOMALY_DETECTION].translationId,
+        //     },
+        //     redirect: () => ({
+        //         name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION._NAME,
+        //     }),
+        //     component: { template: '<router-view />' },
+        //     children: [
+        //         {
+        //             path: 'config',
+        //             name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION._NAME,
+        //             meta: {
+        //                 menuId: MENU_ID.ANOMALY_DETECTION_CONFIGURATION,
+        //                 translationId: 'BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.TITLE',
+        //             },
+        //             component: { template: '<router-view />' },
+        //             children: [
+        //                 {
+        //                     path: '/',
+        //                     name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION._NAME,
+        //                     meta: {
+        //                         lsbVisible: true,
+        //                         menuId: MENU_ID.ANOMALY_DETECTION_CONFIGURATION,
+        //                     },
+        //                     component: AnomalyDetectionConfigurationPage as any,
+        //                 },
+        //                 {
+        //                     path: 'create',
+        //                     name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.CREATE._NAME,
+        //                     meta: { translationId: 'BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.CREATE_TITLE' },
+        //                     component: AnomalyDetectionConfigurationCreatePage as any,
+        //                 },
+        //                 {
+        //                     path: ':configId',
+        //                     name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.DETAIL._NAME,
+        //                     props: true,
+        //                     meta: { label: ({ params }) => params.budgetId },
+        //                     component: AnomalyDetectionConfigurationDetailPage as any,
+        //                 },
+        //             ],
+        //         },
+        //         {
+        //             path: 'policy',
+        //             name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.POLICY._NAME,
+        //             meta: {
+        //                 lsbVisible: true,
+        //                 menuId: MENU_ID.ANOMALY_DETECTION_POLICY,
+        //                 translationId: 'BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.POLICY.TITLE',
+        //             },
+        //             component: AnomalyDetectionPolicyPage as any,
+        //         },
+        //         {
+        //             path: 'history',
+        //             name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY._NAME,
+        //             meta: {
+        //                 menuId: MENU_ID.ANOMALY_DETECTION_HISTORY,
+        //                 translationId: 'BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE',
+        //             },
+        //             component: { template: '<router-view />' },
+        //             children: [
+        //                 {
+        //                     path: '/',
+        //                     name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY._NAME,
+        //                     meta: {
+        //                         lsbVisible: true,
+        //                         menuId: MENU_ID.ANOMALY_DETECTION_HISTORY,
+        //                     },
+        //                     component: AnomalyDetectionHistoryPage as any,
+        //                 },
+        //                 {
+        //                     path: ':historyId',
+        //                     name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY.DETAIL._NAME,
+        //                     props: true,
+        //                     meta: { label: ({ params }) => params.historyId },
+        //                     component: AnomalyDetectionHistoryDetailPage as any,
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // },
         {
             path: 'budget',
             meta: {

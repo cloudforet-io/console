@@ -4,10 +4,11 @@ import { computed, reactive } from 'vue';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
+import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
-import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
@@ -22,11 +23,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
+const workspaceHomePageStore = useWorkspaceHomePageStore();
+const workspaceHomePageState = workspaceHomePageStore.state;
 
 const storeState = reactive({
-    isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
+    bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
+
+    isFileFullMode: computed<boolean>(() => workspaceHomePageState.isFileFullMode),
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    bookmarkType: computed<BookmarkType>(() => bookmarkState.bookmarkType),
 });
 </script>
 

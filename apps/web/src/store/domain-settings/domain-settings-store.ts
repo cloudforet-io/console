@@ -14,16 +14,7 @@ import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
-interface DomainSettingsData {
-    display_name?: string;
-    admin_email?: string;
-    timezone?: string;
-    language?: string;
-    wordtype_logo_url?: string;
-    symbol_favicon_url?: string;
-    login_page_image_url?: string;
-}
+import type { DomainSettingsData } from '@/services/preference/types/domain-settings-type';
 
 export const useDomainSettingsStore = defineStore('domain-config', () => {
     const state = reactive({

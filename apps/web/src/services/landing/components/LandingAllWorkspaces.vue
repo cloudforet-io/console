@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { sortBy } from 'lodash';
+import { partition, sortBy } from 'lodash';
 
 import {
     PFieldTitle, PButton,
@@ -34,11 +34,14 @@ const emit = defineEmits<{(e: 'create'): void}>();
 const state = reactive({
     isShowAll: false,
     workspaceBoardSets: computed<WorkspaceBoardSet[]>(() => {
-        const orderList = sortBy(props.workspaceList, (workspaceItem) => {
+        const favoriteOrderList = sortBy(props.workspaceList, (workspaceItem) => {
             const correspondingAItem = props.favoriteList?.find((favoriteItem) => favoriteItem?.itemId === workspaceItem.workspace_id);
             return correspondingAItem ? props.favoriteList?.indexOf(correspondingAItem) : Infinity;
         });
-        const slicedList = state.isShowAll ? orderList : orderList.slice(0, PAGE_SIZE);
+        const [active, dormant] = partition(favoriteOrderList, (item) => !item.is_dormant);
+
+        const orderedList = [...active, ...dormant];
+        const slicedList = state.isShowAll ? orderedList : orderedList.slice(0, PAGE_SIZE);
         return slicedList.map((d) => ({
             ...d,
             rounded: true,
@@ -75,6 +78,7 @@ const handleClickShowAll = () => {
         </div>
         <landing-workspace-board :board-sets="state.workspaceBoardSets"
                                  :board-type="BOARD_TYPE.ALL_WORKSPACE"
+                                 :is-domain-admin="props.isDomainAdmin"
         />
         <p-button v-if="props.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < props.workspaceList.length"
                   icon-right="ic_chevron-down"
