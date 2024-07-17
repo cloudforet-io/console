@@ -150,10 +150,10 @@ const state = reactive({
     fields: computed(() => {
         const fields = [
             { name: 'alert_number', label: 'No' },
-            { name: 'title', label: 'Title', width: '320px' },
+            { name: 'title', label: 'Title', width: '20rem' },
             { name: 'state', label: 'State' },
             { name: 'urgency', label: 'Urgency' },
-            { name: 'resource', label: 'Resource' },
+            { name: 'resource', label: 'Resource', width: '20rem' },
             { name: 'created_at', label: 'Created' },
             { name: 'duration', label: 'Duration', sortable: false },
             { name: 'assignee', label: 'Assigned to' },
@@ -367,7 +367,7 @@ initPage();
                                     params: { id: item.alert_id }
                                 }"
                         >
-                            {{ value }}
+                            <span class="title-link">{{ value }}</span>
                         </p-link>
                     </template>
                 </template>
@@ -446,6 +446,17 @@ initPage();
 <style lang="postcss" scoped>
 .alert-data-table {
     @apply col-span-12;
+
+    .title-link {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+
+        /* display: inline-block; */
+        -webkit-box-orient: vertical;
+    }
 
     /* custom design-system component - p-toolbox-table */
     :deep(.p-toolbox-table) {
