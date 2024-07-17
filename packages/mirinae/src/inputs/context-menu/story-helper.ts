@@ -1,6 +1,7 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
-import { getContextMenuItemArgTypes } from '@/inputs/context-menu/context-menu-item/story-helper';
+import { getContextMenuItemArgs, getContextMenuItemArgTypes } from '@/inputs/context-menu/context-menu-item/story-helper';
 // eslint-disable-next-line import/no-cycle
 import { getSearchSlotArgTypes } from '@/inputs/search/search/story-helper';
 
@@ -60,14 +61,65 @@ const getArgTypes = (category: string, info: [string, string][]) => {
     return argTypes;
 };
 
+export const getContextMenuArgs = (): Args => {
+    const contextMenuItemArgs = getContextMenuItemArgs();
+
+    return {
+        title: undefined,
+        menu: [],
+        loading: false,
+        selected: [{ name: 'collect' }],
+        multiSelectable: false,
+        showSelectMarker: false,
+        itemHeightFixed: false,
+        highlightTerm: contextMenuItemArgs.highlightTerm,
+        noSelectIndication: false,
+        showSelectHeader: false,
+        showClearSelection: false,
+        searchable: false,
+        searchText: '',
+        readonly: false,
+        resetSelectedOnUnmounted: true,
+        beforeSelect: undefined,
+        beforeClearSelection: undefined,
+        header: null,
+        // 'menu': null,
+        items: null,
+        bottom: null,
+        'no-data-format': null,
+        'item-text-list': null,
+        'search-left': null,
+        'search-default': null,
+        'search-right': null,
+        '<item.name>:select': null,
+        select: null,
+        focus: null,
+        blur: null,
+        'keyup:up:end': null,
+        'keyup:down:end': null,
+        'keyup:esc': null,
+        'click-button': null,
+        'click-done': null,
+        'click-show-more': null,
+        'clear-selection': null,
+        'update:search-text': null,
+    };
+};
+
+export const getContextMenuParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A133521',
+    },
+});
+
 export const getContextMenuArgTypes = (): ArgTypes => {
     const contextMenuItemArgTypes = getContextMenuItemArgTypes();
     return {
         title: {
             name: 'title',
-            type: { name: 'string' },
+            type: 'string',
             description: 'Context menu title',
-            defaultValue: undefined,
             table: {
                 type: {
                     summary: 'string',
@@ -77,15 +129,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: undefined,
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         menu: {
             name: 'menu',
-            type: { name: 'array' },
+            type: { name: 'array' } as SBType,
             description: 'Menu items',
-            defaultValue: [],
             table: {
                 type: {
                     summary: 'array',
@@ -95,15 +144,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: '[]',
                 },
             },
-            control: {
-                type: 'object',
-            },
+            control: 'object',
         },
         loading: {
             name: 'loading',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Loading state.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -113,15 +159,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         selected: {
             name: 'selected',
-            type: { name: 'array' },
+            type: { name: 'array' } as SBType,
             description: 'Array of selected menu item.',
-            defaultValue: [{ name: 'collect' }],
             table: {
                 type: {
                     summary: 'array',
@@ -131,15 +174,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: '[]',
                 },
             },
-            control: {
-                type: 'object',
-            },
+            control: 'object',
         },
         multiSelectable: {
             name: 'multiSelectable',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to select multiple items or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -149,15 +189,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         showSelectMarker: {
             name: 'showSelectMarker',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to show checkbox or radio icon or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -167,15 +204,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         itemHeightFixed: {
             name: 'itemHeightFixed',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Determines whether to make all items\' height fixed or not. If it\'s `true`, item text overflow will be ellipsis.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -185,16 +219,13 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         highlightTerm: contextMenuItemArgTypes.highlightTerm,
         noSelectIndication: {
             name: 'noSelectIndication',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to display selected state to selected item or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -204,15 +235,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         showSelectHeader: {
             name: 'showSelectHeader',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to activate the selection header that is activated when the value of multiSelectable is true.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -222,15 +250,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         showClearSelection: {
             name: 'showClearSelection',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to enable a button to deselect all selected items. It is activated when the value of multiSelectable is true.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -240,15 +265,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         searchable: {
             name: 'searchable',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to enable search or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -258,15 +280,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         searchText: {
             name: 'searchText',
-            type: { name: 'string' },
+            type: 'string',
             description: 'Input value for search component in searchable case. sync for two way binding is supported.',
-            defaultValue: '',
             table: {
                 type: {
                     summary: 'string',
@@ -276,15 +295,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: '',
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         readonly: {
             name: 'readonly',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to make readonly or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -294,15 +310,12 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: false,
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         resetSelectedOnUnmounted: {
             name: 'resetSelectedOnUnmounted',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to reset selected items when unmounted or not.',
-            defaultValue: true,
             table: {
                 type: {
                     summary: 'boolean',
@@ -312,16 +325,14 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                     summary: true,
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         beforeSelect: {
             name: 'beforeSelect',
-            type: { name: 'function' },
+            type: 'function',
             description: 'A function that is called before selecting an item. If it returns false, the selection is canceled.',
-            defaultValue: undefined,
             table: {
+                // disable: true,
                 type: {
                     summary: 'function',
                 },
@@ -333,9 +344,8 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         beforeClearSelection: {
             name: 'beforeClearSelection',
-            type: { name: 'function' },
+            type: 'function',
             description: 'A function that is called before clearing all selected items. If it returns false, the clearing is canceled.',
-            defaultValue: undefined,
             table: {
                 type: {
                     summary: 'function',
@@ -348,5 +358,34 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         ...getArgTypes('slots', contextMenuSlots),
         ...getArgTypes('events', contextMenuEvents),
+
+        // default
+        'search-left': { table: { disable: true } },
+        'search-default': { table: { disable: true } },
+        'search-right': { table: { disable: true } },
+        '<item.name>:select': { table: { disable: true } },
+        header: { table: { disable: true } },
+        items: { table: { disable: true } },
+        bottom: { table: { disable: true } },
+        'no-data-format': { table: { disable: true } },
+        'item-text-list': { table: { disable: true } },
+        /* eslint-disable no-template-curly-in-string */
+        '`search-${slot}`': { table: { disable: true } },
+        select: { table: { disable: true } },
+        focus: { table: { disable: true } },
+        blur: { table: { disable: true } },
+        'keyup:up:end': { table: { disable: true } },
+        'keyup:down:end': { table: { disable: true } },
+        'keyup:esc': { table: { disable: true } },
+        'click-button': { table: { disable: true } },
+        'click-done': { table: { disable: true } },
+        'click-show-more': { table: { disable: true } },
+        'click-selection': { table: { disable: true } },
+        'clear-selection': { table: { disable: true } },
+        'update:search-text': { table: { disable: true } },
+        'update:selected': { table: { disable: true } },
+        'item--format': { table: { disable: true } },
+        /* eslint-disable no-template-curly-in-string */
+        '`header-${item.name}`': { table: { disable: true } },
     };
 };
