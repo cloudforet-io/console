@@ -32,6 +32,7 @@ interface Props {
   widgetId: string;
   dataInfo?: DataInfo;
   sortBy: Query['sort'];
+  thisPage: number;
   fieldType: TableDataFieldValue['fieldType'];
   criteria?: string;
   dataField?: string|string[];
@@ -42,7 +43,10 @@ interface Props {
   totalInfo?: TotalValue;
 }
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void}>();
+const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
+  (e: 'update:this-page', value: number): void;
+  (e: 'load'): void;
+}>();
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
@@ -54,6 +58,7 @@ const storeState = reactive({
 
 const state = reactive({
     proxySortBy: useProxyValue('sortBy', props, emit),
+    proxyThisPage: useProxyValue('thisPage', props, emit),
 });
 
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
@@ -158,7 +163,8 @@ const handleClickSort = async (sortKey: string) => {
         resultSortBy = [{ key: _sortKey, desc: true }];
     }
     state.proxySortBy = resultSortBy;
-    // state.thisPage = 1;
+    state.proxyThisPage = 1;
+    emit('load');
 };
 const isSortable = (field: TableWidgetField) => {
     const isDynamicDataField = props.fieldType === 'dynamicField' && field.fieldInfo?.type === 'dataField' && field.name !== 'sub_total';
@@ -255,7 +261,7 @@ const isSortable = (field: TableWidgetField) => {
 
 <style scoped lang="postcss">
 .widget-data-table {
-    @apply bg-white h-full w-full relative;
+    @apply bg-white w-full relative;
     max-height: 100%;
     overflow: auto;
 
