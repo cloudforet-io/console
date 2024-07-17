@@ -70,6 +70,9 @@ export interface MaxOptions {
 export interface LegendOptions { // toggle button
     default?: boolean;
 }
+export interface PieChartTypeOptions {
+    default?: string;
+}
 
 export interface IconOptions {
     default?: string; // e.g. 'ic_coin-filled'
@@ -112,7 +115,7 @@ export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxi
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
-    | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions;
+    | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -126,7 +129,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'subTotal' | 'total'
     | 'progressBar'
     | 'formatRules'
-    | 'granularity' | 'colorSchema';
+    | 'granularity' | 'colorSchema' | 'pieChartType';
 
 export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;

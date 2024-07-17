@@ -22,6 +22,11 @@ const pieChart: WidgetConfig = {
                 excludeDateField: true,
             },
         },
+        pieChartType: {
+            options: {
+                default: 'donut',
+            },
+        },
     },
     optionalFieldsSchema: {
         legend: {

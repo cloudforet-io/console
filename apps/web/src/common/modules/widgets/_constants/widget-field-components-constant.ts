@@ -13,6 +13,7 @@ import legend from '@/common/modules/widgets/_widget-fields/WidgetFieldLegend.vu
 import lineBy from '@/common/modules/widgets/_widget-fields/WidgetFieldLineBy.vue';
 import max from '@/common/modules/widgets/_widget-fields/WidgetFieldMax.vue';
 import min from '@/common/modules/widgets/_widget-fields/WidgetFieldMin.vue';
+import pieChartType from '@/common/modules/widgets/_widget-fields/WidgetFieldPieChartType.vue';
 import progressBar from '@/common/modules/widgets/_widget-fields/WidgetFieldProgressBar.vue';
 import stackBy from '@/common/modules/widgets/_widget-fields/WidgetFieldStackBy.vue';
 import subTotal from '@/common/modules/widgets/_widget-fields/WidgetFieldSubTotal.vue';
@@ -46,4 +47,5 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     comparison,
     granularity,
     colorSchema,
+    pieChartType,
 };
