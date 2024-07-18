@@ -1,7 +1,25 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 // eslint-disable-next-line import/no-cycle
-import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
+import { getContextMenuArgTypes, getContextMenuArgs } from '@/inputs/context-menu/story-helper';
+import { getSearchSlotArgTypes } from '@/inputs/story-helper';
+
+export const getSearchParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5952%3A1343',
+    },
+});
+
+const initContextMenuArgs = (): Args => {
+    const contextMenuArgs = getContextMenuArgs();
+
+    const args: Args = {
+        menu: contextMenuArgs.menu,
+        loading: contextMenuArgs.loading,
+    };
+    return args;
+};
 
 const initContextMenuArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = getContextMenuArgTypes();
@@ -14,59 +32,14 @@ const initContextMenuArgTypes = (): ArgTypes => {
     return argTypes;
 };
 
-export const getSearchSlotArgTypes = (): ArgTypes => ({
-    left: {
-        name: 'left',
-        description: 'A slot for insert something into left side of input element.',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            category: 'slots',
-            defaultValue: {
-                summary: null,
-            },
-        },
-    },
-    default: {
-        name: 'default',
-        description: 'A slot for replace input element. Use it carefully and don\'t forget bind props and event handlers that provided by slot props.',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            category: 'slots',
-            defaultValue: {
-                summary: null,
-            },
-        },
-    },
-    right: {
-        name: 'right',
-        description: 'A slot for replace right side of input element including delete button.',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            category: 'slots',
-            defaultValue: {
-                summary: null,
-            },
-        },
-    },
-});
-
 export const getSearchArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = initContextMenuArgTypes();
     return ({
         value: {
             name: 'value',
-            type: { name: 'string', required: true },
+            type: 'string',
+            required: true,
             description: 'Input value. Supported with v-model and sync for two way binding.',
-            defaultValue: '',
             table: {
                 type: {
                     summary: 'string',
@@ -76,15 +49,12 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: '',
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         placeholder: {
             name: 'placeholder',
-            type: { name: 'string' },
+            type: 'string',
             description: 'Input placeholder.',
-            defaultValue: undefined,
             table: {
                 type: {
                     summary: 'string',
@@ -94,15 +64,12 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: 'undefined',
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         disableIcon: {
             name: 'disableIcon',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Hide search icon.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -112,15 +79,12 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: false,
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         isFocused: {
             name: 'isFocused',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'focused value for sync.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -130,13 +94,11 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: null,
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         invalid: {
             name: 'invalid',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to apply invalid style or not.',
             defaultValue: false,
             table: {
@@ -148,15 +110,12 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         disabled: {
             name: 'disabled',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to disable search or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -166,15 +125,12 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         readonly: {
             name: 'readonly',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to make input readonly.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -184,15 +140,12 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         visibleMenu: {
             name: 'visibleMenu',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Use this prop when you want to control menu visibility manually. this is `sync` prop with event `update:visible-menu`.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -202,15 +155,12 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         useFixedMenuStyle: {
             name: 'useFixedMenuStyle',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to use position fixed style on menu or not. ',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -220,16 +170,13 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         ...contextMenuArgTypes,
         handler: {
             name: 'handler',
-            type: { name: 'function' },
+            type: 'function',
             description: 'Handler that returns auto-completion menu according to input value. If no value is given, the default handler is executed.',
-            defaultValue: undefined,
             table: {
                 type: {
                     summary: 'function',
@@ -243,9 +190,8 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         disableHandler: {
             name: 'disableHandler',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to use handler or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -255,15 +201,12 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         useAutoComplete: {
             name: 'useAutoComplete',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to use autocomplete or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -273,15 +216,12 @@ export const getSearchArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         // attrs
         inputAttrs: {
             name: 'all input attributes',
             description: 'All input attributes are allowed. e.g. type',
-            defaultValue: {},
             table: {
                 type: {
                     summary: null,
@@ -291,16 +231,13 @@ export const getSearchArgTypes = (): ArgTypes => {
                 },
                 category: 'attrs',
             },
-            control: {
-                type: 'object',
-            },
+            control: 'object',
         },
         /* model */
         'v-model': {
             name: 'v-model',
-            type: { name: 'string' },
+            type: 'string',
             description: 'model of \'value\' props and \'update:value\' event.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: 'string',
@@ -394,4 +331,34 @@ export const getSearchArgTypes = (): ArgTypes => {
             },
         },
     });
+};
+
+
+const getSearchSlotArgs = (): Args => ({
+    left: null,
+    default: null,
+    right: null,
+});
+
+export const getSearchArgs = (): Args => {
+    const contextMenuArgs = initContextMenuArgs();
+
+    return {
+        value: '',
+        placeholder: undefined,
+        disableIcon: false,
+        isFocused: false,
+        invalid: false,
+        disabled: false,
+        readonly: false,
+        visibleMenu: false,
+        useFixedMenuStyle: false,
+        ...contextMenuArgs,
+        handler: undefined,
+        disableHandler: false,
+        useAutoComplete: false,
+        inputAttrs: {},
+        'v-model': null,
+        ...getSearchSlotArgs(),
+    };
 };
