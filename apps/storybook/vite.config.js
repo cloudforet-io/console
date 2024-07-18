@@ -12,7 +12,7 @@ export default defineConfig({
         },
     },
     optimizeDeps: {
-        include: ['@/styles/colors.cjs', '@/styles/web-fonts.cjs', '@/styles/screens.cjs', '@/styles/variables.cjs', '@/styles/font-size.cjs'],
+        include: ['@/styles/colors.cjs', '@/styles/web-fonts.cjs', '@/styles/screens.cjs', '@/styles/variables.cjs', '@/styles/font-size.cjs', '@/index'],
     },
     rollupInputOptions: {
         plugins: [commonjs()]

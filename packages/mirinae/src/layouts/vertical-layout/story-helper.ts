@@ -1,11 +1,24 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getVerticalLayoutArgs = (): Args => ({
+    height: '100%',
+    initWidth: 300,
+    minWidth: 100,
+    maxWidth: 500,
+});
+
+export const getVerticalLayoutParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A228265&t=6YbalXLy731vS0l2-4',
+    },
+});
 
 export const getVerticalLayoutArgTypes = (): ArgTypes => ({
     height: {
         name: 'height',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Height of layout.',
-        defaultValue: '100%',
         table: {
             type: {
                 summary: 'string',
@@ -15,15 +28,12 @@ export const getVerticalLayoutArgTypes = (): ArgTypes => ({
                 summary: '"100%"',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     initWidth: {
         name: 'initWidth',
-        type: { name: 'number' },
+        type: 'number',
         description: '',
-        defaultValue: 300,
         table: {
             type: {
                 summary: 'number',
@@ -33,15 +43,12 @@ export const getVerticalLayoutArgTypes = (): ArgTypes => ({
                 summary: '300',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     minWidth: {
         name: 'minWidth',
-        type: { name: 'number' },
+        type: 'number',
         description: '',
-        defaultValue: 100,
         table: {
             type: {
                 summary: 'number',
@@ -51,15 +58,12 @@ export const getVerticalLayoutArgTypes = (): ArgTypes => ({
                 summary: '100',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     maxWidth: {
         name: 'maxWidth',
-        type: { name: 'number' },
+        type: 'number',
         description: '',
-        defaultValue: 500,
         table: {
             type: {
                 summary: 'number',
@@ -69,8 +73,6 @@ export const getVerticalLayoutArgTypes = (): ArgTypes => ({
                 summary: '500',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
 });
