@@ -33,6 +33,8 @@ import {
     getWidgetDateFields,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getDataTableCostFields } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
@@ -57,7 +59,6 @@ const props = withDefaults(defineProps<Props>(), {
 const LIMIT = 15;
 const DATE_FIELD_NAME = 'date';
 const chartContext = ref<HTMLElement|null>(null);
-// const chartHelper = useAmcharts5(chartContext);
 const allReferenceStore = useAllReferenceStore();
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
@@ -72,6 +73,7 @@ const state = reactive({
     chartData: [],
     chart: null as EChartsType | null,
     chartOptions: computed<BarSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
         grid: {
             left: 0,
             right: 0,

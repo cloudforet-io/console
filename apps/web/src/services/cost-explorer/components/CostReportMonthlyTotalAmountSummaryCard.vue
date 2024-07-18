@@ -1,14 +1,16 @@
 <script lang="ts" setup>
+import { useResizeObserver } from '@vueuse/core/index';
 import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { Root } from '@amcharts/amcharts5';
-import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import type { PieSeriesOption } from 'echarts/charts';
+import type { EChartsType } from 'echarts/core';
+import { init } from 'echarts/core';
 import {
-    cloneDeep, debounce, sum, sumBy,
+    debounce, isEmpty, sum, sumBy, throttle,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -34,10 +36,10 @@ import type { WorkspaceReferenceMap } from '@/store/reference/workspace-referenc
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { getReferenceLabel } from '@/common/modules/widgets/_helpers/widget-date-helper';
 
-import { gray, white } from '@/styles/colors';
+import { gray } from '@/styles/colors';
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
@@ -46,41 +48,30 @@ import {
     GROUP_BY,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+import {
+    useAllReferenceTypeInfoStore,
+} from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
-interface ChartData {
-    category: string;
-    value: number;
-    pieSettings: {
-        fill: string;
-    };
-}
 type CostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;
     value_sum: number;
 };
 
-const CHART_ROOT_OPTIONS: IRootSettings = {
-    tooltipContainerBounds: {
-        top: 100,
-        right: 1000,
-        bottom: 0,
-        left: 1000,
-    },
-};
 const OTHER_CATEGORY = 'Others';
-
 const chartContext = ref<HTMLElement|null>(null);
-const chartHelper = useAmcharts5(chartContext);
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 const costReportPageGetters = costReportPageStore.getters;
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
 });
 const state = reactive({
     loading: true,
@@ -98,22 +89,44 @@ const state = reactive({
     }),
     currentReportId: undefined as string|undefined,
     //
-    chartData: computed<ChartData[]>(() => state.data?.results?.map((d, idx) => {
-        const _category = d[state.selectedTarget];
-        const _categoryLabel = state.selectedTarget === GROUP_BY.WORKSPACE_NAME
-            ? _category ?? d.workspace_name
-            : storeState.providers[_category]?.name ?? d.provider;
-        let _color = state.selectedTarget === GROUP_BY.WORKSPACE_NAME
-            ? MASSIVE_CHART_COLORS[idx]
-            : storeState.providers[_category]?.color ?? MASSIVE_CHART_COLORS[idx];
-        if (_category === OTHER_CATEGORY) _color = gray[500];
-        return {
-            category: _categoryLabel,
-            value: d.value_sum,
-            pieSettings: {
-                fill: _color,
+    chart: null as EChartsType | null,
+    chartData: [],
+    chartOptions: computed<PieSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
+        grid: {
+            containLabel: true,
+        },
+        tooltip: {
+            trigger: 'item',
+            position: 'inside',
+            formatter: (params) => {
+                const _name = getReferenceLabel(storeState.allReferenceTypeInfo, state.selectedTarget, params.name);
+                const _value = numberFormatter(params.value) || '';
+                return `${params.marker} ${_name}: <b>${_value}</b>`;
             },
-        };
+        },
+        legend: {
+            show: false,
+        },
+        series: [
+            {
+                type: 'pie',
+                radius: ['30%', '70%'],
+                center: ['30%', '50%'],
+                data: state.chartData,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)',
+                    },
+                },
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                },
+            },
+        ],
     })),
     tableFields: computed<DataTableFieldType[]>(() => ([
         { name: state.selectedTarget, label: COST_REPORT_GROUP_BY_ITEM_MAP[state.selectedTarget].label },
@@ -156,7 +169,6 @@ const getLegendColor = (field: string, value: string, rowIndex: number) => {
 /* Api */
 const analyzeCostReportData = debounce(async () => {
     state.loading = true;
-    chartHelper.clearChildrenOfRoot();
     try {
         const _period = {
             start: state.currentDate?.format('YYYY-MM'),
@@ -208,29 +220,25 @@ const listCostReport = async () => {
 };
 
 /* Util */
-const drawChart = () => {
-    chartHelper.disposeRoot();
-    chartHelper.setRoot(Root.new(chartContext.value as HTMLElement, CHART_ROOT_OPTIONS));
-    const chart = chartHelper.createDonutChart({
-        paddingLeft: 20,
-        paddingRight: 20,
-        innerRadius: 40,
+const drawChart = (rawData: AnalyzeResponse<CostReportDataAnalyzeResult>) => {
+    if (isEmpty(rawData)) return;
+
+    const _seriesData: any[] = [];
+    rawData.results?.forEach((d) => {
+        let _color = state.selectedTarget === 'provider' ? storeState.providers[d[state.selectedTarget]]?.color : undefined;
+        if (d[state.selectedTarget] === OTHER_CATEGORY) _color = gray[500];
+        _seriesData.push({
+            name: d[state.selectedTarget],
+            value: d.value_sum,
+            itemStyle: {
+                color: _color,
+            },
+        });
     });
-    const seriesSettings = {
-        categoryField: 'category',
-        valueField: 'value',
-    };
-    const series = chartHelper.createPieSeries(seriesSettings);
-    series.slices.template.setAll({
-        stroke: chartHelper.color(white),
-        templateField: 'pieSettings',
-    });
-    const tooltip = chartHelper.createTooltip();
-    const valueFormatter = (val) => numberFormatter(val, { minimumFractionDigits: 2 }) as string;
-    chartHelper.setPieTooltipText(series, tooltip, valueFormatter);
-    series.slices.template.set('tooltip', tooltip);
-    series.data.setAll(cloneDeep(state.chartData));
-    chart.series.push(series);
+    state.chartData = _seriesData;
+
+    state.chart = init(chartContext.value);
+    state.chart.setOption(state.chartOptions, true);
 };
 
 /* Event */
@@ -254,11 +262,11 @@ const handleChangeDate = (date: Dayjs) => {
 };
 
 /* Watcher */
-watch([() => chartContext.value, () => state.chartData], async ([_chartContext, _chartData]) => {
-    if (_chartContext && _chartData) {
-        drawChart();
+watch([() => chartContext.value, () => state.loading, () => state.data], async ([_chartContext, loading, data]) => {
+    if (_chartContext && !loading) {
+        drawChart(data);
     }
-}, { immediate: true });
+});
 watch(() => costReportPageState.recentReportMonth, async (after) => {
     if (!after) return;
     state.currentDate = dayjs.utc(after);
@@ -273,6 +281,9 @@ watch([
 watch(() => state.currentDate, () => {
     if (state.currentDate) listCostReport();
 }, { immediate: true });
+useResizeObserver(chartContext, throttle(() => {
+    state.chart?.resize();
+}, 500));
 </script>
 
 <template>
