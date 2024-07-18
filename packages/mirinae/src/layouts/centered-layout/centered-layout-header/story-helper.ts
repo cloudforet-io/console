@@ -1,11 +1,26 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getCenteredLayoutHeaderArgs = (): Args => ({
+    title: 'Title',
+    description: 'Description',
+    showCloseButton: false,
+    showStep: false,
+    currentStep: 1,
+    totalSteps: 3,
+});
+
+export const getCenteredLayoutHeaderParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A228226&t=GVsFwo5txLv6VtoA-4',
+    },
+});
 
 export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
     title: {
         name: 'title',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Title',
-        defaultValue: 'Title',
         table: {
             type: {
                 summary: 'string',
@@ -15,15 +30,12 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     description: {
         name: 'description',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Description',
-        defaultValue: 'Description',
         table: {
             type: {
                 summary: 'string',
@@ -33,15 +45,12 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     showCloseButton: {
         name: 'showCloseButton',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show close button',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -51,15 +60,12 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     showStep: {
         name: 'showStep',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show step',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -69,15 +75,12 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     currentStep: {
         name: 'currentStep',
-        type: { name: 'number' },
+        type: 'number',
         description: 'The current step',
-        defaultValue: 1,
         table: {
             type: {
                 summary: 'number',
@@ -87,15 +90,12 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     totalSteps: {
         name: 'totalSteps',
-        type: { name: 'number' },
+        type: 'number',
         description: 'Total steps',
-        defaultValue: 3,
         table: {
             type: {
                 summary: 'number',
@@ -105,9 +105,7 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     // events
     onClose: {
@@ -123,4 +121,6 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    close: { table: { disable: true } },
 });
