@@ -1,12 +1,27 @@
 import { faker } from '@faker-js/faker';
-import type { ArgTypes } from '@storybook/addons';
+import type { Args, ArgTypes, Parameters } from '@storybook/vue';
+
+export const getTextareaArgs = (): Args => ({
+    value: faker.lorem.sentence(30),
+    placeholder: 'placeholder',
+    autofocus: false,
+    readonly: false,
+    invalid: false,
+    disabled: false,
+    'v-model': '',
+});
+
+export const getTextareaParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
 
 export const getTextareaArgTypes = (): ArgTypes => ({
     value: {
         name: 'value',
-        type: { name: 'string, number' },
         description: 'The value for textarea contents.',
-        defaultValue: faker.lorem.sentence(30),
         table: {
             type: {
                 summary: 'string, number',
@@ -16,15 +31,11 @@ export const getTextareaArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     placeholder: {
         name: 'placeholder',
-        type: { name: 'string, number' },
         description: 'The placeholder for textarea contents.',
-        defaultValue: 'placeholder',
         table: {
             type: {
                 summary: 'string, number',
@@ -34,15 +45,12 @@ export const getTextareaArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     autofocus: {
         name: 'autofocus',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to autofocus textarea or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -52,15 +60,12 @@ export const getTextareaArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     readonly: {
         name: 'readonly',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to make readonly or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -70,15 +75,12 @@ export const getTextareaArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     invalid: {
         name: 'invalid',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show invalid style or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -88,15 +90,12 @@ export const getTextareaArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     disabled: {
         name: 'disabled',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Disabled textarea.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -106,15 +105,11 @@ export const getTextareaArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     'v-model': {
         name: 'v-model',
-        type: { name: 'string, number' },
         description: 'Two way binding for `value` props with `update:value` event.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'string, number',
