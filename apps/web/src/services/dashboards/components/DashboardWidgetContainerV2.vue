@@ -75,7 +75,6 @@ const widgetDeleteState = reactive({
     targetWidget: null as RefinedWidgetInfo|null,
 });
 
-
 /* Util */
 const { containerWidth } = useDashboardContainerWidth({ containerRef, observeResize: true });
 const getRefinedWidgetInfoList = (): RefinedWidgetInfo[] => {

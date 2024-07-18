@@ -56,7 +56,7 @@ const storeState = reactive({
 const state = reactive({
     proxyLegend: useProxyValue('legend', props, emit),
     chart: null as EChartsType | null,
-    xAxisData: [],
+    xAxisData: computed<string[]>(() => getWidgetDateFields(metricExplorerPageState.granularity, metricExplorerPageState.period?.start, metricExplorerPageState.period?.end)),
     chartData: [],
     parsedGroupBy: computed<string>(() => metricExplorerPageState.selectedChartGroupBy?.replace('labels.', '') || ''),
     chartOptions: computed<LineSeriesOption>(() => ({
@@ -155,7 +155,6 @@ const getTotalData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => ({
 });
 const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
     if (isEmpty(rawData)) return;
-    state.xAxisData = getWidgetDateFields(metricExplorerPageState.granularity, metricExplorerPageState.period?.start, metricExplorerPageState.period?.end);
 
     if (metricExplorerPageState.selectedChartGroupBy) {
         state.chartData = getLineByData(rawData);
@@ -183,7 +182,7 @@ watch([() => chartContext.value, () => props.loading, () => props.data], async (
     if (_chartContext && !loading) {
         drawChart(data);
     }
-}, { immediate: false });
+});
 watch(() => state.proxyLegend, () => {
     state.chart.setOption(state.chartOptions, true);
 });

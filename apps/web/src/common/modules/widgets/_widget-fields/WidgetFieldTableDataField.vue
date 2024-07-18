@@ -74,6 +74,7 @@ const state = reactive({
     })),
 });
 
+
 /* Event */
 const handleUpdateCriteria = (val: string|MenuItem[]) => {
     state.selectedCriteria = val;

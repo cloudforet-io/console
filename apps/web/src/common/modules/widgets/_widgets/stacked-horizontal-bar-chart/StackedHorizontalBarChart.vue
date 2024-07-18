@@ -9,7 +9,7 @@ import type { BarSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
 import {
-    groupBy, isEmpty, orderBy, throttle,
+    groupBy, isEmpty, orderBy, reverse, throttle,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -151,7 +151,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
                     },
                 },
                 field_group: [state.stackByField],
-                sort: [{ key: `_total_${state.dataField}`, desc: false }],
+                sort: [{ key: `_total_${state.dataField}`, desc: true }],
                 page: { start: 1, limit: state.yAxisCount },
             },
             vars: props.dashboardVars,
@@ -174,7 +174,7 @@ const drawChart = (rawData?: Data|null) => {
     if (state.yAxisField === DATE_FIELD.DATE) {
         state.yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
-        state.yAxisData = rawData.results?.map((d) => d[state.yAxisField] as string) ?? [];
+        state.yAxisData = reverse([...rawData.results?.map((d) => d[state.yAxisField] as string) ?? []]);
     }
 
     // slice stackByData by stackByCount
