@@ -1,22 +1,37 @@
+import { reactive, toRefs } from 'vue';
+
 import { faker } from '@faker-js/faker';
-import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import PSidebar from '@/layouts/sidebar/PSidebar.vue';
+import type { Meta, StoryObj } from '@storybook/vue';
+import type { ComponentProps } from 'vue-component-type-helpers';
+
 import PButton from '@/inputs/buttons/button/PButton.vue';
-import { reactive, toRefs, watch, computed } from 'vue';
-import { getSidebarArgTypes } from '@/layouts/sidebar/story-helper';
+import { getSidebarArgTypes, getSidebarArgs, getSidebarParameters } from '@/layouts/sidebar/story-helper';
+
+import PSidebar from './PSidebar.vue';
+
+type PSidebarPropsAndCustomArgs = ComponentProps<typeof PSidebar>;
+
+const meta : Meta<PSidebarPropsAndCustomArgs> = {
+    title: 'Layouts/Sidebar',
+    component: PSidebar,
+    argTypes: {
+        ...getSidebarArgTypes(),
+    },
+    parameters: {
+        ...getSidebarParameters(),
+    },
+    args: {
+        ...getSidebarArgs(),
+    },
+};
+
+export default meta;
+type Story = StoryObj<typeof PSidebar>;
 
 
-<Meta title='Layouts/Sidebar' parameters={{
-    design: {
-        type: 'figma',
-        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6980%3A163443'
-    }
-}} component={PSidebar} argTypes={getSidebarArgTypes()} />
-
-
-export const Template = (args, {argTypes}) => {
-    return {
-        props: Object.keys(argTypes).filter(d => d !== 'visible'),
+const Template: Story = {
+    render: (args, { argTypes }) => ({
+        props: Object.keys(argTypes).filter((d) => d !== 'visible'),
         components: { PSidebar, PButton },
         template: `
             <div class="flex flex-col" style="height: 500px;">
@@ -40,19 +55,20 @@ export const Template = (args, {argTypes}) => {
                 </p-sidebar>
             </div>
         `,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         setup(props) {
             const state = reactive({
                 visible: true,
-            })
+            });
             return {
                 ...toRefs(state),
-            }
-        }
-    }
+            };
+        },
+    }),
 };
 
-export const Playground = (args, {argTypes}) => {
-    return {
+const PlaygroundTemplate: Story = {
+    render: (args, { argTypes }) => ({
         props: Object.keys(argTypes),
         components: { PSidebar },
         template: `
@@ -72,109 +88,67 @@ export const Playground = (args, {argTypes}) => {
                 </p-sidebar>
             </div>
         `,
-        setup(props) {
-            return {
-            }
-        }
-    }
+    }),
 };
 
-
-# Sidebar
-<br/>
-<br/>
-<br/>
-
-## Basic
-
-<Canvas>
-    <Story name="basic" argTypes={{
+export const Basic: Story = {
+    ...Template,
+    argTypes: {
         contents: {
-            defaultValue: ''
+            defaultValue: '',
         },
         sidebarContents: {
-            defaultValue: ''
-        }
-    }}>
-        {Template.bind({})}
-    </Story>
-</Canvas>
+            defaultValue: '',
+        },
+    },
+};
 
-<br/>
-<br/>
-
-## Long Contents
-
-<Canvas>
-    <Story name="long contents" argTypes={{
+export const LongContents: Story = {
+    ...Template,
+    argTypes: {
         contents: {
-            defaultValue: faker.lorem.lines(100)
+            defaultValue: faker.lorem.lines(100),
         },
         sidebarContents: {
-            defaultValue: faker.lorem.lines(50)
-        }
-    }}>
-        {Template.bind({})}
-    </Story>
-</Canvas>
+            defaultValue: faker.lorem.lines(50),
+        },
+    },
+};
 
-<br/>
-<br/>
-
-## Long Title
-
-<Canvas>
-    <Story name="long title" argTypes={{
+export const LongTitle: Story = {
+    ...Template,
+    argTypes: {
         contents: {
-            defaultValue: ''
+            defaultValue: '',
         },
         sidebarContents: {
-            defaultValue: faker.lorem.lines(50)
-        }
-    }} args={{
-        title: faker.lorem.lines(2)
-    }}>
-        {Template.bind({})}
-    </Story>
-</Canvas>
+            defaultValue: faker.lorem.lines(50),
+        },
+    },
+    args: {
+        title: faker.lorem.lines(2),
+    },
+};
 
-<br/>
-<br/>
-
-## No Title
-
-<Canvas>
-    <Story name="no title" argTypes={{
+export const NoTitle: Story = {
+    ...Template,
+    argTypes: {
         contents: {
-            defaultValue: ''
+            defaultValue: '',
         },
         sidebarContents: {
-            defaultValue: faker.lorem.lines(50)
+            defaultValue: faker.lorem.lines(50),
         },
-    }} args={{
-        title: undefined
-    }}>
-        {Template.bind({})}
-    </Story>
-</Canvas>
+    },
+    args: {
+        title: undefined,
+    },
+};
 
-<br/>
-<br/>
-
-## Custom Title
-
-<Canvas>
-    <Story name="custom title" argTypes={{
-        contents: {
-            defaultValue: ''
-        },
-        sidebarContents: {
-            defaultValue: ''
-        }
-    }}>
-        {{
-            components: { PSidebar },
-            template: `
+export const CustomTitle: Story = {
+    render: () => ({
+        components: { PSidebar },
+        template: `
             <div style="height: 500px;">
                 <p-sidebar :visible="true"
                             class="mt-4"
@@ -188,33 +162,23 @@ export const Playground = (args, {argTypes}) => {
                     <template #sidebar>Sidebar Contents</template>
                 </p-sidebar>
             </div>
-    <!--<div>-->`,
-            setup(props) {
-                return {
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-
-## Secondary Style Type
-
-<Canvas>
-    <Story name="Secondary Style Type" argTypes={{
+            <!--<div>-->
+        `,
+    }),
+    argTypes: {
         contents: {
-            defaultValue: ''
+            defaultValue: '',
         },
         sidebarContents: {
-            defaultValue: 'Style Type - Secondary'
-        }
-    }}>
-        {{
-            components: { PSidebar },
-            template: `
+            defaultValue: '',
+        },
+    },
+};
+
+export const SecondaryStyleType: Story = {
+    render: () => ({
+        components: { PSidebar },
+        template: `
             <div style="height: 500px;">
                 <p-sidebar :visible="true"
                             title="Secondary Style Type"
@@ -227,32 +191,23 @@ export const Playground = (args, {argTypes}) => {
                     <template #sidebar>{{sidebarContents || 'Sidebar contents'}}</template>
                 </p-sidebar>
             </div>
-    <!--<div>-->`,
-            setup(props) {
-                return {
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Hide Close Button
-
-<Canvas>
-    <Story name="Hide Close Button" argTypes={{
+            <!--<div>-->
+        `,
+    }),
+    argTypes: {
         contents: {
-            defaultValue: ''
+            defaultValue: '',
         },
         sidebarContents: {
-            defaultValue: 'Style Type - Secondary'
-        }
-    }}>
-        {{
-            components: { PSidebar },
-            template: `
+            defaultValue: 'Style Type - Secondary',
+        },
+    },
+};
+
+export const HideCloseButton: Story = {
+    render: () => ({
+        components: { PSidebar },
+        template: `
             <div style="height: 500px;">
                 <p-sidebar :visible="true"
                             title="No Close Button"
@@ -265,25 +220,23 @@ export const Playground = (args, {argTypes}) => {
                     <template #sidebar>{{sidebarContents || 'Sidebar contents'}}</template>
                 </p-sidebar>
             </div>
-    <!--<div>-->`,
-            setup(props) {
-                return {
-                }
-            }
-        }}
-    </Story>
-</Canvas>
+            <!--<div>-->
+        `,
+    }),
+    argTypes: {
+        contents: {
+            defaultValue: '',
+        },
+        sidebarContents: {
+            defaultValue: 'Style Type - Secondary',
+        },
+    },
+};
 
-<br/>
-<br/>
-
-## Large Size
-
-<Canvas>
-    <Story name="Large Size">
-        {{
-            components: { PSidebar },
-            template: `
+export const LargeSize: Story = {
+    render: () => ({
+        components: { PSidebar },
+        template: `
             <div style="height: 500px;">
                 <p-sidebar :visible="true"
                             title="Large Size"
@@ -297,25 +250,15 @@ export const Playground = (args, {argTypes}) => {
                     <template #sidebar>Large Size</template>
                 </p-sidebar>
             </div>
-    <!--<div>-->`,
-            setup(props) {
-                return {
-                }
-            }
-        }}
-    </Story>
-</Canvas>
+            <!--<div>-->
+        `,
+    }),
+};
 
-<br/>
-<br/>
-
-## Medium Size
-
-<Canvas>
-    <Story name="Medium Size">
-        {{
-            components: { PSidebar },
-            template: `
+export const MediumSize: Story = {
+    render: () => ({
+        components: { PSidebar },
+        template: `
             <div style="height: 500px;">
                 <p-sidebar :visible="true"
                             title="Medium Size"
@@ -329,28 +272,15 @@ export const Playground = (args, {argTypes}) => {
                     <template #sidebar>Medium Size</template>
                 </p-sidebar>
             </div>
-    <!--<div>-->`,
-            setup(props) {
-                return {
-                }
-            }
-        }}
-    </Story>
-</Canvas>
+            <!--<div>-->
+        `,
+    }),
+};
 
-<br/>
-<br/>
-
-<br/>
-<br/>
-
-## Small Size
-
-<Canvas>
-    <Story name="Small Size">
-        {{
-            components: { PSidebar },
-            template: `
+export const SmallSize: Story = {
+    render: () => ({
+        components: { PSidebar },
+        template: `
             <div style="height: 500px;">
                 <p-sidebar :visible="true"
                             title="Small Size"
@@ -364,25 +294,15 @@ export const Playground = (args, {argTypes}) => {
                     <template #sidebar>Small Size</template>
                 </p-sidebar>
             </div>
-    <!--<div>-->`,
-            setup(props) {
-                return {
-                }
-            }
-        }}
-    </Story>
-</Canvas>
+            <!--<div>-->
+        `,
+    }),
+};
 
-<br/>
-<br/>
-
-## Footer Slot
-
-<Canvas>
-    <Story name="Footer Slot">
-        {{
-            components: { PSidebar },
-            template: `
+export const FooterSlot: Story = {
+    render: () => ({
+        components: { PSidebar },
+        template: `
             <div style="height: 500px;">
                 <p-sidebar :visible="true"
                             title="Footer Sidebar"
@@ -398,24 +318,11 @@ export const Playground = (args, {argTypes}) => {
                     </template>
                 </p-sidebar>
             </div>
-    <!--<div>-->`,
-            setup(props) {
-                return {
-                }
-            }
-        }}
-    </Story>
-</Canvas>
+            <!--<div>-->
+        `,
+    }),
+};
 
-<br/>
-<br/>
-
-## Playground
-
-<Canvas>
-    <Story name="playground" >
-        {Playground.bind({})}
-    </Story>
-</Canvas>
-
-<ArgsTable story="playground" />
+export const Playground: Story = {
+    ...PlaygroundTemplate,
+};
