@@ -1,12 +1,34 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getSelectCardArgs = (): Args => ({
+    value: true,
+    'v-model': '',
+    selected: undefined,
+    disabled: false,
+    predicate: undefined,
+    multiSelectable: false,
+    block: false,
+    imageUrl: undefined,
+    icon: 'img_avatar_admin',
+    iconColor: '',
+    label: 'Click Me!',
+    tabIndex: 0,
+    defaultSlot: '',
+    bottomSlot: '',
+});
+
+export const getSelectCardParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=13512%3A300523',
+    },
+});
 
 export const getSelectCardArgTypes = (): ArgTypes => ({
     /* props */
     value: {
         name: 'value',
-        type: { name: 'any' },
         description: 'The value to be compared for the \'selected\' props.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'any',
@@ -16,15 +38,11 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     'v-model': {
         name: 'v-model',
-        type: { name: 'any' },
         description: 'Two way binding for `value` props with `change` event.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'any',
@@ -38,9 +56,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
     },
     selected: {
         name: 'selected',
-        type: { name: 'any, any[]' },
         description: 'Selected value(s).',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'any, any[]',
@@ -50,15 +66,12 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     disabled: {
         name: 'disabled',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to disable selection or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -68,16 +81,13 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     predicate: {
         name: 'predicate',
-        type: { name: 'func' },
+        type: 'function',
         description: `Function that predicate two arguments are the same or not.
         It's useful when the props \`value\` is an object.`,
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'func',
@@ -91,9 +101,8 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
     },
     multiSelectable: {
         name: 'multiSelectable',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to allow multi select or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -103,16 +112,13 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     // select card props
     block: {
         name: 'block',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Make card style to be display block and apply wide style.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -122,15 +128,12 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     imageUrl: {
         name: 'imageUrl',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Card image url. It has a higher render priority than icon props.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -140,18 +143,14 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     icon: {
         name: 'icon',
-        type: { name: 'string, boolean' },
         description: `Card icon.
         It has a lower priority than \`imageUrl\` props.
         So it is rendered only when there is no value in \`imageUrl\` props or when the image load fails.
         If it is \`true\`, default icon will be rendered.`,
-        defaultValue: 'img_avatar_admin',
         table: {
             type: {
                 summary: 'string, boolean',
@@ -161,15 +160,12 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     iconColor: {
         name: 'iconColor',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Card icon\'s color.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'string',
@@ -179,15 +175,12 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     label: {
         name: 'label',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Card label',
-        defaultValue: 'Click Me!',
         table: {
             type: {
                 summary: 'string',
@@ -197,15 +190,12 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     tabIndex: {
         name: 'tabIndex',
-        type: { name: 'number' },
+        type: 'number',
         description: 'Tab Index, used for keydown event and Web Accessibility',
-        defaultValue: 0,
         table: {
             type: {
                 summary: 'number',
@@ -215,15 +205,12 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
                 summary: 0,
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     /* slot */
     defaultSlot: {
         name: 'default',
         description: 'Slot for card contents.',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
@@ -233,14 +220,11 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     bottomSlot: {
         name: 'bottom',
         description: 'Bottom slot for extra contents',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
@@ -250,9 +234,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* event */
     onChange: {
@@ -270,4 +252,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
+    bottom: { table: { disable: true } },
 });
