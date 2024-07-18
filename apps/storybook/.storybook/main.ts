@@ -37,7 +37,10 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/layouts/pane-layout/**/*.stories.@(js|jsx|ts|tsx)', 
 
     '../../../packages/mirinae/src/layouts/sidebar/**/*.mdx',
-    '../../../packages/mirinae/src/layouts/sidebar/**/*.stories.@(js|jsx|ts|tsx)', 
+    '../../../packages/mirinae/src/layouts/sidebar/**/*.stories.@(js|jsx|ts|tsx)',
+
+    '../../../packages/mirinae/src/layouts/vertical-layout/**/*.mdx',
+    '../../../packages/mirinae/src/layouts/vertical-layout/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
