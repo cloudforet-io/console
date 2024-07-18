@@ -29,6 +29,9 @@ const config: StorybookConfig = {
 
     '../../../packages/mirinae/src/layouts/horizontal-layout/**/*.mdx',
     '../../../packages/mirinae/src/layouts/horizontal-layout/**/*.stories.@(js|jsx|ts|tsx)', 
+
+    '../../../packages/mirinae/src/layouts/overlay-layout/**/*.mdx',
+    '../../../packages/mirinae/src/layouts/overlay-layout/**/*.stories.@(js|jsx|ts|tsx)', 
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
