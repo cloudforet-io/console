@@ -1,19 +1,23 @@
 <script lang="ts" setup>
+import { useResizeObserver } from '@vueuse/core/index';
 import {
     computed,
     reactive, ref, watch,
 } from 'vue';
 
-import type * as am5xy from '@amcharts/amcharts5/xy';
 import dayjs from 'dayjs';
+import type { BarSeriesOption } from 'echarts/charts';
+import type { EChartsType } from 'echarts/core';
+import { init } from 'echarts/core';
 import {
-    cloneDeep, find, sortBy, sumBy,
+    cloneDeep, find, isEmpty, sortBy, throttle,
 } from 'lodash';
 
 import {
     PCollapsibleToggle, PDataTable, PSkeleton,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 
@@ -23,16 +27,20 @@ import type { WorkspaceReferenceMap } from '@/store/reference/workspace-referenc
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import { useAmcharts5 } from '@/common/composables/amcharts5';
-
-import { gray } from '@/styles/colors';
+import {
+    getDateLabelFormat,
+    getReferenceLabel,
+    getWidgetDateFields,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
 
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getDataTableCostFields } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
-import { getLegends, getXYChartData } from '@/services/cost-explorer/helpers/cost-explorer-chart-data-helper';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
-import type { Legend, XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+import {
+    useAllReferenceTypeInfoStore,
+} from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
 interface Props {
@@ -46,20 +54,59 @@ const props = withDefaults(defineProps<Props>(), {
     data: () => ({}),
 });
 
-const OTHER_CATEGORY = 'Others';
+const LIMIT = 15;
 const DATE_FIELD_NAME = 'date';
 const chartContext = ref<HTMLElement|null>(null);
-const chartHelper = useAmcharts5(chartContext);
+// const chartHelper = useAmcharts5(chartContext);
 const allReferenceStore = useAllReferenceStore();
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
 const storeState = reactive({
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
-    legends: [] as Legend[],
-    chartData: [] as XYChartData[],
+    xAxisData: computed(() => getWidgetDateFields(GRANULARITY.MONTHLY, props.period?.start, props.period?.end)),
+    chartData: [],
+    chart: null as EChartsType | null,
+    chartOptions: computed<BarSeriesOption>(() => ({
+        grid: {
+            left: 0,
+            right: 0,
+            top: '3%',
+            bottom: '3%',
+            containLabel: true,
+        },
+        legend: {
+            show: false,
+        },
+        tooltip: {
+            formatter: (params) => {
+                const _params = Array.isArray(params) ? params : [params];
+                return _params.map((p) => {
+                    const _seriesName = getReferenceLabel(storeState.allReferenceTypeInfo, props.groupBy, p.seriesName);
+                    const _value = numberFormatter(p.value) || '';
+                    return `${_seriesName}<br>${p.marker} ${params.name}: <b>${_value}</b>`;
+                }).join('<br>');
+            },
+        },
+        xAxis: {
+            type: 'category',
+            data: state.xAxisData,
+            axisLabel: {
+                formatter: (val) => dayjs.utc(val).format(getDateLabelFormat(GRANULARITY.MONTHLY)),
+            },
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: (val) => numberFormatter(val, { notation: 'compact' }),
+            },
+        },
+        series: state.chartData,
+    })),
     isDetailsCollapsed: true,
     tableFields: computed<DataTableFieldType[]>(() => {
         const targetField: DataTableFieldType = {
@@ -99,96 +146,62 @@ const state = reactive({
 });
 
 /* Util */
-const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>): AnalyzeResponse<CostReportDataAnalyzeResult> => {
-    const _results: CostReportDataAnalyzeResult[] = [];
-    const _totalAmount = sumBy(res.results, '_total_value_sum');
-    const _thresholdValue = _totalAmount * 0.02;
-    const _othersResult: CostReportDataAnalyzeResult = {
-        [props.groupBy]: OTHER_CATEGORY,
-        _total_value_sum: 0,
-        value_sum: [],
-    };
-    res.results?.forEach((d) => {
-        if (d._total_value_sum && (d._total_value_sum < _thresholdValue)) {
-            _othersResult._total_value_sum += d._total_value_sum;
-            d.value_sum?.forEach((v) => {
-                const _target = find(_othersResult.value_sum, { date: v.date });
-                if (_target) {
-                    _target.value += v.value;
-                } else {
-                    _othersResult.value_sum?.push({ ...v });
-                }
-            });
-        } else {
-            _results.push(d);
+const drawChart = (rawData: AnalyzeResponse<CostReportDataAnalyzeResult>) => {
+    if (isEmpty(rawData)) return;
+
+    const _slicedData = rawData.results?.slice(0, LIMIT);
+    const _etcData = rawData.results?.slice(LIMIT);
+
+    const _seriesData: any[] = [];
+    _slicedData?.forEach((d) => {
+        let _color: string|undefined;
+        if (props.groupBy === 'provider') {
+            _color = storeState.providers[d[props.groupBy]]?.color;
         }
-    });
-    if (_othersResult._total_value_sum > 0) {
-        _results.push(_othersResult);
-    }
-    return {
-        more: res.more,
-        results: _results,
-    };
-};
-const drawChart = () => {
-    chartHelper.refreshRoot();
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart();
-
-    // set base interval of xAxis
-    xAxis.get('baseInterval').timeUnit = 'month';
-
-    // set label adapter of yAxis
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    yAxis.get('renderer').remove('labels');
-
-    // set min value of yAxis
-    state.legends.forEach((legend) => {
-        // create series
-        const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
-            name: legend.label as string,
-            valueYField: legend.name,
-            stacked: true,
-            stroke: undefined,
-        };
-        if (legend.color) {
-            seriesSettings.fill = chartHelper.color(legend.color);
-        }
-        if (legend.name === OTHER_CATEGORY) {
-            seriesSettings.fill = chartHelper.color(gray[500]);
-        }
-        const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
-
-        chart.series.push(series);
-
-        // set data processor
-        const dateFormat = 'yyyy-MM';
-        series.data.processor = chartHelper.createDataProcessor({
-            dateFormat,
-            dateFields: [DATE_FIELD_NAME],
+        _seriesData.push({
+            name: d[props.groupBy] || '--',
+            type: 'bar',
+            stack: true,
+            barMaxWidth: 50,
+            itemStyle: {
+                color: _color,
+            },
+            data: state.xAxisData.map((xAxis) => {
+                const _data = d.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
+                return _data ? _data?.value : undefined;
+            }),
         });
-
-        // create tooltip and set on series
-        const tooltip = chartHelper.createTooltip();
-        const formatter = (value) => currencyMoneyFormatter(value, { currency: costReportPageGetters.currency, style: 'decimal' }) as string;
-        chartHelper.setXYSharedTooltipText(chart, tooltip, formatter);
-        // set tooltip
-        series.set('tooltip', tooltip);
-
-        // set data
-        series.data.setAll(cloneDeep(state.chartData));
     });
-};
-/* Watcher */
-watch([() => props.loading, () => chartContext.value], async ([loading, _chartContext]) => {
-    if (!loading && _chartContext) {
-        const _refinedData = getRefinedAnalyzeData(props.data);
-        state.legends = getLegends(_refinedData, GRANULARITY.MONTHLY, props.groupBy);
-        state.chartData = getXYChartData(_refinedData, GRANULARITY.MONTHLY, props.period, props.groupBy);
-        drawChart();
+    if (_etcData?.length) {
+        _seriesData.push({
+            name: 'etc',
+            type: 'bar',
+            stack: true,
+            barMaxWidth: 50,
+            data: state.xAxisData.map((xAxis) => {
+                const _data = _etcData.reduce((acc, d) => {
+                    const _value = d.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
+                    return acc + (_value ? _value.value : 0);
+                }, 0);
+                return _data;
+            }),
+        });
     }
-}, { immediate: true });
+    state.chartData = _seriesData;
+
+    state.chart = init(chartContext.value);
+    state.chart.setOption(state.chartOptions, true);
+};
+
+/* Watcher */
+watch([() => chartContext.value, () => props.loading, () => props.data], async ([_chartContext, loading, data]) => {
+    if (_chartContext && !loading) {
+        drawChart(data);
+    }
+});
+useResizeObserver(chartContext, throttle(() => {
+    state.chart?.resize();
+}, 500));
 </script>
 
 <template>
