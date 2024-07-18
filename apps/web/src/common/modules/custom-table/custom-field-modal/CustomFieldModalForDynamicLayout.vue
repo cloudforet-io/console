@@ -21,7 +21,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
-import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
+import ColumnItemForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItemForDynamicLayout.vue';
 
 import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agent-mode-helper';
 import { getServiceAccountTableSchema, updateCustomTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
@@ -355,12 +355,12 @@ watch([() => props.visible, () => props.resourceType], ([visible, resourceType])
                                        draggable=".draggable-item"
                                        ghost-class="ghost"
                             >
-                                <column-item v-for="(column, idx) in state.allColumns"
-                                             :key="`${column.key}-${idx}`"
-                                             :selected-keys="state.selectedAllColumnKeys"
-                                             :item="column"
-                                             :search-text="state.search"
-                                             @update:selectedKeys="handleUpdateSelectedKeys"
+                                <column-item-for-dynamic-layout v-for="(column, idx) in state.allColumns"
+                                                                :key="`${column.key}-${idx}`"
+                                                                :selected-keys="state.selectedAllColumnKeys"
+                                                                :item="column"
+                                                                :search-text="state.search"
+                                                                @update:selectedKeys="handleUpdateSelectedKeys"
                                 />
                             </draggable>
                         </div>
