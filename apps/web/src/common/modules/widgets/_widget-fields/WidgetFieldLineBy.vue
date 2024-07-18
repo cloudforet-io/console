@@ -82,7 +82,6 @@ onMounted(() => {
 <template>
     <div class="widget-field-category-by">
         <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.LINE_BY')"
-                       class="root-field-group"
                        required
         >
             <template #label-extra>
@@ -123,7 +122,7 @@ onMounted(() => {
 
 .toggle-box {
     text-align: right;
-    width: 100%;
+    flex-grow: 1;
 }
 
 </style>
