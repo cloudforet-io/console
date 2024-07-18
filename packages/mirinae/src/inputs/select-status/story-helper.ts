@@ -1,14 +1,32 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
+
+export const getSelectStatusArgs = (): Args => ({
+    'v-model': '',
+    value: 'select status',
+    selected: undefined,
+    predicate: undefined,
+    multiSelectable: false,
+    icon: undefined,
+    iconColor: undefined,
+    iconAnimation: undefined,
+    disableCheckIcon: false,
+    defaultSlot: '',
+});
+
+export const getSelectStatusParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
 
 export const getSelectStatusArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
-        type: { name: 'any' },
         description: 'Two way binding for `value` props with `change` event.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'any',
@@ -22,9 +40,7 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
     },
     value: {
         name: 'value',
-        type: { name: 'any' },
         description: 'The value to be compared for the \'selected\' props.',
-        defaultValue: 'select status',
         table: {
             type: {
                 summary: 'any',
@@ -34,15 +50,11 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     selected: {
         name: 'selected',
-        type: { name: 'any, any[]' },
         description: 'Selected value(s).',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'any, any[]',
@@ -52,16 +64,13 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     predicate: {
         name: 'predicate',
-        type: { name: 'func' },
+        type: 'function',
         description: `Function that predicate two arguments are the same or not.
         It's useful when the props \`value\` is an object.`,
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'func',
@@ -75,9 +84,8 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
     },
     multiSelectable: {
         name: 'multiSelectable',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to allow multi select or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -87,16 +95,13 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     // select status props
     icon: {
         name: 'icon',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The icon name that represent the status.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -106,15 +111,12 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     iconColor: {
         name: 'iconColor',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The icon color',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -124,15 +126,12 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     iconAnimation: {
         name: 'iconAnimation',
-        type: { name: 'string' },
+        type: 'string',
         description: `Icon Animation type. ${Object.values(ANIMATION_TYPE).map((d) => `'${d}'`)} are available.`,
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -142,16 +141,13 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(ANIMATION_TYPE),
-        },
+        control: 'select',
+        options: Object.values(ANIMATION_TYPE),
     },
     disableCheckIcon: {
         name: 'disableCheckIcon',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show check icon or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -161,15 +157,12 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     /* slot */
     defaultSlot: {
         name: 'default',
         description: 'Slot for text.',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
@@ -179,9 +172,7 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* event */
     onChange: {
