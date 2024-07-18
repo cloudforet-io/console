@@ -1,4 +1,5 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 const sampleCodeObj = {
     server_id: 'server-283cd170d17d',
@@ -23,12 +24,41 @@ const sampleCodeObj = {
 };
 export const sampleCode = JSON.stringify(sampleCodeObj, null, ' ');
 
+export const getTextEditorParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A182308',
+    },
+});
+
+export const getTextEditorArgs = (): Args => ({
+    code: sampleCode,
+    options: {
+        tabSize: 4,
+        styleActiveLine: true,
+        lineNumbers: true,
+        line: true,
+        mode: 'application/json',
+        lineWrapping: true,
+        theme: 'ayu-mirage',
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        autoCloseTags: true,
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+    },
+    readOnly: false,
+    loading: false,
+    folded: false,
+    highlightLines: undefined,
+    disableAutoReformat: false,
+    loader: null,
+});
+
 export const getTextEditorArgTypes = (): ArgTypes => ({
     code: {
         name: 'code',
-        type: { name: 'any' },
         description: 'Code',
-        defaultValue: sampleCode,
         table: {
             type: {
                 summary: 'any',
@@ -38,28 +68,12 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     options: {
         name: 'options',
-        type: { name: 'object' },
+        type: { name: 'object' } as SBType,
         description: 'CodeMirror options.',
-        defaultValue: {
-            tabSize: 4,
-            styleActiveLine: true,
-            lineNumbers: true,
-            line: true,
-            mode: 'application/json',
-            lineWrapping: true,
-            theme: 'ayu-mirage',
-            matchBrackets: true,
-            autoCloseBrackets: true,
-            autoCloseTags: true,
-            foldGutter: true,
-            gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-        },
         table: {
             type: {
                 summary: 'object',
@@ -69,13 +83,11 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     readOnly: {
         name: 'readOnly',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether Mode of text editor is ReadOnly',
         defaultValue: false,
         table: {
@@ -87,15 +99,12 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
                 summary: 'edit',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     loading: {
         name: 'loading',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show loader or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -105,15 +114,12 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     folded: {
         name: 'folded',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to fold code block or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -123,15 +129,12 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     highlightLines: {
         name: 'highlightLines',
-        type: { name: 'Array<number>' },
+        type: { name: 'array' } as SBType,
         description: 'highlight inputted lines',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'Array<number>',
@@ -141,15 +144,12 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     disableAutoReformat: {
         name: 'disableAutoReformat',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to disable auto reformatting of code on code change or not. It works only when the code prop\'s type is `string`.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -159,15 +159,12 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     /* slots */
     loader: {
         name: 'loader',
         description: 'Slot for loader.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -178,4 +175,6 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
             category: 'slots',
         },
     },
+    // default
+    'update:code': { table: { disable: true } },
 });
