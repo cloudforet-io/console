@@ -108,7 +108,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const publicDashboardApiQueryHelper = new ApiQueryHelper();
-    const load = async (isProject?: string) => {
+    const load = async (isProject?: boolean) => {
         publicDashboardApiQueryHelper.setFilters([]);
         if (_state.isAdminMode) {
             publicDashboardApiQueryHelper.addFilter({
