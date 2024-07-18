@@ -1,9 +1,27 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getBreadcrumbsArgs = (): Args => ({
+    routes: [
+        { name: 'Page1', to: { name: 'Page1' } },
+        { name: 'Page2', to: { name: 'Page2' } },
+        { name: 'Page3' },
+    ],
+    copiable: false,
+
+});
+
+export const getBreadcrumbsParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
 
 export const getBreadcrumbsArgTypes = (): ArgTypes => ({
     routes: {
         name: 'routes',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: `Array of route to display.
         \`
         interface Route {
@@ -13,11 +31,6 @@ export const getBreadcrumbsArgTypes = (): ArgTypes => ({
         }
         \`
         `,
-        defaultValue: [
-            { name: 'Page1', to: { name: 'Page1' } },
-            { name: 'Page2', to: { name: 'Page2' } },
-            { name: 'Page3' },
-        ],
         table: {
             type: {
                 summary: 'array',
@@ -27,13 +40,11 @@ export const getBreadcrumbsArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     copiable: {
         name: 'copiable',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether copying is possible or not.',
         defaultValue: false,
         table: {
@@ -45,9 +56,7 @@ export const getBreadcrumbsArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     /* events */
     onClick: {
@@ -78,4 +87,7 @@ export const getBreadcrumbsArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    click: { table: { disable: true } },
+    'click-dropdown-menu-item': { table: { disable: true } },
 });

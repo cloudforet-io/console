@@ -20,27 +20,12 @@ const config: StorybookConfig = {
     
     '../../../packages/mirinae/src/inputs/**/*.mdx',
     '../../../packages/mirinae/src/inputs/**/*.stories.@(js|jsx|ts|tsx)',
-        
-    '../../../packages/mirinae/src/layouts/centered-layout/**/*.mdx',
-    '../../../packages/mirinae/src/layouts/centered-layout/**/*.stories.@(js|jsx|ts|tsx)',
 
-    '../../../packages/mirinae/src/layouts/divider/**/*.mdx',
-    '../../../packages/mirinae/src/layouts/divider/**/*.stories.@(js|jsx|ts|tsx)', 
+    '../../../packages/mirinae/src/layouts/**/*.mdx',
+    '../../../packages/mirinae/src/layouts/**/*.stories.@(js|jsx|ts|tsx)',
 
-    '../../../packages/mirinae/src/layouts/horizontal-layout/**/*.mdx',
-    '../../../packages/mirinae/src/layouts/horizontal-layout/**/*.stories.@(js|jsx|ts|tsx)', 
-
-    '../../../packages/mirinae/src/layouts/overlay-layout/**/*.mdx',
-    '../../../packages/mirinae/src/layouts/overlay-layout/**/*.stories.@(js|jsx|ts|tsx)', 
-
-    '../../../packages/mirinae/src/layouts/pane-layout/**/*.mdx',
-    '../../../packages/mirinae/src/layouts/pane-layout/**/*.stories.@(js|jsx|ts|tsx)', 
-
-    '../../../packages/mirinae/src/layouts/sidebar/**/*.mdx',
-    '../../../packages/mirinae/src/layouts/sidebar/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/layouts/vertical-layout/**/*.mdx',
-    '../../../packages/mirinae/src/layouts/vertical-layout/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/navigation/**/*.mdx',
+    '../../../packages/mirinae/src/navigation/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
