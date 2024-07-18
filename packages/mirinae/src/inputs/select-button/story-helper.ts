@@ -1,14 +1,33 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { SELECT_BUTTON_LAYOUT_TYPE, SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
+
+export const getSelectButtonArgs = (): Args => ({
+    'v-model': [],
+    value: true,
+    iconName: 'ic_chart-line',
+    disabled: false,
+    selected: undefined,
+    predicate: undefined,
+    multiSelectable: false,
+    layout: SELECT_BUTTON_LAYOUT_TYPE.TEXT_ONLY,
+    styleType: SELECT_BUTTON_STYLE_TYPE.secondary,
+    size: SELECT_BUTTON_SIZE.md,
+    defaultSlot: 'click me!',
+});
+
+export const getSelectButtonParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=13512%3A300523',
+    },
+});
 
 export const getSelectButtonArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
-        type: { name: 'any' },
         description: 'Two way binding for `selected` props with `change` event.',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'any',
@@ -22,9 +41,7 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
     },
     value: {
         name: 'value',
-        type: { name: 'any' },
         description: 'The value to be compared for the \'selected\' props.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'any',
@@ -34,15 +51,12 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     iconName: {
         name: 'iconName',
-        type: { name: 'string' },
+        type: 'string',
         description: 'You can use the icon name from the [Icons](https://storybook.developer.spaceone.dev/?path=/story/foundation-graphics-icons--all-icons).',
-        defaultValue: 'ic_chart-line',
         table: {
             type: {
                 summary: 'string',
@@ -52,15 +66,12 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
                 summary: 'ic_chart-line',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     disabled: {
         name: 'disabled',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to disable or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -70,15 +81,11 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     selected: {
         name: 'selected',
-        type: { name: 'any, any[]' },
         description: 'Selected value(s).',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'any, any[]',
@@ -88,16 +95,13 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     predicate: {
         name: 'predicate',
-        type: { name: 'func' },
+        type: 'function',
         description: `Function that predicate two arguments are the same or not.
         It's useful when the props \`value\` is an object.`,
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'func',
@@ -111,9 +115,8 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
     },
     multiSelectable: {
         name: 'multiSelectable',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to allow multi select or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -123,15 +126,12 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     layout: {
         name: 'layout',
-        type: { name: 'string' },
+        type: 'string',
         description: `Layout of select button. ${Object.values(SELECT_BUTTON_LAYOUT_TYPE)} are available.`,
-        defaultValue: SELECT_BUTTON_LAYOUT_TYPE.TEXT_ONLY,
         table: {
             type: {
                 summary: 'string',
@@ -141,16 +141,13 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
                 summary: SELECT_BUTTON_LAYOUT_TYPE.TEXT_ONLY,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(SELECT_BUTTON_LAYOUT_TYPE),
-        },
+        control: 'select',
+        options: Object.values(SELECT_BUTTON_LAYOUT_TYPE),
     },
     styleType: {
         name: 'styleType',
-        type: { name: 'string' },
+        type: 'string',
         description: `Style type of select button. ${Object.values(SELECT_BUTTON_STYLE_TYPE)} are available.`,
-        defaultValue: SELECT_BUTTON_STYLE_TYPE.secondary,
         table: {
             type: {
                 summary: 'string',
@@ -160,16 +157,13 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
                 summary: SELECT_BUTTON_STYLE_TYPE.secondary,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(SELECT_BUTTON_STYLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(SELECT_BUTTON_STYLE_TYPE),
     },
     size: {
         name: 'size',
-        type: { name: 'string' },
+        type: 'string',
         description: `Size of select button. ${Object.values(SELECT_BUTTON_SIZE)} are available.`,
-        defaultValue: SELECT_BUTTON_SIZE.md,
         table: {
             type: {
                 summary: 'string',
@@ -179,16 +173,13 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
                 summary: SELECT_BUTTON_SIZE.md,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(SELECT_BUTTON_SIZE),
-        },
+        control: 'select',
+        options: Object.values(SELECT_BUTTON_SIZE),
     },
     /* slot */
     defaultSlot: {
         name: 'default',
         description: 'Slot for the additional selectable area that explains checkbox.',
-        defaultValue: 'click me!',
         table: {
             type: {
                 summary: null,
@@ -198,9 +189,7 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* event */
     onChange: {
@@ -218,4 +207,6 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
 });
