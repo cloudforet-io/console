@@ -16,7 +16,7 @@ interface Props {
     type?: 'info' | 'danger' | 'warning';
     hideHeaderCloseButton?: boolean;
     visible?: boolean;
-    layout: 'insection' | 'full-width';
+    layout?: 'insection' | 'full-width';
 }
 
 const props = withDefaults(defineProps<Props>(), {
