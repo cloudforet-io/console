@@ -3,7 +3,7 @@ import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { getContextMenuItemArgs, getContextMenuItemArgTypes } from '@/inputs/context-menu/context-menu-item/story-helper';
 // eslint-disable-next-line import/no-cycle
-import { getSearchSlotArgTypes } from '@/inputs/search/search/story-helper';
+import { getSearchSlotArgTypes } from '@/inputs/story-helper';
 
 const searchSlots = Object.values(getSearchSlotArgTypes());
 

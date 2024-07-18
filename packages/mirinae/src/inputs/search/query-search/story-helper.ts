@@ -1,6 +1,27 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
-import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
+import { getSearchArgTypes, getSearchArgs } from '@/inputs/search/search/story-helper';
+
+export const getQuerySearchParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5952%3A20040',
+    },
+});
+
+export const getQuerySearchArgs = (): Args => {
+    const searchArgs = getSearchArgs();
+
+    return {
+        value: searchArgs.value,
+        placeholder: searchArgs.placeholder,
+        'v-model': searchArgs['v-model'],
+        focused: false,
+        keyItemSets: [],
+        valueHandlerMap: {},
+    };
+};
 
 export const getQuerySearchArgTypes = (): ArgTypes => {
     const searchArgTypes = getSearchArgTypes();
@@ -10,9 +31,8 @@ export const getQuerySearchArgTypes = (): ArgTypes => {
         'v-model': searchArgTypes['v-model'],
         focused: {
             name: 'focused',
-            type: { name: 'boolean' },
+            type: 'boolean',
             description: 'Whether to make focused at the first time or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -22,15 +42,12 @@ export const getQuerySearchArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         keyItemSets: {
             name: 'keyItemSets',
-            type: { name: 'array' },
+            type: { name: 'array' } as SBType,
             description: 'Query key list.',
-            defaultValue: [],
             table: {
                 type: {
                     summary: 'array',
@@ -43,9 +60,8 @@ export const getQuerySearchArgTypes = (): ArgTypes => {
         },
         valueHandlerMap: {
             name: 'valueHandlerMap',
-            type: { name: 'object' },
+            type: { name: 'object' } as SBType,
             description: 'Query value handlers.',
-            defaultValue: {},
             table: {
                 type: {
                     summary: 'object',
