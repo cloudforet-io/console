@@ -36,10 +36,6 @@ const displayState = reactive({
         minHeight: `${displayState.minHeight}px`,
         width: '100%',
     })),
-    tableStyle: computed(() => ({
-        height: `${displayState.tableAreaHeight}px`,
-        minHeight: `${(dataTableContentsRef.value?.clientHeight || 1000) / 5}px`,
-    })),
     resizing: false,
     clientY: null,
     transition: false,
