@@ -44,6 +44,9 @@ const config: StorybookConfig = {
 
     '../../../packages/mirinae/src/inputs/input/**/*.mdx',
     '../../../packages/mirinae/src/inputs/input/**/*.stories.@(js|jsx|ts|tsx)',
+
+    '../../../packages/mirinae/src/inputs/link/**/*.mdx',
+    '../../../packages/mirinae/src/inputs/link/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
