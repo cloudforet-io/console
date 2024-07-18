@@ -1,10 +1,10 @@
 import { getDataTableArgsType, getDataTableDefaultArgs } from '@/data-display/tables/data-table/story-helper';
-import { getToolboxArgTypes, getToolboxDefaultArgs } from '@/navigation/toolbox/story-helper';
+import { getToolboxArgTypes, getToolboxArgs } from '@/navigation/toolbox/story-helper';
 
 export const getToolboxTableDefaultArgs = () => {
     const args = {
         ...getDataTableDefaultArgs(),
-        ...getToolboxDefaultArgs(),
+        ...getToolboxArgs(),
         toolboxTopSlot: undefined,
         toolboxBottomSlot: undefined,
         toolboxLeftSlot: undefined,
