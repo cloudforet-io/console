@@ -244,4 +244,7 @@ export const getPFieldGroupArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    'label-extra': { table: { disable: true } },
+    'click-field-title': { table: { disable: true } },
 });
