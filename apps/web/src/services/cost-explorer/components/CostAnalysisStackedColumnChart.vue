@@ -53,7 +53,6 @@ const DATE_FIELD_NAME = 'date';
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.state;
 const chartContext = ref<HTMLElement | null>(null);
-// const chartHelper = useAmcharts5(chartContext);
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const storeState = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
