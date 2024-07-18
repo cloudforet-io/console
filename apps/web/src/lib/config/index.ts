@@ -41,6 +41,9 @@ class Config {
                 const edgeConfig = await edgeConfigClient.getAll();
                 console.debug('edgeConfig', edgeConfig);
                 this.config = { ...this.config, ...edgeConfig };
+            } if (import.meta.env?.VITE_NETLIFY_CONFIG) {
+                const netlifyConfig = await this.axiosInstance.get(import.meta.env.VITE_NETLIFY_CONFIG);
+                this.config = { ...this.config, ...netlifyConfig };
             }
         }
     }
