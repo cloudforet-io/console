@@ -1,15 +1,36 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 import VueRouter from 'vue-router';
 
 import { ACTION_ICON, LinkSize } from '@/inputs/link/type';
 
+export const getLinkArgs = (): Args => ({
+    text: 'Hello World',
+    disabled: false,
+    highlight: false,
+    size: LinkSize.md,
+    iconLeft: undefined,
+    actionIcon: undefined,
+    newTab: false,
+    href: 'https://cloudforet.io',
+    to: undefined,
+    useAnchorScroll: false,
+    defaultSlot: null,
+
+});
+
+export const getLinkParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=7050%3A551812',
+    },
+});
 
 export const getLinkArgTypes = (): ArgTypes => ({
     text: {
         name: 'text',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Link text. It will be replaced by default slot if exists.',
-        defaultValue: 'Hello World',
         table: {
             type: {
                 summary: 'string',
@@ -19,13 +40,11 @@ export const getLinkArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     disabled: {
         name: 'disabled',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Disable link or not',
         defaultValue: false,
         table: {
@@ -37,15 +56,12 @@ export const getLinkArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     highlight: {
         name: 'highlight',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Fix link color for highlighting, not inherit parent\'s color.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -55,16 +71,13 @@ export const getLinkArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     size: {
         name: 'size',
-        type: { name: 'string' },
+        type: 'string',
         description: `Select link size. ${
             [...Object.values(LinkSize)].map((d) => `\`${d}\``)} are available.`,
-        defaultValue: LinkSize.md,
         table: {
             type: {
                 summary: 'string',
@@ -74,16 +87,13 @@ export const getLinkArgTypes = (): ArgTypes => ({
                 summary: LinkSize.md,
             },
         },
-        control: {
-            type: 'select',
-            options: [...Object.values(LinkSize)],
-        },
+        control: 'select',
+        options: [...Object.values(LinkSize)],
     },
     iconLeft: {
         name: 'iconLeft',
-        type: { name: 'string' },
+        type: 'string',
         description: 'The name of left icon to be displayed.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -93,15 +103,12 @@ export const getLinkArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     actionIcon: {
         name: 'actionIcon',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Action icon that will appear to the right of the link text.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -111,16 +118,13 @@ export const getLinkArgTypes = (): ArgTypes => ({
                 summary: ACTION_ICON.NONE,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(ACTION_ICON),
-        },
+        control: 'select',
+        options: Object.values(ACTION_ICON),
     },
     newTab: {
         name: 'newTab',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to open the link in a new tab or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -130,15 +134,12 @@ export const getLinkArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     href: {
         name: 'href',
-        type: { name: 'string' },
+        type: 'string',
         description: 'href',
-        defaultValue: 'https://cloudforet.io',
         table: {
             type: {
                 summary: 'string',
@@ -148,15 +149,12 @@ export const getLinkArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     to: {
         name: 'to',
-        type: { name: 'object' },
+        type: { name: 'object' } as SBType,
         description: 'Vue Router `Location`.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'object',
@@ -166,15 +164,12 @@ export const getLinkArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     useAnchorScroll: {
         name: 'useAnchorScroll',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: "Whether to use 'a' tag's scroll to specific element or not.",
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -188,7 +183,6 @@ export const getLinkArgTypes = (): ArgTypes => ({
     defaultSlot: {
         name: 'default',
         description: 'Slot for text',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -198,10 +192,10 @@ export const getLinkArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
+    // default
+    default: { table: { disable: true } },
 });
 
 export const router = new VueRouter({
