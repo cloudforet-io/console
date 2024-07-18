@@ -18,59 +18,11 @@ const config: StorybookConfig = {
     '../../../packages/mirinae/src/foundation/**/*.mdx',
     '../../../packages/mirinae/src/foundation/**/*.stories.@(js|jsx|ts|tsx)',
     
-    '../../../packages/mirinae/src/inputs/buttons/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/buttons/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/checkbox/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/checkbox/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/checkbox-group/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/checkbox-group/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/context-menu/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/context-menu/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/datetime-picker/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/datetime-picker/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/dropdown/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/dropdown/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/file-uploader/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/file-uploader/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/forms/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/forms/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/input/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/input/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/link/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/link/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/radio/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/radio/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/radio-group/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/radio-group/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/search/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/search/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/select-button/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/select-button/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/select-card/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/select-card/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/select-status/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/select-status/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/text-editor/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/text-editor/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/inputs/textarea/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/textarea/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/inputs/**/*.mdx',
+    '../../../packages/mirinae/src/inputs/**/*.stories.@(js|jsx|ts|tsx)',
+        
+    '../../../packages/mirinae/src/layouts/centered-layout/**/*.mdx',
+    '../../../packages/mirinae/src/layouts/centered-layout/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),
