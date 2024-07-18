@@ -9,6 +9,7 @@ interface Props {
     item: LSBCollapsibleItem;
     isSubItem?: boolean;
     overrideCollapsed?: boolean;
+    showSubItemCount?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -53,7 +54,9 @@ watch(() => props.overrideCollapsed, (changedCollapsed) => {
                             height="1rem"
                 />
             </slot>
-            <span>{{ props.item.label }}</span>
+            <span>{{ props.item.label }} <span v-if="props.showSubItemCount && props.item.subItems?.length"
+                                               class="sub-item-count"
+            >({{ props.item.subItems?.length }})</span></span>
         </div>
         <div class="collapsible-contents">
             <slot name="collapsible-contents"
@@ -77,6 +80,9 @@ watch(() => props.overrideCollapsed, (changedCollapsed) => {
         }
         .title-image {
             margin-right: 0.25rem;
+        }
+        .sub-item-count {
+            @apply font-normal;
         }
     }
     .collapsible-contents {
