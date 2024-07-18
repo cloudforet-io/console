@@ -203,11 +203,11 @@ watch([() => chartContext.value, () => props.loading, () => props.data], async (
 });
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
-}, 500));
+}, 300));
 </script>
 
 <template>
-    <div>
+    <div class="cost-report-overview-cost-trend-chart">
         <div class="chart-wrapper">
             <p-skeleton v-if="props.loading"
                         height="100%"
@@ -243,7 +243,11 @@ useResizeObserver(chartContext, throttle(() => {
 </template>
 
 <style lang="postcss" scoped>
+.cost-report-overview-cost-trend-chart {
+    width: 100%;
+}
 .chart-wrapper {
+    width: 100%;
     height: 17rem;
     padding-top: 1.5rem;
     padding-bottom: 1rem;
