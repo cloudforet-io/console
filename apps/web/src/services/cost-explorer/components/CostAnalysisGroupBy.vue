@@ -82,6 +82,7 @@ const setSelectedTagsMenu = (groupBy?: string[]) => {
 const setSelectedAdditionalInfoGroupBy = (groupBy?: string[]) => {
     if (!groupBy) return;
     state.selectedAdditionalGroupByMenu = groupBy
+        .filter((d) => !costAnalysisPageGetters.managedGroupByItems.map((v) => v.name).includes(d))
         .filter((d) => d.startsWith('additional_info.'))
         .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
 };
