@@ -1,31 +1,10 @@
-import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import PQuerySearchTags from './PQuerySearchTags.vue';
-import {
-    getQuerySearchTagsArgTypes
-} from '@/inputs/search/query-search-tags/story-helper';
+{/* PQuerySearchTags.mdx */}
 
-<Meta title='Inputs/Search/QuerySearchTags' parameters={{
-    design: {
-        type: 'figma',
-        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=73%3A0',
-    }
-}} argTypes={getQuerySearchTagsArgTypes()}/>
+import { Canvas, Meta, Controls } from '@storybook/blocks';
 
+import * as PQuerySearchTagsStories from './PQuerySearchTags.stories';
 
-export const Template = (args, { argTypes }) => ({
-    props: Object.keys(argTypes),
-    components: { PQuerySearchTags },
-    template: `
-    <div class="h-full w-full overflow p-8">
-        <p-query-search-tags :tags="tags"
-            :timezone="timezone"
-            :read-only="readonly"
-        >
-        </p-query-search-tags>
-    </div>
-    `,
-});
-
+<Meta of={PQuerySearchTagsStories} />
 
 # Query Search Tags
 <br/>
@@ -195,11 +174,8 @@ interface QuerySearchTagsFunctions {
 
 ## Playground
 
-<Canvas>
-    <Story name="Playground">
-        {Template.bind({})}
-    </Story>
-</Canvas>
+<Canvas of={PQuerySearchTagsStories.Playground} />
+<Controls of={PQuerySearchTagsStories.Playground} />
 
-<ArgsTable story="Playground"/>
-
+<br/>
+<br/>

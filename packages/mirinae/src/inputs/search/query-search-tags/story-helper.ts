@@ -1,13 +1,28 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { getQuerySearchTags } from '@/inputs/search/query-search-tags/mock';
+
+export const getQuerySearchTagsArgs = (): Args => ({
+    tags: getQuerySearchTags(),
+    timezone: 'UTC',
+    validator: undefined,
+    converter: undefined,
+    readOnly: false,
+});
+
+export const getQuerySearchTagsParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=73%3A0',
+    },
+});
 
 export const getQuerySearchTagsArgTypes = (): ArgTypes => ({
     tags: {
         name: 'tags',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: 'Tags for query search. Follow the QuerySearch component spec. sync props.',
-        defaultValue: getQuerySearchTags(),
         table: {
             type: {
                 summary: 'array',
@@ -17,15 +32,12 @@ export const getQuerySearchTagsArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     timezone: {
         name: 'timezone',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Timezone that is used for display time value of query search tags.',
-        defaultValue: 'UTC',
         table: {
             type: {
                 summary: 'string',
@@ -35,15 +47,12 @@ export const getQuerySearchTagsArgTypes = (): ArgTypes => ({
                 summary: 'UTC',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     validator: {
         name: 'validator',
-        type: { name: 'function' },
+        type: 'function',
         description: 'Validator for each tag.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -56,9 +65,8 @@ export const getQuerySearchTagsArgTypes = (): ArgTypes => ({
     },
     converter: {
         name: 'converter',
-        type: { name: 'function' },
+        type: 'function',
         description: 'Converter for each tag.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -71,9 +79,8 @@ export const getQuerySearchTagsArgTypes = (): ArgTypes => ({
     },
     readOnly: {
         name: 'readOnly',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to make editable or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -83,8 +90,9 @@ export const getQuerySearchTagsArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
+    // default
+    // eslint-disable-next-line no-template-curly-in-string
+    "`data-type-${tag.key.dataType || 'string'}`": { table: { disable: true } },
 });
