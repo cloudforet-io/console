@@ -123,7 +123,6 @@ onUnmounted(() => {
     gap: 1.5625rem;
     font-size: 0.875rem;
     line-height: 125%;
-    padding-bottom: 1.5rem;
 
     .draggable-wrapper {
         display: flex;
@@ -154,7 +153,7 @@ onUnmounted(() => {
     }
 }
 .footer-wrapper {
-    @apply flex border-t border-gray-200 bg-white;
+    @apply flex border-t border-gray-200;
     width: 100%;
     gap: 0.75rem;
     padding: 0.75rem 1rem;

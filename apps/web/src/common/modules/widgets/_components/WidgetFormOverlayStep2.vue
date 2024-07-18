@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onBeforeMount, onMounted, onUnmounted, reactive, ref, watch,
+    computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import { cloneDeep, isEqual } from 'lodash';
@@ -84,26 +84,6 @@ const state = reactive({
     //
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
-});
-const displayState = reactive({
-    rightPartWidth: (window.innerWidth || 1000) / 4,
-    resizing: false,
-    clientX: null,
-    transition: false,
-    resizerStyle: computed(() => ({
-        left: `${displayState.rightPartWidth}px`,
-        'border-left-width': '1px',
-    })),
-    leftPartStyle: computed(() => ({
-        width: `calc(100% - ${displayState.rightPartWidth}px)`,
-    })),
-    rightPartStyle: computed(() => ({
-        width: `${displayState.rightPartWidth}px`,
-        minWidth: `${displayState.minWidth}px`,
-        maxWidth: `${displayState.maxWidth}px`,
-    })),
-    minWidth: 224,
-    maxWidth: ((window.innerWidth || 1000) / 2) - 32,
 });
 
 const {
@@ -189,33 +169,6 @@ const handleMountWidgetComponent = () => {
 const handleEditWidget = () => {
     widgetGenerateStore.setOverlayType('EDIT');
 };
-const isResizing = (event) => {
-    if (displayState.resizing) {
-        if (displayState.clientX === null) {
-            displayState.clientX = event.clientX;
-            return;
-        }
-        const delta = displayState.clientX - event.clientX;
-        const width = displayState.rightPartWidth + delta;
-        if (!(width <= displayState.minWidth || width > displayState.maxWidth)) {
-            displayState.rightPartWidth = width;
-        }
-        displayState.clientX = event.clientX;
-    }
-};
-const endResizing = () => {
-    displayState.resizing = false;
-    displayState.clientX = null;
-};
-const startResizing = () => {
-    displayState.resizing = true;
-};
-const documentEventMount = (eventName: string, func: any) => {
-    onMounted(() => document.addEventListener(eventName, func));
-    onUnmounted(() => document.removeEventListener(eventName, func));
-};
-documentEventMount('mousemove', isResizing);
-documentEventMount('mouseup', endResizing);
 
 /* Watcher */
 watch(() => widgetGenerateState.widget?.size, (widgetSize) => {
@@ -247,9 +200,7 @@ onUnmounted(() => {
     <div class="sidebar-contents"
          :class="{ 'expand': widgetGenerateState.overlayType === 'EXPAND' }"
     >
-        <div class="left-part"
-             :style="displayState.leftPartStyle"
-        >
+        <div class="left-part">
             <div class="dashboard-settings-wrapper">
                 <div class="toolbox-wrapper">
                     <dashboard-toolset-date-dropdown :date-range="state.dashboardOptionsSnapshot.date_range" />
@@ -303,20 +254,9 @@ onUnmounted(() => {
                 />
             </div>
         </div>
-        <div v-if="widgetGenerateState.overlayType !== 'EXPAND'"
-             class="resizer-container line"
-             :class="{transition: displayState.transition}"
-             :style="displayState.resizerStyle"
-             @mousedown="startResizing"
-             @mousemove="isResizing"
-             @mouseup="endResizing"
-        />
         <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'"
                                                :widget-validation-invalid="optionsInvalid"
                                                :widget-validation-invalid-text="optionsInvalidText"
-                                               :style="displayState.rightPartStyle"
-                                               class="right-part"
-                                               :class="{ 'transition': displayState.transition, 'unselectable': displayState.resizing }"
         />
         <portal to="apply-button">
             <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
@@ -343,8 +283,10 @@ onUnmounted(() => {
     padding: 0 1.5rem 1rem 1.5rem;
     .left-part {
         @apply bg-gray-100 border border-gray-150 rounded-md;
-        width: 100%;
+        max-width: 75%;
         flex-grow: 1;
+        display: flex;
+        flex-direction: column;
         padding: 1rem;
         .dashboard-settings-wrapper {
             display: flex;
@@ -396,39 +338,6 @@ onUnmounted(() => {
         .left-part {
             @apply border-none;
             padding: 1.5rem 0;
-        }
-    }
-    .resizer-container {
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        position: sticky;
-        top: 0;
-        height: 100%;
-        width: 0;
-        z-index: 1;
-
-        &.transition {
-            transition: left 0.2s;
-        }
-
-        &.line {
-            @apply border-gray-200;
-            background-color: transparent;
-
-            &:hover {
-                @apply border-blue-500;
-                cursor: ew-resize;
-            }
-        }
-    }
-    .right-part {
-        display: flex;
-        &.transition {
-            transition: height 0.2s;
-        }
-        &.unselectable {
-            user-select: none;
         }
     }
 }
