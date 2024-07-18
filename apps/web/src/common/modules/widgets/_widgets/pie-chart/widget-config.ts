@@ -24,7 +24,7 @@ const pieChart: WidgetConfig = {
         },
         pieChartType: {
             options: {
-                default: 'donut',
+                default: 'pie',
             },
         },
     },

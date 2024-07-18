@@ -22,15 +22,15 @@ const state = reactive({
     proxyValue: useProxyValue<string>('value', props, emit),
     pieChartTypeMenuItems: computed<MenuItem[]>(() => [
         {
-            name: 'donut',
-            label: i18n.t('COMMON.WIDGETS.DONUT'),
-        },
-        {
             name: 'pie',
             label: i18n.t('COMMON.WIDGETS.PIE'),
         },
+        {
+            name: 'donut',
+            label: i18n.t('COMMON.WIDGETS.DONUT'),
+        },
     ]),
-    selectedPieChartType: 'donut',
+    selectedPieChartType: 'pie',
 });
 
 /* Event */
@@ -41,7 +41,7 @@ const handleChangePieChartType = (value: string) => {
 
 onMounted(() => {
     emit('update:is-valid', true);
-    state.proxyValue = props.value ?? 'donut';
+    state.proxyValue = props.value ?? 'pie';
 });
 </script>
 
