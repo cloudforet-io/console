@@ -1,12 +1,30 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getRadioArgs = (): Args => ({
+    'v-model': [],
+    value: true,
+    selected: undefined,
+    disabled: false,
+    predicate: undefined,
+    invalid: false,
+    readonly: false,
+    defaultSlot: 'click me!',
+    radioIconSlot: null,
+    radioLeftSlot: null,
+});
+
+export const getRadioParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A162064',
+    },
+});
 
 export const getRadioArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
-        type: { name: 'any' },
         description: 'Two way binding for `selected` props with `change` event.',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'any',
@@ -20,9 +38,7 @@ export const getRadioArgTypes = (): ArgTypes => ({
     },
     value: {
         name: 'value',
-        type: { name: 'any' },
         description: 'The value to be compared for the \'selected\' props.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'any',
@@ -32,15 +48,11 @@ export const getRadioArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     selected: {
         name: 'selected',
-        type: { name: 'any, any[]' },
         description: 'Selected value(s).',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'any, any[]',
@@ -50,15 +62,12 @@ export const getRadioArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     disabled: {
         name: 'disabled',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to disable selection or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -68,16 +77,13 @@ export const getRadioArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     predicate: {
         name: 'predicate',
-        type: { name: 'func' },
+        type: 'function',
         description: `Function that predicate two arguments are the same or not.
         It's useful when the props \`value\` is an object.`,
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'func',
@@ -92,9 +98,8 @@ export const getRadioArgTypes = (): ArgTypes => ({
     // radio props
     invalid: {
         name: 'invalid',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Apply invalid style',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -104,15 +109,12 @@ export const getRadioArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     readonly: {
         name: 'readonly',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to make readonly or not',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -122,9 +124,7 @@ export const getRadioArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     /* slot */
     defaultSlot: {
@@ -140,9 +140,7 @@ export const getRadioArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     radioIconSlot: {
         name: 'radio-icon',
@@ -157,14 +155,11 @@ export const getRadioArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     radioLeftSlot: {
         name: 'radio-left',
         description: 'Slot for left area of radio.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -174,9 +169,7 @@ export const getRadioArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* event */
     onChange: {
@@ -194,4 +187,8 @@ export const getRadioArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
+    'radio-left': { table: { disable: true } },
+    icon: { table: { disable: true } },
 });
