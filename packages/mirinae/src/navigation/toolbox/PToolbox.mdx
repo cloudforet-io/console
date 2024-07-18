@@ -1,0 +1,66 @@
+{/* PToolbox.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PToolboxStories from './PToolbox.stories';
+
+<Meta of={PToolboxStories} />
+
+
+# Toolbox
+
+<br />
+<br />
+
+## Basic
+<Canvas of={PToolboxStories.Basic} />
+
+<br/>
+<br/>
+
+### Options
+
+<br/>
+
+When pagination, page size, filters like search text and query tags, and sort value are changed, `change` event will be occurred.<br/>
+`change` event has one argument, `options`. <br/>
+`options` contains `sortBy`, `pageStart`, `pageLimit`, `queryTags`, and `searchText` optionally.<br/>
+Each property in options exists only when the value changed.<br/>
+
+```typescript
+interface Options {
+    pageStart?: number;
+    pageLimit?: number;
+    sortBy?: string;
+    queryTags?: QueryTag[]; // query search tag type
+    searchText?: string;
+}
+```
+
+<br/>
+
+
+## Full Case
+<Canvas of={PToolboxStories.FullCase} />
+
+<br/>
+<br/>
+
+## Query Search
+<Canvas of={PToolboxStories.QuerySearch} />
+
+<br/>
+<br/>
+
+## Left Area Slot
+<Canvas of={PToolboxStories.LeftAreaSlot} />
+
+<br/>
+<br/>
+
+## Playground
+<Canvas of={PToolboxStories.Playground} />
+<Controls of={PToolboxStories.Playground} />
+
+<br/>
+<br/>

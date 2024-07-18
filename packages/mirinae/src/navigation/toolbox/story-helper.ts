@@ -1,7 +1,11 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import { getKeyItemSets, getQueryTags, getValueHandlerMap } from '@/navigation/toolbox/mock';
 
-export const getToolboxDefaultArgs = () => ({
+
+export const getToolboxArgs = (): Args => ({
     paginationVisible: true,
     pageSizeChangeable: true,
     settingsVisible: false,
@@ -26,7 +30,14 @@ export const getToolboxDefaultArgs = () => ({
     leftAreaSlot: undefined,
 });
 
-export const getToolboxArgTypes = () => ({
+export const getToolboxParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A179180',
+    },
+});
+
+export const getToolboxArgTypes = (): ArgTypes => ({
     paginationVisible: {
         name: 'paginationVisible',
         type: 'boolean',
@@ -242,7 +253,7 @@ export const getToolboxArgTypes = () => ({
     },
     pageSizeOptions: {
         name: 'pageSizeOptions',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Options for dropdown of page sizes.',
         table: {
             type: {
@@ -257,7 +268,7 @@ export const getToolboxArgTypes = () => ({
     },
     sortByOptions: {
         name: 'sortByOptions',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Options for dropdown of sort keys.',
         table: {
             type: {
@@ -272,7 +283,7 @@ export const getToolboxArgTypes = () => ({
     },
     keyItemSets: {
         name: 'keyItemSets',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Query search key item sets. Follow the QuerySearch component spec.',
         table: {
             type: {
@@ -287,7 +298,7 @@ export const getToolboxArgTypes = () => ({
     },
     valueHandlerMap: {
         name: 'valueHandlerMap',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Query search value handler map. Follow the QuerySearch component spec.',
         table: {
             type: {
@@ -302,7 +313,7 @@ export const getToolboxArgTypes = () => ({
     },
     queryTags: {
         name: 'queryTags',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Query search tags. Follow the QuerySearchTags component spec. sync props.',
         table: {
             type: {
@@ -414,4 +425,10 @@ export const getToolboxArgTypes = () => ({
             },
         },
     },
+    // default
+    'left-area': { table: { disable: true } },
+    'pagination-area': { table: { disable: true } },
+    export: { table: { disable: true } },
+    'click-settings': { table: { disable: true } },
+    refresh: { table: { disable: true } },
 });
