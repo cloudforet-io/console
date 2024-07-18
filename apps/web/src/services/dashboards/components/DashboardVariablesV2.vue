@@ -19,6 +19,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 interface Props {
+    isProjectDashboard?: boolean;
     loading?: boolean;
     disableSaveButton?: boolean;
     originVars?: DashboardVars;
@@ -39,10 +40,12 @@ const storeState = reactive({
 const state = reactive({
     variableProperties: computed<Record<string, DashboardVariableSchemaProperty>>(() => {
         const _defaultDashboardVariables: Record<string, DashboardVariableSchemaProperty> = {
-            project: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project.key],
             service_account: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.service_account.key],
             // region: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.region.key],
         };
+        if (!props.isProjectDashboard) {
+            _defaultDashboardVariables.project = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project.key];
+        }
         if (storeState.isAdminMode) {
             _defaultDashboardVariables.workspace = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key];
         }

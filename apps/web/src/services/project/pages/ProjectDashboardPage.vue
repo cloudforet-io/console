@@ -17,10 +17,10 @@ import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVari
 import DashboardWidgetContainerV2 from '@/services/dashboards/components/DashboardWidgetContainerV2.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
-// interface Props {
-//     id: string;
-// }
-// const props = defineProps<Props>();
+interface Props {
+    id: string;
+}
+const props = defineProps<Props>();
 
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -91,6 +91,7 @@ watch(() => state.currentDashboardId, async (dashboardId, prevDashboardId) => {
     if (dashboardId && !prevDashboardId) { // this includes all three cases
         dashboardDetailStore.reset();
     }
+    dashboardDetailStore.setVars({ project_id: [props.id] }); // TODO: Check Project Dashboard default "vars"
     await getDashboardData(dashboardId);
 }, { immediate: true });
 
@@ -123,6 +124,7 @@ watch(() => state.currentDashboardId, async (dashboardId, prevDashboardId) => {
             <div class="contents-wrapper">
                 <div class="dashboard-selectors">
                     <dashboard-variables-v2 class="variable-selector-wrapper"
+                                            is-project-dashboard
                                             :disable-save-button="dashboardDetailGetters.disableManageButtons"
                                             :loading="state.dashboardVariablesLoading"
                                             @update="handleUpdateDashboardVariables"
