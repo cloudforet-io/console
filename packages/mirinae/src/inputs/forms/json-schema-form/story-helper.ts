@@ -253,4 +253,8 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    'label-extra': { table: { disable: true } },
+    'dropdown-extra': { table: { disable: true } },
+    'input-extra': { table: { disable: true } },
 });
