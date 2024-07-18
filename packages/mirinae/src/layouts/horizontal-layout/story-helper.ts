@@ -1,11 +1,25 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getHorizontalLayoutArgs = (): Args => ({
+    height: 400,
+    minHeight: 300,
+    maxHeight: 1000,
+    container: null,
+    onResizeEnd: null,
+});
+
+export const getHorizontalLayoutParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A228226&t=GVsFwo5txLv6VtoA-4',
+    },
+});
 
 export const getHorizontalLayoutArgTypes = (): ArgTypes => ({
     height: {
         name: 'height',
-        type: { name: 'number' },
+        type: 'number',
         description: '',
-        defaultValue: 400,
         table: {
             type: {
                 summary: 'number',
@@ -15,15 +29,12 @@ export const getHorizontalLayoutArgTypes = (): ArgTypes => ({
                 summary: '"400"',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     minHeight: {
         name: 'minHeight',
-        type: { name: 'number' },
+        type: 'number',
         description: '',
-        defaultValue: 300,
         table: {
             type: {
                 summary: 'number',
@@ -33,15 +44,12 @@ export const getHorizontalLayoutArgTypes = (): ArgTypes => ({
                 summary: '"300"',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     maxHeight: {
         name: 'maxHeight',
-        type: { name: 'number' },
+        type: 'number',
         description: '',
-        defaultValue: 1000,
         table: {
             type: {
                 summary: 'number',
@@ -51,16 +59,13 @@ export const getHorizontalLayoutArgTypes = (): ArgTypes => ({
                 summary: '"1000"',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
 
     // slots
     container: {
         name: 'container',
         description: 'Slot for layout contents.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -73,7 +78,6 @@ export const getHorizontalLayoutArgTypes = (): ArgTypes => ({
     onResizeEnd: {
         name: 'resize-end',
         description: 'Emitted when resizing is end.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
