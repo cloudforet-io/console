@@ -507,5 +507,10 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 category: 'events',
             },
         },
+        // default
+        default: { table: { disable: true } },
+        'right-extra': { table: { disable: true } },
+        'input-right': { table: { disable: true } },
+        'right-edge': { table: { disable: true } },
     };
 };
