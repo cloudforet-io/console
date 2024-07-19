@@ -145,7 +145,7 @@ watch(() => state.currentDashboardId, async (dashboardId, prevDashboardId) => {
                      :title="$t('PROJECT.DETAIL.DASHBOARD.NO_DASHBOARD')"
             >
                 <template #image>
-                    <img src="../../../assets/images/img_ghost.png"
+                    <img src="@/assets/images/img_ghost.png"
                          alt="empty-options"
                          class="empty-options-image"
                     >
@@ -198,6 +198,9 @@ watch(() => state.currentDashboardId, async (dashboardId, prevDashboardId) => {
                 }
             }
         }
+    }
+    .empty-contents {
+        padding-top: 1rem;
     }
 }
 </style>
