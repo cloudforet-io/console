@@ -2,7 +2,7 @@ import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, onMounted, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
-import { cloneDeep, isEmpty } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -150,13 +150,14 @@ export const useWidgetFrame = (
         }),
         dataTable: computed<DataTableModel|undefined>(() => _state.dataTables?.find((d) => d.data_table_id === props.dataTableId)),
         dataTables: [] as DataTableModel[],
-        unit: computed<string|undefined>(() => {
-            if (isEmpty(_state.dataTable)) return undefined;
-            const _units: string[] = [];
-            Object.values(_state.dataTable.data_info).forEach((d) => {
-                if (d?.unit) _units.push(d.unit);
+        unitMap: computed<Record<string, string>>(() => {
+            const _result: Record<string, string> = {};
+            _state.dataTables.forEach((d) => {
+                Object.entries(d.data_info).forEach(([k, v]) => {
+                    if (v?.unit) _result[k] = v.unit;
+                });
             });
-            return _units.join(', ');
+            return _result;
         }),
         fullDataLinkList: computed<FullDataLink[]>(() => {
             if (!_state.dataTable) return [];
@@ -197,7 +198,7 @@ export const useWidgetFrame = (
         size: _state.size,
         width: props.width,
         periodText: _state.periodText,
-        unit: _state.unit,
+        unitMap: _state.unitMap,
         fullDataLinkList: _state.fullDataLinkList,
     }));
 
