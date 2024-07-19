@@ -1826,7 +1826,10 @@
 			}
 		},
 		"DETAIL": {
+			"1": "",
 			"ADD_WIDGET": "ウィジェットを追加する",
+			"ALL_PROJECTS": "すべてのプロジェクト",
+			"ALL_WORKSPACES": "すべてのワークスペース",
 			"ALT_S_SHARE_DASHBOARD": "ダッシュボードの共有が成功しました",
 			"ALT_S_UNSHARE_DASHBOARD": "ダッシュボードの共有解除が成功しました",
 			"APPLY": "確認",
@@ -1865,10 +1868,17 @@
 			"SET_HOME": "ホームダッシュボードとして設定",
 			"SHARE": "共有",
 			"SHARED_BY_ADMIN": "Adminにより共有",
+			"SHARED_TO_ALL_PROJECTS": "",
 			"SHARED_TO_WORKSPACES": "ワークスペースに共有",
+			"SHARE_DASHBOARD": "",
+			"SHARE_TO_ALL_PROJECTS": "",
+			"SHARE_TO_ALL_PROJECTS_DESC": "",
 			"SHARE_TO_ALL_WORKSPACES": "すべてのワークスペースに共有する",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "このダッシュボードをすべてのワークスペースと共有しますか？",
 			"SHARE_WITH_CODE": "コードで共有",
+			"UNSHARE_DASHBOARD": "",
+			"UNSHARE_FROM_ALL_PROJECTS": "",
+			"UNSHARE_FROM_ALL_PROJECTS_DESC": "このダッシュボードをすべてのプロジェクトで共有解除しますか？",
 			"UNSHARE_FROM_ALL_WORKSPACES": "すべてのワークスペースから共有解除",
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "ワークスペース全体でこのダッシュボードの共有を解除してもよろしいですか？"
 		},

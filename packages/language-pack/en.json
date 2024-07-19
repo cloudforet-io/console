@@ -1826,7 +1826,10 @@
 			}
 		},
 		"DETAIL": {
+			"1": "Share with Code",
 			"ADD_WIDGET": "Add Widget",
+			"ALL_PROJECTS": "All Projects",
+			"ALL_WORKSPACES": "All Workspaces",
 			"ALT_S_SHARE_DASHBOARD": "Dashboard successfully shared",
 			"ALT_S_UNSHARE_DASHBOARD": "Dashboard successfully unshared",
 			"APPLY": "Confirm",
@@ -1865,10 +1868,17 @@
 			"SET_HOME": "Set as Home Dashboard",
 			"SHARE": "Share",
 			"SHARED_BY_ADMIN": "Shared by Admin",
+			"SHARED_TO_ALL_PROJECTS": "Shared to All Projects",
 			"SHARED_TO_WORKSPACES": "Shared to Workspaces",
+			"SHARE_DASHBOARD": "Share Dashboard",
+			"SHARE_TO_ALL_PROJECTS": "Share to All Projects",
+			"SHARE_TO_ALL_PROJECTS_DESC": "Are you sure you want to share this dashboard to all projects?",
 			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "Are you sure you want to share this dashboard to all workspace?",
 			"SHARE_WITH_CODE": "Share with Code",
+			"UNSHARE_DASHBOARD": "Unshare Dashboard",
+			"UNSHARE_FROM_ALL_PROJECTS": "Unshare from All Projects",
+			"UNSHARE_FROM_ALL_PROJECTS_DESC": "Are you sure you want to unshare this dashboard from all projects?",
 			"UNSHARE_FROM_ALL_WORKSPACES": "Unshare from All Workspaces",
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "Are you sure you want to unshare this dashboard from all workspace?"
 		},
