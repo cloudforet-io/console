@@ -145,6 +145,9 @@ onMounted(async () => {
             variation: rule.variations,
             notifyLevel: rule.severity,
         }));
+        if (!state.notificationRules.length) {
+            state.notificationRules = [{ variation: ['gte', 'lte'] }];
+        }
         state.recipients = savedConfig.recipients?.role_type.includes('WORKSPACE_OWNER') ?? false;
     }
 });
