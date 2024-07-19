@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -24,12 +25,12 @@ import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-s
 
 
 interface Props {
-    dashboardType?: 'SHARED' | 'PRIVATE' | 'DEPRECATED';
+    isCollapsed?: boolean;
     fieldTitle?: string;
     dashboardList?: DashboardModel[];
 }
 const props = withDefaults(defineProps<Props>(), {
-    dashboardType: 'SHARED',
+    isCollapsed: false,
     fieldTitle: undefined,
     dashboardList: () => ([]),
 });
@@ -52,19 +53,6 @@ const state = reactive({
             ...d,
             iconButtonSets: convertBoardItemButtonSet(d),
         }))),
-    badgeStyleType: computed(() => {
-        if (props.dashboardType === 'SHARED') return 'indigo100';
-        if (props.dashboardType === 'PRIVATE') return 'gray150';
-        return 'red100';
-    }),
-    badgeText: computed(() => {
-        if (props.dashboardType === 'SHARED') {
-            if (storeState.isAdminMode) return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
-            return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
-        }
-        if (props.dashboardType === 'PRIVATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
-        return i18n.t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED');
-    }),
 });
 
 const deleteModalState = reactive({
@@ -85,9 +73,28 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
     ];
 };
 const showBadge = (board: DashboardModel): boolean => {
-    if (props.dashboardType === 'PRIVATE' || props.dashboardType === 'DEPRECATED') return true;
-    if (board?.workspace_id === '*') return true;
+    if (board.user_id || board.version === '1.0') return true;
+    if (board.shared) return true;
     return false;
+};
+const getBadgeStyleType = (board: DashboardModel): string|undefined => {
+    if (board.shared) return 'indigo100';
+    if (board.version === '1.0') return 'red100';
+    if (board.user_id) return 'gray150';
+    return undefined;
+};
+const getBadgeText = (board: DashboardModel): TranslateResult|undefined => {
+    if (board.version === '1.0') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED');
+    if (board.user_id) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
+    if (board.shared) {
+        if (storeState.isAdminMode) {
+            if (board.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+            return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
+        }
+        if (board.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+        return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+    }
+    return undefined;
 };
 const isPrivate = (dashboardId: string): boolean => dashboardId.startsWith('private');
 
@@ -114,7 +121,7 @@ const handleSetQuery = (selectedLabel: string | string[]) => {
 };
 
 onMounted(() => {
-    if (props.dashboardType === 'DEPRECATED') state.isCollapsed = true;
+    if (props.isCollapsed) state.isCollapsed = true;
 });
 </script>
 
@@ -162,7 +169,7 @@ onMounted(() => {
                     <div class="labels-wrapper">
                         <p-badge v-if="showBadge(board)"
                                  badge-type="subtle"
-                                 :style-type="state.badgeStyleType"
+                                 :style-type="getBadgeStyleType(board)"
                         >
                             <p-i v-if="props.dashboardType === 'PRIVATE'"
                                  name="ic_lock-filled"
@@ -171,7 +178,7 @@ onMounted(() => {
                                  color="gray900"
                                  class="mr-1"
                             />
-                            {{ state.badgeText }}
+                            {{ getBadgeText(board) }}
                         </p-badge>
                         <p-badge v-if="props.dashboardType === 'DEPRECATED' && isPrivate(board.dashboard_id)"
                                  badge-type="subtle"
