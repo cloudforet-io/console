@@ -93,6 +93,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const fixedValue = Math.abs(targetValue - subjectValue);
             const percentageValue = fixedValue / (targetValue || 1) * 100;
             if (!fixedValue || fixedValue === 0) return '-';
+            if (item[props.fields[0].name] === 'Total') return valueFormatter(fixedValue, field);
             if (props.comparisonInfo?.format === 'fixed') return valueFormatter(fixedValue, field);
             if (props.comparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
             if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
@@ -109,6 +110,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const fixedValue = Math.abs(targetValue - subjectValue);
             const percentageValue = fixedValue / (targetValue || 1) * 100;
             if (!fixedValue || fixedValue === 0) return '-';
+            if (item[props.fields[0].name] === 'Total') return valueFormatter(fixedValue, field);
             if (props.comparisonInfo?.format === 'fixed') return valueFormatter(fixedValue, field);
             if (props.comparisonInfo?.format === 'percent') return `${numberFormatter(percentageValue)}%`;
             if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
