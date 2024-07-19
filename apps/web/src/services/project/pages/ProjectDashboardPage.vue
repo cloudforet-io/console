@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed,
+    computed, onUnmounted,
     reactive, watch,
 } from 'vue';
 
@@ -74,7 +74,7 @@ const setDefaultDashboard = () => {
 };
 const getDashboardData = async (dashboardId: string) => {
     try {
-        await dashboardDetailStore.getDashboardInfo(dashboardId);
+        await dashboardDetailStore.getDashboardInfo(dashboardId, true);
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -94,6 +94,10 @@ watch(() => state.currentDashboardId, async (dashboardId, prevDashboardId) => {
     await getDashboardData(dashboardId);
     dashboardDetailStore.setProjectId(props.id);
 }, { immediate: true });
+
+onUnmounted(() => {
+    dashboardDetailStore.reset();
+});
 
 </script>
 
