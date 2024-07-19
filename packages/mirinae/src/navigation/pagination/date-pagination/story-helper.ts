@@ -1,44 +1,50 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 import dayjs from 'dayjs';
 
+export const getDatePaginationParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A210565',
+    },
+});
+
+export const getDatePaginationArgs = (): Args => ({
+    date: dayjs(),
+    allowFuture: false,
+    timezone: 'UTC',
+    disableNextButton: false,
+});
 
 export const getDatePaginationArgTypes = (): ArgTypes => ({
     date: {
         name: 'date',
-        type: { name: 'object' },
+        type: { name: 'object' } as SBType,
         description: 'Current date',
-        defaultValue: dayjs(),
     },
     type: {
         name: 'type',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Date type',
         defaultValue: 'month',
-        control: {
-            type: 'select',
-            options: ['month', 'week'],
-        },
+        control: 'select',
+        options: ['month', 'week'],
     },
     allowFuture: {
         name: 'allowFuture',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Decide whether to allow the future',
-        defaultValue: false,
     },
     timezone: {
         name: 'timezone',
-        type: { name: 'string' },
+        type: 'string',
         description: 'Timezone',
-        defaultValue: 'UTC',
-        control: {
-            type: 'select',
-            options: ['UTC', 'Asia/Seoul'],
-        },
+        control: 'select',
+        options: ['UTC', 'Asia/Seoul'],
     },
     disableNextButton: {
         name: 'disableNextButton',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Decide whether to disable the next button',
-        defaultValue: false,
     },
 });
