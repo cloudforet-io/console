@@ -1,15 +1,34 @@
 import { reactive, toRefs } from 'vue';
 
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
+
+export const getBoxTabArgs = (): Args => ({
+    tabs: [
+        { name: 'detail', label: 'Detail' },
+        { name: 'info', label: 'Info' },
+        { name: 'tags', label: 'Tags' },
+    ],
+    activeTab: 'detail',
+    styleType: BOX_TAB_STYLE_TYPE.white,
+    defaultSlot: 'This is tab body!',
+});
+
+export const getBoxTabParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=13493%3A294520',
+    },
+});
 
 export const getBoxTabArgTypes = (): ArgTypes => ({
     /* props */
     tabs: {
         name: 'tabs',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: `Tab items. 
         It is array of \`string\` or array of 
         \`{
@@ -18,11 +37,6 @@ export const getBoxTabArgTypes = (): ArgTypes => ({
           keepAlive?: boolean;
         }\`
         .`,
-        defaultValue: [
-            { name: 'detail', label: 'Detail' },
-            { name: 'info', label: 'Info' },
-            { name: 'tags', label: 'Tags' },
-        ],
         table: {
             type: {
                 summary: 'array',
@@ -32,15 +46,12 @@ export const getBoxTabArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     activeTab: {
         name: 'activeTab',
         type: { name: 'string', required: true },
         description: 'Active tab name. `sync` props.',
-        defaultValue: 'detail',
         table: {
             type: {
                 summary: 'string',
@@ -50,15 +61,12 @@ export const getBoxTabArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     styleType: {
         name: 'styleType',
         type: { name: 'string' },
         description: `Box style types. ${Object.values(BOX_TAB_STYLE_TYPE)} are available.`,
-        defaultValue: BOX_TAB_STYLE_TYPE.white,
         table: {
             type: {
                 summary: 'string',
@@ -68,16 +76,13 @@ export const getBoxTabArgTypes = (): ArgTypes => ({
                 summary: `"${BOX_TAB_STYLE_TYPE.white}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(BOX_TAB_STYLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(BOX_TAB_STYLE_TYPE),
     },
     /* slots */
     defaultSlot: {
         name: 'default',
         description: 'Use it to insert something to every tab body.',
-        defaultValue: 'This is tab body!',
         table: {
             type: {
                 summary: null,
@@ -87,9 +92,7 @@ export const getBoxTabArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* events */
     onUpdateActiveTab: {
@@ -121,6 +124,9 @@ export const getBoxTabArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    'v-model': { table: { disable: true } },
+    default: { table: { disable: true } },
 });
 
 export const Inner = {
