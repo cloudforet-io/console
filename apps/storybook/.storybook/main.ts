@@ -9,23 +9,8 @@ function getAbsolutePath(value) {
 const config: StorybookConfig = {
   staticDirs: ['../public'],
   stories: [
-    '../../../packages/mirinae/src/data-display/**/*.mdx',
-    '../../../packages/mirinae/src/data-display/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/feedbacks/**/*.mdx',
-    '../../../packages/mirinae/src/feedbacks/**/*.stories.@(js|jsx|ts|tsx)',
-    
-    '../../../packages/mirinae/src/foundation/**/*.mdx',
-    '../../../packages/mirinae/src/foundation/**/*.stories.@(js|jsx|ts|tsx)',
-    
-    '../../../packages/mirinae/src/inputs/**/*.mdx',
-    '../../../packages/mirinae/src/inputs/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/layouts/**/*.mdx',
-    '../../../packages/mirinae/src/layouts/**/*.stories.@(js|jsx|ts|tsx)',
-
-    '../../../packages/mirinae/src/navigation/**/*.mdx',
-    '../../../packages/mirinae/src/navigation/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/mirinae/src/**/*.mdx',
+    '../../../packages/mirinae/src/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     getAbsolutePath("@storybook/addon-links"),

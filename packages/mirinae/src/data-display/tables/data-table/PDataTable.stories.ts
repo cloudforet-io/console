@@ -6,7 +6,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { getUserFields, getUsers, getLongUsers } from '@/data-display/tables/data-table/mock';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
-import { getDataTableDefaultArgs, getDataTableArgsType } from '@/data-display/tables/data-table/story-helper';
+import { getDataTableArgs, getDataTableArgsType, getDataTableParameters } from '@/data-display/tables/data-table/story-helper';
 import { useProxyValue } from '@/hooks';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton.vue';
 import PTextarea from '@/inputs/textarea/PTextarea.vue';
@@ -22,30 +22,12 @@ const meta : Meta<PDataTablePropsAndCustomArgs> = {
     component: PDataTable,
     argTypes: {
         ...getDataTableArgsType(),
-        head: { table: { disable: true } },
-        'th-format': { table: { disable: true } },
-        /* eslint-disable no-template-curly-in-string */
-        '`th-${field.name}`': { table: { disable: true } },
-        /* eslint-disable no-template-curly-in-string */
-        '`th-${field.name}-format`': { table: { disable: true } },
-        'no-data': { table: { disable: true } },
-        'no-data-format': { table: { disable: true } },
-        body: { table: { disable: true } },
-        'col-format': { table: { disable: true } },
-        /* eslint-disable no-template-curly-in-string */
-        '`col-${field.name}-format`': { table: { disable: true } },
-        /* eslint-disable no-template-curly-in-string */
-        '`col-${colIndex}-format`': { table: { disable: true } },
-        foot: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
-        },
+        ...getDataTableParameters(),
     },
     args: {
-        ...getDataTableDefaultArgs(),
+        ...getDataTableArgs(),
     },
 };
 

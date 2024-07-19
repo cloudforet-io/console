@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
-import { getDefinitionDefaultArgs, getDefinitionArgTypes } from '@/data-display/tables/definition-table/definition/story-helper';
+import { getDefinitionArgs, getDifinitionParameters, getDefinitionArgTypes } from '@/data-display/tables/definition-table/definition/story-helper';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
 type PDefinitionPropsAndCustomArgs = ComponentProps<typeof PDefinition>;
@@ -15,18 +15,12 @@ const meta : Meta<PDefinitionPropsAndCustomArgs> = {
     component: PDefinition,
     argTypes: {
         ...getDefinitionArgTypes(),
-        default: { table: { disable: true } },
-        key: { table: { disable: true } },
-        extra: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5373%3A6989',
-        },
+        ...getDifinitionParameters(),
     },
     args: {
-        ...getDefinitionDefaultArgs(),
+        ...getDefinitionArgs(),
     },
 };
 

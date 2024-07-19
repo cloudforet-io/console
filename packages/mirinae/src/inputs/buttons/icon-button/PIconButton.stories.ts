@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { getIconButtonDefaultArgs, getIconButtonArgTypes } from '@/inputs/buttons/icon-button/story-helper';
+import { getIconButtonArgs, getIconButtonArgTypes, getIconButtonParameters } from '@/inputs/buttons/icon-button/story-helper';
 import { ICON_BUTTON_STYLE_TYPE } from '@/inputs/buttons/icon-button/type';
 
 type PIconButtonPropsAndCustomArgs = ComponentProps<typeof PIconButton>;
@@ -14,13 +14,10 @@ const meta : Meta<PIconButtonPropsAndCustomArgs> = {
         ...getIconButtonArgTypes(),
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5110%3A120777',
-        },
+        ...getIconButtonParameters(),
     },
     args: {
-        ...getIconButtonDefaultArgs(),
+        ...getIconButtonArgs(),
     },
 };
 

@@ -6,7 +6,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable.vue';
-import { getDefinitionTableDefaultArgs, getDefinitionTableArgTypes } from '@/data-display/tables/definition-table/story-helper';
+import { getDefinitionTableArgs, getDefinitionTableArgTypes, getDefinitionTableParameters } from '@/data-display/tables/definition-table/story-helper';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
 type PDefinitionTablePropsAndCustomArgs = ComponentProps<typeof PDefinitionTable>;
@@ -16,22 +16,12 @@ const meta : Meta<PDefinitionTablePropsAndCustomArgs> = {
     component: PDefinitionTable,
     argTypes: {
         ...getDefinitionTableArgTypes(),
-        /* eslint-disable no-template-curly-in-string */
-        '`data-${item.name}`': { table: { disable: true } },
-        /* eslint-disable no-template-curly-in-string */
-        '`data-${idx}`': { table: { disable: true } },
-        key: { table: { disable: true } },
-        extra: { table: { disable: true } },
-        'no-data': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5373%3A6989',
-        },
+        ...getDefinitionTableParameters(),
     },
     args: {
-        ...getDefinitionTableDefaultArgs(),
+        ...getDefinitionTableArgs(),
     },
 };
 

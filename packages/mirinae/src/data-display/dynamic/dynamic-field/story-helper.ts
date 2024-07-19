@@ -1,9 +1,21 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args } from '@storybook/vue';
+
 import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
-export const getDynamicFieldArgTypes = () => ({
+export const getDynamicFieldArgs = (): Args => ({
+    type: `${dynamicFieldTypes[0]}`,
+    options: {},
+    data: 'data',
+    extraData: {},
+    typeOptions: {},
+    handler: (props) => props,
+});
+
+export const getDynamicFieldArgTypes = (): ArgTypes => ({
     type: {
         name: 'type',
-        type: 'string',
+        type: { name: 'string' },
         description: `The type of dynamic field. <br/>
                     Available types: ${dynamicFieldTypes}`,
         table: {
@@ -20,7 +32,7 @@ export const getDynamicFieldArgTypes = () => ({
     },
     options: {
         name: 'options',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'The options for field. Different by each type.',
         table: {
             type: {
@@ -35,7 +47,6 @@ export const getDynamicFieldArgTypes = () => ({
     },
     data: {
         name: 'data',
-        type: 'any',
         description: 'Data to display.',
         table: {
             type: {
@@ -50,7 +61,6 @@ export const getDynamicFieldArgTypes = () => ({
     },
     extraData: {
         name: 'extraData',
-        type: 'any',
         description: `Extra data that is just passed to each field. <br/>
                     It's useful when you want to reformat the data with handler.`,
         table: {
@@ -66,7 +76,6 @@ export const getDynamicFieldArgTypes = () => ({
     },
     typeOptions: {
         name: 'typeOptions',
-        type: 'any',
         description: 'Options that is the same with all fields even in recursive fields like enum type.',
         table: {
             type: {
@@ -81,7 +90,7 @@ export const getDynamicFieldArgTypes = () => ({
     },
     handler: {
         name: 'handler',
-        type: 'function',
+        type: { name: 'function' },
         description: 'handler that reformat the data or options to display field.',
         table: {
             type: {

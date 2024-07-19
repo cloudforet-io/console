@@ -2,9 +2,8 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import mock from '@/data-display/dynamic/dynamic-layout/mock';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-import { getDynamicLayoutSimpleTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/story-helper';
+import { getDynamicLayoutSimpleTableArgTypes, getDynamicLayoutSimpleTableArgs } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/story-helper';
 import { I18nConnector } from '@/translations';
 
 
@@ -15,19 +14,9 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
     component: PDynamicLayout,
     argTypes: {
         ...getDynamicLayoutSimpleTableArgTypes(),
-        slot: { table: { disable: true } },
-        type: { table: { disable: true } },
-        fetchOptions: { table: { disable: true } },
-        typeOptions: { table: { disable: true } },
-        fieldHandler: { table: { disable: true } },
     },
     args: {
-        name: 'Base Information',
-        options: mock.simpleTable.options,
-        data: mock.table.data,
-        loading: false,
-        timezone: 'UTC',
-        colCopy: false,
+        ...getDynamicLayoutSimpleTableArgs(),
     },
 };
 

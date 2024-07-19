@@ -37,8 +37,7 @@ export const getSearchArgTypes = (): ArgTypes => {
     return ({
         value: {
             name: 'value',
-            type: 'string',
-            required: true,
+            type: { name: 'string', required: true },
             description: 'Input value. Supported with v-model and sync for two way binding.',
             table: {
                 type: {
@@ -53,7 +52,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         placeholder: {
             name: 'placeholder',
-            type: 'string',
+            type: { name: 'string' },
             description: 'Input placeholder.',
             table: {
                 type: {
@@ -68,7 +67,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         disableIcon: {
             name: 'disableIcon',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Hide search icon.',
             table: {
                 type: {
@@ -83,7 +82,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         isFocused: {
             name: 'isFocused',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'focused value for sync.',
             table: {
                 type: {
@@ -98,7 +97,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         invalid: {
             name: 'invalid',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to apply invalid style or not.',
             defaultValue: false,
             table: {
@@ -114,7 +113,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         disabled: {
             name: 'disabled',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to disable search or not.',
             table: {
                 type: {
@@ -129,7 +128,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         readonly: {
             name: 'readonly',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to make input readonly.',
             table: {
                 type: {
@@ -144,7 +143,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         visibleMenu: {
             name: 'visibleMenu',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Use this prop when you want to control menu visibility manually. this is `sync` prop with event `update:visible-menu`.',
             table: {
                 type: {
@@ -159,7 +158,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         useFixedMenuStyle: {
             name: 'useFixedMenuStyle',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to use position fixed style on menu or not. ',
             table: {
                 type: {
@@ -175,7 +174,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         ...contextMenuArgTypes,
         handler: {
             name: 'handler',
-            type: 'function',
+            type: { name: 'function' },
             description: 'Handler that returns auto-completion menu according to input value. If no value is given, the default handler is executed.',
             table: {
                 type: {
@@ -190,7 +189,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         disableHandler: {
             name: 'disableHandler',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to use handler or not.',
             table: {
                 type: {
@@ -205,7 +204,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         },
         useAutoComplete: {
             name: 'useAutoComplete',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to use autocomplete or not.',
             table: {
                 type: {
@@ -236,7 +235,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         /* model */
         'v-model': {
             name: 'v-model',
-            type: 'string',
+            type: { name: 'string' },
             description: 'model of \'value\' props and \'update:value\' event.',
             table: {
                 type: {

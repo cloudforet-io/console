@@ -1,9 +1,29 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
+import { boardStandardItemSets } from '@/data-display/board/mock';
 import { BOARD_STYLE_TYPE } from '@/data-display/board/type';
 
-export const getBoardArgTypes = () => ({
+
+export const getBoardArgs = (): Args => ({
+    styleType: BOARD_STYLE_TYPE.list,
+    styleOptions: {},
+    boardSets: boardStandardItemSets,
+    pageLimit: 10,
+    selectable: 10,
+});
+
+export const getBoardParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'figma url',
+    },
+});
+
+export const getBoardArgTypes = (): ArgTypes => ({
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: `Board style types. [${Object.values(BOARD_STYLE_TYPE)}] are available`,
         table: {
             type: {
@@ -19,7 +39,7 @@ export const getBoardArgTypes = () => ({
     },
     styleOptions: {
         name: 'styleOptions',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: "Board style type's options. Each styleType has a different styleOptions. Optional props",
         table: {
             type: {
@@ -33,7 +53,7 @@ export const getBoardArgTypes = () => ({
     },
     boardSets: {
         name: 'boardSets',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Board items',
         table: {
             type: {
@@ -47,7 +67,7 @@ export const getBoardArgTypes = () => ({
     },
     pageLimit: {
         name: 'pageLimit',
-        type: 'number',
+        type: { name: 'number' },
         description: '',
         table: {
             type: {
@@ -61,7 +81,7 @@ export const getBoardArgTypes = () => ({
     },
     selectable: {
         name: 'selectable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: '',
         table: {
             type: {
@@ -132,4 +152,9 @@ export const getBoardArgTypes = () => ({
             },
         },
     },
+    // default
+    'item-content': { table: { disable: true } },
+    'item-left-content': { table: { disable: true } },
+    'item-custom-right-content': { table: { disable: true } },
+    'item-overlay-content': { table: { disable: true } },
 });

@@ -16,7 +16,7 @@ export const getCheckboxGroupParameters = (): Parameters => ({
 export const getCheckboxGroupArgTypes = (): ArgTypes => ({
     direction: {
         name: 'direction',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Checkbox alignment direction',
         table: {
             type: {

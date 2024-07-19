@@ -1,10 +1,28 @@
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { EmptyImageSize } from '@/data-display/empty/type';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
-export const getEmptyArgTypes = () => ({
+export const getEmptyArgs = (): Args => ({
+    showImage: false,
+    imageSize: EmptyImageSize.sm,
+    title: undefined,
+    showButton: false,
+    buttonStyleType: BUTTON_STYLE.substitutive,
+    buttonTitle: 'Button',
+});
+
+export const getEmptyParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A179434',
+    },
+});
+
+export const getEmptyArgTypes = (): ArgTypes => ({
     showImage: {
         name: 'showImage',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Disabled when true',
         table: {
             type: {
@@ -19,7 +37,7 @@ export const getEmptyArgTypes = () => ({
     },
     imageSize: {
         name: 'imageSize',
-        type: 'string',
+        type: { name: 'string' },
         description: `Image size. ${Object.keys(EmptyImageSize).map((d) => `\`${d}\``).join(', ')} are available.`,
         table: {
             type: {
@@ -35,7 +53,7 @@ export const getEmptyArgTypes = () => ({
     },
     title: {
         name: 'title',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Empty title',
         table: {
             type: {
@@ -50,7 +68,7 @@ export const getEmptyArgTypes = () => ({
     },
     showButton: {
         name: 'showButton',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Disabled when true',
         table: {
             type: {
@@ -65,7 +83,7 @@ export const getEmptyArgTypes = () => ({
     },
     buttonStyleType: {
         name: 'buttonStyleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Button style',
         table: {
             type: {
@@ -81,7 +99,7 @@ export const getEmptyArgTypes = () => ({
     },
     buttonTitle: {
         name: 'buttonTitle',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Button title',
         table: {
             type: {
@@ -97,7 +115,7 @@ export const getEmptyArgTypes = () => ({
     /* slot */
     defaultSlot: {
         name: 'default',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Slot for contents of empty',
         table: {
             type: {
@@ -142,4 +160,9 @@ export const getEmptyArgTypes = () => ({
             category: 'events',
         },
     },
+    // default
+    image: { table: { disable: true } },
+    default: { table: { disable: true } },
+    button: { table: { disable: true } },
+    'click-button': { table: { disable: true } },
 });

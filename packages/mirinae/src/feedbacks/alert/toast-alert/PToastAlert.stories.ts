@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PToastAlert from '@/feedbacks/alert/toast-alert/PToastAlert.vue';
-import { getToastAlertDefaultArgs, getToastAlertArgTypes } from '@/feedbacks/alert/toast-alert/story-helper';
+import { getToastAlertArgs, getToastAlertParameters, getToastAlertArgTypes } from '@/feedbacks/alert/toast-alert/story-helper';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
 
@@ -17,13 +17,10 @@ const meta : Meta<PToastAlertPropsAndCustomArgs> = {
         ...getToastAlertArgTypes(),
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A88918&t=kwTRXVZQtJLDw0Ei-4',
-        },
+        ...getToastAlertParameters(),
     },
     args: {
-        ...getToastAlertDefaultArgs(),
+        ...getToastAlertArgs(),
     },
 };
 

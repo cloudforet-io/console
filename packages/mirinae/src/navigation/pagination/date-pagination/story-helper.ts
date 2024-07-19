@@ -24,7 +24,7 @@ export const getDatePaginationArgTypes = (): ArgTypes => ({
     },
     type: {
         name: 'type',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Date type',
         defaultValue: 'month',
         control: 'select',
@@ -32,19 +32,19 @@ export const getDatePaginationArgTypes = (): ArgTypes => ({
     },
     allowFuture: {
         name: 'allowFuture',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Decide whether to allow the future',
     },
     timezone: {
         name: 'timezone',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Timezone',
         control: 'select',
         options: ['UTC', 'Asia/Seoul'],
     },
     disableNextButton: {
         name: 'disableNextButton',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Decide whether to disable the next button',
     },
 });

@@ -1,4 +1,7 @@
-export const getTreeDefaultArgs = () => ({
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args } from '@storybook/vue';
+
+export const getTreeArgs = (): Args => ({
     toggleOptions: {},
     selectOptions: {},
     editOptions: {},
@@ -10,10 +13,10 @@ export const getTreeDefaultArgs = () => ({
     getClassNames: undefined,
 });
 
-export const getTreeArgTypes = () => ({
+export const getTreeArgTypes = (): ArgTypes => ({
     toggleOptions: {
         name: 'toggleOptions',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Options for toggle.',
         table: {
             type: {
@@ -28,7 +31,7 @@ export const getTreeArgTypes = () => ({
     },
     selectOptions: {
         name: 'selectOptions',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Options for toggle.',
         table: {
             type: {
@@ -43,7 +46,7 @@ export const getTreeArgTypes = () => ({
     },
     editOptions: {
         name: 'editOptions',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Options for inline edit.',
         table: {
             type: {
@@ -58,7 +61,7 @@ export const getTreeArgTypes = () => ({
     },
     dragOptions: {
         name: 'dragOptions',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Options for drag and drop.',
         table: {
             type: {
@@ -73,7 +76,7 @@ export const getTreeArgTypes = () => ({
     },
     dataGetter: {
         name: 'dataGetter',
-        type: 'function',
+        type: { name: 'function' },
         description: 'Function that returns data to display.',
         table: {
             type: {
@@ -88,7 +91,7 @@ export const getTreeArgTypes = () => ({
     },
     dataSetter: {
         name: 'dataSetter',
-        type: 'function',
+        type: { name: 'function' },
         description: 'Function for setting children or node\'s data.',
         table: {
             type: {
@@ -103,7 +106,7 @@ export const getTreeArgTypes = () => ({
     },
     dataFetcher: {
         name: 'dataFetcher',
-        type: 'function',
+        type: { name: 'function' },
         description: 'Function for fetching nodes.',
         table: {
             type: {
@@ -118,7 +121,7 @@ export const getTreeArgTypes = () => ({
     },
     fetchOnInit: {
         name: 'fetchOnInit',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to fetch data on init tree or not.',
         table: {
             type: {
@@ -133,7 +136,7 @@ export const getTreeArgTypes = () => ({
     },
     getClassNames: {
         name: 'getClassNames',
-        type: 'function',
+        type: { name: 'function' },
         description: 'Function that returns class object to each node.',
         table: {
             type: {
@@ -146,4 +149,12 @@ export const getTreeArgTypes = () => ({
         },
         control: 'object',
     },
+    // default
+    node: { table: { disable: true } },
+    'left-extra': { table: { disable: true } },
+    toggle: { table: { disable: true } },
+    'toggle-right': { table: { disable: true } },
+    icon: { table: { disable: true } },
+    data: { table: { disable: true } },
+    'right-extra': { table: { disable: true } },
 });

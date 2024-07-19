@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getLazyImgDefaultArgs, getLazyImgArgTypes } from '@/feedbacks/loading/lazy-img/story-helper';
+import { getLazyImgArgs, getLazyImgArgTypes, getLazyImgParameters } from '@/feedbacks/loading/lazy-img/story-helper';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
@@ -19,17 +19,12 @@ const meta : Meta<PLazyImgPropsAndCustomArgs> = {
     component: PLazyImg,
     argTypes: {
         ...getLazyImgArgTypes(),
-        error: { table: { disable: true } },
-        preloader: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A133538',
-        },
+        ...getLazyImgParameters(),
     },
     args: {
-        ...getLazyImgDefaultArgs(),
+        ...getLazyImgArgs(),
     },
 };
 

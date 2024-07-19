@@ -1,10 +1,10 @@
-import type { ArgTypes, Args } from '@storybook/vue';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 import icon from 'vue-svgicon';
 
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import { ICON_BUTTON_SHAPE, ICON_BUTTON_STYLE_TYPE } from '@/inputs/buttons/icon-button/type';
 
-export const getIconButtonDefaultArgs = (): Args => ({
+export const getIconButtonArgs = (): Args => ({
     name: 'ic_refresh',
     styleType: ICON_BUTTON_STYLE_TYPE.transparent,
     size: 'md',
@@ -18,10 +18,17 @@ export const getIconButtonDefaultArgs = (): Args => ({
     default: 'button',
 });
 
+export const getIconButtonParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5110%3A120777',
+    },
+});
+
 export const getIconButtonArgTypes = (): ArgTypes => ({
     name: {
         name: 'name',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Icon name',
         table: {
             type: {
@@ -37,7 +44,7 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
     },
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Button style',
         table: {
             type: {
@@ -53,7 +60,7 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Button size',
         table: {
             type: {
@@ -69,7 +76,7 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Disabled when true',
         table: {
             type: {
@@ -84,7 +91,7 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
     },
     activated: {
         name: 'activated',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Activated when true (only works with gray-border style)',
         table: {
             type: {
@@ -99,7 +106,7 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
     },
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show loader or not.',
         table: {
             type: {
@@ -114,7 +121,7 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
     },
     outline: {
         name: 'outline',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Outlined when true',
         table: {
             type: {
@@ -129,7 +136,7 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
     },
     color: {
         name: 'color',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Color of icon',
         table: {
             type: {
@@ -144,7 +151,7 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
     },
     animation: {
         name: 'animation',
-        type: 'string',
+        type: { name: 'string' },
         description: `Animation type. ${Object.values(ANIMATION_TYPE).map((d) => `'${d}'`)} are available.`,
         table: {
             type: {
@@ -160,7 +167,7 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
     },
     shape: {
         name: 'shape',
-        type: 'string',
+        type: { name: 'string' },
         description: `Shape of icon button. ${Object.values(ICON_BUTTON_SHAPE).map((d) => `'${d}'`)} are available.`,
         table: {
             type: {
@@ -177,7 +184,7 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
     // slots
     default: {
         name: 'default',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Slot to replace icon',
         table: {
             type: {

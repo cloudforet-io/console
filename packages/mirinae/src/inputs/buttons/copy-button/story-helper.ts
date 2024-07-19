@@ -1,8 +1,8 @@
-import type { ArgTypes, Args } from '@storybook/vue';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { SIZE } from '@/inputs/buttons/copy-button/type';
 
-export const getCopyButtonDefaultArgs = (): Args => ({
+export const getCopyButtonArgs = (): Args => ({
     value: 'Please, place any string to copy by button next to.',
     size: SIZE.md,
     autoHideIcon: false,
@@ -10,10 +10,17 @@ export const getCopyButtonDefaultArgs = (): Args => ({
     defaultSlot: 'Please, place any string to copy by button next to.',
 });
 
+export const getCopyButtonParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=8075%3A2235',
+    },
+});
+
 export const getCopyButtonArgTypes = (): ArgTypes => ({
     value: {
         name: 'value',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Text to be copied',
         table: {
             type: {
@@ -28,7 +35,7 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Copy button size',
         table: {
             type: {
@@ -44,7 +51,7 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
     },
     autoHideIcon: {
         name: 'autoHideIcon',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to auto hide icon when there is not text to copy or not.',
         table: {
             type: {
@@ -59,7 +66,7 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
     },
     copyManually: {
         name: 'copyManually',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to copy manually by event or not. When it is `true`, this component just emit `copy` event, and do nothing.',
         table: {
             type: {
@@ -107,4 +114,6 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
         },
         control: null,
     },
+    // default
+    default: { table: { disable: true } },
 });

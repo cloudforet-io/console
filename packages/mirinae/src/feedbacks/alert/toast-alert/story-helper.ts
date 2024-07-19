@@ -1,13 +1,22 @@
+import type { Args, ArgTypes, Parameters } from '@storybook/vue';
+
 import { TOAST_GROUP } from '@/feedbacks/alert/toast-alert/config';
 
-export const getToastAlertDefaultArgs = () => ({
+export const getToastAlertArgs = (): Args => ({
     group: TOAST_GROUP.toastTopCenter,
 });
 
-export const getToastAlertArgTypes = () => ({
+export const getToastAlertParameters = ():Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A88918&t=kwTRXVZQtJLDw0Ei-4',
+    },
+});
+
+export const getToastAlertArgTypes = (): ArgTypes => ({
     group: {
         name: 'group',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Name of target toast group.',
         table: {
             type: {

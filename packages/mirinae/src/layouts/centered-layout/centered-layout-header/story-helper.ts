@@ -19,7 +19,7 @@ export const getCenteredLayoutHeaderParameters = (): Parameters => ({
 export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
     title: {
         name: 'title',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Title',
         table: {
             type: {
@@ -34,7 +34,7 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
     },
     description: {
         name: 'description',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Description',
         table: {
             type: {
@@ -49,7 +49,7 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
     },
     showCloseButton: {
         name: 'showCloseButton',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show close button',
         table: {
             type: {
@@ -64,7 +64,7 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
     },
     showStep: {
         name: 'showStep',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show step',
         table: {
             type: {
@@ -79,7 +79,7 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
     },
     currentStep: {
         name: 'currentStep',
-        type: 'number',
+        type: { name: 'number' },
         description: 'The current step',
         table: {
             type: {
@@ -94,7 +94,7 @@ export const getCenteredLayoutHeaderArgTypes = (): ArgTypes => ({
     },
     totalSteps: {
         name: 'totalSteps',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Total steps',
         table: {
             type: {

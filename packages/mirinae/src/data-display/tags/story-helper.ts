@@ -1,6 +1,9 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { getTagItemWithFullArg } from '@/data-display/tags/mock';
 
-export const getTagDefaultArgs = () => ({
+export const getTagArgs = (): Args => ({
     keyItem: getTagItemWithFullArg().keyItem,
     valueItem: getTagItemWithFullArg().valueItem,
     categoryItem: getTagItemWithFullArg().categoryItem,
@@ -14,10 +17,17 @@ export const getTagDefaultArgs = () => ({
     valueSlot: '',
 });
 
-export const getTagArgTypes = () => ({
+export const getTagParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124044',
+    },
+});
+
+export const getTagArgTypes = (): ArgTypes => ({
     keyItem: {
         name: 'keyItem',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: "The value for tag's key content",
         table: {
             type: {
@@ -31,7 +41,7 @@ export const getTagArgTypes = () => ({
     },
     valueItem: {
         name: 'valueItem',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: "The value for tag's value content",
         table: {
             type: {
@@ -45,7 +55,7 @@ export const getTagArgTypes = () => ({
     },
     categoryItem: {
         name: 'categoryItem',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: "The value for tag's category content",
         table: {
             type: {
@@ -59,7 +69,7 @@ export const getTagArgTypes = () => ({
     },
     deletable: {
         name: 'deletable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Deletable when true',
         table: {
             type: {
@@ -74,7 +84,7 @@ export const getTagArgTypes = () => ({
     },
     outline: {
         name: 'outline',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Outlined when true',
         table: {
             type: {
@@ -89,7 +99,7 @@ export const getTagArgTypes = () => ({
     },
     selected: {
         name: 'selected',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'selected when true',
         table: {
             type: {
@@ -104,7 +114,7 @@ export const getTagArgTypes = () => ({
     },
     invalid: {
         name: 'invalid',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Show error icon when true',
         table: {
             type: {
@@ -119,7 +129,7 @@ export const getTagArgTypes = () => ({
     },
     errorMessage: {
         name: 'errorMessage',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Error Message',
         table: {
             type: {
@@ -188,4 +198,10 @@ export const getTagArgTypes = () => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
+    category: { table: { disable: true } },
+    key: { table: { disable: true } },
+    value: { table: { disable: true } },
+    delete: { table: { disable: true } },
 });

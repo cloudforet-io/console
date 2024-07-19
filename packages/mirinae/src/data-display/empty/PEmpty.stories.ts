@@ -1,10 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-
-import { getEmptyArgTypes } from '@/data-display/empty/story-helper';
-import { EmptyImageSize } from '@/data-display/empty/type';
-import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
+import { getEmptyArgTypes, getEmptyParameters, getEmptyArgs } from '@/data-display/empty/story-helper';
 import { i18n } from '@/translations';
 
 import PEmpty from './PEmpty.vue';
@@ -16,24 +13,12 @@ const meta : Meta<PEmptyPropsAndCustomArgs> = {
     component: PEmpty,
     argTypes: {
         ...getEmptyArgTypes(),
-        image: { table: { disable: true } },
-        default: { table: { disable: true } },
-        button: { table: { disable: true } },
-        'click-button': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A179434',
-        },
+        ...getEmptyParameters(),
     },
     args: {
-        showImage: false,
-        imageSize: EmptyImageSize.sm,
-        title: undefined,
-        showButton: false,
-        buttonStyleType: BUTTON_STYLE.substitutive,
-        buttonTitle: 'Button',
+        ...getEmptyArgs(),
     },
 };
 

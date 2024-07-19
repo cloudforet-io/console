@@ -1,17 +1,19 @@
-export const getSkeletonDefaultArgs = () => ({
+import type { ArgTypes, Args } from '@storybook/vue';
+
+export const getSkeletonArgs = (): Args => ({
     loading: true,
     animation: true,
     duration: 2,
-    width: undefined,
-    height: undefined,
+    width: null,
+    height: null,
     tag: 'span',
     opacity: 0.4,
 });
 
-export const getSkeletonArgTypes = () => ({
+export const getSkeletonArgTypes = (): ArgTypes => ({
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Loading when true',
         table: {
             type: {
@@ -26,7 +28,7 @@ export const getSkeletonArgTypes = () => ({
     },
     animation: {
         name: 'animation',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Animate when true',
         table: {
             type: {
@@ -41,7 +43,7 @@ export const getSkeletonArgTypes = () => ({
     },
     duration: {
         name: 'duration',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Duration of animation',
         table: {
             type: {
@@ -56,7 +58,7 @@ export const getSkeletonArgTypes = () => ({
     },
     width: {
         name: 'width',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Width of skeleton',
         table: {
             type: {
@@ -71,7 +73,7 @@ export const getSkeletonArgTypes = () => ({
     },
     height: {
         name: 'height',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Width of skeleton',
         table: {
             type: {
@@ -86,7 +88,7 @@ export const getSkeletonArgTypes = () => ({
     },
     tag: {
         name: 'tag',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Tag of skeleton',
         table: {
             type: {
@@ -101,7 +103,7 @@ export const getSkeletonArgTypes = () => ({
     },
     opacity: {
         name: 'opacity',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Opacity of skeleton',
         table: {
             type: {

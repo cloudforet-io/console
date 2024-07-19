@@ -1,17 +1,34 @@
+import type { ArgTypes, Args } from '@storybook/vue';
+
+import mock from '@/data-display/dynamic/dynamic-layout/mock';
 import { getDynamicLayoutArgTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';
 
-export const getDynamicLayoutSimpleTableArgTypes = () => {
-    const argTypes = getDynamicLayoutArgTypes();
+export const getDynamicLayoutSimpleTableArgs = (): Args => ({
+    name: 'Base Information',
+    options: mock.simpleTable.options,
+    data: mock.table.data,
+    loading: false,
+    timezone: 'UTC',
+    colCopy: false,
+});
 
-    // argTypes.data.defaultValue = mock.table.data;
-    // argTypes.options.defaultValue = mock.simpleTable.options;
+export const getDynamicLayoutSimpleTableArgTypes = (): ArgTypes => {
+    const dynamicLayoutArgTypes = getDynamicLayoutArgTypes();
 
-    return {
-        name: argTypes.name,
-        options: argTypes.options,
-        data: argTypes.data,
-        loading: argTypes.loading,
-        timezone: argTypes.timezone,
-        colCopy: argTypes.colCopy,
+    const argTypes: ArgTypes = {
+        name: dynamicLayoutArgTypes.name,
+        options: dynamicLayoutArgTypes.options,
+        data: dynamicLayoutArgTypes.data,
+        loading: dynamicLayoutArgTypes.loading,
+        timezone: dynamicLayoutArgTypes.timezone,
+        colCopy: dynamicLayoutArgTypes.colCopy,
+        // default
+        slot: { table: { disable: true } },
+        type: { table: { disable: true } },
+        fetchOptions: { table: { disable: true } },
+        typeOptions: { table: { disable: true } },
+        fieldHandler: { table: { disable: true } },
     };
+
+    return argTypes;
 };

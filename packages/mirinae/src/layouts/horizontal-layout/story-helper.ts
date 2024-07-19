@@ -18,7 +18,7 @@ export const getHorizontalLayoutParameters = (): Parameters => ({
 export const getHorizontalLayoutArgTypes = (): ArgTypes => ({
     height: {
         name: 'height',
-        type: 'number',
+        type: { name: 'number' },
         description: '',
         table: {
             type: {
@@ -33,7 +33,7 @@ export const getHorizontalLayoutArgTypes = (): ArgTypes => ({
     },
     minHeight: {
         name: 'minHeight',
-        type: 'number',
+        type: { name: 'number' },
         description: '',
         table: {
             type: {
@@ -48,7 +48,7 @@ export const getHorizontalLayoutArgTypes = (): ArgTypes => ({
     },
     maxHeight: {
         name: 'maxHeight',
-        type: 'number',
+        type: { name: 'number' },
         description: '',
         table: {
             type: {

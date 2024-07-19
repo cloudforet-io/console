@@ -3,7 +3,7 @@ import { reactive, toRefs } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getButtonDefaultArgs, getButtonArgTypes } from '@/inputs/buttons/button/story-helper';
+import { getButtonArgs, getButtonParameters, getButtonArgTypes } from '@/inputs/buttons/button/story-helper';
 import { BUTTON_STYLE, BUTTON_SIZE } from '@/inputs/buttons/button/type';
 
 import PButton from './PButton.vue';
@@ -15,16 +15,12 @@ const meta : Meta<PButtonPropsAndCustomArgs> = {
     component: PButton,
     argTypes: {
         ...getButtonArgTypes(),
-        // 'item-content': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5152%3A122457',
-        },
+        ...getButtonParameters(),
     },
     args: {
-        ...getButtonDefaultArgs(),
+        ...getButtonArgs(),
     },
 };
 

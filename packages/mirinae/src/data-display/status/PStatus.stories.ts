@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PStatus from '@/data-display/status/PStatus.vue';
-import { getStatusDefaultArgs, getStatusArgTypes } from '@/data-display/status/story-helper';
+import { getStatusArgs, getStatusArgTypes, getStatusParameters } from '@/data-display/status/story-helper';
 
 
 type PStatusPropsAndCustomArgs = ComponentProps<typeof PStatus>;
@@ -12,16 +12,12 @@ const meta : Meta<PStatusPropsAndCustomArgs> = {
     component: PStatus,
     argTypes: {
         ...getStatusArgTypes(),
-        default: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124044',
-        },
+        ...getStatusParameters(),
     },
     args: {
-        ...getStatusDefaultArgs(),
+        ...getStatusArgs(),
     },
 };
 

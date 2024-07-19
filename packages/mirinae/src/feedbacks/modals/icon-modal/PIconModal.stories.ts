@@ -6,11 +6,8 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getIconModalDefaultArgs, getIconModalArgTypes } from '@/feedbacks/modals/icon-modal/story-helper';
+import { getIconModalArgs, getIconModalArgTypes, getIconModalParameters } from '@/feedbacks/modals/icon-modal/story-helper';
 import PButton from '@/inputs/buttons/button/PButton.vue';
-
-
-
 
 import PIconModal from './PIconModal.vue';
 
@@ -23,14 +20,10 @@ const meta : Meta<PIconModalPropsAndCustomArgs> = {
         ...getIconModalArgTypes(),
     },
     parameters: {
-        centered: { disable: true },
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A138158&t=kwTRXVZQtJLDw0Ei-4',
-        },
+        ...getIconModalParameters(),
     },
     args: {
-        ...getIconModalDefaultArgs(),
+        ...getIconModalArgs(),
     },
 };
 

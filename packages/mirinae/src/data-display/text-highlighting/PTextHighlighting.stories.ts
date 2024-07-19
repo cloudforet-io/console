@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { getTextHighlightingProps } from '@/data-display/text-highlighting/mock';
-import { getTextHighlightingDefaultArgs, getTextHighlightingArgTypes } from '@/data-display/text-highlighting/story-helper';
+import { getTextHighlightingArgs, getTextHighlightingArgTypes, getTextHighlightingParameters } from '@/data-display/text-highlighting/story-helper';
 
 import PTextHighlighting from './PTextHighlighting.vue';
 
@@ -13,16 +13,12 @@ const meta : Meta<PTextHighlightingPropsAndCustomArgs> = {
     component: PTextHighlighting,
     argTypes: {
         ...getTextHighlightingArgTypes(),
-        default: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
-        },
+        ...getTextHighlightingParameters(),
     },
     args: {
-        ...getTextHighlightingDefaultArgs(),
+        ...getTextHighlightingArgs(),
     },
 };
 

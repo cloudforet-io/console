@@ -27,8 +27,7 @@ export const getSidebarParameters = (): Parameters => ({
 export const getSidebarArgTypes = (): ArgTypes => ({
     visible: {
         name: 'visible',
-        type: 'boolean',
-        required: true,
+        type: { name: 'boolean', required: true },
         description: 'Switch props for show or hide a sidebar.',
         table: {
             type: {
@@ -43,7 +42,7 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     },
     title: {
         name: 'title',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Sidebar title',
         table: {
             type: {
@@ -58,7 +57,7 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     },
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'sidebar style',
         table: {
             type: {
@@ -74,7 +73,7 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Sidebar size',
         table: {
             type: {
@@ -90,7 +89,7 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     },
     isFixedSize: {
         name: 'isFixedSize',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether or not sidebar size is fixed',
         table: {
             type: {
@@ -105,7 +104,7 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     },
     hideCloseButton: {
         name: 'hideCloseButton',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Show close button or not.',
         table: {
             type: {
@@ -120,7 +119,7 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     },
     'v-model': {
         name: 'v-model',
-        type: 'boolean',
+        type: { name: 'boolean' },
         required: false,
         description: 'Two way binding for `visible` props with `update:visible` event.',
         table: {

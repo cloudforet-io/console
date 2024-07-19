@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { HEADING_TYPE } from '@/data-display/heading/config';
-import { getHeadingArgTypes } from '@/data-display/heading/story-helper';
-
+import { getHeadingArgTypes, getHeadingParameters, getHeadingArgs } from '@/data-display/heading/story-helper';
 
 import PHeading from './PHeading.vue';
 
@@ -14,28 +12,12 @@ const meta : Meta<PHeadingPropsAndCustomArgs> = {
     component: PHeading,
     argTypes: {
         ...getHeadingArgTypes(),
-        // 'item-content': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=7823%3A421870&t=tyr8RcRHt8hwP1dM-4',
-        },
+        ...getHeadingParameters(),
     },
     args: {
-        title: 'Page Title',
-        headingType: HEADING_TYPE.MAIN,
-        showBackButton: false,
-        useTotalCount: true,
-        totalCount: 0,
-        useSelectedCount: false,
-        selectedCount: 0,
-        defaultSlot: undefined,
-        titleSlot: undefined,
-        titleLeftExtraSlot: undefined,
-        totalCountSLot: undefined,
-        titleRightExtraSlot: undefined,
-        extraSlot: undefined,
+        ...getHeadingArgs(),
     },
 };
 

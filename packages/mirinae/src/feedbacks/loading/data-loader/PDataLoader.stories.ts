@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { range } from 'lodash';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getDataLoaderDefaultArgs, getDataLoaderArgTypes } from '@/feedbacks/loading/data-loader/story-helper';
+import { getDataLoaderArgs, getDataLoaderArgTypes, getDataLoaderParameters } from '@/feedbacks/loading/data-loader/story-helper';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
 
@@ -19,18 +19,12 @@ const meta : Meta<PDataLoaderPropsAndCustomArgs> = {
     component: PDataLoader,
     argTypes: {
         ...getDataLoaderArgTypes(),
-        'no-data': { table: { disable: true } },
-        default: { table: { disable: true } },
-        loader: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5921%3A164129',
-        },
+        ...getDataLoaderParameters(),
     },
     args: {
-        ...getDataLoaderDefaultArgs(),
+        ...getDataLoaderArgs(),
     },
 };
 

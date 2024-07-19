@@ -33,8 +33,7 @@ export const getJsonSchemaFormParameters = (): Parameters => ({
 export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     schema: {
         name: 'schema',
-        type: { name: 'object' } as SBType,
-        required: true,
+        type: { name: 'object', required: true } as SBType,
         description: 'The json schema of form.',
         table: {
             type: {
@@ -49,8 +48,7 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     },
     formData: {
         name: 'formData',
-        type: { name: 'object' } as SBType,
-        required: true,
+        type: { name: 'object', required: true } as SBType,
         description: 'Input data of form. This is `sync` prop with `update:form-data` event.',
         table: {
             type: {
@@ -65,7 +63,7 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     },
     language: {
         name: 'language',
-        type: 'string',
+        type: { name: 'string' },
         table: {
             type: {
                 summary: 'string',
@@ -79,7 +77,7 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     },
     validationMode: {
         name: 'validationMode',
-        type: 'string',
+        type: { name: 'string' },
         description: `Validation mode. ${VALIDATION_MODES} are available. <br/>
         \`input\`:  Show validation results only for fields where input occurred.  <br/>
         \`all\`:  Show the validation results of all fields.  <br/>
@@ -99,7 +97,7 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     },
     resetOnSchemaChange: {
         name: 'resetOnSchemaChange',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to reset validation state and input occurred state when schema prop is changed.',
         table: {
             type: {
@@ -144,7 +142,7 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     },
     useFixedMenuStyle: {
         name: 'useFixedMenuStyle',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to use position fixed style on dropdown form\'s menu or not. ',
         table: {
             type: {
@@ -159,7 +157,7 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     },
     uniformWidth: {
         name: 'uniformWidth',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'It ensures that all input forms have the same width, creating a consistent and visually appealing layout.',
         table: {
             type: {

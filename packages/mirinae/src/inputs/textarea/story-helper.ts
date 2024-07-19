@@ -49,7 +49,7 @@ export const getTextareaArgTypes = (): ArgTypes => ({
     },
     autofocus: {
         name: 'autofocus',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to autofocus textarea or not.',
         table: {
             type: {
@@ -64,7 +64,7 @@ export const getTextareaArgTypes = (): ArgTypes => ({
     },
     readonly: {
         name: 'readonly',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to make readonly or not.',
         table: {
             type: {
@@ -79,7 +79,7 @@ export const getTextareaArgTypes = (): ArgTypes => ({
     },
     invalid: {
         name: 'invalid',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show invalid style or not.',
         table: {
             type: {
@@ -94,7 +94,7 @@ export const getTextareaArgTypes = (): ArgTypes => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Disabled textarea.',
         table: {
             type: {

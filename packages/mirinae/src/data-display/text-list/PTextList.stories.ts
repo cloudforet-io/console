@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getTextListDeafultArgs, getTextListArgTypes } from '@/data-display/text-list/story-helper';
+import { getTextListArgs, getTextListArgTypes, getTextLisyParameters } from '@/data-display/text-list/story-helper';
 
 import PTextList from './PTextList.vue';
 
@@ -15,16 +15,12 @@ const meta : Meta<PTextListPropsAndCustomArgs> = {
     component: PTextList,
     argTypes: {
         ...getTextListArgTypes(),
-        // 'item-content': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
-        },
+        ...getTextLisyParameters(),
     },
     args: {
-        ...getTextListDeafultArgs(),
+        ...getTextListArgs(),
     },
 };
 

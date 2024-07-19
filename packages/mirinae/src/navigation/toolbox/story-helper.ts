@@ -40,7 +40,7 @@ export const getToolboxParameters = (): Parameters => ({
 export const getToolboxArgTypes = (): ArgTypes => ({
     paginationVisible: {
         name: 'paginationVisible',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show pagination or not.',
         table: {
             type: {
@@ -55,7 +55,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     pageSizeChangeable: {
         name: 'pageSizeChangeable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show page size options and allow changing page size or not.',
         table: {
             type: {
@@ -70,7 +70,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     settingsVisible: {
         name: 'settingsVisible',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show settings button or not.',
         table: {
             type: {
@@ -85,7 +85,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     sortable: {
         name: 'sortable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show sort menu and allow changing sort key or not.',
         table: {
             type: {
@@ -100,7 +100,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     exportable: {
         name: 'exportable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show excel button and allow export or not.',
         table: {
             type: {
@@ -115,7 +115,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     refreshable: {
         name: 'refreshable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show refresh button and allow refresh or not.',
         table: {
             type: {
@@ -130,7 +130,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     searchable: {
         name: 'searchable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show search input and allow search or not.',
         table: {
             type: {
@@ -145,7 +145,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     filtersVisible: {
         name: 'filtersVisible',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show search filters or not. Filters exist only when search type is `query`.',
         table: {
             type: {
@@ -160,7 +160,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     searchType: {
         name: 'searchType',
-        type: 'string',
+        type: { name: 'string' },
         description: `Search type. ${Object.values(SEARCH_TYPES)} are available.`,
         table: {
             type: {
@@ -176,7 +176,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     thisPage: {
         name: 'thisPage',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Current page. sync props.',
         table: {
             type: {
@@ -191,7 +191,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     pageSize: {
         name: 'pageSize',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Page size to show data. sync props.',
         table: {
             type: {
@@ -207,7 +207,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     totalCount: {
         name: 'totalCount',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Total count of data for calculating pagination.',
         table: {
             type: {
@@ -223,7 +223,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     hasNextPage: {
         name: 'hasNextPage',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show indication that there is next page or not.  It cannot be used with totalCount prop.',
         table: {
             type: {
@@ -238,7 +238,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     sortBy: {
         name: 'sortBy',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Sort key. sync props.',
         table: {
             type: {
@@ -328,7 +328,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     searchText: {
         name: 'searchText',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Search text for plain search. Works only with plain search. sync props.',
         table: {
             type: {
@@ -343,7 +343,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     },
     timezone: {
         name: 'timezone',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Timezone that is used for display time value of query search tags.',
         table: {
             type: {

@@ -3,9 +3,8 @@ import { reactive, toRefs, computed } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getLabelArgTypes } from '@/data-display/label/story-helper';
+import { getLabelArgTypes, getLabelArgs, getLabelParameters } from '@/data-display/label/story-helper';
 import { I18nConnector } from '@/translations';
-
 
 import PLabel from './PLabel.vue';
 
@@ -16,24 +15,12 @@ const meta : Meta<PLabelPropsAndCustomArgs> = {
     component: PLabel,
     argTypes: {
         ...getLabelArgTypes(),
-        clickStop: { table: { disable: true } },
-        active: { table: { disable: true } },
-        'label-content': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'figma url',
-        },
+        ...getLabelParameters(),
     },
     args: {
-        leftIcon: '',
-        text: 'Label',
-        deletable: false,
-        clickable: false,
-        itemClick: undefined,
-        delete: undefined,
-        labelContentSlot: 'Label Content',
+        ...getLabelArgs(),
     },
 };
 

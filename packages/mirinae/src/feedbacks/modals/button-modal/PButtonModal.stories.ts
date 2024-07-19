@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
-import { getButtonModalDefaultArgs, getButtonModalArgTypes } from '@/feedbacks/modals/button-modal/story-helper';
+import { getButtonModalArgs, getButtonModalArgTypes, getButtonModalParameters } from '@/feedbacks/modals/button-modal/story-helper';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 
@@ -23,14 +23,10 @@ const meta : Meta<PButtonModalPropsAndCustomArgs> = {
         ...getButtonModalArgTypes(),
     },
     parameters: {
-        centered: { disable: true },
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=7654%3A182002',
-        },
+        ...getButtonModalParameters(),
     },
     args: {
-        ...getButtonModalDefaultArgs(),
+        ...getButtonModalArgs(),
     },
 };
 

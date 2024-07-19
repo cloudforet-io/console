@@ -1,9 +1,27 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 import icon from 'vue-svgicon';
 
-export const getBoardItemArgTypes = () => ({
+import { standardIconActionSet } from '@/data-display/board-item/mock';
+
+export const getBoardItemArgs = (): Args => ({
+    leftIcon: undefined,
+    IconButtonSets: standardIconActionSet,
+    rounded: false,
+    selected: false,
+});
+
+export const getBoardItemParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'figma url',
+    },
+});
+
+export const getBoardItemArgTypes = (): ArgTypes => ({
     leftIcon: {
         name: 'leftIcon',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Icon name in Left Content Area.',
         table: {
             type: {
@@ -19,7 +37,7 @@ export const getBoardItemArgTypes = () => ({
     },
     iconButtonSets: {
         name: 'iconButtonSets',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Array of icon-button-set that will fit into the right overlay content area',
         table: {
             type: {
@@ -33,7 +51,7 @@ export const getBoardItemArgTypes = () => ({
     },
     rounded: {
         name: 'rounded',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Use `border-radius` style of the card item.',
         table: {
             type: {
@@ -48,7 +66,7 @@ export const getBoardItemArgTypes = () => ({
     },
     selected: {
         name: 'selected',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Selected style',
         table: {
             type: {
@@ -95,4 +113,9 @@ export const getBoardItemArgTypes = () => ({
             defaultValue: 'Board Item Custom Right Content',
         },
     },
+    // default
+    'left-content': { table: { disable: true } },
+    content: { table: { disable: true } },
+    'overlay-content': { table: { disable: true } },
+    'custom-right-content': { table: { disable: true } },
 });

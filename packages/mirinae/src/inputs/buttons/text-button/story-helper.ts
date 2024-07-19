@@ -1,10 +1,10 @@
-import type { ArgTypes, Args } from '@storybook/vue';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 import icon from 'vue-svgicon';
 
 import { TEXT_BUTTON_SIZE, TEXT_BUTTON_STYLE } from '@/inputs/buttons/text-button/type';
 
 
-export const getTextButtonDefaultArgs = (): Args => ({
+export const getTextButtonArgs = (): Args => ({
     styleType: TEXT_BUTTON_STYLE.default,
     size: TEXT_BUTTON_SIZE.md,
     iconLeft: null,
@@ -16,10 +16,17 @@ export const getTextButtonDefaultArgs = (): Args => ({
     handleClick: "() => console.log('click')",
 });
 
+export const getTextButtonParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=5023%3A360207',
+    },
+});
+
 export const getTextButtonArgTypes = (): ArgTypes => ({
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Text button style',
         table: {
             type: {
@@ -35,7 +42,7 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Text button size',
         table: {
             type: {
@@ -51,7 +58,7 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
     },
     iconLeft: {
         name: 'iconLeft',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Name of icon to the left of the text.',
         table: {
             type: {
@@ -67,7 +74,7 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
     },
     iconRight: {
         name: 'iconRight',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Name of icon to the right of the text.',
         table: {
             type: {
@@ -83,7 +90,7 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
     },
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Loading when true',
         table: {
             type: {
@@ -98,7 +105,7 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Disabled when true',
         table: {
             type: {
@@ -113,7 +120,7 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
     },
     readonly: {
         name: 'readonly',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to make readonly or not',
         table: {
             type: {
@@ -129,7 +136,7 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
     // slots
     default: {
         name: 'default',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Slot for contents of text button.',
         table: {
             type: {
@@ -142,7 +149,7 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
     // events
     handleClick: {
         name: 'click',
-        type: 'function',
+        type: { name: 'function' },
         description: 'Click function',
         table: {
             type: {

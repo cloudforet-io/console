@@ -1,8 +1,25 @@
-export const getCollapsiblePanelArgTypes = () => ({
+import { faker } from '@faker-js/faker';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
+export const getCollapsiblePanelArgs = (): Args => ({
+    'v-model': '',
+    isCollapsed: true,
+    lineClamp: 2,
+    defaultSlot: faker.lorem.sentence(40),
+});
+
+export const getCollapsiblePanelParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
+
+export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
         table: {
             type: {
@@ -17,7 +34,7 @@ export const getCollapsiblePanelArgTypes = () => ({
     },
     isCollapsed: {
         name: 'isCollapsed',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Collapsed state of toggle button.',
         table: {
             type: {
@@ -32,7 +49,7 @@ export const getCollapsiblePanelArgTypes = () => ({
     },
     lineClamp: {
         name: 'lineClamp',
-        type: 'number',
+        type: { name: 'number' },
         description: 'It refers to the number of content lines to be displayed in the collapsed state.',
         table: {
             type: {
@@ -48,7 +65,7 @@ export const getCollapsiblePanelArgTypes = () => ({
     /* slot */
     defaultSlot: {
         name: 'default',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Slot for contents.',
         table: {
             type: {
@@ -72,4 +89,6 @@ export const getCollapsiblePanelArgTypes = () => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
 });

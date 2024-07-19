@@ -1,6 +1,9 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
 
-export const getProgressBarDefaultArgs = () => ({
+export const getProgressBarArgs = (): Args => ({
     percentage: 50,
     label: undefined,
     size: PROGRESS_BAR_SIZE.md,
@@ -11,10 +14,17 @@ export const getProgressBarDefaultArgs = () => ({
     labelSlot: '',
 });
 
-export const getProgressBarArgTypes = () => ({
+export const getProgressBarParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=2667%3A173604',
+    },
+});
+
+export const getProgressBarArgTypes = (): ArgTypes => ({
     percentage: {
         name: 'percentage',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Progress percentage',
         table: {
             type: {
@@ -29,7 +39,7 @@ export const getProgressBarArgTypes = () => ({
     },
     label: {
         name: 'label',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Label text',
         table: {
             type: {
@@ -44,7 +54,7 @@ export const getProgressBarArgTypes = () => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: `Progress Bar size. ${Object.values(PROGRESS_BAR_SIZE)} are available.`,
         table: {
             type: {
@@ -60,7 +70,7 @@ export const getProgressBarArgTypes = () => ({
     },
     color: {
         name: 'color',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Color of tracker bar',
         table: {
             type: {
@@ -75,7 +85,7 @@ export const getProgressBarArgTypes = () => ({
     },
     gradient: {
         name: 'gradient',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Gradient Color & Gradient Starting point of tracker bar.',
         table: {
             type: {
@@ -90,7 +100,7 @@ export const getProgressBarArgTypes = () => ({
     },
     disableAnimation: {
         name: 'disableAnimation',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to disable animation or not.',
         table: {
             type: {
@@ -105,7 +115,7 @@ export const getProgressBarArgTypes = () => ({
     },
     height: {
         name: 'height',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Height of progress bar',
         table: {
             type: {

@@ -1,10 +1,13 @@
 import { faker } from '@faker-js/faker';
+import type { SBType } from '@storybook/types';
+import type { Args, ArgTypes, Parameters } from '@storybook/vue';
 import { range } from 'lodash';
 
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 
-export const getDataLoaderDefaultArgs = () => ({
+
+export const getDataLoaderArgs = (): Args => ({
     loading: true,
     data: range(15).map(() => faker.lorem.lines()),
     loaderType: LOADER_TYPES.spinner,
@@ -16,13 +19,22 @@ export const getDataLoaderDefaultArgs = () => ({
     loaderBackdropOpacity: 0.5,
     loaderBackdropColor: 'white',
     disableTransition: false,
-    defaultSlot: undefined,
+    loaderSlot: null,
+    defaultSlot: null,
+    noDataSlot: null,
 });
 
-export const getDataLoaderArgTypes = () => ({
+export const getDataLoaderParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5921%3A164129',
+    },
+});
+
+export const getDataLoaderArgTypes = (): ArgTypes => ({
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -36,7 +48,7 @@ export const getDataLoaderArgTypes = () => ({
     },
     data: {
         name: 'data',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Data to display',
         table: {
             type: {
@@ -51,7 +63,7 @@ export const getDataLoaderArgTypes = () => ({
     },
     loaderType: {
         name: 'loaderType',
-        type: 'string',
+        type: { name: 'string' },
         description: `Loader type. ${Object.values(LOADER_TYPES)} are available.`,
         table: {
             type: {
@@ -67,7 +79,7 @@ export const getDataLoaderArgTypes = () => ({
     },
     spinnerSize: {
         name: 'spinnerSize',
-        type: 'string',
+        type: { name: 'string' },
         description: `Spinner loader size. It works only when \`loaderType\` props is ${LOADER_TYPES.spinner}.`,
         table: {
             type: {
@@ -83,7 +95,7 @@ export const getDataLoaderArgTypes = () => ({
     },
     disableEmptyCase: {
         name: 'disableEmptyCase',
-        type: 'boolean',
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -97,7 +109,7 @@ export const getDataLoaderArgTypes = () => ({
     },
     showDataFromScratch: {
         name: 'showDataFromScratch',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show data from scratch or after fetching data at least once.',
         table: {
             type: {
@@ -112,7 +124,7 @@ export const getDataLoaderArgTypes = () => ({
     },
     minLoadingTime: {
         name: 'minLoadingTime',
-        type: 'number',
+        type: { name: 'number' },
         table: {
             type: {
                 summary: 'number',
@@ -126,7 +138,7 @@ export const getDataLoaderArgTypes = () => ({
     },
     lazyLoadingTime: {
         name: 'lazyLoadingTime',
-        type: 'number',
+        type: { name: 'number' },
         table: {
             type: {
                 summary: 'number',
@@ -140,7 +152,7 @@ export const getDataLoaderArgTypes = () => ({
     },
     loaderBackdropOpacity: {
         name: 'loaderBackdropOpacity',
-        type: 'number',
+        type: { name: 'number' },
         table: {
             type: {
                 summary: 'number',
@@ -154,7 +166,7 @@ export const getDataLoaderArgTypes = () => ({
     },
     loaderBackdropColor: {
         name: 'loaderBackdropColor',
-        type: 'string',
+        type: { name: 'string' },
         table: {
             type: {
                 summary: 'string',
@@ -168,7 +180,7 @@ export const getDataLoaderArgTypes = () => ({
     },
     disableTransition: {
         name: 'disableTransition',
-        type: 'boolean',
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -220,4 +232,8 @@ export const getDataLoaderArgTypes = () => ({
             },
         },
     },
+    // default
+    'no-data': { table: { disable: true } },
+    default: { table: { disable: true } },
+    loader: { table: { disable: true } },
 });

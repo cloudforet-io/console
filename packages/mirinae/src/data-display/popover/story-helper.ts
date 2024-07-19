@@ -1,6 +1,8 @@
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';
 
-export const getPopoverDefaultArgs = () => ({
+export const getPopoverArgs = (): Args => ({
     isVisible: false,
     tag: 'span',
     position: POPOVER_PLACEMENT.BOTTOM_END,
@@ -11,16 +13,23 @@ export const getPopoverDefaultArgs = () => ({
     hideCloseButton: false,
     hideArrow: false,
     'v-model': false,
-    defaultSlot: undefined,
-    contentRefSlot: undefined,
+    defaultSlot: null,
+    contentRefSlot: null,
 });
 
-export const getPopoverArgTypes = () => {
-    const argTypes = {
+export const getPopoverParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=2667%3A173604',
+    },
+});
+
+export const getPopoverArgTypes = (): ArgTypes => {
+    const argTypes: ArgTypes = {
         // props
         isVisible: {
             name: 'isVisible',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to show popover or not. support two way binding with `sync`.',
             table: {
                 type: {
@@ -35,7 +44,7 @@ export const getPopoverArgTypes = () => {
         },
         tag: {
             name: 'tag',
-            type: 'string',
+            type: { name: 'string' },
             description: 'root element tag',
             table: {
                 type: {
@@ -50,7 +59,7 @@ export const getPopoverArgTypes = () => {
         },
         position: {
             name: 'position',
-            type: 'string',
+            type: { name: 'string' },
             description: `Select popover placement. ${
                 [...Object.values(POPOVER_PLACEMENT)].map((d) => `\`${d}\``)} are available.`,
             table: {
@@ -67,7 +76,7 @@ export const getPopoverArgTypes = () => {
         },
         trigger: {
             name: 'trigger',
-            type: 'string',
+            type: { name: 'string' },
             description: `Select popover trigger. ${
                 [...Object.values(POPOVER_TRIGGER)].map((d) => `\`${d}\``)} are available.`,
             table: {
@@ -84,7 +93,7 @@ export const getPopoverArgTypes = () => {
         },
         ignoreTargetClick: {
             name: 'ignoreTargetClick',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'If the value is true, Ignore element click events assigned to the default slot.',
             table: {
                 type: {
@@ -99,7 +108,7 @@ export const getPopoverArgTypes = () => {
         },
         ignoreOutsideClick: {
             name: 'ignoreOutsideClick',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'If the value is true, do not close the popover even if user click outside the popover.',
             table: {
                 type: {
@@ -110,13 +119,11 @@ export const getPopoverArgTypes = () => {
                     summary: false,
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         hidePadding: {
             name: 'hidePadding',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'If the value is true, do not apply padding to the popover.',
             table: {
                 type: {
@@ -131,7 +138,7 @@ export const getPopoverArgTypes = () => {
         },
         hideCloseButton: {
             name: 'hideCloseButton',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'If the value is true, hide the close button.',
             table: {
                 type: {
@@ -146,7 +153,7 @@ export const getPopoverArgTypes = () => {
         },
         hideArrow: {
             name: 'hideArrow',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'If the value is true, hide the arrow.',
             table: {
                 type: {
@@ -162,7 +169,7 @@ export const getPopoverArgTypes = () => {
         // model
         'v-model': {
             name: 'v-model',
-            type: 'boolean',
+            type: { name: 'boolean' },
             required: false,
             description: 'Two way binding for `isVisible` props with `update:isVisible` event.',
             table: {
@@ -180,7 +187,7 @@ export const getPopoverArgTypes = () => {
         defaultSlot: {
             name: 'default',
             description: 'Slot of components to which popover will be applied.',
-            type: 'string',
+            type: { name: 'string' },
             table: {
                 type: {
                     summary: null,
@@ -195,7 +202,7 @@ export const getPopoverArgTypes = () => {
         contentRefSlot: {
             name: 'content',
             description: 'Slot for content.',
-            type: 'string',
+            type: { name: 'string' },
             table: {
                 type: {
                     summary: null,
@@ -265,6 +272,10 @@ export const getPopoverArgTypes = () => {
                 category: 'events',
             },
         },
+        // default
+        default: { table: { disable: true } },
+        content: { table: { disable: true } },
     };
+
     return argTypes;
 };

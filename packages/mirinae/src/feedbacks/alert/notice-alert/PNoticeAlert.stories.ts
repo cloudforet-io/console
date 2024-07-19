@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PNoticeAlert from '@/feedbacks/alert/notice-alert/PNoticeAlert.vue';
-import { getNoticeAlertDefaultArgs, getNoticeAlertArgTypes } from '@/feedbacks/alert/notice-alert/story-helper';
+import { getNoticeAlertArgs, getNoticeAlertArgTypes, getNoticeAlertParameters } from '@/feedbacks/alert/notice-alert/story-helper';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
 type PNoticeAlertPropsAndCustomArgs = ComponentProps<typeof PNoticeAlert>;
@@ -14,16 +14,12 @@ const meta : Meta<PNoticeAlertPropsAndCustomArgs> = {
     component: PNoticeAlert,
     argTypes: {
         ...getNoticeAlertArgTypes(),
-        // 'item-content': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A88958&t=kwTRXVZQtJLDw0Ei-4',
-        },
+        ...getNoticeAlertParameters(),
     },
     args: {
-        ...getNoticeAlertDefaultArgs(),
+        ...getNoticeAlertArgs(),
     },
 };
 

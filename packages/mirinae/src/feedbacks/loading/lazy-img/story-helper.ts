@@ -1,4 +1,6 @@
-export const getLazyImgDefaultArgs = () => ({
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
+export const getLazyImgArgs = (): Args => ({
     height: '2rem',
     width: '2rem',
     src: '',
@@ -6,14 +8,21 @@ export const getLazyImgDefaultArgs = () => ({
     errorIconColor: '',
     loading: undefined,
     alt: undefined,
-    preloaderSlot: undefined,
-    errorSlot: undefined,
+    preloaderSlot: null,
+    errorSlot: null,
 });
 
-export const getLazyImgArgTypes = () => ({
+export const getLazyImgParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A133538',
+    },
+});
+
+export const getLazyImgArgTypes = (): ArgTypes => ({
     height: {
         name: 'height',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Height of image',
         table: {
             type: {
@@ -28,7 +37,7 @@ export const getLazyImgArgTypes = () => ({
     },
     width: {
         name: 'width',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Height of image',
         table: {
             type: {
@@ -43,7 +52,7 @@ export const getLazyImgArgTypes = () => ({
     },
     src: {
         name: 'src',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Source of image',
         table: {
             type: {
@@ -58,7 +67,7 @@ export const getLazyImgArgTypes = () => ({
     },
     errorIcon: {
         name: 'errorIcon',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Alternative icon name when failed to load image. Refer to Icon component.',
         table: {
             type: {
@@ -73,7 +82,7 @@ export const getLazyImgArgTypes = () => ({
     },
     errorIconColor: {
         name: 'errorIconColor',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Alternative icon\'s color.',
         table: {
             type: {
@@ -88,7 +97,7 @@ export const getLazyImgArgTypes = () => ({
     },
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Manual loading controller. If it\'s not given, it works automatically.',
         table: {
             type: {
@@ -103,7 +112,7 @@ export const getLazyImgArgTypes = () => ({
     },
     alt: {
         name: 'alt',
-        type: 'string',
+        type: { name: 'string' },
         description: 'alt attribute of image tag.',
         table: {
             type: {
@@ -145,4 +154,7 @@ export const getLazyImgArgTypes = () => ({
         },
         control: null,
     },
+    // default
+    error: { table: { disable: true } },
+    preloader: { table: { disable: true } },
 });

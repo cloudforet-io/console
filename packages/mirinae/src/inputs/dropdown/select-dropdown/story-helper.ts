@@ -39,7 +39,7 @@ const extraArgTypes: ArgTypes = {
     /* props */
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Style type to display selected items.',
         table: {
             type: {
@@ -55,7 +55,7 @@ const extraArgTypes: ArgTypes = {
     },
     appearanceType: {
         name: 'appearanceType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Appearance type to display selected items.',
         table: {
             type: {
@@ -71,7 +71,7 @@ const extraArgTypes: ArgTypes = {
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Size of dropdown button.',
         table: {
             type: {
@@ -87,7 +87,7 @@ const extraArgTypes: ArgTypes = {
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to disable selection or not.',
         table: {
             type: {
@@ -102,7 +102,7 @@ const extraArgTypes: ArgTypes = {
     },
     invalid: {
         name: 'invalid',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to apply invalid style or not.',
         table: {
             type: {
@@ -117,7 +117,7 @@ const extraArgTypes: ArgTypes = {
     },
     placeholder: {
         name: 'placeholder',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Search input placeholder.',
         table: {
             type: {
@@ -132,7 +132,7 @@ const extraArgTypes: ArgTypes = {
     },
     selectionLabel: {
         name: 'selectionLabel',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Label to display selected items.',
         table: {
             type: {
@@ -147,7 +147,7 @@ const extraArgTypes: ArgTypes = {
     },
     selectionHighlight: {
         name: 'selectionHighlight',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to highlight or not.',
         table: {
             type: {
@@ -162,7 +162,7 @@ const extraArgTypes: ArgTypes = {
     },
     showAlertDot: {
         name: 'showAlertDot',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show alert or not.',
         table: {
             type: {
@@ -177,7 +177,7 @@ const extraArgTypes: ArgTypes = {
     },
     showDeleteAllButton: {
         name: 'showDeleteAllButton',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show delete all button or not.',
         table: {
             type: {
@@ -192,7 +192,7 @@ const extraArgTypes: ArgTypes = {
     },
     useFixedMenuStyle: {
         name: 'useFixedMenuStyle',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to use position fixed style on menu or not. ',
         table: {
             type: {
@@ -207,7 +207,7 @@ const extraArgTypes: ArgTypes = {
     },
     buttonIcon: {
         name: 'buttonIcon',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Icons for dropdown right button. Useful when `type` props is `icon-button`.',
         table: {
             type: {
@@ -222,7 +222,7 @@ const extraArgTypes: ArgTypes = {
     },
     isFixedWidth: {
         name: 'isFixedWidth',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to fix width.',
         table: {
             type: {
@@ -237,7 +237,7 @@ const extraArgTypes: ArgTypes = {
     },
     resetSelectionOnMenuClose: {
         name: 'resetSelectionOnMenuClose',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'reset selection when menu close.',
         table: {
             type: {
@@ -252,7 +252,7 @@ const extraArgTypes: ArgTypes = {
     },
     isFilterable: {
         name: 'isFilterable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to be filterable or not.',
         table: {
             type: {
@@ -267,7 +267,7 @@ const extraArgTypes: ArgTypes = {
     },
     visibleMenu: {
         name: 'visibleMenu',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Use this prop when you want to control menu visibility manually. this is `sync` prop with event `update:visible-menu`.',
         table: {
             type: {
@@ -282,7 +282,7 @@ const extraArgTypes: ArgTypes = {
     },
     menuPosition: {
         name: 'menuPosition',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Position of Context menu',
         table: {
             type: {
@@ -298,7 +298,7 @@ const extraArgTypes: ArgTypes = {
     },
     indexMode: {
         name: 'indexMode',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to `selected` props works with item\'s index or not.',
         table: {
             type: {
@@ -313,7 +313,7 @@ const extraArgTypes: ArgTypes = {
     },
     parentId: {
         name: 'parentId',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The property to automatically hide the context menu when scrolling, if the Select-Dropdown\'s parent component exists.',
         table: {
             type: {
@@ -328,7 +328,7 @@ const extraArgTypes: ArgTypes = {
     },
     handler: {
         name: 'handler',
-        type: 'function',
+        type: { name: 'function' },
         description: 'Handler that returns auto-completion menu according to input value. If no value is given, the default handler is executed.',
         defaultValue: undefined,
         table: {
@@ -344,7 +344,7 @@ const extraArgTypes: ArgTypes = {
     },
     disableHandler: {
         name: 'disableHandler',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to execute handler automatically or not.',
         table: {
             type: {
@@ -359,7 +359,7 @@ const extraArgTypes: ArgTypes = {
     },
     pageSize: {
         name: 'pageSize',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Page size to show items.',
         table: {
             type: {
@@ -375,7 +375,7 @@ const extraArgTypes: ArgTypes = {
     },
     resetSelectedOnUnmounted: {
         name: 'resetSelectedOnUnmounted',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to reset selected items when unmounted or not.',
         table: {
             type: {
@@ -390,7 +390,7 @@ const extraArgTypes: ArgTypes = {
     },
     initSelectedWithHandler: {
         name: 'initSelectedWithHandler',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to initialize selected items with handler or not.',
         table: {
             type: {
@@ -405,7 +405,7 @@ const extraArgTypes: ArgTypes = {
     },
     hideHeaderWithoutItems: {
         name: 'hideHeaderWithoutItems',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to hide the header when there are no items that indicate the name of the header.',
         table: {
             type: {

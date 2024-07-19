@@ -1,10 +1,27 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 import icon from 'vue-svgicon';
+
+export const getLabelArgs = (): Args => ({
+    leftIcon: '',
+    text: 'Label',
+    deletable: false,
+    clickable: false,
+    itemClick: null,
+    delete: null,
+    labelContentSlot: 'Label Content',
+});
+
+export const getLabelParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'figma url',
+    },
+});
 
 export const getLabelArgTypes = (): ArgTypes => ({
     leftIcon: {
         name: 'leftIcon',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Left icon name',
         table: {
             type: {
@@ -20,7 +37,7 @@ export const getLabelArgTypes = (): ArgTypes => ({
     },
     // backgroundColor: {
     //     name: 'backgroundColor',
-    //     type: 'string',
+    //     type: { name: 'string' },
     //     description: 'Background color of label.',
     //     defaultValue: '',
     //     table: {
@@ -35,7 +52,7 @@ export const getLabelArgTypes = (): ArgTypes => ({
     // },
     text: {
         name: 'text',
-        type: 'string',
+        type: { name: 'string' },
         description: "The text for label's content",
         table: {
             type: {
@@ -49,7 +66,7 @@ export const getLabelArgTypes = (): ArgTypes => ({
     },
     deletable: {
         name: 'deletable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Indicates whether the label can be deleted or not. If true, the delete icon button is displayed.',
         table: {
             type: {
@@ -63,7 +80,7 @@ export const getLabelArgTypes = (): ArgTypes => ({
     },
     clickable: {
         name: 'clickable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Indicates whether the label can be clicked or not. If true, shows the UI of the clicked label.',
         table: {
             type: {
@@ -77,7 +94,7 @@ export const getLabelArgTypes = (): ArgTypes => ({
     },
     // active: {
     //     name: 'active',
-    //     type: 'boolean',
+    //     type: { name: 'boolean' },
     //     description: 'The active status of label. This is the state when it is clicked in the clickable state.',
     //     defaultValue: false,
     //     table: {
@@ -129,4 +146,8 @@ export const getLabelArgTypes = (): ArgTypes => ({
             defaultValue: 'Label Content',
         },
     },
+    // default
+    clickStop: { table: { disable: true } },
+    active: { table: { disable: true } },
+    'label-content': { table: { disable: true } },
 });

@@ -1,22 +1,29 @@
 import { getTextHighlightingProps } from '@/data-display/text-highlighting/mock';
 import { TEXT_HIGHLIGHTING_STYLE_TYPE } from '@/data-display/text-highlighting/type';
 
-export const getTextHighlightingDefaultArgs = () => {
+export const getTextHighlightingArgs = () => {
     const { text, term } = getTextHighlightingProps();
 
     return {
         text,
         term,
         styleType: TEXT_HIGHLIGHTING_STYLE_TYPE[0],
-        defaultSlot: undefined,
-        onNativeEvents: undefined,
+        defaultSlot: null,
+        onNativeEvents: null,
     };
 };
+
+export const getTextHighlightingParameters = () => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
 
 export const getTextHighlightingArgTypes = () => ({
     text: {
         name: 'text',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Text to display.',
         table: {
             type: {
@@ -31,7 +38,7 @@ export const getTextHighlightingArgTypes = () => ({
     },
     term: {
         name: 'term',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Term to highlight.',
         table: {
             type: {
@@ -46,7 +53,7 @@ export const getTextHighlightingArgTypes = () => ({
     },
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: `Style type.  ${TEXT_HIGHLIGHTING_STYLE_TYPE.map((d) => `\`${d}\``)} are available.`,
         table: {
             type: {
@@ -82,4 +89,6 @@ export const getTextHighlightingArgTypes = () => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
 });

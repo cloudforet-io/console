@@ -66,7 +66,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
     return {
         value: {
             name: 'value',
-            required: false,
+            type: { name: 'string', required: false },
             description: 'Input value',
             table: {
                 type: {
@@ -81,7 +81,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         size: {
             name: 'size',
-            type: 'string',
+            type: { name: 'string' },
             description: `TextInput size. ${Object.values(INPUT_SIZE)} are available.`,
             table: {
                 type: {
@@ -97,7 +97,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         isFocused: {
             name: 'isFocused',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'focused value for sync.',
             table: {
                 type: {
@@ -112,7 +112,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         disabled: {
             name: 'disabled',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'The same with disabled attribute.',
             table: {
                 type: {
@@ -127,7 +127,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         block: {
             name: 'block',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Make input style to be display block',
             table: {
                 type: {
@@ -142,7 +142,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         invalid: {
             name: 'invalid',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Apply invalid style',
             table: {
                 type: {
@@ -157,7 +157,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         placeholder: {
             name: 'placeholder',
-            type: 'string',
+            type: { name: 'string' },
             description: 'Input placeholder.',
             table: {
                 type: {
@@ -172,7 +172,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         multiInput: {
             name: 'multiInput',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to enable multi input mode or not.',
             table: {
                 type: {
@@ -202,7 +202,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         visibleMenu: {
             name: 'visibleMenu',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Use this prop when you want to control menu visibility manually. this is `sync` prop with event `update:visible-menu`.',
             table: {
                 type: {
@@ -217,7 +217,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         useFixedMenuStyle: {
             name: 'useFixedMenuStyle',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to use position fixed style on menu or not. ',
             table: {
                 type: {
@@ -233,7 +233,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         ...contextMenuArgTypes,
         handler: {
             name: 'handler',
-            type: 'function',
+            type: { name: 'function' },
             description: 'Handler that returns auto-completion menu according to input value. If no value is given, the default handler is executed.',
             table: {
                 type: {
@@ -248,7 +248,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         disableHandler: {
             name: 'disableHandler',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to use handler or not.',
             table: {
                 type: {
@@ -263,7 +263,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         useAutoComplete: {
             name: 'useAutoComplete',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to use autocomplete or not.',
             table: {
                 type: {
@@ -278,7 +278,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         maskingMode: {
             name: 'maskingMode',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to use input masking or not.',
             table: {
                 type: {
@@ -293,7 +293,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         showPassword: {
             name: 'showPassword',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to display password or not.',
             defaultValue: true,
             table: {
@@ -309,7 +309,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         appearanceType: {
             name: 'appearanceType',
-            type: 'string',
+            type: { name: 'string' },
             description: 'Appearance type to display selected items.',
             table: {
                 type: {
@@ -325,7 +325,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         pageSize: {
             name: 'pageSize',
-            type: 'number',
+            type: { name: 'number' },
             description: 'Page size to show items.',
             table: {
                 type: {

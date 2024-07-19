@@ -17,7 +17,7 @@ export const getVerticalLayoutParameters = (): Parameters => ({
 export const getVerticalLayoutArgTypes = (): ArgTypes => ({
     height: {
         name: 'height',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Height of layout.',
         table: {
             type: {
@@ -32,7 +32,7 @@ export const getVerticalLayoutArgTypes = (): ArgTypes => ({
     },
     initWidth: {
         name: 'initWidth',
-        type: 'number',
+        type: { name: 'number' },
         description: '',
         table: {
             type: {
@@ -47,7 +47,7 @@ export const getVerticalLayoutArgTypes = (): ArgTypes => ({
     },
     minWidth: {
         name: 'minWidth',
-        type: 'number',
+        type: { name: 'number' },
         description: '',
         table: {
             type: {
@@ -62,7 +62,7 @@ export const getVerticalLayoutArgTypes = (): ArgTypes => ({
     },
     maxWidth: {
         name: 'maxWidth',
-        type: 'number',
+        type: { name: 'number' },
         description: '',
         table: {
             type: {

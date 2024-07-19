@@ -1,13 +1,32 @@
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import {
     FIELD_TITLE_COLOR,
     FIELD_TITLE_SIZE,
     FIELD_TITLE_TEXT_WEIGHT,
 } from '@/data-display/field-title/config';
 
-export const getLabelArgTypes = () => ({
+export const getLabelArgs = (): Args => ({
+    label: 'Field Title',
+    description: 'description for the title!',
+    size: FIELD_TITLE_SIZE.md,
+    fontWeight: FIELD_TITLE_TEXT_WEIGHT.bold,
+    color: FIELD_TITLE_COLOR.dark,
+    inline: false,
+    defaultSlot: '',
+});
+
+export const getLabelParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A193199',
+    },
+});
+
+export const getLabelArgTypes = (): ArgTypes => ({
     label: {
         name: 'label',
-        type: 'string',
+        type: { name: 'string' },
         description: 'text to display.',
         table: {
             type: {
@@ -22,7 +41,7 @@ export const getLabelArgTypes = () => ({
     },
     description: {
         name: 'description',
-        type: 'string',
+        type: { name: 'string' },
         description: 'description for the title.',
         table: {
             type: {
@@ -37,7 +56,7 @@ export const getLabelArgTypes = () => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: 'size of field title label.',
         table: {
             type: {
@@ -53,7 +72,7 @@ export const getLabelArgTypes = () => ({
     },
     fontWeight: {
         name: 'fontWeight',
-        type: 'string',
+        type: { name: 'string' },
         description: 'font weight of field title label.',
         table: {
             type: {
@@ -69,7 +88,7 @@ export const getLabelArgTypes = () => ({
     },
     color: {
         name: 'color',
-        type: 'string',
+        type: { name: 'string' },
         description: 'color of field title label.',
         table: {
             type: {
@@ -85,7 +104,7 @@ export const getLabelArgTypes = () => ({
     },
     inline: {
         name: 'inline',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to display the title in inline mode.',
         table: {
             type: {
@@ -152,4 +171,9 @@ export const getLabelArgTypes = () => ({
             category: 'slots',
         },
     },
+    // default
+    default: { table: { disable: true } },
+    right: { table: { disable: true } },
+    left: { table: { disable: true } },
+    bottom: { table: { disable: true } },
 });

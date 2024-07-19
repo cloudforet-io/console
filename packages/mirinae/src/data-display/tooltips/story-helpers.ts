@@ -1,17 +1,27 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { POSITIONS } from '@/data-display/tooltips/type';
 
-export const getTooltipDefaultArgs = () => ({
+export const getTooltipArgs = (): Args => ({
     tag: 'span',
     contents: 'Tooltip contents',
-    defaultSlot: undefined,
+    defaultSlot: null,
     position: 'top',
     options: { autoHide: false },
 });
 
-export const getTooltipArgTypes = () => ({
+export const getTooltipParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124040',
+    },
+});
+
+export const getTooltipArgTypes = (): ArgTypes => ({
     tag: {
         name: 'tag',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Root element tag',
         table: {
             type: {
@@ -26,7 +36,7 @@ export const getTooltipArgTypes = () => ({
     },
     contents: {
         name: 'contents',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Tooltip contents.',
         table: {
             type: {
@@ -41,7 +51,7 @@ export const getTooltipArgTypes = () => ({
     },
     position: {
         name: 'position',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Position of tooltip.',
         table: {
             type: {
@@ -57,7 +67,7 @@ export const getTooltipArgTypes = () => ({
     },
     options: {
         name: 'options',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Options of Tooltip. This must be options of [v-tooltip](https://www.npmjs.com/package/v-tooltip#other-options).',
         table: {
             type: {
@@ -81,4 +91,6 @@ export const getTooltipArgTypes = () => ({
             category: 'slots',
         },
     },
+    // default
+    default: { table: { disable: true } },
 });

@@ -16,7 +16,7 @@ export const getPaginationParameters = (): Parameters => ({
 export const getPaginationArgTypes = (): ArgTypes => ({
     thisPage: {
         name: 'thisPage',
-        type: 'number',
+        type: { name: 'number' },
         description: 'This represents current page number.',
         table: {
             type: {
@@ -31,7 +31,7 @@ export const getPaginationArgTypes = (): ArgTypes => ({
     },
     pageSize: {
         name: 'pageSize',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Size of per page.',
         table: {
             type: {
@@ -46,7 +46,7 @@ export const getPaginationArgTypes = (): ArgTypes => ({
     },
     totalCount: {
         name: 'totalCount',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Total page number.',
         table: {
             type: {

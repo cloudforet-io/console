@@ -7,7 +7,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
 import PNotificationBar from './PNotificationBar.vue';
-import { getNotificationBarDefaultArgs, getNotificationBarArgTypes } from './stroy-helper';
+import { getNotificationBarArgs, getNotificationBarParameters, getNotificationBarArgTypes } from './stroy-helper';
 
 
 
@@ -20,13 +20,10 @@ const meta : Meta<PNotificationBarPropsAndCustomArgs> = {
         ...getNotificationBarArgTypes(),
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=8791%3A189001',
-        },
+        ...getNotificationBarParameters(),
     },
     args: {
-        ...getNotificationBarDefaultArgs(),
+        ...getNotificationBarArgs(),
     },
 };
 

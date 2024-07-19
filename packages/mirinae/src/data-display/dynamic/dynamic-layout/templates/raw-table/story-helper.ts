@@ -1,33 +1,62 @@
+import type { ArgTypes, Args } from '@storybook/vue';
+
+import mock from '@/data-display/dynamic/dynamic-layout/mock';
 import { getDynamicLayoutArgTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';
 
+export const getDynamicLayoutRawTableArgs = (): Args => ({
+    name: 'Base Information',
+    options: mock.rawTable.options,
+    data: mock.rawTable.data,
+    loading: false,
+    totalCount: 0,
+    timezone: 'UTC',
+    selectIndex: [],
+    selectable: false,
+    multiSelect: true,
+    invalid: false,
+    colCopy: false,
+    excelVisible: false,
+    settingsVisible: false,
+    sortBy: undefined,
+    sortDesc: undefined,
+    pageStart: undefined,
+    pageLimit: undefined,
+    searchText: '',
+});
+
 export const getDynamicLayoutRawTableArgTypes = () => {
-    const argTypes = getDynamicLayoutArgTypes();
+    const dynamicLayoutArgTypes = getDynamicLayoutArgTypes();
 
-    // argTypes.options.defaultValue = mock.rawTable.options;
-    // argTypes.data.defaultValue = mock.rawTable.data;
-
-    return {
-        name: argTypes.name,
-        options: argTypes.options,
-        data: argTypes.data,
-        loading: argTypes.loading,
-        totalCount: argTypes.totalCount,
-        timezone: argTypes.timezone,
-        selectIndex: argTypes.selectIndex,
-        selectable: argTypes.selectable,
-        multiSelect: argTypes.multiSelect,
-        invalid: argTypes.invalid,
-        colCopy: argTypes.colCopy,
-        excelVisible: argTypes.excelVisible,
-        settingsVisible: argTypes.settingsVisible,
-        sortBy: argTypes.sortBy,
-        sortDesc: argTypes.sortDesc,
-        pageStart: argTypes.pageStart,
-        pageLimit: argTypes.pageLimit,
-        searchText: argTypes.searchText,
-        onFetch: argTypes.onFetch,
-        onSelect: argTypes.onSelect,
-        onExport: argTypes.onExport,
-        onClickSettings: argTypes.onClickSettings,
+    const argTypes: ArgTypes = {
+        name: dynamicLayoutArgTypes.name,
+        options: dynamicLayoutArgTypes.options,
+        data: dynamicLayoutArgTypes.data,
+        loading: dynamicLayoutArgTypes.loading,
+        totalCount: dynamicLayoutArgTypes.totalCount,
+        timezone: dynamicLayoutArgTypes.timezone,
+        selectIndex: dynamicLayoutArgTypes.selectIndex,
+        selectable: dynamicLayoutArgTypes.selectable,
+        multiSelect: dynamicLayoutArgTypes.multiSelect,
+        invalid: dynamicLayoutArgTypes.invalid,
+        colCopy: dynamicLayoutArgTypes.colCopy,
+        excelVisible: dynamicLayoutArgTypes.excelVisible,
+        settingsVisible: dynamicLayoutArgTypes.settingsVisible,
+        sortBy: dynamicLayoutArgTypes.sortBy,
+        sortDesc: dynamicLayoutArgTypes.sortDesc,
+        pageStart: dynamicLayoutArgTypes.pageStart,
+        pageLimit: dynamicLayoutArgTypes.pageLimit,
+        searchText: dynamicLayoutArgTypes.searchText,
+        onFetch: dynamicLayoutArgTypes.onFetch,
+        onSelect: dynamicLayoutArgTypes.onSelect,
+        onExport: dynamicLayoutArgTypes.onExport,
+        onClickSettings: dynamicLayoutArgTypes.onClickSettings,
+        // default
+        slot: { table: { disable: true } },
+        type: { table: { disable: true } },
+        fetchOptions: { table: { disable: true } },
+        typeOptions: { table: { disable: true } },
+        fieldHandler: { table: { disable: true } },
     };
+
+    return argTypes;
 };

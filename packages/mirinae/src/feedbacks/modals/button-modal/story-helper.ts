@@ -1,7 +1,9 @@
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import { SizeMapping } from '@/feedbacks/modals/type';
 
-export const getButtonModalDefaultArgs = () => ({
+export const getButtonModalArgs = (): Args => ({
     visible: false,
     backdrop: true,
     size: 'md',
@@ -21,22 +23,29 @@ export const getButtonModalDefaultArgs = () => ({
     'v-model': false,
     header: 'Modal Header',
     body: 'Modal Content',
-    'footer-extra': undefined,
+    'footer-extra': null,
     'reset-button': 'Reset',
     'close-button': 'Cancel',
     'confirm-button': 'Confirm',
-    onConfirm: undefined,
-    onCancel: undefined,
-    onReturn: undefined,
-    onClose: undefined,
-    onUpdateVisible: undefined,
+    onConfirm: null,
+    onCancel: null,
+    onReturn: null,
+    onClose: null,
+    onUpdateVisible: null,
 });
 
-export const getButtonModalArgTypes = () => ({
+export const getButtonModalParameters = (): Parameters => ({
+    centered: { disable: true },
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=7654%3A182002',
+    },
+});
+
+export const getButtonModalArgTypes = (): ArgTypes => ({
     visible: {
         name: 'visible',
-        type: 'boolean',
-        required: true,
+        type: { name: 'boolean', required: true },
         description: 'Whether to show modal or not. sync prop.',
         table: {
             type: {
@@ -51,7 +60,7 @@ export const getButtonModalArgTypes = () => ({
     },
     backdrop: {
         name: 'backdrop',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show backdrop or not.',
         table: {
             type: {
@@ -66,7 +75,7 @@ export const getButtonModalArgTypes = () => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: `Modal size. ${Object.keys(SizeMapping).map((d) => `\`${d}\``).join(', ')} are available.`,
         table: {
             type: {
@@ -82,7 +91,7 @@ export const getButtonModalArgTypes = () => ({
     },
     themeColor: {
         name: 'themeColor',
-        type: 'string',
+        type: { name: 'string' },
         description: `Modal themes. ${THEME_COLORS.map((d) => `\`${d}\``).join(', ')} are available.`,
         table: {
             type: {
@@ -98,7 +107,7 @@ export const getButtonModalArgTypes = () => ({
     },
     headerTitle: {
         name: 'headerTitle',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Header Title',
         table: {
             type: {
@@ -113,7 +122,7 @@ export const getButtonModalArgTypes = () => ({
     },
     hideHeader: {
         name: 'hideHeader',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to hide header or not.',
         table: {
             type: {
@@ -128,7 +137,7 @@ export const getButtonModalArgTypes = () => ({
     },
     hideBody: {
         name: 'hideBody',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to hide body or not.',
         table: {
             type: {
@@ -143,7 +152,7 @@ export const getButtonModalArgTypes = () => ({
     },
     hideFooter: {
         name: 'hideFooter',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to hide footer or not.',
         table: {
             type: {
@@ -158,7 +167,7 @@ export const getButtonModalArgTypes = () => ({
     },
     hideHeaderCloseButton: {
         name: 'hideHeaderCloseButton',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to hide close button in header or not.',
         table: {
             type: {
@@ -173,7 +182,7 @@ export const getButtonModalArgTypes = () => ({
     },
     footerResetButtonVisible: {
         name: 'footerResetButtonVisible',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show reset button in footer or not.',
         table: {
             type: {
@@ -188,7 +197,7 @@ export const getButtonModalArgTypes = () => ({
     },
     hideFooterCloseButton: {
         name: 'hideFooterCloseButton',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to hide footer close button or not.',
         table: {
             type: {
@@ -203,7 +212,7 @@ export const getButtonModalArgTypes = () => ({
     },
     hideFooterConfirmButton: {
         name: 'hideFooterConfirmButton',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to hide footer confirm button or not.',
         table: {
             type: {
@@ -218,7 +227,7 @@ export const getButtonModalArgTypes = () => ({
     },
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Show Loading in confirm button',
         table: {
             type: {
@@ -233,7 +242,7 @@ export const getButtonModalArgTypes = () => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Disable confirm button or Not',
         table: {
             type: {
@@ -248,7 +257,7 @@ export const getButtonModalArgTypes = () => ({
     },
     absolute: {
         name: 'absolute',
-        type: 'number',
+        type: { name: 'number' },
         description: 'set position by absolute, with [{top: {absolute}rem}, {left: {absolute}rem}]',
         table: {
             type: {
@@ -263,7 +272,7 @@ export const getButtonModalArgTypes = () => ({
     },
     modalBodyId: {
         name: 'modalBodyId',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Applied when utilizing the id value of the body, as in the usage within the select-dropdown component',
         table: {
             type: {
@@ -279,7 +288,7 @@ export const getButtonModalArgTypes = () => ({
     // model
     'v-model': {
         name: 'v-model',
-        type: 'boolean',
+        type: { name: 'boolean' },
         required: false,
         description: 'Two way binding for `visible` props with `update:visible` event.',
         table: {

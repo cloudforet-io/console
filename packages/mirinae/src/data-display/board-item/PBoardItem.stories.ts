@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { standardIconActionSet, extraIconActionSet } from '@/data-display/board-item/mock';
-import { getBoardItemArgTypes } from '@/data-display/board-item/story-helper';
+import { getBoardItemArgTypes, getBoardItemParameters, getBoardItemArgs } from '@/data-display/board-item/story-helper';
 import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
 import { I18nConnector } from '@/translations';
 
@@ -19,22 +19,12 @@ const meta : Meta<PBoardItemPropsAndCustomArgs> = {
     component: PBoardItem,
     argTypes: {
         ...getBoardItemArgTypes(),
-        'left-content': { table: { disable: true } },
-        content: { table: { disable: true } },
-        'overlay-content': { table: { disable: true } },
-        'custom-right-content': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'figma url',
-        },
+        ...getBoardItemParameters(),
     },
     args: {
-        leftIcon: undefined,
-        IconButtonSets: standardIconActionSet,
-        rounded: false,
-        selected: false,
+        ...getBoardItemArgs(),
     },
 };
 

@@ -21,7 +21,6 @@ const meta : Meta<PContextMenuPropsAndCustomArgs> = {
     component: PContextMenu,
     argTypes: {
         ...getContextMenuArgTypes(),
-        // 'item-content': { table: { disable: true } },
     },
     parameters: {
         ...getContextMenuParameters(),

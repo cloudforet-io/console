@@ -1,10 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getBadgesArgTypes } from '@/data-display/badge/story-helper';
-import {
-    SOLID_STYLE_TYPE, SOLID_OUTLINE_STYLE_TYPE, SUBTLE_STYLE_TYPE, BADGE_FONT_WEIGHT, BADGE_SHAPE, BADGE_STYLE_TYPE, BADGE_TYPE,
-} from '@/data-display/badge/type';
+import { getBadgesArgTypes, getBadgesArgs, getBadgesParameters } from '@/data-display/badge/story-helper';
+import { SOLID_STYLE_TYPE, SOLID_OUTLINE_STYLE_TYPE, SUBTLE_STYLE_TYPE } from '@/data-display/badge/type';
 
 import PBadge from './PBadge.vue';
 
@@ -15,23 +13,12 @@ const meta : Meta<PBadgePropsAndCustomArgs> = {
     component: PBadge,
     argTypes: {
         ...getBadgesArgTypes(),
-        default: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124077',
-        },
+        ...getBadgesParameters(),
     },
     args: {
-        badgeType: BADGE_TYPE.SOLID,
-        styleType: BADGE_STYLE_TYPE.primary,
-        textColor: undefined,
-        backgroundColor: undefined,
-        outlineColor: undefined,
-        shape: BADGE_SHAPE.ROUND,
-        fontWeight: BADGE_FONT_WEIGHT.REGULAR,
-        defaultSlot: 'badge',
+        ...getBadgesArgs(),
     },
 };
 

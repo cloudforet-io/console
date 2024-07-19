@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getDynamicFieldArgTypes } from '@/data-display/dynamic/dynamic-field/story-helper';
-import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import { getDynamicFieldArgTypes, getDynamicFieldArgs } from '@/data-display/dynamic/dynamic-field/story-helper';
 
 import PDynamicField from './PDynamicField.vue';
 
@@ -15,12 +14,7 @@ const meta : Meta<PDynamicFieldPropsAndCustomArgs> = {
         ...getDynamicFieldArgTypes(),
     },
     args: {
-        type: `${dynamicFieldTypes[0]}`,
-        options: {},
-        data: 'data',
-        extraData: {},
-        typeOptions: {},
-        handler: (props) => props,
+        ...getDynamicFieldArgs(),
     },
 };
 
@@ -312,7 +306,7 @@ export const MoreType: Story = {
                 typeOptions: { displayKey: 'name' },
             };
         },
-    })
+    }),
 };
 
 export const Playground: Story = {

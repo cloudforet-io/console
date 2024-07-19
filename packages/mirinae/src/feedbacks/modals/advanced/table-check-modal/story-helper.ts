@@ -1,8 +1,11 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
 import { getUserFields, getUsers } from '@/data-display/tables/data-table/mock';
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import { SizeMapping } from '@/feedbacks/modals/type';
 
-export const getTableCheckModalDefaultArgs = () => ({
+export const getTableCheckModalArgs = (): Args => ({
     modalSize: 'md',
     visible: false,
     headerTitle: 'This is header title.',
@@ -11,16 +14,24 @@ export const getTableCheckModalDefaultArgs = () => ({
     fields: getUserFields(),
     items: getUsers(),
     loading: false,
-    defaultSlot: undefined,
-    subTitleSlot: undefined,
-    subTitleFormatSlot: undefined,
-    onConfirm: undefined,
+    defaultSlot: null,
+    subTitleSlot: null,
+    subTitleFormatSlot: null,
+    onConfirm: null,
+    onCancel: null,
 });
 
-export const getTableCheckModalArgTypes = () => ({
+export const getTableCheckModalParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/t0napBIB14ZZN9RIq9uo3O/Asset-Inventory?node-id=2613%3A371966&t=0A8wuvLdPqlyb3TM-4',
+    },
+});
+
+export const getTableCheckModalArgTypes = (): ArgTypes => ({
     modalSize: {
         name: 'modalSize',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Size of modal.',
         table: {
             type: {
@@ -36,7 +47,7 @@ export const getTableCheckModalArgTypes = () => ({
     },
     visible: {
         name: 'visible',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show modal or not.',
         table: {
             type: {
@@ -51,7 +62,7 @@ export const getTableCheckModalArgTypes = () => ({
     },
     headerTitle: {
         name: 'headerTitle',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Header title of modal.',
         table: {
             type: {
@@ -66,7 +77,7 @@ export const getTableCheckModalArgTypes = () => ({
     },
     subTitle: {
         name: 'headerTitle',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Sub title of modal.',
         table: {
             type: {
@@ -81,7 +92,7 @@ export const getTableCheckModalArgTypes = () => ({
     },
     themeColor: {
         name: 'themeColor',
-        type: 'string',
+        type: { name: 'string' },
         description: `Modal themes. ${THEME_COLORS.map((d) => `\`${d}\``).join(', ')} are available.`,
         table: {
             type: {
@@ -97,8 +108,7 @@ export const getTableCheckModalArgTypes = () => ({
     },
     fields: {
         name: 'fields',
-        type: 'array',
-        required: true,
+        type: { name: 'array', required: true } as SBType,
         description: 'Table columns. Array of field type object or string.',
         table: {
             type: {
@@ -113,7 +123,7 @@ export const getTableCheckModalArgTypes = () => ({
     },
     items: {
         name: 'items',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Table data array.',
         table: {
             type: {
@@ -128,7 +138,7 @@ export const getTableCheckModalArgTypes = () => ({
     },
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show loader or not.',
         table: {
             type: {

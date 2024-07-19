@@ -7,7 +7,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 import PButton from '../../inputs/buttons/button/PButton.vue';
 import PTextInput from '../../inputs/input/text-input/PTextInput.vue';
 import PPopover from './PPopover.vue';
-import { getPopoverDefaultArgs, getPopoverArgTypes } from './story-helper';
+import { getPopoverArgs, getPopoverParameters, getPopoverArgTypes } from './story-helper';
 
 
 
@@ -18,17 +18,12 @@ const meta : Meta<PPopoverPropsAndCustomArgs> = {
     component: PPopover,
     argTypes: {
         ...getPopoverArgTypes(),
-        default: { table: { disable: true } },
-        content: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=2667%3A173604',
-        },
+        ...getPopoverParameters(),
     },
     args: {
-        ...getPopoverDefaultArgs(),
+        ...getPopoverArgs(),
     },
 };
 

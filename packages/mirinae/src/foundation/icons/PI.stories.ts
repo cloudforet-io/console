@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getAllAvailableIcons, getIconDefaultArgs, getIconsArgTypes } from '@/foundation/icons/story-helper';
+import {
+    getAllAvailableIcons, getIconArgs, getIconsArgTypes, getIconsParameters,
+} from '@/foundation/icons/story-helper';
 
 import PI from './PI.vue';
 
@@ -14,13 +16,10 @@ const meta : Meta<PIPropsAndCustomArgs> = {
         ...getIconsArgTypes(),
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A123491',
-        },
+        ...getIconsParameters(),
     },
     args: {
-        ...getIconDefaultArgs(),
+        ...getIconArgs(),
     },
 };
 

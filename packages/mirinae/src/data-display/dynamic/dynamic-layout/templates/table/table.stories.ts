@@ -1,10 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-
-import mock from '@/data-display/dynamic/dynamic-layout/mock';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-import { getDynamicLayoutTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/table/story-helper';
+import { getDynamicLayoutTableArgTypes, getDynamicLayoutTableArgs } from '@/data-display/dynamic/dynamic-layout/templates/table/story-helper';
 import { I18nConnector } from '@/translations';
 
 type PDynamicLayoutPropsAndCustomArgs = ComponentProps<typeof PDynamicLayout>;
@@ -14,31 +12,9 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
     component: PDynamicLayout,
     argTypes: {
         ...getDynamicLayoutTableArgTypes(),
-        type: { table: { disable: true } },
-        fetchOptions: { table: { disable: true } },
-        typeOptions: { table: { disable: true } },
-        fieldHandler: { table: { disable: true } },
-        slot: { table: { disable: true } },
     },
     args: {
-        name: 'Base Information',
-        options: mock.table.options,
-        data: mock.table.data,
-        loading: false,
-        totalCount: 0,
-        timezone: 'UTC',
-        selectIndex: [],
-        selectable: false,
-        multiSelect: true,
-        invalid: false,
-        colCopy: false,
-        excelVisible: false,
-        settingsVisible: false,
-        sortBy: undefined,
-        sortDesc: undefined,
-        pageStart: undefined,
-        pageLimit: undefined,
-        searchText: '',
+        ...getDynamicLayoutTableArgs(),
     },
 };
 

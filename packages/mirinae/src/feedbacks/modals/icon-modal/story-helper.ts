@@ -1,7 +1,9 @@
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
 import { SizeMapping } from '@/feedbacks/modals/type';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
-export const getIconModalDefaultArgs = () => ({
+export const getIconModalArgs = (): Args => ({
     size: 'sm',
     visible: false,
     iconName: 'ic_service_dashboard',
@@ -17,10 +19,18 @@ export const getIconModalDefaultArgs = () => ({
     body: 'Modal Content',
 });
 
-export const getIconModalArgTypes = () => ({
+export const getIconModalParameters = (): Parameters => ({
+    centered: { disable: true },
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A138158&t=kwTRXVZQtJLDw0Ei-4',
+    },
+});
+
+export const getIconModalArgTypes = (): ArgTypes => ({
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: `Modal size. ${Object.keys(SizeMapping).map((d) => `\`${d}\``).join(', ')} are available.`,
         table: {
             type: {
@@ -36,8 +46,7 @@ export const getIconModalArgTypes = () => ({
     },
     visible: {
         name: 'visible',
-        type: 'boolean',
-        required: true,
+        type: { name: 'boolean', required: true },
         description: 'Whether to show modal or not. sync prop.',
         table: {
             type: {
@@ -52,7 +61,7 @@ export const getIconModalArgTypes = () => ({
     },
     iconName: {
         name: 'iconName',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Icon name.',
         table: {
             type: {
@@ -67,7 +76,7 @@ export const getIconModalArgTypes = () => ({
     },
     iconColor: {
         name: 'iconColor',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Values can be given in the order of stroke and fill. Consider space as a delimiter. Giving one thing applies to both. e.g. "inherit transparent"',
         table: {
             type: {
@@ -82,7 +91,7 @@ export const getIconModalArgTypes = () => ({
     },
     emoji: {
         name: 'emoji',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Emoji.',
         table: {
             type: {
@@ -97,7 +106,7 @@ export const getIconModalArgTypes = () => ({
     },
     headerTitle: {
         name: 'headerTitle',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Header Title',
         table: {
             type: {
@@ -112,7 +121,7 @@ export const getIconModalArgTypes = () => ({
     },
     headerDesc: {
         name: 'headerDesc',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Header description.',
         table: {
             type: {
@@ -127,7 +136,7 @@ export const getIconModalArgTypes = () => ({
     },
     buttonText: {
         name: 'buttonText',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Button Text.',
         table: {
             type: {
@@ -142,7 +151,7 @@ export const getIconModalArgTypes = () => ({
     },
     buttonStyleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Button style of modal button.',
         table: {
             type: {
@@ -158,7 +167,7 @@ export const getIconModalArgTypes = () => ({
     },
     backdrop: {
         name: 'backdrop',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show backdrop or not.',
         table: {
             type: {
@@ -173,7 +182,7 @@ export const getIconModalArgTypes = () => ({
     },
     hideButton: {
         name: 'hideButton',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to use default button or not.',
         table: {
             type: {

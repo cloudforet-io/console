@@ -1,12 +1,31 @@
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import {
     BADGE_FONT_WEIGHT, BADGE_SHAPE, BADGE_STYLE_TYPE, BADGE_TYPE,
 } from '@/data-display/badge/type';
 
+export const getBadgesArgs = (): Args => ({
+    badgeType: BADGE_TYPE.SOLID,
+    styleType: BADGE_STYLE_TYPE.primary,
+    textColor: null,
+    backgroundColor: null,
+    outlineColor: null,
+    shape: BADGE_SHAPE.ROUND,
+    fontWeight: BADGE_FONT_WEIGHT.REGULAR,
+    defaultSlot: 'badge',
+});
 
-export const getBadgesArgTypes = () => ({
+export const getBadgesParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124077',
+    },
+});
+
+export const getBadgesArgTypes = (): ArgTypes => ({
     badgeType: {
         name: 'badgeType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Badge type',
         table: {
             type: {
@@ -22,7 +41,7 @@ export const getBadgesArgTypes = () => ({
     },
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Badge style',
         table: {
             type: {
@@ -38,7 +57,7 @@ export const getBadgesArgTypes = () => ({
     },
     textColor: {
         name: 'textColor',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Text color of badge',
         table: {
             type: {
@@ -53,7 +72,7 @@ export const getBadgesArgTypes = () => ({
     },
     backgroundColor: {
         name: 'backgroundColor',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Background color of badge',
         table: {
             type: {
@@ -68,7 +87,7 @@ export const getBadgesArgTypes = () => ({
     },
     outlineColor: {
         name: 'outlineColor',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Outline color of badge.',
         table: {
             type: {
@@ -83,7 +102,7 @@ export const getBadgesArgTypes = () => ({
     },
     shape: {
         name: 'shape',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Shape of badge',
         table: {
             type: {
@@ -99,7 +118,7 @@ export const getBadgesArgTypes = () => ({
     },
     fontWeight: {
         name: 'fontWeight',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Font weight of badge',
         table: {
             type: {
@@ -115,7 +134,7 @@ export const getBadgesArgTypes = () => ({
     },
     defaultSlot: {
         name: 'default',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Slot for contents of badge',
         table: {
             type: {
@@ -125,4 +144,6 @@ export const getBadgesArgTypes = () => ({
         },
         control: 'text',
     },
+    // default
+    default: { table: { disable: true } },
 });

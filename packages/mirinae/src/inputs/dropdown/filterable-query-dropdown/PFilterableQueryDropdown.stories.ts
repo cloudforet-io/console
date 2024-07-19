@@ -15,7 +15,6 @@ const meta : Meta<PFilterableQueryDropdownPropsAndCustomArgs> = {
     component: PFilterableQueryDropdown,
     argTypes: {
         ...getFilterableQueryDropdownArgTypes(),
-        // 'item-content': { table: { disable: true } },
     },
     parameters: {
         ...getFilterableQueryDropdownParameters(),

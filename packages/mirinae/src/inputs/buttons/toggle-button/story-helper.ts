@@ -26,7 +26,7 @@ export const getToggleButtonParameters = (): Parameters => ({
 export const getToggleButtonArgTypes = (): ArgTypes => ({
     value: {
         name: 'value',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Determine whether the toggle button is checked.',
         table: {
             type: {
@@ -41,7 +41,7 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
     },
     showStateText: {
         name: 'showStateText',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Determine whether the toggle button state text is checked.',
         table: {
             type: {
@@ -56,7 +56,7 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
     },
     trueStateText: {
         name: 'trueStateText',
-        type: 'string',
+        type: { name: 'string' },
         description: 'StateText when toggle is true',
         table: {
             type: {
@@ -71,7 +71,7 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
     },
     falseStateText: {
         name: 'falseStateText',
-        type: 'string',
+        type: { name: 'string' },
         description: 'StateText when toggle is false',
         table: {
             type: {
@@ -86,7 +86,7 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
     },
     readOnly: {
         name: 'readOnly',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Button does not react on mouse events, and show only state text',
         table: {
             type: {
@@ -101,7 +101,7 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
     },
     position: {
         name: 'position',
-        type: 'string',
+        type: { name: 'string' },
         description: 'StateText position',
         table: {
             type: {
@@ -117,7 +117,7 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
     },
     spacing: {
         name: 'spacing',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The spacing between toggle and stateText',
         defaultValue: 'sm',
         table: {
@@ -134,7 +134,7 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Button does not react on mouse events',
         table: {
             type: {

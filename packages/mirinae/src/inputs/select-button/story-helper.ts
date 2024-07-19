@@ -55,7 +55,7 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
     },
     iconName: {
         name: 'iconName',
-        type: 'string',
+        type: { name: 'string' },
         description: 'You can use the icon name from the [Icons](https://storybook.developer.spaceone.dev/?path=/story/foundation-graphics-icons--all-icons).',
         table: {
             type: {
@@ -70,7 +70,7 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to disable or not.',
         table: {
             type: {
@@ -99,7 +99,7 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
     },
     predicate: {
         name: 'predicate',
-        type: 'function',
+        type: { name: 'function' },
         description: `Function that predicate two arguments are the same or not.
         It's useful when the props \`value\` is an object.`,
         table: {
@@ -115,7 +115,7 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
     },
     multiSelectable: {
         name: 'multiSelectable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to allow multi select or not.',
         table: {
             type: {
@@ -130,7 +130,7 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
     },
     layout: {
         name: 'layout',
-        type: 'string',
+        type: { name: 'string' },
         description: `Layout of select button. ${Object.values(SELECT_BUTTON_LAYOUT_TYPE)} are available.`,
         table: {
             type: {
@@ -146,7 +146,7 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
     },
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: `Style type of select button. ${Object.values(SELECT_BUTTON_STYLE_TYPE)} are available.`,
         table: {
             type: {
@@ -162,7 +162,7 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: `Size of select button. ${Object.values(SELECT_BUTTON_SIZE)} are available.`,
         table: {
             type: {

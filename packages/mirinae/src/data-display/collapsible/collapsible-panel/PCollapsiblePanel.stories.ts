@@ -4,12 +4,11 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getCollapsiblePanelArgTypes } from '@/data-display/collapsible/collapsible-panel/story-helper';
+import { getCollapsiblePanelArgTypes, getCollapsiblePanelArgs, getCollapsiblePanelParameters } from '@/data-display/collapsible/collapsible-panel/story-helper';
 import { useProxyValue } from '@/hooks';
 import { I18nConnector } from '@/translations';
 
 import PCollapsiblePanel from './PCollapsiblePanel.vue';
-
 
 type PCollapsiblePanelPropsAndCustomArgs = ComponentProps<typeof PCollapsiblePanel>;
 
@@ -18,19 +17,12 @@ const meta : Meta<PCollapsiblePanelPropsAndCustomArgs> = {
     component: PCollapsiblePanel,
     argTypes: {
         ...getCollapsiblePanelArgTypes(),
-        default: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
-        },
+        ...getCollapsiblePanelParameters(),
     },
     args: {
-        'v-model': '',
-        isCollapsed: true,
-        lineClamp: 2,
-        defaultSlot: faker.lorem.sentence(40),
+        ...getCollapsiblePanelArgs(),
     },
 };
 

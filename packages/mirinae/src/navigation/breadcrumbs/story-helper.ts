@@ -44,7 +44,7 @@ export const getBreadcrumbsArgTypes = (): ArgTypes => ({
     },
     copiable: {
         name: 'copiable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether copying is possible or not.',
         defaultValue: false,
         table: {
