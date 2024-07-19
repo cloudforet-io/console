@@ -146,7 +146,7 @@ const getTotalData = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => [{
     type: 'bar',
     barMaxWidth: 50,
     data: state.xAxisData.map((d) => {
-        const _data = rawData.results?.[0]?.count?.find((v) => v[DATE_FIELD_NAME] === d);
+        const _data = rawData.results?.[0]?.value_sum?.find((v) => v[DATE_FIELD_NAME] === d);
         return _data ? _data.value : 0;
     }),
 }];
