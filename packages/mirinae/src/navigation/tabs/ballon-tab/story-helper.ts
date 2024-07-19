@@ -1,12 +1,34 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { BALLOON_TAB_POSITION, BALLOON_TAB_SIZE, BALLOON_TAB_STYLE_TYPE } from '@/navigation/tabs/ballon-tab/config';
+
+export const getBalloonTabParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
+
+export const getBalloonTabArgs = (): Args => ({
+    tabs: [
+        { name: 'detail', label: 'Detail' },
+        { name: 'info', label: 'Info' },
+        { name: 'tags', label: 'Tags' },
+    ],
+    activeTab: 'detail',
+    tail: false,
+    styleType: BALLOON_TAB_STYLE_TYPE.primary,
+    position: BALLOON_TAB_POSITION.top,
+    size: BALLOON_TAB_SIZE.md,
+    stretch: false,
+});
 
 export const getBalloonTabArgTypes = (): ArgTypes => ({
     /* props */
     tabs: {
         name: 'tabs',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: `Tab items. 
         It is array of \`string\` or array of 
         \`{
@@ -15,11 +37,6 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
           keepAlive?: boolean;
         }\`
         .`,
-        defaultValue: [
-            { name: 'detail', label: 'Detail' },
-            { name: 'info', label: 'Info' },
-            { name: 'tags', label: 'Tags' },
-        ],
         table: {
             type: {
                 summary: 'array',
@@ -29,9 +46,7 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     activeTab: {
         name: 'activeTab',
@@ -47,15 +62,12 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     tail: {
         name: 'tail',
         type: { name: 'boolean' },
         description: 'Whether to show tail of each balloon or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -65,15 +77,12 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     styleType: {
         name: 'styleType',
         type: { name: 'string' },
         description: `Balloon style types. ${Object.values(BALLOON_TAB_STYLE_TYPE)} are available.`,
-        defaultValue: BALLOON_TAB_STYLE_TYPE.primary,
         table: {
             type: {
                 summary: 'string',
@@ -83,16 +92,13 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
                 summary: `"${BALLOON_TAB_STYLE_TYPE.primary}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(BALLOON_TAB_STYLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(BALLOON_TAB_STYLE_TYPE),
     },
     size: {
         name: 'size',
         type: { name: 'string' },
         description: `Balloon size. ${Object.values(BALLOON_TAB_SIZE)} are available.`,
-        defaultValue: BALLOON_TAB_SIZE.md,
         table: {
             type: {
                 summary: 'string',
@@ -102,16 +108,13 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
                 summary: `"${BALLOON_TAB_SIZE.md}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(BALLOON_TAB_SIZE),
-        },
+        control: 'select',
+        options: Object.values(BALLOON_TAB_SIZE),
     },
     position: {
         name: 'position',
         type: { name: 'string' },
         description: `Balloon position. ${Object.values(BALLOON_TAB_POSITION)} are available.`,
-        defaultValue: BALLOON_TAB_POSITION.top,
         table: {
             type: {
                 summary: 'string',
@@ -121,16 +124,13 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
                 summary: `"${BALLOON_TAB_POSITION.top}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(BALLOON_TAB_POSITION),
-        },
+        control: 'select',
+        options: Object.values(BALLOON_TAB_POSITION),
     },
     stretch: {
         name: 'stretch',
         type: { name: 'boolean' },
         description: 'Whether to stretch tab items or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -140,9 +140,7 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     /* events */
     onUpdateActiveTab: {
@@ -174,4 +172,7 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    tab: { table: { disable: true } },
+    default: { table: { disable: true } },
+    'v-model': { table: { disable: true } },
 });
