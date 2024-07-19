@@ -1,11 +1,23 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getPaginationArgs = (): Args => ({
+    thisPage: 1,
+    pageSize: 3,
+    totalCount: 53,
+});
+
+export const getPaginationParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
 
 export const getPaginationArgTypes = (): ArgTypes => ({
     thisPage: {
         name: 'thisPage',
-        type: { name: 'number' },
+        type: 'number',
         description: 'This represents current page number.',
-        defaultValue: 1,
         table: {
             type: {
                 summary: 'number',
@@ -15,15 +27,12 @@ export const getPaginationArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     pageSize: {
         name: 'pageSize',
-        type: { name: 'number' },
+        type: 'number',
         description: 'Size of per page.',
-        defaultValue: 3,
         table: {
             type: {
                 summary: 'number',
@@ -33,15 +42,12 @@ export const getPaginationArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     totalCount: {
         name: 'totalCount',
-        type: { name: 'number' },
+        type: 'number',
         description: 'Total page number.',
-        defaultValue: 53,
         table: {
             type: {
                 summary: 'number',
@@ -51,8 +57,6 @@ export const getPaginationArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
 });
