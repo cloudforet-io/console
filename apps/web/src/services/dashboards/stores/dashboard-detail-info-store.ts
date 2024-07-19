@@ -159,8 +159,13 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             return _refinedVariablesSchema;
         }),
         refinedVars: computed<DashboardVars>(() => {
+            const isProjectSharedDashboard = state.dashboardInfo?.project_id === '*';
             const _vars: Record<string, string[]> = {};
-            Object.entries(state.vars).forEach(([k, v]) => {
+            const originVars = state.vars;
+            if (isProjectSharedDashboard && !!state.projectId) {
+                originVars.project = [state.projectId];
+            }
+            Object.entries(originVars).forEach(([k, v]) => {
                 const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
                 if (idKey) _vars[idKey] = v;
             });
@@ -256,7 +261,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        state.projectId = _dashboardInfo.project_id;
+        if (_dashboardInfo.project_id !== '*') state.projectId = _dashboardInfo.project_id;
         state.vars = _dashboardInfo.vars ?? {};
         state.dashboardLayouts = _dashboardInfo.layouts ?? [];
     };

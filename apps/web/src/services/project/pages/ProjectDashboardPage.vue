@@ -28,7 +28,7 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 
 const storeState = reactive({
-    dashboardList: computed(() => dashboardStore.state.publicDashboardItems.filter((dashboard) => dashboard.version !== '1.0')), // TODO: remove filter
+    dashboardList: computed(() => dashboardStore.state.publicDashboardItems),
 });
 
 const state = reactive({
@@ -86,13 +86,13 @@ const getDashboardData = async (dashboardId: string) => {
 })();
 
 watch(() => state.currentDashboardId, async (dashboardId, prevDashboardId) => {
-    if (!dashboardId) return;
+    if (!dashboardId || !props.id) return;
     /* NOTE: The dashboard data is reset in first entering case */
     if (dashboardId && !prevDashboardId) { // this includes all three cases
         dashboardDetailStore.reset();
     }
-    dashboardDetailStore.setVars({ project_id: [props.id] }); // TODO: Check Project Dashboard default "vars"
     await getDashboardData(dashboardId);
+    dashboardDetailStore.setProjectId(props.id);
 }, { immediate: true });
 
 </script>
