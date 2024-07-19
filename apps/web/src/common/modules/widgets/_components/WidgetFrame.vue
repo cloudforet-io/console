@@ -51,6 +51,7 @@ const state = reactive({
         name: size,
         label: WIDGET_WIDTH_STR_MAP[size],
     }))),
+    unitText: computed<string>(() => Object.values(props.unitMap || {}).join(', ') || '--'),
 });
 
 /* Event */
@@ -100,7 +101,7 @@ const handleToggleWidth = () => {
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>
-                            <span>{{ props.unit || '--' }}</span>
+                            <span>{{ state.unitText }}</span>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.FULL_DATA_LINK') }}</span>

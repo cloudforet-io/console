@@ -52,12 +52,18 @@ const state = reactive({
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: [],
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<TreemapSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         tooltip: {
             trigger: 'item',
             position: 'inside',
-            valueFormatter: (val) => numberFormatter(val) || '',
+            formatter: (params) => {
+                let _name = getReferenceLabel(props.allReferenceTypeInfo, state.categoryByField, params.name);
+                if (state.unit) _name = `${_name} (${state.unit})`;
+                const _value = numberFormatter(params.value) || '';
+                return `${params.marker} ${_name}: <b>${_value}</b>`;
+            },
         },
         legend: {
             show: false,

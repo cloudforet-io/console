@@ -57,6 +57,7 @@ const state = reactive({
     chart: null as EChartsType | null,
     xAxisData: [],
     chartData: [],
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<LineSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         grid: {
@@ -79,7 +80,8 @@ const state = reactive({
             confine: true,
             formatter: (params) => {
                 const _params = params as any[];
-                const _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
+                let _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
+                if (state.unit) _axisValue += ` (${state.unit})`;
                 const _values = _params.map((p) => {
                     const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.lineByField, p.seriesName);
                     const _value = p.value ? numberFormatter(p.value) : undefined;

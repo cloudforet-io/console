@@ -28,6 +28,6 @@ export interface WidgetFrameProps {
     size?: WidgetSize;
     width?: number;
     periodText?: string;
-    unit?: string;
+    unitMap?: Record<string, string>;
     fullDataLinkList?: FullDataLink[];
 }

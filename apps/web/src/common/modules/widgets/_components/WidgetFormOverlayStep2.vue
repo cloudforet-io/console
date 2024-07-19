@@ -337,6 +337,7 @@ onUnmounted(() => {
     &.expand {
         .left-part {
             @apply border-none;
+            max-width: 100%;
             padding: 1.5rem 0;
         }
     }

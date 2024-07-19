@@ -54,6 +54,7 @@ const state = reactive({
     data: null as WidgetLoadData | null,
     chart: null as EChartsType | null,
     chartData: [],
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<MapSeriesOption>(() => ({
         map: 'world',
         geo: {
@@ -75,8 +76,10 @@ const state = reactive({
         tooltip: {
             trigger: 'item',
             formatter: (params) => {
+                let _name = params.name;
+                if (state.unit) _name = `${_name} (${state.unit})`;
                 const _value = numberFormatter(params.value[2]) || '';
-                return `${params.marker} ${params.name}: <b>${_value}</b>`;
+                return `${params.marker} ${_name}: <b>${_value}</b>`;
             },
         },
         series: [
