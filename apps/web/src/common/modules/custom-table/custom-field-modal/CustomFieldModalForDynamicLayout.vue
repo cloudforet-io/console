@@ -357,10 +357,10 @@ watch([() => props.visible, () => props.resourceType], ([visible, resourceType])
                             >
                                 <column-item-for-dynamic-layout v-for="(column, idx) in state.allColumns"
                                                                 :key="`${column.key}-${idx}`"
-                                                                :selected-keys="state.selectedAllColumnKeys"
+                                                                :value="state.selectedAllColumnKeys"
                                                                 :item="column"
                                                                 :search-text="state.search"
-                                                                @update:selectedKeys="handleUpdateSelectedKeys"
+                                                                @update:value="handleUpdateSelectedKeys"
                                 />
                             </draggable>
                         </div>
