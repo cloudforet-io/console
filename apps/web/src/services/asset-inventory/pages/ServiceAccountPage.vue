@@ -49,7 +49,7 @@ import AutoSyncState from '@/common/components/badge/AutoSyncState.vue';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
+import CustomFieldModalForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/CustomFieldModalForDynamicLayout.vue';
 
 import { gray } from '@/styles/colors';
 
@@ -464,11 +464,11 @@ onMounted(async () => {
                 </template>
             </p-dynamic-layout>
         </component>
-        <custom-field-modal :visible="tableState.visibleCustomFieldModal"
-                            :resource-type="tableState.isTrustedAccount ? 'identity.TrustedAccount' : 'identity.ServiceAccount'"
-                            :options="{provider: state.selectedProvider}"
-                            @update:visible="handleVisibleCustomFieldModal"
-                            @complete="reloadTable"
+        <custom-field-modal-for-dynamic-layout :visible="tableState.visibleCustomFieldModal"
+                                               :resource-type="tableState.isTrustedAccount ? 'identity.TrustedAccount' : 'identity.ServiceAccount'"
+                                               :options="{provider: state.selectedProvider}"
+                                               @update:visible="handleVisibleCustomFieldModal"
+                                               @complete="reloadTable"
         />
     </section>
 </template>

@@ -1,46 +1,44 @@
 <script setup lang="ts">
-import {
-    computed, reactive,
-} from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PCheckbox, PI, PTextHighlighting, getTextHighlightRegex,
 } from '@cloudforet/mirinae';
-import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+
 interface Props {
-    item: DataTableFieldType;
+    item: DynamicField;
     value: string[];
     searchText: string;
 }
-
 const props = defineProps<Props>();
-
 const emit = defineEmits<{(e: 'update:value', value: string[]): void;
 }>();
-
 const state = reactive({
     regex: computed(() => getTextHighlightRegex(props.searchText)),
-    proxyValue: useProxyValue('value', props, emit),
+    proxySelectedKeys: useProxyValue('value', props, emit),
 });
-
 </script>
 
 <template>
-    <span v-show="state.regex.test(props.item.label ?? props.item.name)"
-          :key="props.item.name"
+    <span v-show="state.regex.test(props.item.name ?? '')"
+          :key="props.item.key"
           class="column-item"
-          :class="{'draggable-item' :(state.proxyValue ?? []).includes(props.item.name)}"
+          :class="{'draggable-item' :state.proxySelectedKeys.includes(props.item.key)}"
     >
-        <p-checkbox v-model="state.proxyValue"
-                    :value="props.item.name"
+        <p-checkbox v-model="state.proxySelectedKeys"
+                    :value="props.item.key"
         >
-            <p-text-highlighting :text="props.item.label ?? props.item.name"
+            <p-text-highlighting :text="props.item.name"
                                  :term="searchText"
                                  style-type="secondary"
             />
+            <span v-if="props.item.options && props.item.options.field_description"
+                  class="ml-1 text-gray-400"
+            >{{ props.item.options.field_description }}</span>
         </p-checkbox>
         <p-i name="ic_drag-handle-alt"
              width="1rem"

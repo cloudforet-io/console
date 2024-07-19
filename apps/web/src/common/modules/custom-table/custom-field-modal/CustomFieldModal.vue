@@ -7,55 +7,43 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PButtonModal, PCheckbox, PDataLoader, PSearch,
 } from '@cloudforet/mirinae';
-import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
+import type { UserConfigUpdateParameters } from '@/schema/config/user-config/api-verbs/update';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { UserState } from '@/store/modules/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
 
-import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agent-mode-helper';
-import { getServiceAccountTableSchema, updateCustomTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
-import type {
-    GetSchemaParams,
-    ResourceType,
-} from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
-const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue');
-const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');
+
 
 interface Props {
     visible?: boolean;
-    resourceType?: ResourceType;
-    options?: {
-        provider?: string;
-        cloudServiceGroup?: string;
-        cloudServiceType?: string;
-        include_workspace_info?: boolean;
-    };
-    isServerPage?: boolean;
+    resourceType: string;
+    defaultField?: DataTableFieldType[];
 }
 
-type SelectedColumnMap = Record<string, DynamicField>;
+type SelectedColumnMap = Record<string, DataTableFieldType>;
 
 /**
  * @description Merge two field lists. Duplicate check is performed based on key, and the field list given as the first parameter takes precedence.
  * @param fieldsA
  * @param fieldsB
  */
-const mergeFields = (fieldsA: DynamicField[], fieldsB: DynamicField[]): DynamicField[] => {
+const mergeFields = (fieldsA: DataTableFieldType[], fieldsB: DataTableFieldType[]): DataTableFieldType[] => {
     const allColumns: any[] = [...fieldsA];
     fieldsB.forEach((d) => {
-        const isExist = fieldsA.some((c) => c.key === d.key);
+        const isExist = fieldsA.some((c) => c.name === d.name);
         if (!isExist) allColumns.push(d);
     });
     return allColumns;
@@ -64,19 +52,15 @@ const mergeFields = (fieldsA: DynamicField[], fieldsB: DynamicField[]): DynamicF
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     resourceType: undefined,
+    defaultField: () => ([]),
     options: () => ({}),
     isServerPage: false,
 });
 
 const emit = defineEmits<{(e: 'complete'): void;
-    (e: 'update:selected-tag-keys', tagKeys: string[]): void;
+    (e: 'custom-field-loaded', fields: DataTableFieldType[]|undefined): void;
 }>();
 
-
-const appContextStore = useAppContextStore();
-const appContextGetters = appContextStore.getters;
-
-let schema: any = {};
 const _userConfigMap = computed<UserState>(() => store.state.user);
 
 const state = reactive({
@@ -84,47 +68,36 @@ const state = reactive({
     search: '',
     isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
     loading: true,
-    availableColumns: [] as DynamicField[], // all default fields including optional fields.
-    currentColumns: [] as DynamicField[], // if custom fields exist, it will be custom fields. if custom fields don't exist, it will be default fields excluding optional fields.
-    allColumns: [] as DynamicField[], // fields merged with availableColumns and currentColumns
+    availableColumns: [] as DataTableFieldType[], // all default fields including optional fields.
+    currentColumns: [] as DataTableFieldType[], // if custom fields exist, it will be custom fields. if custom fields don't exist, it will be default fields excluding optional fields.
+    allColumns: [] as DataTableFieldType[], // fields merged with availableColumns and currentColumns
     selectedColumnMap: {} as SelectedColumnMap,
-    selectedColumns: computed<DynamicField[]>({
-        get: () => state.allColumns.filter((d) => !!state.selectedColumnMap[d.key]),
-        set: (val: DynamicField[]) => {
+    selectedColumns: computed<DataTableFieldType[]>({
+        get: () => state.allColumns.filter((d) => !!state.selectedColumnMap[d.name]),
+        set: (val: DataTableFieldType[]) => {
             const selectedMap: SelectedColumnMap = {};
-            const tagColumns: DynamicField[] = [];
-            val.forEach((d) => {
-                selectedMap[d.key] = d;
-                if (d.key.startsWith(TAGS_PREFIX)) tagColumns.push(d);
-            });
-
-            state.allColumns = mergeFields(state.allColumns, tagColumns)
-                .filter((d) => (d.key.startsWith(TAGS_PREFIX) ? !!selectedMap[d.key] : true));
+            val.forEach((d) => { selectedMap[d.name] = d; });
             state.selectedColumnMap = selectedMap;
         },
     }),
-    selectedAllColumnKeys: computed<string[]>(() => state.selectedColumns.map((d) => d.key)),
-    selectedNonTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => !key.startsWith(TAGS_PREFIX))),
-    selectedTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => key.startsWith(TAGS_PREFIX))),
+    selectedAllColumnKeys: computed<string[]>(() => state.selectedColumns.map((d) => d.name)),
     recommendedSequenceMap: computed<Record<string, number>>(() => {
         const orderMap: Record<string, number> = {};
         state.availableColumns.forEach((d, i) => {
-            orderMap[d.key] = i;
+            orderMap[d.name] = i;
         });
         return orderMap;
     }),
     isValid: computed(() => state.loading || state.selectedColumns.length > 0),
-    isResourceTypeCloudService: computed(() => props.resourceType === 'inventory.CloudService'),
-    isServiceAccountTable: computed(() => ['identity.ServiceAccount', 'identity.TrustedAccount'].includes(props.resourceType ?? '')),
 });
 
 const sortByRecommendation = () => {
     state.allColumns = state.allColumns.sort((a, b) => {
-        if (!state.selectedColumnMap[a.key]) return 1;
-        if (!state.selectedColumnMap[b.key]) return -1;
-        if (state.recommendedSequenceMap[a.key] === undefined) return 1;
-        if (state.recommendedSequenceMap[b.key] === undefined) return -1;
-        return state.recommendedSequenceMap[a.key] - (state.recommendedSequenceMap[b.key]);
+        if (!state.selectedColumnMap[a.name]) return 1;
+        if (!state.selectedColumnMap[b.name]) return -1;
+        if (state.recommendedSequenceMap[a.name] === undefined) return 1;
+        if (state.recommendedSequenceMap[b.name] === undefined) return -1;
+        return state.recommendedSequenceMap[a.name] - (state.recommendedSequenceMap[b.name]);
     });
 };
 
@@ -132,8 +105,8 @@ const sortByAlphabet = () => {
     state.allColumns = state.allColumns.sort((a, b) => {
         const nameA = a.name.toUpperCase();
         const nameB = b.name.toUpperCase();
-        if (!state.selectedColumnMap[a.key]) return 1;
-        if (!state.selectedColumnMap[b.key]) return -1;
+        if (!state.selectedColumnMap[a.name]) return 1;
+        if (!state.selectedColumnMap[b.name]) return -1;
         if (nameA < nameB) return -1;
         if (nameA > nameB) return 1;
         return 0;
@@ -147,97 +120,71 @@ const onChangeAllSelect = (val) => {
         state.selectedColumns = [];
     }
 };
-
-const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]> => {
+const updateCustomTableField = async (userData:{userType:string, userId: string}, resourceType:string, data:DataTableFieldType[]) => {
     try {
-        const options: GetSchemaParams['options'] = {
-            include_optional_fields: includeOptionalFields,
-            isAdminMode: appContextGetters.isAdminMode,
-        };
-        const {
-            provider, cloudServiceGroup, cloudServiceType, include_workspace_info,
-        } = props.options;
-        if (provider)options.provider = provider;
-        if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
-        if (cloudServiceType) options.cloud_service_type = cloudServiceType;
-        if (include_workspace_info) options.include_workspace_info = include_workspace_info;
-
-        let res;
-        if (state.isServiceAccountTable && props.resourceType) {
-            res = await getServiceAccountTableSchema({
-                userData: {
-                    userType: _userConfigMap.value.userType ?? 'USER',
-                    userId: _userConfigMap.value.userId ?? '',
-                },
-                resourceType: props.resourceType,
-                options,
-            });
-            // NOTE: Temporary hard coding for agent mode, before separating or adding more agent.
-            if (props.options?.provider === 'kubernetes') res.options = convertAgentModeOptions(res.options ?? {});
-        } else {
-            res = await SpaceConnector.client.addOns.pageSchema.get({
-                resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
-                schema: 'table',
-                options,
-            });
-        }
-        /*
-        * NOTE: The storage for schema config is the same for both user and admin modes, making it difficult to distinguish data on the entry level.
-        * Therefore, it is segmented as follows:
-        * */
-        const workspaceIndex = res.options.fields.findIndex((field) => field.name === 'Workspace');
-        if (!appContextGetters.isAdminMode && workspaceIndex !== -1) {
-            res.options.fields.splice(workspaceIndex, 1);
-        }
-        schema = res;
-        delete schema.options?.search;
-        return res.options?.fields || [];
+        const { userType, userId } = userData;
+        await SpaceConnector.clientV2.config.userConfig.set<UserConfigUpdateParameters, UserConfigModel>({
+            name: `console:${userType}:${userId}:custom-field:${resourceType}`,
+            data: { data },
+        });
     } catch (e) {
         ErrorHandler.handleError(e);
-        schema = {};
+    }
+};
+
+interface CustomFieldsConfigData {
+    data: DataTableFieldType[];
+}
+
+const getCustomTableField = async (userData:{userType:string, userId: string}, resourceType:string):Promise<DataTableFieldType[] | undefined> => {
+    let userConfig:UserConfigModel<CustomFieldsConfigData>|undefined;
+    try {
+        const { userType, userId } = userData;
+        const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigGetParameters, ListResponse<UserConfigModel<CustomFieldsConfigData>>>({
+            name: `console:${userType}:${userId}:custom-field:${resourceType}`,
+        });
+        userConfig = results ? results[0] : undefined;
+    } catch (e:any) {
+        if (e?.status !== 404) ErrorHandler.handleError(e);
+        return undefined;
+    }
+    return (userConfig?.data) ? userConfig?.data?.data : props.defaultField ?? [];
+};
+
+const getCurrentColumns = async (): Promise<DataTableFieldType[]> => {
+    try {
+        const currentSavedFields = await getCustomTableField({
+            userType: _userConfigMap.value.userType ?? 'USER',
+            userId: _userConfigMap.value.userId ?? '',
+        }, props.resourceType) ?? [];
+        if (!currentSavedFields) return props.defaultField ?? [];
+        return currentSavedFields;
+    } catch (e) {
+        ErrorHandler.handleError(e);
         return [];
     }
 };
 
 const setColumnsDefault = async () => {
     state.allColumns = state.availableColumns;
-    state.selectedColumns = state.availableColumns.filter((d) => !d.options?.is_optional);
+    state.selectedColumns = state.availableColumns;
     sortByRecommendation();
 };
 
-const updatePageSchema = async () => {
+const handleConfirm = async () => {
     state.loading = true;
 
-    const data = { ...schema };
-    if (!data.options) data.options = {};
-    data.options.fields = state.selectedColumns;
-
-    const options: any = {};
-    const { provider, cloudServiceGroup, cloudServiceType } = props.options;
-    if (provider) options.provider = provider;
-    if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
-    if (cloudServiceType) options.cloud_service_type = cloudServiceType;
-
     try {
-        if (state.isServiceAccountTable && props.resourceType) {
-            await updateCustomTableSchema(
-                {
-                    userType: _userConfigMap.value.userType ?? 'USER',
-                    userId: _userConfigMap.value.userId ?? '',
-                },
-                props.resourceType,
-                props.options.provider ?? '',
-                data,
-            );
-        } else {
-            await SpaceConnector.client.addOns.pageSchema.update({
-                resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
-                schema: 'table',
-                data,
-                options,
-            });
-        }
+        await updateCustomTableField(
+            {
+                userType: _userConfigMap.value.userType ?? 'USER',
+                userId: _userConfigMap.value.userId ?? '',
+            },
+            props.resourceType,
+            state.selectedColumns,
+        );
         showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
+        emit('custom-field-loaded', state.selectedColumns);
         emit('complete');
         state.proxyVisible = false;
     } catch (e) {
@@ -247,45 +194,19 @@ const updatePageSchema = async () => {
     }
 };
 
-
-const updateSelectedKeys = (keys: string[]) => {
-    state.selectedColumns = keys.map((key) => {
-        if (key.startsWith(TAGS_PREFIX)) {
-            const name = key.slice(TAGS_PREFIX.length);
-            return {
-                key,
-                name,
-                options: {
-                    ...TAGS_OPTIONS,
-                    ...(!state.isResourceTypeCloudService && { key_depth: 1 }),
-                },
-            } as DynamicField;
-        }
-        return state.availableColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
-    });
-};
-
 const handleUpdateSelectedKeys = (keys: string[]) => {
-    updateSelectedKeys(keys);
-};
-
-/* Tags */
-const clearSelectedTags = () => {
-    const tagKeys = state.selectedAllColumnKeys.filter((d) => !d.startsWith(TAGS_PREFIX));
-    updateSelectedKeys(tagKeys);
-};
-const handleUpdatedSelectedTagKeys = (tagKeys: string[]) => {
-    updateSelectedKeys(tagKeys.concat(state.selectedNonTagKeys));
+    state.selectedColumns = keys.map((key) => state.availableColumns.find((col) => col.name === key) ?? { label: key, name: key } as DataTableFieldType);
 };
 
 /* Init */
 const initColumns = async () => {
     state.loading = true;
-    const [availableColumnRes, currentColumnRes] = await Promise.allSettled([getColumns(true), getColumns(false)]);
-    state.availableColumns = availableColumnRes.status === 'fulfilled' ? availableColumnRes.value : [];
-    state.currentColumns = currentColumnRes.status === 'fulfilled' ? currentColumnRes.value : [];
+    const currentColumns = await getCurrentColumns();
+    state.availableColumns = props.defaultField ?? [];
+    state.currentColumns = currentColumns;
     state.allColumns = mergeFields(state.currentColumns, state.availableColumns);
     state.selectedColumns = [...state.currentColumns];
+    emit('custom-field-loaded', state.selectedColumns);
     state.loading = false;
 };
 watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
@@ -301,7 +222,8 @@ watch([() => props.visible, () => props.resourceType], ([visible, resourceType])
                     :header-title="$t('COMMON.CUSTOM_FIELD_MODAL.TITLE')"
                     :loading="state.loading"
                     :disabled="!state.isValid"
-                    @confirm="updatePageSchema"
+                    size="sm"
+                    @confirm="handleConfirm"
     >
         <template #body>
             <p-data-loader :loading="state.loading"
@@ -356,41 +278,14 @@ watch([() => props.visible, () => props.resourceType], ([visible, resourceType])
                                        ghost-class="ghost"
                             >
                                 <column-item v-for="(column, idx) in state.allColumns"
-                                             :key="`${column.key}-${idx}`"
-                                             :selected-keys="state.selectedAllColumnKeys"
+                                             :key="`${column.name}-${idx}`"
+                                             :value="state.selectedAllColumnKeys"
                                              :item="column"
                                              :search-text="state.search"
-                                             @update:selectedKeys="handleUpdateSelectedKeys"
+                                             @update:value="handleUpdateSelectedKeys"
                                 />
                             </draggable>
                         </div>
-                    </section>
-
-                    <section>
-                        <h3 class="section-title">
-                            {{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL') }}
-                            <p-button style-type="secondary"
-                                      size="sm"
-                                      @click="clearSelectedTags"
-                            >
-                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
-                            </p-button>
-                        </h3>
-                        <keep-alive>
-                            <select-cloud-service-tag-columns v-if="state.isResourceTypeCloudService"
-                                                              :options="options"
-                                                              :is-server-page="isServerPage"
-                                                              :selected-tag-keys="state.selectedTagKeys"
-                                                              @update:selected-tag-keys="handleUpdatedSelectedTagKeys"
-                            />
-                            <select-tag-columns v-else
-                                                :resource-type="resourceType"
-                                                :options="options"
-                                                :is-server-page="isServerPage"
-                                                :selected-tag-keys="state.selectedTagKeys"
-                                                @update:selected-tag-keys="handleUpdatedSelectedTagKeys"
-                            />
-                        </keep-alive>
                     </section>
                 </div>
             </p-data-loader>
@@ -438,9 +333,6 @@ section {
         margin-bottom: 0.875rem;
         .invalid-text {
             @apply text-alert;
-        }
-        .p-button {
-            flex-shrink: 0;
         }
     }
     .sort-wrapper {
