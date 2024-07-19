@@ -4216,7 +4216,9 @@
 			"ALT_S_UPDATE_PROJECT_TYPE": "プロジェクトアクセスが正常に更新されました",
 			"ALT_S_UPDATE_WEBHOOK": "ウェプフク編集成功",
 			"DASHBOARD": {
-				"DASHBOARD": "ダッシュボード"
+				"DASHBOARD": "ダッシュボード",
+				"NO_DASHBOARD": "",
+				"NO_DASHBOARD_DESC": ""
 			},
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
