@@ -11,6 +11,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PButton, PHeading, PBadge, PI, PLink,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
@@ -33,6 +34,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
+import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
 import { red } from '@/styles/colors';
 
@@ -142,27 +144,24 @@ const valueHandlerMap = computed<ValueHandlerMap>(() => {
     };
 });
 
+const DEFAULT_FIELD:DataTableFieldType[] = [
+    { name: 'alert_number', label: 'No' },
+    { name: 'title', label: 'Title', width: '20rem' },
+    { name: 'state', label: 'State' },
+    { name: 'urgency', label: 'Urgency' },
+    { name: 'resource', label: 'Resource', width: '20rem' },
+    { name: 'created_at', label: 'Created' },
+    { name: 'duration', label: 'Duration', sortable: false },
+    { name: 'assignee', label: 'Assigned to' },
+    { name: 'triggered_by', label: 'Triggered by' },
+];
+
 /* States */
 const state = reactive({
     loading: true,
     selectIndex: [] as number[],
     selectedItems: computed(() => state.selectIndex.map((d) => state.items[d])),
-    fields: computed(() => {
-        const fields = [
-            { name: 'alert_number', label: 'No' },
-            { name: 'title', label: 'Title', width: '20rem' },
-            { name: 'state', label: 'State' },
-            { name: 'urgency', label: 'Urgency' },
-            { name: 'resource', label: 'Resource', width: '20rem' },
-            { name: 'created_at', label: 'Created' },
-            { name: 'duration', label: 'Duration', sortable: false },
-            { name: 'assignee', label: 'Assigned to' },
-            { name: 'triggered_by', label: 'Triggered by' },
-        ];
-
-        if (state.totalCount === 0) { fields[1].width = 'auto'; }
-        return fields;
-    }),
+    fields: DEFAULT_FIELD,
     excelFields: computed(() => {
         const fields = [
             { key: 'alert_number', name: 'No' },
@@ -188,6 +187,7 @@ const state = reactive({
     visibleAlertFormModal: false,
     alertStateLabels: useAlertStateI18n(),
     urgencyLabels: useAlertUrgencyI18n(),
+    visibleCustomFieldModal: false,
 });
 
 /* formatters & autocomplete handlers */
@@ -286,6 +286,21 @@ const handleAlertFormConfirm = () => {
     getAlerts();
 };
 
+const handleClickSettings = () => {
+    state.visibleCustomFieldModal = true;
+};
+
+const handleVisibleCustomFieldModal = (visible) => {
+    state.visibleCustomFieldModal = visible;
+};
+
+const handleCustomFieldModalConfirm = () => {
+    getAlerts();
+};
+
+const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
+    state.fields = fields;
+};
 /* Init */
 const initPage = () => {
     (async () => {
@@ -303,7 +318,7 @@ initPage();
 </script>
 
 <template>
-    <fragment>
+    <div>
         <div class="alert-data-table">
             <p-toolbox-table
                 searchable
@@ -321,7 +336,9 @@ initPage();
                 :query-tags="state.tags"
                 :key-item-sets="keyItemSets"
                 :value-handler-map="valueHandlerMap"
+                settings-visible
                 @change="handleChange"
+                @click-settings="handleClickSettings"
                 @refresh="getAlerts()"
                 @export="handleExportToExcel"
             >
@@ -440,7 +457,14 @@ initPage();
             :project-id="props.projectId"
             @confirm="handleAlertFormConfirm"
         />
-    </fragment>
+        <custom-field-modal :visible="state.visibleCustomFieldModal"
+                            resource-type="monitoring.alert"
+                            :default-field="DEFAULT_FIELD"
+                            @update:visible="handleVisibleCustomFieldModal"
+                            @complete="handleCustomFieldModalConfirm"
+                            @custom-field-loaded="handleCustomFieldUpdate"
+        />
+    </div>
 </template>
 
 <style lang="postcss" scoped>
