@@ -1826,7 +1826,10 @@
 			}
 		},
 		"DETAIL": {
+			"1": "",
 			"ADD_WIDGET": "위젯 추가",
+			"ALL_PROJECTS": "모든 프로젝트",
+			"ALL_WORKSPACES": "전체 워크스페이스",
 			"ALT_S_SHARE_DASHBOARD": "대시보드 공유 완료",
 			"ALT_S_UNSHARE_DASHBOARD": "대시보드 공유 해제 완료",
 			"APPLY": "확인",
@@ -1865,10 +1868,17 @@
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "공유",
 			"SHARED_BY_ADMIN": "Admin에 의해 공유됨",
+			"SHARED_TO_ALL_PROJECTS": "",
 			"SHARED_TO_WORKSPACES": "워크스페이스에 공유됨",
+			"SHARE_DASHBOARD": "",
+			"SHARE_TO_ALL_PROJECTS": "",
+			"SHARE_TO_ALL_PROJECTS_DESC": "",
 			"SHARE_TO_ALL_WORKSPACES": "전체 워크스페이스에 공유",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "이 대시보드를 전체 워크스페이스에 공유하시겠습니까?",
 			"SHARE_WITH_CODE": "코드로 공유",
+			"UNSHARE_DASHBOARD": "",
+			"UNSHARE_FROM_ALL_PROJECTS": "",
+			"UNSHARE_FROM_ALL_PROJECTS_DESC": "이 대시보드를 모든 프로젝트에서 공유 해제하시겠습니까?",
 			"UNSHARE_FROM_ALL_WORKSPACES": "전체 워크스페이스 공유 해제",
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "이 대시보드를 모든 워크스페이스에서 공유 해제하시겠습니까?"
 		},
