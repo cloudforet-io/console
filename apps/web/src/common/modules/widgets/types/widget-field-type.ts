@@ -129,7 +129,8 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'subTotal' | 'total'
     | 'progressBar'
     | 'formatRules'
-    | 'granularity' | 'colorSchema' | 'pieChartType';
+    | 'granularity' | 'colorSchema' | 'pieChartType'
+    | 'title' | 'description';
 
 export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;

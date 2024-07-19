@@ -51,8 +51,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         widgetId: '',
         latestWidgetId: '',
         selectedWidgetName: 'table',
-        title: '',
-        description: undefined as undefined | string,
         size: 'full' as WidgetSize,
         widgetFormValueMap: {} as Record<string, WidgetFieldValues|undefined>,
         widgetValidMap: {} as Record<string, boolean>,
@@ -96,12 +94,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setSelectedDataTableId = (selectedDataTableId?: string) => {
         state.selectedDataTableId = selectedDataTableId;
     };
-    const setTitle = (title: string) => {
-        state.title = title;
-    };
-    const setDescription = (description?: string) => {
-        state.description = description;
-    };
     const setSelectedWidgetName = (widgetName: string) => {
         state.selectedWidgetName = widgetName;
     };
@@ -132,8 +124,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setOverlayType,
         setSelectedDataTableId,
         setSelectedWidgetName,
-        setTitle,
-        setDescription,
         setSize,
         setWidgetFormValueMap,
         setWidgetValidMap,
@@ -332,8 +322,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.showOverlay = false;
             state.overlayStep = 1;
             state.selectedDataTableId = undefined;
-            state.title = '';
-            state.description = undefined;
             state.size = 'full';
             state.widgetValidMap = {};
             state.widgetFormValueMap = {};
@@ -343,9 +331,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             const _widgetConfig = getWidgetConfig(widgetInfo?.widget_type || 'table');
             state.widget = widgetInfo;
             state.widgetId = widgetInfo?.widget_id || '';
-            state.title = widgetInfo?.name || _widgetConfig.meta?.title || '';
-            state.description = widgetInfo?.description;
-            state.size = widgetInfo?.size || _widgetConfig.meta?.sizes[0];
+            state.size = widgetInfo?.size || _widgetConfig?.meta?.sizes[0] || 'full';
             state.selectedDataTableId = widgetInfo?.data_table_id || undefined;
             state.widgetFormValueMap = widgetInfo?.options || {};
         },

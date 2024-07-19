@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { cloneDeep } from 'lodash';
 
 import {
-    PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea, PButtonModal,
+    PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea, PButtonModal, PToggleButton,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+
+import { i18n } from '@/translations';
 
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
@@ -25,7 +27,7 @@ import { red } from '@/styles/colors';
 
 
 const FORM_TITLE_MAP = {
-    WIDGET_INFO: 'WIDGET_INFO',
+    WIDGET_HEADER: 'WIDGET_HEADER',
     REQUIRED_FIELDS: 'REQUIRED_FIELDS',
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
@@ -53,9 +55,20 @@ const state = reactive({
     formErrorModalValue: undefined as number|undefined,
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
+    enableWidgetHeader: false,
+    isWidgetTitleValid: computed<boolean>(() => {
+        if (widgetGenerateState.widgetFormValueMap.title === undefined) return true;
+        return !!widgetGenerateState.widgetFormValueMap.title?.trim();
+    }),
+    titleInvalidText: computed(() => {
+        if (!widgetGenerateState.widgetFormValueMap.title?.trim()?.length) {
+            return i18n.t('COMMON.WIDGETS.WIDGET_TITLE_REQUIRED');
+        }
+        return undefined;
+    }),
     // display
     collapsedTitleMap: {
-        [FORM_TITLE_MAP.WIDGET_INFO]: false,
+        [FORM_TITLE_MAP.WIDGET_HEADER]: false,
         [FORM_TITLE_MAP.REQUIRED_FIELDS]: false,
         [FORM_TITLE_MAP.OPTIONAL_FIELDS]: false,
     },
@@ -130,16 +143,25 @@ const handleSelectWidgetName = (widgetName: string) => {
 
     const _config = getWidgetConfig(widgetName);
     widgetGenerateStore.setSize(_config.meta.sizes[0]);
-    widgetGenerateStore.setTitle(_config.meta.title);
-    widgetGenerateStore.setWidgetFormValueMap({});
-    widgetGenerateStore.setWidgetValidMap({});
+    widgetGenerateStore.setWidgetFormValueMap({
+        title: _config?.meta.title,
+    });
+    widgetGenerateStore.setWidgetValidMap({
+        title: true,
+    });
     checkDefaultValidation();
 };
-const handleUpdateWidgetTitle = (title: string) => {
-    widgetGenerateStore.setTitle(title);
+const handleUpdateWidgetTitle = (title?: string) => {
+    widgetGenerateStore.setWidgetFormValueMap({
+        ...widgetGenerateState.widgetFormValueMap,
+        title: title?.trim(),
+    });
 };
-const handleChangeDescription = (description: string) => {
-    widgetGenerateStore.setDescription(description);
+const handleChangeDescription = (description?: string) => {
+    widgetGenerateStore.setWidgetFormValueMap({
+        ...widgetGenerateState.widgetFormValueMap,
+        description,
+    });
 };
 const handleClickEditDataTable = () => {
     widgetGenerateStore.setOverlayStep(1);
@@ -167,10 +189,46 @@ const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
     _validMap[fieldName] = isValid;
     widgetGenerateStore.setWidgetValidMap(_validMap);
 };
+const handleToggleWidgetHeader = (value: boolean) => {
+    state.enableWidgetHeader = value;
+    state.collapsedTitleMap[FORM_TITLE_MAP.WIDGET_HEADER] = !value;
+    const _valueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
+    const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
+    let _title: string | undefined;
+    let _description: string | undefined;
+    if (value) {
+        _title = state.widgetConfig.meta?.title || '';
+        _description = '';
+    } else {
+        _title = undefined;
+        _description = undefined;
+    }
+    widgetGenerateStore.setWidgetFormValueMap({
+        ..._valueMap,
+        title: _title,
+        description: _description,
+    });
+    widgetGenerateStore.setWidgetValidMap({
+        ..._validMap,
+        title: true,
+        description: true,
+    });
+};
 
-// eslint-disable-next-line max-len
-const keyGenerator = (name: string) => `${name}-${widgetGenerateState.selectedWidgetName}`;
-
+watch(() => widgetGenerateState.widgetFormValueMap.title, (title) => {
+    if (title !== undefined) {
+        state.enableWidgetHeader = true;
+        state.collapsedTitleMap[FORM_TITLE_MAP.WIDGET_HEADER] = false;
+    } else {
+        state.enableWidgetHeader = false;
+        state.collapsedTitleMap[FORM_TITLE_MAP.WIDGET_HEADER] = true;
+    }
+}, { immediate: true });
+watch(() => state.isWidgetTitleValid, (isValid) => {
+    const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
+    _validMap.title = isValid;
+    widgetGenerateStore.setWidgetValidMap(_validMap);
+});
 onMounted(() => {
     checkDefaultValidation();
 });
@@ -227,29 +285,42 @@ onMounted(() => {
         </div>
         <!-- widget info -->
         <div class="form-group-wrapper"
-             :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.WIDGET_INFO] }"
+             :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.WIDGET_HEADER] }"
         >
-            <div class="title-wrapper"
-                 @click="handleClickCollapsibleTitle(FORM_TITLE_MAP.WIDGET_INFO)"
+            <div class="title-wrapper flex justify-between align-middle"
+                 :class="{ 'disabled': !state.enableWidgetHeader }"
+                 @click="state.enableWidgetHeader ? handleClickCollapsibleTitle(FORM_TITLE_MAP.WIDGET_HEADER) : undefined"
             >
-                <p-i name="ic_chevron-down"
-                     width="1.25rem"
-                     height="1.25rem"
-                     color="inherit transparent"
-                     class="arrow-button"
-                />
-                <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.WIDGET_HEADER') }}</span>
+                <div class="left-part">
+                    <p-i name="ic_chevron-down"
+                         width="1.25rem"
+                         height="1.25rem"
+                         color="inherit transparent"
+                         class="arrow-button"
+                    />
+                    <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.WIDGET_HEADER') }}</span>
+                </div>
+                <div class="right-part flex">
+                    <p-toggle-button :value="state.enableWidgetHeader"
+                                     @update:value="handleToggleWidgetHeader"
+                    />
+                </div>
             </div>
             <div class="form-wrapper no-gap">
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.TITLE')"
+                               :invalid-text="state.titleInvalidText"
+                               :invalid="!widgetGenerateState.widgetFormValueMap.title"
                                required
                 >
-                    <p-text-input :value="widgetGenerateState.title"
-                                  @update:value="handleUpdateWidgetTitle"
-                    />
+                    <template #default="{invalid}">
+                        <p-text-input :value="widgetGenerateState.widgetFormValueMap.title"
+                                      :invalid="invalid"
+                                      @update:value="handleUpdateWidgetTitle"
+                        />
+                    </template>
                 </p-field-group>
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DESCRIPTION')">
-                    <p-textarea :value="widgetGenerateState.description"
+                    <p-textarea :value="widgetGenerateState.widgetFormValueMap.description"
                                 @update:value="handleChangeDescription"
                     />
                 </p-field-group>
@@ -288,7 +359,7 @@ onMounted(() => {
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetRequiredFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="keyGenerator(fieldName)"
+                               :key="`${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
@@ -320,7 +391,7 @@ onMounted(() => {
             <div class="form-wrapper">
                 <template v-for="[fieldName, fieldSchema] in state.widgetOptionalFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
-                               :key="keyGenerator(fieldName)"
+                               :key="`${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
@@ -430,6 +501,16 @@ onMounted(() => {
         padding-top: 1rem;
         vertical-align: middle;
         cursor: pointer;
+        .right-part {
+            padding-right: 1.5rem;
+        }
+        &.disabled {
+            cursor: default;
+            .arrow-button {
+                @apply text-gray-700;
+                opacity: 0.5;
+            }
+        }
     }
     .widget-validation-warning {
         @apply w-full bg-red-100 rounded;
