@@ -1652,7 +1652,8 @@
 				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
 				"TITLE": "Trusted Advisor"
 			},
-			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget"
+			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget",
+			"WIDGET_TITLE_REQUIRED": "Please enter widget title."
 		}
 	},
 	"COST_EXPLORER": {

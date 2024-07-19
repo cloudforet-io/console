@@ -1652,7 +1652,8 @@
 				"SUB_TITLE_PROJECT_SUMMARY": "요약 정보",
 				"TITLE": "Trusted Advisor"
 			},
-			"UNABLE_TO_LOAD_WIDGET": "위젯 표시 불가"
+			"UNABLE_TO_LOAD_WIDGET": "위젯 표시 불가",
+			"WIDGET_TITLE_REQUIRED": ""
 		}
 	},
 	"COST_EXPLORER": {
