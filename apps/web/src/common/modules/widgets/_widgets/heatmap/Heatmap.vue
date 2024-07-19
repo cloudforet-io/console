@@ -60,6 +60,7 @@ const state = reactive({
     yAxisData: [],
     chartData: [],
     heatmapMaxValue: computed(() => max(state.chartData.map((d) => d?.[2] || 0)) ?? 1),
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<HeatmapSeriesOption>(() => ({
         grid: {
             left: 0,
@@ -97,7 +98,8 @@ const state = reactive({
             position: 'top',
             confine: true,
             formatter: (params) => {
-                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.name);
+                let _name = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.name);
+                if (state.unit) _name = `${_name} (${state.unit})`;
                 const _value = numberFormatter(params.value[2]) || '';
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
             },

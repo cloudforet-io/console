@@ -53,6 +53,7 @@ const state = reactive({
     yAxisData: [],
     chartData: [],
     chart: null as EChartsType | null,
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<BarSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         legend: {
@@ -69,7 +70,8 @@ const state = reactive({
             formatter: (params) => {
                 const _params = Array.isArray(params) ? params : [params];
                 return _params.map((p) => {
-                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, p.seriesName);
+                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, p.seriesName);
+                    if (state.unit) _seriesName = `${_seriesName} (${state.unit})`;
                     const _value = numberFormatter(p.value) || '';
                     return `${_seriesName}<br>${p.marker} ${params.name}: <b>${_value}</b>`;
                 }).join('<br>');

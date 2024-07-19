@@ -79,7 +79,9 @@ const state = reactive({
                 const _params = params as any[];
                 const _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
                 const _values = _params.map((p) => {
-                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
+                    const _unit = widgetFrameProps.value.unitMap?.[p.seriesName];
+                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
+                    if (_unit) _seriesName = `${_seriesName} (${_unit})`;
                     const _value = numberFormatter(p.value) || '';
                     return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
                 });

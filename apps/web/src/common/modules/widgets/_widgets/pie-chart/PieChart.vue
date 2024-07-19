@@ -52,13 +52,15 @@ const state = reactive({
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: [],
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<PieSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         tooltip: {
             trigger: 'item',
             position: 'inside',
             formatter: (params) => {
-                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, params.name);
+                let _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, params.name);
+                if (state.unit) _name = `${_name} (${state.unit})`;
                 const _value = numberFormatter(params.value) || '';
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
             },
@@ -75,15 +77,6 @@ const state = reactive({
             itemWidth: 10,
             itemHeight: 10,
             icon: 'circle',
-            formatter: (name) => {
-                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, name);
-                const _series = state.chart.getOption().series[0];
-                const _value = _series.data.filter((row) => row.name === name)[0]?.value;
-                if (props.size === 'full') {
-                    return `${_name}  ${numberFormatter(_value)}`;
-                }
-                return `${(_name.length > 15 ? `${_name.slice(0, 15)}...` : _name)}  ${numberFormatter(_value)}`;
-            },
         },
         series: [
             {
