@@ -207,7 +207,9 @@ onUnmounted(() => {
                     <p-divider vertical
                                class="divider"
                     />
-                    <dashboard-variables-v2 disable-save-button />
+                    <dashboard-variables-v2 disable-save-button
+                                            :is-project-dashboard="!!dashboardDetailState.projectId"
+                    />
                     <p-button v-if="widgetGenerateState.overlayType === 'EXPAND'"
                               style-type="tertiary"
                               icon-left="ic_edit"

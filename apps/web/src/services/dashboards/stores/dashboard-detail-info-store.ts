@@ -129,6 +129,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         isDeprecatedDashboard: computed<boolean>(() => state.dashboardInfo?.version === '1.0'),
         isSharedDashboard: computed<boolean>(() => state.dashboardInfo?.workspace_id === '*'),
         disableManageButtons: computed<boolean>(() => {
+            if (state.projectId) return true;
             const editableDomains = config.get('DASHBOARD_EDITABLE_DOMAINS');
             if (!storeState.isAdminMode && getters.isSharedDashboard) return true;
             return !editableDomains?.includes(storeState.domainId);
@@ -231,6 +232,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setLabels([]);
         setDashboardType('PUBLIC');
         setDashboardScope('WORKSPACE');
+        setVars({});
         //
         setDashboardWidgetInfoList([]);
         setLoadingWidgets(false);
@@ -241,7 +243,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setOriginDashboardName = (name: string) => {
         if (state.dashboardInfo) state.dashboardInfo.name = name;
     };
-    const _setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel) => {
+    const _setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel, isProject?: boolean) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
             console.error('setDashboardInfo failed', dashboardInfo);
             return;
@@ -261,7 +263,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        if (_dashboardInfo.project_id !== '*') state.projectId = _dashboardInfo.project_id;
+        if (isProject) state.projectId = _dashboardInfo.project_id;
         state.vars = _dashboardInfo.vars ?? {};
         state.dashboardLayouts = _dashboardInfo.layouts ?? [];
     };
@@ -312,7 +314,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         })) ?? [];
         setDashboardWidgetInfoList(_dashboardWidgetInfoList);
     };
-    const getDashboardInfo = async (dashboardId: undefined|string) => {
+    const getDashboardInfo = async (dashboardId: undefined|string, isProject?: boolean) => {
         if (dashboardId === state.dashboardId || dashboardId === undefined) return;
 
         const isPrivate = dashboardId?.startsWith('private');
@@ -328,7 +330,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             if (result.version === '1.0') {
                 _setDashboardInfoStoreState(result);
             } else {
-                _setDashboardInfoStoreStateV2(result);
+                _setDashboardInfoStoreStateV2(result, isProject);
             }
         } catch (e) {
             reset();
