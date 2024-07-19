@@ -71,10 +71,8 @@ const state = reactive({
     isWidgetFieldChanged: computed<boolean>(() => {
         const _isOptionsChanged = isWidgetOptionsChanged(false, widgetGenerateState.widgetFormValueMap, widgetGenerateState.widget?.options || {});
         const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widgetGenerateState.widget?.widget_type;
-        const _isNameChanged = widgetGenerateState.title !== widgetGenerateState.widget?.name;
-        const _isDescriptionChanged = widgetGenerateState.description !== widgetGenerateState.widget?.description;
-        emit('watch-options-changed', _isOptionsChanged || _isTypeChanged || _isNameChanged || _isDescriptionChanged);
-        return _isOptionsChanged || _isTypeChanged || _isNameChanged || _isDescriptionChanged;
+        emit('watch-options-changed', _isOptionsChanged || _isTypeChanged);
+        return _isOptionsChanged || _isTypeChanged;
     }),
     disableApplyButton: computed<boolean>(() => {
         if (!widgetGenerateGetters.isAllWidgetFormValid) return true;

@@ -78,7 +78,9 @@ const handleToggleWidth = () => {
          :class="{ full: state.isFull, [props.size]: props.size }"
          :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
-        <div class="widget-header">
+        <div v-if="props.title !== undefined"
+             class="widget-header"
+        >
             <h3 class="title">
                 {{ props.title }}
             </h3>
@@ -320,6 +322,7 @@ const handleToggleWidth = () => {
         right: 0.25rem;
         top: 0.25rem;
         display: none;
+        z-index: 1000;
         padding: 0.25rem;
         &.selected {
             display: block;
