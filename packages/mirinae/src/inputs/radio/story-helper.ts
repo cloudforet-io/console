@@ -66,7 +66,7 @@ export const getRadioArgTypes = (): ArgTypes => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to disable selection or not.',
         table: {
             type: {
@@ -81,7 +81,7 @@ export const getRadioArgTypes = (): ArgTypes => ({
     },
     predicate: {
         name: 'predicate',
-        type: 'function',
+        type: { name: 'function' },
         description: `Function that predicate two arguments are the same or not.
         It's useful when the props \`value\` is an object.`,
         table: {
@@ -98,7 +98,7 @@ export const getRadioArgTypes = (): ArgTypes => ({
     // radio props
     invalid: {
         name: 'invalid',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Apply invalid style',
         table: {
             type: {
@@ -113,7 +113,7 @@ export const getRadioArgTypes = (): ArgTypes => ({
     },
     readonly: {
         name: 'readonly',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to make readonly or not',
         table: {
             type: {

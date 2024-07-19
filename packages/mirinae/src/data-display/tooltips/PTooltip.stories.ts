@@ -4,7 +4,7 @@ import { range } from 'lodash';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
-import { getTooltipDefaultArgs, getTooltipArgTypes } from '@/data-display/tooltips/story-helpers';
+import { getTooltipArgs, getTooltipArgTypes, getTooltipParameters } from '@/data-display/tooltips/story-helpers';
 import { POSITIONS } from '@/data-display/tooltips/type';
 
 import PTooltip from './PTooltip.vue';
@@ -17,16 +17,12 @@ const meta : Meta<PTooltipPropsAndCustomArgs> = {
     component: PTooltip,
     argTypes: {
         ...getTooltipArgTypes(),
-        default: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124040',
-        },
+        ...getTooltipParameters(),
     },
     args: {
-        ...getTooltipDefaultArgs(),
+        ...getTooltipArgs(),
     },
 };
 

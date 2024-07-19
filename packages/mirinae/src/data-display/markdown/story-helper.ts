@@ -1,7 +1,26 @@
-export const getMarkdownArgTypes = () => ({
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+import mock from '@/data-display/markdown/mock';
+
+export const getMarkdownArgs = (): Args => ({
+    markdown: mock.markdown,
+    data: mock.data,
+    language: 'en',
+    removeSpacing: false,
+});
+
+export const getMarkdownParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5718%3A9288',
+    },
+});
+
+export const getMarkdownArgTypes = (): ArgTypes => ({
     markdown: {
         name: 'markdown',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Markdown data',
         table: {
             type: {
@@ -16,7 +35,7 @@ export const getMarkdownArgTypes = () => ({
     },
     data: {
         name: 'data',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Variable data to be rendered combined with markdown. Use the ejs.render function internally.',
         table: {
             type: {
@@ -31,7 +50,7 @@ export const getMarkdownArgTypes = () => ({
     },
     language: {
         name: 'language',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Language for display markdown',
         table: {
             type: {
@@ -47,7 +66,7 @@ export const getMarkdownArgTypes = () => ({
     },
     removeSpacing: {
         name: 'removeSpacing',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to remove spacing(margins or paddings) or not.',
         table: {
             type: {

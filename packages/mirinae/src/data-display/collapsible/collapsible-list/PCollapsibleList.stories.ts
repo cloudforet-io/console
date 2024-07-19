@@ -5,13 +5,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { range } from 'lodash';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-
-import {
-    COLLAPSIBLE_LIST_THEME,
-    COLLAPSIBLE_LIST_TOGGLE_POSITION,
-} from '@/data-display/collapsible/collapsible-list/config';
-import { getCollapsibleListArgTypes } from '@/data-display/collapsible/collapsible-list/story-helper';
-import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
+import { getCollapsibleListArgTypes, getCollapsibleListParameters, getCollapsibleListArgs } from '@/data-display/collapsible/collapsible-list/story-helper';
 import { useProxyValue } from '@/hooks';
 import { I18nConnector } from '@/translations';
 
@@ -24,25 +18,12 @@ const meta : Meta<PCollapsibleListPropsAndCustomArgs> = {
     component: PCollapsibleList,
     argTypes: {
         ...getCollapsibleListArgTypes(),
-        title: { table: { disable: true } },
-        'no-styled-title': { table: { disable: true } },
-        default: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=13560%3A296687',
-        },
+        ...getCollapsibleListParameters(),
     },
     args: {
-        items: range(10).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(60) })),
-        unfoldedIndices: [],
-        lineClamp: 2,
-        multiUnfoldable: false,
-        togglePosition: COLLAPSIBLE_LIST_TOGGLE_POSITION.title,
-        toggleType: COLLAPSIBLE_TOGGLE_TYPE.text,
-        theme: COLLAPSIBLE_LIST_THEME.plain,
-        'v-model': [],
+        ...getCollapsibleListArgs(),
     },
 };
 

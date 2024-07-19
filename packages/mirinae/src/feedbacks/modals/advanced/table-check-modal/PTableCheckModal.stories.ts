@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getTableCheckModalDefaultArgs, getTableCheckModalArgTypes } from '@/feedbacks/modals/advanced/table-check-modal/story-helper';
+import { getTableCheckModalArgs, getTableCheckModalArgTypes, getTableCheckModalParameters } from '@/feedbacks/modals/advanced/table-check-modal/story-helper';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
 import PTableCheckModal from './PTableCheckModal.vue';
@@ -16,16 +16,12 @@ const meta : Meta<PTableCheckModalPropsAndCustomArgs> = {
     component: PTableCheckModal,
     argTypes: {
         ...getTableCheckModalArgTypes(),
-        // 'item-content': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/t0napBIB14ZZN9RIq9uo3O/Asset-Inventory?node-id=2613%3A371966&t=0A8wuvLdPqlyb3TM-4',
-        },
+        ...getTableCheckModalParameters(),
     },
     args: {
-        ...getTableCheckModalDefaultArgs(),
+        ...getTableCheckModalArgs(),
     },
 };
 

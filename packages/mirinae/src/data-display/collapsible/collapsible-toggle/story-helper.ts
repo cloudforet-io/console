@@ -1,10 +1,27 @@
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
 
-export const getCollapsibleToggleArgTypes = () => ({
+export const getCollapsibleToggleArgs = (): Args => ({
+    'v-model': '',
+    isCollapsed: true,
+    toggleType: COLLAPSIBLE_TOGGLE_TYPE.text,
+    defaultSlot: 'Show',
+});
+
+export const getCollapsibleToggleParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
+
+
+export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
         table: {
             type: {
@@ -19,7 +36,7 @@ export const getCollapsibleToggleArgTypes = () => ({
     },
     isCollapsed: {
         name: 'isCollapsed',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Collapsed state of toggle button.',
         table: {
             type: {
@@ -34,7 +51,7 @@ export const getCollapsibleToggleArgTypes = () => ({
     },
     toggleType: {
         name: 'toggleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'type of toggle button.',
         table: {
             type: {
@@ -51,7 +68,7 @@ export const getCollapsibleToggleArgTypes = () => ({
     /* slot */
     defaultSlot: {
         name: 'default',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Slot for toggle button contents.',
         table: {
             type: {
@@ -75,4 +92,6 @@ export const getCollapsibleToggleArgTypes = () => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
 });

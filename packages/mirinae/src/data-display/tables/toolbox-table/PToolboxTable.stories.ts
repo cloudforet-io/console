@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { getUserFields, getUsers } from '@/data-display/tables/data-table/mock';
-import { getToolboxTableDefaultArgs, getToolboxTableArgTypes } from '@/data-display/tables/toolbox-table/story-helper';
+import { getToolboxTableArgs, getToolboxTableArgTypes, getToolboxTableParameters } from '@/data-display/tables/toolbox-table/story-helper';
 import { useProxyValue } from '@/hooks/proxy-state';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PSelectStatus from '@/inputs/select-status/PSelectStatus.vue';
@@ -18,24 +18,12 @@ const meta : Meta<PToolboxTablePropsAndCustomArgs> = {
     component: PToolboxTable,
     argTypes: {
         ...getToolboxTableArgTypes(),
-        'toolbox-top': { table: { disable: true } },
-        'pagination-area': { table: { disable: true } },
-        'toolbox-left': { table: { disable: true } },
-        'toolbox-bottom': { table: { disable: true } },
-        slot: { table: { disable: true } },
-        'toolbox-table-bottom': { table: { disable: true } },
-        export: { table: { disable: true } },
-        refresh: { table: { disable: true } },
-        'click-settings': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
-        },
+        ...getToolboxTableParameters(),
     },
     args: {
-        ...getToolboxTableDefaultArgs(),
+        ...getToolboxTableArgs(),
     },
 };
 

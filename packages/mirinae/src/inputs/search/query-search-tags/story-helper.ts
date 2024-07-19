@@ -36,7 +36,7 @@ export const getQuerySearchTagsArgTypes = (): ArgTypes => ({
     },
     timezone: {
         name: 'timezone',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Timezone that is used for display time value of query search tags.',
         table: {
             type: {
@@ -51,7 +51,7 @@ export const getQuerySearchTagsArgTypes = (): ArgTypes => ({
     },
     validator: {
         name: 'validator',
-        type: 'function',
+        type: { name: 'function' },
         description: 'Validator for each tag.',
         table: {
             type: {
@@ -65,7 +65,7 @@ export const getQuerySearchTagsArgTypes = (): ArgTypes => ({
     },
     converter: {
         name: 'converter',
-        type: 'function',
+        type: { name: 'function' },
         description: 'Converter for each tag.',
         table: {
             type: {
@@ -79,7 +79,7 @@ export const getQuerySearchTagsArgTypes = (): ArgTypes => ({
     },
     readOnly: {
         name: 'readOnly',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to make editable or not.',
         table: {
             type: {

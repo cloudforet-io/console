@@ -16,7 +16,7 @@ export const getRadioGroupArgs = (): Args => ({
 export const getRadioGroupArgTypes = (): ArgTypes => ({
     direction: {
         name: 'direction',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Radios alignment direction',
         table: {
             type: {

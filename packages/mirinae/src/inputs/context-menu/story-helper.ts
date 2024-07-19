@@ -118,7 +118,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
     return {
         title: {
             name: 'title',
-            type: 'string',
+            type: { name: 'string' },
             description: 'Context menu title',
             table: {
                 type: {
@@ -148,7 +148,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         loading: {
             name: 'loading',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Loading state.',
             table: {
                 type: {
@@ -178,7 +178,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         multiSelectable: {
             name: 'multiSelectable',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to select multiple items or not.',
             table: {
                 type: {
@@ -193,7 +193,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         showSelectMarker: {
             name: 'showSelectMarker',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to show checkbox or radio icon or not.',
             table: {
                 type: {
@@ -208,7 +208,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         itemHeightFixed: {
             name: 'itemHeightFixed',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Determines whether to make all items\' height fixed or not. If it\'s `true`, item text overflow will be ellipsis.',
             table: {
                 type: {
@@ -224,7 +224,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         highlightTerm: contextMenuItemArgTypes.highlightTerm,
         noSelectIndication: {
             name: 'noSelectIndication',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to display selected state to selected item or not.',
             table: {
                 type: {
@@ -239,7 +239,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         showSelectHeader: {
             name: 'showSelectHeader',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to activate the selection header that is activated when the value of multiSelectable is true.',
             table: {
                 type: {
@@ -254,7 +254,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         showClearSelection: {
             name: 'showClearSelection',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to enable a button to deselect all selected items. It is activated when the value of multiSelectable is true.',
             table: {
                 type: {
@@ -269,7 +269,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         searchable: {
             name: 'searchable',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to enable search or not.',
             table: {
                 type: {
@@ -284,7 +284,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         searchText: {
             name: 'searchText',
-            type: 'string',
+            type: { name: 'string' },
             description: 'Input value for search component in searchable case. sync for two way binding is supported.',
             table: {
                 type: {
@@ -299,7 +299,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         readonly: {
             name: 'readonly',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to make readonly or not.',
             table: {
                 type: {
@@ -314,7 +314,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         resetSelectedOnUnmounted: {
             name: 'resetSelectedOnUnmounted',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to reset selected items when unmounted or not.',
             table: {
                 type: {
@@ -329,7 +329,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         beforeSelect: {
             name: 'beforeSelect',
-            type: 'function',
+            type: { name: 'function' },
             description: 'A function that is called before selecting an item. If it returns false, the selection is canceled.',
             table: {
                 // disable: true,
@@ -344,7 +344,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         beforeClearSelection: {
             name: 'beforeClearSelection',
-            type: 'function',
+            type: { name: 'function' },
             description: 'A function that is called before clearing all selected items. If it returns false, the clearing is canceled.',
             table: {
                 type: {

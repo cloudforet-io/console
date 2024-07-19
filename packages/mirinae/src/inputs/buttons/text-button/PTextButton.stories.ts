@@ -3,7 +3,7 @@ import { reactive, toRefs } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getTextButtonDefaultArgs, getTextButtonArgTypes } from '@/inputs/buttons/text-button/story-helper';
+import { getTextButtonArgs, getTextButtonArgTypes, getTextButtonParameters } from '@/inputs/buttons/text-button/story-helper';
 import { TEXT_BUTTON_SIZE } from '@/inputs/buttons/text-button/type';
 
 import PTextButton from './PTextButton.vue';
@@ -17,13 +17,10 @@ const meta : Meta<PTextButtonPropsAndCustomArgs> = {
         ...getTextButtonArgTypes(),
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=5023%3A360207',
-        },
+        ...getTextButtonParameters(),
     },
     args: {
-        ...getTextButtonDefaultArgs(),
+        ...getTextButtonArgs(),
     },
 };
 

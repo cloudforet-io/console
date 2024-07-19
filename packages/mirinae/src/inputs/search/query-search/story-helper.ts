@@ -31,7 +31,7 @@ export const getQuerySearchArgTypes = (): ArgTypes => {
         'v-model': searchArgTypes['v-model'],
         focused: {
             name: 'focused',
-            type: 'boolean',
+            type: { name: 'boolean' },
             description: 'Whether to make focused at the first time or not.',
             table: {
                 type: {

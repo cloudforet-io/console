@@ -87,7 +87,7 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
     },
     readOnly: {
         name: 'readOnly',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether Mode of text editor is ReadOnly',
         defaultValue: false,
         table: {
@@ -103,7 +103,7 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
     },
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show loader or not.',
         table: {
             type: {
@@ -118,7 +118,7 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
     },
     folded: {
         name: 'folded',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to fold code block or not.',
         table: {
             type: {
@@ -148,7 +148,7 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
     },
     disableAutoReformat: {
         name: 'disableAutoReformat',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to disable auto reformatting of code on code change or not. It works only when the code prop\'s type is `string`.',
         table: {
             type: {

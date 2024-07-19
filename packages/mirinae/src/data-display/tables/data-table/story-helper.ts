@@ -1,7 +1,17 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 import { getUserFields, getUsers } from '@/data-display/tables/data-table/mock';
 
-export const getDataTableDefaultArgs = () => ({
+export const getDataTableParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
+
+export const getDataTableArgs = (): Args => ({
     loading: false,
     fields: getUserFields(),
     items: getUsers(),
@@ -25,21 +35,21 @@ export const getDataTableDefaultArgs = () => ({
     getRowClassNames: undefined,
     getRowSelectable: undefined,
     beautifyText: false,
-    headSlot: undefined,
-    theadSlot: undefined,
-    theadFormatSlot: undefined,
-    noDataSlot: undefined,
-    noDataFormatSlot: undefined,
-    bodySlot: undefined,
-    colFormatNamedSlot: undefined,
-    colFormatIndexSlot: undefined,
-    loadingSlot: undefined,
+    headSlot: null,
+    theadSlot: null,
+    theadFormatSlot: null,
+    noDataSlot: null,
+    noDataFormatSlot: null,
+    bodySlot: null,
+    colFormatNamedSlot: null,
+    colFormatIndexSlot: null,
+    loadingSlot: null,
 });
 
-export const getDataTableArgsType = () => ({
+export const getDataTableArgsType = (): ArgTypes => ({
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show loading spinner or not.',
         table: {
             type: {
@@ -54,8 +64,7 @@ export const getDataTableArgsType = () => ({
     },
     fields: {
         name: 'fields',
-        type: 'array',
-        required: true,
+        type: { name: 'array', required: true } as SBType,
         description: 'Table columns. Array of field type object or string.',
         table: {
             type: {
@@ -70,7 +79,7 @@ export const getDataTableArgsType = () => ({
     },
     items: {
         name: 'items',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Table data array.',
         table: {
             type: {
@@ -85,7 +94,7 @@ export const getDataTableArgsType = () => ({
     },
     sortable: {
         name: 'sortable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to make table sortable or not.',
         table: {
             type: {
@@ -100,7 +109,7 @@ export const getDataTableArgsType = () => ({
     },
     sortBy: {
         name: 'sortBy',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Sort key. Must be one of `fields` item\'s name. Works with `sync`.',
         table: {
             type: {
@@ -115,7 +124,7 @@ export const getDataTableArgsType = () => ({
     },
     sortDesc: {
         name: 'sortDesc',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to make sort table data by sort key(`sortBy` props) in descending or ascending order. Works with `sync`.',
         table: {
             type: {
@@ -130,7 +139,7 @@ export const getDataTableArgsType = () => ({
     },
     colCopy: {
         name: 'colCopy',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show copy button to columns or not.',
         table: {
             type: {
@@ -145,7 +154,7 @@ export const getDataTableArgsType = () => ({
     },
     selectable: {
         name: 'selectable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to make table rows selectable or not.',
         table: {
             type: {
@@ -160,7 +169,7 @@ export const getDataTableArgsType = () => ({
     },
     selectIndex: {
         name: 'selectIndex',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Selected table row\'s index or array of indices. Works with `sync`.',
         table: {
             type: {
@@ -171,13 +180,11 @@ export const getDataTableArgsType = () => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     multiSelect: {
         name: 'multiSelect',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to allow table row multi selection or not.',
         table: {
             type: {
@@ -192,7 +199,7 @@ export const getDataTableArgsType = () => ({
     },
     rowClickMultiSelectMode: {
         name: 'rowClickMultiSelectMode',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to allow table row click as multi selection or not.',
         table: {
             type: {
@@ -207,7 +214,7 @@ export const getDataTableArgsType = () => ({
     },
     useCursorLoading: {
         name: 'useCursorLoading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show cursor loading or not when `loading` props is `true`.',
         table: {
             type: {
@@ -222,7 +229,7 @@ export const getDataTableArgsType = () => ({
     },
     tableStyleType: {
         name: 'tableStyleType',
-        type: 'string',
+        type: { name: 'string' },
         description: `Style type for table. ${Object.values(DATA_TABLE_STYLE_TYPE)} are available.`,
         table: {
             type: {
@@ -238,7 +245,7 @@ export const getDataTableArgsType = () => ({
     },
     tableCustomStyle: {
         name: 'tableCustomStyle',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: "Custom inline style for table. HTML element's style properties are available.",
         table: {
             type: {
@@ -253,7 +260,7 @@ export const getDataTableArgsType = () => ({
     },
     striped: {
         name: 'striped',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to separate rows by striped background color or not.',
         table: {
             type: {
@@ -268,7 +275,7 @@ export const getDataTableArgsType = () => ({
     },
     bordered: {
         name: 'bordered',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to display table rows border or not.',
         table: {
             type: {
@@ -283,7 +290,7 @@ export const getDataTableArgsType = () => ({
     },
     disableHover: {
         name: 'disableHover',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show table rows hover style or not.',
         table: {
             type: {
@@ -298,7 +305,7 @@ export const getDataTableArgsType = () => ({
     },
     rowHeightFixed: {
         name: 'rowHeightFixed',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to make table cell height fixed or not.',
         table: {
             type: {
@@ -313,7 +320,7 @@ export const getDataTableArgsType = () => ({
     },
     rowCursorPointer: {
         name: 'rowCursorPointer',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to apply cursor pointer style to rows or not.',
         table: {
             type: {
@@ -328,7 +335,7 @@ export const getDataTableArgsType = () => ({
     },
     invalid: {
         name: 'invalid',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to apply invalid style to table or not.',
         table: {
             type: {
@@ -343,7 +350,7 @@ export const getDataTableArgsType = () => ({
     },
     getRowClassNames: {
         name: 'getRowClassNames',
-        type: 'function',
+        type: { name: 'function' },
         description: 'The function that receives row data and index as arguments, and returns class names for each row as an object.',
         table: {
             type: {
@@ -357,7 +364,7 @@ export const getDataTableArgsType = () => ({
     },
     getRowSelectable: {
         name: 'getRowSelectable',
-        type: 'function',
+        type: { name: 'function' },
         description: 'The function that receives row data and index as arguments, and returns a `boolean` indicating whether the row is selectable or not.',
         table: {
             type: {
@@ -371,7 +378,7 @@ export const getDataTableArgsType = () => ({
     },
     beautifyText: {
         name: 'beautifyText',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to beautify text or not. See the `TextBeautifier` component.',
         table: {
             type: {
@@ -550,4 +557,20 @@ export const getDataTableArgsType = () => ({
             category: 'events',
         },
     },
+    // default
+    head: { table: { disable: true } },
+    'th-format': { table: { disable: true } },
+    /* eslint-disable no-template-curly-in-string */
+    '`th-${field.name}`': { table: { disable: true } },
+    /* eslint-disable no-template-curly-in-string */
+    '`th-${field.name}-format`': { table: { disable: true } },
+    'no-data': { table: { disable: true } },
+    'no-data-format': { table: { disable: true } },
+    body: { table: { disable: true } },
+    'col-format': { table: { disable: true } },
+    /* eslint-disable no-template-curly-in-string */
+    '`col-${field.name}-format`': { table: { disable: true } },
+    /* eslint-disable no-template-curly-in-string */
+    '`col-${colIndex}-format`': { table: { disable: true } },
+    foot: { table: { disable: true } },
 });

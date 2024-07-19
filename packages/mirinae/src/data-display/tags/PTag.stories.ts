@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { getBasicTagArgs } from '@/data-display/tags/mock';
-import { getTagDefaultArgs, getTagArgTypes } from '@/data-display/tags/story-helper';
+import { getTagArgs, getTagArgTypes, getTagParameters } from '@/data-display/tags/story-helper';
 
 import PTag from './PTag.vue';
 
@@ -13,20 +13,13 @@ const meta : Meta<PTagPropsAndCustomArgs> = {
     component: PTag,
     argTypes: {
         ...getTagArgTypes(),
-        default: { table: { disable: true } },
-        category: { table: { disable: true } },
-        key: { table: { disable: true } },
-        value: { table: { disable: true } },
-        delete: { table: { disable: true } },
+
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124044',
-        },
+        ...getTagParameters(),
     },
     args: {
-        ...getTagDefaultArgs(),
+        ...getTagArgs(),
     },
 };
 

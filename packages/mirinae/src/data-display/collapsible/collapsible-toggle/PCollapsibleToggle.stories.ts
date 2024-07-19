@@ -3,8 +3,7 @@ import { reactive, toRefs } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getCollapsibleToggleArgTypes } from '@/data-display/collapsible/collapsible-toggle/story-helper';
-import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
+import { getCollapsibleToggleArgTypes, getCollapsibleToggleParameters, getCollapsibleToggleArgs } from '@/data-display/collapsible/collapsible-toggle/story-helper';
 import { useProxyValue } from '@/hooks';
 import { I18nConnector } from '@/translations';
 
@@ -17,19 +16,12 @@ const meta : Meta<PCollapsibleTogglePropsAndCustomArgs> = {
     component: PCollapsibleToggle,
     argTypes: {
         ...getCollapsibleToggleArgTypes(),
-        default: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
-        },
+        ...getCollapsibleToggleParameters(),
     },
     args: {
-        'v-model': '',
-        isCollapsed: true,
-        toggleType: COLLAPSIBLE_TOGGLE_TYPE.text,
-        defaultSlot: 'Show',
+        ...getCollapsibleToggleArgs(),
     },
 };
 

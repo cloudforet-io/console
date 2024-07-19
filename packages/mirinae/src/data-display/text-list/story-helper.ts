@@ -1,17 +1,27 @@
-export const getTextListDeafultArgs = () => ({
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
+export const getTextListArgs = (): Args => ({
     items: ['hi', 'hello'],
     delimiter: ', ',
     subKey: undefined,
     link: undefined,
     linkTarget: undefined,
-    defaultSlot: undefined,
-    delimiterSlot: undefined,
+    defaultSlot: null,
+    delimiterSlot: null,
 });
 
-export const getTextListArgTypes = () => ({
+export const getTextLisyParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
+
+export const getTextListArgTypes = (): ArgTypes => ({
     items: {
         name: 'items',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Array of string or object to display as text.',
         table: {
             type: {
@@ -26,7 +36,7 @@ export const getTextListArgTypes = () => ({
     },
     delimiter: {
         name: 'delimiter',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Delimiter to place between text.',
         table: {
             type: {
@@ -41,7 +51,7 @@ export const getTextListArgTypes = () => ({
     },
     subKey: {
         name: 'subKey',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Subkey to get object value.',
         table: {
             type: {
@@ -56,7 +66,7 @@ export const getTextListArgTypes = () => ({
     },
     link: {
         name: 'link',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Link address to link to text.',
         table: {
             type: {
@@ -71,7 +81,7 @@ export const getTextListArgTypes = () => ({
     },
     linkTarget: {
         name: 'linkTarget',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Anchor\'s target when there is a link.',
         table: {
             type: {

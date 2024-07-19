@@ -8,8 +8,8 @@ import { range } from 'lodash';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
-import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
-import { getListCardArgTypes } from '@/data-display/cards/list-card/story-helper';
+import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
+import { getListCardArgTypes, getListCardParameters, getListCardArgs } from '@/data-display/cards/list-card/story-helper';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
@@ -22,30 +22,12 @@ const meta : Meta<PListCardPropsAndCustomArgs> = {
     component: PListCard,
     argTypes: {
         ...getListCardArgTypes(),
-        loader: { table: { disable: true } },
-        'no-data': { table: { disable: true } },
-        item: { table: { disable: true } },
-        defaultSlot: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
-        },
+        ...getListCardParameters(),
     },
     args: {
-        header: 'This is header!',
-        styleType: CARD_STYLE_TYPE.gray100,
-        size: CARD_SIZE.md,
-        defaultSlot: 'This is card body!',
-        headerSlot: '',
-
-        disableEmptyCase: false,
-
-        items: range(10).map(() => faker.lorem.sentence(8)),
-        loading: false,
-        hoverable: false,
-        itemSlot: null,
+        ...getListCardArgs(),
     },
 };
 

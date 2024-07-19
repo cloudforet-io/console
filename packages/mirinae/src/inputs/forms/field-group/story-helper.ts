@@ -27,7 +27,7 @@ export const getPFieldGroupParameters = (): Parameters => ({
 export const getPFieldGroupArgTypes = (): ArgTypes => ({
     label: {
         name: 'label',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Label of field',
         table: {
             type: {
@@ -42,7 +42,7 @@ export const getPFieldGroupArgTypes = (): ArgTypes => ({
     },
     helpText: {
         name: 'helpText',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Help text of field',
         table: {
             type: {
@@ -57,7 +57,7 @@ export const getPFieldGroupArgTypes = (): ArgTypes => ({
     },
     invalidText: {
         name: 'invalidText',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Invalid text of field',
         defaultValue: 'invalid text.',
         table: {
@@ -73,7 +73,7 @@ export const getPFieldGroupArgTypes = (): ArgTypes => ({
     },
     validText: {
         name: 'validText',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Valid text of field',
         table: {
             type: {
@@ -88,7 +88,7 @@ export const getPFieldGroupArgTypes = (): ArgTypes => ({
     },
     invalid: {
         name: 'invalid',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Props for show invalid text and invalid style',
         table: {
             type: {
@@ -103,7 +103,7 @@ export const getPFieldGroupArgTypes = (): ArgTypes => ({
     },
     valid: {
         name: 'valid',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Props for show valid text',
         table: {
             type: {
@@ -118,7 +118,7 @@ export const getPFieldGroupArgTypes = (): ArgTypes => ({
     },
     required: {
         name: 'required',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Props for hide optional mark',
         table: {
             type: {
@@ -133,7 +133,7 @@ export const getPFieldGroupArgTypes = (): ArgTypes => ({
     },
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Style type for field group',
         table: {
             type: {

@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import mock from '@/data-display/dynamic/dynamic-layout/mock';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-import { getDynamicLayoutItemArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/item/story-helper';
+import { getDynamicLayoutItemArgTypes, getDynamicLayoutItemArgs } from '@/data-display/dynamic/dynamic-layout/templates/item/story-helper';
 import { I18nConnector } from '@/translations';
 
 
@@ -14,18 +13,9 @@ const meta : Meta<PDynamicLayoutPropsAndCustomArgs> = {
     component: PDynamicLayout,
     argTypes: {
         ...getDynamicLayoutItemArgTypes(),
-        slot: { table: { disable: true } },
-        type: { table: { disable: true } },
-        typeOptions: { table: { disable: true } },
-        fetchOptions: { table: { disable: true } },
-        fieldHandler: { table: { disable: true } },
     },
     args: {
-        name: 'Base Information',
-        options: mock.item.options,
-        data: mock.item.data,
-        loading: false,
-        timezone: 'UTC',
+        ...getDynamicLayoutItemArgs(),
     },
 };
 

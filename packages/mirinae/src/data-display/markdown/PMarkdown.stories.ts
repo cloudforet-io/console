@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import mock from '@/data-display/markdown/mock';
-import { getMarkdownArgTypes } from '@/data-display/markdown/story-helper';
+import { getMarkdownArgTypes, getMarkdownArgs, getMarkdownParameters } from '@/data-display/markdown/story-helper';
 
 import PMarkdown from './PMarkdown.vue';
 
@@ -15,16 +15,10 @@ const meta : Meta<PMarkdownPropsAndCustomArgs> = {
         ...getMarkdownArgTypes(),
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5718%3A9288',
-        },
+        ...getMarkdownParameters(),
     },
     args: {
-        markdown: mock.markdown,
-        data: mock.data,
-        language: 'en',
-        removeSpacing: false,
+        ...getMarkdownArgs(),
     },
 };
 

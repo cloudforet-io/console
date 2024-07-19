@@ -4,8 +4,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { boardStandardItemSets, basicItemSets } from '@/data-display/board/mock';
-import { getBoardArgTypes } from '@/data-display/board/story-helper';
-import { BOARD_STYLE_TYPE } from '@/data-display/board/type';
+import { getBoardArgTypes, getBoardParameters, getBoardArgs } from '@/data-display/board/story-helper';
 import { I18nConnector } from '@/translations';
 
 import PBoard from './PBoard.vue';
@@ -17,23 +16,12 @@ const meta : Meta<PBoardPropsAndCustomArgs> = {
     component: PBoard,
     argTypes: {
         ...getBoardArgTypes(),
-        'item-content': { table: { disable: true } },
-        'item-left-content': { table: { disable: true } },
-        'item-custom-right-content': { table: { disable: true } },
-        'item-overlay-content': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'figma url',
-        },
+        ...getBoardParameters(),
     },
     args: {
-        styleType: BOARD_STYLE_TYPE.list,
-        styleOptions: {},
-        boardSets: boardStandardItemSets,
-        pageLimit: 10,
-        selectable: 10,
+        ...getBoardArgs(),
     },
 };
 

@@ -1,6 +1,9 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 
-export const getDefinitionTableDefaultArgs = () => ({
+export const getDefinitionTableArgs = (): Args => ({
     fields: [
         { label: 'Id', name: 'collector_id' },
         { label: 'Name', name: 'name' },
@@ -19,10 +22,17 @@ export const getDefinitionTableDefaultArgs = () => ({
     customKeyWidth: undefined,
 });
 
-export const getDefinitionTableArgTypes = () => ({
+export const getDefinitionTableParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5373%3A6989',
+    },
+});
+
+export const getDefinitionTableArgTypes = (): ArgTypes => ({
     fields: {
         name: 'fields',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Fields of definition table.',
         table: {
             type: {
@@ -37,7 +47,7 @@ export const getDefinitionTableArgTypes = () => ({
     },
     data: {
         name: 'data',
-        type: 'object, array',
+        type: { name: 'object' } as SBType,
         description: 'Data object of definition table.',
         table: {
             type: {
@@ -52,7 +62,7 @@ export const getDefinitionTableArgTypes = () => ({
     },
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Loading.',
         table: {
             type: {
@@ -67,7 +77,7 @@ export const getDefinitionTableArgTypes = () => ({
     },
     skeletonRows: {
         name: 'skeletonRows',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Rows of skeletons',
         table: {
             type: {
@@ -82,7 +92,7 @@ export const getDefinitionTableArgTypes = () => ({
     },
     disableCopy: {
         name: 'disableCopy',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to GLOBALLY disable copy button or not.',
         table: {
             type: {
@@ -97,7 +107,7 @@ export const getDefinitionTableArgTypes = () => ({
     },
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: `Box style types. ${Object.values(DEFINITION_TABLE_STYLE_TYPE)} are available.`,
         table: {
             type: {
@@ -113,7 +123,7 @@ export const getDefinitionTableArgTypes = () => ({
     },
     block: {
         name: 'block',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to GLOBALLY show value with full width or not.',
         table: {
             type: {
@@ -127,7 +137,7 @@ export const getDefinitionTableArgTypes = () => ({
     },
     customKeyWidth: {
         name: 'customKeyWidth',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Custom Width of table key',
         table: {
             type: {
@@ -139,4 +149,12 @@ export const getDefinitionTableArgTypes = () => ({
             },
         },
     },
+    // default
+    /* eslint-disable no-template-curly-in-string */
+    '`data-${item.name}`': { table: { disable: true } },
+    /* eslint-disable no-template-curly-in-string */
+    '`data-${idx}`': { table: { disable: true } },
+    key: { table: { disable: true } },
+    extra: { table: { disable: true } },
+    'no-data': { table: { disable: true } },
 });

@@ -1,9 +1,34 @@
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { HEADING_TYPE } from '@/data-display/heading/config';
 
-export const getHeadingArgTypes = () => ({
+export const getHeadingArgs = (): Args => ({
+    title: 'Page Title',
+    headingType: HEADING_TYPE.MAIN,
+    showBackButton: false,
+    useTotalCount: true,
+    totalCount: 0,
+    useSelectedCount: false,
+    selectedCount: 0,
+    defaultSlot: null,
+    titleSlot: null,
+    titleLeftExtraSlot: null,
+    totalCountSLot: null,
+    titleRightExtraSlot: null,
+    extraSlot: null,
+});
+
+export const getHeadingParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=7823%3A421870&t=tyr8RcRHt8hwP1dM-4',
+    },
+});
+
+export const getHeadingArgTypes = (): ArgTypes => ({
     title: {
         name: 'title',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The value to display.',
         table: {
             type: {
@@ -18,7 +43,7 @@ export const getHeadingArgTypes = () => ({
     },
     headingType: {
         name: 'headingType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Type of heading.',
         table: {
             type: {
@@ -34,7 +59,7 @@ export const getHeadingArgTypes = () => ({
     },
     showBackButton: {
         name: 'showBackButton',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to display back button or not.',
         table: {
             type: {
@@ -49,7 +74,7 @@ export const getHeadingArgTypes = () => ({
     },
     useTotalCount: {
         name: 'useTotalCount',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show total count or not.',
         table: {
             type: {
@@ -64,7 +89,7 @@ export const getHeadingArgTypes = () => ({
     },
     totalCount: {
         name: 'totalCount',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Number to display next to title. Works only when `useTotalCount` prop is `true`.',
         table: {
             type: {
@@ -79,7 +104,7 @@ export const getHeadingArgTypes = () => ({
     },
     useSelectedCount: {
         name: 'useSelectedCount',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show selected count with total count or not.',
         table: {
             type: {
@@ -94,7 +119,7 @@ export const getHeadingArgTypes = () => ({
     },
     selectedCount: {
         name: 'selectedCount',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Number to display next to title with total count. Works only when `useTotalCount` and `useSelectedCount` props are `true`.',
         table: {
             type: {

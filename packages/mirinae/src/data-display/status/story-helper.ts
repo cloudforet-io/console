@@ -1,25 +1,33 @@
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 import icon from 'vue-svgicon';
+
 
 import { themes } from '@/data-display/status/config';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
+export const getStatusParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124044',
+    },
+});
 
-export const getStatusDefaultArgs = () => ({
+export const getStatusArgs = (): Args => ({
     theme: 'green',
-    icon: undefined,
+    icon: null,
     text: 'Enabled',
-    textColor: undefined,
-    iconColor: undefined,
+    textColor: null,
+    iconColor: null,
     disableIcon: false,
     iconSize: 1,
     iconAnimation: undefined,
     defaultSlot: '',
 });
 
-export const getStatusArgTypes = () => ({
+export const getStatusArgTypes = (): ArgTypes => ({
     theme: {
         name: 'theme',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Status theme',
         table: {
             type: {
@@ -35,7 +43,7 @@ export const getStatusArgTypes = () => ({
     },
     icon: {
         name: 'icon',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Icon name',
         defaultValue: null,
         table: {
@@ -52,7 +60,7 @@ export const getStatusArgTypes = () => ({
     },
     text: {
         name: 'text',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Text',
         table: {
             type: {
@@ -67,7 +75,7 @@ export const getStatusArgTypes = () => ({
     },
     textColor: {
         name: 'textColor',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Text color',
         table: {
             type: {
@@ -82,7 +90,7 @@ export const getStatusArgTypes = () => ({
     },
     iconColor: {
         name: 'iconColor',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Icon color',
         table: {
             type: {
@@ -97,7 +105,7 @@ export const getStatusArgTypes = () => ({
     },
     disableIcon: {
         name: 'disableIcon',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Disable icon when true',
         table: {
             type: {
@@ -112,7 +120,7 @@ export const getStatusArgTypes = () => ({
     },
     iconSize: {
         name: 'iconSize',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Icon size',
         table: {
             type: {
@@ -127,7 +135,7 @@ export const getStatusArgTypes = () => ({
     },
     iconAnimation: {
         name: 'iconAnimation',
-        type: 'string',
+        type: { name: 'string' },
         description: `Animation type. ${Object.values(ANIMATION_TYPE).map((d) => `'${d}'`)} are available.`,
         table: {
             type: {
@@ -155,4 +163,6 @@ export const getStatusArgTypes = () => ({
         },
         control: 'text',
     },
+    // default
+    default: { table: { disable: true } },
 });

@@ -63,7 +63,7 @@ export const getContextMenuItemParameters = (): Parameters => ({
 export const getContextMenuItemArgTypes = (): ArgTypes => ({
     name: {
         name: 'name',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The key of item. must be unique.',
         table: {
             type: {
@@ -78,7 +78,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     },
     label: {
         name: 'label',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The display label of item.',
         table: {
             type: {
@@ -93,7 +93,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     },
     link: {
         name: 'link',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The external link of item.',
         defaultValue: '',
         table: {
@@ -124,7 +124,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether the item is clickable(selectable) or not.',
         table: {
             type: {
@@ -139,7 +139,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     },
     selected: {
         name: 'selected',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether the item is selected or not.',
         table: {
             type: {
@@ -154,7 +154,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     },
     selectMarker: {
         name: 'selectMarker',
-        type: 'string',
+        type: { name: 'string' },
         description: `Whether to show checkbox, radio, or nothing. ${SELECT_MARKERS.map((d) => `\`${d}\``).join(', ')}, \`undefined\` are available.`,
         table: {
             type: {
@@ -170,7 +170,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     },
     ellipsis: {
         name: 'ellipsis',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to ellipsis label text or not.',
         table: {
             type: {
@@ -185,7 +185,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     },
     highlightTerm: {
         name: 'highlightTerm',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The term for highlighting part of the label.',
         table: {
             type: {
@@ -200,7 +200,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     },
     icon: {
         name: 'icon',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Icon in Left Content Area.',
         table: {
             type: {
@@ -215,7 +215,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     },
     iconColor: {
         name: 'iconColor',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Color of icon in Left Content Area.',
         table: {
             type: {
@@ -230,7 +230,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     },
     imageUrl: {
         name: 'imageUrl',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Image url in Left Content Area.',
         table: {
             type: {

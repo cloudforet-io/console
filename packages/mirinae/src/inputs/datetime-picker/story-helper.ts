@@ -38,7 +38,7 @@ export const getDatetimePickerArgTypes = (): ArgTypes => ({
     },
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Style type of datetime picker.',
         table: {
             type: {
@@ -54,7 +54,7 @@ export const getDatetimePickerArgTypes = (): ArgTypes => ({
     },
     invalid: {
         name: 'invalid',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to apply invalid style or not.',
         table: {
             type: {
@@ -69,7 +69,7 @@ export const getDatetimePickerArgTypes = (): ArgTypes => ({
     },
     minDate: {
         name: 'minDate',
-        type: 'string',
+        type: { name: 'string' },
         description: '<b>[Flatpickr]</b> Specifies the minimum/earliest date. (ex. "2021-09" or "2021-09-30")',
         table: {
             type: {
@@ -83,7 +83,7 @@ export const getDatetimePickerArgTypes = (): ArgTypes => ({
     },
     maxDate: {
         name: 'maxDate',
-        type: 'string',
+        type: { name: 'string' },
         description: '<b>[Flatpickr]</b> Specifies the maximum/latest date. (ex. "2021-10" or "2021-10-31")',
         table: {
             type: {
@@ -97,7 +97,7 @@ export const getDatetimePickerArgTypes = (): ArgTypes => ({
     },
     selectMode: {
         name: 'selectMode',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Select mode of datetime picker.',
         table: {
             type: {
@@ -113,7 +113,7 @@ export const getDatetimePickerArgTypes = (): ArgTypes => ({
     },
     dataType: {
         name: 'dataType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'data types of datetime picker.',
         table: {
             type: {

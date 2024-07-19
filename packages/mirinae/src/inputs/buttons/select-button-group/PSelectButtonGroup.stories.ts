@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PSelectButtonGroup from './PSelectButtonGroup.vue';
-import { getSelectButtonGroupDefaultArgs, getSelectButtonGroupArgTypes } from './story-helper';
+import { getSelectButtonGroupArgs, getSelectButtonGroupArgTypes, getSelectButtonGroupParameters } from './story-helper';
 
 
 type PSelectButtonGroupPropsAndCustomArgs = ComponentProps<typeof PSelectButtonGroup>;
@@ -18,13 +18,10 @@ const meta : Meta<PSelectButtonGroupPropsAndCustomArgs> = {
         ...getSelectButtonGroupArgTypes(),
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5131%3A126230',
-        },
+        ...getSelectButtonGroupParameters(),
     },
     args: {
-        ...getSelectButtonGroupDefaultArgs(),
+        ...getSelectButtonGroupArgs(),
     },
 };
 

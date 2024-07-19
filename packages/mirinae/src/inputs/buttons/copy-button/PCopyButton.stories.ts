@@ -5,7 +5,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
-import { getCopyButtonDefaultArgs, getCopyButtonArgTypes } from '@/inputs/buttons/copy-button/story-helper';
+import { getCopyButtonArgs, getCopyButtonArgTypes, getCopyButtonParameters } from '@/inputs/buttons/copy-button/story-helper';
 import { SIZE } from '@/inputs/buttons/copy-button/type';
 import PTextarea from '@/inputs/textarea/PTextarea.vue';
 import { copyAnyData } from '@/utils/helpers';
@@ -17,16 +17,12 @@ const meta : Meta<PCopyButtonPropsAndCustomArgs> = {
     component: PCopyButton,
     argTypes: {
         ...getCopyButtonArgTypes(),
-        default: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=8075%3A2235',
-        },
+        ...getCopyButtonParameters(),
     },
     args: {
-        ...getCopyButtonDefaultArgs(),
+        ...getCopyButtonArgs(),
     },
 };
 

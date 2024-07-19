@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 
+import { getTypographyParameters } from '@/foundation/typography/stroy-helper';
+
 import { semanticFontSize, lineHeight, letterSpacing } from '@/styles/font-size.cjs';
+
 
 const meta : Meta = {
     title: 'Foundation/Styles/Typography',
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/DVwz3WQLLIxWXj4d4W8MQI/Foundation?node-id=100%3A48',
-        },
+        ...getTypographyParameters(),
     },
 };
 

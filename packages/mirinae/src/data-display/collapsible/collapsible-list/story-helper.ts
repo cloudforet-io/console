@@ -1,15 +1,37 @@
+import { faker } from '@faker-js/faker';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+import { range } from 'lodash';
+
 import {
     COLLAPSIBLE_LIST_THEME,
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
 } from '@/data-display/collapsible/collapsible-list/config';
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
 
+export const getCollapsibleListArgs = (): Args => ({
+    items: range(10).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(60) })),
+    unfoldedIndices: [],
+    lineClamp: 2,
+    multiUnfoldable: false,
+    togglePosition: COLLAPSIBLE_LIST_TOGGLE_POSITION.title,
+    toggleType: COLLAPSIBLE_TOGGLE_TYPE.text,
+    theme: COLLAPSIBLE_LIST_THEME.plain,
+    'v-model': [],
+});
 
-export const getCollapsibleListArgTypes = () => ({
+export const getCollapsibleListParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=13560%3A296687',
+    },
+});
+
+export const getCollapsibleListArgTypes = (): ArgTypes => ({
     /* props */
     items: {
         name: 'items',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'List items. Array of `string` or `{title?: string; data: string;}`.',
         table: {
             type: {
@@ -24,7 +46,7 @@ export const getCollapsibleListArgTypes = () => ({
     },
     unfoldedIndices: {
         name: 'unfoldedIndices',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Array of collapsed item\'s index. sync props.',
         table: {
             type: {
@@ -39,7 +61,7 @@ export const getCollapsibleListArgTypes = () => ({
     },
     lineClamp: {
         name: 'lineClamp',
-        type: 'number',
+        type: { name: 'number' },
         description: 'It refers to the number of content lines to be displayed in the collapsed state.',
         table: {
             type: {
@@ -54,7 +76,7 @@ export const getCollapsibleListArgTypes = () => ({
     },
     multiUnfoldable: {
         name: 'multiUnfoldable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to allow multiple items to unfold at the same time.',
         table: {
             type: {
@@ -69,7 +91,7 @@ export const getCollapsibleListArgTypes = () => ({
     },
     togglePosition: {
         name: 'togglePosition',
-        type: 'string',
+        type: { name: 'string' },
         description: `Toggle position. ${Object.values(COLLAPSIBLE_LIST_TOGGLE_POSITION)} are available.`,
         table: {
             type: {
@@ -85,7 +107,7 @@ export const getCollapsibleListArgTypes = () => ({
     },
     toggleType: {
         name: 'toggleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'type of collapsible toggle button.',
         table: {
             type: {
@@ -101,7 +123,7 @@ export const getCollapsibleListArgTypes = () => ({
     },
     theme: {
         name: 'theme',
-        type: 'string',
+        type: { name: 'string' },
         description: `${Object.values(COLLAPSIBLE_LIST_THEME)} are available.`,
         table: {
             type: {
@@ -117,7 +139,7 @@ export const getCollapsibleListArgTypes = () => ({
     },
     'v-model': {
         name: 'v-model',
-        type: 'array',
+        type: { name: 'array' } as SBType,
         description: 'Two way binding for `unfoldedIndices` props with `update:unfoldedIndices` event.',
         table: {
             type: {
@@ -133,7 +155,7 @@ export const getCollapsibleListArgTypes = () => ({
     /* slot */
     titleSlot: {
         name: 'title',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Slot for title.',
         table: {
             type: {
@@ -145,7 +167,7 @@ export const getCollapsibleListArgTypes = () => ({
     },
     noStyledTitleSlot: {
         name: 'no-styled-title',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Slot for title without style.',
         table: {
             type: {
@@ -157,7 +179,7 @@ export const getCollapsibleListArgTypes = () => ({
     },
     defaultSlot: {
         name: 'default',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Slot for contents.',
         table: {
             type: {
@@ -181,4 +203,8 @@ export const getCollapsibleListArgTypes = () => ({
             category: 'events',
         },
     },
+    // default
+    title: { table: { disable: true } },
+    'no-styled-title': { table: { disable: true } },
+    default: { table: { disable: true } },
 });

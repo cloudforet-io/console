@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
-import { getCardArgTypes } from '@/data-display/cards/card/story-helper';
+import { getCardArgTypes, getCardArgs, getCardParameters } from '@/data-display/cards/card/story-helper';
 import PI from '@/foundation/icons/PI.vue';
 
 import PCard from './PCard.vue';
@@ -16,21 +16,12 @@ const meta : Meta<PCardPropsAndCustomArgs> = {
     component: PCard,
     argTypes: {
         ...getCardArgTypes(),
-        default: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
-        },
+        ...getCardParameters(),
     },
     args: {
-        header: 'This is header!',
-        styleType: CARD_STYLE_TYPE.gray100,
-        size: CARD_SIZE.md,
-        defaultSlot: 'This is card body!',
-        headerSlot: '',
-
+        ...getCardArgs(),
     },
 };
 

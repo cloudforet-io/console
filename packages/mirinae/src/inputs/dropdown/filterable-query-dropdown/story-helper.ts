@@ -28,7 +28,7 @@ export const getFilterableQueryDropdownParameters = (): Parameters => ({
 export const getFilterableQueryDropdownArgTypes = (): ArgTypes => ({
     placeholder: {
         name: 'placeholder',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Input placeholder.',
         table: {
             type: {
@@ -42,7 +42,7 @@ export const getFilterableQueryDropdownArgTypes = (): ArgTypes => ({
     },
     focused: {
         name: 'focused',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to make focused at the first time or not.',
         table: {
             type: {
@@ -100,7 +100,7 @@ export const getFilterableQueryDropdownArgTypes = (): ArgTypes => ({
     },
     multiSelectable: {
         name: 'multiSelectable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to select multiple items or not.',
         table: {
             type: {
@@ -116,7 +116,7 @@ export const getFilterableQueryDropdownArgTypes = (): ArgTypes => ({
     // context menu fixed style props
     useFixedMenuStyle: {
         name: 'useFixedMenuStyle',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to use position fixed style on menu or not. ',
         table: {
             type: {
@@ -131,7 +131,7 @@ export const getFilterableQueryDropdownArgTypes = (): ArgTypes => ({
     },
     visibleMenu: {
         name: 'visibleMenu',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to show the menu or not. Automatically determined if no value is given. `sync` props.',
         table: {
             type: {

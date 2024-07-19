@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getTreeDefaultArgs, getTreeArgTypes } from '@/data-display/tree/story-helper';
+import { getTreeArgs, getTreeArgTypes } from '@/data-display/tree/story-helper';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
@@ -13,7 +13,6 @@ import PRadio from '@/inputs/radio/PRadio.vue';
 
 import { getTreeList, getTreeData, getRecursiveInfo } from './mock';
 import PTree from './PTree.vue';
-
 
 import './PTree.stories.pcss';
 
@@ -24,16 +23,9 @@ const meta : Meta<PTreePropsAndCustomArgs> = {
     component: PTree,
     argTypes: {
         ...getTreeArgTypes(),
-        node: { table: { disable: true } },
-        'left-extra': { table: { disable: true } },
-        toggle: { table: { disable: true } },
-        'toggle-right': { table: { disable: true } },
-        icon: { table: { disable: true } },
-        data: { table: { disable: true } },
-        'right-extra': { table: { disable: true } },
     },
     args: {
-        ...getTreeDefaultArgs(),
+        ...getTreeArgs(),
     },
 };
 

@@ -1,7 +1,7 @@
 import type { SBType } from '@storybook/types';
-import type { ArgTypes, Args } from '@storybook/vue';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
-export const getSelectButtonGroupDefaultArgs = (): Args => ({
+export const getSelectButtonGroupArgs = (): Args => ({
     buttons: [
         {
             name: 'one',
@@ -24,6 +24,13 @@ export const getSelectButtonGroupDefaultArgs = (): Args => ({
     theme: 'default',
 });
 
+export const getSelectButtonGroupParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5131%3A126230',
+    },
+});
+
 export const getSelectButtonGroupArgTypes = (): ArgTypes => ({
     buttons: {
         name: 'buttons',
@@ -42,7 +49,7 @@ export const getSelectButtonGroupArgTypes = (): ArgTypes => ({
     },
     selected: {
         name: 'selected',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Selected button name.',
         table: {
             type: {
@@ -58,7 +65,7 @@ export const getSelectButtonGroupArgTypes = (): ArgTypes => ({
     },
     theme: {
         name: 'theme',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Style theme of buttons.',
         table: {
             type: {

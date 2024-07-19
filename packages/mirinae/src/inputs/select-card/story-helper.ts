@@ -70,7 +70,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to disable selection or not.',
         table: {
             type: {
@@ -85,7 +85,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
     },
     predicate: {
         name: 'predicate',
-        type: 'function',
+        type: { name: 'function' },
         description: `Function that predicate two arguments are the same or not.
         It's useful when the props \`value\` is an object.`,
         table: {
@@ -101,7 +101,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
     },
     multiSelectable: {
         name: 'multiSelectable',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to allow multi select or not.',
         table: {
             type: {
@@ -117,7 +117,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
     // select card props
     block: {
         name: 'block',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Make card style to be display block and apply wide style.',
         table: {
             type: {
@@ -132,7 +132,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
     },
     imageUrl: {
         name: 'imageUrl',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Card image url. It has a higher render priority than icon props.',
         table: {
             type: {
@@ -164,7 +164,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
     },
     iconColor: {
         name: 'iconColor',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Card icon\'s color.',
         table: {
             type: {
@@ -179,7 +179,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
     },
     label: {
         name: 'label',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Card label',
         table: {
             type: {
@@ -194,7 +194,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
     },
     tabIndex: {
         name: 'tabIndex',
-        type: 'number',
+        type: { name: 'number' },
         description: 'Tab Index, used for keydown event and Web Accessibility',
         table: {
             type: {

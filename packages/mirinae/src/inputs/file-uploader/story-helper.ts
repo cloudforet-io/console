@@ -9,7 +9,7 @@ export const getFileUploaderArgs = (): Args => ({
 
 export const getFileUploaderParameters = (): Parameters => ({
     design: {
-        type: 'figma',
+        type: { name: 'figma' },
         url: 'https://www.figma.com/',
     },
 });
@@ -32,7 +32,7 @@ export const getFileUploaderArgTypes = (): ArgTypes => ({
     },
     serverEndpoint: {
         name: 'serverEndpoint',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Server Endpoint for uploading files',
         table: {
             type: {

@@ -1,9 +1,26 @@
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 
-export const getCardArgTypes = () => ({
+export const getCardArgs = (): Args => ({
+    header: 'This is header!',
+    styleType: CARD_STYLE_TYPE.gray100,
+    size: CARD_SIZE.md,
+    defaultSlot: 'This is card body!',
+    headerSlot: '',
+});
+
+export const getCardParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
+
+export const getCardArgTypes = (): ArgTypes => ({
     header: {
         name: 'header',
-        type: 'string, boolean',
+        type: { name: 'string' },
         description: 'Card header',
         table: {
             type: {
@@ -18,7 +35,7 @@ export const getCardArgTypes = () => ({
     },
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: `Card style types. ${Object.values(CARD_STYLE_TYPE)} are available.`,
         table: {
             type: {
@@ -34,7 +51,7 @@ export const getCardArgTypes = () => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: `Card size. ${Object.values(CARD_SIZE)} are available.`,
         table: {
             type: {
@@ -76,4 +93,6 @@ export const getCardArgTypes = () => ({
         },
         control: 'text',
     },
+    // default
+    default: { table: { disable: true } },
 });

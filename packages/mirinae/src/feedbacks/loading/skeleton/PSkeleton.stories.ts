@@ -3,7 +3,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 
-import { getSkeletonDefaultArgs, getSkeletonArgTypes } from './story-helper';
+import { getSkeletonArgs, getSkeletonArgTypes } from './story-helper';
 
 type PSkeletonPropsAndCustomArgs = ComponentProps<typeof PSkeleton>;
 
@@ -14,7 +14,7 @@ const meta : Meta<PSkeletonPropsAndCustomArgs> = {
         ...getSkeletonArgTypes(),
     },
     args: {
-        ...getSkeletonDefaultArgs(),
+        ...getSkeletonArgs(),
     },
 };
 

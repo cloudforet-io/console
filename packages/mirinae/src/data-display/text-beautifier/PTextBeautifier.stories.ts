@@ -2,11 +2,9 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getTextBeautifierDefaultArgs, getTextBeautifierArgTypes } from '@/data-display/text-beautifier/story-helper';
+import { getTextBeautifierArgs, getTextBeautifierArgTypes, getTextBeautifierParameters } from '@/data-display/text-beautifier/story-helper';
 
 import PTextBeautifier from './PTextBeautifier.vue';
-
-
 
 type PTextBeautifierPropsAndCustomArgs = ComponentProps<typeof PTextBeautifier>;
 
@@ -15,16 +13,12 @@ const meta : Meta<PTextBeautifierPropsAndCustomArgs> = {
     component: PTextBeautifier,
     argTypes: {
         ...getTextBeautifierArgTypes(),
-        // 'item-content': { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
-        },
+        ...getTextBeautifierParameters(),
     },
     args: {
-        ...getTextBeautifierDefaultArgs(),
+        ...getTextBeautifierArgs(),
     },
 };
 

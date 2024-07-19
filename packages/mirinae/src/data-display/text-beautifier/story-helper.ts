@@ -1,19 +1,27 @@
 import { faker } from '@faker-js/faker';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
-export const getTextBeautifierDefaultArgs = () => ({
+export const getTextBeautifierArgs = (): Args => ({
     value: `${faker.lorem.sentence(30)} ${faker.internet.url()} ${faker.lorem.sentence(30)}`,
     tag: 'span',
     // object: undefined,
     // boolean: false,
     // select: '',
-    // defaultSlot: undefined,
-    // onClick: undefined
+    // defaultSlot: null,
+    // onClick: null
 });
 
-export const getTextBeautifierArgTypes = () => ({
+export const getTextBeautifierParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
+
+export const getTextBeautifierArgTypes = (): ArgTypes => ({
     value: {
         name: '',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The value to beautify',
         table: {
             type: {
@@ -28,7 +36,7 @@ export const getTextBeautifierArgTypes = () => ({
     },
     tag: {
         name: '',
-        type: 'tag',
+        type: { name: 'string' },
         description: 'The tag of root element',
         table: {
             type: {
@@ -44,7 +52,7 @@ export const getTextBeautifierArgTypes = () => ({
 
     // object: {
     //     name: '',
-    //     type: 'object',
+    //     type: { name: 'object' },
     //     description: '',
     //     table: {
     //         type: {
@@ -60,7 +68,7 @@ export const getTextBeautifierArgTypes = () => ({
 
     // boolean: {
     //     name: '',
-    //     type: 'boolean',
+    //     type: { name: 'boolean' },
     //     description: '',
     //     table: {
     //         type: {
@@ -76,7 +84,7 @@ export const getTextBeautifierArgTypes = () => ({
 
     // select: {
     //     name: '',
-    //     type: 'string',
+    //     type: { name: 'string' },
     //     description: `Select XXX. ${
     //         [...Object.values(CONFIG)].map(d => `\`\``)} are available.`,
     //     table: {

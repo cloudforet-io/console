@@ -1,9 +1,9 @@
-import type { ArgTypes, Args } from '@storybook/vue';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 import icon from 'vue-svgicon';
 
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
-export const getButtonDefaultArgs = (): Args => ({
+export const getButtonArgs = (): Args => ({
     styleType: BUTTON_STYLE.primary,
     size: 'md',
     href: 'https://cloudforet.io',
@@ -11,16 +11,23 @@ export const getButtonDefaultArgs = (): Args => ({
     readonly: false,
     loading: false,
     block: false,
-    iconLeft: undefined,
-    iconRight: undefined,
+    iconLeft: null,
+    iconRight: null,
     default: 'button',
     handleClick: "() => console.log('click')",
+});
+
+export const getButtonParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5152%3A122457',
+    },
 });
 
 export const getButtonArgTypes = (): ArgTypes => ({
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Button style',
         table: {
             type: {
@@ -36,7 +43,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Button size',
         table: {
             type: {
@@ -52,7 +59,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
     },
     href: {
         name: 'href',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Href of button',
         table: {
             type: {
@@ -67,7 +74,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Disabled when true',
         table: {
             type: {
@@ -82,7 +89,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
     },
     readonly: {
         name: 'readonly',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to make readonly or not',
         table: {
             type: {
@@ -97,7 +104,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
     },
     loading: {
         name: 'loading',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Loading when true',
         table: {
             type: {
@@ -112,7 +119,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
     },
     block: {
         name: 'block',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Width became 100% when true',
         table: {
             type: {
@@ -127,7 +134,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
     },
     iconLeft: {
         name: 'iconLeft',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Name of icon to the left of the text.',
         table: {
             type: {
@@ -143,7 +150,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
     },
     iconRight: {
         name: 'iconRight',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Name of icon to the right of the text.',
         table: {
             type: {
@@ -160,7 +167,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
     // slots
     default: {
         name: 'default',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Slot for contents of button',
         table: {
             type: {
@@ -173,7 +180,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
     // events
     handleClick: {
         name: 'click',
-        type: 'function',
+        type: { name: 'function' },
         description: 'Click function',
         table: {
             type: {

@@ -5,7 +5,7 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
 import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
-import { getProgressBarDefaultArgs, getProgressBarArgTypes } from '@/data-display/progress-bar/story-helper';
+import { getProgressBarArgs, getProgressBarParameters, getProgressBarArgTypes } from '@/data-display/progress-bar/story-helper';
 
 type PProgressBarPropsAndCustomArgs = ComponentProps<typeof PProgressBar>;
 
@@ -16,13 +16,10 @@ const meta : Meta<PProgressBarPropsAndCustomArgs> = {
         ...getProgressBarArgTypes(),
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=2667%3A173604',
-        },
+        ...getProgressBarParameters(),
     },
     args: {
-        ...getProgressBarDefaultArgs(),
+        ...getProgressBarArgs(),
     },
 };
 

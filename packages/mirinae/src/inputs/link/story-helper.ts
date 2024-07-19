@@ -29,7 +29,7 @@ export const getLinkParameters = (): Parameters => ({
 export const getLinkArgTypes = (): ArgTypes => ({
     text: {
         name: 'text',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Link text. It will be replaced by default slot if exists.',
         table: {
             type: {
@@ -44,7 +44,7 @@ export const getLinkArgTypes = (): ArgTypes => ({
     },
     disabled: {
         name: 'disabled',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Disable link or not',
         defaultValue: false,
         table: {
@@ -60,7 +60,7 @@ export const getLinkArgTypes = (): ArgTypes => ({
     },
     highlight: {
         name: 'highlight',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Fix link color for highlighting, not inherit parent\'s color.',
         table: {
             type: {
@@ -75,7 +75,7 @@ export const getLinkArgTypes = (): ArgTypes => ({
     },
     size: {
         name: 'size',
-        type: 'string',
+        type: { name: 'string' },
         description: `Select link size. ${
             [...Object.values(LinkSize)].map((d) => `\`${d}\``)} are available.`,
         table: {
@@ -92,7 +92,7 @@ export const getLinkArgTypes = (): ArgTypes => ({
     },
     iconLeft: {
         name: 'iconLeft',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The name of left icon to be displayed.',
         table: {
             type: {
@@ -107,7 +107,7 @@ export const getLinkArgTypes = (): ArgTypes => ({
     },
     actionIcon: {
         name: 'actionIcon',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Action icon that will appear to the right of the link text.',
         table: {
             type: {
@@ -123,7 +123,7 @@ export const getLinkArgTypes = (): ArgTypes => ({
     },
     newTab: {
         name: 'newTab',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to open the link in a new tab or not.',
         table: {
             type: {
@@ -138,7 +138,7 @@ export const getLinkArgTypes = (): ArgTypes => ({
     },
     href: {
         name: 'href',
-        type: 'string',
+        type: { name: 'string' },
         description: 'href',
         table: {
             type: {
@@ -168,7 +168,7 @@ export const getLinkArgTypes = (): ArgTypes => ({
     },
     useAnchorScroll: {
         name: 'useAnchorScroll',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: "Whether to use 'a' tag's scroll to specific element or not.",
         table: {
             type: {

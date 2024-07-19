@@ -1,10 +1,12 @@
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 import icon from 'vue-svgicon';
 
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
+
 export const getAllAvailableIcons = () => Object.keys(icon.icons);
 
-export const getIconDefaultArgs = () => ({
+export const getIconArgs = (): Args => ({
     name: '',
     dir: undefined,
     fill: true,
@@ -17,10 +19,17 @@ export const getIconDefaultArgs = () => ({
     animation: undefined,
 });
 
-export const getIconsArgTypes = () => ({
+export const getIconsParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A123491',
+    },
+});
+
+export const getIconsArgTypes = (): ArgTypes => ({
     name: {
         name: 'name',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The name of icon.',
         table: {
             type: {
@@ -35,7 +44,7 @@ export const getIconsArgTypes = () => ({
     },
     dir: {
         name: 'dir',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The direction of icon.',
         table: {
             type: {
@@ -50,7 +59,7 @@ export const getIconsArgTypes = () => ({
     },
     fill: {
         name: 'fill',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to fill icon or not.',
         table: {
             type: {
@@ -65,7 +74,7 @@ export const getIconsArgTypes = () => ({
     },
     width: {
         name: 'width',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The width of icon.',
         table: {
             type: {
@@ -80,7 +89,7 @@ export const getIconsArgTypes = () => ({
     },
     height: {
         name: 'height',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The height of icon.',
         table: {
             type: {
@@ -95,7 +104,7 @@ export const getIconsArgTypes = () => ({
     },
     scale: {
         name: 'scale',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The scale of icon.',
         table: {
             type: {
@@ -110,7 +119,7 @@ export const getIconsArgTypes = () => ({
     },
     color: {
         name: 'color',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Values can be given in the order of stroke and fill. Consider space as a delimiter. Giving one thing applies to both. e.g. "inherit transparent"',
         table: {
             type: {
@@ -125,7 +134,7 @@ export const getIconsArgTypes = () => ({
     },
     original: {
         name: 'original',
-        type: 'boolean',
+        type: { name: 'boolean' },
         description: 'Whether to use original icon or not.',
         table: {
             type: {
@@ -140,7 +149,7 @@ export const getIconsArgTypes = () => ({
     },
     title: {
         name: 'title',
-        type: 'string',
+        type: { name: 'string' },
         description: 'The title of icon.',
         table: {
             type: {
@@ -155,7 +164,7 @@ export const getIconsArgTypes = () => ({
     },
     animation: {
         name: 'animation',
-        type: 'string',
+        type: { name: 'string' },
         description: `Animation type. ${Object.values(ANIMATION_TYPE).map((d) => `'${d}'`)} are available.`,
         table: {
             type: {

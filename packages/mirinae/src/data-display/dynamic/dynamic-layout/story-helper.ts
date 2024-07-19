@@ -1,11 +1,40 @@
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args } from '@storybook/vue';
+
+import mock, { getQueryTags } from '@/data-display/dynamic/dynamic-layout/mock';
 import { dynamicLayoutTypes } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-export const getDynamicLayoutArgTypes = () => ({
+export const getDynamicLayoutArgs = (): Args => ({
+    name: 'Base Information',
+    options: mock.item.options,
+    data: mock.item.data,
+    loading: false,
+    totalCount: 0,
+    timezone: 'UTC',
+    selectIndex: [],
+    selectable: false,
+    multiSelect: true,
+    invalid: false,
+    colCopy: false,
+    excelVisible: false,
+    settingsVisible: false,
+    sortBy: undefined,
+    sortDesc: undefined,
+    pageStart: undefined,
+    pageLimit: undefined,
+    searchText: '',
+    valueHandlerMap: {},
+    keyItemSets: [],
+    language: 'en',
+    popupVisible: false,
+    queryTags: getQueryTags(),
+});
+
+export const getDynamicLayoutArgTypes = (): ArgTypes => ({
     name: {
         name: 'name',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Name of layout',
-        // defaultValue: 'Base Information',
         table: {
             type: {
                 summary: 'string',
@@ -19,9 +48,8 @@ export const getDynamicLayoutArgTypes = () => ({
     },
     type: {
         name: 'type',
-        type: 'string',
+        type: { name: 'string' },
         description: 'Type of dynamic layout',
-        // defaultValue: dynamicLayoutTypes[0],
         table: {
             type: {
                 summary: 'string',
@@ -36,25 +64,23 @@ export const getDynamicLayoutArgTypes = () => ({
     },
     options: {
         name: 'options',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Meta schema options. Different by layout type.',
-        // defaultValue: mock.item.options,
         table: {
             type: {
-               summary: 'object',
+                summary: 'object',
             },
             category: 'props',
             defaultValue: {
                 summary: '{}',
             },
         },
-        control: 'object'
+        control: 'object',
     },
     data: {
         name: 'data',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Data to display by layout.',
-        // defaultValue: mock.item.data,
         table: {
             type: {
                 summary: 'object',
@@ -64,13 +90,12 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: null,
             },
         },
-        control: 'object'
+        control: 'object',
     },
     typeOptions: {
         name: 'typeOptions',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: 'Props for each layout component. Different by layout type.',
-        // defaultValue: undefined,
         table: {
             type: {
                 summary: 'object',
@@ -84,10 +109,9 @@ export const getDynamicLayoutArgTypes = () => ({
     },
     fetchOptions: {
         name: 'fetchOptions',
-        type: 'object',
+        type: { name: 'object' } as SBType,
         description: `Options for fetching data.<br/>
                       Note that it is bound when setting the initial value, but changes made later are not.`,
-        // defaultValue: undefined,
         table: {
             type: {
                 summary: 'object',
@@ -101,8 +125,7 @@ export const getDynamicLayoutArgTypes = () => ({
     },
     fieldHandler: {
         name: 'fieldHandler',
-        type: 'func',
-        // defaultValue: undefined,
+        type: { name: 'function' },
         description: 'Handler that executed for handling dynamic field props that bound to dynamic field component.',
         table: {
             type: {
@@ -118,8 +141,7 @@ export const getDynamicLayoutArgTypes = () => ({
     // type options
     loading: {
         name: 'loading',
-        type: 'boolean',
-        // defaultValue: false,
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -129,12 +151,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: false,
             },
         },
-        control: 'boolean'
+        control: 'boolean',
     },
     totalCount: {
         name: 'totalCount',
-        type: 'number',
-        // defaultValue: 0,
+        type: { name: 'number' },
         table: {
             type: {
                 summary: 'number',
@@ -145,12 +166,11 @@ export const getDynamicLayoutArgTypes = () => ({
             },
         },
         control: 'number',
-        options: { min: 0 }
+        options: { min: 0 },
     },
     timezone: {
         name: 'timezone',
-        type: 'string',
-        // defaultValue: 'UTC',
+        type: { name: 'string' },
         table: {
             type: {
                 summary: 'string',
@@ -164,8 +184,7 @@ export const getDynamicLayoutArgTypes = () => ({
     },
     language: {
         name: 'language',
-        type: 'string',
-        // defaultValue: 'en',
+        type: { name: 'string' },
         table: {
             type: {
                 summary: 'string',
@@ -175,12 +194,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: 'en',
             },
         },
-        control: 'text'
+        control: 'text',
     },
     colCopy: {
         name: 'colCopy',
-        type: 'boolean',
-        // defaultValue: false,
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -190,12 +208,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: false,
             },
         },
-        control: 'boolean'
+        control: 'boolean',
     },
     excelVisible: {
         name: 'excelVisible',
-        type: 'boolean',
-        // defaultValue: false,
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -205,12 +222,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: false,
             },
         },
-        control: 'boolean'
+        control: 'boolean',
     },
     settingsVisible: {
         name: 'settingsVisible',
-        type: 'boolean',
-        // defaultValue: false,
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -220,12 +236,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: false,
             },
         },
-        control: 'boolean'
+        control: 'boolean',
     },
     selectable: {
         name: 'selectable',
-        type: 'boolean',
-        // defaultValue: false,
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -235,12 +250,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: false,
             },
         },
-        control: 'boolean'
+        control: 'boolean',
     },
     multiSelect: {
         name: 'multiSelect',
-        type: 'boolean',
-        // defaultValue: true,
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -250,12 +264,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: true,
             },
         },
-        control: 'boolean'
+        control: 'boolean',
     },
     invalid: {
         name: 'invalid',
-        type: 'boolean',
-        // defaultValue: false,
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -265,12 +278,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: false,
             },
         },
-        control: 'boolean'
+        control: 'boolean',
     },
     selectIndex: {
         name: 'selectIndex',
-        type: 'array',
-        // defaultValue: [],
+        type: { name: 'array' } as SBType,
         table: {
             type: {
                 summary: 'array',
@@ -280,12 +292,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: '[]',
             },
         },
-        control: 'object'
+        control: 'object',
     },
     keyItemSets: {
         name: 'keyItemSets',
-        type: 'array',
-        // defaultValue: [],
+        type: { name: 'array' } as SBType,
         table: {
             type: {
                 summary: 'array',
@@ -295,12 +306,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: '[]',
             },
         },
-        control: 'object'
+        control: 'object',
     },
     valueHandlerMap: {
         name: 'valueHandlerMap',
-        type: 'object',
-        // defaultValue: {},
+        type: { name: 'object' } as SBType,
         table: {
             type: {
                 summary: 'object',
@@ -310,12 +320,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: '{}',
             },
         },
-        control: 'object'
+        control: 'object',
     },
     popupVisible: {
         name: 'popupVisible',
-        type: 'boolean',
-        // defaultValue: false,
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -325,13 +334,12 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: false,
             },
         },
-        control: 'boolean'
+        control: 'boolean',
     },
     // fetch options
     sortBy: {
         name: 'sortBy',
-        type: 'string',
-        // defaultValue: undefined,
+        type: { name: 'string' },
         table: {
             type: {
                 summary: 'string',
@@ -341,12 +349,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: '',
             },
         },
-        control: 'text'
+        control: 'text',
     },
     sortDesc: {
         name: 'sortDesc',
-        type: 'boolean',
-        // defaultValue: undefined,
+        type: { name: 'boolean' },
         table: {
             type: {
                 summary: 'boolean',
@@ -356,12 +363,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: true,
             },
         },
-        control: 'boolean'
+        control: 'boolean',
     },
     pageStart: {
         name: 'pageStart',
-        type: 'number',
-        // defaultValue: undefined,
+        type: { name: 'number' },
         table: {
             type: {
                 summary: 'number',
@@ -371,12 +377,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: 1,
             },
         },
-        control: 'number'
+        control: 'number',
     },
     pageLimit: {
         name: 'pageLimit',
-        type: 'number',
-        // defaultValue: undefined,
+        type: { name: 'number' },
         table: {
             type: {
                 summary: 'number',
@@ -386,12 +391,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: 15,
             },
         },
-        control: 'number'
+        control: 'number',
     },
     queryTags: {
         name: 'queryTags',
-        type: 'array',
-        // defaultValue: getQueryTags(),
+        type: { name: 'array' } as SBType,
         table: {
             type: {
                 summary: 'array',
@@ -401,12 +405,11 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: '[]',
             },
         },
-        control: 'object'
+        control: 'object',
     },
     searchText: {
         name: 'searchText',
-        type: 'string',
-        // defaultValue: '',
+        type: { name: 'string' },
         table: {
             type: {
                 summary: 'string',
@@ -416,7 +419,7 @@ export const getDynamicLayoutArgTypes = () => ({
                 summary: '',
             },
         },
-        control: 'text'
+        control: 'text',
     },
     // events
     onFetch: {
@@ -498,4 +501,6 @@ export const getDynamicLayoutArgTypes = () => ({
             },
         },
     },
+    // default
+    slot: { table: { disable: true } },
 });

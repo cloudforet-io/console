@@ -1,19 +1,27 @@
 import { faker } from '@faker-js/faker';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { styleTypes } from './config';
 
-export const getNotificationBarDefaultArgs = () => ({
+
+export const getNotificationBarArgs = (): Args => ({
     visible: true,
     styleType: 'dark',
     'v-model': false,
     default: faker.lorem.lines(5),
 });
 
-export const getNotificationBarArgTypes = () => ({
+export const getNotificationBarParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=8791%3A189001',
+    },
+});
+
+export const getNotificationBarArgTypes = (): ArgTypes => ({
     visible: {
         name: 'visible',
-        type: 'boolean',
-        required: true,
+        type: { name: 'boolean', required: true },
         description: 'Switch props for show or hide a notification bar.',
         defaultValue: true,
         table: {
@@ -29,7 +37,7 @@ export const getNotificationBarArgTypes = () => ({
     },
     styleType: {
         name: 'styleType',
-        type: 'string',
+        type: { name: 'string' },
         description: `Style type of notification bar.<br/>
                       \`${styleTypes}\` are available.`,
         table: {
@@ -46,7 +54,7 @@ export const getNotificationBarArgTypes = () => ({
     },
     'v-model': {
         name: 'v-model',
-        type: 'boolean',
+        type: { name: 'boolean' },
         required: false,
         description: 'Two way binding for `visible` props with `update:visible` event.',
         table: {

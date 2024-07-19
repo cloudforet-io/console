@@ -1,13 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import {
-    FIELD_TITLE_COLOR,
-    FIELD_TITLE_SIZE,
-    FIELD_TITLE_TEXT_WEIGHT,
-} from '@/data-display/field-title/config';
-import { getLabelArgTypes } from '@/data-display/field-title/story-helper';
-
+import { getLabelArgTypes, getLabelParameters, getLabelArgs } from '@/data-display/field-title/story-helper';
 
 import PFieldTitle from './PFieldTitle.vue';
 
@@ -18,25 +12,12 @@ const meta : Meta<PFieldTitlePropsAndCustomArgs> = {
     component: PFieldTitle,
     argTypes: {
         ...getLabelArgTypes(),
-        default: { table: { disable: true } },
-        right: { table: { disable: true } },
-        left: { table: { disable: true } },
-        bottom: { table: { disable: true } },
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A193199',
-        },
+        ...getLabelParameters(),
     },
     args: {
-        label: 'Field Title',
-        description: 'description for the title!',
-        size: FIELD_TITLE_SIZE.md,
-        fontWeight: FIELD_TITLE_TEXT_WEIGHT.bold,
-        color: FIELD_TITLE_COLOR.dark,
-        inline: false,
-        defaultSlot: '',
+        ...getLabelArgs(),
     },
 };
 

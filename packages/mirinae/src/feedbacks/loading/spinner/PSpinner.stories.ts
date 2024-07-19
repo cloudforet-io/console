@@ -3,7 +3,7 @@ import { reactive, toRefs } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
-import { getSpinnerDefaultArgs, getSpinnerArgTypes } from '@/feedbacks/loading/spinner/story-helper';
+import { getSpinnerArgs, getSpinnerArgTypes, getSpinnerParameters } from '@/feedbacks/loading/spinner/story-helper';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 
 import PSpinner from './PSpinner.vue';
@@ -17,13 +17,10 @@ const meta : Meta<PSpinnerPropsAndCustomArgs> = {
         ...getSpinnerArgTypes(),
     },
     parameters: {
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=5687%3A372907&viewport=-33728%2C-44113%2C1.65',
-        },
+        ...getSpinnerParameters(),
     },
     args: {
-        ...getSpinnerDefaultArgs(),
+        ...getSpinnerArgs(),
     },
 };
 
