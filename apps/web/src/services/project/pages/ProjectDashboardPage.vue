@@ -4,7 +4,7 @@ import {
     reactive, watch,
 } from 'vue';
 
-import { PSelectDropdown } from '@cloudforet/mirinae';
+import { PSelectDropdown, PEmpty } from '@cloudforet/mirinae';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
@@ -63,7 +63,7 @@ const handleSelectDashboard = (dashboardName: string) => {
 /* api */
 
 const listProjectDashboard = async () => {
-    await dashboardStore.load();
+    await dashboardStore.load(true);
 };
 const setDefaultDashboard = () => {
     if (storeState.dashboardList.length === 0) return;
@@ -137,6 +137,24 @@ watch(() => state.currentDashboardId, async (dashboardId, prevDashboardId) => {
                 <dashboard-widget-container-v2 ref="widgetContainerRef" />
             </div>
         </div>
+        <div v-else
+             class="empty-contents"
+        >
+            <p-empty image-size="sm"
+                     show-image
+                     :title="$t('PROJECT.DETAIL.DASHBOARD.NO_DASHBOARD')"
+            >
+                <template #image>
+                    <img src="@/assets/images/img_ghost.png"
+                         alt="empty-options"
+                         class="empty-options-image"
+                    >
+                </template>
+                <template #default>
+                    {{ $t('PROJECT.DETAIL.DASHBOARD.NO_DASHBOARD_DESC') }}
+                </template>
+            </p-empty>
+        </div>
     </div>
 </template>
 
@@ -180,6 +198,9 @@ watch(() => state.currentDashboardId, async (dashboardId, prevDashboardId) => {
                 }
             }
         }
+    }
+    .empty-contents {
+        padding-top: 1rem;
     }
 }
 </style>

@@ -4216,7 +4216,9 @@
 			"ALT_S_UPDATE_PROJECT_TYPE": "Project Access successfully updated ",
 			"ALT_S_UPDATE_WEBHOOK": "Webhook successfully updated ",
 			"DASHBOARD": {
-				"DASHBOARD": "Dashboard"
+				"DASHBOARD": "Dashboard",
+				"NO_DASHBOARD": "No Dashboard",
+				"NO_DASHBOARD_DESC": "Shared dashboard can be added here."
 			},
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",

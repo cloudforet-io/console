@@ -4216,7 +4216,9 @@
 			"ALT_S_UPDATE_PROJECT_TYPE": "프로젝트 엑세스 방식 변경 완료",
 			"ALT_S_UPDATE_WEBHOOK": "웹훅 업데이트 완료",
 			"DASHBOARD": {
-				"DASHBOARD": "대시보드 "
+				"DASHBOARD": "대시보드 ",
+				"NO_DASHBOARD": "",
+				"NO_DASHBOARD_DESC": ""
 			},
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
