@@ -1,14 +1,32 @@
 import { reactive, toRefs } from 'vue';
 
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import PButton from '@/inputs/buttons/button/PButton.vue';
+
+export const getButtonTabArgs = (): Args => ({
+    tabs: [
+        { name: 'detail', label: 'Detail' },
+        { name: 'info', label: 'Info' },
+        { name: 'tags', label: 'Tags' },
+    ],
+    activeTab: 'detail',
+    defaultSlot: 'This is tab body!',
+});
+
+export const getButtonTabParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=12164%3A1629',
+    },
+});
 
 export const getButtonTabArgTypes = (): ArgTypes => ({
     /* props */
     tabs: {
         name: 'tabs',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: `Tab items. 
         It is array of \`string\` or array of 
         \`{
@@ -17,11 +35,6 @@ export const getButtonTabArgTypes = (): ArgTypes => ({
           keepAlive?: boolean;
         }\`
         .`,
-        defaultValue: [
-            { name: 'detail', label: 'Detail' },
-            { name: 'info', label: 'Info' },
-            { name: 'tags', label: 'Tags' },
-        ],
         table: {
             type: {
                 summary: 'array',
@@ -31,15 +44,12 @@ export const getButtonTabArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     activeTab: {
         name: 'activeTab',
         type: { name: 'string', required: true },
         description: 'Active tab name. `sync` props.',
-        defaultValue: 'detail',
         table: {
             type: {
                 summary: 'string',
@@ -49,15 +59,12 @@ export const getButtonTabArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* slots */
     defaultSlot: {
         name: 'default',
         description: 'Use it to insert something to every tab body.',
-        defaultValue: 'This is tab body!',
         table: {
             type: {
                 summary: null,
@@ -67,9 +74,7 @@ export const getButtonTabArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* events */
     onUpdateActiveTab: {
@@ -101,6 +106,9 @@ export const getButtonTabArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
+    'v-model': { table: { disable: true } },
 });
 
 export const Inner = {
