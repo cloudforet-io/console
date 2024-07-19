@@ -1,0 +1,33 @@
+{/* PTextPagination.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PTextPaginationStories from './PTextPagination.stories';
+
+<Meta of={PTextPaginationStories} />
+
+
+# Text Pagination
+
+<br/>
+<br/>
+<br/>
+
+## Basic
+<Canvas of={PTextPaginationStories.BasicTextPagination} />
+
+## no page number
+<Canvas of={PTextPaginationStories.WithoutPageNumber} />
+
+## Disable Next Page Button
+<Canvas of={PTextPaginationStories.DisableNextPageButton} />
+
+## Without Total Page Count
+<Canvas of={PTextPaginationStories.WithoutTotalPageCount} />
+
+## Custom contents with default slot
+<Canvas of={PTextPaginationStories.Customcontentswithdefaultslot} />
+
+## Playground
+<Canvas of={PTextPaginationStories.Playground} />
+<Controls of={PTextPaginationStories.Playground} />

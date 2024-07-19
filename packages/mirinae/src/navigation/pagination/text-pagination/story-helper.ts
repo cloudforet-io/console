@@ -1,10 +1,25 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getTextPaginationArgs = (): Args => ({
+    thisPage: 1,
+    allPage: undefined,
+    showPageNumber: true,
+    disableNextPage: false,
+    hasNextPage: false,
+    defaultSlot: '',
+});
+
+export const getTextPaginationParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A178955',
+    },
+});
 
 export const getTextPaginationArgTypes = (): ArgTypes => ({
     thisPage: {
         name: 'thisPage',
         description: 'Current page number.',
-        defaultValue: 1,
         table: {
             type: {
                 summary: 'boolean',
@@ -14,14 +29,11 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     allPage: {
         name: 'allPage',
         description: 'Total page number.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'boolean',
@@ -31,13 +43,11 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     showPageNumber: {
         name: 'showPageNumber',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show page number or not.',
         defaultValue: true,
         table: {
@@ -49,15 +59,12 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     disableNextPage: {
         name: 'disableNextPage',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'This prop used only for "only this page number". When allPage is undefined, you can use disableNextPage to activate the next icons',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -67,15 +74,12 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     hasNextPage: {
         name: 'hasNextPage',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Whether to show indication that there is next page or not. It cannot be used with allPage prop.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -85,15 +89,12 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     /* slot */
     defaultSlot: {
         name: 'default',
         description: 'Slot to customize page contents area.',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
@@ -103,8 +104,8 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
+    // default
+    default: { table: { disable: true } },
 });
