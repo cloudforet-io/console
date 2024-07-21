@@ -4210,6 +4210,7 @@
 			"ALT_S_UPDATE_PROJECT": "プロジェクト編集完了",
 			"ALT_S_UPDATE_PROJECT_TYPE": "プロジェクトアクセスが正常に更新されました",
 			"ALT_S_UPDATE_WEBHOOK": "ウェプフク編集成功",
+			"CREATE": "作成",
 			"DASHBOARD": {
 				"DASHBOARD": "ダッシュボード"
 			},

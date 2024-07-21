@@ -4210,6 +4210,7 @@
 			"ALT_S_UPDATE_PROJECT": "Project successfully updated ",
 			"ALT_S_UPDATE_PROJECT_TYPE": "Project Access successfully updated ",
 			"ALT_S_UPDATE_WEBHOOK": "Webhook successfully updated ",
+			"CREATE": "Create",
 			"DASHBOARD": {
 				"DASHBOARD": "Dashboard"
 			},
