@@ -2,19 +2,17 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRoute } from 'vue-router/composables';
 
-import { find, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import {
-    PBadge, PDataLoader, PTab,
+    PDataLoader, PHorizontalLayout,
 } from '@cloudforet/mirinae';
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
-import { numberFormatter } from '@cloudforet/utils';
 
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -24,14 +22,13 @@ import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/stor
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import BetaMark from '@/common/components/marks/BetaMark.vue';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
+import ProjectDetailTab from '@/services/project/components/ProjectDetailTab.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
@@ -40,8 +37,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 const route = useRoute();
-const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const gnbStore = useGnbStore();
 const appContextStore = useAppContextStore();
@@ -83,9 +78,6 @@ const state = reactive({
         }
         return results;
     }),
-    counts: computed(() => ({
-        TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
-    })),
     projectGroupMoveModalVisible: false,
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.PROJECT,
@@ -119,11 +111,6 @@ const singleItemTabState = reactive({
     ]),
     activeTab: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
 });
-
-const onChangeTab = (activeTab) => {
-    if (activeTab === route.name) return;
-    router.replace(getProperRouteLocation({ name: activeTab }));
-};
 
 /* Watchers */
 watch(() => projectDetailPageState.projectId, async (projectId) => {
@@ -163,43 +150,42 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="project-detail-tab-page">
-        <p-data-loader class="page-inner"
-                       :loading="projectDetailPageState.loading"
-                       :loader-backdrop-color="BACKGROUND_COLOR"
+    <p-data-loader class="project-detail-tab-page"
+                   :loading="projectDetailPageState.loading"
+                   :loader-backdrop-color="BACKGROUND_COLOR"
+    >
+        <div v-if="singleItemTabState.activeTab === PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME
+            && route.query?.tab === 'webhook'"
         >
-            <p-tab v-if="state.item"
-                   :tabs="singleItemTabState.tabs"
-                   :active-tab.sync="singleItemTabState.activeTab"
-                   @change="onChangeTab"
+            <p-horizontal-layout class="page-inner"
+                                 :height="522"
             >
-                <router-view />
-                <template #extra="tab">
-                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && state.counts[ALERT_STATE.TRIGGERED] !== 0"
-                             style-type="primary3"
-                             badge-type="subtle"
-                    >
-                        {{ numberFormatter(state.counts[ALERT_STATE.TRIGGERED]) }}
-                    </p-badge>
-                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications'" />
+                <template #container="{ height }">
+                    <project-detail-tab :style="{ height: `${height}px` }"
+                                        :item="state.item"
+                                        :tabs="singleItemTabState.tabs"
+                                        :active-tab.sync="singleItemTabState.activeTab"
+                    />
                 </template>
-            </p-tab>
-        </p-data-loader>
-    </div>
+            </p-horizontal-layout>
+        </div>
+        <div v-else>
+            <project-detail-tab :item="state.item"
+                                :tabs="singleItemTabState.tabs"
+                                :active-tab.sync="singleItemTabState.activeTab"
+            />
+        </div>
+    </p-data-loader>
 </template>
 
 <style lang="postcss" scoped>
 .project-detail-tab-page {
     height: 100%;
     margin-top: 1.5rem;
-}
-.page-inner {
-    height: 100%;
-    max-width: 85.5rem;
-}
-
-.p-tab {
-    @apply rounded-lg;
+    .page-inner {
+        height: 100%;
+        max-width: 85.5rem;
+    }
 }
 
 /* custom design-system component - p-data-loader */
