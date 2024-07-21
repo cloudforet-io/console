@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    reactive, computed, onActivated,
+    reactive, computed, onActivated, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute } from 'vue-router/composables';
@@ -49,6 +49,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import ProjectAlertWebhookAddModal from '@/services/project/components/ProjectAlertWebhookAddModal.vue';
 import ProjectAlertWebhookUpdateModal from '@/services/project/components/ProjectAlertWebhookUpdateModal.vue';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
 
 const WEBHOOK_STATE = {
@@ -62,6 +63,7 @@ interface Props {
 const props = defineProps<Props>();
 const route = useRoute();
 const allReferenceStore = useAllReferenceStore();
+const projectDetailPageStore = useProjectDetailPageStore();
 
 const handlers = {
     keyItemSets: [{
@@ -163,6 +165,7 @@ const listWebhooks = async () => {
         state.items = [];
         state.totalCount = 0;
     } finally {
+        projectDetailPageStore.setWebhookList(state.items);
         state.loading = false;
     }
 };
@@ -267,6 +270,10 @@ const onChange = async (options: any = {}) => {
     }
     await listWebhooks();
 };
+
+watch(() => state.selectIndex, (selectIndex) => {
+    projectDetailPageStore.setWebhookItemIdx(selectIndex);
+});
 
 /* init */
 (async () => {

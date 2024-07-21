@@ -7,12 +7,14 @@ import { useRoute } from 'vue-router/composables';
 import { isEmpty } from 'lodash';
 
 import {
-    PDataLoader, PHorizontalLayout,
+    PDataLoader, PHorizontalLayout, PTab, PDefinitionTable, PStatus, PHeading,
 } from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ProjectModel } from '@/schema/identity/project/model';
+import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -28,6 +30,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
+import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import ProjectDetailTab from '@/services/project/components/ProjectDetailTab.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
@@ -43,11 +46,13 @@ const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
+const projectDetailPageGetters = projectDetailPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+    selectedWebhookItem: computed<WebhookModel|undefined>(() => projectDetailPageGetters.selectedWebhookItem),
 });
 const state = reactive({
     item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
@@ -84,8 +89,6 @@ const state = reactive({
         id: projectDetailPageState.projectId,
     })),
 });
-
-/** Tabs */
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
         {
@@ -110,6 +113,21 @@ const singleItemTabState = reactive({
         },
     ]),
     activeTab: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+    webhookDetailTab: computed<TabItem[]>(() => [
+        {
+            name: 'details',
+            label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS'),
+        },
+    ]),
+    webhookDetailActiveTab: 'details',
+});
+const tableState = reactive({
+    definitionFields: computed<DefinitionField[]>(() => [
+        { label: 'Name', name: 'name' },
+        { label: 'State', name: 'state' },
+        { label: 'Version', name: 'version' },
+        { label: 'Webhook URL', name: 'webhook_url' },
+    ]),
 });
 
 /* Watchers */
@@ -168,6 +186,26 @@ onUnmounted(() => {
                     />
                 </template>
             </p-horizontal-layout>
+            <p-tab v-if="storeState.selectedWebhookItem"
+                   :tabs="singleItemTabState.webhookDetailTab"
+                   :active-tab.sync="singleItemTabState.webhookDetailActiveTab"
+            >
+                <p-heading heading-type="sub"
+                           :title="$t('PROJECT.DETAIL.MEMBER.BASE_INFORMATION')"
+                />
+                <p-definition-table :fields="tableState.definitionFields"
+                                    :data="storeState.selectedWebhookItem"
+                                    :skeleton-rows="4"
+                                    block
+                >
+                    <template #data-state="{data}">
+                        <p-status
+                            class="capitalize"
+                            v-bind="userStateFormatter(data)"
+                        />
+                    </template>
+                </p-definition-table>
+            </p-tab>
         </div>
         <div v-else>
             <project-detail-tab :item="state.item"

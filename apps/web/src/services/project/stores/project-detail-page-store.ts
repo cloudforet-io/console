@@ -8,27 +8,42 @@ import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/g
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ProjectType } from '@/schema/identity/project/type';
 import type { AlertState } from '@/schema/monitoring/alert/type';
+import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-
 export interface AlertCount {
     state: AlertState;
     total: number;
 }
 
+interface ProjectDetailPageState {
+    loading: boolean,
+    projectId?: string,
+    currentProject?: ProjectModel,
+    alertCounts: AlertCount[],
+    webhookList?: WebhookModel[],
+    selectedWebhookItemIdx: number[],
+}
 export const useProjectDetailPageStore = defineStore('page-project-detail', () => {
-    const state = reactive({
+    const state = reactive<ProjectDetailPageState>({
         loading: false,
-        projectId: undefined as string | undefined,
-        currentProject: undefined as ProjectModel | undefined,
-        alertCounts: [] as AlertCount[],
+        projectId: undefined,
+        currentProject: undefined,
+        alertCounts: [],
+        webhookList: undefined,
+        selectedWebhookItemIdx: [],
     });
     const getters = reactive({
         projectType: computed<ProjectType|undefined>(() => state.currentProject?.project_type),
+        selectedWebhookItem: computed<WebhookModel|undefined>(() => {
+            if (state.selectedWebhookItemIdx.length === 0) return undefined;
+            const idx = state.selectedWebhookItemIdx[0];
+            return state.webhookList?.[idx];
+        }),
     });
 
     /* mutations */
@@ -37,6 +52,12 @@ export const useProjectDetailPageStore = defineStore('page-project-detail', () =
     };
     const setProject = (project: ProjectModel|undefined) => {
         state.currentProject = project;
+    };
+    const setWebhookList = (webhookList: WebhookModel[]|undefined) => {
+        state.webhookList = webhookList;
+    };
+    const setWebhookItemIdx = (idx: number[]) => {
+        state.selectedWebhookItemIdx = idx;
     };
 
     /* actions */
@@ -75,6 +96,8 @@ export const useProjectDetailPageStore = defineStore('page-project-detail', () =
     const mutations = {
         setProjectId,
         setProject,
+        setWebhookList,
+        setWebhookItemIdx,
     };
     const actions = {
         getProject,
