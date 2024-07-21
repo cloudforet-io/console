@@ -8,7 +8,7 @@ import type {
 export interface EventRuleCreateParameters {
     conditions: EventRuleCondition[];
     conditions_policy: EventRuleConditionsPolicy;
-    actions: EventRuleActions;
+    actions?: EventRuleActions;
     resource_group: EventRuleModel['resource_group'];
     name?: string;
     project_id?: string;
