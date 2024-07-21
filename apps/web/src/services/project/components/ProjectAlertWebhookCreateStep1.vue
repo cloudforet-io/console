@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PSelectCard, PButton, PTextButton, PLazyImg, PDataLoader,
+    PSelectCard, PButton, PLink, PLazyImg, PDataLoader,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -14,6 +14,7 @@ import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
+import { store } from '@/store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -22,26 +23,30 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import type { WebhookType } from '@/services/project/types/project-alert-type';
 
 const router = useRouter();
 
 const emit = defineEmits<{(e: 'update:currentStep', step: number, item: PluginModel): void; }>();
 
-interface WebhookType extends PluginModel {
-    long_description?: string
-}
-
+const storeState = reactive({
+    language: computed(() => store.state.user.language),
+});
 const state = reactive({
     loading: true,
     showValidation: false,
     webhookTypeList: [] as WebhookType[],
     selectedWebhookType: {} as WebhookType,
+    guideDocsLink: computed(() => {
+        const language = storeState.language === 'ko' ? 'ko/' : '';
+        return `https://cloudforet.io/${language}docs/guides/plugins/alert-manager-webhook/`;
+    }),
 });
 
 const handleClickNextStep = () => {
     emit('update:currentStep', 2, state.selectedWebhookType);
 };
-const handleClickGoback = () => {
+const handleClickGoBack = () => {
     router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, query: { tab: 'webhook' } });
 };
 
@@ -106,12 +111,14 @@ onMounted(() => {
                             {{ item.tags?.long_description || item.tags?.description }}
                         </p>
                     </div>
-                    <p-text-button style-type="highlight"
-                                   icon-right="ic_external-link"
-                                   class="learn-more-button"
+                    <p-link new-tab
+                            highlight
+                            action-icon="external-link"
+                            :href="state.guideDocsLink"
+                            class="learn-more-button"
                     >
                         {{ $t('PROJECT.DETAIL.LEARN_MORE') }}
-                    </p-text-button>
+                    </p-link>
                 </div>
             </p-select-card>
         </div>
@@ -119,7 +126,7 @@ onMounted(() => {
             <p-button style-type="transparent"
                       size="lg"
                       icon-left="ic_arrow-left"
-                      @click="handleClickGoback"
+                      @click="handleClickGoBack"
             >
                 {{ $t('COMMON.ERROR.GO_BACK') }}
             </p-button>
