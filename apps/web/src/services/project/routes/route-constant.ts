@@ -8,7 +8,12 @@ export const PROJECT_ROUTE = Object.freeze({
             _NAME: `${MENU_ID.PROJECT}.detail.tab`,
             DASHBOARD: { _NAME: `${MENU_ID.PROJECT}.detail.tab.dashboard` },
             MEMBER: { _NAME: `${MENU_ID.PROJECT}.detail.tab.member` },
-            ALERT: { _NAME: `${MENU_ID.PROJECT}.detail.tab.alert` },
+            ALERT: {
+                _NAME: `${MENU_ID.PROJECT}.detail.tab.alert`,
+                WEBHOOK: {
+                    CREATE: { _NAME: `${MENU_ID.PROJECT}.detail.tab.alert.webhook.create` },
+                },
+            },
             NOTIFICATIONS: {
                 _NAME: `${MENU_ID.PROJECT}.detail.tab.notification`,
                 ADD: { _NAME: `${MENU_ID.PROJECT}.detail.tab.notification.add` },
