@@ -4,18 +4,24 @@ import { reactive } from 'vue';
 import { PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
 import ProjectAlertWebhookCreateStep1 from '@/services/project/components/ProjectAlertWebhookCreateStep1.vue';
+import ProjectAlertWebhookCreateStep2 from '@/services/project/components/ProjectAlertWebhookCreateStep2.vue';
+import type { WebhookType } from '@/services/project/types/project-alert-type';
 
 const state = reactive({
     step: 1,
     deleteModalVisible: false,
+    selectedWebhookType: {} as WebhookType,
 });
 
 const handleClickClose = () => {
     state.deleteModalVisible = true;
 };
 
-const handleChangeStep = (step: number) => {
+const handleChangeStep = (step: number, item?: WebhookType) => {
     state.step = step;
+    if (item) {
+        state.selectedWebhookType = item;
+    }
 };
 </script>
 
@@ -28,7 +34,11 @@ const handleChangeStep = (step: number) => {
                                   :total-steps="2"
                                   @close="handleClickClose"
         />
-        <project-alert-webhook-create-step1 v-if="state.step===1"
+        <project-alert-webhook-create-step1 v-if="state.step === 1"
+                                            @update:currentStep="handleChangeStep"
+        />
+        <project-alert-webhook-create-step2 v-else-if="state.step === 2"
+                                            :selected-type="state.selectedWebhookType"
                                             @update:currentStep="handleChangeStep"
         />
     </div>
