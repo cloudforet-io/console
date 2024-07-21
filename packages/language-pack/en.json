@@ -4210,12 +4210,18 @@
 			"ALT_S_UPDATE_PROJECT": "Project successfully updated ",
 			"ALT_S_UPDATE_PROJECT_TYPE": "Project Access successfully updated ",
 			"ALT_S_UPDATE_WEBHOOK": "Webhook successfully updated ",
+			"CLOSE": "Close",
+			"CREATE": {
+				"DESC": "Select a Plugin to receive events that occured in external monitoring services.",
+				"TITLE": "Create New Webhook"
+			},
 			"DASHBOARD": {
 				"DASHBOARD": "Dashboard"
 			},
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
 			"INVITE_ONLY": "Invite only",
+			"LEARN_MORE": "Learn more",
 			"MEMBER": {
 				"ADD": "Add",
 				"ADD_FROM": "Add from {user_type}",

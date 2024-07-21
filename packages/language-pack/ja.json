@@ -4210,12 +4210,18 @@
 			"ALT_S_UPDATE_PROJECT": "プロジェクト編集完了",
 			"ALT_S_UPDATE_PROJECT_TYPE": "プロジェクトアクセスが正常に更新されました",
 			"ALT_S_UPDATE_WEBHOOK": "ウェプフク編集成功",
+			"CLOSE": "閉じる",
+			"CREATE": {
+				"DESC": "",
+				"TITLE": ""
+			},
 			"DASHBOARD": {
 				"DASHBOARD": "ダッシュボード"
 			},
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
 			"INVITE_ONLY": "招待のみ",
+			"LEARN_MORE": "詳細はこちら",
 			"MEMBER": {
 				"ADD": "追加",
 				"ADD_FROM": "{user_type}から追加する",

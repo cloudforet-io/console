@@ -14,7 +14,7 @@ const ProjectDetailTabPage = () => import('@/services/project/pages/ProjectDetai
 const ProjectDashboardPage = () => import('@/services/project/pages/ProjectDashboardPage.vue');
 const ProjectMemberPage = () => import('@/services/project/pages/ProjectMemberPage.vue');
 const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
-const ProjectWebhookCreatePage = () => import('@/services/project/pages/ProjectWebhookCreatePage.vue');
+const ProjectAlertWebhookCreatePage = () => import('@/services/project/pages/ProjectAlertWebhookCreatePage.vue');
 const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectNotificationPage.vue');
 const ProjectTagPage = () => import('@/services/project/pages/ProjectTagPage.vue');
 const ProjectAlertEventRulePage = () => import('@/services/project/pages/ProjectAlertEventRulePage.vue');
@@ -110,7 +110,7 @@ export default {
                     path: 'webhook/create',
                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME,
                     meta: { centeredLayout: true },
-                    component: ProjectWebhookCreatePage,
+                    component: ProjectAlertWebhookCreatePage,
                 },
             ],
         },

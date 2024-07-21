@@ -4210,12 +4210,18 @@
 			"ALT_S_UPDATE_PROJECT": "프로젝트 업데이트 완료",
 			"ALT_S_UPDATE_PROJECT_TYPE": "프로젝트 엑세스 방식 변경 완료",
 			"ALT_S_UPDATE_WEBHOOK": "웹훅 업데이트 완료",
+			"CLOSE": "닫기",
+			"CREATE": {
+				"DESC": "",
+				"TITLE": ""
+			},
 			"DASHBOARD": {
 				"DASHBOARD": "대시보드 "
 			},
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
 			"INVITE_ONLY": "초대된 사용자만",
+			"LEARN_MORE": "더보기",
 			"MEMBER": {
 				"ADD": "추가",
 				"ADD_FROM": "{user_type} 사용자 추가",
