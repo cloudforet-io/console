@@ -19,7 +19,6 @@ import {
     PStatus,
     PLazyImg,
     PTextInput,
-    PCopyButton,
     PSelectDropdown,
     PTableCheckModal,
 } from '@cloudforet/mirinae';
@@ -383,8 +382,11 @@ onActivated(() => {
                     v-bind="userStateFormatter(value)"
                 />
             </template>
-            <template #col-webhook_url-format="{ value }">
-                <p-copy-button>{{ value }}</p-copy-button>
+            <template #col-total_requests-format="{ value }">
+                <span>{{ value || 0 }}</span>
+            </template>
+            <template #col-failed_requests-format="{ value }">
+                <span class="col-failed-requests">{{ value || 0 }}</span>
             </template>
         </p-table-check-modal>
         <project-alert-webhook-update-modal
@@ -431,9 +433,9 @@ onActivated(() => {
             display: flex;
             align-items: center;
         }
-        .col-failed-requests {
-            @apply text-red-500;
-        }
+    }
+    .col-failed-requests {
+        @apply text-red-500;
     }
 
     /* custom delete-modal */
