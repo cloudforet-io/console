@@ -181,7 +181,7 @@ const onChangeTopic = ({ topicMode, selectedTopic, isTopicValid }: NotificationA
     }
 }
 .content-wrapper {
-    padding: 2rem 1rem 3.5rem;
+    padding: 2rem 1rem 2.5rem;
 }
 .content-title {
     font-size: 1.5rem;

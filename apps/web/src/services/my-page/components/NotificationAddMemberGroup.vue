@@ -97,6 +97,7 @@ watch(() => state.selectedMemberItems, () => {
 <style lang="postcss" scoped>
 .add-notification-member-group {
     max-width: 30rem;
+    margin-top: 0.5rem;
 }
 .tag-menu-item {
     @apply w-full;
