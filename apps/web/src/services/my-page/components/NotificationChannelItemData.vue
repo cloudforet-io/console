@@ -172,7 +172,11 @@ const handleSchemaValidate = (isValid: boolean) => {
         >
             <div class="left-section">
                 <div v-if="state.isSpaceOneUserProtocol">
-                    <p-badge v-for="(userId, index) in notificationItemState.dataForEdit.users"
+                    <span v-if="notificationItemState.dataForEdit?.users?.includes('*')">
+                        {{ $t('PROJECT.DETAIL.NOTIFICATION_ALL_USERS') }}
+                    </span>
+                    <p-badge v-for="(userId, index) in notificationItemState.dataForEdit?.users"
+                             v-else
                              :key="`users-${index}`"
                              badge-type="subtle"
                              style-type="gray200"

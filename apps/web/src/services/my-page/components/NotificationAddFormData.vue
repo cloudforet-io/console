@@ -123,9 +123,11 @@ const handleSchemaFormChange = (isValid, form) => {
     emitChange();
 };
 
-const onChangeMember = (value) => {
+const onChangeMember = (member) => {
     if (state.selectedRadioIdx === 1) {
-        state.selectedMember = value.users;
+        state.selectedMember = member;
+    } else {
+        state.selectedMember = ['*'];
     }
     emitChange();
 };
