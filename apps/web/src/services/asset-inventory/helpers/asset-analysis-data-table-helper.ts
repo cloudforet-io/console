@@ -1,4 +1,4 @@
-import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
+import type { OpUnitType } from 'dayjs';
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
@@ -18,7 +18,7 @@ export const getAssetAnalysisDataTableDateFields = (granularity: Granularity, pe
             name: 'totalCount', label: ' ',
         });
     }
-    let timeUnit: TimeUnit = 'month';
+    let timeUnit: OpUnitType = 'month';
     let labelDateFormat = 'MMM';
     if (granularity === GRANULARITY.DAILY) {
         timeUnit = 'day';

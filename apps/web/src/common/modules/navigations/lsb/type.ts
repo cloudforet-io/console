@@ -46,6 +46,7 @@ export interface LSBItem {
     currentPath?: string;
     isBackLink?: boolean;
     isSub?: boolean;
+    subText?: string;
     initialCollapsed?: boolean; // for collapsible LSB item
 }
 

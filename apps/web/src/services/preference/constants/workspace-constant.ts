@@ -9,7 +9,7 @@ export const WORKSPACE_TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
     { name: 'state', label: 'State', sortable: false },
     { name: 'users', label: 'Users' },
-    { name: 'service_account_count', label: 'Service Account' },
+    { name: 'service_account_count', label: 'Service Accounts' },
     { name: 'cost_info', label: 'Cost' },
     { name: 'created_at', label: 'Created', sortable: false },
 ] as const;
@@ -18,7 +18,7 @@ export const EXCEL_TABLE_FIELDS: ExcelDataField[] = [
     { key: 'name', name: 'Name' },
     { key: 'state', name: 'State' },
     { key: 'users', name: 'Users' },
-    { key: 'service_account_count', name: 'Service Account' },
+    { key: 'service_account_count', name: 'Service Accounts' },
     { key: 'cost_info', name: 'Cost' },
     { key: 'created_at', name: 'Created At' },
 ];

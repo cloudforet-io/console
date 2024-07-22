@@ -180,6 +180,7 @@ const state = reactive({
             {
                 type: MENU_ITEM_TYPE.TOP_TITLE,
                 label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARD'),
+                subText: isAdminMode.value ? `(${state.domainMenuSet.length})` : undefined,
             },
         ];
 
@@ -271,6 +272,7 @@ callApiWithGrantGuard();
                                              subItems: state.sharedSubItem,
                                          }"
                                          is-sub-item
+                                         show-sub-item-count
             >
                 <template #collapsible-contents="{ item: _item }">
                     <l-s-b-menu-item v-for="item in _item?.subItems"
@@ -290,6 +292,7 @@ callApiWithGrantGuard();
                                              subItems: state.privateSubItem,
                                          }"
                                          is-sub-item
+                                         show-sub-item-count
             >
                 <template #collapsible-contents="{ item: _item }">
                     <l-s-b-menu-item v-for="item in _item?.subItems"
@@ -310,6 +313,7 @@ callApiWithGrantGuard();
                                          }"
                                          is-sub-item
                                          :override-collapsed="true"
+                                         show-sub-item-count
             >
                 <template #collapsible-contents="{ item: _item }">
                     <l-s-b-menu-item v-for="item in _item?.subItems"

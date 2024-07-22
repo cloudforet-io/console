@@ -6,7 +6,7 @@ import {
 import dayjs from 'dayjs';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -84,7 +84,6 @@ const tableState = reactive({
 
 const costReportListApiQueryHelper = new ApiQueryHelper()
     .setSort('issue_date', true);
-let costReportListApiQuery = costReportListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
@@ -161,7 +160,7 @@ const handleClickLinkButton = async (id: string) => {
 
 /* API */
 const getCostReportsList = (options: any = {}) => {
-    costReportListApiQuery = getApiQueryWithToolboxOptions(costReportListApiQueryHelper, options) ?? costReportListApiQuery;
+    setApiQueryWithToolboxOptions(costReportListApiQueryHelper, options);
     if (options.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
         tableState.searchFilters = costReportListApiQueryHelper.filters;
@@ -170,7 +169,7 @@ const getCostReportsList = (options: any = {}) => {
     if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
     costReportListApiQueryHelper.setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit);
     costReportPageStore.fetchCostReportsList({
-        query: costReportListApiQuery,
+        query: costReportListApiQueryHelper.data,
     });
 };
 

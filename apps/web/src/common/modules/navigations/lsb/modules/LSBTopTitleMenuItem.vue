@@ -24,6 +24,9 @@ const props = withDefaults(defineProps<Props>(), {
         />
         <span class="top-title">
             {{ props.item.label }}
+            <span v-if="props.item.subText"
+                  class="sub-text"
+            >{{ props.item.subText }}</span>
         </span>
     </p>
 </template>
@@ -37,5 +40,8 @@ const props = withDefaults(defineProps<Props>(), {
     padding-bottom: 0.5rem;
     padding-left: 0.5rem;
     gap: 0.25rem;
+    .sub-text {
+        @apply font-normal;
+    }
 }
 </style>
