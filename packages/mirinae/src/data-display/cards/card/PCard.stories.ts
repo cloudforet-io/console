@@ -113,6 +113,7 @@ export const StyleTypes: Story = {
 
 export const Size: Story = {
     render: () => ({
+        components: { PCard },
         template: `
             <div class="h-full w-full overflow p-8 flex flex-wrap">
                 <p-card v-for="size in sizes" :key="size" :header="size" :size="size"

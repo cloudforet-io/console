@@ -7,7 +7,7 @@ export const getDynamicLayoutListArgs = (): Args => ({
     name: 'Base Information',
     options: mock.list.options,
     data: mock.list.data,
-    fieldHandler: (props) => props,
+    fieldHandler: undefined,
     loading: false,
     totalCount: 0,
     timezone: 'UTC',
