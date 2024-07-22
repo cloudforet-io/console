@@ -7,13 +7,13 @@ import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 
-export const getWidgetDataTable = async (widgetId: string): Promise<PrivateDataTableModel|PublicDataTableModel|undefined> => {
-    const isPrivate = widgetId.startsWith('private-');
+export const getWidgetDataTable = async (dataTableId: string): Promise<PrivateDataTableModel|PublicDataTableModel|undefined> => {
+    const isPrivate = dataTableId.startsWith('private-');
     const fetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateDataTable.get<DataTableGetParameters, PrivateDataTableModel>
         : SpaceConnector.clientV2.dashboard.publicDataTable.get<DataTableGetParameters, PublicDataTableModel>;
     try {
-        const result = await fetcher({ data_table_id: widgetId });
+        const result = await fetcher({ data_table_id: dataTableId });
         return result;
     } catch (e) {
         ErrorHandler.handleError(e);

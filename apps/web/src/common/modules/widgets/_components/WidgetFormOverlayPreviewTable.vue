@@ -22,6 +22,7 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, white } from '@/styles/colors';
 
@@ -58,7 +59,7 @@ const state = reactive({
     data: undefined,
     labelFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
     dataFields: computed<string[]>(() => (storeState.loading ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
-    dataInfo: computed(() => storeState.selectedDataTable?.data_info),
+    dataInfo: computed<DataInfo|undefined>(() => storeState.selectedDataTable?.data_info),
     fields: computed<PreviewTableField[]>(() => [
         ...state.labelFields.map((key) => ({ type: 'LABEL', name: key, sortKey: key })).filter((field) => {
             const _granularity = storeState.selectedGranularity;
@@ -174,6 +175,14 @@ const getSortIcon = (field: PreviewTableField) => {
     return '';
 };
 
+const getTimeDiffSubText = (field: PreviewTableField): string => {
+    if (!state.dataInfo?.[field.name]) return '';
+    const { timediff } = state.dataInfo[field.name];
+    if (!timediff || !Object.entries(timediff ?? {}).length) return '';
+    const [key, value] = Object.entries(timediff)[0];
+    return `( ${value} ${key} )`;
+};
+
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
     if (dataTableId) {
         state.thisPage = 1;
@@ -238,6 +247,9 @@ watch(() => storeState.dataTableUpdating, () => {
                               :class="{'th-contents': true, 'data-field': field.type === 'DATA'}"
                         >
                             {{ field.name }}
+                            <span v-if="state.dataInfo?.[field.name]?.timediff"
+                                  class="timediff-sub-text"
+                            >{{ getTimeDiffSubText(field) }}</span>
                             <p-i v-if="field.type === 'LABEL'"
                                  :name="getSortIcon(field)"
                                  class="sort-icon"
@@ -323,11 +335,15 @@ watch(() => storeState.dataTableUpdating, () => {
         min-width: 8rem;
 
         .th-contents {
-            @apply flex justify-between pl-4;
+            @apply flex justify-between pl-4 items-center gap-1;
             line-height: 2;
 
             &.data-field {
                 @apply justify-end;
+            }
+
+            .timediff-sub-text {
+                @apply text-gray-400 text-paragraph-sm;
             }
         }
         .sort-icon {
