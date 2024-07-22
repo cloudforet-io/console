@@ -1,4 +1,4 @@
-import { reactive, toRefs } from 'vue';
+import { reactive, toRefs, watch } from 'vue';
 
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
@@ -63,6 +63,15 @@ const Template: Story = {
                 proxyIsVisible: props.isVisible,
                 defaultContentValue: faker.lorem.sentence(10),
             });
+
+            watch(() => props.isVisible, (newVal) => {
+                state.proxyIsVisible = newVal;
+            });
+
+            watch(() => props.position, (newVal) => {
+                state.proxyPosition = newVal;
+            });
+
             const handleClick = () => {
                 /* eslint-disable no-alert */
                 alert('default slot clicked');
@@ -75,7 +84,7 @@ const Template: Story = {
     }),
 };
 
-export const Basic: Story = {
+export const BasicPopover: Story = {
     render: () => ({
         components: { PPopover, PTextInput, PButton },
         template: `
