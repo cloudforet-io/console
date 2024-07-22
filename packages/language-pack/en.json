@@ -1404,6 +1404,7 @@
 			"CHANGE_DATA_MODAL_DESCRIPTION": "Note that all options set below will be reset.",
 			"CHANGE_DATA_MODAL_TITLE": "Do you want to change the data?",
 			"CLONE": "Clone",
+			"CLONE_SUCCESS_MSG": "Successfully cloned as a new widget.",
 			"CLOUD_SERVICE": {
 				"HELP": "Displays only major services in cloud service.",
 				"NO_DATA": "No Cloud Resources",
