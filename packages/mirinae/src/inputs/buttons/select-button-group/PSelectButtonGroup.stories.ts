@@ -61,7 +61,7 @@ const Template: Story = {
     }),
 };
 
-export const LongCase: Story = {
+export const LongCaseSelectButtonGroup: Story = {
     render: () => ({
         components: { PSelectButtonGroup },
         template: `

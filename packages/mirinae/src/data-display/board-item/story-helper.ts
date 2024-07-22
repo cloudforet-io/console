@@ -6,7 +6,7 @@ import { standardIconActionSet } from '@/data-display/board-item/mock';
 
 export const getBoardItemArgs = (): Args => ({
     leftIcon: undefined,
-    IconButtonSets: standardIconActionSet,
+    iconButtonSets: standardIconActionSet,
     rounded: false,
     selected: false,
 });
