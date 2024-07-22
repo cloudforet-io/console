@@ -61,7 +61,7 @@ export const Theme: Story = {
     }),
 };
 
-export const ThemeWithoutIcon: Story = {
+export const ThemeStatusWithoutIcon: Story = {
     render: () => ({
         components: { PStatus },
         template: `

@@ -126,7 +126,7 @@ export const ToggleButtonSpacing: Story = {
     }),
 };
 
-export const ToggleButtonDisabeld: Story = {
+export const ToggleButtonDisabled: Story = {
     render: () => ({
         components: { PToggleButton },
         template: `
@@ -160,7 +160,7 @@ export const ToggleButtonDisabeld: Story = {
     }),
 };
 
-export const ToggleButtonReadOnly: Story = {
+export const ToggleButtonReadonly: Story = {
     render: () => ({
         components: { PToggleButton },
         template: `

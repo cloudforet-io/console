@@ -221,7 +221,7 @@ export const Block: Story = {
     }),
 };
 
-export const ReadOnly: Story = {
+export const Readonly: Story = {
     render: () => ({
         components: { PButton },
         template: `

@@ -138,7 +138,7 @@ export const WithoutTotalPageCount: Story = {
     }),
 };
 
-export const Customcontentswithdefaultslot: Story = {
+export const CustomContentsWithDefaultSlot: Story = {
     render: () => ({
         components: { PTextPagination },
         template: `

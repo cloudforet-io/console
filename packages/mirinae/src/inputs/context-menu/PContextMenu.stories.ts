@@ -562,7 +562,7 @@ export const Searchable: Story = {
     }),
 };
 
-export const ReadOnly: Story = {
+export const Readonly: Story = {
     render: () => ({
         props: Object.keys(getContextMenuArgTypes()),
         components: { PContextMenu },
