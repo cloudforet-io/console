@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { isEmpty } from 'lodash';
@@ -14,13 +14,10 @@ import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
-import { store } from '@/store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import type { WebhookType } from '@/services/project/types/project-alert-type';
@@ -29,18 +26,11 @@ const router = useRouter();
 
 const emit = defineEmits<{(e: 'update:currentStep', step: number, item: PluginModel): void; }>();
 
-const storeState = reactive({
-    language: computed(() => store.state.user.language),
-});
 const state = reactive({
     loading: true,
     showValidation: false,
     webhookTypeList: [] as WebhookType[],
     selectedWebhookType: {} as WebhookType,
-    guideDocsLink: computed(() => {
-        const language = storeState.language === 'ko' ? 'ko/' : '';
-        return `https://cloudforet.io/${language}docs/guides/plugins/alert-manager-webhook/`;
-    }),
 });
 
 const handleClickNextStep = () => {
@@ -82,7 +72,7 @@ onMounted(() => {
     <p-data-loader class="project-alert-webhook-create-step-1"
                    :data="state.webhookTypeList"
                    :loading="state.loading"
-                   :loader-background-color="BACKGROUND_COLOR"
+                   loader-backdrop-color="0"
     >
         <div class="card-wrapper">
             <p-select-card
@@ -108,13 +98,15 @@ onMounted(() => {
                     <div class="info">
                         <p>{{ item.name }}</p>
                         <p class="desc">
-                            {{ item.tags?.long_description || item.tags?.description }}
+                            {{ (item.name !== item.tags?.description) ? item.tags?.description : '' }}
                         </p>
                     </div>
-                    <p-link new-tab
+                    <!-- TODO: will be updated field name -->
+                    <p-link v-if="item.tags.url"
+                            new-tab
                             highlight
                             action-icon="external-link"
-                            :href="state.guideDocsLink"
+                            :href="item.tags.url"
                             class="learn-more-button"
                     >
                         {{ $t('PROJECT.DETAIL.LEARN_MORE') }}
@@ -202,7 +194,7 @@ onMounted(() => {
     }
 
     @screen tablet {
-        min-width: 43rem;
+        min-width: 30rem;
         .card-wrapper {
             @apply grid-cols-1;
             .card {
@@ -212,8 +204,7 @@ onMounted(() => {
     }
 
     @screen mobile {
-        min-width: unset;
-        max-width: 100vw;
+        min-width: 20rem;
     }
 }
 </style>
