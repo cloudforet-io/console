@@ -228,7 +228,7 @@ watch(() => state.isWidgetTitleValid, (isValid) => {
     const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
     _validMap.title = isValid;
     widgetGenerateStore.setWidgetValidMap(_validMap);
-});
+}, { immediate: true });
 onMounted(() => {
     checkDefaultValidation();
 });

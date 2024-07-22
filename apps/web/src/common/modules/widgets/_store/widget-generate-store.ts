@@ -68,8 +68,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         selectedDataTable: computed<Partial<DataTableModel>|undefined>(() => state.dataTables.find((dataTable) => dataTable.data_table_id === state.selectedDataTableId)),
         isAllWidgetFormValid: computed<boolean>(() => {
             const widgetValidMapValues = Object.values(state.widgetValidMap);
-            // const widgetValueMapKeys = Object.keys(state.widgetFormValueMap);
-            // if (widgetValidMapValues.length !== widgetValueMapKeys.length) return false;
+            const widgetValueMapKeys = Object.keys(state.widgetFormValueMap);
+            if (widgetValidMapValues.length !== widgetValueMapKeys.length) return false;
             return widgetValidMapValues.every((valid) => valid);
         }),
         widgetState: computed<WidgetState|undefined>(() => state.widget?.state),
