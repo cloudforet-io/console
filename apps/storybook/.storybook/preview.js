@@ -52,7 +52,6 @@ Object.keys(screens).forEach((k) => {
     };
 });
 
-/** @type { import('@storybook/vue').Preview } */
 const preview = {
   parameters : {
     controls: { expanded: true },
