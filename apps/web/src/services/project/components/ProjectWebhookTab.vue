@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    reactive, computed, onActivated,
+    reactive, computed, onActivated, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute } from 'vue-router/composables';
@@ -19,7 +19,6 @@ import {
     PStatus,
     PLazyImg,
     PTextInput,
-    PCopyButton,
     PSelectDropdown,
     PTableCheckModal,
 } from '@cloudforet/mirinae';
@@ -49,6 +48,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import ProjectAlertWebhookAddModal from '@/services/project/components/ProjectAlertWebhookAddModal.vue';
 import ProjectAlertWebhookUpdateModal from '@/services/project/components/ProjectAlertWebhookUpdateModal.vue';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
 
 const WEBHOOK_STATE = {
@@ -62,25 +62,21 @@ interface Props {
 const props = defineProps<Props>();
 const route = useRoute();
 const allReferenceStore = useAllReferenceStore();
+const projectDetailPageStore = useProjectDetailPageStore();
 
 const handlers = {
     keyItemSets: [{
         title: 'Properties',
         items: [
             { name: 'name', label: 'Name' },
-            { name: 'webhook_id', label: 'Webhook ID' },
             { name: 'state', label: 'State' },
             { name: 'plugin_info.plugin_id', label: 'Plugin' },
-            { name: 'webhook_url', label: 'Webhook URL' },
-            { name: 'created_at', label: 'Created', dataType: 'datetime' },
         ],
     }]as KeyItemSet[],
     valueHandlerMap: {
         name: makeDistinctValueHandler('monitoring.Webhook', 'name'),
         state: makeEnumValueHandler(WEBHOOK_STATE),
         'plugin_info.plugin_id': makeDistinctValueHandler('monitoring.Webhook', 'plugin_info.plugin_id'),
-        webhook_url: makeDistinctValueHandler('monitoring.Webhook', 'webhook_url'),
-        created_at: makeDistinctValueHandler('monitoring.Webhook', 'created_at'),
     },
 };
 const webhookListApiQueryHelper = new ApiQueryHelper()
@@ -116,14 +112,13 @@ const state = reactive({
             label: _i18n.t('PROJECT.DETAIL.WEBHOOK_DELETE'),
         },
     ] as MenuItem[])),
+    // TODO: check filed name
     fields: [
         { name: 'name', label: 'Name' },
-        { name: 'webhook_id', label: 'Webhook ID' },
         { name: 'state', label: 'State' },
-        { name: 'plugin_info.plugin_id', label: 'Type' },
-        { name: 'plugin_info.version', label: 'Version' },
-        { name: 'webhook_url', label: 'Webhook URL' },
-        { name: 'created_at', label: 'Created' },
+        { name: 'plugin_info.plugin_id', label: 'Plugin' },
+        { name: 'total_requests', label: 'Total Requests' },
+        { name: 'failed_requests', label: 'Failed Requests' },
     ],
     items: [],
     selectIndex: [],
@@ -169,6 +164,7 @@ const listWebhooks = async () => {
         state.items = [];
         state.totalCount = 0;
     } finally {
+        projectDetailPageStore.setWebhookList(state.items);
         state.loading = false;
     }
 };
@@ -250,6 +246,7 @@ const onSelectDropdown = (name) => {
     default: break;
     }
 };
+// TODO: check filed name
 const onExport = async () => {
     await downloadExcel({
         url: '/monitoring/webhook/list',
@@ -258,8 +255,8 @@ const onExport = async () => {
             { name: 'Name', key: 'name' },
             { name: 'State', key: 'state' },
             { name: 'Plugin', key: 'plugin_info.plugin_id' },
-            { name: 'WebhookURL', key: 'webhook_url' },
-            { name: 'Created', key: 'created_at', type: 'datetime' },
+            { name: 'Total Requests', key: 'total_requests' },
+            { name: 'Failed Requests', key: 'failed_requests' },
         ],
         file_name_prefix: FILE_NAME_PREFIX.projectWebhook,
         timezone: state.timezone,
@@ -272,6 +269,10 @@ const onChange = async (options: any = {}) => {
     }
     await listWebhooks();
 };
+
+watch(() => state.selectIndex, (selectIndex) => {
+    projectDetailPageStore.setWebhookItemIdx(selectIndex);
+});
 
 /* init */
 (async () => {
@@ -317,7 +318,7 @@ onActivated(() => {
                           icon-left="ic_plus_bold"
                           @click="onClickAdd"
                 >
-                    {{ $t('PROJECT.DETAIL.ADD') }}
+                    {{ $t('PROJECT.DETAIL.CREATE') }}
                 </p-button>
                 <p-select-dropdown
                     :menu="state.dropdown"
@@ -344,8 +345,11 @@ onActivated(() => {
                     v-bind="userStateFormatter(value)"
                 />
             </template>
-            <template #col-webhook_url-format="{ value }">
-                <p-copy-button>{{ value }}</p-copy-button>
+            <template #col-total_requests-format="{ value }">
+                <span>{{ value || 0 }}</span>
+            </template>
+            <template #col-failed_requests-format="{ value }">
+                <span class="col-failed-requests">{{ value || 0 }}</span>
             </template>
         </p-toolbox-table>
 
@@ -378,8 +382,11 @@ onActivated(() => {
                     v-bind="userStateFormatter(value)"
                 />
             </template>
-            <template #col-webhook_url-format="{ value }">
-                <p-copy-button>{{ value }}</p-copy-button>
+            <template #col-total_requests-format="{ value }">
+                <span>{{ value || 0 }}</span>
+            </template>
+            <template #col-failed_requests-format="{ value }">
+                <span class="col-failed-requests">{{ value || 0 }}</span>
             </template>
         </p-table-check-modal>
         <project-alert-webhook-update-modal
@@ -426,6 +433,9 @@ onActivated(() => {
             display: flex;
             align-items: center;
         }
+    }
+    .col-failed-requests {
+        @apply text-red-500;
     }
 
     /* custom delete-modal */

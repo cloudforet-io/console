@@ -2,19 +2,19 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRoute } from 'vue-router/composables';
 
-import { find, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import {
-    PBadge, PDataLoader, PTab,
+    PDataLoader, PHorizontalLayout, PTab, PDefinitionTable, PStatus, PHeading,
 } from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
-import { numberFormatter } from '@cloudforet/utils';
 
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
+import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -24,14 +24,14 @@ import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/stor
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import BetaMark from '@/common/components/marks/BetaMark.vue';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
+import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
+import ProjectDetailTab from '@/services/project/components/ProjectDetailTab.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
@@ -40,19 +40,19 @@ interface Props {
 }
 const props = defineProps<Props>();
 const route = useRoute();
-const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const gnbStore = useGnbStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
+const projectDetailPageGetters = projectDetailPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+    selectedWebhookItem: computed<WebhookModel|undefined>(() => projectDetailPageGetters.selectedWebhookItem),
 });
 const state = reactive({
     item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
@@ -83,17 +83,12 @@ const state = reactive({
         }
         return results;
     }),
-    counts: computed(() => ({
-        TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
-    })),
     projectGroupMoveModalVisible: false,
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.PROJECT,
         id: projectDetailPageState.projectId,
     })),
 });
-
-/** Tabs */
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
         {
@@ -118,12 +113,22 @@ const singleItemTabState = reactive({
         },
     ]),
     activeTab: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+    webhookDetailTab: computed<TabItem[]>(() => [
+        {
+            name: 'details',
+            label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS'),
+        },
+    ]),
+    webhookDetailActiveTab: 'details',
 });
-
-const onChangeTab = (activeTab) => {
-    if (activeTab === route.name) return;
-    router.replace(getProperRouteLocation({ name: activeTab }));
-};
+const tableState = reactive({
+    definitionFields: computed<DefinitionField[]>(() => [
+        { label: 'Name', name: 'name' },
+        { label: 'State', name: 'state' },
+        { label: 'Version', name: 'version' },
+        { label: 'Webhook URL', name: 'webhook_url' },
+    ]),
+});
 
 /* Watchers */
 watch(() => projectDetailPageState.projectId, async (projectId) => {
@@ -163,43 +168,62 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="project-detail-tab-page">
-        <p-data-loader class="page-inner"
-                       :loading="projectDetailPageState.loading"
-                       :loader-backdrop-color="BACKGROUND_COLOR"
+    <p-data-loader class="project-detail-tab-page"
+                   :loading="projectDetailPageState.loading"
+                   :loader-backdrop-color="BACKGROUND_COLOR"
+    >
+        <div v-if="singleItemTabState.activeTab === PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME
+            && route.query?.tab === 'webhook'"
         >
-            <p-tab v-if="state.item"
-                   :tabs="singleItemTabState.tabs"
-                   :active-tab.sync="singleItemTabState.activeTab"
-                   @change="onChangeTab"
+            <p-horizontal-layout class="page-inner"
+                                 :height="522"
             >
-                <router-view />
-                <template #extra="tab">
-                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && state.counts[ALERT_STATE.TRIGGERED] !== 0"
-                             style-type="primary3"
-                             badge-type="subtle"
-                    >
-                        {{ numberFormatter(state.counts[ALERT_STATE.TRIGGERED]) }}
-                    </p-badge>
-                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications'" />
+                <template #container="{ height }">
+                    <project-detail-tab :style="{ height: `${height}px` }"
+                                        :item="state.item"
+                                        :tabs="singleItemTabState.tabs"
+                                        :active-tab.sync="singleItemTabState.activeTab"
+                    />
                 </template>
+            </p-horizontal-layout>
+            <p-tab v-if="storeState.selectedWebhookItem"
+                   :tabs="singleItemTabState.webhookDetailTab"
+                   :active-tab.sync="singleItemTabState.webhookDetailActiveTab"
+            >
+                <p-heading heading-type="sub"
+                           :title="$t('PROJECT.DETAIL.MEMBER.BASE_INFORMATION')"
+                />
+                <p-definition-table :fields="tableState.definitionFields"
+                                    :data="storeState.selectedWebhookItem"
+                                    :skeleton-rows="4"
+                                    block
+                >
+                    <template #data-state="{data}">
+                        <p-status
+                            class="capitalize"
+                            v-bind="userStateFormatter(data)"
+                        />
+                    </template>
+                </p-definition-table>
             </p-tab>
-        </p-data-loader>
-    </div>
+        </div>
+        <div v-else>
+            <project-detail-tab :item="state.item"
+                                :tabs="singleItemTabState.tabs"
+                                :active-tab.sync="singleItemTabState.activeTab"
+            />
+        </div>
+    </p-data-loader>
 </template>
 
 <style lang="postcss" scoped>
 .project-detail-tab-page {
     height: 100%;
     margin-top: 1.5rem;
-}
-.page-inner {
-    height: 100%;
-    max-width: 85.5rem;
-}
-
-.p-tab {
-    @apply rounded-lg;
+    .page-inner {
+        height: 100%;
+        max-width: 85.5rem;
+    }
 }
 
 /* custom design-system component - p-data-loader */

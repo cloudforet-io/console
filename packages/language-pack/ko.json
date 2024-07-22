@@ -4210,6 +4210,7 @@
 			"ALT_S_UPDATE_PROJECT": "프로젝트 업데이트 완료",
 			"ALT_S_UPDATE_PROJECT_TYPE": "프로젝트 엑세스 방식 변경 완료",
 			"ALT_S_UPDATE_WEBHOOK": "웹훅 업데이트 완료",
+			"CREATE": "생성",
 			"DASHBOARD": {
 				"DASHBOARD": "대시보드 "
 			},
