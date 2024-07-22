@@ -125,7 +125,7 @@ const tableState = reactive({
     definitionFields: computed<DefinitionField[]>(() => [
         { label: 'Name', name: 'name' },
         { label: 'State', name: 'state' },
-        { label: 'Version', name: 'version' },
+        { label: 'Version', name: 'plugin_info.version' },
         { label: 'Webhook URL', name: 'webhook_url' },
     ]),
 });

@@ -155,6 +155,7 @@ watch(() => state.conditions, (conditions) => {
             class="event-rule-condition-form"
             :conditions-policy.sync="state.conditionsPolicy"
             :conditions.sync="state.conditions"
+            :project-id="props.projectId"
         />
         <project-alert-event-rule-action-form
             class="event-rule-action-form"

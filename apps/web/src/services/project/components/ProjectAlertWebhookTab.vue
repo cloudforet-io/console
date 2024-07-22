@@ -112,13 +112,11 @@ const state = reactive({
             label: _i18n.t('PROJECT.DETAIL.WEBHOOK_DELETE'),
         },
     ] as MenuItem[])),
-    // TODO: check filed name
     fields: [
         { name: 'name', label: 'Name' },
         { name: 'state', label: 'State' },
         { name: 'plugin_info.plugin_id', label: 'Plugin' },
-        { name: 'total_requests', label: 'Total Requests' },
-        { name: 'failed_requests', label: 'Failed Requests' },
+        { name: 'requests.total', label: 'Total Requests' },
     ],
     items: [],
     selectIndex: [],
@@ -344,11 +342,8 @@ onActivated(() => {
                     v-bind="userStateFormatter(value)"
                 />
             </template>
-            <template #col-total_requests-format="{ value }">
+            <template #col-requests.total-format="{ value }">
                 <span>{{ value || 0 }}</span>
-            </template>
-            <template #col-failed_requests-format="{ value }">
-                <span class="col-failed-requests">{{ value || 0 }}</span>
             </template>
         </p-toolbox-table>
         <p-table-check-modal :visible.sync="checkModalState.visible"
@@ -375,11 +370,8 @@ onActivated(() => {
                     v-bind="userStateFormatter(value)"
                 />
             </template>
-            <template #col-total_requests-format="{ value }">
+            <template #col-requests.total-format="{ value }">
                 <span>{{ value || 0 }}</span>
-            </template>
-            <template #col-failed_requests-format="{ value }">
-                <span class="col-failed-requests">{{ value || 0 }}</span>
             </template>
         </p-table-check-modal>
         <project-alert-webhook-update-modal
@@ -426,9 +418,6 @@ onActivated(() => {
             display: flex;
             align-items: center;
         }
-    }
-    .col-failed-requests {
-        @apply text-red-500;
     }
 
     /* custom delete-modal */
