@@ -184,101 +184,6 @@ const updateWidget = async (widgetId: string, size: WidgetSize) => {
     }
 };
 
-
-/* Event */
-const handleClickDeleteWidget = (widget: RefinedWidgetInfo) => {
-    widgetDeleteState.targetWidget = widget;
-    widgetDeleteState.visibleModal = true;
-};
-const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo, overlayType: WidgetOverlayType) => {
-    widgetGenerateStore.setOverlayType(overlayType);
-    widgetGenerateStore.setWidgetForm(widget);
-    widgetGenerateStore.setOverlayStep(2);
-    widgetGenerateStore.setShowOverlay(true);
-};
-const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
-    if (!dashboardDetailState.dashboardId) return;
-    const isPrivate = widget.widget_id.startsWith('private');
-    const widgetCreateFetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.create<PrivateWidgetCreateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>;
-    const widgetUpdateFetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
-    const dashboardUpdateFetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateDashboard.update<UpdateDashboardParameters, DashboardModel>
-        : SpaceConnector.clientV2.dashboard.publicDashboard.update<UpdateDashboardParameters, DashboardModel>;
-
-    const dataTableList = await listWidgetDataTables(widget.widget_id);
-    const dataTableIndex = dataTableList.findIndex((d) => d.data_table_id === widget.data_table_id);
-    const refinedDataTables = getRefinedDataTables(dataTableList);
-    try {
-        const createdWidget = await widgetCreateFetcher({
-            dashboard_id: dashboardDetailState.dashboardId,
-            name: `Clone - ${widget.name}`,
-            widget_type: widget.widget_type,
-            size: widget.size,
-            options: widget.options,
-            description: widget.description,
-            data_tables: refinedDataTables,
-            data_table_id: dataTableIndex,
-        });
-        const completedWidget = await widgetUpdateFetcher({
-            widget_id: createdWidget.widget_id,
-            state: 'ACTIVE',
-        });
-        dashboardDetailStore.addWidgetToDashboardLayouts(completedWidget.widget_id);
-        dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets, completedWidget]);
-        await dashboardUpdateFetcher({
-            dashboard_id: dashboardDetailState.dashboardId,
-            layouts: dashboardDetailState.dashboardLayouts,
-        });
-        showSuccessMessage(i18n.t('COMMON.WIDGETS.CLONE_SUCCESS_MSG'), '');
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-const handleToggleWidgetSize = async (widget: RefinedWidgetInfo, size: WidgetSize) => {
-    const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widget.widget_id);
-    if (!_widget) return;
-    await updateWidget(widget.widget_id, size);
-    await dashboardDetailStore.listDashboardWidgets();
-};
-const handleWidgetMounted = (widgetId: string) => {
-    state.mountedWidgetMap = {
-        ...state.mountedWidgetMap,
-        [widgetId]: true,
-    };
-};
-// eslint-disable-next-line no-undef
-const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isIntersecting, target }], observer) => {
-    if (isIntersecting) {
-        if (state.isAllWidgetsMounted) {
-            state.intersectedWidgetMap[target.id] = true;
-            state.intersectedWidgetMap = { ...state.intersectedWidgetMap };
-            observer.unobserve(target);
-        }
-    }
-};
-const handleDeleteModalConfirm = async () => {
-    const _targetWidgetId = widgetDeleteState.targetWidget?.widget_id as string;
-    // 1. remove from dashboard layouts
-    await dashboardDetailStore.deleteDashboardWidget(_targetWidgetId);
-    // 2. delete widget
-    await deleteWidget(_targetWidgetId);
-    // 3. delete widget from mounted map
-    delete state.mountedWidgetMap[_targetWidgetId];
-    state.mountedWidgetMap = { ...state.mountedWidgetMap };
-    // 3. close modal
-    widgetDeleteState.visibleModal = false;
-    widgetDeleteState.targetWidget = null;
-    await dashboardDetailStore.listDashboardWidgets();
-};
-const handleClickAddWidget = () => {
-    widgetGenerateStore.setOverlayType('ADD');
-    widgetGenerateStore.setShowOverlay(true);
-};
-
 const listWidgetDataTables = async (widgetId: string) => {
     const isPrivate = widgetId.startsWith('private');
     const fetcher = isPrivate
@@ -340,6 +245,104 @@ const getRefinedDataTables = (dataTableList: DataTableModel[]) => {
 
     return results;
 };
+
+
+/* Event */
+const handleClickDeleteWidget = (widget: RefinedWidgetInfo) => {
+    widgetDeleteState.targetWidget = widget;
+    widgetDeleteState.visibleModal = true;
+};
+const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo, overlayType: WidgetOverlayType) => {
+    widgetGenerateStore.setOverlayType(overlayType);
+    widgetGenerateStore.setWidgetForm(widget);
+    widgetGenerateStore.setOverlayStep(2);
+    widgetGenerateStore.setShowOverlay(true);
+};
+const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
+    if (!dashboardDetailState.dashboardId) return;
+    const isPrivate = widget.widget_id.startsWith('private');
+    const widgetCreateFetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.create<PrivateWidgetCreateParameters, PrivateWidgetModel>
+        : SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>;
+    const widgetUpdateFetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
+        : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
+    const dashboardUpdateFetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateDashboard.update<UpdateDashboardParameters, DashboardModel>
+        : SpaceConnector.clientV2.dashboard.publicDashboard.update<UpdateDashboardParameters, DashboardModel>;
+
+    const dataTableList = await listWidgetDataTables(widget.widget_id);
+    const dataTableIndex = dataTableList.findIndex((d) => d.data_table_id === widget.data_table_id);
+    const refinedDataTables = getRefinedDataTables(dataTableList);
+    try {
+        const createdWidget = await widgetCreateFetcher({
+            dashboard_id: dashboardDetailState.dashboardId,
+            widget_type: widget.widget_type,
+            size: widget.size,
+            options: {
+                ...widget.options,
+                title: widget.options.title ? `Clone - ${widget.options.title}` : undefined,
+            },
+            description: widget.description,
+            data_tables: refinedDataTables,
+            data_table_id: dataTableIndex,
+        });
+        const completedWidget = await widgetUpdateFetcher({
+            widget_id: createdWidget.widget_id,
+            state: 'ACTIVE',
+        });
+        dashboardDetailStore.addWidgetToDashboardLayouts(completedWidget.widget_id);
+        dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets, completedWidget]);
+        await dashboardUpdateFetcher({
+            dashboard_id: dashboardDetailState.dashboardId,
+            layouts: dashboardDetailState.dashboardLayouts,
+        });
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.CLONE_SUCCESS_MSG'), '');
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+const handleToggleWidgetSize = async (widget: RefinedWidgetInfo, size: WidgetSize) => {
+    const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widget.widget_id);
+    if (!_widget) return;
+    await updateWidget(widget.widget_id, size);
+    await dashboardDetailStore.listDashboardWidgets();
+};
+const handleWidgetMounted = (widgetId: string) => {
+    state.mountedWidgetMap = {
+        ...state.mountedWidgetMap,
+        [widgetId]: true,
+    };
+};
+// eslint-disable-next-line no-undef
+const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isIntersecting, target }], observer) => {
+    if (isIntersecting) {
+        if (state.isAllWidgetsMounted) {
+            state.intersectedWidgetMap[target.id] = true;
+            state.intersectedWidgetMap = { ...state.intersectedWidgetMap };
+            observer.unobserve(target);
+        }
+    }
+};
+const handleDeleteModalConfirm = async () => {
+    const _targetWidgetId = widgetDeleteState.targetWidget?.widget_id as string;
+    // 1. remove from dashboard layouts
+    await dashboardDetailStore.deleteDashboardWidget(_targetWidgetId);
+    // 2. delete widget
+    await deleteWidget(_targetWidgetId);
+    // 3. delete widget from mounted map
+    delete state.mountedWidgetMap[_targetWidgetId];
+    state.mountedWidgetMap = { ...state.mountedWidgetMap };
+    // 3. close modal
+    widgetDeleteState.visibleModal = false;
+    widgetDeleteState.targetWidget = null;
+    await dashboardDetailStore.listDashboardWidgets();
+};
+const handleClickAddWidget = () => {
+    widgetGenerateStore.setOverlayType('ADD');
+    widgetGenerateStore.setShowOverlay(true);
+};
+
 
 /* Watcher */
 watch(() => dashboardDetailState.dashboardId, (dashboardId) => {

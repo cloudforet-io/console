@@ -224,13 +224,17 @@ watch(() => widgetGenerateState.widgetFormValueMap.title, (title) => {
         state.collapsedTitleMap[FORM_TITLE_MAP.WIDGET_HEADER] = true;
     }
 }, { immediate: true });
-watch(() => state.isWidgetTitleValid, (isValid) => {
+watch([() => state.isWidgetTitleValid, () => state.enableWidgetHeader], ([isValid, enabled]) => {
     const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
     const _valueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
     _validMap.title = isValid;
-    _valueMap.title = state.enableWidgetHeader ? _valueMap.title : undefined;
     widgetGenerateStore.setWidgetValidMap(_validMap);
-    widgetGenerateStore.setWidgetFormValueMap(_valueMap);
+    if (!enabled) {
+        widgetGenerateStore.setWidgetFormValueMap({
+            ..._valueMap,
+            title: undefined,
+        });
+    }
 }, { immediate: true });
 onMounted(() => {
     checkDefaultValidation();
