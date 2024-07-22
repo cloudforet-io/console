@@ -78,6 +78,7 @@ const preview = {
     (story, { globals: { locale } }) => {
         i18n.locale = locale;
         return {
+            components: { story },
             i18n,
             router: new VueRouter(),
             template: '<story/>',

@@ -37,7 +37,6 @@ const config: StorybookConfig = {
   },
   previewBody: (body) => {
     return `
-      ${body}
       <style>
         .sb-show-main.sb-main-centered #storybook-root {
             padding: 0;
@@ -48,7 +47,13 @@ const config: StorybookConfig = {
             align-items: center;
             flex-wrap: wrap;
         }
+
+        .docs-story div[scale="1"] {
+            transform: none;
+            width: 100%;
+        }
       </style>
+      ${body}
     `
   }
 };
