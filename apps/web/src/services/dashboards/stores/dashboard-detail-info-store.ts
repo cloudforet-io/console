@@ -205,6 +205,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setDashboardInfo = (dashboardInfo: DashboardModel|null) => {
         state.dashboardInfo = dashboardInfo;
     };
+    const setDashboardWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>) => {
+        state.dashboardWidgets = dashboardWidgets;
+    };
     const setLoadingWidgets = (loading: boolean) => {
         state.loadingWidgets = loading;
     };
@@ -451,6 +454,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariables,
         setVariablesInitMap,
         setDashboardInfo,
+        setDashboardWidgets,
         setLoadingWidgets,
         setDashboardType,
         setDashboardScope,

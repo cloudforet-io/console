@@ -1404,6 +1404,7 @@
 			"CHANGE_DATA_MODAL_DESCRIPTION": "下記に設定されたすべてのオプションがリセットされます。",
 			"CHANGE_DATA_MODAL_TITLE": "データを変更しますか？",
 			"CLONE": "複製",
+			"CLONE_SUCCESS_MSG": "",
 			"CLOUD_SERVICE": {
 				"HELP": "サービスしている主要なクラウドサービスリストを表示します",
 				"NO_DATA": "クラウドリソースがありません。",
