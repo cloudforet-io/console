@@ -125,7 +125,7 @@ const state = reactive({
         else { // None Time Series Dynamic Field Case
             state.finalConvertedData?.results?.[0]?.[state.tableDataCriteria].forEach((d) => {
                 if (d[state.tableDataField] === 'sub_total') return;
-                const fieldName = d[state.tableDataField];
+                const fieldName = `${d[state.tableDataField]}`;
                 const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
                 if (fieldName && fieldName.startsWith('comparison_')) {
                     if (state.comparisonInfo?.format && state.isComparisonEnabled && d[state.tableDataField] !== 'etc') {
@@ -413,7 +413,7 @@ watch(() => state.data, () => {
             if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
             const fieldForTotal = results?.[0]?.[state.tableDataCriteria] ?? [];
             totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
-                const fieldName = item[state.tableDataField];
+                const fieldName = `${item[state.tableDataField]}`;
                 if (fieldName.startsWith('comparison_')) {
                     const targetTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.target || 0), 0);
                     const subjectTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.subject || 0), 0);

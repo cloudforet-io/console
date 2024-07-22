@@ -226,8 +226,11 @@ watch(() => widgetGenerateState.widgetFormValueMap.title, (title) => {
 }, { immediate: true });
 watch(() => state.isWidgetTitleValid, (isValid) => {
     const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
+    const _valueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
     _validMap.title = isValid;
+    _valueMap.title = state.enableWidgetHeader ? _valueMap.title : undefined;
     widgetGenerateStore.setWidgetValidMap(_validMap);
+    widgetGenerateStore.setWidgetFormValueMap(_valueMap);
 }, { immediate: true });
 onMounted(() => {
     checkDefaultValidation();
