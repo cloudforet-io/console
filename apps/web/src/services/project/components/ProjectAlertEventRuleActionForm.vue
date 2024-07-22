@@ -186,7 +186,7 @@ const handleStopProcessingChange = (value: boolean) => {
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.PROJECT_ROUTING') }}
                 </p>
-                <p-toggle-button :value="state.proxyIsProjectRoute"
+                <p-toggle-button :value="state.proxyActions.change_project !== undefined"
                                  show-state-text
                                  position="left"
                                  @change-toggle="onToggleChange"
