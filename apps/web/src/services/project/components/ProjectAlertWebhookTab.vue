@@ -3,8 +3,7 @@ import {
     reactive, computed, onActivated, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/composables';
-
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     makeDistinctValueHandler, makeEnumValueHandler,
@@ -46,8 +45,8 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
-import ProjectAlertWebhookAddModal from '@/services/project/components/ProjectAlertWebhookAddModal.vue';
 import ProjectAlertWebhookUpdateModal from '@/services/project/components/ProjectAlertWebhookUpdateModal.vue';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
 
@@ -61,6 +60,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const route = useRoute();
+const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
 const projectDetailPageStore = useProjectDetailPageStore();
 
@@ -135,7 +135,6 @@ const state = reactive({
     }),
 });
 const formState = reactive({
-    addModalVisible: false,
     updateModalVisible: false,
     deleteModalVisible: false,
 });
@@ -210,7 +209,7 @@ const deleteWebhookConfirm = async () => {
 
 /* event */
 const onClickAdd = () => {
-    formState.addModalVisible = true;
+    router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME });
 };
 const checkModalConfirm = async () => {
     if (checkModalState.mode === WEBHOOK_STATE.ENABLED) await enableWebhook();
@@ -352,12 +351,6 @@ onActivated(() => {
                 <span class="col-failed-requests">{{ value || 0 }}</span>
             </template>
         </p-toolbox-table>
-
-        <project-alert-webhook-add-modal
-            :visible.sync="formState.addModalVisible"
-            :project-id="props.id"
-            @confirm="listWebhooks()"
-        />
         <p-table-check-modal :visible.sync="checkModalState.visible"
                              :header-title="checkModalState.title"
                              :sub-title="checkModalState.subTitle"
