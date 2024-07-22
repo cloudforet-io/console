@@ -98,7 +98,7 @@ const listEscalationPolicy = async () => {
     <p-pane-layout class="alert-detail-responder">
         <article class="responder-wrapper">
             <p-heading heading-type="sub"
-                       :title="$t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER')"
+                       :title="$t('MONITORING.ALERT.DETAIL.RESPONDER.NOTIFICATION')"
                        class="panel-title"
             >
                 <template #extra>

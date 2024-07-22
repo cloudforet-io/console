@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onActivated, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
@@ -148,9 +148,9 @@ const init = async () => {
     }
 };
 
-onActivated(() => {
+(() => {
     init();
-});
+})();
 </script>
 
 <template>
