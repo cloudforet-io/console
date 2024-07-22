@@ -48,6 +48,7 @@ export interface WidgetFrameEmit {
     (event: 'click-expand'): void;
     (event: 'click-delete'): void;
     (event: 'click-edit'): void;
+    (event: 'click-clone'): void;
     (event: 'toggle-size', size: WidgetSize): void;
 }
 

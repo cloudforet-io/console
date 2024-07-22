@@ -37,6 +37,12 @@ const state = reactive({
             label: i18n.t('COMMON.WIDGETS.EDIT'),
             icon: 'ic_edit',
         },
+        {
+            type: 'item',
+            name: 'clone',
+            label: i18n.t('COMMON.WIDGETS.CLONE'),
+            icon: 'ic_clone',
+        },
         { type: 'divider', name: '' },
         {
             type: 'item',
@@ -60,6 +66,8 @@ const handleSelectEtcMenu = (selected: MenuItem) => {
         emit('click-expand');
     } else if (selected.name === 'edit') {
         emit('click-edit');
+    } else if (selected.name === 'clone') {
+        emit('click-clone');
     } else if (selected.name === 'delete') {
         emit('click-delete');
     }

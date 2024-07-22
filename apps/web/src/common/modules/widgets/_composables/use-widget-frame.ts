@@ -210,6 +210,9 @@ export const useWidgetFrame = (
         'click-edit': () => {
             emit('click-edit');
         },
+        'click-clone': () => {
+            emit('click-clone');
+        },
         'click-delete': () => {
             emit('click-delete');
         },
