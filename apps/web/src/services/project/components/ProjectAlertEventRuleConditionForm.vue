@@ -70,14 +70,6 @@ const state = reactive({
             label: 'Title',
         },
         {
-            name: 'webhook_id',
-            label: 'Webhook ID',
-        },
-        {
-            name: 'description',
-            label: 'Description',
-        },
-        {
             name: 'rule',
             label: 'Rule',
         },

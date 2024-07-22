@@ -4365,7 +4365,7 @@
 			"PAUSE_NOTIFICATION": "通知停止",
 			"PROJECT_ROUTING": "プロジェクトルーティング",
 			"SAVE": "保存",
-			"SNOOZED_NOTIFICATIONS": "通知なし",
+			"SNOOZED_NOTIFICATIONS": "",
 			"THEN_STOP_PROCESSING": "その後、作業は停止する",
 			"THESE_THINGS": "次の作業",
 			"TITLE_INFO_MESSAGE": "イベントルールは昇順で実行されます。",

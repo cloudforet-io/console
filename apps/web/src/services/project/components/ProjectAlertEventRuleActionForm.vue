@@ -34,10 +34,12 @@ const URGENCY = Object.freeze({
 interface Props {
     actions?: EventRuleActions;
     options?: EventRuleOptions;
+    isProjectRoute?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     actions: () => ({}),
     options: () => ({}),
+    isProjectRoute: false,
 });
 const emit = defineEmits(['update:actions', 'update:options']);
 
@@ -81,6 +83,7 @@ const state = reactive({
     })),
     proxyActions: useProxyValue<EventRuleActions>('actions', props, emit),
     proxyOptions: useProxyValue<EventRuleOptions>('options', props, emit),
+    proxyIsProjectRoute: useProxyValue<EventRuleOptions>('isProjectRoute', props, emit),
     routingProjects: computed<string[]>({
         get() {
             return props.actions?.change_project ? [props.actions.change_project] : [];
@@ -151,11 +154,14 @@ const state = reactive({
 });
 
 /* event */
-const onToggleChange = (value) => {
+const onChangeCheckbox = (value: boolean) => {
     state.proxyActions = {
         ...state.proxyActions,
         no_notification: value,
     };
+};
+const onToggleChange = (value: boolean) => {
+    state.proxyIsProjectRoute = value;
 };
 const handleUpdateAdditionalInformation = (tags: Tag) => {
     state.additionalInfoTags = tags;
@@ -176,120 +182,130 @@ const handleStopProcessingChange = (value: boolean) => {
             </i18n>
         </p>
         <div class="content-wrapper">
-            <div class="form-box">
-                <p class="label">
-                    {{ $t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') }}
-                </p>
-                <p-toggle-button
-                    :value="state.proxyActions.no_notification"
-                    :show-state-text="state.proxyActions.no_notification"
-                    position="left"
-                    spacing="md"
-                    @change-toggle="onToggleChange"
-                />
-            </div>
-            <div class="form-box mobile-block">
+            <div class="form-box mobile-block project">
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.PROJECT_ROUTING') }}
+                </p>
+                <p-toggle-button :value="state.proxyIsProjectRoute"
+                                 show-state-text
+                                 position="left"
+                                 @change-toggle="onToggleChange"
+                />
+            </div>
+            <div v-if="state.proxyIsProjectRoute"
+                 class="form-box"
+            >
+                <p class="label">
+                    {{ $t('PROJECT.LANDING.PROJECT') }}
                 </p>
                 <project-select-dropdown project-selectable
                                          :project-group-selectable="false"
                                          :selected-project-ids.sync="state.routingProjects"
                 />
             </div>
-            <div class="form-box urgency">
-                <p class="label">
-                    {{ $t('PROJECT.EVENT_RULE.URGENCY') }}
-                </p>
-                <div>
-                    <p-radio v-for="(urgency, uIdx) in state.urgencyList"
-                             :key="`urgency-${uIdx}`"
-                             v-model="state.selectedUrgency"
-                             :value="urgency.name"
-                             class="mr-4"
-                    >
-                        {{ urgency.label }}
-                    </p-radio>
-                    <p-select-dropdown :selected.sync="state.selectedUrgency"
-                                       :menu="state.urgencyList"
+            <div v-else>
+                <div class="form-box">
+                    <p class="label">
+                        {{ $t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') }}
+                    </p>
+                    <p-checkbox v-model="state.proxyActions.no_notification"
+                                :value="true"
+                                @change="onChangeCheckbox"
                     />
                 </div>
-            </div>
-            <div class="form-box mobile-block">
-                <p class="label">
-                    {{ $t('PROJECT.EVENT_RULE.ASSIGNEE') }}
-                </p>
-                <p-select-dropdown class="user-search-dropdown"
-                                   show-select-marker
-                                   :menu="state.userItems"
-                                   :selected.sync="state.selectedAssignee"
-                                   is-filterable
-                                   show-delete-all-button
-                                   reset-selected-on-unmounted
-                />
-            </div>
-            <div class="form-box mobile-block">
-                <p class="label">
-                    {{ $t('PROJECT.EVENT_RULE.ESCALATION_POLICY') }}
-                </p>
-                <p-select-dropdown class="escalation-dropdown"
-                                   :menu="state.escalationPolicyList"
-                                   :selected.sync="state.selectedEscalationPolicy"
-                                   show-delete-all-button
-                                   reset-selected-on-unmounted
-                >
-                    <template #dropdown-button="item">
-                        <span v-if="state.escalationPolicyList.find((policy) => policy.name === item.name)"
-                              class="escalation-policy-menu-item"
+                <div class="form-box urgency">
+                    <p class="label">
+                        {{ $t('PROJECT.EVENT_RULE.URGENCY') }}
+                    </p>
+                    <div>
+                        <p-radio v-for="(urgency, uIdx) in state.urgencyList"
+                                 :key="`urgency-${uIdx}`"
+                                 v-model="state.selectedUrgency"
+                                 :value="urgency.name"
+                                 class="mr-4"
                         >
-                            <span class="escalation-policy-label">
-                                {{ state.escalationPolicyList.find((policy) => policy.name === item.name)?.label }}
+                            {{ urgency.label }}
+                        </p-radio>
+                        <p-select-dropdown :selected.sync="state.selectedUrgency"
+                                           :menu="state.urgencyList"
+                        />
+                    </div>
+                </div>
+                <div class="form-box mobile-block">
+                    <p class="label">
+                        {{ $t('PROJECT.EVENT_RULE.ASSIGNEE') }}
+                    </p>
+                    <p-select-dropdown class="user-search-dropdown"
+                                       show-select-marker
+                                       :menu="state.userItems"
+                                       :selected.sync="state.selectedAssignee"
+                                       is-filterable
+                                       use-fixed-menu-style
+                                       show-delete-all-button
+                    />
+                </div>
+                <div class="form-box mobile-block">
+                    <p class="label">
+                        {{ $t('PROJECT.EVENT_RULE.ESCALATION_POLICY') }}
+                    </p>
+                    <p-select-dropdown class="escalation-dropdown"
+                                       :menu="state.escalationPolicyList"
+                                       :selected.sync="state.selectedEscalationPolicy"
+                                       show-delete-all-button
+                    >
+                        <template #dropdown-button="item">
+                            <span v-if="state.escalationPolicyList.find((policy) => policy.name === item.name)"
+                                  class="escalation-policy-menu-item"
+                            >
+                                <span class="escalation-policy-label">
+                                    {{ state.escalationPolicyList.find((policy) => policy.name === item.name)?.label }}
+                                </span>
+                                <p-badge class="scope-badge"
+                                         :style-type="alertResourceGroupBadgeStyleTypeFormatter(state.escalationPolicyList.find((policy) => policy.name === item.name)?.scope)"
+                                         badge-type="subtle"
+                                >
+                                    {{ state.resourceGroups[state.escalationPolicyList.find((policy) => policy.name === item.name)?.scope] }}
+                                </p-badge>
                             </span>
-                            <p-badge class="scope-badge"
-                                     :style-type="alertResourceGroupBadgeStyleTypeFormatter(state.escalationPolicyList.find((policy) => policy.name === item.name)?.scope)"
-                                     badge-type="subtle"
+                            <span v-else
+                                  class="escalation-policy-label placeholder"
+                            >{{ $t('COMPONENT.SELECT_DROPDOWN.SELECT') }}</span>
+                        </template>
+                        <template #menu-item--format="{ item }">
+                            <p-tooltip class="escalation-policy-menu-item"
+                                       :contents="item.label"
+                                       position="bottom"
                             >
-                                {{ state.resourceGroups[state.escalationPolicyList.find((policy) => policy.name === item.name)?.scope] }}
-                            </p-badge>
-                        </span>
-                        <span v-else
-                              class="escalation-policy-label placeholder"
-                        >{{ $t('COMPONENT.SELECT_DROPDOWN.SELECT') }}</span>
-                    </template>
-                    <template #menu-item--format="{ item }">
-                        <p-tooltip class="escalation-policy-menu-item"
-                                   :contents="item.label"
-                                   position="bottom"
-                        >
-                            <span class="escalation-policy-label">{{ item.label }}</span>
-                            <p-badge class="scope-badge"
-                                     :style-type="alertResourceGroupBadgeStyleTypeFormatter(item.scope)"
-                                     badge-type="subtle"
-                            >
-                                {{ state.resourceGroups[item.scope] }}
-                            </p-badge>
-                        </p-tooltip>
-                    </template>
-                </p-select-dropdown>
-            </div>
-            <div class="form-box additional-information">
-                <tags-input-group show-header
-                                  :tags="state.additionalInfoTags"
-                                  @update-tags="handleUpdateAdditionalInformation"
-                >
-                    <template #add-button="{handleAddPair}">
-                        <div class="top-part">
-                            <p>{{ $t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') }}</p>
-                            <p-button style-type="tertiary"
-                                      icon-left="ic_plus_bold"
-                                      class="mb-2"
-                                      @click="handleAddPair($event)"
-                            >
-                                {{ $t('PROJECT.EVENT_RULE.ADD') }}
-                            </p-button>
-                        </div>
-                    </template>
-                </tags-input-group>
+                                <span class="escalation-policy-label">{{ item.label }}</span>
+                                <p-badge class="scope-badge"
+                                         :style-type="alertResourceGroupBadgeStyleTypeFormatter(item.scope)"
+                                         badge-type="subtle"
+                                >
+                                    {{ state.resourceGroups[item.scope] }}
+                                </p-badge>
+                            </p-tooltip>
+                        </template>
+                    </p-select-dropdown>
+                </div>
+                <div class="form-box additional-information">
+                    <tags-input-group show-header
+                                      :tags="state.additionalInfoTags"
+                                      @update-tags="handleUpdateAdditionalInformation"
+                    >
+                        <template #add-button="{handleAddPair}">
+                            <div class="top-part">
+                                <p>{{ $t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') }}</p>
+                                <p-button style-type="tertiary"
+                                          icon-left="ic_plus_bold"
+                                          class="mb-2"
+                                          @click="handleAddPair($event)"
+                                >
+                                    {{ $t('PROJECT.EVENT_RULE.ADD') }}
+                                </p-button>
+                            </div>
+                        </template>
+                    </tags-input-group>
+                </div>
             </div>
         </div>
         <p-checkbox :selected="state.stopProcessing"
@@ -325,6 +341,13 @@ const handleStopProcessingChange = (value: boolean) => {
         &:last-child {
             border: none;
         }
+        &.project {
+            @apply bg-gray-100 text-gray-500;
+            height: 2.875rem;
+            min-height: initial;
+            padding-top: 0.75rem;
+            padding-bottom: 0.625rem;
+        }
         &.urgency {
             .p-select-dropdown {
                 display: none;
@@ -332,7 +355,6 @@ const handleStopProcessingChange = (value: boolean) => {
         }
 
         .escalation-dropdown {
-
             .escalation-policy-menu-item {
                 @apply flex justify-between items-center gap-2;
 
@@ -340,13 +362,13 @@ const handleStopProcessingChange = (value: boolean) => {
                     white-space: normal;
                     word-break: normal;
                 }
-                .placeholder {
-                    @apply text-gray-600;
-                }
                 .scope-badge {
                     @apply flex-shrink-0;
                 }
             }
+        }
+        .placeholder {
+            @apply text-gray-600;
         }
 
         /* customize tags-input-group */

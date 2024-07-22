@@ -4365,7 +4365,7 @@
 			"PAUSE_NOTIFICATION": "Pause Notifications",
 			"PROJECT_ROUTING": "Project Routing",
 			"SAVE": "Save",
-			"SNOOZED_NOTIFICATIONS": "No Notifications",
+			"SNOOZED_NOTIFICATIONS": "Silence",
 			"THEN_STOP_PROCESSING": "Then stop processing",
 			"THESE_THINGS": "these things",
 			"TITLE_INFO_MESSAGE": "Event rules are executed in ascending order.",
