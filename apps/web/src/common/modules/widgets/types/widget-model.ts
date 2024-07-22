@@ -36,6 +36,7 @@ export interface AssetOptions {
 
 export interface CostOptions {
     data_source_id: string;
+    plugin_id?: string;
     data_key: string;
 }
 
