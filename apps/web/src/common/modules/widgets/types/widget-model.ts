@@ -9,13 +9,14 @@ export type DataTableOperator = typeof DATA_TABLE_OPERATOR[keyof typeof DATA_TAB
 export type DataTableDataType = typeof DATA_TABLE_TYPE[keyof typeof DATA_TABLE_TYPE];
 export type AdditionalLabels = Record<string, string>;
 export type DateFormat = 'SINGLE' | 'SEPARATE';
-export type TimeDiff = Record<string, any>; // years|months|days
+export type TimeDiff = Record<TimeDiffItem, any>; // years|months|days
 export type TimeSeriesAnalyzeQuery = Record<string, any>;
 export type LabelsInfo = Record<string, object>;
-export type DataInfo = Record<string, { unit: string }>;
+export type DataInfo = Record<string, { unit?: string, timediff?: Record<TimeDiffItem, number> }>;
 export type DataTableOptions = DataTableAddOptions | DataTableTransformOptions;
 export type JoinType = typeof JOIN_TYPE[keyof typeof JOIN_TYPE];
 export type WidgetState = 'CREATING' | 'INACTIVE' | 'ACTIVE';
+export type TimeDiffItem = 'years' | 'months' | 'days';
 /* ADD Data Type Options */
 export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;
