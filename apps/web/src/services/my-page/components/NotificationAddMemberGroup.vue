@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
     users: () => [],
 });
 
-const emit = defineEmits<{(e: 'change', value: any): void; }>();
+const emit = defineEmits<{(e: 'change', member: string[]): void; }>();
 
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
@@ -53,9 +53,7 @@ const state = reactive({
 });
 
 const emitChange = () => {
-    emit('change', {
-        users: state.selectedMemberItems.map((d) => d.name),
-    });
+    emit('change', state.selectedMemberItems.map((d) => d.name));
 };
 
 /* Api */

@@ -78,49 +78,38 @@ const getEventRule = async () => {
         state.conditions = res.conditions;
         state.actions = res.actions;
         state.options = res.options;
+
+        if (state.actions.change_project) {
+            state.isProjectRoute = true;
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
 const createEventRule = async () => {
-    const defaultParams = {
-        conditions: state.conditions,
-        conditions_policy: state.conditionsPolicy,
-        resource_group: 'PROJECT' as const,
-    };
-    const params = state.isProjectRoute
-        ? {
-            ...defaultParams,
+    try {
+        await SpaceConnector.clientV2.monitoring.eventRule.create<EventRuleCreateParameters>({
+            conditions: state.conditions,
+            conditions_policy: state.conditionsPolicy,
+            resource_group: 'PROJECT' as const,
             project_id: props.projectId,
-        }
-        : {
-            ...defaultParams,
             actions: state.actions,
             options: state.options,
-        };
-    try {
-        await SpaceConnector.clientV2.monitoring.eventRule.create<EventRuleCreateParameters>(params);
+        });
         showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.EVENT_RULE.ALT_E_CREATE_EVENT_RULE'));
     }
 };
 const updateEventRule = async () => {
-    const defaultParams = {
-        event_rule_id: props.eventRuleId || '',
-        conditions: state.conditions,
-        conditions_policy: state.conditionsPolicy,
-    };
-    // TODO: check project id
-    const params = state.isProjectRoute
-        ? undefined
-        : {
-            ...defaultParams,
+    try {
+        await SpaceConnector.clientV2.monitoring.eventRule.update<EventRuleUpdateParameters>({
+            event_rule_id: props.eventRuleId || '',
+            conditions: state.conditions,
+            conditions_policy: state.conditionsPolicy,
             actions: state.actions,
             options: state.options,
-        };
-    try {
-        await SpaceConnector.clientV2.monitoring.eventRule.update<EventRuleUpdateParameters>(params);
+        });
         showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.EVENT_RULE.ALT_E_UPDATE_EVENT_RULE'));

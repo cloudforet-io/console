@@ -5,7 +5,7 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PIconModal, PDefinitionTable, PButton, PLink, PStatus,
+    PIconModal, PDefinitionTable, PButton, PStatus,
 } from '@cloudforet/mirinae';
 
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
@@ -76,19 +76,20 @@ const handleCopyWebhookUrl = () => {
                   class="project-alert-webhook-created-modal"
                   @update:visible="handleCloseSucceedModal"
     >
-        <template #header-desc>
-            <i18n path="PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.DESC">
-                <template #guide>
-                    <p-link new-tab
-                            highlight
-                            action-icon="external-link"
-                            :href="state.guideDocsLink"
-                    >
-                        {{ $t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.GUIDE') }}
-                    </p-link>
-                </template>
-            </i18n>
-        </template>
+        <!-- TODO: will be updated field name -->
+        <!--        <template #header-desc>-->
+        <!--            <i18n path="PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.DESC">-->
+        <!--                <template #guide>-->
+        <!--                    <p-link new-tab-->
+        <!--                            highlight-->
+        <!--                            action-icon="external-link"-->
+        <!--                            :href="props.succeedWebhook?.plugin_info"-->
+        <!--                    >-->
+        <!--                        {{ $t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.GUIDE') }}-->
+        <!--                    </p-link>-->
+        <!--                </template>-->
+        <!--            </i18n>-->
+        <!--        </template>-->
         <template #body>
             <div class="contents">
                 <div class="table">

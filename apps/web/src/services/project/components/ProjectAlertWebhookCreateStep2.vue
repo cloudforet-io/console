@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-
-import { computed, reactive } from 'vue';
+import {
+    reactive,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -10,7 +11,6 @@ import {
 
 import type { WebhookCreateParameters } from '@/schema/monitoring/webhook/api-verbs/create';
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
-import { store } from '@/store';
 import { i18n as _i18n, i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -34,17 +34,10 @@ const route = useRoute();
 
 const emit = defineEmits<{(e: 'update:currentStep', step: number): void; }>();
 
-const storeState = reactive({
-    language: computed(() => store.state.user.language),
-});
 const state = reactive({
     loading: false,
     isSucceedMode: false,
     succeedWebhook: {} as WebhookModel,
-    guideDocsLink: computed(() => {
-        const language = storeState.language === 'ko' ? 'ko/' : '';
-        return `https://cloudforet.io/${language}docs/guides/plugins/alert-manager-webhook/`;
-    }),
 });
 
 const {
@@ -111,10 +104,12 @@ const handleClickCreate = async () => {
                     <p class="desc">
                         {{ props.selectedType.tags?.long_description || props.selectedType.tags?.description }}
                     </p>
-                    <p-link new-tab
+                    <!-- TODO: will be updated field name -->
+                    <p-link v-if="props.selectedType.tags?.url"
+                            new-tab
                             highlight
                             action-icon="external-link"
-                            :href="state.guideDocsLink"
+                            :href="props.selectedType.tags?.url"
                     >
                         {{ $t('PROJECT.DETAIL.LEARN_MORE') }}
                     </p-link>
