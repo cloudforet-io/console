@@ -27,8 +27,8 @@ const handleChangeStep = (step: number, item?: WebhookType) => {
 
 <template>
     <div class="project-alert-webhook-create-page">
-        <p-centered-layout-header :title="$t('PROJECT.DETAIL.CREATE.TITLE')"
-                                  :description="state.step === 1 && $t('PROJECT.DETAIL.CREATE.DESC')"
+        <p-centered-layout-header :title="$t('PROJECT.DETAIL.CREATE_WEBHOOK_TITLE')"
+                                  :description="state.step === 1 && $t('PROJECT.DETAIL.CREATE_WEBHOOK_DESC')"
                                   show-step
                                   :current-step="state.step"
                                   :total-steps="2"

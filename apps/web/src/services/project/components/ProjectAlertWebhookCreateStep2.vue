@@ -1,17 +1,25 @@
 <script lang="ts" setup>
 import {
-    reactive,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PFieldGroup, PLazyImg, PTextInput, PLink,
+    PButton, PFieldGroup, PLazyImg, PTextInput, PLink, PDataLoader, PJsonSchemaForm,
 } from '@cloudforet/mirinae';
+import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookCreateParameters } from '@/schema/monitoring/webhook/api-verbs/create';
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
-import { i18n as _i18n, i18n } from '@/translations';
+import type {
+    GetPluginMetadataParameters,
+    GetPluginMetadataResponse,
+} from '@/schema/plugin/plugin/api-verbs/get-plugin-metadata';
+import type { PluginGetVersionsParameters } from '@/schema/repository/plugin/api-verbs/get-versions';
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -34,10 +42,17 @@ const route = useRoute();
 
 const emit = defineEmits<{(e: 'update:currentStep', step: number): void; }>();
 
+const storeState = reactive({
+    language: computed(() => store.state.user.language),
+});
 const state = reactive({
+    pageLoading: true,
     loading: false,
     isSucceedMode: false,
     succeedWebhook: {} as WebhookModel,
+    pluginVersions: undefined as undefined|string,
+    optionsSchema: null as null|JsonSchema|object,
+    options: {} as Record<string, any>,
 });
 
 const {
@@ -64,7 +79,36 @@ const handleClickGoBack = () => {
 const convertSucceedMode = () => {
     state.isSucceedMode = true;
 };
+const handleUpdateSchemaForm = (isValid:boolean, value) => {
+    state.options = value;
+};
 
+const getVersions = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.repository.plugin.getVersions<PluginGetVersionsParameters, ListResponse<string> >({
+            plugin_id: props.selectedType?.plugin_id || '',
+        });
+        state.pluginVersions = results ? results[0] : undefined;
+    } catch (e) {
+        state.pluginVersions = undefined;
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
+    }
+};
+const getPluginMetaData = async () => {
+    state.pageLoading = true;
+    try {
+        const results = await SpaceConnector.clientV2.plugin.plugin.getPluginMetadata<GetPluginMetadataParameters, GetPluginMetadataResponse>({
+            plugin_id: props.selectedType?.plugin_id || '',
+            version: state.pluginVersions,
+        });
+        state.optionsSchema = results.metadata?.options_schema ?? {};
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.optionsSchema = {};
+    } finally {
+        state.pageLoading = false;
+    }
+};
 const handleClickCreate = async () => {
     state.loading = true;
     if (!props.selectedType) return;
@@ -73,22 +117,36 @@ const handleClickCreate = async () => {
             name: name.value,
             plugin_info: {
                 plugin_id: props.selectedType?.plugin_id,
-                options: {},
+                options: state.options,
             },
             project_id: route.params.id || '',
         });
         convertSucceedMode();
-        showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '');
+        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'));
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'));
     } finally {
         state.loading = false;
     }
 };
+
+watch(() => state.pluginVersions, (version) => {
+    if (version) {
+        getPluginMetaData();
+    }
+});
+
+onMounted(() => {
+    getVersions();
+});
 </script>
 
 <template>
-    <div class="project-alert-webhook-create-step-2">
+    <p-data-loader class="project-alert-webhook-create-step-2"
+                   :data="true"
+                   :loading="state.pageLoading"
+                   loader-backdrop-color="0"
+    >
         <div v-if="props.selectedType"
              class="webhook-item"
         >
@@ -130,6 +188,14 @@ const handleClickCreate = async () => {
                     />
                 </template>
             </p-field-group>
+            <p-json-schema-form :schema="state.optionsSchema"
+                                :form-data="state.options"
+                                :language="storeState.language"
+                                use-fixed-menu-style
+                                reset-on-schema-change
+                                uniform-width
+                                @change="handleUpdateSchemaForm"
+            />
         </div>
         <div class="buttons-wrapper">
             <p-button style-type="transparent"
@@ -145,19 +211,20 @@ const handleClickCreate = async () => {
                       :loading="state.loading"
                       @click="handleClickCreate"
             >
-                {{ $t('PROJECT.DETAIL.CREATE.TITLE') }}
+                {{ $t('PROJECT.DETAIL.CREATE_WEBHOOK_TITLE') }}
             </p-button>
         </div>
         <project-alert-webhook-created-modal v-if="state.isSucceedMode"
                                              :visible.sync="state.isSucceedMode"
                                              :succeed-webhook="state.succeedWebhook"
         />
-    </div>
+    </p-data-loader>
 </template>
 
 <style lang="postcss" scoped>
 .project-alert-webhook-create-step-2 {
     width: 25rem;
+    min-height: 22.5rem;
     .webhook-item {
         @apply flex;
         width: 100%;

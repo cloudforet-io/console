@@ -4210,6 +4210,7 @@
 			"ALT_S_UPDATE_PROJECT": "プロジェクト編集完了",
 			"ALT_S_UPDATE_PROJECT_TYPE": "プロジェクトアクセスが正常に更新されました",
 			"ALT_S_UPDATE_WEBHOOK": "ウェプフク編集成功",
+			"CLOSE": "閉じる",
 			"CREATE": "作成",
 			"CREATE_WEBHOOK_DESC": "外部監視サービスで発生したイベントを受信するプラグインを選択してください。",
 			"CREATE_WEBHOOK_TITLE": "新しいウェブフックの作成",
