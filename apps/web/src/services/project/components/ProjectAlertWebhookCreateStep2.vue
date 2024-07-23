@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PFieldGroup, PLazyImg, PTextInput, PLink, PDataLoader, PJsonSchemaForm,
+    PButton, PFieldGroup, PLazyImg, PTextInput, PLink, PDataLoader, PJsonSchemaForm, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
 
@@ -188,6 +188,16 @@ onMounted(() => {
                     />
                 </template>
             </p-field-group>
+            <p-field-group :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_VERSION')"
+                           required
+            >
+                <p-select-dropdown class="version-dropdown"
+                                   :menu="[]"
+                                   :visible-menu="false"
+                                   :placeholder="state.pluginVersions || ''"
+                                   disabled
+                />
+            </p-field-group>
             <p-json-schema-form :schema="state.optionsSchema"
                                 :form-data="state.options"
                                 :language="storeState.language"
@@ -247,6 +257,9 @@ onMounted(() => {
 
     .input-form {
         margin-top: 2rem;
+        .version-dropdown {
+            width: 100%;
+        }
     }
 
     .buttons-wrapper {
