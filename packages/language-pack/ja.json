@@ -3736,9 +3736,11 @@
 				"DETAILS": {
 					"ADDITIONAL_INFO": "追加情報",
 					"DETAILS": "詳細情報",
+					"RESOURCE": "",
 					"RESOURCE_ID": "リソースID",
 					"RESOURCE_NAME": "リソース名",
-					"RESOURCE_TYPE": "リソースタイプ"
+					"RESOURCE_TYPE": "リソースタイプ",
+					"RESPONDER": ""
 				},
 				"EDIT_MODAL_TITLE": "アラート名を修正",
 				"HEADER": {
@@ -3816,10 +3818,12 @@
 					"CURRENT": "現在",
 					"HIDE": "隠す",
 					"LEVEL": "レベル",
+					"NOTIFICATION": "",
 					"NO_RESPONDER": "応答者なし",
 					"RESPONDER": "受信先",
 					"SHOW_RESPONDERS": "受信先を見る"
 				},
+				"SIGN_IN_BUTTON": "",
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "ステータスの更新に失敗しました",
 					"ALT_S_UPDATE_STATUS": "ステータスが正常に更新されました",

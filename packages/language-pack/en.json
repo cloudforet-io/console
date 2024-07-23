@@ -3736,9 +3736,11 @@
 				"DETAILS": {
 					"ADDITIONAL_INFO": "Additional Information",
 					"DETAILS": "Details",
+					"RESOURCE": "Resource",
 					"RESOURCE_ID": "Resource ID",
 					"RESOURCE_NAME": "Resource Name",
-					"RESOURCE_TYPE": "Resource Type"
+					"RESOURCE_TYPE": "Resource Type",
+					"RESPONDER": "Responder"
 				},
 				"EDIT_MODAL_TITLE": "Edit Alert Name",
 				"HEADER": {
@@ -3816,10 +3818,12 @@
 					"CURRENT": "Current",
 					"HIDE": "hide",
 					"LEVEL": "Level",
+					"NOTIFICATION": "Notification",
 					"NO_RESPONDER": "No Responder",
 					"RESPONDER": "Responder",
 					"SHOW_RESPONDERS": "show responders"
 				},
+				"SIGN_IN_BUTTON": "Sign in to Manage Details",
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "Failed to Update Status",
 					"ALT_S_UPDATE_STATUS": "Status successfully updated ",

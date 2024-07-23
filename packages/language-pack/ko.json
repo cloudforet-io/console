@@ -3736,9 +3736,11 @@
 				"DETAILS": {
 					"ADDITIONAL_INFO": "추가 정보",
 					"DETAILS": "상세 정보",
+					"RESOURCE": "",
 					"RESOURCE_ID": "리소스 ID",
 					"RESOURCE_NAME": "리소스 이름",
-					"RESOURCE_TYPE": "리소스 타입"
+					"RESOURCE_TYPE": "리소스 타입",
+					"RESPONDER": ""
 				},
 				"EDIT_MODAL_TITLE": "얼럿 이름 수정",
 				"HEADER": {
@@ -3816,10 +3818,12 @@
 					"CURRENT": "현재",
 					"HIDE": "숨기기",
 					"LEVEL": "레벨",
+					"NOTIFICATION": "",
 					"NO_RESPONDER": "수신자 없음",
 					"RESPONDER": "수신자",
 					"SHOW_RESPONDERS": "수신자 보기"
 				},
+				"SIGN_IN_BUTTON": "",
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "상태 업데이트 실패",
 					"ALT_S_UPDATE_STATUS": "상태 업데이트 완료 ",
