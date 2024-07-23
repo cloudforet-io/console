@@ -370,8 +370,7 @@ const extraArgTypes: ArgTypes = {
                 summary: 'undefined',
             },
         },
-        control: 'number',
-        options: { min: 0 },
+        control: { type: 'number', min: 0 },
     },
     resetSelectedOnUnmounted: {
         name: 'resetSelectedOnUnmounted',
