@@ -54,7 +54,7 @@ export class SpaceRouter {
             routes,
         });
 
-        let nextPath: string;
+        let previousPath: string;
         const appContextStore = useAppContextStore(pinia);
         const userWorkspaceStore = useUserWorkspaceStore(pinia);
 
@@ -65,9 +65,9 @@ export class SpaceRouter {
                 const lastCheckedTime = LocalStorageAccessor.getItem(CHUNK_LOAD_REFRESH_STORAGE_KEY);
                 if (!lastCheckedTime) {
                     LocalStorageAccessor.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, getCurrentTime().toString());
-                    window.location.href = nextPath ?? '/';
+                    window.location.href = previousPath ?? '/';
                 } else if (getCurrentTime() - parseInt(lastCheckedTime) < 10) {
-                    window.location.href = nextPath ?? '/';
+                    window.location.href = previousPath ?? '/';
                 }
             }
         });

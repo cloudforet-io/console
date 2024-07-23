@@ -66,7 +66,7 @@ export const processTokenVerification = (to: Route, next: NavigationGuardNext, r
         }
         next({
             name: AUTH_ROUTE.SIGN_OUT._NAME,
-            query: { nextPath: to.fullPath },
+            query: { previousPath: to.fullPath },
         });
         return false;
     }

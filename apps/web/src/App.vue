@@ -69,7 +69,7 @@ const goToSignIn = async () => {
     state.isRoutingToSignIn = true;
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
-        query: { nextPath: route.fullPath },
+        query: { previousPath: route.fullPath },
     };
     store.commit('user/setCurrentGrantInfo', undefined);
     store.commit('error/setVisibleSessionExpiredError', false);
