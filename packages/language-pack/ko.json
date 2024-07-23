@@ -4210,6 +4210,7 @@
 			"ALT_S_UPDATE_PROJECT": "프로젝트 업데이트 완료",
 			"ALT_S_UPDATE_PROJECT_TYPE": "프로젝트 엑세스 방식 변경 완료",
 			"ALT_S_UPDATE_WEBHOOK": "웹훅 업데이트 완료",
+			"CLOSE": "닫기",
 			"CREATE": "생성",
 			"CREATE_WEBHOOK_DESC": "외부 모니터링 서비스에서 발생한 이벤트를 수신할 플러그인을 선택하세요.",
 			"CREATE_WEBHOOK_TITLE": "신규 웹훅 생성",

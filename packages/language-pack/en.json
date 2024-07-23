@@ -4210,6 +4210,7 @@
 			"ALT_S_UPDATE_PROJECT": "Project successfully updated ",
 			"ALT_S_UPDATE_PROJECT_TYPE": "Project Access successfully updated ",
 			"ALT_S_UPDATE_WEBHOOK": "Webhook successfully updated ",
+			"CLOSE": "Close",
 			"CREATE": "Create",
 			"CREATE_WEBHOOK_DESC": "Select a Plugin to receive events that occured in external monitoring services.",
 			"CREATE_WEBHOOK_TITLE": "Create New Webhook",
