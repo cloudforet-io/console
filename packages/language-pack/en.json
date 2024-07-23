@@ -4234,6 +4234,7 @@
 			},
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
+			"GO_TO_DASHBOARD": "Go to Dashboard",
 			"INVITE_ONLY": "Invite only",
 			"MEMBER": {
 				"ADD": "Add",

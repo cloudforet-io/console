@@ -3,24 +3,29 @@ import {
     computed, onUnmounted,
     reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { PSelectDropdown, PEmpty } from '@cloudforet/mirinae';
+import { PSelectDropdown, PEmpty, PButton } from '@cloudforet/mirinae';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/DashboardVariablesV2.vue';
 import DashboardWidgetContainerV2 from '@/services/dashboards/components/DashboardWidgetContainerV2.vue';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {
     id: string;
 }
 const props = defineProps<Props>();
+const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -32,6 +37,14 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    dashboardMenu: computed(() => [
+        {
+            name: 'Project Dashboards',
+            label: 'Project Dashboards',
+            type: 'header',
+        },
+        ...storeState.dashboardList,
+    ]),
     hasAlertConfig: false,
     dashboardVariablesLoading: false,
     currentDashboardId: undefined as string|undefined,
@@ -58,6 +71,11 @@ const handleSelectDashboard = (dashboardName: string) => {
     if (selectedDashbaord) {
         state.currentDashboardId = selectedDashbaord.dashboard_id;
     }
+};
+const handleClickGoToDashboard = () => {
+    router.push(getProperRouteLocation({
+        name: DASHBOARDS_ROUTE._NAME,
+    }));
 };
 
 /* api */
@@ -110,7 +128,7 @@ onUnmounted(() => {
                 <div class="title">
                     <p-select-dropdown style-type="tertiary-icon-button"
                                        button-icon="ic_dots-4-square"
-                                       :menu="storeState.dashboardList"
+                                       :menu="state.dashboardMenu"
                                        :selected="dashboardDetailState.name"
                                        @select="handleSelectDashboard"
                     >
@@ -146,6 +164,7 @@ onUnmounted(() => {
         >
             <p-empty image-size="sm"
                      show-image
+                     show-button
                      :title="$t('PROJECT.DETAIL.DASHBOARD.NO_DASHBOARD')"
             >
                 <template #image>
@@ -156,6 +175,14 @@ onUnmounted(() => {
                 </template>
                 <template #default>
                     {{ $t('PROJECT.DETAIL.DASHBOARD.NO_DASHBOARD_DESC') }}
+                </template>
+                <template #button>
+                    <p-button icon-left="ic_service_dashboard"
+                              style-type="substitutive"
+                              @click="handleClickGoToDashboard"
+                    >
+                        {{ $t('PROJECT.DETAIL.GO_TO_DASHBOARD') }}
+                    </p-button>
                 </template>
             </p-empty>
         </div>

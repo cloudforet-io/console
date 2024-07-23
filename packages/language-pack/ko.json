@@ -4234,6 +4234,7 @@
 			},
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
+			"GO_TO_DASHBOARD": "",
 			"INVITE_ONLY": "초대된 사용자만",
 			"MEMBER": {
 				"ADD": "추가",
