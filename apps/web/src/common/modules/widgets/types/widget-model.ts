@@ -16,7 +16,7 @@ export type DataInfo = Record<string, { unit?: string, timediff?: Record<TimeDif
 export type DataTableOptions = DataTableAddOptions | DataTableTransformOptions;
 export type JoinType = typeof JOIN_TYPE[keyof typeof JOIN_TYPE];
 export type WidgetState = 'CREATING' | 'INACTIVE' | 'ACTIVE';
-export type TimeDiffItem = 'years' | 'months' | 'days';
+export type TimeDiffItem = 'years' | 'months';
 /* ADD Data Type Options */
 export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;
