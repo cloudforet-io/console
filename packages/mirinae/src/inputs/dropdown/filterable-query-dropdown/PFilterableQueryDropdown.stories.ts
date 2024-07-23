@@ -71,6 +71,9 @@ export const Basic: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };
 
 export const MultiSelectable: Story = {
@@ -94,6 +97,9 @@ export const MultiSelectable: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };
 
 export const UseFixedMenuStyle: Story = {
@@ -122,4 +128,7 @@ export const UseFixedMenuStyle: Story = {
 
 export const Playground: Story = {
     ...Template,
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };

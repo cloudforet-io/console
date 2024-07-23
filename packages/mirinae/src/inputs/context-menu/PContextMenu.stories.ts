@@ -71,6 +71,9 @@ export const Basic: Story = {
     args: {
         menu: menuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const Loading: Story = {
@@ -84,6 +87,9 @@ export const Loading: Story = {
     args: {
         menu: menuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const NoData: Story = {
@@ -97,6 +103,9 @@ export const NoData: Story = {
     args: {
         menu: menuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 4rem;" />',
+    })],
 };
 
 export const MultiSelectableAndShowSelectMarker: Story = {
@@ -132,6 +141,9 @@ export const MultiSelectableAndShowSelectMarker: Story = {
     args: {
         menu: menuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const Title: Story = {
@@ -145,6 +157,9 @@ export const Title: Story = {
     args: {
         menu: menuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const HeaderSlot: Story = {
@@ -397,6 +412,9 @@ export const ItemsHeightFixed: Story = {
     args: {
         menu: longMenuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const HighlightTermAndItemTextListSlot: Story = {
@@ -437,6 +455,9 @@ export const HighlightTermAndItemTextListSlot: Story = {
     args: {
         menu: menuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const ShowSelectionHeader: Story = {
@@ -450,6 +471,9 @@ export const ShowSelectionHeader: Story = {
     args: {
         menu: menuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const ShowClearSelection: Story = {
@@ -463,6 +487,9 @@ export const ShowClearSelection: Story = {
     args: {
         menu: menuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const ShowMore: Story = {
@@ -516,6 +543,9 @@ export const ShowMore: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const Searchable: Story = {
@@ -560,6 +590,9 @@ export const Searchable: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const Readonly: Story = {
@@ -573,6 +606,9 @@ export const Readonly: Story = {
     args: {
         menu: menuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };
 
 export const Playground: Story = {
@@ -580,4 +616,7 @@ export const Playground: Story = {
     args: {
         menu: menuItems,
     },
+    decorators: [() => ({
+        template: '<story style="height: 18rem;" />',
+    })],
 };

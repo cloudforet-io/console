@@ -117,6 +117,9 @@ export const Basic: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };
 
 export const StyleType: Story = {
@@ -154,38 +157,9 @@ export const StyleType: Story = {
             };
         },
     }),
-};
-
-export const Size: Story = {
-    render: () => ({
-        components: { PSelectDropdown },
-        template: `
-            <table class="w-full border-separate border-spacing-1">
-                <thead>
-                    <tr>
-                        <th>md</th>
-                        <th>sm</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>
-                            <p-select-dropdown :menu="menuItems" size="md" class="my-2 mx-auto"/>
-                        </th>
-                        <th>
-                            <p-select-dropdown :menu="menuItems" size="sm" class="my-2 mx-auto"/>
-                        </th>
-                    </tr>
-                </tbody>
-            </table>
-        `,
-        setup() {
-            return {
-                menuItems,
-                styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
-            };
-        },
-    }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };
 
 export const AppearanceType: Story = {
@@ -222,6 +196,9 @@ export const AppearanceType: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const Disabled: Story = {
@@ -294,6 +271,9 @@ export const ReadOnly: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px" />',
+    })],
 };
 
 export const Invalid: Story = {
@@ -325,6 +305,9 @@ export const Invalid: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px" />',
+    })],
 };
 
 export const Placeholder: Story = {
@@ -350,6 +333,9 @@ export const Placeholder: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const SelectionLabel: Story = {
@@ -372,6 +358,9 @@ export const SelectionLabel: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const SelectionHighlight: Story = {
@@ -412,6 +401,9 @@ export const SelectionHighlight: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 500px" />',
+    })],
 };
 
 export const ShowAlertDot: Story = {
@@ -441,6 +433,9 @@ export const ShowAlertDot: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const ShowDeleteAllButton: Story = {
@@ -463,6 +458,9 @@ export const ShowDeleteAllButton: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const UseFixedMenuStyle: Story = {
@@ -532,6 +530,9 @@ export const ButtonIconType: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px" />',
+    })],
 };
 
 export const IsFixedWidth: Story = {
@@ -555,6 +556,9 @@ export const IsFixedWidth: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px" />',
+    })],
 };
 
 export const IsFilterable: Story = {
@@ -583,6 +587,9 @@ export const IsFilterable: Story = {
     args: {
         menu: getSelectDropdownMenuWithMultiTypes(),
     },
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const ShowRelatedHeadertotheSelectedZone: Story = {
@@ -608,6 +615,9 @@ export const ShowRelatedHeadertotheSelectedZone: Story = {
     args: {
         menu: getSelectDropdownMenuWithHeaderNames(),
     },
+    decorators: [() => ({
+        template: '<story style="height: 600px" />',
+    })],
 };
 
 export const UsingCustomHandlerAndLoading: Story = {
@@ -660,6 +670,9 @@ export const UsingCustomHandlerAndLoading: Story = {
     args: {
         menu: getSelectDropdownMenuWithMultiTypes(),
     },
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const ShowSelectHeader: Story = {
@@ -680,6 +693,9 @@ export const ShowSelectHeader: Story = {
     args: {
         menu: getSelectDropdownMenuWithMultiTypes(),
     },
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const ShowSelectMarker: Story = {
@@ -706,6 +722,9 @@ export const ShowSelectMarker: Story = {
     args: {
         menu: getSelectDropdownMenuWithMultiTypes(),
     },
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const MenuPosition: Story = {
@@ -738,6 +757,9 @@ export const MenuPosition: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px" />',
+    })],
 };
 
 export const DisableHandler: Story = {
@@ -758,6 +780,9 @@ export const DisableHandler: Story = {
     args: {
         menu: getSelectDropdownMenuWithMultiTypes(),
     },
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const ShowMoreAndPageSize: Story = {
@@ -803,6 +828,9 @@ export const ShowMoreAndPageSize: Story = {
     args: {
         menu: getSelectDropdownMenu(11, 22),
     },
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };
 
 export const Playground: Story = {
@@ -810,4 +838,7 @@ export const Playground: Story = {
     args: {
         menu: getSelectDropdownMenu(),
     },
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
 };

@@ -125,4 +125,7 @@ export const CopyManually: Story = {
 
 export const Playground: Story = {
     ...Template,
+    decorators: [() => ({
+        template: '<story style="height: 150px;" />',
+    })],
 };

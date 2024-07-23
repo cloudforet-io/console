@@ -82,6 +82,9 @@ export const Basic: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };
 
 export const WithSeveralKeyItemSets: Story = {
@@ -108,6 +111,9 @@ export const WithSeveralKeyItemSets: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 500px;" />',
+    })],
 };
 
 export const ValueHandler: Story = {
@@ -170,6 +176,9 @@ export const ValueHandler: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 500px;" />',
+    })],
 };
 
 export const NestedKeySearch: Story = {
@@ -233,6 +242,9 @@ export const NestedKeySearch: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };
 
 export const DataTypes: Story = {
@@ -297,6 +309,9 @@ export const DataTypes: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };
 
 export const Operators: Story = {
@@ -352,6 +367,9 @@ export const Operators: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };
 
 export const Playground: Story = {
