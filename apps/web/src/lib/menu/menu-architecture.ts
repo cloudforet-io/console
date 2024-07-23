@@ -37,7 +37,6 @@ export const MENU_LIST: Menu[] = [
         id: MENU_ID.ALERT_MANAGER,
         needPermissionByRole: true,
         subMenuList: [
-            { id: MENU_ID.ALERT_MANAGER_DASHBOARD, needPermissionByRole: true },
             { id: MENU_ID.ALERT, needPermissionByRole: true },
             { id: MENU_ID.ESCALATION_POLICY, needPermissionByRole: true },
         ],

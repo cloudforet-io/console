@@ -9,8 +9,6 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
 const AlertManagerContainer = () => import('@/services/alert-manager/AlertManagerContainer.vue');
-
-const AlertDashboardPage = () => import('@/services/alert-manager/pages/AlertDashboardPage.vue');
 const AlertMainPage = () => import('@/services/alert-manager/pages/AlertMainPage.vue');
 const EscalationPolicyPage = () => import('@/services/alert-manager/pages/EscalationPolicyPage.vue');
 const AlertDetailPage = () => import('@/services/alert-manager/pages/AlertDetailPage.vue');
@@ -25,15 +23,6 @@ const alertManagerRoutes: RouteConfig = {
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: AlertManagerContainer,
     children: [
-        {
-            path: 'dashboard',
-            name: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
-            meta: {
-                menuId: MENU_ID.ALERT_MANAGER_DASHBOARD,
-                translationId: MENU_INFO_MAP[MENU_ID.ALERT_MANAGER_DASHBOARD].translationId,
-            },
-            component: AlertDashboardPage as any,
-        },
         {
             path: 'alert',
             meta: {
@@ -67,6 +56,5 @@ const alertManagerRoutes: RouteConfig = {
             component: EscalationPolicyPage as any,
         },
     ],
-
 };
 export default alertManagerRoutes;
