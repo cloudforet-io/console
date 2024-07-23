@@ -5,7 +5,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PTextInput,
+    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
 } from '@cloudforet/mirinae';
 
 
@@ -84,6 +84,7 @@ const onUpdateConfirm = async () => {
         :visible.sync="state.proxyVisible"
         :loading="state.loading"
         size="sm"
+        class="project-alert-webhook-update-modal"
         @confirm="onUpdateConfirm"
     >
         <template #body>
@@ -101,6 +102,24 @@ const onUpdateConfirm = async () => {
                     :disabled="state.loading"
                 />
             </p-field-group>
+            <p-field-group :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_VERSION')"
+                           required
+            >
+                <p-select-dropdown class="version-dropdown"
+                                   :menu="[]"
+                                   :visible-menu="false"
+                                   :placeholder="props.selectedItem[0].plugin_info.version || ''"
+                                   disabled
+                />
+            </p-field-group>
         </template>
     </p-button-modal>
 </template>
+
+<style scoped lang="postcss">
+.project-alert-webhook-update-modal {
+    .version-dropdown {
+        width: 100%;
+    }
+}
+</style>

@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router/composables';
 import { isEmpty } from 'lodash';
 
 import {
-    PDataLoader, PHorizontalLayout, PTab, PDefinitionTable, PStatus, PHeading,
+    PDataLoader, PHorizontalLayout, PTab, PDefinitionTable, PStatus, PHeading, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
@@ -20,6 +20,7 @@ import { i18n } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -51,6 +52,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     selectedWebhookItem: computed<WebhookModel|undefined>(() => projectDetailPageGetters.selectedWebhookItem),
 });
@@ -126,7 +128,9 @@ const tableState = reactive({
         { label: 'Name', name: 'name' },
         { label: 'State', name: 'state' },
         { label: 'Version', name: 'plugin_info.version' },
+        { label: 'Webhook ID', name: 'webhook_id' },
         { label: 'Webhook URL', name: 'webhook_url' },
+        { label: 'Plugin', name: 'plugin_info.plugin_id' },
     ]),
 });
 
@@ -204,6 +208,17 @@ onUnmounted(() => {
                             v-bind="userStateFormatter(data)"
                         />
                     </template>
+                    <template #data-plugin_info.plugin_id="{value}">
+                        <div class="col-type">
+                            <p-lazy-img :src="storeState.plugins[value] ? storeState.plugins[value].icon : 'ic_webhook'"
+                                        error-icon="ic_webhook"
+                                        width="1rem"
+                                        height="1rem"
+                                        class="mr-2"
+                            />
+                            <span class="name">{{ storeState.plugins[value] ? storeState.plugins[value].label : value }}</span>
+                        </div>
+                    </template>
                 </p-definition-table>
             </p-tab>
         </div>
@@ -230,6 +245,13 @@ onUnmounted(() => {
 :deep(.p-data-loader) {
     .data-wrapper {
         overflow-y: unset;
+    }
+    .col-type {
+        display: inline-flex;
+        align-items: center;
+        .name {
+            margin-top: -0.125rem;
+        }
     }
 }
 </style>
