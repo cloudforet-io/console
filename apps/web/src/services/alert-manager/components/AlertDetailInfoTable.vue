@@ -57,6 +57,7 @@ const state = reactive({
             copyValueFormatter: () => state.data.triggered_by,
         },
         { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
+        { name: 'resources', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE'), disableCopy: true },
         { name: 'responder', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESPONDER') },
         { name: 'created_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.CREATED'), disableCopy: true },
         { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
@@ -148,6 +149,22 @@ const getEscalationPolicy = async () => {
             </template>
             <template #data-account="{ value }">
                 {{ value }}
+            </template>
+            <template #data-resources="{ value }">
+                <span v-if="value.length === 0">
+                    --
+                </span>
+                <template v-else>
+                    <p v-for="resource in value"
+                       :key="resource.resource_id"
+                       class="additional-info"
+                    >
+                        {{ resource.name }}
+                    </p>
+                </template>
+            </template>
+            <template #data-responder>
+                {{ state.data?.responder }}
             </template>
             <template #data-created_at>
                 {{ iso8601Formatter(state.data.created_at, state.timezone) }}
