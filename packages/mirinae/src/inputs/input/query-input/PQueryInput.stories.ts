@@ -82,6 +82,9 @@ export const Basic: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };
 
 export const MultiInput: Story = {
@@ -284,4 +287,7 @@ export const Size: Story = {
 
 export const Playground: Story = {
     ...Template,
+    decorators: [() => ({
+        template: '<story style="height: 300px;" />',
+    })],
 };

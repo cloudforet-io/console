@@ -96,8 +96,14 @@ export const Basic: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 500px; width: 100%;" />',
+    })],
 };
 
 export const Playground: Story = {
     ...Template,
+    decorators: [() => ({
+        template: '<story style="height: 500px; position: relative;" />',
+    })],
 };

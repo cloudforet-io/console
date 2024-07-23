@@ -70,6 +70,9 @@ export const Sizes: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 150px;" />',
+    })],
 };
 
 export const WithIcon: Story = {
@@ -98,6 +101,9 @@ export const WithIcon: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 150px;" />',
+    })],
 };
 
 export const StyleTypes: Story = {
@@ -130,6 +136,9 @@ export const StyleTypes: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 250px;" />',
+    })],
 };
 
 export const Disabled: Story = {
@@ -163,6 +172,9 @@ export const Disabled: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 150px;" />',
+    })],
 };
 
 export const Loading: Story = {
@@ -189,6 +201,9 @@ export const Loading: Story = {
             </div>
         `,
     }),
+    decorators: [() => ({
+        template: '<story style="height: 150px;" />',
+    })],
 };
 
 export const Block: Story = {
@@ -219,6 +234,9 @@ export const Block: Story = {
             </div>
         `,
     }),
+    decorators: [() => ({
+        template: '<story style="height: 200px;" />',
+    })],
 };
 
 export const Readonly: Story = {
@@ -242,8 +260,14 @@ export const Readonly: Story = {
             </div>
         `,
     }),
+    decorators: [() => ({
+        template: '<story style="height: 150px;" />',
+    })],
 };
 
 export const Playground: Story = {
     ...Template,
+    decorators: [() => ({
+        template: '<story style="height: 150px;" />',
+    })],
 };

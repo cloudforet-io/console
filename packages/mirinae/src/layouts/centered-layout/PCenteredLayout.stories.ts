@@ -67,6 +67,9 @@ export const Basic: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 500px;" />',
+    })],
 };
 
 export const WithTopContentsSlot: Story = {
@@ -87,8 +90,14 @@ export const WithTopContentsSlot: Story = {
             </div>
         `,
     }),
+    decorators: [() => ({
+        template: '<story style="height: 500px;" />',
+    })],
 };
 
 export const Playground: Story = {
     ...Template,
+    decorators: [() => ({
+        template: '<story style="height: 500px;" />',
+    })],
 };

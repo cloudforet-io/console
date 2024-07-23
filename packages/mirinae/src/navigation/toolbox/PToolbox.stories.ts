@@ -114,6 +114,9 @@ export const FullCase: Story = {
             </p-toolbox>
         `,
     }),
+    decorators: [() => ({
+        template: '<story style="height: 150px;" />',
+    })],
 };
 
 export const QuerySearch: Story = {
@@ -145,6 +148,9 @@ export const QuerySearch: Story = {
             };
         },
     }),
+    decorators: [() => ({
+        template: '<story style="height: 200px;" />',
+    })],
 };
 
 export const LeftAreaSlot: Story = {
