@@ -165,8 +165,7 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
                 summary: 0,
             },
         },
-        control: 'number',
-        options: { min: 0 },
+        control: { type: 'number', min: 0 },
     },
     timezone: {
         name: 'timezone',

@@ -336,8 +336,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: 'undefined',
                 },
             },
-            control: 'number',
-            options: { min: 0 },
+            control: { type: 'number', min: 0 },
         },
         // attrs
         inputAttrs: {
