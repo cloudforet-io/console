@@ -1927,10 +1927,10 @@
 			"SAVE": "保存"
 		},
 		"LNB": {
-			"DEPRECATED": "",
+			"DEPRECATED": "サポート終了",
 			"ONLY_FAVORITE": "お気に入りだけを表示する",
-			"PRIVATE": "",
-			"SHARED": ""
+			"PRIVATE": "非公開",
+			"SHARED": "共有"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
