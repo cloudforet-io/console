@@ -178,13 +178,13 @@ const isSortable = (field: TableWidgetField) => {
     return !isDynamicDataField && !isStaticSubTotal;
 };
 
-const getTimeDiffSubText = (field: TableWidgetField): string => {
-    if (!props.dataInfo?.[field.name]) return '';
-    const { timediff } = props.dataInfo[field.name];
-    if (!timediff || !Object.entries(timediff ?? {}).length) return '';
-    const [key, value] = Object.entries(timediff)[0];
-    return `( ${value} ${key} )`;
-};
+// const getTimeDiffSubText = (field: TableWidgetField): string => {
+//     if (!props.dataInfo?.[field.name]) return '';
+//     const { timediff } = props.dataInfo[field.name];
+//     if (!timediff || !Object.entries(timediff ?? {}).length) return '';
+//     const [key, value] = Object.entries(timediff)[0];
+//     return `( ${value} ${key} )`;
+// };
 
 </script>
 
@@ -212,7 +212,7 @@ const getTimeDiffSubText = (field: TableWidgetField): string => {
                         >
                             <span class="th-text">
                                 {{ field.fieldInfo?.additionalType === 'comparison' ? 'Δ' : "" }}{{ getField(field) }}
-                                <span class="timediff-sub-text">{{ getTimeDiffSubText(field) }}</span>
+                                <!--                                <span class="timediff-sub-text">{{ getTimeDiffSubText(field) }}</span>-->
                             </span>
                             <p-tooltip v-if="field.fieldInfo?.additionalType === 'comparison'"
                                        class="comparison-info"
