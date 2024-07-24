@@ -84,10 +84,8 @@ export const WithLanguage: Story = {
     ...Template,
     argTypes: {
         language: {
-            control: {
-                type: 'select',
-                options: ['en', 'ko', 'ch'],
-            },
+            control: 'select',
+            options: ['en', 'ko', 'ch'],
         },
     },
     args: {
