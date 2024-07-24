@@ -27,7 +27,6 @@ import NotificationAddLevel from '@/services/my-page/components/NotificationAddL
 import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
 import type { NotificationAddFormDataPayload } from '@/services/my-page/types/notification-add-form-type';
 
-
 const SPACEONE_USER_CHANNEL_TYPE = 'SpaceONE User' as const;
 const allReferenceStore = useAllReferenceStore();
 const PROTOCOL_TYPE = {
@@ -72,7 +71,7 @@ const state = reactive({
     isInputNotEmpty: computed<boolean>(() => state.channelName !== undefined && Object.keys(state.schemaForm).length !== 0),
     isInputValid: computed<boolean>(() => state.isInputNotEmpty && (state.isSchemaFormValid && !state.isNameInvalid)),
     isDataValid: computed<boolean>(() => (!state.isJsonSchema && !state.isNameInvalid) || (state.isJsonSchema && state.isInputValid)),
-    selectedMember: [] as string[],
+    selectedMember: ['*'] as string[],
     radioMenuList: computed<MenuItem[]>(() => [
         {
             label: i18n.t('PROJECT.DETAIL.NOTIFICATION_ALL_USERS'),
@@ -101,7 +100,6 @@ const getSchema = async (): Promise<JsonSchema|null> => {
 };
 
 const emitChange = () => {
-    // TODO: check users value when radio button is changed
     emit('change', {
         channelName: state.channelName,
         data: (props.protocolType === PROTOCOL_TYPE.EXTERNAL)
@@ -142,7 +140,7 @@ const initStates = () => {
     state.notificationLevel = 'LV1';
     state.schemaForm = {};
     state.isSchemaFormValid = false;
-    state.selectedMember = [];
+    state.selectedMember = ['*'];
     state.schema = null;
 };
 
@@ -184,7 +182,7 @@ watch([() => props.protocolId, () => props.protocolType], async ([protocolId, pr
                             @change="handleSchemaFormChange"
         />
         <div v-if="props.projectId && state.protocol?.name === SPACEONE_USER_CHANNEL_TYPE && props.protocolType === PROTOCOL_TYPE.INTERNAL">
-            <p-field-group :label="$t('MENU.ADMINISTRATION_USER')"
+            <p-field-group :label="$t('IAM.USER.FORM.MEMBER')"
                            required
             >
                 <template #default>

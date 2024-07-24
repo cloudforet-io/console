@@ -2582,6 +2582,8 @@
 				"ALT_S_DISABLE_USER_CHANNEL": "ユーザーのチャンネルの無効化に成功",
 				"ALT_S_ENABLE_PROJECT_CHANNEL": "プロジェクトチャンネルの有効化に成功",
 				"ALT_S_ENABLE_USER_CHANNEL": "ユーザーのチャンネルの有効化に成功",
+				"ASSOCIATED_MEMBER": "関連メンバー",
+				"ASSOCIATED_MEMBER_DESC": "ワークスペースメンバーの個人通知チャネルに転送します。",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "スラックトークンは編集できません。",
 				"CANNOT_EDIT_TOKEN": "トークンを編集することができません。",
