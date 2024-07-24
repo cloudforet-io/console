@@ -251,15 +251,6 @@ onActivated(async () => {
                         </router-link>
                     </ul>
                 </div>
-                <p v-if="projectId"
-                   class="spaceone-desc"
-                >
-                    <p-i name="ic_users"
-                         width="1.125rem"
-                         class="mr-2"
-                    />
-                    <b>SpaceOne User:</b> {{ $t('MY_PAGE.NOTIFICATION.SPACEONE_USER_DESC') }}
-                </p>
                 <template #no-data>
                     <p-empty class="empty-msg protocol">
                         {{ $t('MY_PAGE.NOTIFICATION.NO_PROTOCOL') }}
@@ -315,15 +306,6 @@ onActivated(async () => {
     .data-wrapper {
         overflow-y: hidden;
     }
-}
-.spaceone-desc {
-    @apply bg-gray-100 text-gray-700;
-    min-height: 2.125rem;
-    width: 100%;
-    margin-top: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    line-height: 150%;
-    font-size: 0.75rem;
 }
 .channel-list-wrapper {
     display: grid;
