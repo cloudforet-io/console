@@ -25,7 +25,6 @@ import { store } from '@/store';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
-import config from '@/lib/config';
 import getRandomId from '@/lib/random-id-generator';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -130,9 +129,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         isSharedDashboard: computed<boolean>(() => state.dashboardInfo?.workspace_id === '*'),
         disableManageButtons: computed<boolean>(() => {
             if (state.projectId) return true;
-            const editableDomains = config.get('DASHBOARD_EDITABLE_DOMAINS');
-            if (!storeState.isAdminMode && getters.isSharedDashboard) return true;
-            return !editableDomains?.includes(storeState.domainId);
+            return !storeState.isAdminMode && getters.isSharedDashboard;
         }),
         refinedVariablesSchema: computed<DashboardVariablesSchema>(() => {
             const _storedVariablesSchema = cloneDeep(state.variablesSchema);

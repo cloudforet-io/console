@@ -108,7 +108,7 @@ const state = reactive({
     })),
 });
 
-const getLineByData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => {
+const getGroupByData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => {
     const _seriesData: any[] = [];
     const _orderedData = orderBy(rawData?.results || [], '_total_count', 'desc');
     let _etcValueList: number[] = [];
@@ -157,7 +157,7 @@ const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
     if (isEmpty(rawData)) return;
 
     if (metricExplorerPageState.selectedChartGroupBy) {
-        state.chartData = getLineByData(rawData);
+        state.chartData = getGroupByData(rawData);
     } else {
         state.chartData = getTotalData(rawData);
     }

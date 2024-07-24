@@ -68,7 +68,7 @@ const state = reactive({
         if (state.isSharedDashboard) {
             if (storeState.isAdminMode) {
                 if (state.sharedScope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
-                return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_WORKSPACES');
+                return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
             }
             if (state.sharedScope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
