@@ -93,55 +93,35 @@ const PlaygroundTemplate: Story = {
 
 export const Basic: Story = {
     ...Template,
-    argTypes: {
-        contents: {
-            defaultValue: '',
-        },
-        sidebarContents: {
-            defaultValue: '',
-        },
+    args: {
+        contents: '',
+        sidebarContents: '',
     },
 };
 
 export const LongContents: Story = {
     ...Template,
-    argTypes: {
-        contents: {
-            defaultValue: faker.lorem.lines(100),
-        },
-        sidebarContents: {
-            defaultValue: faker.lorem.lines(50),
-        },
+    args: {
+        contents: faker.lorem.lines(100),
+        sidebarContents: faker.lorem.lines(50),
     },
 };
 
 export const LongTitle: Story = {
     ...Template,
-    argTypes: {
-        contents: {
-            defaultValue: '',
-        },
-        sidebarContents: {
-            defaultValue: faker.lorem.lines(50),
-        },
-    },
     args: {
         title: faker.lorem.lines(2),
+        contents: '',
+        sidebarContents: faker.lorem.lines(50),
     },
 };
 
 export const NoTitle: Story = {
     ...Template,
-    argTypes: {
-        contents: {
-            defaultValue: '',
-        },
-        sidebarContents: {
-            defaultValue: faker.lorem.lines(50),
-        },
-    },
     args: {
         title: undefined,
+        contents: '',
+        sidebarContents: faker.lorem.lines(50),
     },
 };
 
@@ -165,13 +145,9 @@ export const CustomTitle: Story = {
             <!--<div>-->
         `,
     }),
-    argTypes: {
-        contents: {
-            defaultValue: '',
-        },
-        sidebarContents: {
-            defaultValue: '',
-        },
+    args: {
+        contents: '',
+        sidebarContents: '',
     },
 };
 
@@ -194,13 +170,9 @@ export const SecondaryStyleType: Story = {
             <!--<div>-->
         `,
     }),
-    argTypes: {
-        contents: {
-            defaultValue: '',
-        },
-        sidebarContents: {
-            defaultValue: 'Style Type - Secondary',
-        },
+    args: {
+        contents: '',
+        sidebarContents: 'Style Type - Secondary',
     },
 };
 
@@ -223,13 +195,9 @@ export const HideCloseButton: Story = {
             <!--<div>-->
         `,
     }),
-    argTypes: {
-        contents: {
-            defaultValue: '',
-        },
-        sidebarContents: {
-            defaultValue: 'Style Type - Secondary',
-        },
+    args: {
+        contents: '',
+        sidebarContents: 'Style Type - Secondary',
     },
 };
 

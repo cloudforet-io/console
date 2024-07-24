@@ -54,10 +54,7 @@ export const Playground: Story = {
         data: {
             name: 'data',
             type: { name: 'string' },
-            defaultValue: '',
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
     },
 };
