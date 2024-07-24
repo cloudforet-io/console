@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { cloneDeep } from 'lodash';
 
 import {
-    PBadge, PButton, PI, PJsonSchemaForm,
+    PBadge, PButton, PI, PJsonSchemaForm, PRadio, PRadioGroup,
 } from '@cloudforet/mirinae';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -15,6 +15,7 @@ import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+import { RadioMenuList } from '@/services/project/constants/project-notification-constant';
 
 const props = withDefaults(defineProps<{
     channelData: NotiChannelItem;
@@ -50,11 +51,13 @@ const state = reactive({
     schema: props.channelData.schema,
     isSecretData: computed<boolean>(() => !!props.channelData.secret_id),
     isSpaceOneUserProtocol: computed<boolean>(() => state.keyListForEdit.includes('users')),
+    isAllUsers: computed<boolean>(() => props.channelData.data.users.some((i) => i === '*')),
     //
     isSchemaDataValid: false,
     isJsonSchema: computed(() => Object.keys(state.schema).length !== 0),
     isInputValid: computed(() => state.isSchemaDataValid),
     isDataValid: computed(() => state.isJsonSchema && state.isInputValid),
+    selectedRadioIdx: 0,
 });
 
 const setKeyListForEdit = () => {
@@ -89,12 +92,23 @@ const onClickSave = async () => {
 
 const onChangeUser = (value: Record<string, any>) => {
     if (!notificationItemState.dataForEdit) return;
-    notificationItemState.dataForEdit.users = value.users;
+    if (state.selectedRadioIdx === 1) {
+        notificationItemState.dataForEdit.users = value;
+    } else {
+        notificationItemState.dataForEdit.users = ['*'];
+    }
 };
 
 const handleSchemaValidate = (isValid: boolean) => {
     state.isSchemaDataValid = isValid;
 };
+
+watch(() => notificationItemState.isEditMode, (mode) => {
+    if (!mode) return;
+    if (!state.isAllUsers) {
+        state.selectedRadioIdx = 1;
+    }
+});
 
 (async () => {
     await Promise.allSettled([setKeyListForEdit(), setKeyListForRead(), setValueList()]);
@@ -133,7 +147,20 @@ const handleSchemaValidate = (isValid: boolean) => {
         >
             <div class="left-section">
                 <p v-if="state.isSpaceOneUserProtocol">
-                    <notification-add-member-group :users="props.channelData.data.users"
+                    <p-radio-group>
+                        <p-radio v-for="(item, idx) in RadioMenuList"
+                                 :key="idx"
+                                 v-model="state.selectedRadioIdx"
+                                 :value="idx"
+                                 @change="onChangeUser"
+                        >
+                            <span class="radio-item">
+                                {{ item.label }}
+                            </span>
+                        </p-radio>
+                    </p-radio-group>
+                    <notification-add-member-group v-if="state.selectedRadioIdx === 1"
+                                                   :users="state.isAllUsers ? [] : props.channelData.data.users"
                                                    :project-id="props.projectId"
                                                    @change="onChangeUser"
                     />
@@ -223,14 +250,26 @@ const handleSchemaValidate = (isValid: boolean) => {
 
 <style lang="postcss" scoped>
 @import '../styles/NotificationChannelItem.pcss';
-.content-wrapper .edit-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    &.edit-disable {
-        @apply text-gray-300 cursor-not-allowed;
-        &:active {
-            @apply pointer-events-none;
+.content-wrapper {
+    .edit-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        &.edit-disable {
+            @apply text-gray-300 cursor-not-allowed;
+            &:active {
+                @apply pointer-events-none;
+            }
+        }
+    }
+
+    /* custom design-system component - p-radio */
+    :deep(.p-radio) {
+        @apply inline-flex items-center;
+        .radio-item {
+            @apply flex items-center;
+            margin-left: 0.25rem;
+            gap: 0.25rem;
         }
     }
 }

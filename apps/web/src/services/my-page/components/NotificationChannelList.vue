@@ -35,10 +35,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
-import type { UserNotificationAddPageUrlQuery } from '@/services/my-page/types/user-notification-add-page-url-query-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-import type { ProjectNotificationAddPageUrlQuery } from '@/services/project/types/project-notification-add-page-url-query-type';
-
 
 interface EnrichedProtocolItem extends ProtocolModel {
     label: TranslateResult;
@@ -46,6 +43,7 @@ interface EnrichedProtocolItem extends ProtocolModel {
     protocolType: string;
     tags: Tags;
     icon: any;
+    id: string;
 }
 const allReferenceStore = useAllReferenceStore();
 
@@ -63,30 +61,35 @@ const state = reactive({
     userId: computed<string>(() => (route.params.userId ? decodeURIComponent(route.params.userId) : store.state.user.userId)),
     channelList: [] as NotiChannelItem[],
     protocolResp: [] as ProtocolModel[],
-    protocolList: computed<EnrichedProtocolItem[]>(() => state.protocolResp.map((d) => {
-        const query: ProjectNotificationAddPageUrlQuery|UserNotificationAddPageUrlQuery = {
-            protocolLabel: d.name,
-            protocolType: d.protocol_type,
-        };
-        return {
-            label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name }),
-            link: {
-                name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
-                params: {
-                    protocolId: d.protocol_id,
-                },
-                query,
-            },
-            protocolType: d.protocol_type,
-            tags: d.tags,
-            plugin_info: d.plugin_info,
-            icon: state.plugins[d.plugin_info?.plugin_id]?.icon || '',
-            name: d.name,
-        };
-    })),
+    defaultProtocolResp: computed<ProtocolModel[]>(() => state.protocolResp.filter((d) => d.protocol_type !== 'INTERNAL')),
+    associatedMemberProtocol: computed<EnrichedProtocolItem>(() => (
+        state.protocolResp.filter((d) => d.protocol_type === 'INTERNAL').map((d) => createProtocolItem(d))
+    )),
+    protocolList: computed<EnrichedProtocolItem[]>(() => (
+        state.defaultProtocolResp.map((d) => createProtocolItem(d))
+    )),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
 });
 
+const createProtocolItem = (d) => {
+    const query = {
+        protocolLabel: d.name,
+        protocolType: d.protocol_type,
+    };
+    return {
+        label: d.protocol_type === 'INTERNAL' ? i18n.t('IAM.USER.NOTIFICATION.ASSOCIATED_MEMBER') : i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name }),
+        link: {
+            name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
+            params: { protocolId: d.protocol_id },
+            query,
+        },
+        protocolType: d.protocol_type,
+        tags: d.tags,
+        plugin_info: d.plugin_info,
+        icon: state.plugins[d.plugin_info?.plugin_id]?.icon || '',
+        name: d.name,
+    };
+};
 
 const apiQuery = new ApiQueryHelper();
 const listProtocol = async () => {
@@ -198,28 +201,51 @@ onActivated(async () => {
                         :class="{disabled: props.manageDisabled}"
                     >
                         <router-link :to="item.link">
-                            <li class="channel-item">
-                                <p-lazy-img v-if="item.protocolType === 'INTERNAL'"
-                                            :src="assetUrlConverter('https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg')"
+                            <li class="channel-item"
+                                :class="{disabled: props.manageDisabled}"
+                            >
+                                <p-lazy-img :src="assetUrlConverter(item.icon)"
                                             width="2.25rem"
                                             height="2.25rem"
                                             class="service-img"
                                 />
-                                <p-lazy-img v-else
-                                            :src="assetUrlConverter(item.icon)"
-                                            width="2.25rem"
-                                            height="2.25rem"
-                                            class="service-img"
-                                />
-                                <span class="text"
-                                      :class="{disabled: props.manageDisabled}"
-                                >
+                                <span class="text">
                                     <p-i name="ic_plus_bold"
                                          width="1rem"
                                          height="1rem"
                                          color="inherit transparent"
                                     />
                                     {{ item.label }}
+                                </span>
+                            </li>
+                        </router-link>
+                    </ul>
+                </div>
+                <div class="associated-member-item-wrapper">
+                    <ul v-for="item in state.associatedMemberProtocol"
+                        :key="item.protocol_id"
+                        class="associated-member-item"
+                        :class="{disabled: props.manageDisabled}"
+                    >
+                        <router-link :to="item.link">
+                            <li class="channel-item"
+                                :class="{disabled: props.manageDisabled}"
+                            >
+                                <p-lazy-img :src="assetUrlConverter('https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg')"
+                                            width="2.25rem"
+                                            height="2.25rem"
+                                            class="service-img"
+                                />
+                                <span class="text">
+                                    <p-i name="ic_plus_bold"
+                                         width="1rem"
+                                         height="1rem"
+                                         color="inherit transparent"
+                                    />
+                                    {{ item.label }}
+                                </span>
+                                <span class="description">
+                                    {{ $t('IAM.USER.NOTIFICATION.ASSOCIATED_MEMBER_DESC') }}
                                 </span>
                             </li>
                         </router-link>
@@ -308,6 +334,15 @@ onActivated(async () => {
     gap: 0.5rem;
     overflow-y: hidden;
 }
+.associated-member-item-wrapper {
+    @apply bg-gray-100;
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    .associated-member-item {
+        @apply bg-white;
+    }
+}
 .channel-item-wrapper {
     &.hide {
         display: none;
@@ -325,13 +360,18 @@ onActivated(async () => {
     align-items: center;
     height: 8.625rem;
     min-height: 8.625rem;
+    &.disabled {
+        .text, .description {
+            @apply text-gray-300;
+        }
+    }
     .text {
         @apply text-primaryDark font-bold;
         text-align: center;
         line-height: 160%;
-        &.disabled {
-            @apply text-gray-300;
-        }
+    }
+    .description {
+        @apply text-violet-800 text-label-sm text-center;
     }
     .item-desc {
         @apply text-violet-800;
