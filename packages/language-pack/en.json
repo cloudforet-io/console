@@ -2292,7 +2292,7 @@
 			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "Enable Anomaly Detection Configuration",
 			"APPEARANCE": "Appearance",
 			"AUTO_DORMANCY_CONFIGURATION": "Dormancy Configuration",
-			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "Send notification emails whenever the threshold falls below.",
+			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "Send email notifications",
 			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "Cost Report",
 			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD": "Cost Threshold",
 			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD_DESC": "Set up a currency in the cost report",
