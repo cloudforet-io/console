@@ -10,6 +10,7 @@ export const getEmptyArgs = (): Args => ({
     showButton: false,
     buttonStyleType: BUTTON_STYLE.substitutive,
     buttonTitle: 'Button',
+    defaultSlot: 'No Data',
 });
 
 export const getEmptyParameters = (): Parameters => ({
