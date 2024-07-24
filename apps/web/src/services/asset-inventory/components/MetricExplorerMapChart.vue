@@ -74,8 +74,8 @@ const state = reactive({
     })),
 });
 
-const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
-    if (isEmpty(rawData)) return;
+/* Util */
+const getGroupByData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => {
     const _sortedData = orderBy(rawData.results, '_total_count', 'desc');
     const _slicedData = _sortedData.slice(0, LIMIT);
     const _etcValue = _sortedData.slice(LIMIT).reduce((acc, v) => acc + v.count, 0);
@@ -86,10 +86,23 @@ const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
     const _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
 
     // get chart data
-    state.chartData = _refinedData?.map((v) => ({
+    return _refinedData?.map((v) => ({
         name: getReferenceLabel(storeState.allReferenceTypeInfo, state.parsedGroupBy, v[state.parsedGroupBy]),
         value: v.count,
     })) || [];
+};
+const getTotalData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => [{
+    name: 'Total',
+    value: rawData.results?.[0]?.count || 0,
+}];
+const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
+    if (isEmpty(rawData)) return;
+
+    if (metricExplorerPageState.selectedChartGroupBy) {
+        state.chartData = getGroupByData(rawData);
+    } else {
+        state.chartData = getTotalData(rawData);
+    }
 
     state.chart = init(chartContext.value);
     state.chart.setOption(state.chartOptions, true);
