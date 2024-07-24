@@ -228,6 +228,7 @@ watch([() => state.isWidgetTitleValid, () => state.enableWidgetHeader], ([isVali
     const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
     const _valueMap = cloneDeep(widgetGenerateState.widgetFormValueMap);
     _validMap.title = isValid;
+    _validMap.description = true;
     widgetGenerateStore.setWidgetValidMap(_validMap);
     if (!enabled) {
         widgetGenerateStore.setWidgetFormValueMap({
