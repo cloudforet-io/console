@@ -77,8 +77,8 @@ const state = reactive({
         series: [
             {
                 type: 'pie',
-                radius: ['70%', '90%'],
-                center: ['40%', '50%'],
+                radius: ['60%', '80%'],
+                center: ['40%', '45%'],
                 data: state.chartData,
                 emphasis: {
                     itemStyle: {
@@ -96,9 +96,8 @@ const state = reactive({
     })),
 });
 
-const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
-    if (isEmpty(rawData)) return;
-
+/* Util */
+const getGroupByData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => {
     const _orderedData = orderBy(rawData.results || [], '_total_count', 'desc');
     const _slicedData = _orderedData.slice(0, LIMIT);
     const _etcData = _orderedData.slice(LIMIT).reduce((acc, cur) => {
@@ -107,10 +106,23 @@ const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
         return acc;
     }, {} as Record<string, string|number>);
     const _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
-    state.chartData = _refinedData?.map((v) => ({
+    return _refinedData?.map((v) => ({
         name: v[state.parsedGroupBy] || '--',
         value: v?.count || 0,
     })) || [];
+};
+const getTotalData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => [{
+    name: 'Total',
+    value: rawData.results?.[0]?.count || 0,
+}];
+const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
+    if (isEmpty(rawData)) return;
+
+    if (metricExplorerPageState.selectedChartGroupBy) {
+        state.chartData = getGroupByData(rawData);
+    } else {
+        state.chartData = getTotalData(rawData);
+    }
 
     // init legend
     const _legend: Record<string, boolean> = {};
