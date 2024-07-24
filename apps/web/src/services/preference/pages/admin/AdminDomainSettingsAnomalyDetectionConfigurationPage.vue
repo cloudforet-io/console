@@ -29,6 +29,7 @@ import type {
 } from '@/services/cost-explorer/types/anomaly-detection-type';
 
 const CONFIG_NAME = 'anomaly_detection_configuration';
+const ALL_VALUE: NotificationVariation[] = ['gte', 'lte'];
 
 const state = reactive<{
     statusToggle: boolean;
@@ -39,13 +40,13 @@ const state = reactive<{
     recipients: boolean;
         }>({
             statusToggle: false,
-            notificationRules: [{ variation: ['gte', 'lte'] }],
+            notificationRules: [{ variation: ALL_VALUE }],
             unitMenu: computed(() => [
                 { label: 'Percentage (%)', name: 'PERCENTAGE' },
-                { label: 'Fixed Amount', name: 'CURRENCY' },
+                { label: 'Fixed Amount', name: 'FIXED_AMOUNT' },
             ]),
             variationMenu: computed(() => [
-                { label: 'All', name: JSON.stringify(['gte', 'lte']) },
+                { label: 'All', name: 'all' },
                 { label: 'Increase (>=)', name: JSON.stringify(['gte']) },
                 { label: 'Decrease (<=)', name: JSON.stringify(['lte']) },
             ]),
@@ -58,12 +59,12 @@ const state = reactive<{
             recipients: false,
         });
 
-const handleUpdateNotificationRules = (key: keyof NotificationRule, value: NotificationRule[keyof NotificationRule], index: number) => {
+const handleUpdateNotificationRules = (key: keyof NotificationRule, value: NotificationRule[keyof NotificationRule]|'all', index: number) => {
     const clonedNotificationRules = cloneDeep(state.notificationRules);
     if (key === 'variation') {
         clonedNotificationRules[index] = {
             ...clonedNotificationRules[index],
-            variation: JSON.parse(value as string),
+            variation: value === 'all' ? ALL_VALUE : JSON.parse(value as string),
         };
     } else {
         clonedNotificationRules[index] = {
@@ -75,7 +76,7 @@ const handleUpdateNotificationRules = (key: keyof NotificationRule, value: Notif
 };
 
 const handleAddNotificationRule = () => {
-    state.notificationRules = cloneDeep(state.notificationRules).concat({ variation: ['gte', 'lte'] });
+    state.notificationRules = cloneDeep(state.notificationRules).concat({ variation: ALL_VALUE });
 };
 
 const handleDeleteRule = (index:number) => {
@@ -145,6 +146,9 @@ onMounted(async () => {
             variation: rule.variations,
             notifyLevel: rule.severity,
         }));
+        if (!state.notificationRules.length) {
+            state.notificationRules = [{ variation: ALL_VALUE }];
+        }
         state.recipients = savedConfig.recipients?.role_type.includes('WORKSPACE_OWNER') ?? false;
     }
 });
@@ -199,7 +203,7 @@ onMounted(async () => {
                                                use-fixed-menu-style
                                                @select="handleUpdateNotificationRules('unit', $event, index)"
                             />
-                            <p-select-dropdown :selected="JSON.stringify(rule.variation)"
+                            <p-select-dropdown :selected="rule.variation.length === 2 ? 'all': JSON.stringify(rule.variation)"
                                                :menu="state.variationMenu"
                                                block
                                                use-fixed-menu-style

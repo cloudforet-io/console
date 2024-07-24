@@ -56,7 +56,7 @@ const storeState = reactive({
 const state = reactive({
     proxyLegend: useProxyValue('legend', props, emit),
     chart: null as EChartsType | null,
-    xAxisData: [],
+    xAxisData: computed<string[]>(() => getWidgetDateFields(metricExplorerPageState.granularity, metricExplorerPageState.period?.start, metricExplorerPageState.period?.end)),
     chartData: [],
     parsedGroupBy: computed<string>(() => metricExplorerPageState.selectedChartGroupBy?.replace('labels.', '') || ''),
     chartOptions: computed<LineSeriesOption>(() => ({
@@ -108,7 +108,7 @@ const state = reactive({
     })),
 });
 
-const getLineByData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => {
+const getGroupByData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => {
     const _seriesData: any[] = [];
     const _orderedData = orderBy(rawData?.results || [], '_total_count', 'desc');
     let _etcValueList: number[] = [];
@@ -155,18 +155,17 @@ const getTotalData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => ({
 });
 const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
     if (isEmpty(rawData)) return;
-    state.xAxisData = getWidgetDateFields(metricExplorerPageState.granularity, metricExplorerPageState.period?.start, metricExplorerPageState.period?.end);
 
     if (metricExplorerPageState.selectedChartGroupBy) {
-        state.chartData = getLineByData(rawData);
+        state.chartData = getGroupByData(rawData);
     } else {
         state.chartData = getTotalData(rawData);
     }
 
     // init legend
     const _legend: Record<string, boolean> = {};
-    if (isEmpty(state.proxyLegend)) {
-        const _series = state.chartData.map((d) => d.name);
+    if (metricExplorerPageState.selectedChartGroupBy && isEmpty(state.proxyLegend)) {
+        const _series = state.chartData?.map((d) => d.name);
         _series.forEach((d) => {
             _legend[d] = true;
         });
@@ -183,7 +182,7 @@ watch([() => chartContext.value, () => props.loading, () => props.data], async (
     if (_chartContext && !loading) {
         drawChart(data);
     }
-}, { immediate: false });
+});
 watch(() => state.proxyLegend, () => {
     state.chart.setOption(state.chartOptions, true);
 });

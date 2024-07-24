@@ -76,7 +76,7 @@ export const getWidgetDateRange = (granularity: string, basedOnDate: string, sub
     return [start, end];
 };
 
-export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, field: string, val?: string) => {
+export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, field?: string, val?: string) => {
     if (!val) return '';
     if (field === 'Workspace' || field === 'workspace_id') {
         return allReferenceTypeInfo.workspace.referenceMap[val]?.label ?? val;
@@ -87,7 +87,7 @@ export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, fi
     if (field === 'Region') {
         return allReferenceTypeInfo.region.referenceMap[val]?.name || val;
     }
-    if (field === 'Provider') {
+    if (field === 'Provider' || field === 'provider') {
         return allReferenceTypeInfo.provider.referenceMap[val]?.label || val;
     }
     if (field === 'Service Account') {

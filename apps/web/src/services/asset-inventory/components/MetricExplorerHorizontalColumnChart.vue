@@ -96,9 +96,8 @@ const state = reactive({
     })),
 });
 
-const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
-    if (isEmpty(rawData)) return;
-
+/* Util */
+const getGroupByData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => {
     const _orderedData = orderBy(rawData.results || [], 'count', 'desc');
 
     const _yAxisData = _orderedData.map((d) => d[state.parsedGroupBy]).slice(0, LIMIT);
@@ -106,7 +105,7 @@ const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
     if (_etcValue) _yAxisData.push('etc');
     state.yAxisData = _yAxisData;
 
-    state.chartData = state.yAxisData.map((d) => ({
+    return state.yAxisData.map((d) => ({
         name: d,
         type: 'bar',
         stack: true,
@@ -117,6 +116,24 @@ const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
             return _data?.count || 0;
         }),
     }));
+};
+const getTotalData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>) => {
+    state.yAxisData = ['Total'];
+    return [{
+        name: 'Total',
+        type: 'bar',
+        barMaxWidth: 50,
+        data: [rawData.results?.[0]?.count],
+    }];
+};
+const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
+    if (isEmpty(rawData)) return;
+
+    if (metricExplorerPageState.selectedChartGroupBy) {
+        state.chartData = getGroupByData(rawData);
+    } else {
+        state.chartData = getTotalData(rawData);
+    }
 
     // init legend
     const _legend: Record<string, boolean> = {};
