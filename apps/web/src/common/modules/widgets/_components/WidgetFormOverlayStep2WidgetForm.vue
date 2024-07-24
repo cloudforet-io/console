@@ -234,6 +234,7 @@ watch([() => state.isWidgetTitleValid, () => state.enableWidgetHeader], ([isVali
         widgetGenerateStore.setWidgetFormValueMap({
             ..._valueMap,
             title: undefined,
+            description: undefined,
         });
     }
 }, { immediate: true });
