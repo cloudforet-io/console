@@ -249,4 +249,5 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     // default
     default: { table: { disable: true } },
     'text-list': { table: { disable: true } },
+    readonly: { table: { disable: true } },
 });

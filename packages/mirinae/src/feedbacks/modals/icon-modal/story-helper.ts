@@ -218,4 +218,10 @@ export const getIconModalArgTypes = (): ArgTypes => ({
             defaultValue: 'Modal Content',
         },
     },
+    // default
+    'custom-header': { table: { disable: true } },
+    'custom-button': { table: { disable: true } },
+    'header-desc': { table: { disable: true } },
+    imageUrl: { table: { disable: true } },
+    clickButton: { table: { disable: true } },
 });

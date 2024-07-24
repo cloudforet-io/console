@@ -119,4 +119,5 @@ export const getTextListArgTypes = (): ArgTypes => ({
         },
         control: 'text',
     },
+    default: { table: { disable: true } },
 });

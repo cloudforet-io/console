@@ -141,5 +141,7 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
         // default
         'middle-contents': { table: { disable: true } },
         'bottom-contents': { table: { disable: true } },
+        confirm: { table: { disable: true } },
+        cancel: { table: { disable: true } },
     };
 };

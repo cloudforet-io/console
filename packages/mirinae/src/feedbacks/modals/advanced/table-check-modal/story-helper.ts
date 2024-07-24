@@ -206,4 +206,9 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    'sub-title': { table: { disable: true } },
+    'sub-title-format': { table: { disable: true } },
+    default: { table: { disable: true } },
+    slot: { table: { disable: true } },
 });
