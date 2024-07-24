@@ -75,4 +75,8 @@ export const getVerticalLayoutArgTypes = (): ArgTypes => ({
         },
         control: 'number',
     },
+    // default
+    sidebar: { table: { disable: true } },
+    'resizer-button': { table: { disable: true } },
+    default: { table: { disable: true } },
 });

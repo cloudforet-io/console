@@ -119,8 +119,7 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     },
     'v-model': {
         name: 'v-model',
-        type: { name: 'boolean' },
-        required: false,
+        type: { name: 'boolean', required: false },
         description: 'Two way binding for `visible` props with `update:visible` event.',
         table: {
             type: {
@@ -200,4 +199,6 @@ export const getSidebarArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    footer: { table: { disable: true } },
 });

@@ -255,4 +255,5 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     'label-extra': { table: { disable: true } },
     'dropdown-extra': { table: { disable: true } },
     'input-extra': { table: { disable: true } },
+    isRoot: { table: { disable: true } },
 });

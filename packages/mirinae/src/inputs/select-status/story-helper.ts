@@ -190,4 +190,6 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
 });
