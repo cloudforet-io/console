@@ -16,6 +16,7 @@ import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/ty
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
 import type { NamespaceReferenceItem, NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
@@ -47,6 +48,7 @@ const route = useRoute();
 
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -65,6 +67,7 @@ const storeState = reactive({
         ...favoriteGetters.metricExampleItems,
     ]),
     selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
 const state = reactive({
@@ -74,7 +77,7 @@ const state = reactive({
     isDetailPage: computed(() => !!state.currentMetricIdByUrl),
     currentMetrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === storeState.selectedNamespace?.name)),
     menuSet: computed(() => {
-        const baseMenuSet = [
+        const baseMenuSet = storeState.isAdminMode ? [] : [
             {
                 type: MENU_ITEM_TYPE.STARRED,
                 childItems: state.starredMenuSet,
