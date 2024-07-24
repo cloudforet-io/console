@@ -1689,7 +1689,7 @@
 			"LABEL_VIWERS": "공개 여부",
 			"PRIVATE": "비공개",
 			"PROJECT": "프로젝트",
-			"SHARED": "공유",
+			"SHARED": "공유됨",
 			"SINGLE_PROJECT": "개별 프로젝트",
 			"TOOLTIP_CLONE": "복제",
 			"TOOLTIP_DELETE": "삭제",
@@ -1927,10 +1927,10 @@
 			"SAVE": "저장"
 		},
 		"LNB": {
-			"DEPRECATED": "",
+			"DEPRECATED": "지원 중지된",
 			"ONLY_FAVORITE": "즐겨찾기 항목만 노출",
-			"PRIVATE": "",
-			"SHARED": ""
+			"PRIVATE": "비공개",
+			"SHARED": "공유됨"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
