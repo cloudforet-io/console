@@ -126,7 +126,7 @@ watch(() => notificationItemState.isEditMode, (mode) => {
             <p v-for="(item, index) in state.keyListForEdit"
                :key="`channel-data-key-${index}`"
             >
-                {{ item.replace(/\_/g, ' ') }}
+                {{ state.isSpaceOneUserProtocol ? $t('IAM.USER.FORM.MEMBER') : item.replace(/\_/g, ' ') }}
             </p>
         </div>
 
@@ -137,7 +137,7 @@ watch(() => notificationItemState.isEditMode, (mode) => {
             <span v-for="(item, index) in state.keyListForRead"
                   :key="`channel-data-key-${index}`"
             >
-                {{ item.replace(/\_/g, ' ') }}
+                {{ state.isSpaceOneUserProtocol ? $t('IAM.USER.FORM.MEMBER') : item.replace(/\_/g, ' ') }}
             </span>
         </div>
 

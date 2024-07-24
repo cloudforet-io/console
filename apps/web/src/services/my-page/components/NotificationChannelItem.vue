@@ -188,7 +188,7 @@ const onEdit = (value?: EditTarget) => {
 <template>
     <p-pane-layout class="channel-card-wrapper">
         <div class="card-header">
-            <p-field-title :label="props.channelData.protocol_name">
+            <p-field-title :label="props.channelData.protocol_name.toLowerCase().includes('spaceone') ? i18n.t('IAM.USER.NOTIFICATION.ASSOCIATED_MEMBER') : props.channelData.protocol_name">
                 <template #left>
                     <p-toggle-button :value="state.isActivated"
                                      :disabled="props.manageDisabled"
