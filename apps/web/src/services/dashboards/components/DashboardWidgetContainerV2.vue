@@ -27,7 +27,7 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -298,7 +298,8 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             layouts: dashboardDetailState.dashboardLayouts,
         });
         showSuccessMessage(i18n.t('COMMON.WIDGETS.CLONE_SUCCESS_MSG'), '');
-    } catch (e) {
+    } catch (e: any) {
+        showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
     }
 };

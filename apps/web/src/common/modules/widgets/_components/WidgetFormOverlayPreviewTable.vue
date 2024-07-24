@@ -175,13 +175,13 @@ const getSortIcon = (field: PreviewTableField) => {
     return '';
 };
 
-const getTimeDiffSubText = (field: PreviewTableField): string => {
-    if (!state.dataInfo?.[field.name]) return '';
-    const { timediff } = state.dataInfo[field.name];
-    if (!timediff || !Object.entries(timediff ?? {}).length) return '';
-    const [key, value] = Object.entries(timediff)[0];
-    return `( ${value} ${key} )`;
-};
+// const getTimeDiffSubText = (field: PreviewTableField): string => {
+//     if (!state.dataInfo?.[field.name]) return '';
+//     const { timediff } = state.dataInfo[field.name];
+//     if (!timediff || !Object.entries(timediff ?? {}).length) return '';
+//     const [key, value] = Object.entries(timediff)[0];
+//     return `( ${value} ${key} )`;
+// };
 
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
     if (dataTableId) {
@@ -247,9 +247,9 @@ watch(() => storeState.dataTableUpdating, () => {
                               :class="{'th-contents': true, 'data-field': field.type === 'DATA'}"
                         >
                             {{ field.name }}
-                            <span v-if="state.dataInfo?.[field.name]?.timediff"
-                                  class="timediff-sub-text"
-                            >{{ getTimeDiffSubText(field) }}</span>
+                            <!--                            <span v-if="state.dataInfo?.[field.name]?.timediff"-->
+                            <!--                                  class="timediff-sub-text"-->
+                            <!--                            >{{ getTimeDiffSubText(field) }}</span>-->
                             <p-i v-if="field.type === 'LABEL'"
                                  :name="getSortIcon(field)"
                                  class="sort-icon"
