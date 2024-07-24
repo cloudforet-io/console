@@ -6,6 +6,9 @@ import { cloneDeep } from 'lodash';
 import {
     PBadge, PButton, PI, PJsonSchemaForm, PRadio, PRadioGroup,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
@@ -15,7 +18,6 @@ import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
-import { RadioMenuList } from '@/services/project/constants/project-notification-constant';
 
 const props = withDefaults(defineProps<{
     channelData: NotiChannelItem;
@@ -57,6 +59,16 @@ const state = reactive({
     isJsonSchema: computed(() => Object.keys(state.schema).length !== 0),
     isInputValid: computed(() => state.isSchemaDataValid),
     isDataValid: computed(() => state.isJsonSchema && state.isInputValid),
+    radioMenuList: computed<MenuItem[]>(() => [
+        {
+            label: i18n.t('PROJECT.DETAIL.NOTIFICATION_ALL_USERS'),
+            name: 'all',
+        },
+        {
+            label: i18n.t('PROJECT.DETAIL.NOTIFICATION_SPECIFIC_MEMBER'),
+            name: 'specific',
+        },
+    ]),
     selectedRadioIdx: 0,
 });
 
@@ -148,7 +160,7 @@ watch(() => notificationItemState.isEditMode, (mode) => {
             <div class="left-section">
                 <p v-if="state.isSpaceOneUserProtocol">
                     <p-radio-group>
-                        <p-radio v-for="(item, idx) in RadioMenuList"
+                        <p-radio v-for="(item, idx) in state.radioMenuList"
                                  :key="idx"
                                  v-model="state.selectedRadioIdx"
                                  :value="idx"

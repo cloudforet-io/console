@@ -9,6 +9,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -25,7 +26,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
 import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
 import type { NotificationAddFormDataPayload } from '@/services/my-page/types/notification-add-form-type';
-import { RadioMenuList } from '@/services/project/constants/project-notification-constant';
 
 const SPACEONE_USER_CHANNEL_TYPE = 'SpaceONE User' as const;
 const allReferenceStore = useAllReferenceStore();
@@ -72,6 +72,16 @@ const state = reactive({
     isInputValid: computed<boolean>(() => state.isInputNotEmpty && (state.isSchemaFormValid && !state.isNameInvalid)),
     isDataValid: computed<boolean>(() => (!state.isJsonSchema && !state.isNameInvalid) || (state.isJsonSchema && state.isInputValid)),
     selectedMember: ['*'] as string[],
+    radioMenuList: computed<MenuItem[]>(() => [
+        {
+            label: i18n.t('PROJECT.DETAIL.NOTIFICATION_ALL_USERS'),
+            name: 'all',
+        },
+        {
+            label: i18n.t('PROJECT.DETAIL.NOTIFICATION_SPECIFIC_MEMBER'),
+            name: 'specific',
+        },
+    ]),
     selectedRadioIdx: 0,
 });
 
@@ -177,7 +187,7 @@ watch([() => props.protocolId, () => props.protocolType], async ([protocolId, pr
             >
                 <template #default>
                     <p-radio-group>
-                        <p-radio v-for="(item, idx) in RadioMenuList"
+                        <p-radio v-for="(item, idx) in state.radioMenuList"
                                  :key="idx"
                                  v-model="state.selectedRadioIdx"
                                  :value="idx"
