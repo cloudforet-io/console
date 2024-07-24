@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
@@ -64,10 +65,8 @@ export const Basic: Story = {
                 <p-context-menu-item label="basic (mouse over me to check hover style)" />
                 <p-context-menu-item label="disabled" disabled />
                 <p-context-menu-item label="selected" selected />
-                <p-context-menu-item label="long long long long long long long long long long long long long long long long 
-                long long long long long long long long long long long long long long long long long long long long label case" />
-                <p-context-menu-item label="ellipsis, long long long long long long long long long long long long long long 
-                long long long long long long long long long long long long long long long long long long long long long long label case" ellipsis />
+                <p-context-menu-item label="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" />
+                <p-context-menu-item label="ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" ellipsis />
             </div>
         `,
     }),
@@ -82,10 +81,8 @@ export const AnchorCase: Story = {
                 <p-context-menu-item label="link" link="http://google.com" />
                 <p-context-menu-item label="link, disabled" link="http://google.com" disabled />
                 <p-context-menu-item label="link, selected" link="http://google.com" selected />
-                <p-context-menu-item label="link, long long long long long long long long long long long long long long long 
-                long long long long long long long long long long long long long long long long long long long long long label case" link="http://google.com" />
-                <p-context-menu-item label="link, ellipsis, long long long long long long long long long long long long long 
-                long long long long long long long long long long long long long long long long long long long long long long long label case" link="http://google.com" ellipsis />
+                <p-context-menu-item label="link, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" link="http://google.com" />
+                <p-context-menu-item label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" link="http://google.com" ellipsis />
             </div>
         `,
     }),
@@ -102,12 +99,9 @@ export const ImageIconCase: Story = {
                     <p-context-menu-item image-url="ic_refresh" label="link" />
                     <p-context-menu-item image-url="ic_refresh" label="link, disabled" disabled />
                     <p-context-menu-item image-url="ic_refresh" label="link, selected" selected />
-                    <p-context-menu-item image-url="ic_refresh" label="link, long long long long long long long long long long 
-                    long long long long long long long long long long long long long long long long long long long long long long long long long long label case" />
-                    <p-context-menu-item image-url="ic_refresh" label="link, ellipsis, long long long long long long long long 
-                    long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" ellipsis />
-                    <p-context-menu-item image-url="ic_refresh" label="link, ellipsis, long long long long long long long long 
-                    long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" select-marker="radio" />
+                    <p-context-menu-item image-url="ic_refresh" label="link, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" />
+                    <p-context-menu-item image-url="ic_refresh" label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" ellipsis />
+                    <p-context-menu-item image-url="ic_refresh" label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" select-marker="radio" />
                 </div>
                 <br/>
                 <h2>Icon Case</h2>
@@ -116,12 +110,9 @@ export const ImageIconCase: Story = {
                     <p-context-menu-item icon="ic_refresh" label="link" />
                     <p-context-menu-item icon="ic_refresh" label="link, disabled" disabled />
                     <p-context-menu-item icon="ic_refresh" label="link, selected" selected />
-                    <p-context-menu-item icon="ic_refresh" label="link, long long long long long long long long long long long 
-                    long long long long long long long long long long long long long long long long long long long long long long long long long label case" />
-                    <p-context-menu-item icon="ic_refresh" label="link, ellipsis, long long long long long long long long long 
-                    long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" ellipsis />
-                    <p-context-menu-item icon="ic_refresh" label="link, ellipsis, long long long long long long long long long 
-                    long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" select-marker="radio" />
+                    <p-context-menu-item icon="ic_refresh" label="link, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" />
+                    <p-context-menu-item icon="ic_refresh" label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" ellipsis />
+                    <p-context-menu-item icon="ic_refresh" label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" select-marker="radio" />
                 </div>
                 <br/>
                 <p><b>In cases where icons and images are used at the same time, the icons are shown preferentially.</b></p>
@@ -137,15 +128,9 @@ export const SelectMarkers: Story = {
             <div class="border border-primary-1 p-4">
                 <p-context-menu-item label="selectMarker: checkbox" select-marker="checkbox" />
                 <p-context-menu-item label="selectMarker: checkbox, link" select-marker="checkbox" link="https://google.com" />
-                <p-context-menu-item label="selectMarker: checkbox, long long long long long long long long long long long long 
-                long long long long long long long long long long long long long long long long long long long
-                 long long long long long label case" select-marker="checkbox" />
-                <p-context-menu-item label="selectMarker: checkbox, link, long long long long long long long long long long long 
-                long long long long long long long long long long long long long long long long long 
-                long long long long long long long long label case" select-marker="checkbox" link="https://google.com" />
-                <p-context-menu-item label="selectMarker: checkbox, link, ellipsis, long long long long long long long long long 
-                long long long long long long long long long long long long long long long long long long long 
-                long long long long long long long long label case" select-marker="checkbox" link="https://google.com" ellipsis />
+                <p-context-menu-item label="selectMarker: checkbox, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" select-marker="checkbox" />
+                <p-context-menu-item label="selectMarker: checkbox, link, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" select-marker="checkbox" link="https://google.com" />
+                <p-context-menu-item label="selectMarker: checkbox, link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" select-marker="checkbox" link="https://google.com" ellipsis />
                 <p-context-menu-item label="selectMarker: checkbox, selected" select-marker="checkbox" selected />
                 <p-context-menu-item label="selectMarker: checkbox, disabled" select-marker="checkbox" disabled />
                 <p-context-menu-item label="selectMarker: checkbox, selected, disabled" select-marker="checkbox" selected disabled />
