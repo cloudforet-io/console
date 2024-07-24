@@ -68,7 +68,7 @@ export const Basic: Story = {
         },
     }),
     decorators: [() => ({
-        template: '<story style="height: 500px;" />',
+        template: '<story style="height: 500px; position: relative;" />',
     })],
 };
 
