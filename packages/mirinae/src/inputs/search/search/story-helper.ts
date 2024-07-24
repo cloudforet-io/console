@@ -235,7 +235,7 @@ export const getSearchArgTypes = (): ArgTypes => {
         /* model */
         'v-model': {
             name: 'v-model',
-            type: { name: 'string' },
+            type: { name: 'string', required: false },
             description: 'model of \'value\' props and \'update:value\' event.',
             table: {
                 type: {
