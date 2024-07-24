@@ -146,9 +146,11 @@ const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setSize(_config.meta.sizes[0]);
     widgetGenerateStore.setWidgetFormValueMap({
         title: _config?.meta.title,
+        description: '',
     });
     widgetGenerateStore.setWidgetValidMap({
         title: true,
+        description: true,
     });
     checkDefaultValidation();
 };
