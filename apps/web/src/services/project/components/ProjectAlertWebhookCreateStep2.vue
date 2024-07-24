@@ -1,24 +1,19 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    onMounted, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PFieldGroup, PLazyImg, PTextInput, PLink, PDataLoader, PJsonSchemaForm, PSelectDropdown,
+    PButton, PFieldGroup, PLazyImg, PTextInput, PLink, PDataLoader, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookCreateParameters } from '@/schema/monitoring/webhook/api-verbs/create';
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
-import type {
-    GetPluginMetadataParameters,
-    GetPluginMetadataResponse,
-} from '@/schema/plugin/plugin/api-verbs/get-plugin-metadata';
 import type { PluginGetVersionsParameters } from '@/schema/repository/plugin/api-verbs/get-versions';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -42,9 +37,9 @@ const route = useRoute();
 
 const emit = defineEmits<{(e: 'update:currentStep', step: number): void; }>();
 
-const storeState = reactive({
-    language: computed(() => store.state.user.language),
-});
+// const storeState = reactive({
+//     language: computed(() => store.state.user.language),
+// });
 const state = reactive({
     pageLoading: true,
     loading: false,
@@ -79,11 +74,12 @@ const handleClickGoBack = () => {
 const convertSucceedMode = () => {
     state.isSucceedMode = true;
 };
-const handleUpdateSchemaForm = (isValid:boolean, value) => {
-    state.options = value;
-};
+// const handleUpdateSchemaForm = (isValid:boolean, value) => {
+//     state.options = value;
+// };
 
 const getVersions = async () => {
+    state.pageLoading = true;
     try {
         const { results } = await SpaceConnector.clientV2.repository.plugin.getVersions<PluginGetVersionsParameters, ListResponse<string> >({
             plugin_id: props.selectedType?.plugin_id || '',
@@ -92,23 +88,26 @@ const getVersions = async () => {
     } catch (e) {
         state.pluginVersions = undefined;
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
-    }
-};
-const getPluginMetaData = async () => {
-    state.pageLoading = true;
-    try {
-        const results = await SpaceConnector.clientV2.plugin.plugin.getPluginMetadata<GetPluginMetadataParameters, GetPluginMetadataResponse>({
-            plugin_id: props.selectedType?.plugin_id || '',
-            version: state.pluginVersions,
-        });
-        state.optionsSchema = results.metadata?.options_schema ?? {};
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.optionsSchema = {};
     } finally {
         state.pageLoading = false;
     }
 };
+
+// const getPluginMetaData = async () => {
+//     state.pageLoading = true;
+//     try {
+//         const results = await SpaceConnector.clientV2.plugin.plugin.getPluginMetadata<GetPluginMetadataParameters, GetPluginMetadataResponse>({
+//             plugin_id: props.selectedType?.plugin_id || '',
+//             version: state.pluginVersions,
+//         });
+//         state.optionsSchema = results.metadata?.options_schema ?? {};
+//     } catch (e) {
+//         ErrorHandler.handleError(e);
+//         state.optionsSchema = {};
+//     } finally {
+//         state.pageLoading = false;
+//     }
+// };
 const handleClickCreate = async () => {
     state.loading = true;
     if (!props.selectedType) return;
@@ -130,12 +129,13 @@ const handleClickCreate = async () => {
     }
 };
 
-watch(() => state.pluginVersions, (version) => {
-    if (version) {
-        getPluginMetaData();
-    }
-});
-
+// TODO: Planned for future implementation
+// watch(() => state.pluginVersions, (version) => {
+//     if (version) {
+//         getPluginMetaData();
+//     }
+// });
+//
 onMounted(() => {
     getVersions();
 });
@@ -198,14 +198,14 @@ onMounted(() => {
                                    disabled
                 />
             </p-field-group>
-            <p-json-schema-form :schema="state.optionsSchema"
-                                :form-data="state.options"
-                                :language="storeState.language"
-                                use-fixed-menu-style
-                                reset-on-schema-change
-                                uniform-width
-                                @change="handleUpdateSchemaForm"
-            />
+            <!--            <p-json-schema-form :schema="state.optionsSchema"-->
+            <!--                                :form-data="state.options"-->
+            <!--                                :language="storeState.language"-->
+            <!--                                use-fixed-menu-style-->
+            <!--                                reset-on-schema-change-->
+            <!--                                uniform-width-->
+            <!--                                @change="handleUpdateSchemaForm"-->
+            <!--            />-->
         </div>
         <div class="buttons-wrapper">
             <p-button style-type="transparent"
