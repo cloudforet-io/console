@@ -7,8 +7,6 @@ import type { SharedDataTableInfo } from '@/services/dashboards/types/shared-das
 
 export interface PublicWidgetCreateParameters {
     dashboard_id: string;
-    name?: string;
-    description?: string;
     size?: WidgetSize;
     widget_type?: WidgetType;
     options?: Record<string, any>;

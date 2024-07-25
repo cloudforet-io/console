@@ -137,8 +137,8 @@ export const useWidgetFrame = (
 ) => {
     const _state = reactive({
         widgetConfig: computed(() => getWidgetConfig(props.widgetName)),
-        title: computed(() => props.widgetOptions?.title),
-        description: computed(() => props.widgetOptions?.description),
+        title: computed(() => props.widgetOptions?.widgetHeader?.title),
+        description: computed(() => props.widgetOptions?.widgetHeader?.description),
         size: computed<WidgetSize>(() => {
             if (props.size && _state.widgetConfig.meta.sizes.includes(props.size)) return props.size;
             return _state.widgetConfig.meta.sizes[0];
@@ -195,7 +195,7 @@ export const useWidgetFrame = (
         disableManageButtons: props.disableManageButtons,
         //
         title: _state.title,
-        description: props.description,
+        description: _state.description,
         size: _state.size,
         width: props.width,
         periodText: _state.periodText,

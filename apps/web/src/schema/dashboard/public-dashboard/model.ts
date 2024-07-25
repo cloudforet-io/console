@@ -12,8 +12,6 @@ import type {
 
 export interface PublicDashboardModel {
     dashboard_id: string;
-    name: string;
-    description: string;
     version: string;
     layouts: DashboardLayout[];
     vars?: DashboardVars;
