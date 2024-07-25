@@ -40,6 +40,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type {
     WidgetExpose, WidgetProps, WidgetSize, WidgetOverlayType,
 } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetHeaderValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import DashboardReorderSidebar from '@/services/dashboards/components/DashboardReorderSidebar.vue';
 import {
@@ -282,7 +283,10 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             size: widget.size,
             options: {
                 ...widget.options,
-                title: widget.options.title ? `Clone - ${widget.options.title}` : undefined,
+                widgetHeader: {
+                    ...(widget.options.widgetHeader as WidgetHeaderValue ?? {}),
+                    title: widget.options?.widgetHeader?.title ? `Clone - ${widget.options.widgetHeader.title}` : undefined,
+                },
             },
             data_tables: refinedDataTables,
             data_table_id: dataTableIndex,
