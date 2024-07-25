@@ -36,6 +36,8 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { CategoryByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 
 type Data = ListResponse<{
     [key: string]: string|number;
@@ -50,11 +52,18 @@ const state = reactive({
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: [],
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<TreemapSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
         tooltip: {
             trigger: 'item',
             position: 'inside',
-            valueFormatter: (val) => numberFormatter(val) || '',
+            formatter: (params) => {
+                let _name = getReferenceLabel(props.allReferenceTypeInfo, state.categoryByField, params.name);
+                if (state.unit) _name = `${_name} (${state.unit})`;
+                const _value = numberFormatter(params.value) || '';
+                return `${params.marker} ${_name}: <b>${_value}</b>`;
+            },
         },
         legend: {
             show: false,
@@ -62,7 +71,7 @@ const state = reactive({
         series: [
             {
                 type: 'treemap',
-                roam: 'move',
+                roam: false,
                 nodeClick: false,
                 breadcrumb: {
                     show: false,
@@ -145,9 +154,9 @@ const drawChart = (rawData: Data|null) => {
     })) || [];
 };
 
-const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+const loadWidget = async (): Promise<Data|APIErrorToast> => {
     state.loading = true;
-    const res = data ?? await fetchWidget();
+    const res = await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);

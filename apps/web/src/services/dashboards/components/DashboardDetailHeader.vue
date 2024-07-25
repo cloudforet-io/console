@@ -3,11 +3,12 @@ import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeading, PSkeleton, PSelectDropdown, PButtonModal, PI, PBadge,
+    PHeading, PSkeleton, PSelectDropdown, PButtonModal, PI, PBadge, PSelectCard,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 
+import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import type { PublicDashboardShareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/share';
 import type { PublicDashboardUnshareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/unshare';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -48,20 +49,29 @@ const state = reactive({
     deleteModalVisible: false,
     cloneModalVisible: false,
     shareWithCodeModalVisible: false,
-    shareToWorkspaceModalVisible: false,
+    shareToProjectModalVisible: false,
+    shareModalVisible: false,
+    unshareModalVisible: false,
     isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared),
+    sharedScope: computed<DashboardScope|undefined>(() => dashboardDetailState.dashboardInfo?.scope),
+    selectedSharedScope: 'WORKSPACE' as DashboardScope,
     showBadge: computed<boolean>(() => {
-        if (dashboardDetailState.dashboardScope === 'PRIVATE') return true;
-        return dashboardDetailState.dashboardInfo?.workspace_id === '*';
+        if (dashboardDetailState.dashboardInfo?.user_id) return true;
+        return dashboardDetailState.dashboardInfo?.workspace_id === '*' || dashboardDetailState.dashboardInfo?.project_id === '*';
     }),
     badgeStyleType: computed<string>(() => {
         if (dashboardDetailState.dashboardScope === 'PRIVATE') return 'gray150';
+        if (state.sharedScope === 'PROJECT') return 'primary3';
         return 'indigo100';
     }),
     badgeText: computed(() => {
         if (dashboardDetailState.dashboardScope === 'PRIVATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
-        if (dashboardDetailState.dashboardInfo?.workspace_id === '*') {
-            if (storeState.isAdminMode) return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
+        if (state.isSharedDashboard) {
+            if (storeState.isAdminMode) {
+                if (state.sharedScope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+                return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
+            }
+            if (state.sharedScope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
         }
         return '';
@@ -91,12 +101,19 @@ const state = reactive({
                 },
             ];
         }
-        let _shareToAllWorkspacesMenuItems: MenuItem[] = [];
+        let _shareMenuItems: MenuItem[] = [];
         if (storeState.isAdminMode) {
-            _shareToAllWorkspacesMenuItems = [{
+            _shareMenuItems = [{
                 type: 'item',
-                name: 'shareToAllWorkspaces',
-                label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_WORKSPACES') : i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES'),
+                name: state.isSharedDashboard ? 'unshare' : 'share',
+                label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_DASHBOARD') : i18n.t('DASHBOARDS.DETAIL.SHARE_DASHBOARD'),
+                icon: 'ic_share',
+            }];
+        } else {
+            _shareMenuItems = [{
+                type: 'item',
+                name: 'shareProject',
+                label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS') : i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_PROJECTS'),
                 icon: 'ic_share',
             }];
         }
@@ -120,7 +137,7 @@ const state = reactive({
                 label: i18n.t('DASHBOARDS.DETAIL.SHARE_WITH_CODE'),
                 icon: 'ic_share-code',
             },
-            ..._shareToAllWorkspacesMenuItems,
+            ..._shareMenuItems,
             { type: 'divider', name: 'divider' },
             {
                 type: 'item',
@@ -133,21 +150,32 @@ const state = reactive({
 });
 
 /* Api */
-const shareDashboard = async () => {
+const shareDashboard = async (scope) => {
     state.loading = true;
     try {
-        const _message = state.isSharedDashboard
-            ? i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD')
-            : i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD');
-        const fetcher = state.isSharedDashboard
-            ? SpaceConnector.clientV2.dashboard.publicDashboard.unshare
-            : SpaceConnector.clientV2.dashboard.publicDashboard.share;
-        const updatedDashboard = await fetcher<PublicDashboardShareParameters|PublicDashboardUnshareParameters>({
+        const updatedDashboard = await SpaceConnector.clientV2.dashboard.publicDashboard.share<PublicDashboardShareParameters>({
+            dashboard_id: props.dashboardId,
+            scope,
+        });
+        dashboardDetailStore.setDashboardInfo(updatedDashboard);
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
+        state.shareModalVisible = false;
+    } catch (e: any) {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+const unshareDashboard = async () => {
+    state.loading = true;
+    try {
+        const updatedDashboard = await SpaceConnector.clientV2.dashboard.publicDashboard.unshare<PublicDashboardUnshareParameters>({
             dashboard_id: props.dashboardId,
         });
         dashboardDetailStore.setDashboardInfo(updatedDashboard);
-        showSuccessMessage(_message, '');
-        state.shareToWorkspaceModalVisible = false;
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
+        state.unshareModalVisible = false;
     } catch (e: any) {
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
@@ -162,14 +190,35 @@ const handleSelectItem = (selected: MenuItem) => {
     if (selected.name === 'duplicate') state.cloneModalVisible = true;
     if (selected.name === 'shareWithCode') state.shareWithCodeModalVisible = true;
     if (selected.name === 'delete') state.deleteModalVisible = true;
-    if (selected.name === 'shareToAllWorkspaces') state.shareToWorkspaceModalVisible = true;
+    if (selected.name === 'share') {
+        state.selectedSharedScope = 'WORKSPACE';
+        state.shareModalVisible = true;
+    }
+    if (selected.name === 'unshare') state.unshareModalVisible = true;
+    if (selected.name === 'shareProject') {
+        state.shareToProjectModalVisible = true;
+    }
 };
 const handleNameUpdate = (name: string) => {
     dashboardDetailStore.setName(name);
     dashboardDetailStore.setOriginDashboardName(name);
 };
-const handleConfirmShareToAllWorkspaces = async () => {
-    await shareDashboard();
+const handleConfirmShare = async () => {
+    await shareDashboard(state.selectedSharedScope);
+};
+const handleConfirmUnshare = async () => {
+    await unshareDashboard();
+};
+const handleConfirmShareToProject = async () => {
+    if (state.isSharedDashboard) {
+        await unshareDashboard();
+    } else {
+        await shareDashboard('PROJECT');
+    }
+    state.shareToProjectModalVisible = false;
+};
+const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
+    state.selectedSharedScope = scope;
 };
 </script>
 
@@ -229,14 +278,50 @@ const handleConfirmShareToAllWorkspaces = async () => {
         <dashboard-share-with-code-modal :visible.sync="state.shareWithCodeModalVisible"
                                          :dashboard-id="props.dashboardId"
         />
-        <p-button-modal :header-title="state.isSharedDashboard ? $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_WORKSPACES') : $t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES')"
-                        :visible.sync="state.shareToWorkspaceModalVisible"
+        <!-- Admin / Share Modal -->
+        <p-button-modal :header-title="$t('DASHBOARDS.DETAIL.SHARE_DASHBOARD')"
+                        :visible.sync="state.shareModalVisible"
                         size="sm"
                         :loading="state.loading"
-                        @confirm="handleConfirmShareToAllWorkspaces"
+                        @confirm="handleConfirmShare"
         >
             <template #body>
-                {{ state.isSharedDashboard ? $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_WORKSPACES_DESC') : $t('DASHBOARDS.DETAIL.SHARE_TO_ALL_WORKSPACES_DESC') }}
+                <div class="select-card-wrapper">
+                    <p-select-card :label="i18n.t('DASHBOARDS.DETAIL.ALL_WORKSPACES')"
+                                   icon="ic_workspaces"
+                                   value="WORKSPACE"
+                                   :selected="state.selectedSharedScope"
+                                   @click="handleSelectSharedDashboardScope('WORKSPACE')"
+                    />
+                    <p-select-card :label="i18n.t('DASHBOARDS.DETAIL.ALL_PROJECTS')"
+                                   icon="ic_service_project"
+                                   value="PROJECT"
+                                   :selected="state.selectedSharedScope"
+                                   @click="handleSelectSharedDashboardScope('PROJECT')"
+                    />
+                </div>
+            </template>
+        </p-button-modal>
+        <!-- Admin / Unshare Modal -->
+        <p-button-modal :header-title="state.sharedScope === 'PROJECT' ? $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS') : $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_WORKSPACES')"
+                        :visible.sync="state.unshareModalVisible"
+                        size="sm"
+                        :loading="state.loading"
+                        @confirm="handleConfirmUnshare"
+        >
+            <template #body>
+                {{ state.sharedScope === 'PROJECT' ? $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS_DESC') : $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_WORKSPACES_DESC') }}
+            </template>
+        </p-button-modal>
+        <!-- WORKSPACE / Share Modal -->
+        <p-button-modal :header-title="state.isSharedDashboard ? $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS') : $t('DASHBOARDS.DETAIL.SHARE_TO_ALL_PROJECTS')"
+                        :visible.sync="state.shareToProjectModalVisible"
+                        size="sm"
+                        :loading="state.loading"
+                        @confirm="handleConfirmShareToProject"
+        >
+            <template #body>
+                {{ state.isSharedDashboard ? $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS_DESC') : $t('DASHBOARDS.DETAIL.SHARE_TO_ALL_PROJECTS_DESC') }}
             </template>
         </p-button-modal>
     </div>
@@ -252,6 +337,13 @@ const handleConfirmShareToAllWorkspaces = async () => {
     .template-name {
         @apply text-paragraph-sm text-gray-500;
         margin-left: 2.5rem;
+    }
+}
+.select-card-wrapper {
+    @apply grid grid-cols-12;
+    gap: 0.5rem;
+    .p-select-card {
+        @apply col-span-6;
     }
 }
 </style>

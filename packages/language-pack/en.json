@@ -1403,6 +1403,8 @@
 			"CANCEL": "Cancel",
 			"CHANGE_DATA_MODAL_DESCRIPTION": "Note that all options set below will be reset.",
 			"CHANGE_DATA_MODAL_TITLE": "Do you want to change the data?",
+			"CLONE": "Clone",
+			"CLONE_SUCCESS_MSG": "Successfully cloned as a new widget.",
 			"CLOUD_SERVICE": {
 				"HELP": "Displays only major services in cloud service.",
 				"NO_DATA": "No Cloud Resources",
@@ -1500,6 +1502,7 @@
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
 			"DONE": "Done",
+			"DONUT": "Donut",
 			"EDIT": "Edit",
 			"EDIT_WIDGET": "Edit Widget",
 			"EXPAND": "Expand",
@@ -1573,6 +1576,8 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "Upcoming and Past 7 days"
 			},
+			"PIE": "Pie",
+			"PIE_CHART_TYPE": "Pie Chart Type",
 			"PREVIEW_TABLE_EMPTY_DESC": "The preview will be displayed here.",
 			"PREVIEW_TABLE_EMPTY_TITLE": "To get started, add your data.",
 			"REQUIRED_FIELDS_ARE_MISSING": "Required fields are missing.",
@@ -1648,7 +1653,8 @@
 				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
 				"TITLE": "Trusted Advisor"
 			},
-			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget"
+			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget",
+			"WIDGET_TITLE_REQUIRED": "Please enter widget title."
 		}
 	},
 	"COST_EXPLORER": {
@@ -1662,7 +1668,9 @@
 				"UNIT": "Unit",
 				"VARIATION": "Variation"
 			}
-		}
+		},
+		"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
+		"COST_ADVANCED_SETTINGS": "Advanced Settings"
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -1822,7 +1830,10 @@
 			}
 		},
 		"DETAIL": {
+			"1": "Share with Code",
 			"ADD_WIDGET": "Add Widget",
+			"ALL_PROJECTS": "All Projects",
+			"ALL_WORKSPACES": "All Workspaces",
 			"ALT_S_SHARE_DASHBOARD": "Dashboard successfully shared",
 			"ALT_S_UNSHARE_DASHBOARD": "Dashboard successfully unshared",
 			"APPLY": "Confirm",
@@ -1861,10 +1872,17 @@
 			"SET_HOME": "Set as Home Dashboard",
 			"SHARE": "Share",
 			"SHARED_BY_ADMIN": "Shared by Admin",
+			"SHARED_TO_ALL_PROJECTS": "Shared to All Projects",
 			"SHARED_TO_WORKSPACES": "Shared to Workspaces",
+			"SHARE_DASHBOARD": "Share Dashboard",
+			"SHARE_TO_ALL_PROJECTS": "Share to All Projects",
+			"SHARE_TO_ALL_PROJECTS_DESC": "Are you sure you want to share this dashboard to all projects?",
 			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "Are you sure you want to share this dashboard to all workspace?",
 			"SHARE_WITH_CODE": "Share with Code",
+			"UNSHARE_DASHBOARD": "Unshare Dashboard",
+			"UNSHARE_FROM_ALL_PROJECTS": "Unshare from All Projects",
+			"UNSHARE_FROM_ALL_PROJECTS_DESC": "Are you sure you want to unshare this dashboard from all projects?",
 			"UNSHARE_FROM_ALL_WORKSPACES": "Unshare from All Workspaces",
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "Are you sure you want to unshare this dashboard from all workspace?"
 		},
@@ -1875,6 +1893,7 @@
 			"ALT_E_EDIT_NAME": "Failed to update dashboard name",
 			"ALT_E_UPDATE_DASHBOARD_NAME": "Failed to update the dashboard name",
 			"ALT_S_DELETE_DASHBOARD": "Dashboard successfully deleted",
+			"ALT_S_EDIT_NAME": "Dashboard name successfully edited",
 			"CLONE_TITLE": "Clone Dashboard",
 			"CUSTOM_DATE_FROM": "FROM",
 			"CUSTOM_DATE_TITLE": "Custom Range",
@@ -2080,7 +2099,7 @@
 						"PROGRESS_CARD_DESC": "To illustrate this chart properly, the data requires at least 2 data fields.",
 						"TITLE": "Additional fields are required"
 					},
-					"WIDGET_INFO": "Widget Info",
+					"WIDGET_HEADER": "Widget Header",
 					"X_AXIS": "X-Axis",
 					"Y_AXIS": "Y-Axis"
 				}
@@ -2237,6 +2256,7 @@
 			"REGENERATE": "Regenerate Client Secret",
 			"TITLE": "App"
 		},
+		"AUTO_DORMANCY_CONFIGURATION": "Dormancy Configuration",
 		"BOOKMARK": {
 			"ADD_GLOBAL_BOOKMARK": "Add Global Bookmark",
 			"ADD_LINK": "Add Link",
@@ -2268,13 +2288,11 @@
 			"ALT_S_UPDATE_DISPLAY_NAME": "Display name successfully updated",
 			"ALT_S_UPDATE_DORMANCY": "Dormancy configuration successfully changed",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "Timezone & language successfully updated",
-			"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
 			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "When anomaly costs are detected, an email will be sent to all users with the Workspace Owner role type for each Workspace.",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "With Anomaly Detection Configuration turned on,",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "notifications will be sent to particular recipients associated with each workspace when an anomaly in cost is detected.",
 			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "Enable Anomaly Detection Configuration",
 			"APPEARANCE": "Appearance",
-			"AUTO_DORMANCY_CONFIGURATION": "Dormancy Configuration",
 			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "Send email notifications",
 			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "Cost Report",
 			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD": "Cost Threshold",
@@ -3575,12 +3593,13 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "Additional Settings",
 		"ADMINISTRATION": "Administration",
+		"ADMINISTRATION_ADVANCED": "Advanced",
 		"ADMINISTRATION_APP": "App",
 		"ADMINISTRATION_BOOKMARK": "Bookmark",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "Domain Settings",
 		"ADMINISTRATION_IAM": "IAM",
 		"ADMINISTRATION_POLICY": "Policy",
-		"ADMINISTRATION_PREFERENCE": "Preferences",
+		"ADMINISTRATION_PREFERENCES": "Preferences",
 		"ADMINISTRATION_ROLE": "Role",
 		"ADMINISTRATION_USER": "User",
 		"ADMINISTRATION_WORKSPACES": "Workspaces",
@@ -4222,12 +4241,16 @@
 			"CREATE_WEBHOOK_DESC": "Select a Plugin to receive events that occured in external monitoring services.",
 			"CREATE_WEBHOOK_TITLE": "Create New Webhook",
 			"DASHBOARD": {
-				"DASHBOARD": "Dashboard"
+				"DASHBOARD": "Dashboard",
+				"DASHBOARD_LIST": "Dashboards",
+				"NO_DASHBOARD": "No Dashboard",
+				"NO_DASHBOARD_DESC": "Shared dashboard can be added here."
 			},
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
 			"FAILED": "Failed",
 			"HELP": "Help",
+			"GO_TO_DASHBOARD": "Go to Dashboard",
 			"INVITE_ONLY": "Invite only",
 			"MEMBER": {
 				"ADD": "Add",

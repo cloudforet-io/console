@@ -41,6 +41,10 @@ class Config {
                 const edgeConfig = await edgeConfigClient.getAll();
                 console.debug('edgeConfig', edgeConfig);
                 this.config = { ...this.config, ...edgeConfig };
+            } if (import.meta.env?.VITE_NETLIFY_CONFIG) {
+                const netlifyConfig = JSON.parse(import.meta.env.VITE_NETLIFY_CONFIG);
+                console.log('netlifyConfig', netlifyConfig);
+                this.config = { ...this.config, ...netlifyConfig };
             }
         }
     }

@@ -83,6 +83,9 @@ export const useWidgetOptionValidation = ({
             const colorSchemaValue = fieldValue as ColorSchemaValue;
             return !colorSchemaValue.colorValue.length || !colorSchemaValue.colorName;
         }
+        if (field === 'pieChartType') {
+            return !fieldValue;
+        }
 
         return Array.isArray(fieldValue?.value) ? !fieldValue?.value.length : !fieldValue?.value;
     });

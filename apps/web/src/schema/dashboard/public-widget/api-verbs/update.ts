@@ -6,8 +6,6 @@ import type { WidgetType, WidgetState } from '@/common/modules/widgets/types/wid
 
 export interface PublicWidgetUpdateParameters {
     widget_id: string;
-    name?: string;
-    description?: string;
     size?: WidgetSize;
     widget_type?: WidgetType;
     options?: Record<string, any>;

@@ -1,6 +1,7 @@
 import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -8,7 +9,6 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
@@ -106,6 +106,19 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         highlightTag: 'new',
         icon: 'ic_service_data-sources',
     },
+    [MENU_ID.COST_ADVANCED_SETTINGS]: {
+        menuId: MENU_ID.COST_ADVANCED_SETTINGS,
+        routeName: COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME,
+        translationId: 'COST_EXPLORER.COST_ADVANCED_SETTINGS',
+        highlightTag: 'new',
+        icon: 'ic_service_advanced-settings',
+    },
+    [MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION]: {
+        menuId: MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION,
+        routeName: COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
+        translationId: 'COST_EXPLORER.ANOMALY_DETECTION_CONFIGURATION',
+        highlightTag: 'new',
+    },
     [MENU_ID.ALERT_MANAGER]: {
         menuId: MENU_ID.ALERT_MANAGER,
         routeName: ALERT_MANAGER_ROUTE._NAME,
@@ -148,50 +161,45 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ADMINISTRATION_APP',
         icon: 'ic_service_app',
     },
-    [MENU_ID.PREFERENCE]: {
-        menuId: MENU_ID.PREFERENCE,
-        routeName: PREFERENCE_ROUTE._NAME,
-        translationId: 'MENU.ADMINISTRATION_PREFERENCE',
+    [MENU_ID.ADVANCED]: {
+        menuId: MENU_ID.ADVANCED,
+        routeName: ADVANCED_ROUTE._NAME,
+        translationId: 'MENU.ADMINISTRATION_ADVANCED',
     },
-    [MENU_ID.DOMAIN_SETTINGS]: {
-        menuId: MENU_ID.DOMAIN_SETTINGS,
-        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS._NAME,
-        translationId: 'MENU.ADMINISTRATION_DOMAIN_SETTINGS',
-        highlightTag: 'update',
+    [MENU_ID.PREFERENCES]: {
+        menuId: MENU_ID.PREFERENCES,
+        routeName: ADVANCED_ROUTE.PREFERENCES._NAME,
+        translationId: 'MENU.ADMINISTRATION_PREFERENCES',
         icon: 'ic_service_domain-settings',
     },
-
     [MENU_ID.DOMAIN_INFORMATION]: {
         menuId: MENU_ID.DOMAIN_INFORMATION,
-        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.DOMAIN_INFORMATION._NAME,
+        routeName: ADVANCED_ROUTE.PREFERENCES.DOMAIN_INFORMATION._NAME,
         translationId: 'IAM.DOMAIN_SETTINGS.DOMAIN_INFORMATION',
     },
 
     [MENU_ID.APPEARANCE]: {
         menuId: MENU_ID.APPEARANCE,
-        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.APPEARANCE._NAME,
+        routeName: ADVANCED_ROUTE.PREFERENCES.APPEARANCE._NAME,
         translationId: 'IAM.DOMAIN_SETTINGS.APPEARANCE',
     },
 
     [MENU_ID.AUTO_DORMANCY_CONFIGURATION]: {
         menuId: MENU_ID.AUTO_DORMANCY_CONFIGURATION,
-        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME,
-        translationId: 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION',
-    },
-    [MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION]: {
-        menuId: MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION,
-        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
-        translationId: 'IAM.DOMAIN_SETTINGS.ANOMALY_DETECTION_CONFIGURATION',
+        routeName: ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME,
+        translationId: 'IAM.AUTO_DORMANCY_CONFIGURATION',
+        highlightTag: 'new',
+        icon: 'ic_service_dormancy-configuration',
     },
     [MENU_ID.WORKSPACES]: {
         menuId: MENU_ID.WORKSPACES,
-        routeName: PREFERENCE_ROUTE.WORKSPACES._NAME,
+        routeName: ADVANCED_ROUTE.WORKSPACES._NAME,
         translationId: 'MENU.ADMINISTRATION_WORKSPACES',
         icon: 'ic_service_workspaces',
     },
     [MENU_ID.BOOKMARK]: {
         menuId: MENU_ID.BOOKMARK,
-        routeName: PREFERENCE_ROUTE.BOOKMARK._NAME,
+        routeName: ADVANCED_ROUTE.BOOKMARK._NAME,
         translationId: 'MENU.ADMINISTRATION_BOOKMARK',
         highlightTag: 'new',
         icon: 'ic_service_bookmark',

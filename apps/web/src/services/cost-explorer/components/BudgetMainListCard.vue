@@ -22,10 +22,10 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import BudgetMainUsageProgressBar from '@/services/cost-explorer/components/BudgetMainUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 
 
 interface Props {

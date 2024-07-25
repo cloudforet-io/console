@@ -145,9 +145,9 @@ const fetchWidget = async (): Promise<WidgetLoadData|APIErrorToast|undefined> =>
 };
 
 /* Util */
-const loadWidget = async (data?: WidgetLoadData): Promise<WidgetLoadData|APIErrorToast> => {
+const loadWidget = async (): Promise<WidgetLoadData|APIErrorToast> => {
     state.loading = true;
-    const res = data ?? await fetchWidget();
+    const res = await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     state.loading = false;

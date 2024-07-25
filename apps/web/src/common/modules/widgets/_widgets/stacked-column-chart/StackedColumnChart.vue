@@ -38,6 +38,8 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type { StackByValue, XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 
 type Data = ListResponse<{
     [key: string]: string|number;
@@ -53,7 +55,14 @@ const state = reactive({
     xAxisData: [],
     chartData: [],
     chart: null as EChartsType | null,
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<BarSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
+        grid: {
+            left: 10,
+            right: 10,
+            containLabel: true,
+        },
         legend: {
             type: 'scroll',
             show: state.showLegends,
@@ -68,7 +77,8 @@ const state = reactive({
             formatter: (params) => {
                 const _params = Array.isArray(params) ? params : [params];
                 return _params.map((p) => {
-                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, p.seriesName);
+                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, p.seriesName);
+                    if (state.unit) _seriesName = `${_seriesName} (${state.unit})`;
                     const _value = numberFormatter(p.value) || '';
                     return `${_seriesName}<br>${p.marker} ${params.name}: <b>${_value}</b>`;
                 }).join('<br>');
@@ -205,9 +215,9 @@ const drawChart = (rawData?: Data|null) => {
     state.chartData = _seriesData;
 };
 
-const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+const loadWidget = async (): Promise<Data|APIErrorToast> => {
     state.loading = true;
-    const res = data ?? await fetchWidget();
+    const res = await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);

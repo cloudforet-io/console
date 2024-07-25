@@ -18,9 +18,9 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
+import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 
 const PAGE_SIZE = 10;
 
@@ -91,7 +91,7 @@ const handleClickReloadButton = async () => {
 };
 
 const handleClickCreateButton = () => {
-    window.open(router.resolve({ name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME) }).href);
+    window.open(router.resolve({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME) }).href);
 };
 
 const handleClickShowMore = async () => {

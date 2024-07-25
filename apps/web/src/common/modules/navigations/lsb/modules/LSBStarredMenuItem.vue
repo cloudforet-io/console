@@ -53,6 +53,8 @@ const props = withDefaults(defineProps<Props>(), {
         gap: 0.25rem;
     }
     .contents-wrapper {
+        max-height: 21rem;
+        overflow-y: auto;
         .no-data {
             @apply flex items-start text-gray-500;
             padding-right: 0.5rem;

@@ -1403,6 +1403,8 @@
 			"CANCEL": "취소",
 			"CHANGE_DATA_MODAL_DESCRIPTION": "아래 설정된 모든 옵션이 재설정됩니다.",
 			"CHANGE_DATA_MODAL_TITLE": "데이터를 변경하시겠습니까?",
+			"CLONE": "복제",
+			"CLONE_SUCCESS_MSG": "",
 			"CLOUD_SERVICE": {
 				"HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
 				"NO_DATA": "클라우드 리소스가 없습니다.",
@@ -1500,6 +1502,7 @@
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
 			"DONE": "완료",
+			"DONUT": "",
 			"EDIT": "편집",
 			"EDIT_WIDGET": "위젯 수정",
 			"EXPAND": "확장",
@@ -1573,6 +1576,8 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "지난 7일 ~ 예정 일정"
 			},
+			"PIE": "",
+			"PIE_CHART_TYPE": "",
 			"PREVIEW_TABLE_EMPTY_DESC": "여기에 데이터 구성의 미리보기가 표시됩니다.",
 			"PREVIEW_TABLE_EMPTY_TITLE": "데이터를 추가해 주세요.",
 			"REQUIRED_FIELDS_ARE_MISSING": "필수 필드 중 입력 누락 존재",
@@ -1648,7 +1653,8 @@
 				"SUB_TITLE_PROJECT_SUMMARY": "요약 정보",
 				"TITLE": "Trusted Advisor"
 			},
-			"UNABLE_TO_LOAD_WIDGET": "위젯 표시 불가"
+			"UNABLE_TO_LOAD_WIDGET": "위젯 표시 불가",
+			"WIDGET_TITLE_REQUIRED": ""
 		}
 	},
 	"COST_EXPLORER": {
@@ -1662,7 +1668,9 @@
 				"UNIT": "단위",
 				"VARIATION": "변동"
 			}
-		}
+		},
+		"ANOMALY_DETECTION_CONFIGURATION": "이상 비용 탐지 설정",
+		"COST_ADVANCED_SETTINGS": ""
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -1683,7 +1691,7 @@
 			"LABEL_VIWERS": "공개 여부",
 			"PRIVATE": "비공개",
 			"PROJECT": "프로젝트",
-			"SHARED": "공유",
+			"SHARED": "공유됨",
 			"SINGLE_PROJECT": "개별 프로젝트",
 			"TOOLTIP_CLONE": "복제",
 			"TOOLTIP_DELETE": "삭제",
@@ -1822,7 +1830,10 @@
 			}
 		},
 		"DETAIL": {
+			"1": "",
 			"ADD_WIDGET": "위젯 추가",
+			"ALL_PROJECTS": "모든 프로젝트",
+			"ALL_WORKSPACES": "전체 워크스페이스",
 			"ALT_S_SHARE_DASHBOARD": "대시보드 공유 완료",
 			"ALT_S_UNSHARE_DASHBOARD": "대시보드 공유 해제 완료",
 			"APPLY": "확인",
@@ -1861,10 +1872,17 @@
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "공유",
 			"SHARED_BY_ADMIN": "Admin에 의해 공유됨",
+			"SHARED_TO_ALL_PROJECTS": "",
 			"SHARED_TO_WORKSPACES": "워크스페이스에 공유됨",
+			"SHARE_DASHBOARD": "대시보드 공유",
+			"SHARE_TO_ALL_PROJECTS": "전체 프로젝트에 공유",
+			"SHARE_TO_ALL_PROJECTS_DESC": "이 대시보드를 모든 프로젝트에 공유 하시겠습니까?",
 			"SHARE_TO_ALL_WORKSPACES": "전체 워크스페이스에 공유",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "이 대시보드를 전체 워크스페이스에 공유하시겠습니까?",
 			"SHARE_WITH_CODE": "코드로 공유",
+			"UNSHARE_DASHBOARD": "대시보드 공유 해제",
+			"UNSHARE_FROM_ALL_PROJECTS": "전체 프로젝트에 공유 해제",
+			"UNSHARE_FROM_ALL_PROJECTS_DESC": "이 대시보드를 모든 프로젝트에서 공유 해제하시겠습니까?",
 			"UNSHARE_FROM_ALL_WORKSPACES": "전체 워크스페이스 공유 해제",
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "이 대시보드를 모든 워크스페이스에서 공유 해제하시겠습니까?"
 		},
@@ -1875,6 +1893,7 @@
 			"ALT_E_EDIT_NAME": "대시보드 이름 수정 실패",
 			"ALT_E_UPDATE_DASHBOARD_NAME": "대시보드 이름 수정 실패",
 			"ALT_S_DELETE_DASHBOARD": "대시보드 삭제 완료",
+			"ALT_S_EDIT_NAME": "대시보드 이름 수정 성공",
 			"CLONE_TITLE": "대시보드 복제",
 			"CUSTOM_DATE_FROM": "시작",
 			"CUSTOM_DATE_TITLE": "기간 선택",
@@ -1910,10 +1929,10 @@
 			"SAVE": "저장"
 		},
 		"LNB": {
-			"DEPRECATED": "",
+			"DEPRECATED": "지원 중지된",
 			"ONLY_FAVORITE": "즐겨찾기 항목만 노출",
-			"PRIVATE": "",
-			"SHARED": ""
+			"PRIVATE": "비공개",
+			"SHARED": "공유됨"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
@@ -2080,7 +2099,7 @@
 						"PROGRESS_CARD_DESC": "이 차트를 올바르게 표시하려면, 데이터에 최소 2개 이상의 데이터 필드가 있어야 합니다. ",
 						"TITLE": "추가 필드가 필요합니다."
 					},
-					"WIDGET_INFO": "위젯 기본 정보",
+					"WIDGET_HEADER": "",
 					"X_AXIS": "X축",
 					"Y_AXIS": "Y축"
 				}
@@ -2237,6 +2256,7 @@
 			"REGENERATE": "Client Secret 재생성",
 			"TITLE": "앱"
 		},
+		"AUTO_DORMANCY_CONFIGURATION": "휴면 정책 설정",
 		"BOOKMARK": {
 			"ADD_GLOBAL_BOOKMARK": "글로벌 북마크 추가",
 			"ADD_LINK": "링크 추가",
@@ -2268,13 +2288,11 @@
 			"ALT_S_UPDATE_DISPLAY_NAME": "도메인 표시 명 변경 완료",
 			"ALT_S_UPDATE_DORMANCY": "휴면 설정 업데이트 완료",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "타임존 & 언어 수정 완료",
-			"ANOMALY_DETECTION_CONFIGURATION": "이상 비용 탐지 설정",
 			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "이상 비용이 감지되면 각 워크스페이스별 Workspace Owner 역할(Role)을 가진 모든 사용자에게 이메일이 전송됩니다.",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "이상 비용 탐지를 활성화할 경우,",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "이상 비용이 감지될 때 각 워크스페이스에 특정 수신자에게 알림이 전송됩니다.",
 			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "이상 비용 탐지 활성화",
 			"APPEARANCE": "스타일 설정",
-			"AUTO_DORMANCY_CONFIGURATION": "휴면 정책 설정",
 			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "알림 이메일 전송",
 			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "비용 리포트",
 			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD": "비용 임계값",
@@ -3575,12 +3593,13 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "추가 설정",
 		"ADMINISTRATION": "관리",
+		"ADMINISTRATION_ADVANCED": "",
 		"ADMINISTRATION_APP": "앱",
 		"ADMINISTRATION_BOOKMARK": "북마크",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "도메인 설정",
 		"ADMINISTRATION_IAM": "사용자 및 접근 관리",
 		"ADMINISTRATION_POLICY": "정책",
-		"ADMINISTRATION_PREFERENCE": "환경설정",
+		"ADMINISTRATION_PREFERENCES": "환경설정",
 		"ADMINISTRATION_ROLE": "역할",
 		"ADMINISTRATION_USER": "사용자",
 		"ADMINISTRATION_WORKSPACES": "워크스페이스",
@@ -4222,12 +4241,16 @@
 			"CREATE_WEBHOOK_DESC": "외부 모니터링 서비스에서 발생한 이벤트를 수신할 플러그인을 선택하세요.",
 			"CREATE_WEBHOOK_TITLE": "신규 웹훅 생성",
 			"DASHBOARD": {
-				"DASHBOARD": "대시보드 "
+				"DASHBOARD": "대시보드 ",
+				"DASHBOARD_LIST": "대시보드 리스트",
+				"NO_DASHBOARD": "",
+				"NO_DASHBOARD_DESC": ""
 			},
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
 			"FAILED": "실패",
 			"HELP": "가이드",
+			"GO_TO_DASHBOARD": "",
 			"INVITE_ONLY": "초대된 사용자만",
 			"MEMBER": {
 				"ADD": "추가",

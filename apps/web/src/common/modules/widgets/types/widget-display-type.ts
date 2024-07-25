@@ -48,11 +48,12 @@ export interface WidgetFrameEmit {
     (event: 'click-expand'): void;
     (event: 'click-delete'): void;
     (event: 'click-edit'): void;
+    (event: 'click-clone'): void;
     (event: 'toggle-size', size: WidgetSize): void;
 }
 
 export type WidgetOverlayType = 'ADD'|'EDIT'|'EXPAND';
 
 export interface WidgetExpose<Data = any> {
-    loadWidget: (data?: Data) => Promise<Data|APIErrorToast>;
+    loadWidget: (...args: any) => Promise<Data|APIErrorToast>;
 }
