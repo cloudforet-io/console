@@ -4,8 +4,10 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { isEmpty } from 'lodash';
+
 import {
-    PIconModal, PDefinitionTable, PButton, PStatus,
+    PIconModal, PDefinitionTable, PButton, PStatus, PMarkdown,
 } from '@cloudforet/mirinae';
 
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
@@ -22,14 +24,17 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import type { WebhookType } from '@/services/project/types/project-alert-type';
 
 interface Props {
     visible?: boolean;
     succeedWebhook?: WebhookModel;
+    selectedPlugin?: WebhookType;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     succeedWebhook: undefined,
+    selectedPlugin: undefined,
 });
 
 const allReferenceStore = useAllReferenceStore();
@@ -128,6 +133,12 @@ const handleCopyWebhookUrl = () => {
                         {{ $t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.COPY_WEBHOOK_URL') }}
                     </p-button>
                 </div>
+                <p-markdown v-if="props?.selectedPlugin?.docs && !isEmpty(props?.selectedPlugin?.docs)"
+                            :markdown="props?.selectedPlugin?.docs"
+                            :language="storeState.language"
+                            remove-spacing
+                            class="markdown"
+                />
             </div>
         </template>
     </p-icon-modal>
@@ -168,6 +179,11 @@ const handleCopyWebhookUrl = () => {
             .button {
                 flex-shrink: 0;
             }
+        }
+        .markdown {
+            @apply border border-gray-200;
+            padding: 1rem;
+            border-radius: 0.375rem;
         }
     }
 }

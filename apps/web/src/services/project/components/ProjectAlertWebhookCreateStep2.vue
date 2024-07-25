@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+    computed,
     onMounted, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
@@ -23,6 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import ProjectAlertWebhookCreatedModal from '@/services/project/components/ProjectAlertWebhookCreatedModal.vue';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 import type { WebhookType } from '@/services/project/types/project-alert-type';
 
 interface Props {
@@ -32,6 +34,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     selectedType: undefined,
 });
+
+const projectDetailPageStore = useProjectDetailPageStore();
 
 const route = useRoute();
 
@@ -48,6 +52,11 @@ const state = reactive({
     pluginVersions: undefined as undefined|string,
     optionsSchema: null as null|JsonSchema|object,
     options: {} as Record<string, any>,
+    webhookTypeList: [] as WebhookType[],
+    selectedPlugin: computed<WebhookType|undefined>(() => {
+        const id = state.succeedWebhook?.plugin_info.plugin_id;
+        return state.webhookTypeList.find((i) => i.plugin_id === id);
+    }),
 });
 
 const {
@@ -120,6 +129,7 @@ const handleClickCreate = async () => {
             },
             project_id: route.params.id || '',
         });
+        state.webhookTypeList = await projectDetailPageStore.getListWebhookType();
         convertSucceedMode();
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '');
     } catch (e) {
@@ -229,6 +239,7 @@ onMounted(() => {
         <project-alert-webhook-created-modal v-if="state.isSucceedMode"
                                              :visible.sync="state.isSucceedMode"
                                              :succeed-webhook="state.succeedWebhook"
+                                             :selected-plugin="state.selectedPlugin"
         />
     </p-data-loader>
 </template>

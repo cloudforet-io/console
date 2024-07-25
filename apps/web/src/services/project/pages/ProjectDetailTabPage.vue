@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router/composables';
 import { isEmpty } from 'lodash';
 
 import {
-    PDataLoader, PHorizontalLayout, PTab, PDefinitionTable, PStatus, PHeading, PLazyImg, PBadge, PEmpty, PMarkdown,
+    PDataLoader, PHorizontalLayout, PTab, PDefinitionTable, PStatus, PHeading, PLazyImg, PBadge, PMarkdown,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
@@ -126,7 +126,7 @@ const singleItemTabState = reactive({
             name: 'details',
             label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS'),
         }];
-        if (state.selectedPlugin?.docs) {
+        if (state.selectedPlugin?.docs && !isEmpty(state.selectedPlugin?.docs)) {
             defaultTab.push({
                 name: 'help',
                 label: i18n.t('PROJECT.DETAIL.HELP'),
@@ -148,6 +148,9 @@ const tableState = reactive({
 });
 
 /* Watchers */
+watch(() => storeState.selectedWebhookItem, () => {
+    singleItemTabState.webhookDetailActiveTab = 'details';
+}, { immediate: true });
 watch(() => projectDetailPageState.projectId, async (projectId) => {
     if (projectId) {
         await Promise.allSettled([
@@ -156,19 +159,16 @@ watch(() => projectDetailPageState.projectId, async (projectId) => {
         ]);
     }
 });
-
 watch(() => route.name, () => {
     const exactRoute = route.matched.find((d) => singleItemTabState.tabs.find((tab) => tab.name === d.name));
     singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME;
 }, { immediate: true });
-
 watch([
     () => props.id,
     () => appContextStore.getters.globalGrantLoading,
 ], ([id, globalGrantLoading]) => {
     if (!globalGrantLoading) projectDetailPageStore.setProjectId(id);
 }, { immediate: true });
-
 watch([() => singleItemTabState.activeTab, () => state.item], () => {
     gnbStore.setBreadcrumbs(state.pageNavigation);
 });
@@ -263,13 +263,7 @@ onUnmounted(() => {
                             </div>
                         </div>
                         <div class="docs-wrapper">
-                            <p-empty v-if="!state.selectedPlugin?.docs"
-                                     class="empty"
-                            >
-                                {{ $t('PROJECT.DETAIL.NO_DATA') }}
-                            </p-empty>
-                            <p-markdown v-else
-                                        :markdown="state.selectedPlugin?.docs"
+                            <p-markdown :markdown="state.selectedPlugin?.docs"
                                         :language="storeState.language"
                                         remove-spacing
                                         class="markdown"
