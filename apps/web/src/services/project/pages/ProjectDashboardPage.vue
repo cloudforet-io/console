@@ -94,7 +94,7 @@ const setDefaultDashboard = () => {
 };
 const getDashboardData = async (dashboardId: string) => {
     try {
-        await dashboardDetailStore.getDashboardInfo(dashboardId, true);
+        await dashboardDetailStore.getDashboardInfo(dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -111,8 +111,8 @@ watch(() => state.currentDashboardId, async (dashboardId, prevDashboardId) => {
     if (dashboardId && !prevDashboardId) { // this includes all three cases
         dashboardDetailStore.reset();
     }
-    await getDashboardData(dashboardId);
     dashboardDetailStore.setProjectId(props.id);
+    await getDashboardData(dashboardId);
 }, { immediate: true });
 
 onUnmounted(() => {

@@ -157,7 +157,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             return _refinedVariablesSchema;
         }),
         refinedVars: computed<DashboardVars>(() => {
-            const isProjectSharedDashboard = state.dashboardInfo?.project_id === '*';
+            const isProjectSharedDashboard = !!state.projectId;
             const _vars: Record<string, string[]> = {};
             const originVars = state.vars;
             if (isProjectSharedDashboard && !!state.projectId) {
@@ -243,7 +243,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setOriginDashboardName = (name: string) => {
         if (state.dashboardInfo) state.dashboardInfo.name = name;
     };
-    const _setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel, isProject?: boolean) => {
+    const _setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
             console.error('setDashboardInfo failed', dashboardInfo);
             return;
@@ -263,7 +263,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        if (isProject) state.projectId = _dashboardInfo.project_id;
         state.vars = _dashboardInfo.vars ?? {};
         state.dashboardLayouts = _dashboardInfo.layouts ?? [];
     };
@@ -314,7 +313,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         })) ?? [];
         setDashboardWidgetInfoList(_dashboardWidgetInfoList);
     };
-    const getDashboardInfo = async (dashboardId: undefined|string, isProject?: boolean) => {
+    const getDashboardInfo = async (dashboardId: undefined|string) => {
         if (dashboardId === state.dashboardId || dashboardId === undefined) return;
 
         const isPrivate = dashboardId?.startsWith('private');
@@ -330,7 +329,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             if (result.version === '1.0') {
                 _setDashboardInfoStoreState(result);
             } else {
-                _setDashboardInfoStoreStateV2(result, isProject);
+                _setDashboardInfoStoreStateV2(result);
             }
         } catch (e) {
             reset();
