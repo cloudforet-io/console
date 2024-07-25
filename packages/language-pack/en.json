@@ -4206,6 +4206,7 @@
 			"ALT_S_ACTIVATE_ALERT": "Alert successfully activated",
 			"ALT_S_ADD_MEMBER": "Successfully Added Member ",
 			"ALT_S_ADD_WEBHOOK": "Webhook successfully added ",
+			"ALT_S_COPIED": "Copied",
 			"ALT_S_DELETE_MEMBER": "Member successfully deleted ",
 			"ALT_S_DELETE_PROJECT": "Project successfully deleted ",
 			"ALT_S_DELETE_WEBHOOK": "Webhook successfully deleted ",
@@ -4225,6 +4226,7 @@
 			},
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
+			"FAILED": "Failed",
 			"INVITE_ONLY": "Invite only",
 			"MEMBER": {
 				"ADD": "Add",
