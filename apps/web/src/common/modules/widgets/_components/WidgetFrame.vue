@@ -169,7 +169,7 @@ const handleToggleWidth = () => {
                      class="empty-content"
                      :title="$t('COMMON.WIDGETS.DATA_NOT_DISPLAYED')"
                      :show-image="props.size !== WIDGET_SIZE.sm"
-                     :show-button="props.mode === 'view'"
+                     :show-button="props.mode === 'view' && !props.disableManageButtons"
             >
                 <template #image>
                     <img class="empty-image"
