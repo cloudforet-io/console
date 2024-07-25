@@ -2582,7 +2582,7 @@
 				"ALT_S_DISABLE_USER_CHANNEL": "ユーザーのチャンネルの無効化に成功",
 				"ALT_S_ENABLE_PROJECT_CHANNEL": "プロジェクトチャンネルの有効化に成功",
 				"ALT_S_ENABLE_USER_CHANNEL": "ユーザーのチャンネルの有効化に成功",
-				"ASSOCIATED_MEMBER": "関連メンバー",
+				"ASSOCIATED_MEMBER": "メンバーチャンネルに通知",
 				"ASSOCIATED_MEMBER_DESC": "ワークスペースメンバーの個人通知チャネルに転送します。",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "スラックトークンは編集できません。",
@@ -4227,6 +4227,7 @@
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
 			"FAILED": "失敗",
+			"HELP": "ヘルプ",
 			"INVITE_ONLY": "招待のみ",
 			"MEMBER": {
 				"ADD": "追加",
@@ -4300,6 +4301,7 @@
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "ロード中...",
 			"NOTIFICATION_ALL_USERS": "このプロジェクトの全メンバー",
 			"NOTIFICATION_SPECIFIC_MEMBER": "特定のメンバー",
+			"NO_DATA": "データがありません",
 			"PROJECT_ALERT_ACTIVATE": "通知有効化",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "このプロジェクトのアラートを設定する",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "統合された外部イベントを受信するかこのプロジェクトを管理のためには「通知有効化」をクリックしてください。",
@@ -4335,7 +4337,8 @@
 			"WEBHOOK_DELETE": "削除",
 			"WEBHOOK_DISABLE": "無効化",
 			"WEBHOOK_ENABLE": "有効化",
-			"WEBHOOK_UPDATE": "変更"
+			"WEBHOOK_UPDATE": "変更",
+			"WORKSPACE_MEMBER": "ワークスペースメンバー"
 		},
 		"EVENT_RULE": {
 			"ADD": "追加",

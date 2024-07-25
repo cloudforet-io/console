@@ -78,7 +78,7 @@ const state = reactive({
             name: 'all',
         },
         {
-            label: i18n.t('PROJECT.DETAIL.NOTIFICATION_SPECIFIC_MEMBER'),
+            label: i18n.t('PROJECT.DETAIL.WORKSPACE_MEMBER'),
             name: 'specific',
         },
     ]),
