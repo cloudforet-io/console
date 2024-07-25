@@ -159,7 +159,7 @@ onUnmounted(() => {
                 <dashboard-widget-container-v2 ref="widgetContainerRef" />
             </div>
         </div>
-        <div v-else
+        <div v-else-if="!dashboardStore.state.loading"
              class="empty-contents"
         >
             <p-empty image-size="sm"
