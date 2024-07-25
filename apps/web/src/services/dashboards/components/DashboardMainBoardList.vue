@@ -78,7 +78,10 @@ const showBadge = (board: DashboardModel): boolean => {
     return false;
 };
 const getBadgeStyleType = (board: DashboardModel): string|undefined => {
-    if (board.shared) return 'indigo100';
+    if (board.shared) {
+        if (board.scope === 'PROJECT') return 'primary3';
+        return 'indigo100';
+    }
     if (board.version === '1.0') return 'red100';
     if (board.user_id) return 'gray150';
     return undefined;

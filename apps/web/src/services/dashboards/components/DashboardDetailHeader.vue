@@ -61,6 +61,7 @@ const state = reactive({
     }),
     badgeStyleType: computed<string>(() => {
         if (dashboardDetailState.dashboardScope === 'PRIVATE') return 'gray150';
+        if (state.sharedScope === 'PROJECT') return 'primary3';
         return 'indigo100';
     }),
     badgeText: computed(() => {
