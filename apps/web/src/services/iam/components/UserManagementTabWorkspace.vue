@@ -33,11 +33,11 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import UserManagementRemoveModal from '@/services/iam/components/UserManagementRemoveModal.vue';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 interface WorkspaceItem {

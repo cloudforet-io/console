@@ -1662,7 +1662,9 @@
 				"UNIT": "단위",
 				"VARIATION": "변동"
 			}
-		}
+		},
+		"ANOMALY_DETECTION_CONFIGURATION": "이상 비용 탐지 설정",
+		"COST_ADVANCED_SETTINGS": ""
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -2237,6 +2239,7 @@
 			"REGENERATE": "Client Secret 재생성",
 			"TITLE": "앱"
 		},
+		"AUTO_DORMANCY_CONFIGURATION": "휴면 정책 설정",
 		"BOOKMARK": {
 			"ADD_GLOBAL_BOOKMARK": "글로벌 북마크 추가",
 			"ADD_LINK": "링크 추가",
@@ -2268,13 +2271,11 @@
 			"ALT_S_UPDATE_DISPLAY_NAME": "도메인 표시 명 변경 완료",
 			"ALT_S_UPDATE_DORMANCY": "휴면 설정 업데이트 완료",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "타임존 & 언어 수정 완료",
-			"ANOMALY_DETECTION_CONFIGURATION": "이상 비용 탐지 설정",
 			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "이상 비용이 감지되면 각 워크스페이스별 Workspace Owner 역할(Role)을 가진 모든 사용자에게 이메일이 전송됩니다.",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "이상 비용 탐지를 활성화할 경우,",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "이상 비용이 감지될 때 각 워크스페이스에 특정 수신자에게 알림이 전송됩니다.",
 			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "이상 비용 탐지 활성화",
 			"APPEARANCE": "스타일 설정",
-			"AUTO_DORMANCY_CONFIGURATION": "휴면 정책 설정",
 			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "알림 이메일 전송",
 			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "비용 리포트",
 			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD": "비용 임계값",
@@ -3573,12 +3574,13 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "추가 설정",
 		"ADMINISTRATION": "관리",
+		"ADMINISTRATION_ADVANCED": "",
 		"ADMINISTRATION_APP": "앱",
 		"ADMINISTRATION_BOOKMARK": "북마크",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "도메인 설정",
 		"ADMINISTRATION_IAM": "사용자 및 접근 관리",
 		"ADMINISTRATION_POLICY": "정책",
-		"ADMINISTRATION_PREFERENCE": "환경설정",
+		"ADMINISTRATION_PREFERENCES": "환경설정",
 		"ADMINISTRATION_ROLE": "역할",
 		"ADMINISTRATION_USER": "사용자",
 		"ADMINISTRATION_WORKSPACES": "워크스페이스",
