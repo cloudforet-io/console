@@ -6,6 +6,7 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { map } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PBadge, PPaneLayout, PDefinitionTable, PTextBeautifier, PCollapsiblePanel, PTab, PI, PButton,
 } from '@cloudforet/mirinae';
@@ -24,6 +25,7 @@ import {
     ALERT_SEVERITY_COLORS,
     ALERT_SEVERITY_LABELS,
 } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 const router = useRouter();
@@ -123,6 +125,16 @@ const calculateTime = (time) => {
 };
 
 const handleRouteToSignInWithRedirectPath = () => {
+    if (SpaceConnector.getRefreshToken()) {
+        router.push({
+            name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+            params: {
+                id: state.alertData?.alert_id,
+                workspaceId: state.alertData?.workspace_id,
+            },
+        });
+        return;
+    }
     router.push({
         name: AUTH_ROUTE.SIGN_IN._NAME,
         query: {
@@ -214,13 +226,13 @@ const handleRouteToSignInWithRedirectPath = () => {
                                 <div class="data-description">
                                     <p-collapsible-panel :line-clamp="10">
                                         <p-text-beautifier class="description"
-                                                           :value="state.alertData.description"
+                                                           :value="state.alertData.description ?? ''"
                                         />&zwnj;
                                     </p-collapsible-panel>
                                 </div>
                             </template>
                             <template #data-rule="{value}">
-                                <span v-if="Object.keys(value).length === 0">
+                                <span v-if="Object.keys(value)?.length === 0">
                                     --
                                 </span>
                             </template>
@@ -246,7 +258,7 @@ const handleRouteToSignInWithRedirectPath = () => {
                                 {{ value }}
                             </template>
                             <template #data-resources="{ value }">
-                                <span v-if="value.length === 0">
+                                <span v-if="value?.length === 0">
                                     --
                                 </span>
                                 <template v-else>
@@ -273,7 +285,7 @@ const handleRouteToSignInWithRedirectPath = () => {
                                 <span v-else>--</span>
                             </template>
                             <template #data-additional_info="{value}">
-                                <span v-if="Object.keys(value).length === 0">
+                                <span v-if="Object.keys(value)?.length === 0">
                                     --
                                 </span>
                                 <template v-else>
