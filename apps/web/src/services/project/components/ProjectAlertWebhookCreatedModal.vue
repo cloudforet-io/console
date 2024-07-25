@@ -15,6 +15,9 @@ import { i18n as _i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
+import { copyAnyData } from '@/lib/helper/copy-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
@@ -62,7 +65,8 @@ const handleCloseSucceedModal = () => {
     router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, query: { tab: 'webhook' } });
 };
 const handleCopyWebhookUrl = () => {
-    navigator.clipboard.writeText(props.succeedWebhook?.webhook_url || '');
+    copyAnyData(props.succeedWebhook?.webhook_url || '');
+    showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_COPIED'), '');
 };
 </script>
 

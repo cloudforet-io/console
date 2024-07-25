@@ -347,7 +347,7 @@ onActivated(() => {
                 <span>{{ value || 0 }}</span>
             </template>
             <template #col-requests.error-format="{ value }">
-                <span class="col-failed-requests">{{ value || 0 }}</span>
+                <span class="col-failed-requests">{{ value || 0 }} {{ $t('PROJECT.DETAIL.FAILED') }}</span>
             </template>
         </p-toolbox-table>
         <p-table-check-modal :visible.sync="checkModalState.visible"
@@ -376,6 +376,9 @@ onActivated(() => {
             </template>
             <template #col-requests.total-format="{ value }">
                 <span>{{ value || 0 }}</span>
+            </template>
+            <template #col-requests.error-format="{ value }">
+                <span class="col-failed-requests">{{ value || 0 }} {{ $t('PROJECT.DETAIL.FAILED') }}</span>
             </template>
         </p-table-check-modal>
         <project-alert-webhook-update-modal
@@ -422,9 +425,9 @@ onActivated(() => {
             display: flex;
             align-items: center;
         }
-        .col-failed-requests {
-            @apply text-red-500;
-        }
+    }
+    .col-failed-requests {
+        @apply text-red-500;
     }
 
     /* custom delete-modal */

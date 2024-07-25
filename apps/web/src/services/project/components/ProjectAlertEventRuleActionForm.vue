@@ -67,16 +67,12 @@ const state = reactive({
         },
     ])),
     escalationPolicies: computed<EscalationPolicyReferenceMap>(() => allReferenceStore.getters.escalationPolicy),
-    escalationPolicyList: computed(() => {
-        const allowedProjectIds = [state.currentProjectId, '*'];
-        const escalationPolicieListFilteredByProjectId = Object.keys(state.escalationPolicies).filter((key) => allowedProjectIds.includes(state.escalationPolicies[key].data.project_id));
-        return escalationPolicieListFilteredByProjectId
-            .map((key) => ({
-                name: state.escalationPolicies[key].key,
-                label: state.escalationPolicies[key].name,
-                scope: state.escalationPolicies[key].data.resource_group,
-            }));
-    }),
+    escalationPolicyList: computed(() => Object.keys(state.escalationPolicies)
+        .map((key) => ({
+            name: state.escalationPolicies[key].key,
+            label: state.escalationPolicies[key].name,
+            scope: state.escalationPolicies[key].data.resource_group,
+        }))),
     resourceGroups: computed<Record<EscalationPolicyModel['resource_group'], TranslateResult>>(() => ({
         WORKSPACE: _i18n.t('MONITORING.ALERT.ESCALATION_POLICY.WORKSPACE'),
         PROJECT: _i18n.t('MONITORING.ALERT.ESCALATION_POLICY.PROJECT'),
@@ -90,8 +86,7 @@ const state = reactive({
         },
         set(projectIds) {
             state.proxyActions = {
-                ...state.proxyActions,
-                change_project: projectIds[0],
+                change_project: state.proxyIsProjectRoute ? projectIds[0] : undefined,
             };
         },
     }),
@@ -105,6 +100,7 @@ const state = reactive({
         set(changeUrgency) {
             state.proxyActions = {
                 ...state.proxyActions,
+                change_project: undefined,
                 change_urgency: changeUrgency !== URGENCY.NO_SET ? changeUrgency : undefined,
             };
         },
@@ -117,6 +113,7 @@ const state = reactive({
         set(items) {
             state.proxyActions = {
                 ...state.proxyActions,
+                change_project: undefined,
                 change_assignee: items[0]?.name,
             };
         },
@@ -129,6 +126,7 @@ const state = reactive({
         set(items) {
             state.proxyActions = {
                 ...state.proxyActions,
+                change_project: undefined,
                 change_escalation_policy: items[0]?.name,
             };
         },
@@ -138,6 +136,7 @@ const state = reactive({
         set(tags) {
             state.proxyActions = {
                 ...state.proxyActions,
+                change_project: undefined,
                 add_additional_info: tags,
             };
         },
@@ -147,6 +146,7 @@ const state = reactive({
         set(value) {
             state.proxyOptions = {
                 ...state.proxyOptions,
+                change_project: undefined,
                 stop_processing: value,
             };
         },

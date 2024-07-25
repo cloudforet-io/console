@@ -141,7 +141,8 @@ onMounted(() => {
     min-height: 22.5rem;
     overflow: visible;
     .card-wrapper {
-        @apply grid grid-cols-2;
+        @apply grid grid-cols-2 overflow-y-auto;
+        max-height: 23.875rem;
         grid-column-gap: 0.5rem;
         grid-row-gap: 0.5rem;
         .card {
