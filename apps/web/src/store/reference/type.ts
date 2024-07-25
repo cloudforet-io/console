@@ -15,7 +15,6 @@ export interface ReferenceItem<Data = Record<string, any>> {
     longitude?: string;
     data?: Data;
     description?: string;
-    long_description?: string;
     link?: string;
 }
 
