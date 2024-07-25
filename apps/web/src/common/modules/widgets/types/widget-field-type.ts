@@ -2,6 +2,7 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
 import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type { FormatRulesValue, WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 export interface DataFieldOptions {
@@ -89,6 +90,11 @@ export interface TotalOptions {
     toggle?: boolean;
 }
 
+export interface WidgetHeaderOptions {
+    default?: string;
+    toggle?: boolean;
+}
+
 export interface ComparisonOptions {
     toggle?: boolean;
     // forTable?: boolean;
@@ -115,7 +121,8 @@ export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxi
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
-    | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions;
+    | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions
+    | WidgetHeaderOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -130,16 +137,17 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'progressBar'
     | 'formatRules'
     | 'granularity' | 'colorSchema' | 'pieChartType'
-    | 'title' | 'description';
+    | 'widgetHeader';
 
 export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;
-    allValueMap: {
+    allValueMap?: {
         [key in WidgetFieldName]: WidgetFieldValues;
     }
     widgetFieldSchema?: WidgetFieldSchema<FieldOptions>;
     isValid?: boolean;
     value?: FieldValue;
+    widgetConfig?: WidgetConfig;
 }
 
 export interface WidgetFieldComponentEmit<ValueType> {

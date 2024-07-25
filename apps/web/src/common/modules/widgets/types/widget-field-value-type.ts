@@ -64,6 +64,12 @@ export interface TotalValue {
     freeze: boolean;
 }
 
+export interface WidgetHeaderValue {
+    toggleValue: boolean;
+    title?: string;
+    description?: string;
+}
+
 export type ColorValue = typeof COLOR_SCHEMA[keyof typeof COLOR_SCHEMA];
 export interface ColorSchemaValue {
     colorName: keyof typeof COLOR_SCHEMA;
@@ -72,4 +78,5 @@ export interface ColorSchemaValue {
 
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
-    | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue;
+    | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
+    | WidgetHeaderValue;
