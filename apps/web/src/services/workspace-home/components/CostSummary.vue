@@ -172,14 +172,37 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
             <div v-if="state.chartData?.results.length > 0">
                 <div class="content-wrapper">
                     <div class="price-wrapper">
-                        <div>
-                            <p>{{ $t('HOME.COST_SUMMARY_RECENT', { date: state.currentMonthValue.date }) }}</p>
+                        <div class="price-view">
+                            <p>{{ $t('HOME.COST_SUMMARY_LAST_MONT_TOTAL_COST') }}</p>
                             <p class="price">
                                 <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
                                 <span>{{ currencyMoneyFormatter(state.currentMonthValue.value, { currency: state.currency, style: 'decimal' }) }}</span>
+                                <!--                                <p-status v-bind="stateFormatter(value)"-->
+                                <!--                                          class="capitalize"-->
+                                <!--                                />-->
+                            </p>
+                            <p class="date">
+                                2024-03-01 ~ 2024-03-31
+                            </p>
+                        </div>
+                        <p-divider class="divider"
+                                   vertical
+                        />
+                        <div class="price-view">
+                            <p>{{ $t('HOME.COST_SUMMARY_CURRENT_TOTAL_COST') }}</p>
+                            <p class="price">
+                                <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
+                                <span>{{ currencyMoneyFormatter(state.currentMonthValue.value, { currency: state.currency, style: 'decimal' }) }}</span>
+                                <!--                                <p-status v-bind="stateFormatter(value)"-->
+                                <!--                                          class="capitalize"-->
+                                <!--                                />-->
+                            </p>
+                            <p class="date">
+                                2024-03-01 ~ 2024-03-31
                             </p>
                         </div>
                     </div>
+                    <span class="chart-description">{{ $t('HOME.COST_SUMMARY_DESC') }}</span>
                     <cost-summary-chart :period="state.period"
                                         :currency="state.currency"
                                         :data="state.chartData"
@@ -225,17 +248,32 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
     .content-wrapper {
         @apply flex flex-col;
         padding: 1.375rem 1.5rem 2rem;
-        gap: 2rem;
         .price-wrapper {
-            @apply flex flex-col text-label-md;
-            gap: 1rem;
-            .price {
-                @apply text-display-md;
-                margin-top: 0.25rem;
-                .unit {
-                    @apply text-display-sm text-gray-600;
+            @apply flex text-label-md border border-gray-200;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            border-radius: 0.375rem;
+            .price-view {
+                @apply flex flex-col;
+                flex: 1;
+                padding-right: 1rem;
+                padding-left: 1rem;
+                .price {
+                    @apply text-display-md;
+                    margin-top: 0.25rem;
+                    .unit {
+                        @apply text-display-sm text-gray-600;
+                    }
+                }
+                .date {
+                    margin-top: 0.5rem;
                 }
             }
+        }
+        .chart-description {
+            @apply text-paragraph-sm text-gray-700;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
         }
     }
     .divider {
