@@ -98,7 +98,7 @@ onMounted(() => {
                     <div class="info">
                         <p>{{ item.name }}</p>
                         <p class="desc">
-                            {{ (item.name !== item.tags?.description) ? item.tags?.description : '' }}
+                            {{ item.tags?.long_description || item.tags?.description }}
                         </p>
                     </div>
                     <!-- TODO: will be updated field name -->

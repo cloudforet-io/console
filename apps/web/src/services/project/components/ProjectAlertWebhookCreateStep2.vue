@@ -157,7 +157,9 @@ onMounted(() => {
                         class="image"
             />
             <div class="info">
-                <p>{{ props.selectedType.name }}</p>
+                <p class="name">
+                    {{ props.selectedType.name }}
+                </p>
                 <div class="desc-wrapper">
                     <p class="desc">
                         {{ props.selectedType.tags?.long_description || props.selectedType.tags?.description }}
@@ -233,7 +235,7 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .project-alert-webhook-create-step-2 {
-    width: 25rem;
+    width: 31rem;
     min-height: 22.5rem;
     .webhook-item {
         @apply flex;
@@ -244,11 +246,14 @@ onMounted(() => {
             flex: 1;
             max-width: calc(100% - 3.25rem);
             gap: 0.125rem;
+            .name {
+                @apply font-medium;
+            }
             .desc-wrapper {
                 @apply flex items-center text-label-sm;
                 gap: 0.25rem;
                 .desc {
-                    @apply truncate text-gray-500;
+                    @apply text-gray-500;
                     flex: 1;
                 }
             }
