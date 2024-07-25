@@ -50,6 +50,10 @@ const handleChangeWidgetOrder = async () => {
     });
     dashboardDetailStore.setDashboardLayouts(_updatedLayouts);
 };
+const getWidgetDefaultName = (widgetType: string): string => {
+    const _config = getWidgetConfig(widgetType);
+    return _config?.meta?.title || widgetType;
+};
 
 watch(() => dashboardDetailState.dashboardId, (after, before) => {
     if (after !== before) {
@@ -86,7 +90,9 @@ onUnmounted(() => {
                                  width="1rem"
                                  height="1rem"
                             />
-                            <span class="text">{{ widget.name }}</span>
+                            <span class="text"
+                                  :class="{ 'text-gray-400': !widget.name }"
+                            >{{ widget.name || getWidgetDefaultName(widget.widget_type) }}</span>
                         </div>
                     </div>
                 </draggable>
@@ -117,6 +123,7 @@ onUnmounted(() => {
     gap: 1.5625rem;
     font-size: 0.875rem;
     line-height: 125%;
+    padding-bottom: 1.5rem;
 
     .draggable-wrapper {
         display: flex;
@@ -147,7 +154,7 @@ onUnmounted(() => {
     }
 }
 .footer-wrapper {
-    @apply flex border-t border-gray-200;
+    @apply flex border-t border-gray-200 bg-white;
     width: 100%;
     gap: 0.75rem;
     padding: 0.75rem 1rem;

@@ -52,7 +52,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const getters = reactive({
         allItems: computed<Array<DashboardModel>>(() => [...state.privateDashboardItems, ...state.publicDashboardItems] as DashboardModel[]),
         domainItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'DOMAIN')),
-        workspaceItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))),
+        workspaceItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems
+            .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
+            .filter((item) => !(item.resource_group === 'DOMAIN' && item.scope === 'PROJECT'))),
         privateItems: computed<PrivateDashboardModel[]>(() => state.privateDashboardItems),
     });
 
@@ -108,7 +110,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const publicDashboardApiQueryHelper = new ApiQueryHelper();
-    const load = async () => {
+    const load = async (isProject?: boolean) => {
         publicDashboardApiQueryHelper.setFilters([]);
         if (_state.isAdminMode) {
             publicDashboardApiQueryHelper.addFilter({
@@ -124,6 +126,14 @@ export const useDashboardStore = defineStore('dashboard', () => {
             });
         }
 
+        if (isProject) {
+            publicDashboardApiQueryHelper.addFilter({
+                k: 'project_id',
+                v: '*',
+                o: '=',
+            });
+        }
+
         const _publicDashboardParams = {
             query: {
                 ...publicDashboardApiQueryHelper.data,
@@ -131,6 +141,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
         };
         state.loading = true;
         if (_state.isAdminMode) {
+            await fetchDashboard('PUBLIC', _publicDashboardParams);
+        } else if (isProject) {
             await fetchDashboard('PUBLIC', _publicDashboardParams);
         } else {
             await Promise.allSettled([

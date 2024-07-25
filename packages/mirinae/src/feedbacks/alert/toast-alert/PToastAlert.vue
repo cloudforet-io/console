@@ -100,9 +100,7 @@ const state = reactive({
 }
 
 .p-toast-alert {
-    margin-top: 2.25rem;
-    margin-left: 0;
-    margin-right: 0;
+    margin: 2.25rem 0;
     overflow-y: hidden;
 
     .alert-contents {

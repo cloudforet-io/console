@@ -25,7 +25,6 @@ import { store } from '@/store';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
-import config from '@/lib/config';
 import getRandomId from '@/lib/random-id-generator';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -129,9 +128,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         isDeprecatedDashboard: computed<boolean>(() => state.dashboardInfo?.version === '1.0'),
         isSharedDashboard: computed<boolean>(() => state.dashboardInfo?.workspace_id === '*'),
         disableManageButtons: computed<boolean>(() => {
-            const editableDomains = config.get('DASHBOARD_EDITABLE_DOMAINS');
-            if (!storeState.isAdminMode && getters.isSharedDashboard) return true;
-            return !editableDomains?.includes(storeState.domainId);
+            if (state.projectId) return true;
+            return !storeState.isAdminMode && getters.isSharedDashboard;
         }),
         refinedVariablesSchema: computed<DashboardVariablesSchema>(() => {
             const _storedVariablesSchema = cloneDeep(state.variablesSchema);
@@ -159,8 +157,13 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             return _refinedVariablesSchema;
         }),
         refinedVars: computed<DashboardVars>(() => {
+            const isProjectSharedDashboard = state.dashboardInfo?.project_id === '*';
             const _vars: Record<string, string[]> = {};
-            Object.entries(state.vars).forEach(([k, v]) => {
+            const originVars = state.vars;
+            if (isProjectSharedDashboard && !!state.projectId) {
+                originVars.project = [state.projectId];
+            }
+            Object.entries(originVars).forEach(([k, v]) => {
                 const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
                 if (idKey) _vars[idKey] = v;
             });
@@ -199,6 +202,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setDashboardInfo = (dashboardInfo: DashboardModel|null) => {
         state.dashboardInfo = dashboardInfo;
     };
+    const setDashboardWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>) => {
+        state.dashboardWidgets = dashboardWidgets;
+    };
     const setLoadingWidgets = (loading: boolean) => {
         state.loadingWidgets = loading;
     };
@@ -226,6 +232,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setLabels([]);
         setDashboardType('PUBLIC');
         setDashboardScope('WORKSPACE');
+        setVars({});
         //
         setDashboardWidgetInfoList([]);
         setLoadingWidgets(false);
@@ -236,7 +243,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setOriginDashboardName = (name: string) => {
         if (state.dashboardInfo) state.dashboardInfo.name = name;
     };
-    const _setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel) => {
+    const _setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel, isProject?: boolean) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
             console.error('setDashboardInfo failed', dashboardInfo);
             return;
@@ -256,7 +263,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        state.projectId = _dashboardInfo.project_id;
+        if (isProject) state.projectId = _dashboardInfo.project_id;
         state.vars = _dashboardInfo.vars ?? {};
         state.dashboardLayouts = _dashboardInfo.layouts ?? [];
     };
@@ -307,7 +314,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         })) ?? [];
         setDashboardWidgetInfoList(_dashboardWidgetInfoList);
     };
-    const getDashboardInfo = async (dashboardId: undefined|string) => {
+    const getDashboardInfo = async (dashboardId: undefined|string, isProject?: boolean) => {
         if (dashboardId === state.dashboardId || dashboardId === undefined) return;
 
         const isPrivate = dashboardId?.startsWith('private');
@@ -323,7 +330,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             if (result.version === '1.0') {
                 _setDashboardInfoStoreState(result);
             } else {
-                _setDashboardInfoStoreStateV2(result);
+                _setDashboardInfoStoreStateV2(result, isProject);
             }
         } catch (e) {
             reset();
@@ -444,6 +451,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariables,
         setVariablesInitMap,
         setDashboardInfo,
+        setDashboardWidgets,
         setLoadingWidgets,
         setDashboardType,
         setDashboardScope,

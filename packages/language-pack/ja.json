@@ -1403,6 +1403,8 @@
 			"CANCEL": "キャンセル",
 			"CHANGE_DATA_MODAL_DESCRIPTION": "下記に設定されたすべてのオプションがリセットされます。",
 			"CHANGE_DATA_MODAL_TITLE": "データを変更しますか？",
+			"CLONE": "複製",
+			"CLONE_SUCCESS_MSG": "",
 			"CLOUD_SERVICE": {
 				"HELP": "サービスしている主要なクラウドサービスリストを表示します",
 				"NO_DATA": "クラウドリソースがありません。",
@@ -1500,6 +1502,7 @@
 			"DEFAULT_WIDTH": "デフォルト幅",
 			"DELETE": "削除",
 			"DONE": "完了",
+			"DONUT": "",
 			"EDIT": "編集",
 			"EDIT_WIDGET": "ウィジェット編集",
 			"EXPAND": "展開する",
@@ -1573,6 +1576,8 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "過去7日〜予定日程"
 			},
+			"PIE": "",
+			"PIE_CHART_TYPE": "",
 			"PREVIEW_TABLE_EMPTY_DESC": "プレビューがここに表示されます。",
 			"PREVIEW_TABLE_EMPTY_TITLE": "データを追加してください。",
 			"REQUIRED_FIELDS_ARE_MISSING": "必須フィールドが欠落しています。",
@@ -1648,7 +1653,8 @@
 				"SUB_TITLE_PROJECT_SUMMARY": "サマリ情報",
 				"TITLE": "Trusted Advisor"
 			},
-			"UNABLE_TO_LOAD_WIDGET": "ウィジェット表示不可"
+			"UNABLE_TO_LOAD_WIDGET": "ウィジェット表示不可",
+			"WIDGET_TITLE_REQUIRED": ""
 		}
 	},
 	"COST_EXPLORER": {
@@ -1822,7 +1828,10 @@
 			}
 		},
 		"DETAIL": {
+			"1": "",
 			"ADD_WIDGET": "ウィジェットを追加する",
+			"ALL_PROJECTS": "すべてのプロジェクト",
+			"ALL_WORKSPACES": "すべてのワークスペース",
 			"ALT_S_SHARE_DASHBOARD": "ダッシュボードの共有が成功しました",
 			"ALT_S_UNSHARE_DASHBOARD": "ダッシュボードの共有解除が成功しました",
 			"APPLY": "確認",
@@ -1861,10 +1870,17 @@
 			"SET_HOME": "ホームダッシュボードとして設定",
 			"SHARE": "共有",
 			"SHARED_BY_ADMIN": "Adminにより共有",
+			"SHARED_TO_ALL_PROJECTS": "",
 			"SHARED_TO_WORKSPACES": "ワークスペースに共有",
+			"SHARE_DASHBOARD": "ダッシュボードを共有",
+			"SHARE_TO_ALL_PROJECTS": "すべてのプロジェクトに共有",
+			"SHARE_TO_ALL_PROJECTS_DESC": "このダッシュボードをすべてのプロジェクトに共有してもよろしいですか？",
 			"SHARE_TO_ALL_WORKSPACES": "すべてのワークスペースに共有する",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "このダッシュボードをすべてのワークスペースと共有しますか？",
 			"SHARE_WITH_CODE": "コードで共有",
+			"UNSHARE_DASHBOARD": "ダッシュボードの共有を解除",
+			"UNSHARE_FROM_ALL_PROJECTS": "すべてのプロジェクトから共有解除",
+			"UNSHARE_FROM_ALL_PROJECTS_DESC": "このダッシュボードをすべてのプロジェクトで共有解除しますか？",
 			"UNSHARE_FROM_ALL_WORKSPACES": "すべてのワークスペースから共有解除",
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "ワークスペース全体でこのダッシュボードの共有を解除してもよろしいですか？"
 		},
@@ -1875,6 +1891,7 @@
 			"ALT_E_EDIT_NAME": "ダッシュボード名の更新に失敗しました",
 			"ALT_E_UPDATE_DASHBOARD_NAME": "ダッシュボード名の更新に失敗しました",
 			"ALT_S_DELETE_DASHBOARD": "ダッシュボードが正常に削除されました",
+			"ALT_S_EDIT_NAME": "ダッシュボード名を編集しました",
 			"CLONE_TITLE": "ダッシュボードの複製",
 			"CUSTOM_DATE_FROM": "スタート",
 			"CUSTOM_DATE_TITLE": "期間選択",
@@ -1910,10 +1927,10 @@
 			"SAVE": "保存"
 		},
 		"LNB": {
-			"DEPRECATED": "",
+			"DEPRECATED": "サポート終了",
 			"ONLY_FAVORITE": "お気に入りだけを表示する",
-			"PRIVATE": "",
-			"SHARED": ""
+			"PRIVATE": "非公開",
+			"SHARED": "共有"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
@@ -2080,7 +2097,7 @@
 						"PROGRESS_CARD_DESC": "このグラフを適切に表示するには、少なくとも2つのデータフィールドが必要です。",
 						"TITLE": "追加のフィールドが必要です。"
 					},
-					"WIDGET_INFO": "ウィジェット情報",
+					"WIDGET_HEADER": "",
 					"X_AXIS": "X軸",
 					"Y_AXIS": "Y軸"
 				}
@@ -4211,10 +4228,14 @@
 			"ALT_S_UPDATE_PROJECT_TYPE": "プロジェクトアクセスが正常に更新されました",
 			"ALT_S_UPDATE_WEBHOOK": "ウェプフク編集成功",
 			"DASHBOARD": {
-				"DASHBOARD": "ダッシュボード"
+				"DASHBOARD": "ダッシュボード",
+				"DASHBOARD_LIST": "ダッシュボードリスト",
+				"NO_DASHBOARD": "",
+				"NO_DASHBOARD_DESC": ""
 			},
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
+			"GO_TO_DASHBOARD": "",
 			"INVITE_ONLY": "招待のみ",
 			"MEMBER": {
 				"ADD": "追加",

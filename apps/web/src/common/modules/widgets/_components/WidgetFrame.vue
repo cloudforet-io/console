@@ -37,6 +37,12 @@ const state = reactive({
             label: i18n.t('COMMON.WIDGETS.EDIT'),
             icon: 'ic_edit',
         },
+        {
+            type: 'item',
+            name: 'clone',
+            label: i18n.t('COMMON.WIDGETS.CLONE'),
+            icon: 'ic_clone',
+        },
         { type: 'divider', name: '' },
         {
             type: 'item',
@@ -51,6 +57,7 @@ const state = reactive({
         name: size,
         label: WIDGET_WIDTH_STR_MAP[size],
     }))),
+    unitText: computed<string>(() => Object.values(props.unitMap || {}).join(', ') || '--'),
 });
 
 /* Event */
@@ -59,6 +66,8 @@ const handleSelectEtcMenu = (selected: MenuItem) => {
         emit('click-expand');
     } else if (selected.name === 'edit') {
         emit('click-edit');
+    } else if (selected.name === 'clone') {
+        emit('click-clone');
     } else if (selected.name === 'delete') {
         emit('click-delete');
     }
@@ -77,7 +86,9 @@ const handleToggleWidth = () => {
          :class="{ full: state.isFull, [props.size]: props.size }"
          :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
-        <div class="widget-header">
+        <div v-if="props.title !== undefined"
+             class="widget-header"
+        >
             <h3 class="title">
                 {{ props.title }}
             </h3>
@@ -100,14 +111,14 @@ const handleToggleWidth = () => {
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>
-                            <span>{{ props.unit || '--' }}</span>
+                            <span>{{ state.unitText }}</span>
                         </div>
                         <div class="metadata-item-row">
                             <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.FULL_DATA_LINK') }}</span>
                             <template v-if="props.fullDataLinkList?.length">
                                 <div class="full-data-link-wrapper">
-                                    <p-link v-for="fullDataLink in props.fullDataLinkList"
-                                            :key="`${fullDataLink?.name}-${fullDataLink?.location}`"
+                                    <p-link v-for="(fullDataLink, idx) in props.fullDataLinkList"
+                                            :key="`${idx}-${fullDataLink?.name}`"
                                             new-tab
                                             highlight
                                             action-icon="internal-link"
@@ -260,10 +271,9 @@ const handleToggleWidth = () => {
         .metadata-content {
             @apply text-label-md;
             display: flex;
-            line-height: unset;
+            line-height: normal;
             flex-direction: column;
             gap: 0.5rem;
-            min-height: 6.25rem;
             max-height: 20rem;
             min-width: 20rem;
             max-width: 25rem;
@@ -320,9 +330,13 @@ const handleToggleWidth = () => {
         right: 0.25rem;
         top: 0.25rem;
         display: none;
+        z-index: 1000;
         padding: 0.25rem;
         &.selected {
             display: block;
+        }
+        .etc-button {
+            @apply bg-white;
         }
     }
 }

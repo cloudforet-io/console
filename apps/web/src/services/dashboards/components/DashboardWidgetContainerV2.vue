@@ -4,22 +4,35 @@ import {
     reactive, ref, watch, computed, onBeforeUnmount,
 } from 'vue';
 
-import { debounce, flattenDeep } from 'lodash';
+import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataLoader, PEmpty, PButton } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
+import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
 import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
+import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
+import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-widget/api-verbs/create';
 import type { PublicWidgetDeleteParameters } from '@/schema/dashboard/public-widget/api-verbs/delete';
 import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
+import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { widgetWidthAssigner } from '@/common/modules/widgets/_helpers/widget-width-helper';
@@ -37,8 +50,10 @@ import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { DashboardModel, UpdateDashboardParameters } from '@/services/dashboards/types/dashboard-api-schema-type';
+import type { SharedDataTableInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
-
+type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 type WidgetModel = PublicWidgetModel|PrivateWidgetModel;
 type RefinedWidgetInfo = WidgetModel & {
@@ -53,10 +68,14 @@ const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+const allReferenceStore = useAllReferenceStore();
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
 const widgetRef = ref<Array<WidgetComponent|null>>([]);
+const storeState = reactive({
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+});
 const state = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     mountedWidgetMap: {} as Record<string, boolean>,
@@ -165,6 +184,68 @@ const updateWidget = async (widgetId: string, size: WidgetSize) => {
     }
 };
 
+const listWidgetDataTables = async (widgetId: string) => {
+    const isPrivate = widgetId.startsWith('private');
+    const fetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>
+        : SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>;
+    try {
+        const { results } = await fetcher({ widget_id: widgetId });
+        if (!results) return [];
+        const _refinedResults = cloneDeep(results);
+        results.forEach((r, idx) => {
+            if (r.data_type === DATA_TABLE_TYPE.ADDED && r.source_type === 'COST') {
+                const _dataSourceId = r.options.COST?.data_source_id;
+                _refinedResults[idx].options.COST.plugin_id = storeState.costDataSource[_dataSourceId]?.data?.plugin_info?.plugin_id;
+                _refinedResults[idx].options.COST.data_source_id = undefined;
+            }
+        });
+        return _refinedResults ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+};
+const getRefinedDataTables = (dataTableList: DataTableModel[]) => {
+    const results: SharedDataTableInfo[] = [];
+
+    dataTableList.forEach((dt) => {
+        const _sharedDataTable = {
+            name: dt.name,
+            data_type: dt.data_type,
+            source_type: dt.source_type,
+            operator: dt.operator,
+            labels_info: dt.labels_info,
+            data_info: dt.data_info,
+            options: dt.options,
+        };
+        if (dt.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
+            if (dt.operator === 'JOIN' || dt.operator === 'CONCAT') {
+                const _dataTableIds = dt.options[dt.operator].data_tables;
+                const _dataTableIndices = _dataTableIds.map((dtId) => dataTableList.findIndex((d) => d.data_table_id === dtId));
+                _sharedDataTable.options = {
+                    [dt.operator]: {
+                        ...dt.options[dt.operator],
+                        data_tables: _dataTableIndices,
+                    },
+                };
+            } else if (dt.operator === 'EVAL' || dt.operator === 'QUERY') {
+                const _dataTableId = dt.options[dt.operator].data_table_id;
+                const _dataTableIdx = dataTableList.findIndex((d) => d.data_table_id === _dataTableId);
+                _sharedDataTable.options = {
+                    [dt.operator]: {
+                        ...dt.options[dt.operator],
+                        data_table_id: _dataTableIdx,
+                    },
+                };
+            }
+        }
+        results.push(_sharedDataTable);
+    });
+
+    return results;
+};
+
 
 /* Event */
 const handleClickDeleteWidget = (widget: RefinedWidgetInfo) => {
@@ -176,6 +257,51 @@ const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo, overlayType: WidgetO
     widgetGenerateStore.setWidgetForm(widget);
     widgetGenerateStore.setOverlayStep(2);
     widgetGenerateStore.setShowOverlay(true);
+};
+const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
+    if (!dashboardDetailState.dashboardId) return;
+    const isPrivate = widget.widget_id.startsWith('private');
+    const widgetCreateFetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.create<PrivateWidgetCreateParameters, PrivateWidgetModel>
+        : SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>;
+    const widgetUpdateFetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
+        : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
+    const dashboardUpdateFetcher = isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateDashboard.update<UpdateDashboardParameters, DashboardModel>
+        : SpaceConnector.clientV2.dashboard.publicDashboard.update<UpdateDashboardParameters, DashboardModel>;
+
+    const dataTableList = await listWidgetDataTables(widget.widget_id);
+    const dataTableIndex = dataTableList.findIndex((d) => d.data_table_id === widget.data_table_id);
+    const refinedDataTables = getRefinedDataTables(dataTableList);
+    try {
+        const createdWidget = await widgetCreateFetcher({
+            dashboard_id: dashboardDetailState.dashboardId,
+            widget_type: widget.widget_type,
+            size: widget.size,
+            options: {
+                ...widget.options,
+                title: widget.options.title ? `Clone - ${widget.options.title}` : undefined,
+            },
+            description: widget.description,
+            data_tables: refinedDataTables,
+            data_table_id: dataTableIndex,
+        });
+        const completedWidget = await widgetUpdateFetcher({
+            widget_id: createdWidget.widget_id,
+            state: 'ACTIVE',
+        });
+        dashboardDetailStore.addWidgetToDashboardLayouts(completedWidget.widget_id);
+        dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets, completedWidget]);
+        await dashboardUpdateFetcher({
+            dashboard_id: dashboardDetailState.dashboardId,
+            layouts: dashboardDetailState.dashboardLayouts,
+        });
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.CLONE_SUCCESS_MSG'), '');
+    } catch (e: any) {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    }
 };
 const handleToggleWidgetSize = async (widget: RefinedWidgetInfo, size: WidgetSize) => {
     const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widget.widget_id);
@@ -289,8 +415,6 @@ defineExpose({
                                :widget-id="widget.widget_id"
                                :widget-state="widget.state"
                                :data-table-id="widget.data_table_id"
-                               :title="widget.name"
-                               :description="widget.description"
                                :size="widget.size"
                                :width="widget.width"
                                :widget-options="widget.options"
@@ -303,6 +427,7 @@ defineExpose({
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                @mounted="handleWidgetMounted(widget.widget_id)"
                                @click-edit="handleOpenWidgetOverlay(widget, 'EDIT')"
+                               @click-clone="handleCloneWidget(widget)"
                                @click-delete="handleClickDeleteWidget(widget)"
                                @click-expand="handleOpenWidgetOverlay(widget, 'EXPAND')"
                                @toggle-size="handleToggleWidgetSize(widget, $event)"

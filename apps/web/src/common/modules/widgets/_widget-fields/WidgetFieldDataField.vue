@@ -71,6 +71,7 @@ const convertToMenuItem = (data: string[]|string) => {
 
 const initValue = () => {
     if (state.multiselectable) {
+        if (state.proxyValue && !Array.isArray(state.proxyValue)) state.proxyValue = [state.proxyValue];
         state.selectedItem = convertToMenuItem(state.proxyValue ?? []);
     } else {
         state.selectedItem = state.proxyValue;
@@ -85,6 +86,7 @@ watch(() => state.menuItems, (menuItems) => {
     if (!menuItems?.length) return;
 
     if (state.multiselectable) {
+        if (state.proxyValue && !Array.isArray(state.proxyValue)) state.proxyValue = [state.proxyValue];
         state.proxyValue = getInitialSelectedMenuItem(menuItems, state.proxyValue ?? []);
         state.selectedItem = convertToMenuItem(state.proxyValue ?? []);
     } else {

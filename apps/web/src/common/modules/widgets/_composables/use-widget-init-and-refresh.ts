@@ -14,7 +14,7 @@ import type {
 interface UseWidgetInitAndRefreshOptions<Data> {
     props: WidgetProps;
     emit: WidgetEmit;
-    loadWidget: (data?: Data) => Promise<Data|APIErrorToast>;
+    loadWidget: (...args: any) => Promise<Data|APIErrorToast>;
 }
 
 export const useWidgetInitAndRefresh = <Data = any>({

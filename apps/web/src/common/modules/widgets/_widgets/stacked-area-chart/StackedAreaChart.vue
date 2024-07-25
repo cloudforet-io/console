@@ -40,6 +40,8 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { LineByValue, XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 
 type Data = ListResponse<{
     [key: string]: string|number;
@@ -55,7 +57,14 @@ const state = reactive({
     chart: null as EChartsType | null,
     xAxisData: [],
     chartData: [],
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<LineSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
+        grid: {
+            left: 10,
+            right: 10,
+            containLabel: true,
+        },
         legend: {
             type: 'scroll',
             show: state.showLegends,
@@ -71,7 +80,8 @@ const state = reactive({
             confine: true,
             formatter: (params) => {
                 const _params = params as any[];
-                const _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
+                let _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
+                if (state.unit) _axisValue += ` (${state.unit})`;
                 const _values = _params.map((p) => {
                     const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.lineByField, p.seriesName);
                     const _value = p.value ? numberFormatter(p.value) : undefined;
@@ -234,9 +244,9 @@ const drawChart = (rawData: Data|null) => {
     }
 };
 
-const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+const loadWidget = async (): Promise<Data|APIErrorToast> => {
     state.loading = true;
-    const res = data ?? await fetchWidget();
+    const res = await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);

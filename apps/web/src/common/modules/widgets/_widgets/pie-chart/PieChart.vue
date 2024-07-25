@@ -37,6 +37,8 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 
 type Data = ListResponse<{
     [key: string]: string|number;
@@ -50,12 +52,15 @@ const state = reactive({
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: [],
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<PieSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
         tooltip: {
             trigger: 'item',
             position: 'inside',
             formatter: (params) => {
-                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, params.name);
+                let _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, params.name);
+                if (state.unit) _name = `${_name} (${state.unit})`;
                 const _value = numberFormatter(params.value) || '';
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
             },
@@ -72,20 +77,11 @@ const state = reactive({
             itemWidth: 10,
             itemHeight: 10,
             icon: 'circle',
-            formatter: (name) => {
-                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, name);
-                const _series = state.chart.getOption().series[0];
-                const _value = _series.data.filter((row) => row.name === name)[0]?.value;
-                if (props.size === 'full') {
-                    return `${_name}  ${numberFormatter(_value)}`;
-                }
-                return `${(_name.length > 15 ? `${_name.slice(0, 15)}...` : _name)}  ${numberFormatter(_value)}`;
-            },
         },
         series: [
             {
                 type: 'pie',
-                radius: ['30%', '70%'],
+                ...(state.chartType === 'donut' ? { radius: ['30%', '70%'] } : {}),
                 center: props.size === 'full' ? ['40%', '50%'] : ['30%', '50%'],
                 data: state.chartData,
                 emphasis: {
@@ -108,6 +104,7 @@ const state = reactive({
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy as GroupByValue)?.value as string),
     groupByCount: computed<number>(() => (props.widgetOptions?.groupBy as GroupByValue)?.count as number),
+    chartType: computed<string>(() => props.widgetOptions?.pieChartType as string),
     dateRange: computed<DateRange>(() => {
         const _dateRangeCount = Object.values(DATE_FIELD).includes(state.groupByField) ? state.groupByCount : 1;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
@@ -174,9 +171,9 @@ const drawChart = (rawData: Data|null) => {
     })) || [];
 };
 
-const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+const loadWidget = async (): Promise<Data|APIErrorToast> => {
     state.loading = true;
-    const res = data ?? await fetchWidget();
+    const res = await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);

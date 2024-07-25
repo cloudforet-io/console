@@ -71,10 +71,8 @@ const state = reactive({
     isWidgetFieldChanged: computed<boolean>(() => {
         const _isOptionsChanged = isWidgetOptionsChanged(false, widgetGenerateState.widgetFormValueMap, widgetGenerateState.widget?.options || {});
         const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widgetGenerateState.widget?.widget_type;
-        const _isNameChanged = widgetGenerateState.title !== widgetGenerateState.widget?.name;
-        const _isDescriptionChanged = widgetGenerateState.description !== widgetGenerateState.widget?.description;
-        emit('watch-options-changed', _isOptionsChanged || _isTypeChanged || _isNameChanged || _isDescriptionChanged);
-        return _isOptionsChanged || _isTypeChanged || _isNameChanged || _isDescriptionChanged;
+        emit('watch-options-changed', _isOptionsChanged || _isTypeChanged);
+        return _isOptionsChanged || _isTypeChanged;
     }),
     disableApplyButton: computed<boolean>(() => {
         if (!widgetGenerateGetters.isAllWidgetFormValid) return true;
@@ -99,8 +97,6 @@ const updateWidget = async () => {
     const _isCreating = widgetGenerateState.widget?.state === 'CREATING';
     await widgetGenerateStore.updateWidget({
         widget_id: widgetGenerateState.widgetId,
-        name: widgetGenerateState.title,
-        description: widgetGenerateState.description,
         size: widgetGenerateState.size,
         widget_type: widgetGenerateState.selectedWidgetName,
         data_table_id: widgetGenerateState.selectedDataTableId,
@@ -207,7 +203,9 @@ onUnmounted(() => {
                     <p-divider vertical
                                class="divider"
                     />
-                    <dashboard-variables-v2 disable-save-button />
+                    <dashboard-variables-v2 disable-save-button
+                                            :is-project-dashboard="!!dashboardDetailState.projectId"
+                    />
                     <p-button v-if="widgetGenerateState.overlayType === 'EXPAND'"
                               style-type="tertiary"
                               icon-left="ic_edit"
@@ -242,8 +240,6 @@ onUnmounted(() => {
                            :data-table-id="widgetGenerateState.selectedDataTableId"
                            :size="state.widgetSize"
                            :width="state.widgetWidth"
-                           :title="widgetGenerateState.widget.name"
-                           :description="widgetGenerateState.widget.description"
                            :widget-options="widgetGenerateState.widget.options"
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailGetters.refinedVars"
@@ -283,6 +279,7 @@ onUnmounted(() => {
     padding: 0 1.5rem 1rem 1.5rem;
     .left-part {
         @apply bg-gray-100 border border-gray-150 rounded-md;
+        max-width: 75%;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
@@ -336,6 +333,7 @@ onUnmounted(() => {
     &.expand {
         .left-part {
             @apply border-none;
+            max-width: 100%;
             padding: 1.5rem 0;
         }
     }
