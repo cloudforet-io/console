@@ -66,6 +66,7 @@ export const usePluginReferenceStore = defineStore('reference-plugin', () => {
                     name: pluginInfo.name,
                     icon: pluginInfo.tags.icon ? assetUrlConverter(pluginInfo.tags.icon) : '',
                     description: pluginInfo.tags.description ?? '',
+                    long_description: pluginInfo.tags.long_description ?? '',
                     link: pluginInfo.tags.link ?? '',
                 };
             });

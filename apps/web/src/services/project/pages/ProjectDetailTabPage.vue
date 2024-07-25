@@ -234,9 +234,8 @@ onUnmounted(() => {
                                         error-icon="ic_webhook"
                                         width="2rem"
                                         height="2rem"
-                                        class="mr-2"
                             />
-                            <div>
+                            <div class="plugin-info-wrapper">
                                 <p class="plugin-info">
                                     <span class="name">
                                         {{ state.selectedPlugin ? state.selectedPlugin?.label : storeState.selectedWebhookItem?.plugin_info.plugin_id }}
@@ -248,7 +247,7 @@ onUnmounted(() => {
                                     </p-badge>
                                 </p>
                                 <p class="desc">
-                                    {{ state.selectedPlugin?.description }}
+                                    {{ state.selectedPlugin?.long_description || state.selectedPlugin?.description }}
                                 </p>
                             </div>
                         </div>
@@ -287,15 +286,18 @@ onUnmounted(() => {
         .plugin-wrapper {
             @apply flex;
             gap: 1rem;
-            .plugin-info {
-                @apply flex items-center;
-                gap: 0.125rem;
-                .name {
-                    @apply text-label-xl font-bold;
+            .plugin-info-wrapper {
+                flex: 1;
+                .plugin-info {
+                    @apply flex items-center;
+                    gap: 0.125rem;
+                    .name {
+                        @apply text-label-xl font-bold;
+                    }
                 }
-            }
-            .desc {
-                @apply text-label-sm text-gray-600;
+                .desc {
+                    @apply text-label-sm text-gray-600;
+                }
             }
         }
         .docs-wrapper {
