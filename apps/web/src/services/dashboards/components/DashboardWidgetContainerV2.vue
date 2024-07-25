@@ -415,8 +415,6 @@ defineExpose({
                                :widget-id="widget.widget_id"
                                :widget-state="widget.state"
                                :data-table-id="widget.data_table_id"
-                               :title="widget.name"
-                               :description="widget.description"
                                :size="widget.size"
                                :width="widget.width"
                                :widget-options="widget.options"

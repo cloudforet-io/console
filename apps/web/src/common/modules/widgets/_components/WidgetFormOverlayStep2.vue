@@ -97,8 +97,6 @@ const updateWidget = async () => {
     const _isCreating = widgetGenerateState.widget?.state === 'CREATING';
     await widgetGenerateStore.updateWidget({
         widget_id: widgetGenerateState.widgetId,
-        name: widgetGenerateState.title,
-        description: widgetGenerateState.description,
         size: widgetGenerateState.size,
         widget_type: widgetGenerateState.selectedWidgetName,
         data_table_id: widgetGenerateState.selectedDataTableId,
@@ -242,8 +240,6 @@ onUnmounted(() => {
                            :data-table-id="widgetGenerateState.selectedDataTableId"
                            :size="state.widgetSize"
                            :width="state.widgetWidth"
-                           :title="widgetGenerateState.widget.name"
-                           :description="widgetGenerateState.widget.description"
                            :widget-options="widgetGenerateState.widget.options"
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailGetters.refinedVars"
