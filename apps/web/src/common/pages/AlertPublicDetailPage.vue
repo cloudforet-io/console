@@ -84,7 +84,7 @@ const tableState = reactive({
 
 const tabState = reactive({
     tabs: computed(() => ([
-        { name: 'details', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS') },
+        { name: 'details', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.ADDITIONAL_INFO') },
     ] as TabItem[])),
     activeTab: 'details',
     fields: computed(() => [
@@ -264,7 +264,7 @@ const handleRouteToSignInWithRedirectPath = () => {
                                 <template v-else>
                                     <p v-for="resource in value"
                                        :key="resource.resource_id"
-                                       class="additional-info"
+                                       class="additional-info mb-1"
                                     >
                                         {{ resource.name }}
                                     </p>
@@ -304,9 +304,6 @@ const handleRouteToSignInWithRedirectPath = () => {
                     >
                         <template #details>
                             <section>
-                                <p-heading heading-type="sub"
-                                           :title="$t('PAGE_SCHEMA.BASE_INFO')"
-                                />
                                 <p-definition-table :fields="additionalState.fields"
                                                     :data="additionalState.data"
                                                     :skeleton-rows="7"
