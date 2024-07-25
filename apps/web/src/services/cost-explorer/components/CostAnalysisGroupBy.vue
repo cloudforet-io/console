@@ -162,8 +162,8 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
                                @clear-selection="handleClearTagsGroupBy"
             />
         </div>
-        <p-select-dropdown v-if="costAnalysisPageGetters.additionalInfoGroupByItems.length"
-                           :menu="costAnalysisPageGetters.additionalInfoGroupByItems"
+        <p-select-dropdown v-if="costAnalysisPageGetters.metadataAdditionalInfoItems.length"
+                           :menu="costAnalysisPageGetters.metadataAdditionalInfoItems"
                            :selected.sync="state.selectedAdditionalGroupByMenu"
                            style-type="tertiary-icon-button"
                            button-icon="ic_ellipsis-horizontal"
