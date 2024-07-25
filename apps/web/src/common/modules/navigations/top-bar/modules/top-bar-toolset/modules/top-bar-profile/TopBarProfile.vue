@@ -167,7 +167,7 @@ const handleClickSignOut = async () => {
     if (state.isAdminMode) appContextStore.exitAdminMode();
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
-        query: { nextPath: route.fullPath },
+        query: { previousPath: route.fullPath },
     };
     await router.push(res);
 };

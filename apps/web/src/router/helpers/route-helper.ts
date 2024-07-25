@@ -8,7 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import {
-    ERROR_ROUTE, ROOT_ROUTE, ROUTE_SCOPE,
+    ERROR_ROUTE, EXTERNAL_PAGES, ROOT_ROUTE, ROUTE_SCOPE,
 } from '@/router/constant';
 import type { RouteScopeType } from '@/router/type';
 
@@ -66,16 +66,17 @@ export const processTokenVerification = (to: Route, next: NavigationGuardNext, r
         }
         next({
             name: AUTH_ROUTE.SIGN_OUT._NAME,
-            query: { nextPath: to.fullPath },
+            query: { previousPath: to.fullPath },
         });
         return false;
     }
 
     const ROOT_REDIRECT_SKIP_ROUTE_NAMES = [
         AUTH_ROUTE.SIGN_OUT._NAME,
-        AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
         ERROR_ROUTE._NAME,
-        ROOT_ROUTE.COST_REPORT._NAME,
+        AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
+        ERROR_ROUTE.EXPIRED_LINK._NAME,
+        ...EXTERNAL_PAGES,
     ];
 
     if (!ROOT_REDIRECT_SKIP_ROUTE_NAMES.includes(to.name as string) && routeScope === ROUTE_SCOPE.EXCLUDE_AUTH) {

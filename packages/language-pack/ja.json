@@ -1668,7 +1668,9 @@
 				"UNIT": "ユニット",
 				"VARIATION": "変動"
 			}
-		}
+		},
+		"ANOMALY_DETECTION_CONFIGURATION": "異常コスト検知設定",
+		"COST_ADVANCED_SETTINGS": ""
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -2254,6 +2256,7 @@
 			"REGENERATE": "Client Secretを再生成する",
 			"TITLE": "アプリ"
 		},
+		"AUTO_DORMANCY_CONFIGURATION": "休止設定",
 		"BOOKMARK": {
 			"ADD_GLOBAL_BOOKMARK": "グローバルブックマークを追加",
 			"ADD_LINK": "リンク 追加",
@@ -2285,13 +2288,11 @@
 			"ALT_S_UPDATE_DISPLAY_NAME": "表示名が正常に更新されました",
 			"ALT_S_UPDATE_DORMANCY": "休眠設定の更新が完了しました",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "タイムゾーンと言語が正常に更新されました",
-			"ANOMALY_DETECTION_CONFIGURATION": "異常コスト検知設定",
 			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "異常コストが検出されると、各ワークスペースのWorkspace Owner役割を持つすべてのユーザーにメールが送信されます。",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "異常コスト検出を有効にすると、",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "異常コストが検出されたときに各ワークスペースに特定の受信者に通知が送信されます。",
 			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "異常コスト検出を有効化",
 			"APPEARANCE": "スタイル設定",
-			"AUTO_DORMANCY_CONFIGURATION": "休止設定",
 			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "通知メール送信",
 			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "コストレポート",
 			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD": "コスト閾値",
@@ -2599,6 +2600,8 @@
 				"ALT_S_DISABLE_USER_CHANNEL": "ユーザーのチャンネルの無効化に成功",
 				"ALT_S_ENABLE_PROJECT_CHANNEL": "プロジェクトチャンネルの有効化に成功",
 				"ALT_S_ENABLE_USER_CHANNEL": "ユーザーのチャンネルの有効化に成功",
+				"ASSOCIATED_MEMBER": "メンバーチャンネルに通知",
+				"ASSOCIATED_MEMBER_DESC": "ワークスペースメンバーの個人通知チャネルに転送します。",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "スラックトークンは編集できません。",
 				"CANNOT_EDIT_TOKEN": "トークンを編集することができません。",
@@ -3590,12 +3593,13 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "追加設定",
 		"ADMINISTRATION": "管理",
+		"ADMINISTRATION_ADVANCED": "",
 		"ADMINISTRATION_APP": "アプリ",
 		"ADMINISTRATION_BOOKMARK": "ブックマーク",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "ドメイン設定",
 		"ADMINISTRATION_IAM": "ユーザー及び権限管理",
 		"ADMINISTRATION_POLICY": "Policy",
-		"ADMINISTRATION_PREFERENCE": "環境設定",
+		"ADMINISTRATION_PREFERENCES": "環境設定",
 		"ADMINISTRATION_ROLE": "役割",
 		"ADMINISTRATION_USER": "ユーザー",
 		"ADMINISTRATION_WORKSPACES": "ワークスペース",
@@ -3753,9 +3757,11 @@
 				"DETAILS": {
 					"ADDITIONAL_INFO": "追加情報",
 					"DETAILS": "詳細情報",
+					"RESOURCE": "リソース",
 					"RESOURCE_ID": "リソースID",
 					"RESOURCE_NAME": "リソース名",
-					"RESOURCE_TYPE": "リソースタイプ"
+					"RESOURCE_TYPE": "リソースタイプ",
+					"RESPONDER": "応答者"
 				},
 				"EDIT_MODAL_TITLE": "アラート名を修正",
 				"HEADER": {
@@ -3781,7 +3787,7 @@
 					"URGENCY": "緊急度"
 				},
 				"INFO": {
-					"ACCOUNT_ID": "Account ID",
+					"ACCOUNT_ID": "アカウントID",
 					"ACKNOWLEDGED": "確認時間",
 					"ALERT_ID": "アラートID",
 					"ALT_E_UPDATE_DESCRIPTION": "説明修正に失敗",
@@ -3833,10 +3839,12 @@
 					"CURRENT": "現在",
 					"HIDE": "隠す",
 					"LEVEL": "レベル",
+					"NOTIFICATION": "通知",
 					"NO_RESPONDER": "応答者なし",
 					"RESPONDER": "受信先",
 					"SHOW_RESPONDERS": "受信先を見る"
 				},
+				"SIGN_IN_BUTTON": "",
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "ステータスの更新に失敗しました",
 					"ALT_S_UPDATE_STATUS": "ステータスが正常に更新されました",
@@ -4217,6 +4225,7 @@
 			"ALT_S_ACTIVATE_ALERT": "アラート有効化に成功",
 			"ALT_S_ADD_MEMBER": "メンバー追加完了",
 			"ALT_S_ADD_WEBHOOK": "ウェプフク追加に成功",
+			"ALT_S_COPIED": "コピーしました",
 			"ALT_S_DELETE_MEMBER": "メンバー削除完了",
 			"ALT_S_DELETE_PROJECT": "プロジェクト削除完了",
 			"ALT_S_DELETE_WEBHOOK": "ウェプフク削除完了",
@@ -4227,6 +4236,10 @@
 			"ALT_S_UPDATE_PROJECT": "プロジェクト編集完了",
 			"ALT_S_UPDATE_PROJECT_TYPE": "プロジェクトアクセスが正常に更新されました",
 			"ALT_S_UPDATE_WEBHOOK": "ウェプフク編集成功",
+			"CLOSE": "閉じる",
+			"CREATE": "作成",
+			"CREATE_WEBHOOK_DESC": "外部監視サービスで発生したイベントを受信するプラグインを選択してください。",
+			"CREATE_WEBHOOK_TITLE": "新しいウェブフックの作成",
 			"DASHBOARD": {
 				"DASHBOARD": "ダッシュボード",
 				"DASHBOARD_LIST": "ダッシュボードリスト",
@@ -4235,6 +4248,8 @@
 			},
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
+			"FAILED": "失敗",
+			"HELP": "ヘルプ",
 			"GO_TO_DASHBOARD": "",
 			"INVITE_ONLY": "招待のみ",
 			"MEMBER": {
@@ -4307,6 +4322,9 @@
 			"MODAL_VALIDATION_LENGTH": "40文字以内で入力してください",
 			"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "ロード中...",
+			"NOTIFICATION_ALL_USERS": "このプロジェクトの全メンバー",
+			"NOTIFICATION_SPECIFIC_MEMBER": "特定のメンバー",
+			"NO_DATA": "データがありません",
 			"PROJECT_ALERT_ACTIVATE": "通知有効化",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "このプロジェクトのアラートを設定する",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "統合された外部イベントを受信するかこのプロジェクトを管理のためには「通知有効化」をクリックしてください。",
@@ -4342,7 +4360,8 @@
 			"WEBHOOK_DELETE": "削除",
 			"WEBHOOK_DISABLE": "無効化",
 			"WEBHOOK_ENABLE": "有効化",
-			"WEBHOOK_UPDATE": "変更"
+			"WEBHOOK_UPDATE": "変更",
+			"WORKSPACE_MEMBER": "ワークスペースメンバー"
 		},
 		"EVENT_RULE": {
 			"ADD": "追加",
@@ -4385,7 +4404,7 @@
 			"PAUSE_NOTIFICATION": "通知停止",
 			"PROJECT_ROUTING": "プロジェクトルーティング",
 			"SAVE": "保存",
-			"SNOOZED_NOTIFICATIONS": "通知なし",
+			"SNOOZED_NOTIFICATIONS": "通知停止",
 			"THEN_STOP_PROCESSING": "その後、作業は停止する",
 			"THESE_THINGS": "次の作業",
 			"TITLE_INFO_MESSAGE": "イベントルールは昇順で実行されます。",

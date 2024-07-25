@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import {
-    computed, reactive,
-} from 'vue';
+import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PPaneLayout, PDefinitionTable, PLink, PBadge,
+    PBadge, PDefinitionTable, PLink, PPaneLayout,
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { AlertSeverity } from '@/schema/monitoring/alert/type';
+import type { AlertModel } from '@/schema/monitoring/alert/model';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import { store } from '@/store';
@@ -23,34 +21,13 @@ import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-st
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import {
-    blue, coral, gray, red, violet, yellow,
-} from '@/styles/colors';
-
-import AlertDetailInfoTableDescription
-    from '@/services/alert-manager/components/AlertDetailInfoTableDescription.vue';
+import AlertDetailInfoTableDescription from '@/services/alert-manager/components/AlertDetailInfoTableDescription.vue';
 import AlertDetailInfoTableProject from '@/services/alert-manager/components/AlertDetailInfoTableProject.vue';
 import AlertTriggeredBy from '@/services/alert-manager/components/AlertMainDataTableTriggeredByField.vue';
+import { ALERT_SEVERITY_COLORS, ALERT_SEVERITY_LABELS } from '@/services/alert-manager/constants/alert-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
-
-const ALERT_SEVERITY_LABELS: Record<AlertSeverity, string> = {
-    CRITICAL: 'Critical',
-    ERROR: 'Error',
-    WARNING: 'Warning',
-    INFO: 'Info',
-    NOT_AVAILABLE: 'Not Available',
-    NONE: 'None',
-};
-const ALERT_SEVERITY_COLORS: Record<AlertSeverity, string> = {
-    CRITICAL: red[600],
-    ERROR: coral[600],
-    WARNING: yellow[600],
-    INFO: blue[600],
-    NOT_AVAILABLE: violet[800],
-    NONE: gray[500],
-};
 
 const props = defineProps<{
     id?: string;
@@ -80,14 +57,15 @@ const state = reactive({
             copyValueFormatter: () => state.data.triggered_by,
         },
         { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
-        { name: 'resource.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
+        { name: 'resources', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE'), disableCopy: true },
+        { name: 'responder', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESPONDER') },
         { name: 'created_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.CREATED'), disableCopy: true },
         { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
         { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
     ]),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
-    data: computed(() => alertPageState.alertData ?? {}),
+    data: computed<Partial<AlertModel>>(() => alertPageState.alertData ?? {}),
     escalationPolicyName: '',
     timezone: computed(() => store.state.user.timezone),
 });
@@ -171,6 +149,22 @@ const getEscalationPolicy = async () => {
             </template>
             <template #data-account="{ value }">
                 {{ value }}
+            </template>
+            <template #data-resources="{ value }">
+                <span v-if="value.length === 0">
+                    --
+                </span>
+                <template v-else>
+                    <p v-for="resource in value"
+                       :key="resource.resource_id"
+                       class="additional-info"
+                    >
+                        {{ resource.name }}
+                    </p>
+                </template>
+            </template>
+            <template #data-responder>
+                {{ state.data?.responder }}
             </template>
             <template #data-created_at>
                 {{ iso8601Formatter(state.data.created_at, state.timezone) }}

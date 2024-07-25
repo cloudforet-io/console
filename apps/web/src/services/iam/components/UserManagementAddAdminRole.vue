@@ -26,12 +26,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import type { AddModalMenuItem } from '@/services/iam/types/user-type';
-import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 interface Props {
     isSetAdminRole: boolean;
@@ -229,7 +229,7 @@ watch(() => state.proxyIsSetAdminRole, () => {
                             <template #button>
                                 <p-button style-type="substitutive"
                                           icon-left="ic_plus_bold"
-                                          @click="router.push({ name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME) })"
+                                          @click="router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME) })"
                                 >
                                     {{ $t('IAM.USER.FORM.CREATE_WORKSPACE') }}
                                 </p-button>

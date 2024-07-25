@@ -1,19 +1,46 @@
+<script setup lang="ts">
+import {
+    computed, reactive,
+} from 'vue';
+
+import {
+    PCheckbox, PI, PTextHighlighting, getTextHighlightRegex,
+} from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+interface Props {
+    item: DataTableFieldType;
+    value: string[];
+    searchText: string;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{(e: 'update:value', value: string[]): void;
+}>();
+
+const state = reactive({
+    regex: computed(() => getTextHighlightRegex(props.searchText)),
+    proxyValue: useProxyValue('value', props, emit),
+});
+
+</script>
+
 <template>
-    <span v-show="regex.test(item.name)"
-          :key="item.key"
+    <span v-show="state.regex.test(props.item.label ?? props.item.name)"
+          :key="props.item.name"
           class="column-item"
-          :class="{'draggable-item' :proxySelectedKeys.includes(item.key)}"
+          :class="{'draggable-item' :(state.proxyValue ?? []).includes(props.item.name)}"
     >
-        <p-checkbox v-model="proxySelectedKeys"
-                    :value="item.key"
+        <p-checkbox v-model="state.proxyValue"
+                    :value="props.item.name"
         >
-            <p-text-highlighting :text="item.name"
+            <p-text-highlighting :text="props.item.label ?? props.item.name"
                                  :term="searchText"
                                  style-type="secondary"
             />
-            <span v-if="item.options && item.options.field_description"
-                  class="ml-1 text-gray-400"
-            >{{ item.options.field_description }}</span>
         </p-checkbox>
         <p-i name="ic_drag-handle-alt"
              width="1rem"
@@ -23,69 +50,6 @@
 
     </span>
 </template>
-
-<script lang="ts">
-import type { PropType, SetupContext } from 'vue';
-import {
-    computed,
-    defineComponent, reactive, toRefs,
-} from 'vue';
-
-import {
-    PCheckbox, PI, PTextHighlighting, getTextHighlightRegex,
-} from '@cloudforet/mirinae';
-import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
-import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
-
-interface Props {
-    item: DynamicField[];
-    selectedKeys: string[];
-    searchText: string;
-}
-export default defineComponent<Props>({
-    name: 'ColumnItem',
-    components: {
-        PI,
-        PCheckbox,
-        PTextHighlighting,
-    },
-    model: {
-        prop: 'selectedKeys',
-        event: 'update:selectedKeys',
-    },
-    props: {
-        item: {
-            type: Object as PropType<DynamicField>,
-            default: () => ({}),
-            validator(item: DynamicField) {
-                return typeof item === 'object' && typeof item.name === 'string' && typeof item.key === 'string';
-            },
-        },
-        selectedKeys: {
-            type: Array as PropType<string[]>,
-            default: () => [],
-        },
-        searchText: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            regex: computed(() => getTextHighlightRegex(props.searchText)),
-            proxySelectedKeys: useProxyValue('selectedKeys', props, emit),
-        });
-
-
-        return {
-            ...toRefs(state),
-            TAGS_PREFIX,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .column-item {

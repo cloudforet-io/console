@@ -25,12 +25,12 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { gray } from '@/styles/colors';
 
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
 interface Props {
@@ -86,7 +86,7 @@ const actionWorkspace = (type: string, workspaceId: string) => {
         speed: 1,
     });
     router.push({
-        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+        name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME),
         query: {
             modalType: type,
             selectedWorkspaceId: workspaceId,

@@ -1668,7 +1668,9 @@
 				"UNIT": "Unit",
 				"VARIATION": "Variation"
 			}
-		}
+		},
+		"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
+		"COST_ADVANCED_SETTINGS": "Advanced Settings"
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -2254,6 +2256,7 @@
 			"REGENERATE": "Regenerate Client Secret",
 			"TITLE": "App"
 		},
+		"AUTO_DORMANCY_CONFIGURATION": "Dormancy Configuration",
 		"BOOKMARK": {
 			"ADD_GLOBAL_BOOKMARK": "Add Global Bookmark",
 			"ADD_LINK": "Add Link",
@@ -2285,13 +2288,11 @@
 			"ALT_S_UPDATE_DISPLAY_NAME": "Display name successfully updated",
 			"ALT_S_UPDATE_DORMANCY": "Dormancy configuration successfully changed",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "Timezone & language successfully updated",
-			"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
 			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "When anomaly costs are detected, an email will be sent to all users with the Workspace Owner role type for each Workspace.",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "With Anomaly Detection Configuration turned on,",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "notifications will be sent to particular recipients associated with each workspace when an anomaly in cost is detected.",
 			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "Enable Anomaly Detection Configuration",
 			"APPEARANCE": "Appearance",
-			"AUTO_DORMANCY_CONFIGURATION": "Dormancy Configuration",
 			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "Send email notifications",
 			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "Cost Report",
 			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD": "Cost Threshold",
@@ -2599,6 +2600,8 @@
 				"ALT_S_DISABLE_USER_CHANNEL": "User Channel successfully disabled ",
 				"ALT_S_ENABLE_PROJECT_CHANNEL": "Project Channel successfully enabled ",
 				"ALT_S_ENABLE_USER_CHANNEL": "User Channel successfully enabled ",
+				"ASSOCIATED_MEMBER": "Notify to Member Channel",
+				"ASSOCIATED_MEMBER_DESC": "Forward to workspace members' personal notification channels.",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "Slack Token is unable to edit.",
 				"CANNOT_EDIT_TOKEN": "Token is unable to edit.",
@@ -3590,12 +3593,13 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "Additional Settings",
 		"ADMINISTRATION": "Administration",
+		"ADMINISTRATION_ADVANCED": "Advanced",
 		"ADMINISTRATION_APP": "App",
 		"ADMINISTRATION_BOOKMARK": "Bookmark",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "Domain Settings",
 		"ADMINISTRATION_IAM": "IAM",
 		"ADMINISTRATION_POLICY": "Policy",
-		"ADMINISTRATION_PREFERENCE": "Preferences",
+		"ADMINISTRATION_PREFERENCES": "Preferences",
 		"ADMINISTRATION_ROLE": "Role",
 		"ADMINISTRATION_USER": "User",
 		"ADMINISTRATION_WORKSPACES": "Workspaces",
@@ -3753,9 +3757,11 @@
 				"DETAILS": {
 					"ADDITIONAL_INFO": "Additional Information",
 					"DETAILS": "Details",
+					"RESOURCE": "Resource",
 					"RESOURCE_ID": "Resource ID",
 					"RESOURCE_NAME": "Resource Name",
-					"RESOURCE_TYPE": "Resource Type"
+					"RESOURCE_TYPE": "Resource Type",
+					"RESPONDER": "Responder"
 				},
 				"EDIT_MODAL_TITLE": "Edit Alert Name",
 				"HEADER": {
@@ -3833,10 +3839,12 @@
 					"CURRENT": "Current",
 					"HIDE": "hide",
 					"LEVEL": "Level",
+					"NOTIFICATION": "Notification",
 					"NO_RESPONDER": "No Responder",
 					"RESPONDER": "Responder",
 					"SHOW_RESPONDERS": "show responders"
 				},
+				"SIGN_IN_BUTTON": "Sign in to Manage Details",
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "Failed to Update Status",
 					"ALT_S_UPDATE_STATUS": "Status successfully updated ",
@@ -4217,6 +4225,7 @@
 			"ALT_S_ACTIVATE_ALERT": "Alert successfully activated",
 			"ALT_S_ADD_MEMBER": "Successfully Added Member ",
 			"ALT_S_ADD_WEBHOOK": "Webhook successfully added ",
+			"ALT_S_COPIED": "Copied",
 			"ALT_S_DELETE_MEMBER": "Member successfully deleted ",
 			"ALT_S_DELETE_PROJECT": "Project successfully deleted ",
 			"ALT_S_DELETE_WEBHOOK": "Webhook successfully deleted ",
@@ -4227,6 +4236,10 @@
 			"ALT_S_UPDATE_PROJECT": "Project successfully updated ",
 			"ALT_S_UPDATE_PROJECT_TYPE": "Project Access successfully updated ",
 			"ALT_S_UPDATE_WEBHOOK": "Webhook successfully updated ",
+			"CLOSE": "Close",
+			"CREATE": "Create",
+			"CREATE_WEBHOOK_DESC": "Select a Plugin to receive events that occured in external monitoring services.",
+			"CREATE_WEBHOOK_TITLE": "Create New Webhook",
 			"DASHBOARD": {
 				"DASHBOARD": "Dashboard",
 				"DASHBOARD_LIST": "Dashboards",
@@ -4235,6 +4248,8 @@
 			},
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
+			"FAILED": "Failed",
+			"HELP": "Help",
 			"GO_TO_DASHBOARD": "Go to Dashboard",
 			"INVITE_ONLY": "Invite only",
 			"MEMBER": {
@@ -4307,6 +4322,9 @@
 			"MODAL_VALIDATION_LENGTH": "Must be longer than 40 characters.",
 			"MODAL_VALIDATION_REQUIRED": "Required field",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "Loading...",
+			"NOTIFICATION_ALL_USERS": "All Members in this project",
+			"NOTIFICATION_SPECIFIC_MEMBER": "Specific Members",
+			"NO_DATA": "No Data",
 			"PROJECT_ALERT_ACTIVATE": "Activate Alert",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "Set an Alert of this Project",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "Click ‘Activate Alert’ to receive integrated external events or manage of this project.",
@@ -4342,7 +4360,8 @@
 			"WEBHOOK_DELETE": "Delete",
 			"WEBHOOK_DISABLE": "Disable",
 			"WEBHOOK_ENABLE": "Enable",
-			"WEBHOOK_UPDATE": "Update"
+			"WEBHOOK_UPDATE": "Update",
+			"WORKSPACE_MEMBER": "Workspace Member"
 		},
 		"EVENT_RULE": {
 			"ADD": "Add",
@@ -4385,7 +4404,7 @@
 			"PAUSE_NOTIFICATION": "Pause Notifications",
 			"PROJECT_ROUTING": "Project Routing",
 			"SAVE": "Save",
-			"SNOOZED_NOTIFICATIONS": "No Notifications",
+			"SNOOZED_NOTIFICATIONS": "Silence",
 			"THEN_STOP_PROCESSING": "Then stop processing",
 			"THESE_THINGS": "these things",
 			"TITLE_INFO_MESSAGE": "Event rules are executed in ascending order.",

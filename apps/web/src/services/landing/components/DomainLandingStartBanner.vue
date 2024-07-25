@@ -7,9 +7,9 @@ import { PButton, screens, PTextButton } from '@cloudforet/mirinae';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const router = useRouter();
 
@@ -23,7 +23,7 @@ const state = reactive({
 const handleClickButton = (type: string) => {
     if (type === 'create') {
         window.open(router.resolve({
-            name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+            name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME),
             query: {
                 hasNoWorkspace: 'true',
             },

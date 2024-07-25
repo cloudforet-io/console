@@ -23,7 +23,7 @@ import { i18n } from '@/translations';
 
 import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { AddModalMenuItem } from '@/services/iam/types/user-type';
+import type { AddModalMenuItem, LocalType } from '@/services/iam/types/user-type';
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
@@ -35,7 +35,8 @@ const targetRef = ref<HTMLElement | null>(null);
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const authTypeMenuItem = ref([
-    { label: 'Local', name: 'LOCAL' },
+    { label: 'Local(Email)', name: 'EMAIL' },
+    { label: 'Local(ID)', name: 'ID' },
 ]);
 
 const state = reactive({
@@ -47,7 +48,7 @@ const state = reactive({
 });
 const formState = reactive({
     searchText: '',
-    selectedMenuItem: authTypeMenuItem.value[0].name as AuthType,
+    selectedMenuItem: authTypeMenuItem.value[0].name as AuthType|LocalType,
 });
 const validationState = reactive({
     userIdInvalid: undefined as undefined | boolean,
@@ -82,8 +83,8 @@ const handleClickDeleteButton = (idx: number) => {
     state.selectedItems.splice(idx, 1);
     emit('change-input', { userList: state.selectedItems });
 };
-const handleSelectDropdownItem = (selected: string) => {
-    formState.selectedMenuItem = selected as AuthType;
+const handleSelectDropdownItem = (selected: AuthType|LocalType) => {
+    formState.selectedMenuItem = selected;
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
 };
@@ -104,7 +105,7 @@ const getUserList = async () => {
     }
 };
 const checkEmailValidation = () => {
-    if (formState.selectedMenuItem === 'LOCAL') {
+    if (formState.selectedMenuItem === 'EMAIL') {
         const { isValid, invalidText } = checkEmailFormat(formState.searchText);
         if (!isValid) {
             validationState.userIdInvalid = true;
@@ -146,9 +147,9 @@ const initAuthTypeList = async () => {
 };
 const addSelectedItem = (isNew: boolean) => {
     state.selectedItems.unshift({
-        user_id: formState.searchText,
-        label: formState.searchText,
-        name: formState.searchText,
+        user_id: formState.searchText?.trim(),
+        label: formState.searchText?.trim(),
+        name: formState.searchText?.trim(),
         isNew,
         auth_type: formState.selectedMenuItem,
     });
@@ -294,7 +295,7 @@ onMounted(() => {
                 <div class="selected-toolbox">
                     <p-badge v-if="item.auth_type"
                              badge-type="subtle"
-                             :style-type="item.auth_type === 'LOCAL' ? 'primary3' : 'blue200'"
+                             :style-type="(item.auth_type === 'EMAIL' || item.auth_type === 'ID') ? 'primary3' : 'blue200'"
                     >
                         {{ authTypeMenuItem.find((i) => i.name === item.auth_type).label || '' }}
                     </p-badge>
@@ -384,7 +385,7 @@ onMounted(() => {
     .invalid-feedback {
         @apply absolute;
         bottom: -1.125rem;
-        left: 6.75rem;
+        left: 8rem;
     }
 }
 </style>

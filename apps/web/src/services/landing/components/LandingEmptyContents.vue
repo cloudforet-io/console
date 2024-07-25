@@ -10,7 +10,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 
 interface Props {
     isDomainAdmin: boolean;
@@ -27,7 +27,7 @@ const router = useRouter();
 const handleCreateWorkspace = () => {
     appContextStore.enterAdminMode();
     window.open(router.resolve({
-        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+        name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME),
         query: {
             hasNoWorkspace: 'true',
         },

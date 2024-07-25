@@ -1,4 +1,3 @@
-
 export const ERROR_ROUTE = Object.freeze({
     _NAME: 'error',
     EXPIRED_LINK: {
@@ -13,9 +12,6 @@ export const ROOT_ROUTE = Object.freeze({
     ADMIN: {
         _NAME: 'admin',
     },
-    COST_REPORT: {
-        _NAME: 'cost-report',
-    },
 });
 
 export const ROUTE_SCOPE = {
@@ -26,3 +22,17 @@ export const ROUTE_SCOPE = {
 } as const;
 
 export const CostReportDetailPath = '/cost-report-detail';
+
+export const EXTERNAL_PAGE_ROUTE = {
+    COST_REPORT_DETAIL: {
+        _NAME: 'cost-report-detail',
+    },
+    ALERT_PUBLIC_DETAIL: {
+        _NAME: 'alert-public-detail',
+    },
+} as const;
+
+export const EXTERNAL_PAGES = [
+    EXTERNAL_PAGE_ROUTE.COST_REPORT_DETAIL._NAME,
+    EXTERNAL_PAGE_ROUTE.ALERT_PUBLIC_DETAIL._NAME,
+];

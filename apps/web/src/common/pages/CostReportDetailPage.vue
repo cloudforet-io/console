@@ -271,7 +271,7 @@ const fetchTableData = async () => {
 
 const setMetaTag = () => {
     const viewportEl = document.querySelector('head meta[name="viewport"]');
-    if (viewportEl) viewportEl.attributes.content.value = 'width=928';
+    if (viewportEl) (viewportEl as HTMLMetaElement).content = 'width=928';
 };
 const setRootTagStyle = () => {
     const htmlEl = document.querySelector('html');
@@ -281,7 +281,7 @@ const setRootTagStyle = () => {
         htmlEl.style.overflowY = 'auto';
     }
     if (bodyEl) bodyEl.style.height = 'unset';
-    if (appEl) appEl.style.height = 'unset';
+    if (appEl) (appEl as HTMLElement).style.height = 'unset';
 };
 
 const handlePrint = () => {

@@ -7,10 +7,10 @@ import type { TranslateResult } from 'vue-i18n';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm,
+    PFieldGroup, PTextInput, PJsonSchemaForm, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
-
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
@@ -26,7 +26,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
 import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
 import type { NotificationAddFormDataPayload } from '@/services/my-page/types/notification-add-form-type';
-
 
 const SPACEONE_USER_CHANNEL_TYPE = 'SpaceONE User' as const;
 const allReferenceStore = useAllReferenceStore();
@@ -72,7 +71,18 @@ const state = reactive({
     isInputNotEmpty: computed<boolean>(() => state.channelName !== undefined && Object.keys(state.schemaForm).length !== 0),
     isInputValid: computed<boolean>(() => state.isInputNotEmpty && (state.isSchemaFormValid && !state.isNameInvalid)),
     isDataValid: computed<boolean>(() => (!state.isJsonSchema && !state.isNameInvalid) || (state.isJsonSchema && state.isInputValid)),
-    selectedMember: [] as string[],
+    selectedMember: ['*'] as string[],
+    radioMenuList: computed<MenuItem[]>(() => [
+        {
+            label: i18n.t('PROJECT.DETAIL.NOTIFICATION_ALL_USERS'),
+            name: 'all',
+        },
+        {
+            label: i18n.t('PROJECT.DETAIL.WORKSPACE_MEMBER'),
+            name: 'specific',
+        },
+    ]),
+    selectedRadioIdx: 0,
 });
 
 const apiQuery = new ApiQueryHelper();
@@ -92,7 +102,9 @@ const getSchema = async (): Promise<JsonSchema|null> => {
 const emitChange = () => {
     emit('change', {
         channelName: state.channelName,
-        data: (props.protocolType === PROTOCOL_TYPE.EXTERNAL) ? state.schemaForm : { users: state.selectedMember },
+        data: (props.protocolType === PROTOCOL_TYPE.EXTERNAL)
+            ? state.schemaForm
+            : { users: state.selectedMember },
         level: state.notificationLevel,
         isValid: state.isDataValid,
     });
@@ -109,8 +121,12 @@ const handleSchemaFormChange = (isValid, form) => {
     emitChange();
 };
 
-const onChangeMember = (value) => {
-    state.selectedMember = value.users;
+const onChangeMember = (member) => {
+    if (state.selectedRadioIdx === 1) {
+        state.selectedMember = member;
+    } else {
+        state.selectedMember = ['*'];
+    }
     emitChange();
 };
 
@@ -124,7 +140,7 @@ const initStates = () => {
     state.notificationLevel = 'LV1';
     state.schemaForm = {};
     state.isSchemaFormValid = false;
-    state.selectedMember = [];
+    state.selectedMember = ['*'];
     state.schema = null;
 };
 
@@ -137,7 +153,7 @@ watch([() => props.protocolId, () => props.protocolType], async ([protocolId, pr
 </script>
 
 <template>
-    <div>
+    <div class="notification-add-form-data">
         <p-field-group
             :label="$t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')"
             required
@@ -166,11 +182,24 @@ watch([() => props.protocolId, () => props.protocolType], async ([protocolId, pr
                             @change="handleSchemaFormChange"
         />
         <div v-if="props.projectId && state.protocol?.name === SPACEONE_USER_CHANNEL_TYPE && props.protocolType === PROTOCOL_TYPE.INTERNAL">
-            <p-field-group :label="$t('MENU.ADMINISTRATION_USER')"
+            <p-field-group :label="$t('IAM.USER.FORM.MEMBER')"
                            required
             >
                 <template #default>
-                    <notification-add-member-group :project-id="props.projectId"
+                    <p-radio-group>
+                        <p-radio v-for="(item, idx) in state.radioMenuList"
+                                 :key="idx"
+                                 v-model="state.selectedRadioIdx"
+                                 :value="idx"
+                                 @change="onChangeMember"
+                        >
+                            <span class="radio-item">
+                                {{ item.label }}
+                            </span>
+                        </p-radio>
+                    </p-radio-group>
+                    <notification-add-member-group v-if="state.selectedRadioIdx === 1"
+                                                   :project-id="props.projectId"
                                                    @change="onChangeMember"
                     />
                 </template>
@@ -180,16 +209,29 @@ watch([() => props.protocolId, () => props.protocolType], async ([protocolId, pr
 </template>
 
 <style lang="postcss" scoped>
-.base-info-input {
-    max-width: 30rem;
-    margin-top: 1.25rem;
-}
-
-/* custom design-system component - p-json-schema-form */
-:deep(.p-json-schema-form) {
-    .p-text-input {
-        width: 100%;
+.notification-add-form-data {
+    .base-info-input {
         max-width: 30rem;
+        margin-top: 1.25rem;
+    }
+
+    .radio-item {
+        @apply flex items-center;
+        margin-left: 0.25rem;
+        gap: 0.25rem;
+    }
+
+    /* custom design-system component - p-radio */
+    :deep(.p-radio) {
+        @apply inline-flex items-center;
+    }
+
+    /* custom design-system component - p-json-schema-form */
+    :deep(.p-json-schema-form) {
+        .p-text-input {
+            width: 100%;
+            max-width: 30rem;
+        }
     }
 }
 </style>

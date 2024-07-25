@@ -34,4 +34,8 @@ export const COST_EXPLORER_ROUTE = Object.freeze({
     LANDING: {
         _NAME: `${MENU_ID.COST_EXPLORER}.landing`,
     },
+    COST_ADVANCED_SETTINGS: {
+        _NAME: `${MENU_ID.COST_EXPLORER}.advanced_settings`,
+        ANOMALY_DETECTION_DOMAIN_CONFIGURATION: { _NAME: `${MENU_ID.COST_EXPLORER}.anomaly_detection_domain_configuration` },
+    },
 });
