@@ -228,7 +228,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
             <p-skeleton v-if="state.loading"
                         height="100%"
             />
-            <template v-else-if="!isEmpty(state.data)">
+            <template v-else-if="!state.data?.results">
                 <metric-explorer-line-chart
                     v-if="!metricExplorerPageGetters.isRealtimeChart"
                     :loading="state.loading"
@@ -298,7 +298,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
             padding-right: 0.5rem;
         }
         .empty-wrapper {
-            height: 100%;
+            height: 90%;
         }
 
         /* custom design-system component - p-text-editor */
