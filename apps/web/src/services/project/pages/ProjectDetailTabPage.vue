@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router/composables';
 import { isEmpty } from 'lodash';
 
 import {
-    PDataLoader, PHorizontalLayout, PTab, PDefinitionTable, PStatus, PHeading, PLazyImg,
+    PDataLoader, PHorizontalLayout, PTab, PDefinitionTable, PStatus, PHeading, PLazyImg, PBadge, PEmpty,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
@@ -90,6 +90,7 @@ const state = reactive({
         type: FAVORITE_TYPE.PROJECT,
         id: projectDetailPageState.projectId,
     })),
+    selectedPlugin: computed<PluginReferenceMap|undefined>(() => storeState.selectedWebhookItem?.plugin_info.plugin_id && storeState.plugins[storeState.selectedWebhookItem?.plugin_info.plugin_id]),
 });
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
@@ -119,6 +120,10 @@ const singleItemTabState = reactive({
         {
             name: 'details',
             label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS'),
+        },
+        {
+            name: 'help',
+            label: i18n.t('PROJECT.DETAIL.HELP'),
         },
     ]),
     webhookDetailActiveTab: 'details',
@@ -194,32 +199,68 @@ onUnmounted(() => {
                    :tabs="singleItemTabState.webhookDetailTab"
                    :active-tab.sync="singleItemTabState.webhookDetailActiveTab"
             >
-                <p-heading heading-type="sub"
-                           :title="$t('PROJECT.DETAIL.MEMBER.BASE_INFORMATION')"
-                />
-                <p-definition-table :fields="tableState.definitionFields"
-                                    :data="storeState.selectedWebhookItem"
-                                    :skeleton-rows="4"
-                                    block
-                >
-                    <template #data-state="{data}">
-                        <p-status
-                            class="capitalize"
-                            v-bind="userStateFormatter(data)"
-                        />
-                    </template>
-                    <template #data-plugin_info.plugin_id="{value}">
-                        <div class="col-type">
-                            <p-lazy-img :src="storeState.plugins[value] ? storeState.plugins[value].icon : 'ic_webhook'"
+                <template #details>
+                    <p-heading heading-type="sub"
+                               :title="$t('PROJECT.DETAIL.MEMBER.BASE_INFORMATION')"
+                    />
+                    <p-definition-table :fields="tableState.definitionFields"
+                                        :data="storeState.selectedWebhookItem"
+                                        :skeleton-rows="4"
+                                        block
+                    >
+                        <template #data-state="{data}">
+                            <p-status
+                                class="capitalize"
+                                v-bind="userStateFormatter(data)"
+                            />
+                        </template>
+                        <template #data-plugin_info.plugin_id="{value}">
+                            <div class="col-type">
+                                <p-lazy-img :src="storeState.plugins[value] ? storeState.plugins[value].icon : 'ic_webhook'"
+                                            error-icon="ic_webhook"
+                                            width="1rem"
+                                            height="1rem"
+                                            class="mr-2"
+                                />
+                                <span class="name">{{ storeState.plugins[value] ? storeState.plugins[value].label : value }}</span>
+                            </div>
+                        </template>
+                    </p-definition-table>
+                </template>
+                <template #help>
+                    <div class="help-tap">
+                        <div class="plugin-wrapper">
+                            <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin.icon : 'ic_webhook'"
                                         error-icon="ic_webhook"
-                                        width="1rem"
-                                        height="1rem"
+                                        width="2rem"
+                                        height="2rem"
                                         class="mr-2"
                             />
-                            <span class="name">{{ storeState.plugins[value] ? storeState.plugins[value].label : value }}</span>
+                            <div>
+                                <p class="plugin-info">
+                                    <span class="name">
+                                        {{ state.selectedPlugin ? state.selectedPlugin?.label : storeState.selectedWebhookItem?.plugin_info.plugin_id }}
+                                    </span>
+                                    <p-badge style-type="gray900"
+                                             badge-type="solid-outline"
+                                    >
+                                        v {{ storeState.selectedWebhookItem?.plugin_info.version }}
+                                    </p-badge>
+                                </p>
+                                <p class="desc">
+                                    {{ state.selectedPlugin?.description }}
+                                </p>
+                            </div>
                         </div>
-                    </template>
-                </p-definition-table>
+                        <div class="docs-wrapper">
+                            <p-empty v-if="!storeState.selectedWebhookItem?.tags.docs"
+                                     class="empty"
+                            >
+                                {{ $t('PROJECT.DETAIL.NO_DATA') }}
+                            </p-empty>
+                        </div>
+                    </div>
+                </template>
             </p-tab>
         </div>
         <div v-else>
@@ -238,6 +279,34 @@ onUnmounted(() => {
     .page-inner {
         height: 100%;
         max-width: 85.5rem;
+    }
+    .help-tap {
+        padding-top: 2rem;
+        padding-right: 1rem;
+        padding-left: 1rem;
+        .plugin-wrapper {
+            @apply flex;
+            gap: 1rem;
+            .plugin-info {
+                @apply flex items-center;
+                gap: 0.125rem;
+                .name {
+                    @apply text-label-xl font-bold;
+                }
+            }
+            .desc {
+                @apply text-label-sm text-gray-600;
+            }
+        }
+        .docs-wrapper {
+            margin-top: 1.125rem;
+            .empty {
+                @apply bg-violet-100;
+                padding-top: 4.125rem;
+                padding-bottom: 4.125rem;
+                border-radius: 0.375rem;
+            }
+        }
     }
 }
 
