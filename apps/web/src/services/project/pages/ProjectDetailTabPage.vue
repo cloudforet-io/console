@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {
-    computed, onUnmounted, reactive, watch,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { isEmpty } from 'lodash';
 
 import {
-    PDataLoader, PHorizontalLayout, PTab, PDefinitionTable, PStatus, PHeading, PLazyImg, PBadge, PEmpty,
+    PDataLoader, PHorizontalLayout, PTab, PDefinitionTable, PStatus, PHeading, PLazyImg, PBadge, PEmpty, PMarkdown,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
@@ -15,12 +15,12 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -35,6 +35,7 @@ import { userStateFormatter } from '@/services/iam/composables/refined-table-dat
 import ProjectDetailTab from '@/services/project/components/ProjectDetailTab.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
+import type { WebhookType } from '@/services/project/types/project-alert-type';
 
 interface Props {
     id?: string;
@@ -52,9 +53,9 @@ const userWorkspaceStore = useUserWorkspaceStore();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     selectedWebhookItem: computed<WebhookModel|undefined>(() => projectDetailPageGetters.selectedWebhookItem),
+    language: computed(() => store.state.user.language),
 });
 const state = reactive({
     item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
@@ -90,7 +91,11 @@ const state = reactive({
         type: FAVORITE_TYPE.PROJECT,
         id: projectDetailPageState.projectId,
     })),
-    selectedPlugin: computed<PluginReferenceMap|undefined>(() => storeState.selectedWebhookItem?.plugin_info.plugin_id && storeState.plugins[storeState.selectedWebhookItem?.plugin_info.plugin_id]),
+    webhookTypeList: [] as WebhookType[],
+    selectedPlugin: computed<WebhookType|undefined>(() => {
+        const id = storeState.selectedWebhookItem?.plugin_info.plugin_id;
+        return state.webhookTypeList.find((i) => i.plugin_id === id);
+    }),
 });
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
@@ -116,16 +121,19 @@ const singleItemTabState = reactive({
         },
     ]),
     activeTab: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
-    webhookDetailTab: computed<TabItem[]>(() => [
-        {
+    webhookDetailTab: computed<TabItem[]>(() => {
+        const defaultTab = [{
             name: 'details',
             label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS'),
-        },
-        {
-            name: 'help',
-            label: i18n.t('PROJECT.DETAIL.HELP'),
-        },
-    ]),
+        }];
+        if (state.selectedPlugin?.docs) {
+            defaultTab.push({
+                name: 'help',
+                label: i18n.t('PROJECT.DETAIL.HELP'),
+            });
+        }
+        return defaultTab;
+    }),
     webhookDetailActiveTab: 'details',
 });
 const tableState = reactive({
@@ -171,6 +179,9 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 
+onMounted(async () => {
+    state.webhookTypeList = await projectDetailPageStore.getListWebhookType();
+});
 onUnmounted(() => {
     projectDetailPageStore.reset();
 });
@@ -216,13 +227,13 @@ onUnmounted(() => {
                         </template>
                         <template #data-plugin_info.plugin_id="{value}">
                             <div class="col-type">
-                                <p-lazy-img :src="storeState.plugins[value] ? storeState.plugins[value].icon : 'ic_webhook'"
+                                <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin?.tags?.icon : 'ic_webhook'"
                                             error-icon="ic_webhook"
                                             width="1rem"
                                             height="1rem"
                                             class="mr-2"
                                 />
-                                <span class="name">{{ storeState.plugins[value] ? storeState.plugins[value].label : value }}</span>
+                                <span class="name">{{ state.selectedPlugin ? state.selectedPlugin?.name : value }}</span>
                             </div>
                         </template>
                     </p-definition-table>
@@ -230,7 +241,7 @@ onUnmounted(() => {
                 <template #help>
                     <div class="help-tap">
                         <div class="plugin-wrapper">
-                            <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin.icon : 'ic_webhook'"
+                            <p-lazy-img :src="state.selectedPlugin ? state.selectedPlugin?.tags?.icon : 'ic_webhook'"
                                         error-icon="ic_webhook"
                                         width="2rem"
                                         height="2rem"
@@ -238,7 +249,7 @@ onUnmounted(() => {
                             <div class="plugin-info-wrapper">
                                 <p class="plugin-info">
                                     <span class="name">
-                                        {{ state.selectedPlugin ? state.selectedPlugin?.label : storeState.selectedWebhookItem?.plugin_info.plugin_id }}
+                                        {{ state.selectedPlugin ? state.selectedPlugin?.name : storeState.selectedWebhookItem?.plugin_info.plugin_id }}
                                     </span>
                                     <p-badge style-type="gray900"
                                              badge-type="solid-outline"
@@ -247,16 +258,22 @@ onUnmounted(() => {
                                     </p-badge>
                                 </p>
                                 <p class="desc">
-                                    {{ state.selectedPlugin?.long_description || state.selectedPlugin?.description }}
+                                    {{ state.selectedPlugin?.tags?.long_description || state.selectedPlugin?.tags.description }}
                                 </p>
                             </div>
                         </div>
                         <div class="docs-wrapper">
-                            <p-empty v-if="!storeState.selectedWebhookItem?.tags.docs"
+                            <p-empty v-if="!state.selectedPlugin?.docs"
                                      class="empty"
                             >
                                 {{ $t('PROJECT.DETAIL.NO_DATA') }}
                             </p-empty>
+                            <p-markdown v-else
+                                        :markdown="state.selectedPlugin?.docs"
+                                        :language="storeState.language"
+                                        remove-spacing
+                                        class="markdown"
+                            />
                         </div>
                     </div>
                 </template>
@@ -308,6 +325,11 @@ onUnmounted(() => {
                 padding-bottom: 4.125rem;
                 border-radius: 0.375rem;
             }
+        }
+        .markdown {
+            @apply bg-violet-100;
+            padding: 1rem;
+            border-radius: 0.375rem;
         }
     }
 }

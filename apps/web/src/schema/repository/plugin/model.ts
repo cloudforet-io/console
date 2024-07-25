@@ -17,9 +17,11 @@ export interface PluginModel {
     tags: {
         icon?: string;
         description?: string;
+        long_description?: string;
         link?: string;
         beta?: string;
     } & Tags;
+    docs?: Record<string, any>
     domain_id: string;
     created_at: string;
     updated_at: string;
