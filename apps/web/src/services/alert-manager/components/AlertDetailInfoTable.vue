@@ -201,9 +201,9 @@ const getEscalationPolicy = async () => {
 }
 
 .additional-info {
-    @apply text-gray-500;
     font-size: 0.875rem;
     line-height: 140%;
+    margin-bottom: 0.25rem;
 }
 
 /* custom design-system component - p-definition-table */

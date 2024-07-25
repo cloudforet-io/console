@@ -3,9 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { map } from 'lodash';
 
-import {
-    PDefinitionTable, PHeading,
-} from '@cloudforet/mirinae';
+import { PDefinitionTable } from '@cloudforet/mirinae';
 
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
@@ -21,9 +19,6 @@ const additionalState = reactive({
 
 <template>
     <section>
-        <p-heading heading-type="sub"
-                   :title="$t('PAGE_SCHEMA.BASE_INFO')"
-        />
         <p-definition-table :fields="additionalState.fields"
                             :data="additionalState.data"
                             :skeleton-rows="7"
