@@ -4,23 +4,19 @@ import { useRouter } from 'vue-router/composables';
 
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PSelectCard, PButton, PLink, PLazyImg, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/list';
 import type { PluginModel } from '@/schema/repository/plugin/model';
-import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
-import type { RepositoryModel } from '@/schema/repository/repository/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 import type { WebhookType } from '@/services/project/types/project-alert-type';
+
+const projectDetailPageStore = useProjectDetailPageStore();
 
 const router = useRouter();
 
@@ -29,8 +25,8 @@ const emit = defineEmits<{(e: 'update:currentStep', step: number, item: PluginMo
 const state = reactive({
     loading: true,
     showValidation: false,
-    webhookTypeList: [] as WebhookType[],
     selectedWebhookType: {} as WebhookType,
+    webhookTypeList: [] as WebhookType[],
 });
 
 const handleClickNextStep = () => {
@@ -40,31 +36,12 @@ const handleClickGoBack = () => {
     router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, query: { tab: 'webhook' } });
 };
 
-const getRepositoryID = async () => {
-    const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
-        repository_type: 'remote',
-    });
-    return res.results ? res.results[0].repository_id : '';
-};
-const getListWebhookType = async () => {
-    state.loading = true;
+onMounted(async () => {
     try {
-        const repositoryId = await getRepositoryID();
-        const { results } = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
-            repository_id: repositoryId,
-            resource_type: 'monitoring.Webhook',
-        });
-        state.webhookTypeList = results ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.webhookTypeList = [];
+        state.webhookTypeList = await projectDetailPageStore.getListWebhookType();
     } finally {
         state.loading = false;
     }
-};
-
-onMounted(() => {
-    getListWebhookType();
 });
 </script>
 
@@ -84,7 +61,6 @@ onMounted(() => {
                 icon="ic_webhook"
                 :value="item"
                 :label="item.name"
-                :disabled="state.loading"
                 :invalid="state.showValidation"
                 class="card"
             >
