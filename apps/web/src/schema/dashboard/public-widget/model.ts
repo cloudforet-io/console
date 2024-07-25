@@ -12,8 +12,6 @@ export interface PublicWidgetModel {
     resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
     project_id?: string;
     widget_id: string;
-    name: string;
-    description: string;
     size: WidgetSize;
     data_table_id: string;
     widget_type: WidgetType;

@@ -10,6 +10,8 @@ import type {
 
 export interface PrivateDashboardModel {
     dashboard_id: string;
+    name: string;
+    description: string;
     version: number|string;
     layouts: DashboardLayout[];
     vars?: DashboardVars;
