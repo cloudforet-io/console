@@ -283,7 +283,6 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
                 ...widget.options,
                 title: widget.options.title ? `Clone - ${widget.options.title}` : undefined,
             },
-            description: widget.description,
             data_tables: refinedDataTables,
             data_table_id: dataTableIndex,
         });
