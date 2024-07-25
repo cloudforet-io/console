@@ -125,12 +125,12 @@ const singleItemTabState = reactive({
 });
 const tableState = reactive({
     definitionFields: computed<DefinitionField[]>(() => [
+        { label: 'Webhook ID', name: 'webhook_id' },
         { label: 'Name', name: 'name' },
         { label: 'State', name: 'state' },
-        { label: 'Version', name: 'plugin_info.version' },
-        { label: 'Webhook ID', name: 'webhook_id' },
-        { label: 'Webhook URL', name: 'webhook_url' },
         { label: 'Plugin', name: 'plugin_info.plugin_id' },
+        { label: 'Version', name: 'plugin_info.version' },
+        { label: 'Webhook URL', name: 'webhook_url' },
     ]),
 });
 
