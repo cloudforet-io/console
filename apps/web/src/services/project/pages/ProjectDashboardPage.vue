@@ -7,6 +7,8 @@ import { useRouter } from 'vue-router/composables';
 
 import { PSelectDropdown, PEmpty, PButton } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -39,8 +41,8 @@ const storeState = reactive({
 const state = reactive({
     dashboardMenu: computed(() => [
         {
-            name: 'Project Dashboards',
-            label: 'Project Dashboards',
+            name: 'Dashboards',
+            label: i18n.t('PROJECT.DETAIL.DASHBOARD.DASHBOARD_LIST'),
             type: 'header',
         },
         ...storeState.dashboardList,

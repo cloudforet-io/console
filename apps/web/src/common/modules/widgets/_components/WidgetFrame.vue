@@ -335,6 +335,9 @@ const handleToggleWidth = () => {
         &.selected {
             display: block;
         }
+        .etc-button {
+            @apply bg-white;
+        }
     }
 }
 </style>

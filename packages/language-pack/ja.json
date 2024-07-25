@@ -1872,14 +1872,14 @@
 			"SHARED_BY_ADMIN": "Adminにより共有",
 			"SHARED_TO_ALL_PROJECTS": "",
 			"SHARED_TO_WORKSPACES": "ワークスペースに共有",
-			"SHARE_DASHBOARD": "",
-			"SHARE_TO_ALL_PROJECTS": "",
-			"SHARE_TO_ALL_PROJECTS_DESC": "",
+			"SHARE_DASHBOARD": "ダッシュボードを共有",
+			"SHARE_TO_ALL_PROJECTS": "すべてのプロジェクトに共有",
+			"SHARE_TO_ALL_PROJECTS_DESC": "このダッシュボードをすべてのプロジェクトに共有してもよろしいですか？",
 			"SHARE_TO_ALL_WORKSPACES": "すべてのワークスペースに共有する",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "このダッシュボードをすべてのワークスペースと共有しますか？",
 			"SHARE_WITH_CODE": "コードで共有",
-			"UNSHARE_DASHBOARD": "",
-			"UNSHARE_FROM_ALL_PROJECTS": "",
+			"UNSHARE_DASHBOARD": "ダッシュボードの共有を解除",
+			"UNSHARE_FROM_ALL_PROJECTS": "すべてのプロジェクトから共有解除",
 			"UNSHARE_FROM_ALL_PROJECTS_DESC": "このダッシュボードをすべてのプロジェクトで共有解除しますか？",
 			"UNSHARE_FROM_ALL_WORKSPACES": "すべてのワークスペースから共有解除",
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "ワークスペース全体でこのダッシュボードの共有を解除してもよろしいですか？"
@@ -4229,6 +4229,7 @@
 			"ALT_S_UPDATE_WEBHOOK": "ウェプフク編集成功",
 			"DASHBOARD": {
 				"DASHBOARD": "ダッシュボード",
+				"DASHBOARD_LIST": "ダッシュボードリスト",
 				"NO_DASHBOARD": "",
 				"NO_DASHBOARD_DESC": ""
 			},
