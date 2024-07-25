@@ -109,7 +109,7 @@ const state = reactive({
                 label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_DASHBOARD') : i18n.t('DASHBOARDS.DETAIL.SHARE_DASHBOARD'),
                 icon: 'ic_share',
             }];
-        } else {
+        } else if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
             _shareMenuItems = [{
                 type: 'item',
                 name: 'shareProject',
