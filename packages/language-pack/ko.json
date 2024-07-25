@@ -4206,6 +4206,7 @@
 			"ALT_S_ACTIVATE_ALERT": "얼럿 활성화 완료",
 			"ALT_S_ADD_MEMBER": "멤버 추가 완료",
 			"ALT_S_ADD_WEBHOOK": "웹훅 추가 완료",
+			"ALT_S_COPIED": "복사됨",
 			"ALT_S_DELETE_MEMBER": "멤버 삭제 완료",
 			"ALT_S_DELETE_PROJECT": "프로젝트 삭제 완료",
 			"ALT_S_DELETE_WEBHOOK": "웹훅 삭제 완료",
@@ -4225,6 +4226,7 @@
 			},
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
+			"FAILED": "실패",
 			"INVITE_ONLY": "초대된 사용자만",
 			"MEMBER": {
 				"ADD": "추가",

@@ -117,6 +117,7 @@ const state = reactive({
         { name: 'state', label: 'State' },
         { name: 'plugin_info.plugin_id', label: 'Plugin' },
         { name: 'requests.total', label: 'Total Requests' },
+        { name: 'requests.error', label: 'Failed Requests' },
     ],
     items: [],
     selectIndex: [],
@@ -252,8 +253,8 @@ const onExport = async () => {
             { name: 'Name', key: 'name' },
             { name: 'State', key: 'state' },
             { name: 'Plugin', key: 'plugin_info.plugin_id' },
-            { name: 'Total Requests', key: 'total_requests' },
-            { name: 'Failed Requests', key: 'failed_requests' },
+            { name: 'Total Requests', key: 'requests.total' },
+            { name: 'Failed Requests', key: 'requests.error' },
         ],
         file_name_prefix: FILE_NAME_PREFIX.projectWebhook,
         timezone: state.timezone,
@@ -345,6 +346,9 @@ onActivated(() => {
             <template #col-requests.total-format="{ value }">
                 <span>{{ value || 0 }}</span>
             </template>
+            <template #col-requests.error-format="{ value }">
+                <span class="col-failed-requests">{{ value || 0 }} {{ $t('PROJECT.DETAIL.FAILED') }}</span>
+            </template>
         </p-toolbox-table>
         <p-table-check-modal :visible.sync="checkModalState.visible"
                              :header-title="checkModalState.title"
@@ -372,6 +376,9 @@ onActivated(() => {
             </template>
             <template #col-requests.total-format="{ value }">
                 <span>{{ value || 0 }}</span>
+            </template>
+            <template #col-requests.error-format="{ value }">
+                <span class="col-failed-requests">{{ value || 0 }} {{ $t('PROJECT.DETAIL.FAILED') }}</span>
             </template>
         </p-table-check-modal>
         <project-alert-webhook-update-modal
@@ -418,6 +425,9 @@ onActivated(() => {
             display: flex;
             align-items: center;
         }
+    }
+    .col-failed-requests {
+        @apply text-red-500;
     }
 
     /* custom delete-modal */

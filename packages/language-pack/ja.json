@@ -4206,6 +4206,7 @@
 			"ALT_S_ACTIVATE_ALERT": "アラート有効化に成功",
 			"ALT_S_ADD_MEMBER": "メンバー追加完了",
 			"ALT_S_ADD_WEBHOOK": "ウェプフク追加に成功",
+			"ALT_S_COPIED": "コピーしました",
 			"ALT_S_DELETE_MEMBER": "メンバー削除完了",
 			"ALT_S_DELETE_PROJECT": "プロジェクト削除完了",
 			"ALT_S_DELETE_WEBHOOK": "ウェプフク削除完了",
@@ -4225,6 +4226,7 @@
 			},
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
+			"FAILED": "失敗",
 			"INVITE_ONLY": "招待のみ",
 			"MEMBER": {
 				"ADD": "追加",

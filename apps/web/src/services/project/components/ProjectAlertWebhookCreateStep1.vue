@@ -98,7 +98,7 @@ onMounted(() => {
                     <div class="info">
                         <p>{{ item.name }}</p>
                         <p class="desc">
-                            {{ (item.name !== item.tags?.description) ? item.tags?.description : '' }}
+                            {{ item.tags?.long_description || item.tags?.description }}
                         </p>
                     </div>
                     <!-- TODO: will be updated field name -->
@@ -141,7 +141,8 @@ onMounted(() => {
     min-height: 22.5rem;
     overflow: visible;
     .card-wrapper {
-        @apply grid grid-cols-2;
+        @apply grid grid-cols-2 overflow-y-auto;
+        max-height: 23.875rem;
         grid-column-gap: 0.5rem;
         grid-row-gap: 0.5rem;
         .card {
