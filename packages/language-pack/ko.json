@@ -2582,7 +2582,7 @@
 				"ALT_S_DISABLE_USER_CHANNEL": "사용자 채널 비활성화 완료",
 				"ALT_S_ENABLE_PROJECT_CHANNEL": "프로젝트 채널 활성화 완료",
 				"ALT_S_ENABLE_USER_CHANNEL": "사용자 채널 활성화 완료",
-				"ASSOCIATED_MEMBER": "멤버 알림",
+				"ASSOCIATED_MEMBER": "멤버 채널로 알림",
 				"ASSOCIATED_MEMBER_DESC": "워크스페이스 멤버별 설정된 개인 채널로 알림 발송됩니다.",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "슬랙 토큰은 편집할 수 없습니다.",
@@ -4227,6 +4227,7 @@
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
 			"FAILED": "실패",
+			"HELP": "가이드",
 			"INVITE_ONLY": "초대된 사용자만",
 			"MEMBER": {
 				"ADD": "추가",
@@ -4300,6 +4301,7 @@
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "로딩중...",
 			"NOTIFICATION_ALL_USERS": "이 프로젝트의 모든 멤버",
 			"NOTIFICATION_SPECIFIC_MEMBER": "특정 멤버",
+			"NO_DATA": "데이터가 없습니다.",
 			"PROJECT_ALERT_ACTIVATE": "얼럿 활성화",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "이 프로젝트의 얼럿 설정하기",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "통합된 외부 이벤트를 수신하거나 이 프로젝트를 관리하려면 '얼럿 활성화' 버튼을 클릭하세요.",
@@ -4335,7 +4337,8 @@
 			"WEBHOOK_DELETE": "삭제",
 			"WEBHOOK_DISABLE": "비활성화",
 			"WEBHOOK_ENABLE": "활성화",
-			"WEBHOOK_UPDATE": "변경"
+			"WEBHOOK_UPDATE": "변경",
+			"WORKSPACE_MEMBER": "워크스페이스 멤버"
 		},
 		"EVENT_RULE": {
 			"ADD": "추가",
