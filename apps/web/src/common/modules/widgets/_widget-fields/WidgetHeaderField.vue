@@ -8,12 +8,12 @@ import {
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { WidgetFieldComponentEmit, WidgetHeaderOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const emit = defineEmits<WidgetFieldComponentEmit<WidgetHeaderValue|undefined>>();
-const props = defineProps<WidgetFieldComponentProps<WidgetHeaderOptions, WidgetHeaderValue>>();
+const props = defineProps<WidgetFieldComponentProps<undefined, WidgetHeaderValue>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
     isHeaderCollapsed: false,
@@ -51,23 +51,13 @@ const handleUpdateValue = (key: string, value: string) => {
     emit('update:value', state.proxyValue);
 };
 
-/* Watcher */
-
-
 onMounted(() => {
-    console.log('mounted!');
     emit('update:is-valid', true);
     if (!state.proxyValue) {
         state.proxyValue = {
             toggleValue: true,
             title: props.widgetConfig?.meta?.title,
         };
-    } else {
-        // state.proxyValue = {
-        //     toggleValue: props.value?.toggleValue ?? false,
-        //     title: props.value?.title,
-        //     description: props.value?.description,
-        // };
     }
 });
 </script>

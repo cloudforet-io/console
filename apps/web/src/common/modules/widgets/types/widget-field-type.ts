@@ -90,11 +90,6 @@ export interface TotalOptions {
     toggle?: boolean;
 }
 
-export interface WidgetHeaderOptions {
-    default?: string;
-    toggle?: boolean;
-}
-
 export interface ComparisonOptions {
     toggle?: boolean;
     // forTable?: boolean;
@@ -121,8 +116,7 @@ export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxi
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
-    | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions
-    | WidgetHeaderOptions;
+    | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
