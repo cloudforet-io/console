@@ -21,6 +21,8 @@ import {
     getDateLabelFormat, getReferenceLabel, getWidgetDateFields,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -60,6 +62,7 @@ const state = reactive({
     chartData: [],
     parsedGroupBy: computed<string>(() => metricExplorerPageState.selectedChartGroupBy?.replace('labels.', '') || ''),
     chartOptions: computed<LineSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
         grid: {
             left: 50,
             right: '20%',
