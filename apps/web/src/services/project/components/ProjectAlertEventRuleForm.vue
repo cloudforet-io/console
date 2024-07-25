@@ -65,18 +65,23 @@ const state = reactive({
         stop_processing: undefined,
     } as EventRuleOptions,
     isAllValid: false,
+    isProjectRoute: false,
 });
 
 /* api */
 const getEventRule = async () => {
     try {
         const res = await SpaceConnector.clientV2.monitoring.eventRule.get<EventRuleGetParameters, EventRuleModel>({
-            event_rule_id: props.eventRuleId,
+            event_rule_id: props.eventRuleId || '',
         });
         state.conditionsPolicy = res.conditions_policy;
         state.conditions = res.conditions;
         state.actions = res.actions;
         state.options = res.options;
+
+        if (state.actions.change_project) {
+            state.isProjectRoute = true;
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -86,10 +91,10 @@ const createEventRule = async () => {
         await SpaceConnector.clientV2.monitoring.eventRule.create<EventRuleCreateParameters>({
             conditions: state.conditions,
             conditions_policy: state.conditionsPolicy,
+            resource_group: 'PROJECT' as const,
+            project_id: props.projectId,
             actions: state.actions,
             options: state.options,
-            project_id: props.projectId,
-            resource_group: 'PROJECT',
         });
         showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '');
     } catch (e) {
@@ -99,7 +104,7 @@ const createEventRule = async () => {
 const updateEventRule = async () => {
     try {
         await SpaceConnector.clientV2.monitoring.eventRule.update<EventRuleUpdateParameters>({
-            event_rule_id: props.eventRuleId,
+            event_rule_id: props.eventRuleId || '',
             conditions: state.conditions,
             conditions_policy: state.conditionsPolicy,
             actions: state.actions,
@@ -139,11 +144,13 @@ watch(() => state.conditions, (conditions) => {
             class="event-rule-condition-form"
             :conditions-policy.sync="state.conditionsPolicy"
             :conditions.sync="state.conditions"
+            :project-id="props.projectId"
         />
         <project-alert-event-rule-action-form
             class="event-rule-action-form"
             :actions.sync="state.actions"
             :options.sync="state.options"
+            :is-project-route.sync="state.isProjectRoute"
         />
         <div class="button-group">
             <p-button style-type="tertiary"

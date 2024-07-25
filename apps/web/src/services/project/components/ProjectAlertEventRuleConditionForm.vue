@@ -1,13 +1,21 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
+import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 
 const CONDITIONS_POLICY = Object.freeze({
@@ -24,10 +32,12 @@ const OPERATOR = Object.freeze({
 interface Props {
     conditionsPolicy?: string;
     conditions?: any[]; // TODO: set type
+    projectId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     conditionsPolicy: 'ALL',
     conditions: () => ([]),
+    projectId: undefined,
 });
 const emit = defineEmits<{(e: 'update:conditions-policy'): void;
     (e: 'update:conditions'): void;
@@ -70,30 +80,19 @@ const state = reactive({
             label: 'Title',
         },
         {
-            name: 'webhook_id',
-            label: 'Webhook ID',
-        },
-        {
-            name: 'description',
-            label: 'Description',
-        },
-        {
             name: 'rule',
             label: 'Rule',
+        },
+        {
+            name: 'webhook_id',
+            label: 'Webhook ID',
         },
         {
             name: 'resource_id',
             label: 'Resource ID',
         },
-        {
-            name: 'resource_name',
-            label: 'Resource Name',
-        },
-        {
-            name: 'resource_type',
-            label: 'Resource Type',
-        },
     ],
+    webhookList: [] as SelectDropdownMenuItem[],
 });
 
 /* event */
@@ -109,6 +108,29 @@ const onClickDelete = (idx) => {
     conditions.splice(idx, 1);
     state.proxyConditions = conditions;
 };
+
+const webhookListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(1).setPageLimit(15)
+    .setSort('created_at', true);
+const listWebhooks = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
+            project_id: props.projectId,
+            query: webhookListApiQueryHelper.data,
+        });
+        state.webhookList = (results || []).map((i) => ({
+            label: i.name,
+            name: i.webhook_id,
+        }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.webhookList = [];
+    }
+};
+
+onMounted(() => {
+    listWebhooks();
+});
 </script>
 
 <template>
@@ -151,15 +173,26 @@ const onClickDelete = (idx) => {
                                            use-fixed-menu-style
                                            is-fixed-width
                         />
-                        <p-select-dropdown :selected.sync="condition.operator"
+                        <p-select-dropdown v-if="condition.key === 'webhook_id'"
+                                           :selected.sync="condition.value"
                                            class="input"
-                                           :menu="state.operators"
+                                           :menu="state.webhookList"
                                            use-fixed-menu-style
                                            is-fixed-width
                         />
-                        <p-text-input v-model="condition.value"
-                                      class="input"
-                        />
+                        <div v-else
+                             class="left-part"
+                        >
+                            <p-select-dropdown :selected.sync="condition.operator"
+                                               class="input"
+                                               :menu="state.operators"
+                                               use-fixed-menu-style
+                                               is-fixed-width
+                            />
+                            <p-text-input v-model="condition.value"
+                                          class="input"
+                            />
+                        </div>
                     </div>
                     <p-icon-button name="ic_delete"
                                    class="delete-button"

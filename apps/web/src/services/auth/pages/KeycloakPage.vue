@@ -8,7 +8,7 @@ export default defineComponent({
         if (from?.meta?.isSignInPage) {
             next((vm) => {
                 vm.$router.replace({
-                    query: { ...to.query, nextPath: from.query.nextPath },
+                    query: { ...to.query, previousPath: from.query.previousPath, redirectPath: from.query.redirectPath },
                 }).catch(() => {});
             });
         } else next();
@@ -38,12 +38,14 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 interface Props {
     visible?: boolean;
-    nextPath?: string;
+    previousPath?: string;
+    redirectPath?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: undefined,
-    nextPath: undefined,
+    previousPath: undefined,
+    redirectPath: undefined,
 });
 const router = useRouter();
 const appContextStore = useAppContextStore();
@@ -60,12 +62,19 @@ const onSignIn = async (userId:string) => {
         const hasBoundWorkspaces = userWorkspaceStore.getters.workspaceList.length > 0;
         const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspaces);
 
-        if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {
+        if (props.redirectPath) {
+            await router.push(router.resolve(props.redirectPath).location).catch(() => {
+                router.push(defaultRoute).catch(() => {});
+            });
+            return;
+        }
+
+        if (!props.previousPath || !isSameUserAsPreviouslyLoggedInUser) {
             await router.push(defaultRoute);
             return;
         }
 
-        const resolvedRoute = router.resolve(props.nextPath);
+        const resolvedRoute = router.resolve(props.previousPath);
         const allRoutes = SpaceRouter.router.getRoutes();
 
         const isValidRoute = allRoutes.some((route) => route.name === resolvedRoute.route.name);

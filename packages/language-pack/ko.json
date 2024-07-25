@@ -2600,6 +2600,8 @@
 				"ALT_S_DISABLE_USER_CHANNEL": "사용자 채널 비활성화 완료",
 				"ALT_S_ENABLE_PROJECT_CHANNEL": "프로젝트 채널 활성화 완료",
 				"ALT_S_ENABLE_USER_CHANNEL": "사용자 채널 활성화 완료",
+				"ASSOCIATED_MEMBER": "멤버 채널로 알림",
+				"ASSOCIATED_MEMBER_DESC": "워크스페이스 멤버별 설정된 개인 채널로 알림 발송됩니다.",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "슬랙 토큰은 편집할 수 없습니다.",
 				"CANNOT_EDIT_TOKEN": "입력된 Token은 편집할 수 없습니다.",
@@ -2771,7 +2773,7 @@
 				"DELETE": "삭제됨",
 				"MANAGED_INFO": "Admin 모드에서만 상태를 변경할 수 있습니다.",
 				"NO_SELECTED_ACCOUNT": "서비스 어카운트를 선택하시면 세부 내용을 볼 수 있습니다.",
-				"PENDING": "생성중",
+				"PENDING": "처리중",
 				"PROVIDERS_TITLE": "서비스 제공자",
 				"STATE": "상태",
 				"TAB_CREDENTIALS": "암호화 키",
@@ -3755,9 +3757,11 @@
 				"DETAILS": {
 					"ADDITIONAL_INFO": "추가 정보",
 					"DETAILS": "상세 정보",
+					"RESOURCE": "리소스",
 					"RESOURCE_ID": "리소스 ID",
 					"RESOURCE_NAME": "리소스 이름",
-					"RESOURCE_TYPE": "리소스 타입"
+					"RESOURCE_TYPE": "리소스 타입",
+					"RESPONDER": "처리자"
 				},
 				"EDIT_MODAL_TITLE": "얼럿 이름 수정",
 				"HEADER": {
@@ -3783,7 +3787,7 @@
 					"URGENCY": "긴급도"
 				},
 				"INFO": {
-					"ACCOUNT_ID": "Account ID",
+					"ACCOUNT_ID": "어카운트 아이디",
 					"ACKNOWLEDGED": "확인 시간",
 					"ALERT_ID": "얼럿 ID",
 					"ALT_E_UPDATE_DESCRIPTION": "설명 수정 실패",
@@ -3835,10 +3839,12 @@
 					"CURRENT": "현재",
 					"HIDE": "숨기기",
 					"LEVEL": "레벨",
+					"NOTIFICATION": "알림",
 					"NO_RESPONDER": "수신자 없음",
 					"RESPONDER": "수신자",
 					"SHOW_RESPONDERS": "수신자 보기"
 				},
+				"SIGN_IN_BUTTON": "",
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "상태 업데이트 실패",
 					"ALT_S_UPDATE_STATUS": "상태 업데이트 완료 ",
@@ -4219,6 +4225,7 @@
 			"ALT_S_ACTIVATE_ALERT": "얼럿 활성화 완료",
 			"ALT_S_ADD_MEMBER": "멤버 추가 완료",
 			"ALT_S_ADD_WEBHOOK": "웹훅 추가 완료",
+			"ALT_S_COPIED": "복사됨",
 			"ALT_S_DELETE_MEMBER": "멤버 삭제 완료",
 			"ALT_S_DELETE_PROJECT": "프로젝트 삭제 완료",
 			"ALT_S_DELETE_WEBHOOK": "웹훅 삭제 완료",
@@ -4229,6 +4236,10 @@
 			"ALT_S_UPDATE_PROJECT": "프로젝트 업데이트 완료",
 			"ALT_S_UPDATE_PROJECT_TYPE": "프로젝트 엑세스 방식 변경 완료",
 			"ALT_S_UPDATE_WEBHOOK": "웹훅 업데이트 완료",
+			"CLOSE": "닫기",
+			"CREATE": "생성",
+			"CREATE_WEBHOOK_DESC": "외부 모니터링 서비스에서 발생한 이벤트를 수신할 플러그인을 선택하세요.",
+			"CREATE_WEBHOOK_TITLE": "신규 웹훅 생성",
 			"DASHBOARD": {
 				"DASHBOARD": "대시보드 ",
 				"DASHBOARD_LIST": "대시보드 리스트",
@@ -4237,6 +4248,8 @@
 			},
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
+			"FAILED": "실패",
+			"HELP": "가이드",
 			"GO_TO_DASHBOARD": "",
 			"INVITE_ONLY": "초대된 사용자만",
 			"MEMBER": {
@@ -4309,6 +4322,9 @@
 			"MODAL_VALIDATION_LENGTH": "40자 이하로 입력해주세요. ",
 			"MODAL_VALIDATION_REQUIRED": "이름을 입력해 주세요.",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "로딩중...",
+			"NOTIFICATION_ALL_USERS": "이 프로젝트의 모든 멤버",
+			"NOTIFICATION_SPECIFIC_MEMBER": "특정 멤버",
+			"NO_DATA": "데이터가 없습니다.",
 			"PROJECT_ALERT_ACTIVATE": "얼럿 활성화",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "이 프로젝트의 얼럿 설정하기",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "통합된 외부 이벤트를 수신하거나 이 프로젝트를 관리하려면 '얼럿 활성화' 버튼을 클릭하세요.",
@@ -4344,7 +4360,8 @@
 			"WEBHOOK_DELETE": "삭제",
 			"WEBHOOK_DISABLE": "비활성화",
 			"WEBHOOK_ENABLE": "활성화",
-			"WEBHOOK_UPDATE": "변경"
+			"WEBHOOK_UPDATE": "변경",
+			"WORKSPACE_MEMBER": "워크스페이스 멤버"
 		},
 		"EVENT_RULE": {
 			"ADD": "추가",

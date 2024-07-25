@@ -13,11 +13,13 @@ import { generatePassword } from '@/services/iam/helpers/generate-helper';
 interface Props {
     isReset: boolean;
     password: string;
+    disabledResetPassword: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isReset: true,
     password: '',
+    disabledResetPassword: false,
 });
 
 const emit = defineEmits<{(e: 'update:password', password: string): void,
@@ -51,6 +53,7 @@ const handleClickGenerate = () => {
         <div class="title-wrapper">
             <p-field-title :label="$t('IAM.USER.FORM.PASSWORD_SEND_LINK')" />
             <p-toggle-button v-model="state.proxyIsReset"
+                             :disabled="props.disabledResetPassword"
                              @change-toggle="handleChangeToggleButton"
             />
         </div>
