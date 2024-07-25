@@ -1662,7 +1662,9 @@
 				"UNIT": "ユニット",
 				"VARIATION": "変動"
 			}
-		}
+		},
+		"ANOMALY_DETECTION_CONFIGURATION": "異常コスト検知設定",
+		"COST_ADVANCED_SETTINGS": ""
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -2237,6 +2239,7 @@
 			"REGENERATE": "Client Secretを再生成する",
 			"TITLE": "アプリ"
 		},
+		"AUTO_DORMANCY_CONFIGURATION": "休止設定",
 		"BOOKMARK": {
 			"ADD_GLOBAL_BOOKMARK": "グローバルブックマークを追加",
 			"ADD_LINK": "リンク 追加",
@@ -2268,14 +2271,12 @@
 			"ALT_S_UPDATE_DISPLAY_NAME": "表示名が正常に更新されました",
 			"ALT_S_UPDATE_DORMANCY": "休眠設定の更新が完了しました",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "タイムゾーンと言語が正常に更新されました",
-			"ANOMALY_DETECTION_CONFIGURATION": "異常コスト検知設定",
 			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "異常コストが検出されると、各ワークスペースのWorkspace Owner役割を持つすべてのユーザーにメールが送信されます。",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "異常コスト検出を有効にすると、",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "異常コストが検出されたときに各ワークスペースに特定の受信者に通知が送信されます。",
 			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "異常コスト検出を有効化",
 			"APPEARANCE": "スタイル設定",
-			"AUTO_DORMANCY_CONFIGURATION": "休止設定",
-			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "閾値よりもコストが低くなるたびに通知メールを送信します。",
+			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "通知メール送信",
 			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "コストレポート",
 			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD": "コスト閾値",
 			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD_DESC": "コストレポートで通貨を設定してください。",
@@ -3573,12 +3574,13 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "追加設定",
 		"ADMINISTRATION": "管理",
+		"ADMINISTRATION_ADVANCED": "",
 		"ADMINISTRATION_APP": "アプリ",
 		"ADMINISTRATION_BOOKMARK": "ブックマーク",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "ドメイン設定",
 		"ADMINISTRATION_IAM": "ユーザー及び権限管理",
 		"ADMINISTRATION_POLICY": "Policy",
-		"ADMINISTRATION_PREFERENCE": "環境設定",
+		"ADMINISTRATION_PREFERENCES": "環境設定",
 		"ADMINISTRATION_ROLE": "役割",
 		"ADMINISTRATION_USER": "ユーザー",
 		"ADMINISTRATION_WORKSPACES": "ワークスペース",

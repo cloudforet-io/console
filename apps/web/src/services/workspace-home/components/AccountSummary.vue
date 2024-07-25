@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 
 import type { PieSeriesOption } from 'echarts/charts';
@@ -19,6 +19,7 @@ import type { ServiceAccountListParameters } from '@/schema/identity/service-acc
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
@@ -35,11 +36,14 @@ import type { EmptyData } from '@/services/workspace-home/types/workspace-home-t
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const totalChartContext = ref<HTMLElement|null>(null);
 const providerChartContext = ref<HTMLElement|null>(null);
 
 const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     serviceAccount: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
     provider: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
 });
@@ -116,7 +120,8 @@ const state = reactive({
             formatter: (params) => {
                 const _name = storeState.provider[params.name].label;
                 const _value = numberFormatter(params.value) || '';
-                return `${params.marker} ${_name}: <b>${_value}</b> (${(params.value / state.itemsTotalCount) * 100}%)`;
+                const percent = getPercent(params.value, state.itemsTotalCount);
+                return `${params.marker} ${_name}: <b>${_value}</b> (${percent}%)`;
             },
         },
         series: [
@@ -135,6 +140,11 @@ const state = reactive({
     })),
 });
 
+const getPercent = (value: number, total: number) => {
+    const _value = (value / total) * 100;
+    const roundedValue = Math.ceil(_value * 100) / 100;
+    return parseFloat(roundedValue.toFixed(2));
+};
 const fetchServiceAccountList = async () => {
     state.loading = true;
     try {
@@ -163,9 +173,10 @@ watch([() => state.providerChartData, () => providerChartContext.value], ([, cha
     }
 }, { immediate: true });
 
-onMounted(() => {
-    fetchServiceAccountList();
-});
+watch([() => storeState.currentWorkspaceId, () => storeState.provider], async ([currentWorkspaceId]) => {
+    if (!currentWorkspaceId) return;
+    await fetchServiceAccountList();
+}, { immediate: true });
 </script>
 
 <template>
@@ -230,12 +241,12 @@ onMounted(() => {
                                             <span>{{ storeState.provider[item.provider].label }}</span>
                                             <p>
                                                 <span>
-                                                    <span class="percent">{{ (item.count / state.itemsTotalCount) * 100 }}</span>%
+                                                    <span class="percent">{{ getPercent(item.count, state.itemsTotalCount) }}</span>%
                                                 </span>
                                                 <span class="count">({{ item.count }})</span>
                                             </p>
                                         </div>
-                                        <p-progress-bar :percentage="(item.count / state.itemsTotalCount) * 100"
+                                        <p-progress-bar :percentage="getPercent(item.count, state.itemsTotalCount)"
                                                         :color="storeState.provider[item.provider].color"
                                                         size="md"
                                                         height="0.375rem"

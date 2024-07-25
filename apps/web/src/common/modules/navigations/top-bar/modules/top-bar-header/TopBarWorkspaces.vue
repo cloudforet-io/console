@@ -37,8 +37,8 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { gray, violet } from '@/styles/colors';
 
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const PAGE_SIZE = 9;
 
@@ -93,7 +93,7 @@ const handleClickButton = (hasNoWorkspace?: string) => {
     const selectedWorkspaceId = !hasNoWorkspace && storeState.selectedWorkspace?.workspace_id || '';
     appContextStore.enterAdminMode();
     router.push({
-        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+        name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME),
         query: {
             hasNoWorkspace,
             selectedWorkspaceId: !hasNoWorkspace ? selectedWorkspaceId : undefined,
