@@ -24,8 +24,8 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
+import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 
 
 const emit = defineEmits<{(e: 'update', target: string, isValid: boolean): void; }>();

@@ -20,10 +20,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import type { WorkspaceDropdownMenuItem, NoticeFormType } from '@/services/info/types/notice-type';
-import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 interface Props {
     selectedItems: WorkspaceDropdownMenuItem[];
@@ -160,7 +160,7 @@ const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
                 <template #button>
                     <p-button style-type="substitutive"
                               icon-left="ic_plus_bold"
-                              @click="router.push({ name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME) })"
+                              @click="router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME) })"
                     >
                         {{ $t('INFO.NOTICE.FORM.CREATE_WORKSPACE') }}
                     </p-button>

@@ -95,6 +95,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
             { id: MENU_ID.BUDGET },
             { id: MENU_ID.COST_REPORT },
             { id: MENU_ID.DATA_SOURCES },
+            { id: MENU_ID.COST_ADVANCED_SETTINGS },
         ],
     },
     {
@@ -106,11 +107,12 @@ export const ADMIN_MENU_LIST: Menu[] = [
         ],
     },
     {
-        id: MENU_ID.PREFERENCE,
+        id: MENU_ID.ADVANCED,
         subMenuList: [
             { id: MENU_ID.WORKSPACES },
             { id: MENU_ID.BOOKMARK },
-            { id: MENU_ID.DOMAIN_SETTINGS },
+            { id: MENU_ID.AUTO_DORMANCY_CONFIGURATION },
+            { id: MENU_ID.PREFERENCES },
         ],
     },
     {

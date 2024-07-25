@@ -1668,7 +1668,9 @@
 				"UNIT": "Unit",
 				"VARIATION": "Variation"
 			}
-		}
+		},
+		"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
+		"COST_ADVANCED_SETTINGS": "Advanced Settings"
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -2254,6 +2256,7 @@
 			"REGENERATE": "Regenerate Client Secret",
 			"TITLE": "App"
 		},
+		"AUTO_DORMANCY_CONFIGURATION": "Dormancy Configuration",
 		"BOOKMARK": {
 			"ADD_GLOBAL_BOOKMARK": "Add Global Bookmark",
 			"ADD_LINK": "Add Link",
@@ -2285,13 +2288,11 @@
 			"ALT_S_UPDATE_DISPLAY_NAME": "Display name successfully updated",
 			"ALT_S_UPDATE_DORMANCY": "Dormancy configuration successfully changed",
 			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "Timezone & language successfully updated",
-			"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
 			"ANOMALY_DETECTION_CONF_RECIPIENTS_DESC": "When anomaly costs are detected, an email will be sent to all users with the Workspace Owner role type for each Workspace.",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC1": "With Anomaly Detection Configuration turned on,",
 			"ANOMALY_DETECTION_CONF_TOGGLE_DESC2": "notifications will be sent to particular recipients associated with each workspace when an anomaly in cost is detected.",
 			"ANOMALY_DETECTION_CONF_TOGGLE_TITLE": "Enable Anomaly Detection Configuration",
 			"APPEARANCE": "Appearance",
-			"AUTO_DORMANCY_CONFIGURATION": "Dormancy Configuration",
 			"AUTO_DORMANCY_CONFIGURATION_CHECKBOX": "Send email notifications",
 			"AUTO_DORMANCY_CONFIGURATION_COST_REPORT": "Cost Report",
 			"AUTO_DORMANCY_CONFIGURATION_COST_THRESHOLD": "Cost Threshold",
@@ -3590,12 +3591,13 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "Additional Settings",
 		"ADMINISTRATION": "Administration",
+		"ADMINISTRATION_ADVANCED": "Advanced",
 		"ADMINISTRATION_APP": "App",
 		"ADMINISTRATION_BOOKMARK": "Bookmark",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "Domain Settings",
 		"ADMINISTRATION_IAM": "IAM",
 		"ADMINISTRATION_POLICY": "Policy",
-		"ADMINISTRATION_PREFERENCE": "Preferences",
+		"ADMINISTRATION_PREFERENCES": "Preferences",
 		"ADMINISTRATION_ROLE": "Role",
 		"ADMINISTRATION_USER": "User",
 		"ADMINISTRATION_WORKSPACES": "Workspaces",
