@@ -27,12 +27,12 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { gray } from '@/styles/colors';
 
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import LandingAllWorkspaces from '@/services/landing/components/LandingAllWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/LandingEmptyContents.vue';
 import LandingRecentVisits from '@/services/landing/components/LandingRecentVisits.vue';
 import LandingSearch from '@/services/landing/components/LandingSearch.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
@@ -72,7 +72,7 @@ const handleSearch = (value: string) => {
 };
 const handleClickButton = () => {
     window.open(router.resolve({
-        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+        name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME),
         query: {
             hasNoWorkspace: 'true',
         },

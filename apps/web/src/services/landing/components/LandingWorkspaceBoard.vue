@@ -24,12 +24,12 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { gray } from '@/styles/colors';
 
+import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet, BoardType } from '@/services/landing/type/type';
-import { workspaceStateFormatter } from '@/services/preference/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/preference/constants/workspace-constant';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 interface Props {
@@ -129,7 +129,7 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                                     <p-link :text="$t('LADING.GO_TO_DORMANT_CONFIG')"
                                             highlight
                                             :to="{
-                                                name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION._NAME)
+                                                name: makeAdminRouteName(ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME)
                                             }"
                                     />
                                 </div>
