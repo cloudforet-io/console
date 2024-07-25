@@ -125,6 +125,7 @@ const checkDefaultValidation = () => {
             const labelsInfo = cloneDeep(selectedDataTable.labels_info ?? {});
             const labelsInfoWithoutDateField = removeDateField(labelsInfo);
             const targetCount = Object.keys(labelsInfoWithoutDateField).length;
+            state.errorModalCurrentType = 'default';
             if (targetCount < state.defaultValidationConfig?.defaultMaxCount) {
                 state.widgetDefaultValidationModalVisible = true;
             }
@@ -145,9 +146,11 @@ const handleSelectWidgetName = (widgetName: string) => {
     widgetGenerateStore.setSize(_config.meta.sizes[0]);
     widgetGenerateStore.setWidgetFormValueMap({
         title: _config?.meta.title,
+        description: '',
     });
     widgetGenerateStore.setWidgetValidMap({
         title: true,
+        description: true,
     });
     checkDefaultValidation();
 };
