@@ -3738,11 +3738,11 @@
 				"DETAILS": {
 					"ADDITIONAL_INFO": "추가 정보",
 					"DETAILS": "상세 정보",
-					"RESOURCE": "",
+					"RESOURCE": "리소스",
 					"RESOURCE_ID": "리소스 ID",
 					"RESOURCE_NAME": "리소스 이름",
 					"RESOURCE_TYPE": "리소스 타입",
-					"RESPONDER": ""
+					"RESPONDER": "처리자"
 				},
 				"EDIT_MODAL_TITLE": "얼럿 이름 수정",
 				"HEADER": {
@@ -3768,7 +3768,7 @@
 					"URGENCY": "긴급도"
 				},
 				"INFO": {
-					"ACCOUNT_ID": "Account ID",
+					"ACCOUNT_ID": "어카운트 아이디",
 					"ACKNOWLEDGED": "확인 시간",
 					"ALERT_ID": "얼럿 ID",
 					"ALT_E_UPDATE_DESCRIPTION": "설명 수정 실패",
@@ -3820,7 +3820,7 @@
 					"CURRENT": "현재",
 					"HIDE": "숨기기",
 					"LEVEL": "레벨",
-					"NOTIFICATION": "",
+					"NOTIFICATION": "알림",
 					"NO_RESPONDER": "수신자 없음",
 					"RESPONDER": "수신자",
 					"SHOW_RESPONDERS": "수신자 보기"

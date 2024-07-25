@@ -1,6 +1,8 @@
 <script setup lang="ts">
 
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 import draggable from 'vuedraggable';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -214,6 +216,10 @@ watch([() => props.visible, () => props.resourceType], ([visible, resourceType])
         initColumns();
     }
 }, { immediate: true });
+
+onMounted(() => {
+    initColumns();
+});
 
 </script>
 
