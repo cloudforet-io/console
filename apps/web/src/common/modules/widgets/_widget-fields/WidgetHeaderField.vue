@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PFieldGroup, PI, PTextarea, PTextInput, PToggleButton,
@@ -50,6 +52,11 @@ const handleUpdateValue = (key: string, value: string) => {
     };
     emit('update:value', state.proxyValue);
 };
+
+/* Watcher */
+watch(() => state.isWidgetTitleValid, (isValid) => {
+    emit('update:is-valid', isValid);
+}, { immediate: true });
 
 onMounted(() => {
     emit('update:is-valid', true);
