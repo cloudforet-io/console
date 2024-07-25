@@ -476,7 +476,7 @@ initPage();
         text-overflow: ellipsis;
         white-space: normal;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 3;
 
         /* display: inline-block; */
         -webkit-box-orient: vertical;

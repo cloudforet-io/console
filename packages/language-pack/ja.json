@@ -3738,11 +3738,11 @@
 				"DETAILS": {
 					"ADDITIONAL_INFO": "追加情報",
 					"DETAILS": "詳細情報",
-					"RESOURCE": "",
+					"RESOURCE": "リソース",
 					"RESOURCE_ID": "リソースID",
 					"RESOURCE_NAME": "リソース名",
 					"RESOURCE_TYPE": "リソースタイプ",
-					"RESPONDER": ""
+					"RESPONDER": "応答者"
 				},
 				"EDIT_MODAL_TITLE": "アラート名を修正",
 				"HEADER": {
@@ -3768,7 +3768,7 @@
 					"URGENCY": "緊急度"
 				},
 				"INFO": {
-					"ACCOUNT_ID": "Account ID",
+					"ACCOUNT_ID": "アカウントID",
 					"ACKNOWLEDGED": "確認時間",
 					"ALERT_ID": "アラートID",
 					"ALT_E_UPDATE_DESCRIPTION": "説明修正に失敗",
@@ -3820,7 +3820,7 @@
 					"CURRENT": "現在",
 					"HIDE": "隠す",
 					"LEVEL": "レベル",
-					"NOTIFICATION": "",
+					"NOTIFICATION": "通知",
 					"NO_RESPONDER": "応答者なし",
 					"RESPONDER": "受信先",
 					"SHOW_RESPONDERS": "受信先を見る"
