@@ -26,6 +26,9 @@ import {
     getWidgetDateFields,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
+import { getPeriodByGranularity } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { CostAnalyzeRawData } from '@/services/cost-explorer/types/cost-analyze-type';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -59,10 +62,15 @@ const storeState = reactive({
 });
 const state = reactive({
     proxyLegend: useProxyValue('legend', props, emit),
-    xAxisData: computed(() => getWidgetDateFields(costAnalysisPageState.granularity, costAnalysisPageState.period?.start, costAnalysisPageState.period?.end)),
+    xAxisData: computed(() => {
+        const _period = getPeriodByGranularity(costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
+        return getWidgetDateFields(costAnalysisPageState.granularity, _period?.start, _period?.end);
+    }),
+    parsedChartGroupBy: computed(() => costAnalysisPageState.chartGroupBy?.replace('additional_info.', '').replace('tags.', '')),
     chartData: [],
     chart: null as EChartsType | null,
     chartOptions: computed<BarSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
         grid: {
             left: 50,
             right: '20%',
@@ -114,7 +122,7 @@ const getGroupByData = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
     const _seriesData: any[] = [];
     _slicedData?.forEach((d) => {
         _seriesData.push({
-            name: d[costAnalysisPageState.chartGroupBy] || '--',
+            name: d[state.parsedChartGroupBy] || 'Unknown',
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
@@ -182,7 +190,8 @@ watch([() => chartContext.value, () => props.loading, () => props.data], async (
     }
 });
 watch(() => state.proxyLegend, () => {
-    state.chart.setOption(state.chartOptions, true);
+    if (!state.chart) return;
+    state.chart?.setOption(state.chartOptions, true);
 });
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
@@ -191,7 +200,7 @@ useResizeObserver(chartContext, throttle(() => {
 
 <template>
     <p-data-loader :loading="props.loading"
-                   :data="props.data"
+                   :data="props.data?.results"
                    class="cost-analysis-stacked-column-chart"
     >
         <template #loader>
