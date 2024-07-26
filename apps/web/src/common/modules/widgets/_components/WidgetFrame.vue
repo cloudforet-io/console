@@ -73,8 +73,6 @@ const handleToggleWidth = () => {
     }
     emit('toggle-size', nextSize);
 };
-const handleShowFullDataPopper = () => {
-};
 const handleClickFullData = () => {
     if (!props.fullDataLinkList?.length) return;
     window.open(router.resolve(props.fullDataLinkList[0].location).href, '_blank');
@@ -131,7 +129,6 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                                    size="sm"
                                    name="ic_db-where"
                                    shape="square"
-                                   @click="handleShowFullDataPopper"
                     />
                     <template #content>
                         <div class="metadata-content">
