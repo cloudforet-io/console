@@ -27,6 +27,8 @@ import { PSpinner } from '@cloudforet/mirinae';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+import { ERROR_ROUTE } from '@/router/constant';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -103,7 +105,11 @@ const onErrorSignIn = (e, token) => {
             },
         });
     } else {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, e.message);
+        router.push({
+            name: ERROR_ROUTE._NAME,
+            params: { statusCode: '401' },
+        });
     }
 };
 
