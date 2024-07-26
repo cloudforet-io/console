@@ -228,7 +228,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
             <p-skeleton v-if="state.loading"
                         height="100%"
             />
-            <template v-else-if="!state.data?.results">
+            <template v-else-if="state.data?.results?.length">
                 <metric-explorer-line-chart
                     v-if="!metricExplorerPageGetters.isRealtimeChart"
                     :loading="state.loading"
