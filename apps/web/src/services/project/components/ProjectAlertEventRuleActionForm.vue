@@ -154,10 +154,10 @@ const state = reactive({
 });
 
 /* event */
-const onChangeCheckbox = (value: boolean) => {
+const onChangeCheckbox = (value: boolean[]) => {
     state.proxyActions = {
         ...state.proxyActions,
-        no_notification: value,
+        no_notification: value[0],
     };
 };
 const onToggleChange = (value: boolean) => {
