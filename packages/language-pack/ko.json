@@ -3761,7 +3761,7 @@
 					"RESOURCE_ID": "리소스 ID",
 					"RESOURCE_NAME": "리소스 이름",
 					"RESOURCE_TYPE": "리소스 타입",
-					"RESPONDER": "처리자"
+					"RESPONDER": "응답자"
 				},
 				"EDIT_MODAL_TITLE": "얼럿 이름 수정",
 				"HEADER": {
@@ -4249,8 +4249,8 @@
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
 			"FAILED": "실패",
-			"HELP": "가이드",
 			"GO_TO_DASHBOARD": "",
+			"HELP": "가이드",
 			"INVITE_ONLY": "초대된 사용자만",
 			"MEMBER": {
 				"ADD": "추가",

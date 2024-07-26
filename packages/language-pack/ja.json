@@ -3761,7 +3761,7 @@
 					"RESOURCE_ID": "リソースID",
 					"RESOURCE_NAME": "リソース名",
 					"RESOURCE_TYPE": "リソースタイプ",
-					"RESPONDER": "応答者"
+					"RESPONDER": "回答者"
 				},
 				"EDIT_MODAL_TITLE": "アラート名を修正",
 				"HEADER": {
@@ -4249,8 +4249,8 @@
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
 			"FAILED": "失敗",
-			"HELP": "ヘルプ",
 			"GO_TO_DASHBOARD": "",
+			"HELP": "ヘルプ",
 			"INVITE_ONLY": "招待のみ",
 			"MEMBER": {
 				"ADD": "追加",

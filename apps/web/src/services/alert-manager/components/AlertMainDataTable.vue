@@ -414,8 +414,15 @@ initPage();
                     />
                     <span>{{ state.urgencyLabels[value] }}</span>
                 </template>
-                <template #col-resource-format="{ value }">
-                    {{ value ? value.name : '' }}
+                <template #col-resources-format="{ value }">
+                    <span v-if="(value ?? []).length === 0">
+                        --
+                    </span>
+                    <template v-else>
+                        <p class="additional-info">
+                            {{ value?.[0]?.name }}
+                        </p>
+                    </template>
                 </template>
                 <template #col-project_id-format="{ value }">
                     <template v-if="value">

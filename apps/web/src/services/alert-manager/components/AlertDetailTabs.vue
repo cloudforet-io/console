@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<{
 
 const tabState = reactive({
     tabs: computed(() => ([
-        { name: 'details', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS') },
+        { name: 'details', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.ADDITIONAL_INFO') },
         { name: 'pushed-event', label: i18n.t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT') },
     ] as TabItem[])),
     activeTab: 'details',

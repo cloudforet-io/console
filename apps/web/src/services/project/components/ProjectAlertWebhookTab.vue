@@ -346,8 +346,13 @@ onActivated(() => {
             <template #col-requests.total-format="{ value }">
                 <span>{{ value || 0 }}</span>
             </template>
-            <template #col-requests.error-format="{ value }">
-                <span class="col-failed-requests">{{ value || 0 }} {{ $t('PROJECT.DETAIL.FAILED') }}</span>
+            <template #col-requests.error-format="{ value, item }">
+                <span v-if="value"
+                      class="col-failed-requests"
+                >
+                    {{ value || 0 }}
+                    <span>({{ ((value / item?.requests?.total) * 100).toFixed(1) }}%)</span>
+                </span>
             </template>
         </p-toolbox-table>
         <p-table-check-modal :visible.sync="checkModalState.visible"
@@ -377,8 +382,13 @@ onActivated(() => {
             <template #col-requests.total-format="{ value }">
                 <span>{{ value || 0 }}</span>
             </template>
-            <template #col-requests.error-format="{ value }">
-                <span class="col-failed-requests">{{ value || 0 }} {{ $t('PROJECT.DETAIL.FAILED') }}</span>
+            <template #col-requests.error-format="{ value, item }">
+                <span v-if="value"
+                      class="col-failed-requests"
+                >
+                    {{ value || 0 }}
+                    <span>({{ ((value / item?.requests?.total) * 100).toFixed(1) }}%)</span>
+                </span>
             </template>
         </p-table-check-modal>
         <project-alert-webhook-update-modal
