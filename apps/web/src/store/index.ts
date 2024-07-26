@@ -3,7 +3,6 @@ import Vuex from 'vuex';
 
 import display from './modules/display';
 import domain from './modules/domain';
-import error from './modules/error';
 import settings from './modules/settings';
 // eslint-disable-next-line import/no-cycle
 import user from './modules/user';
@@ -18,7 +17,6 @@ const store = new Vuex.Store<any>({
         settings,
         domain,
         display,
-        error,
     },
     plugins,
 });

@@ -18,6 +18,7 @@ import { EXTERNAL_PAGE_ROUTE } from '@/router/constant';
 import { getRouteScope } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useErrorStore } from '@/store/error/error-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
@@ -45,7 +46,7 @@ const state = reactive({
     showGNB: computed(() => !state.isWorkspaceLandingPage && (route.matched[1]?.name === 'admin' || route.matched[1]?.name === 'workspace' || state.isMyPage)),
     isWorkspaceLandingPage: computed(() => route.name === LANDING_ROUTE._NAME),
     isMyPage: computed(() => route.path.startsWith('/my-page')),
-    isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && state.routeScope !== 'EXCLUDE_AUTH'),
+    isExpired: computed(() => !state.isRoutingToSignIn && errorStore.state.visibleSessionExpiredError && state.routeScope !== 'EXCLUDE_AUTH'),
     isRoutingToSignIn: false,
     isEmailVerified: computed(() => store.state.user.emailVerified),
     userId: computed<string>(() => store.state.user.userId),
@@ -56,6 +57,7 @@ const state = reactive({
 });
 
 const appContextStore = useAppContextStore();
+const errorStore = useErrorStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
 
@@ -72,7 +74,7 @@ const goToSignIn = async () => {
         query: { previousPath: route.fullPath },
     };
     store.commit('user/setCurrentGrantInfo', undefined);
-    store.commit('error/setVisibleSessionExpiredError', false);
+    errorStore.setVisibleSessionExpiredError(false);
 
     await router.push(res);
     state.isRoutingToSignIn = false;
