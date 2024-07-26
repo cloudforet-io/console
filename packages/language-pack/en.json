@@ -1654,6 +1654,7 @@
 				"TITLE": "Trusted Advisor"
 			},
 			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget",
+			"VIEW_FULL_DATA": "View full data",
 			"WIDGET_TITLE_REQUIRED": "Please enter widget title."
 		}
 	},
