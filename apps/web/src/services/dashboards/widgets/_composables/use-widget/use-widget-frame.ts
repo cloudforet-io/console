@@ -6,7 +6,7 @@ import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore

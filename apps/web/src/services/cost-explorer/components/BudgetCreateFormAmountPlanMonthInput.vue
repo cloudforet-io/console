@@ -8,8 +8,8 @@ import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';

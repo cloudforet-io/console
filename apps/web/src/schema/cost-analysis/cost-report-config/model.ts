@@ -1,7 +1,7 @@
 import type { CostReportConfigStatus } from '@/schema/cost-analysis/cost-report-config/type';
 import type { RoleType } from '@/schema/identity/role/type';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 import type { LanguageCode } from '@/store/modules/user/type';
 
 

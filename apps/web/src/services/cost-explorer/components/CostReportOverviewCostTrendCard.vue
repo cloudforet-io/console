@@ -19,7 +19,7 @@ import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cos
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 

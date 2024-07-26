@@ -4,7 +4,7 @@ import type {
     BudgetNotification, BudgetPlannedLimit, BudgetTimeUnit, ProviderFilter,
 } from '@/schema/cost-analysis/budget/type';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 
 
 export interface BudgetModel {

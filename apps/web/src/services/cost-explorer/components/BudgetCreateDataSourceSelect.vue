@@ -5,7 +5,7 @@ import { PFieldGroup, PSelectDropdown, PLazyImg } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap, CostDataSourceItems } from '@/store/reference/cost-data-source-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';

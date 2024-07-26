@@ -29,7 +29,7 @@ import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';

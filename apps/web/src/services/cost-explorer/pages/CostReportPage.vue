@@ -10,7 +10,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 
 import { i18n } from '@/translations';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 
 import CostReportMonthlyTotalAmountSummaryCard
     from '@/services/cost-explorer/components/CostReportMonthlyTotalAmountSummaryCard.vue';
