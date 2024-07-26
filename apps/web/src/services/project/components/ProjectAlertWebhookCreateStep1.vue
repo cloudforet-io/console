@@ -73,9 +73,6 @@ onMounted(async () => {
                     />
                     <div class="info">
                         <p>{{ item.name }}</p>
-                        <p class="desc">
-                            {{ item.tags?.long_description || item.tags?.description }}
-                        </p>
                     </div>
                     <!-- TODO: will be updated field name -->
                     <p-link v-if="item.tags.url"
@@ -117,8 +114,7 @@ onMounted(async () => {
     min-height: 22.5rem;
     overflow: visible;
     .card-wrapper {
-        @apply grid grid-cols-2 overflow-y-auto;
-        max-height: 23.875rem;
+        @apply grid grid-cols-2;
         grid-column-gap: 0.5rem;
         grid-row-gap: 0.5rem;
         .card {
@@ -128,22 +124,17 @@ onMounted(async () => {
             height: 5.25rem;
             border-radius: 0.375rem;
             .card-item {
-                @apply flex relative;
+                @apply flex relative items-center;
                 width: 100%;
                 gap: 0.75rem;
+                .image {
+                    margin-bottom: 0;
+                }
                 .info {
-                    @apply flex flex-col text-label-md;
+                    @apply flex flex-col text-label-md font-medium;
                     flex: 1;
                     max-width: calc(100% - 3.25rem);
                     gap: 0.125rem;
-                    .desc {
-                        @apply text-label-sm text-gray-500;
-                        display: -webkit-box;
-                        -webkit-line-clamp: 2;
-                        -webkit-box-orient: vertical;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
                 }
                 .learn-more-button {
                     @apply absolute text-label-sm;
