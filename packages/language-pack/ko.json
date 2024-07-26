@@ -1872,7 +1872,7 @@
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "공유",
 			"SHARED_BY_ADMIN": "Admin에 의해 공유됨",
-			"SHARED_TO_ALL_PROJECTS": "",
+			"SHARED_TO_ALL_PROJECTS": "전체 프로젝트에 공유됨",
 			"SHARED_TO_WORKSPACES": "워크스페이스에 공유됨",
 			"SHARE_DASHBOARD": "대시보드 공유",
 			"SHARE_TO_ALL_PROJECTS": "전체 프로젝트에 공유",
