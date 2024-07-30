@@ -11,7 +11,7 @@ export interface TableWidgetField {
 
 interface TableFieldInfo {
     type: 'labelField' | 'dataField';
-    additionalType?: 'comparison' | 'subTotal' | 'total' | 'progressBar';
+    additionalType?: 'comparison' | 'subTotal' | 'total' | 'progressBar' | 'dateFormat';
     reference?: string;
     unit?: string;
 }

@@ -76,7 +76,7 @@ export interface ColorSchemaValue {
     colorValue: ColorValue;
 }
 
-export type DateFormat = typeof DATE_FORMAT[keyof typeof DATE_FORMAT];
+export type DateFormat = keyof typeof DATE_FORMAT;
 export interface DateFormatValue {
     value: DateFormat;
 }

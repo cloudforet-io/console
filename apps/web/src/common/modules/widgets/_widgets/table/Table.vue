@@ -41,6 +41,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
+    DateFormat,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -95,9 +96,12 @@ const state = reactive({
     subTotalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.subTotal as TotalValue),
     totalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.total as TotalValue),
     progressBarInfo: computed<ProgressBarValue|undefined>(() => props.widgetOptions?.progressBar as ProgressBarValue),
+    dateFormat: computed<DateFormat|undefined>(() => props.widgetOptions?.dateFormat as DateFormat),
     // table
     tableFields: computed<TableWidgetField[]>(() => {
-        const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map((field) => ({ name: field, label: field, fieldInfo: { type: 'labelField' } })) ?? [];
+        const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map(
+            (field) => ({ name: field, label: field, fieldInfo: { type: 'labelField', additionalType: field === 'Date' ? 'dateFormat' : undefined } }),
+        ) ?? [];
         let dataFields: TableWidgetField[] = [];
         if (state.tableDataFieldType === 'staticField') {
             state.tableDataField?.forEach((field) => {
@@ -209,7 +213,7 @@ const getWidgetTableDateFields = (
         dateFields.push({
             name: now.format(labelDateFormat),
             label: now.format(labelDateFormat),
-            fieldInfo: { type: 'dataField', unit: state.dataInfo?.[criteria]?.unit },
+            fieldInfo: { type: 'dataField', additionalType: 'dateFormat', unit: state.dataInfo?.[criteria]?.unit },
         });
         now = now.add(1, timeUnit);
     }
@@ -464,6 +468,7 @@ defineExpose<WidgetExpose<Data>>({
                                    :total-info="state.totalInfo"
                                    :granularity="state.granularity"
                                    :data-info="state.dataInfo"
+                                   :date-format="state.dateFormat"
                                    :sort-by.sync="state.sortBy"
                                    :this-page.sync="state.thisPage"
                                    @load="handleManualLoadWidget"
