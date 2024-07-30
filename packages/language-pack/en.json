@@ -1360,6 +1360,10 @@
 			"TITLE": "Change Project"
 		},
 		"WIDGETS": {
+			"ABBREVIATION": {
+				"ABBREVIATION": "Abbreviation",
+				"CONTENTS": "Change the number notation to view data more intuitively."
+			},
 			"ACTUAL": "Actual",
 			"ADD_WIDGET": "Add Widget",
 			"ADD_WIDGET_TO_DASHBOARD": "Add Widget to Dashboard",

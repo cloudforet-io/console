@@ -1,5 +1,6 @@
 import type { Component } from 'vue';
 
+import abbreviation from '@/common/modules/widgets/_widget-fields/WidgetFieldAbbreviation.vue';
 import basisField from '@/common/modules/widgets/_widget-fields/WidgetFieldBasisField.vue';
 import categoryBy from '@/common/modules/widgets/_widget-fields/WidgetFieldCategoryBy.vue';
 import colorSchema from '@/common/modules/widgets/_widget-fields/WidgetFieldColorSchema.vue';
@@ -50,4 +51,5 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     colorSchema,
     pieChartType,
     dateFormat,
+    abbreviation,
 };

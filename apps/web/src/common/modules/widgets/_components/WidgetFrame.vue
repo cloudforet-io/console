@@ -101,6 +101,11 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
             <h3 class="title">
                 {{ props.title }}
             </h3>
+            <p v-if="props.showPeriodText"
+               class="date-text"
+            >
+                {{ props.periodText }}
+            </p>
         </div>
         <div v-if="props.mode !== 'overlay'"
              class="action-button-wrapper"
@@ -256,9 +261,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
     }
 
     .widget-header {
-        display: flex;
         align-items: center;
-        height: 1.625rem;
         padding-bottom: 0.5rem;
         .title {
             @apply truncate text-label-md;
@@ -268,6 +271,9 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
             display: block;
             -webkit-box-orient: vertical;
             font-weight: 500;
+        }
+        .date-text {
+            @apply text-label-sm text-gray-500;
         }
     }
     .metadata-content {
