@@ -23,7 +23,8 @@ import type { TableWidgetField } from '@/common/modules/widgets/types/widget-dat
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type {
-    TableDataFieldValue, ComparisonValue, TotalValue, DateFormat,
+    TableDataFieldValue, ComparisonValue, TotalValue,
+    DateFormatValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -47,7 +48,7 @@ interface Props {
   comparisonInfo?: ComparisonValue;
   subTotalInfo?: TotalValue;
   totalInfo?: TotalValue;
-  dateFormat?: DateFormat;
+  dateFormatInfo?: DateFormatValue;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
@@ -67,8 +68,8 @@ const state = reactive({
     proxySortBy: useProxyValue('sortBy', props, emit),
     proxyThisPage: useProxyValue('thisPage', props, emit),
     refinedDateFormat: computed<string|undefined>(() => {
-        if (!props.granularity || !props.dateFormat) return undefined;
-        return getRefinedDateFormatByGranularity(props.granularity, props.dateFormat);
+        if (!props.granularity || !props.dateFormatInfo) return undefined;
+        return getRefinedDateFormatByGranularity(props.granularity, props.dateFormatInfo.value);
     }),
 });
 

@@ -28,18 +28,20 @@ const state = reactive({
         label: d,
     }))),
     proxyValue: useProxyValue('value', props, emit),
-    selectedMenuItem: props.value ?? props.widgetConfig?.optionalFieldsSchema.dateFormat?.options?.default ?? Object.keys(DATE_FORMAT)[0] as undefined | MenuItem[] | string,
+    selectedMenuItem: props.value?.value ?? props.widgetConfig?.optionalFieldsSchema.dateFormat?.options?.default ?? Object.keys(DATE_FORMAT)[0] as undefined | MenuItem[] | string,
 });
 
 /* Event */
 const handleUpdateSelect = (val: string|MenuItem[]) => {
     state.selectedMenuItem = val;
-    state.proxyValue = val;
+    state.proxyValue = {
+        value: val,
+    };
 };
 
 onMounted(() => {
     emit('update:is-valid', true);
-    state.proxyValue = props.value ?? props.widgetConfig?.optionalFieldsSchema.dateFormat?.options?.default ?? Object.keys(DATE_FORMAT)[0];
+    state.proxyValue = props.value?.value ?? props.widgetConfig?.optionalFieldsSchema.dateFormat?.options?.default ?? Object.keys(DATE_FORMAT)[0];
 });
 
 
