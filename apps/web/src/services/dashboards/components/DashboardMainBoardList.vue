@@ -73,8 +73,11 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
     ];
 };
 const showBadge = (board: DashboardModel): boolean => {
-    if (board.user_id || board.version === '1.0') return true;
-    if (board.shared) return true;
+    if (board.version === '1.0') return true;
+    if (board.shared) {
+        if (board.scope === 'PROJECT') return false; // HACK: temp code for legacy project dashboard
+        return true;
+    }
     return false;
 };
 const getBadgeStyleType = (board: DashboardModel): string|undefined => {
@@ -83,7 +86,6 @@ const getBadgeStyleType = (board: DashboardModel): string|undefined => {
         return 'indigo100';
     }
     if (board.version === '1.0') return 'red100';
-    if (board.user_id) return 'gray150';
     return undefined;
 };
 const getBadgeText = (board: DashboardModel): TranslateResult|undefined => {
@@ -174,16 +176,9 @@ onMounted(() => {
                                  badge-type="subtle"
                                  :style-type="getBadgeStyleType(board)"
                         >
-                            <p-i v-if="props.dashboardType === 'PRIVATE'"
-                                 name="ic_lock-filled"
-                                 width="0.75rem"
-                                 height="0.75rem"
-                                 color="gray900"
-                                 class="mr-1"
-                            />
                             {{ getBadgeText(board) }}
                         </p-badge>
-                        <p-badge v-if="props.dashboardType === 'DEPRECATED' && isPrivate(board.dashboard_id)"
+                        <p-badge v-if="isPrivate(board.dashboard_id)"
                                  badge-type="subtle"
                                  style-type="gray150"
                         >

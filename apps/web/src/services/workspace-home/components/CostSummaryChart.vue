@@ -9,7 +9,7 @@ import {
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 

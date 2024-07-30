@@ -27,3 +27,7 @@ export const setIsSignInFailed: Mutation<DisplayState> = (state, isSignInFailed:
 export const setVisibleMobileGuideModal: Mutation<DisplayState> = (state, visibleMobileGuideModal: boolean): void => {
     state.visibleMobileGuideModal = visibleMobileGuideModal;
 };
+
+export const setGnbNotificationLastReadTime: Mutation<DisplayState> = (state, gnbNotificationLastReadTime: string): void => {
+    state.gnbNotificationLastReadTime = gnbNotificationLastReadTime;
+};

@@ -57,7 +57,8 @@ const state = reactive({
     selectedSharedScope: 'WORKSPACE' as DashboardScope,
     showBadge: computed<boolean>(() => {
         if (dashboardDetailState.dashboardInfo?.user_id) return true;
-        return dashboardDetailState.dashboardInfo?.workspace_id === '*' || dashboardDetailState.dashboardInfo?.project_id === '*';
+        // HACK: temp code for legacy project dashboard
+        return dashboardDetailState.dashboardInfo?.workspace_id === '*'; // || dashboardDetailState.dashboardInfo?.project_id === '*';
     }),
     badgeStyleType: computed<string>(() => {
         if (dashboardDetailState.dashboardScope === 'PRIVATE') return 'gray150';
@@ -68,7 +69,8 @@ const state = reactive({
         if (dashboardDetailState.dashboardScope === 'PRIVATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
         if (state.isSharedDashboard) {
             if (storeState.isAdminMode) {
-                if (state.sharedScope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+                // HACK: temp code for legacy project dashboard
+                if (state.sharedScope === 'PROJECT') return undefined; // i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
                 return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
             }
             if (state.sharedScope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
@@ -109,14 +111,15 @@ const state = reactive({
                 label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_DASHBOARD') : i18n.t('DASHBOARDS.DETAIL.SHARE_DASHBOARD'),
                 icon: 'ic_share',
             }];
-        } else if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
-            _shareMenuItems = [{
-                type: 'item',
-                name: 'shareProject',
-                label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS') : i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_PROJECTS'),
-                icon: 'ic_share',
-            }];
         }
+        // else if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
+        //     _shareMenuItems = [{
+        //         type: 'item',
+        //         name: 'shareProject',
+        //         label: state.isSharedDashboard ? i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS') : i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_PROJECTS'),
+        //         icon: 'ic_share',
+        //     }];
+        // }
         return [
             {
                 type: 'item',

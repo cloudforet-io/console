@@ -19,8 +19,8 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
-import { CURRENCY } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';

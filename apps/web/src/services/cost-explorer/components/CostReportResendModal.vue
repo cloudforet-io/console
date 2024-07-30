@@ -13,7 +13,7 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

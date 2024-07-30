@@ -14,7 +14,7 @@ import type { CostReportGetUrlParameters } from '@/schema/cost-analysis/cost-rep
 import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
 import type { CostReportModel, CostReportDataLinkInfoModel } from '@/schema/cost-analysis/cost-report/model';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
