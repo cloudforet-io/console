@@ -41,7 +41,9 @@ const handleUpdateSelect = (val: string|MenuItem[]) => {
 
 onMounted(() => {
     emit('update:is-valid', true);
-    state.proxyValue = props.value?.value ?? props.widgetConfig?.optionalFieldsSchema.dateFormat?.options?.default ?? Object.keys(DATE_FORMAT)[0];
+    state.proxyValue = {
+        value: props.value?.value ?? props.widgetConfig?.optionalFieldsSchema.dateFormat?.options?.default ?? Object.keys(DATE_FORMAT)[0],
+    };
 });
 
 
