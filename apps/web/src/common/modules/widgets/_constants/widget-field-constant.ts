@@ -44,4 +44,9 @@ export const DATE_FORMAT = {
         MONTHLY: 'MM/YYYY',
         DAILY: 'DD/MM/YYYY',
     },
+    'Auto display by granularity': {
+        YEARLY: 'YYYY',
+        MONTHLY: 'MM',
+        DAILY: 'DD',
+    },
 } as const;

@@ -2068,6 +2068,7 @@
 					"COLOR_SCHEMA": "色彩スキーマ",
 					"DATA_FIELD": "データフィールド",
 					"DATA_TABLE": "データテーブル",
+					"DATE_FORMAT": "",
 					"DESCRIPTION": "説明",
 					"DYNAMIC_FIELD": "ダイナミックフィールド",
 					"EDIT_DATA": "データを編集",
