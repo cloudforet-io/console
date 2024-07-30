@@ -7,7 +7,7 @@ const localStoragePlugin = (store: Store<any>) => {
         const settings = LocalStorageAccessor.getItem(state.user.userId) ?? {};
         const global = settings.global || {};
         switch (mutation.type) {
-        case 'settings/setGnbNotificationLastReadTime':
+        case 'display/setGnbNotificationLastReadTime':
             LocalStorageAccessor.setItem(state.user.userId, {
                 ...settings,
                 global: {

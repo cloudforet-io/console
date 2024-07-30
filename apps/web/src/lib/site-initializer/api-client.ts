@@ -5,6 +5,7 @@ import type { DevConfig, MockConfig, AuthConfig } from '@cloudforet/core-lib/spa
 import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
 import type { TokenGrantModel } from '@/schema/identity/token/model';
 
+import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -210,7 +211,9 @@ const getAfterCallApiMap = () => ({
 const getSessionTimeoutCallback = (store) => () => {
     // Add session expiration process
     store.dispatch('user/setIsSessionExpired', true);
-    store.dispatch('error/showSessionExpiredError');
+
+    const errorStore = useErrorStore(pinia);
+    errorStore.showSessionExpiredError();
 };
 const getApiEndpoints = (config) => {
     const ENDPOINT_V1 = config.get('CONSOLE_API.ENDPOINT');

@@ -13,7 +13,7 @@ import type { DashboardVariables } from '@/schema/dashboard/_types/dashboard-typ
 import type { InheritOptions } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

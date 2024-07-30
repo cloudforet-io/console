@@ -23,8 +23,8 @@ import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 

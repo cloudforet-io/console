@@ -12,7 +12,7 @@ import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-q
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

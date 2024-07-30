@@ -9,7 +9,7 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 

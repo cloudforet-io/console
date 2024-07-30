@@ -5,6 +5,7 @@ import axios from 'axios';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -17,6 +18,7 @@ import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type { DisplayState } from '@/store/modules/display/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 export const showHandbook = ({ commit }): void => {
     commit('setVisibleSidebar', true);
@@ -98,7 +100,7 @@ export const checkNotification: Action<DisplayState, any> = async ({
         notificationListApiToken = axios.CancelToken.source();
 
         const currentTime = dayjs.tz(dayjs.utc(), rootState.user.timezone);
-        const lastNotificationReadTimeStr = rootState.settings.gnbNotificationLastReadTime;
+        const lastNotificationReadTimeStr = rootState.display.gnbNotificationLastReadTime;
         const lastNotificationReadTime = lastNotificationReadTimeStr ? dayjs(lastNotificationReadTimeStr).tz(rootState.user.timezone) : undefined;
         const param = getNotificationListParam(
             rootState.user.userId,
@@ -157,4 +159,18 @@ export const startCheckNotification: Action<DisplayState, any> = ({ dispatch }):
 
 export const showMobileGuideModal: Action<DisplayState, any> = ({ commit }) => {
     commit('setVisibleMobileGuideModal', true);
+};
+
+export const initSettings: Action<DisplayState, any> = ({ commit, rootState }): void => {
+    const userId = rootState?.user?.userId;
+    try {
+        const settings = LocalStorageAccessor.getItem(userId);
+
+        if (settings?.global) {
+            commit('setGnbNotificationLastReadTime', settings.global.gnbNotificationLastReadTime);
+        }
+    } catch (e) {
+        console.error(e);
+        LocalStorageAccessor.removeItem(userId);
+    }
 };

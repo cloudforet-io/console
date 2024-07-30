@@ -14,8 +14,8 @@ import { PDataLoader, PSkeleton, PProgressBar } from '@cloudforet/mirinae';
 
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { CurrencySymbol } from '@/store/modules/settings/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { CurrencySymbol } from '@/store/modules/display/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
