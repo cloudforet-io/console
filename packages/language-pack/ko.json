@@ -2068,6 +2068,7 @@
 					"COLOR_SCHEMA": "색상 스키마",
 					"DATA_FIELD": "데이터 필드",
 					"DATA_TABLE": "데이터 테이블",
+					"DATE_FORMAT": "",
 					"DESCRIPTION": "설명",
 					"DYNAMIC_FIELD": "동적 필드",
 					"EDIT_DATA": "데이터 수정",

@@ -2068,6 +2068,7 @@
 					"COLOR_SCHEMA": "Color Schema",
 					"DATA_FIELD": "Data Field",
 					"DATA_TABLE": "Data Table",
+					"DATE_FORMAT": "Date Format",
 					"DESCRIPTION": "Description",
 					"DYNAMIC_FIELD": "Dynamic Field",
 					"EDIT_DATA": "Edit Data",
