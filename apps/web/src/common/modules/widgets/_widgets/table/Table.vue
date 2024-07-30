@@ -100,7 +100,7 @@ const state = reactive({
     // table
     tableFields: computed<TableWidgetField[]>(() => {
         const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map(
-            (field) => ({ name: field, label: field, fieldInfo: { type: 'labelField', additionalType: field === 'Date' ? 'date' : undefined } }),
+            (field) => ({ name: field, label: field, fieldInfo: { type: 'labelField', additionalType: field === 'Date' ? 'dateFormat' : undefined } }),
         ) ?? [];
         let dataFields: TableWidgetField[] = [];
         if (state.tableDataFieldType === 'staticField') {
@@ -213,7 +213,7 @@ const getWidgetTableDateFields = (
         dateFields.push({
             name: now.format(labelDateFormat),
             label: now.format(labelDateFormat),
-            fieldInfo: { type: 'dataField', additionalType: 'date', unit: state.dataInfo?.[criteria]?.unit },
+            fieldInfo: { type: 'dataField', additionalType: 'dateFormat', unit: state.dataInfo?.[criteria]?.unit },
         });
         now = now.add(1, timeUnit);
     }

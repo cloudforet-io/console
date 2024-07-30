@@ -73,7 +73,7 @@ const state = reactive({
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
 const getField = (field: TableWidgetField): string => {
     if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.reference) return storeState[field.fieldInfo.reference][field.label]?.name || field.label || field.name;
-    if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.additionalType === 'date' && !!state.refinedDateFormat) return dayjs.utc(field.name).format(state.refinedDateFormat);
+    if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat) return dayjs.utc(field.name).format(state.refinedDateFormat);
     return field.label || field.name;
 };
 
@@ -93,7 +93,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const referenceValueKey = item[field.name];
             return storeState[referenceKey][referenceValueKey]?.label || storeState[referenceKey][referenceValueKey]?.name || referenceValueKey || '-';
         }
-        if (field.fieldInfo?.additionalType === 'date' && !!state.refinedDateFormat && item[field.name] !== 'Total') {
+        if (field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat && item[field.name] !== 'Total') {
             return dayjs.utc(item[field.name]).format(state.refinedDateFormat);
         }
         return item[field.name] || '-';
