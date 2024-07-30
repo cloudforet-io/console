@@ -129,3 +129,9 @@ export const getApiQueryDateRange = (granularity: string, dateRange: DateRange):
 };
 
 export const getRefinedDateFormatByGranularity = (granularity: string, dateFormat: DateFormat): string => DATE_FORMAT[dateFormat][granularity];
+
+export const getFormattedDate = (date: string, dateFormat: string): string => {
+    const dateFormatsWithMMM = Object.values(DATE_FORMAT['MMM DD, YYYY']) as string[];
+    if (dateFormatsWithMMM.includes(dateFormat)) return dayjs.utc(date).locale('en').format(dateFormat);
+    return dayjs.utc(date).format(dateFormat);
+};
