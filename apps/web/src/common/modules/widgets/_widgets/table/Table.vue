@@ -41,7 +41,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
-    DateFormat,
+    DateFormatValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -96,7 +96,7 @@ const state = reactive({
     subTotalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.subTotal as TotalValue),
     totalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.total as TotalValue),
     progressBarInfo: computed<ProgressBarValue|undefined>(() => props.widgetOptions?.progressBar as ProgressBarValue),
-    dateFormat: computed<DateFormat|undefined>(() => props.widgetOptions?.dateFormat as DateFormat),
+    dateFormatInfo: computed<DateFormatValue|undefined>(() => props.widgetOptions?.dateFormat as DateFormatValue),
     // table
     tableFields: computed<TableWidgetField[]>(() => {
         const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map(
@@ -468,7 +468,7 @@ defineExpose<WidgetExpose<Data>>({
                                    :total-info="state.totalInfo"
                                    :granularity="state.granularity"
                                    :data-info="state.dataInfo"
-                                   :date-format="state.dateFormat"
+                                   :date-format-info="state.dateFormatInfo"
                                    :sort-by.sync="state.sortBy"
                                    :this-page.sync="state.thisPage"
                                    @load="handleManualLoadWidget"
