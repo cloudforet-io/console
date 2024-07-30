@@ -36,6 +36,7 @@ interface OverridableWidgetFrameState {
     errorMessage?: string | ComputedRef<string>;
     widgetLoading?: boolean | ComputedRef<boolean>;
     noData?: boolean | ComputedRef<boolean>;
+    showPeriodText?: boolean;
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -201,6 +202,7 @@ export const useWidgetFrame = (
         periodText: _state.periodText,
         unitMap: _state.unitMap,
         fullDataLinkList: _state.fullDataLinkList,
+        showPeriodText: overrides.showPeriodText ?? false,
     }));
 
     const widgetFrameEventHandlers = {

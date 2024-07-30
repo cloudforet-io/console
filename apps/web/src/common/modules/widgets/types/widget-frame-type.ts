@@ -30,4 +30,5 @@ export interface WidgetFrameProps {
     periodText?: string;
     unitMap?: Record<string, string>;
     fullDataLinkList?: FullDataLink[];
+    showPeriodText?: boolean;
 }
