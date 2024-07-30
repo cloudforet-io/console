@@ -12,6 +12,11 @@ const numberCard: WidgetConfig = {
         dataField: {},
     },
     optionalFieldsSchema: {
+        abbreviation: {
+            options: {
+                toggle: true,
+            },
+        },
         icon: {
             options: {
                 toggle: true,
