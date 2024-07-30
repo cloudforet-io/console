@@ -1,4 +1,4 @@
-import type { COLOR_SCHEMA } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { COLOR_SCHEMA, DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 
 export interface Icon {
     name: string;
@@ -76,7 +76,12 @@ export interface ColorSchemaValue {
     colorValue: ColorValue;
 }
 
+export type DateFormat = typeof DATE_FORMAT[keyof typeof DATE_FORMAT];
+export interface DateFormatValue {
+    value: DateFormat;
+}
+
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
-    | WidgetHeaderValue;
+    | WidgetHeaderValue | DateFormatValue;

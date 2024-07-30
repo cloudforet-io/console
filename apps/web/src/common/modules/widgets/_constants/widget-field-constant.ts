@@ -17,3 +17,11 @@ export const DEFAULT_COMPARISON_COLOR = {
     DECREASE: green[600],
     INCREASE: red[500],
 } as const;
+
+export const DATE_FORMAT = {
+    'YYYY-MM-DD': 'YYYY-MM-DD',
+    'YYYY년 MM월 DD일': 'YYYY년 MM월 DD일',
+    'MMM DD, YYYY': 'MMM DD, YYYY',
+    'YYYY/MM/DD': 'YYYY/MM/DD',
+    'DD/MM/YYYY': 'DD/MM/YYYY',
+} as const;
