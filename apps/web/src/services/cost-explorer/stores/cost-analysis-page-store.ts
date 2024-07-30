@@ -84,7 +84,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
             const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
             let _additionalInfoGroupBy: GroupByItem[] = [];
-            if (metadataAdditionalInfo) {
+            if (metadataAdditionalInfo && !isEmpty(metadataAdditionalInfo)) {
                 _additionalInfoGroupBy = Object.entries(metadataAdditionalInfo)
                     .filter(([, value]) => value?.visible)
                     .map(([key, value]) => ({
