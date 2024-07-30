@@ -70,6 +70,10 @@ export interface WidgetHeaderValue {
     description?: string;
 }
 
+export interface AbbreviationValue {
+    toggleValue: boolean;
+}
+
 export type ColorValue = typeof COLOR_SCHEMA[keyof typeof COLOR_SCHEMA];
 export interface ColorSchemaValue {
     colorName: keyof typeof COLOR_SCHEMA;
