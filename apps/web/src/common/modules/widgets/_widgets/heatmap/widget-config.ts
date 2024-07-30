@@ -37,6 +37,11 @@ const heatmap: WidgetConfig = {
                 default: true,
             },
         },
+        dateFormat: {
+            options: {
+                default: 'MMM DD, YYYY',
+            },
+        },
     },
 };
 

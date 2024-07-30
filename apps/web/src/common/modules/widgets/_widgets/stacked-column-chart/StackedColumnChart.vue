@@ -27,16 +27,17 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getApiQueryDateRange,
-    getDateLabelFormat, getReferenceLabel,
+    getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
-import type { StackByValue, XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { StackByValue, XAxisValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -78,9 +79,16 @@ const state = reactive({
                 const _params = Array.isArray(params) ? params : [params];
                 return _params.map((p) => {
                     let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, p.seriesName);
+                    if (state.stackByField === DATE_FIELD.DATE) {
+                        _seriesName = dayjs.utc(_seriesName).format(state.dateFormat);
+                    }
                     if (state.unit) _seriesName = `${_seriesName} (${state.unit})`;
+                    let _name = params.name;
+                    if (state.xAxisField === DATE_FIELD.DATE) {
+                        _name = dayjs.utc(params.name).format(state.dateFormat);
+                    }
                     const _value = numberFormatter(p.value) || '';
-                    return `${_seriesName}<br>${p.marker} ${params.name}: <b>${_value}</b>`;
+                    return `${_seriesName}<br>${p.marker} ${_name}: <b>${_value}</b>`;
                 }).join('<br>');
             },
         },
@@ -90,7 +98,7 @@ const state = reactive({
             axisLabel: {
                 formatter: (val) => {
                     if (state.xAxisField === DATE_FIELD.DATE) {
-                        return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
+                        return dayjs.utc(val).format(state.dateFormat);
                     }
                     return getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, val);
                 },
@@ -124,6 +132,10 @@ const state = reactive({
     }),
     // optional fields
     showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    dateFormat: computed<string|undefined>(() => {
+        const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
+        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
+    }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),

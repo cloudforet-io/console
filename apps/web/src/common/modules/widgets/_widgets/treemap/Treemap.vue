@@ -4,6 +4,7 @@ import {
     computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
+import dayjs from 'dayjs';
 import type { TreemapSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
 import type {
@@ -24,6 +25,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getApiQueryDateRange,
     getReferenceLabel,
@@ -34,7 +36,7 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { CategoryByValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { CategoryByValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -83,7 +85,7 @@ const state = reactive({
             },
         ],
     })),
-    //
+    // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
@@ -93,6 +95,11 @@ const state = reactive({
         const _dateRangeCount = Object.values(DATE_FIELD).includes(state.categoryByField) ? state.categoryByCount : 1;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
         return { start: _start, end: _end };
+    }),
+    // optional fields
+    dateFormat: computed<string|undefined>(() => {
+        const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
+        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -148,10 +155,16 @@ const drawChart = (rawData: Data|null) => {
     const _refinedData = isEmpty(_etcData) ? _slicedData : [..._slicedData, _etcData];
 
     // get chart data
-    state.chartData = _refinedData?.map((v) => ({
-        name: getReferenceLabel(props.allReferenceTypeInfo, state.categoryByField, v[state.categoryByField]),
-        value: v[state.dataField],
-    })) || [];
+    state.chartData = _refinedData?.map((v) => {
+        let _name = getReferenceLabel(props.allReferenceTypeInfo, state.categoryByField, v[state.categoryByField]);
+        if (state.categoryByField === DATE_FIELD.DATE) {
+            _name = dayjs.utc(v[state.categoryByField]).format(state.dateFormat);
+        }
+        return {
+            name: _name,
+            value: v[state.dataField],
+        };
+    }) || [];
 };
 
 const loadWidget = async (): Promise<Data|APIErrorToast> => {

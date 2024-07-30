@@ -38,6 +38,11 @@ const stackedHorizontalBarChart: WidgetConfig = {
                 default: true,
             },
         },
+        dateFormat: {
+            options: {
+                default: 'MMM DD, YYYY',
+            },
+        },
     },
 };
 
