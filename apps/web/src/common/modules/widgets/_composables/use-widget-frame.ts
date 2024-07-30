@@ -36,7 +36,6 @@ interface OverridableWidgetFrameState {
     errorMessage?: string | ComputedRef<string>;
     widgetLoading?: boolean | ComputedRef<boolean>;
     noData?: boolean | ComputedRef<boolean>;
-    showPeriodText?: boolean;
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -138,8 +137,15 @@ export const useWidgetFrame = (
 ) => {
     const _state = reactive({
         widgetConfig: computed(() => getWidgetConfig(props.widgetName)),
-        title: computed(() => props.widgetOptions?.widgetHeader?.title),
-        description: computed(() => props.widgetOptions?.widgetHeader?.description),
+        showWidgetHeader: computed<boolean>(() => props.widgetOptions?.widgetHeader?.toggleValue),
+        title: computed(() => {
+            if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.title;
+            return undefined;
+        }),
+        description: computed(() => {
+            if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.description;
+            return undefined;
+        }),
         size: computed<WidgetSize>(() => {
             if (props.size && _state.widgetConfig.meta.sizes.includes(props.size)) return props.size;
             return _state.widgetConfig.meta.sizes[0];
@@ -202,7 +208,6 @@ export const useWidgetFrame = (
         periodText: _state.periodText,
         unitMap: _state.unitMap,
         fullDataLinkList: _state.fullDataLinkList,
-        showPeriodText: overrides.showPeriodText ?? false,
     }));
 
     const widgetFrameEventHandlers = {

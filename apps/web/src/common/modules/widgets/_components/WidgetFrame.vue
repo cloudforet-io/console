@@ -101,9 +101,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
             <h3 class="title">
                 {{ props.title }}
             </h3>
-            <p v-if="props.showPeriodText"
-               class="date-text"
-            >
+            <p class="date-text">
                 {{ props.periodText }}
             </p>
         </div>
