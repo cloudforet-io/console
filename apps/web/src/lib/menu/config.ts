@@ -27,6 +27,7 @@ export const MENU_ID = Object.freeze({
     ESCALATION_POLICY: 'escalation_policy',
     IAM: 'iam',
     USER: 'user',
+    USERGROUP: 'user_group',
     ROLE: 'role',
     APP: 'app',
     ADVANCED: 'advanced',

@@ -155,6 +155,12 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ADMINISTRATION_USER',
         icon: 'ic_service_user',
     },
+    [MENU_ID.USERGROUP]: {
+        menuId: MENU_ID.USERGROUP,
+        routeName: IAM_ROUTE.USERGROUP._NAME,
+        translationId: 'MENU.ADMINISTRATION_USERGROUP',
+        icon: 'ic_service_user',
+    },
     [MENU_ID.ROLE]: {
         menuId: MENU_ID.ROLE,
         routeName: IAM_ROUTE.ROLE._NAME,

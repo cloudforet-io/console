@@ -10,6 +10,7 @@ import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 const IamContainer = () => import('@/services/iam/IamContainer.vue');
 
 const UserMainPage = () => import('@/services/iam/pages/UserMainPage.vue');
+const AdminUserGroupPage = () => import('@/services/iam/pages/admin/AdminUserGroupPage.vue');
 const AppMainPage = () => import('@/services/iam/pages/AppMainPage.vue');
 const RolePage = () => import('@/services/iam/pages/admin/AdminRolePage.vue');
 const RoleCreatePage = () => import('@/services/iam/pages/admin/AdminRoleCreatePage.vue');
@@ -35,6 +36,15 @@ const adminIamRoutes: RouteConfig = {
                 translationId: MENU_INFO_MAP[MENU_ID.USER].translationId,
             },
             component: UserMainPage as any,
+        },
+        {
+            path: 'usergroup',
+            name: makeAdminRouteName(IAM_ROUTE.USERGROUP._NAME),
+            meta: {
+                menuId: MENU_ID.USERGROUP,
+                translationId: MENU_INFO_MAP[MENU_ID.USERGROUP].translationId,
+            },
+            component: AdminUserGroupPage as any,
         },
         {
             path: 'app',
