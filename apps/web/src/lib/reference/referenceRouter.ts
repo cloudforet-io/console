@@ -104,7 +104,7 @@ const routerMap: RouterMap = {
         },
     'identity.Project':
         {
-            name: PROJECT_ROUTE.DETAIL._NAME,
+            name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
             formatter: projectLinkFormatter,
         },
     'identity.ProjectGroup':
