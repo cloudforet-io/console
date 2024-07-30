@@ -49,6 +49,7 @@ const table: WidgetConfig = {
         //         baseColor: indigo[500],
         //     },
         // },
+        dateFormat: {},
     },
     dependencies: {
         groupBy: ['comparison'],
