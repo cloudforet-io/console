@@ -1,7 +1,9 @@
 import type { ManipulateType } from 'dayjs';
 import dayjs from 'dayjs';
 
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateFormat } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
@@ -125,3 +127,5 @@ export const getApiQueryDateRange = (granularity: string, dateRange: DateRange):
     }
     return dateRange;
 };
+
+export const getRefinedDateFormatByGranularity = (granularity: string, dateFormat: DateFormat): string => DATE_FORMAT[dateFormat][granularity];
