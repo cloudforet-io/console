@@ -48,7 +48,7 @@ const handleToggleWidgetHeader = () => {
 const handleUpdateValue = (key: string, value: string) => {
     state.proxyValue = {
         ...state.proxyValue,
-        [key]: value,
+        [key]: value.trim(),
     };
     emit('update:value', state.proxyValue);
 };
