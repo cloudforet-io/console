@@ -114,7 +114,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             if (!costQuerySetState.selectedDataSourceId) return [];
             const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
             if (!targetDataSource) return [];
-            const costAdditionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys;
+            const costAdditionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys ?? [];
             const additionalInfoGroupBy: GroupByItem[] = costAdditionalInfoKeys
                 .map((d) => ({
                     name: `additional_info.${d}`,

@@ -162,7 +162,7 @@ const costFilterState = reactive({
                 label: k,
             })), 'label');
         }
-        return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys
+        return dataSource ? sortBy((dataSource.data?.cost_additional_info_keys ?? [])
             .map((key) => ({
                 name: `additional_info.${key}`,
                 label: key,
