@@ -46,8 +46,8 @@ const state = reactive({
 });
 const tableState = reactive({
     fields: computed(() => [
-        { name: 'key', label: i18n.t('COMMON.TAGS.KEY') as string },
-        { name: 'value', label: i18n.t('COMMON.TAGS.VALUE') as string },
+        { name: 'key', label: i18n.t('COMMON.TAGS.KEY') },
+        { name: 'value', label: i18n.t('COMMON.TAGS.VALUE') },
     ]),
     loading: false,
     tags: {} as Tags,
