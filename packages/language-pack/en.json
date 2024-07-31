@@ -1654,6 +1654,7 @@
 				"TITLE": "Trusted Advisor"
 			},
 			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget",
+			"VIEW_FULL_DATA": "View full data",
 			"WIDGET_TITLE_REQUIRED": "Please enter widget title."
 		}
 	},
@@ -2067,6 +2068,7 @@
 					"COLOR_SCHEMA": "Color Schema",
 					"DATA_FIELD": "Data Field",
 					"DATA_TABLE": "Data Table",
+					"DATE_FORMAT": "Date Format",
 					"DESCRIPTION": "Description",
 					"DYNAMIC_FIELD": "Dynamic Field",
 					"EDIT_DATA": "Edit Data",

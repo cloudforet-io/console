@@ -17,3 +17,36 @@ export const DEFAULT_COMPARISON_COLOR = {
     DECREASE: green[600],
     INCREASE: red[500],
 } as const;
+
+export const DATE_FORMAT = {
+    'YYYY-MM-DD': {
+        YEARLY: 'YYYY',
+        MONTHLY: 'YYYY-MM',
+        DAILY: 'YYYY-MM-DD',
+    },
+    'YYYY년 MM월 DD일': {
+        YEARLY: 'YYYY년',
+        MONTHLY: 'YYYY년 MM월',
+        DAILY: 'YYYY년 MM월 DD일',
+    },
+    'MMM DD, YYYY': {
+        YEARLY: 'YYYY',
+        MONTHLY: 'MMM YYYY',
+        DAILY: 'MMM DD, YYYY',
+    },
+    'YYYY/MM/DD': {
+        YEARLY: 'YYYY',
+        MONTHLY: 'YYYY/MM',
+        DAILY: 'YYYY/MM/DD',
+    },
+    'DD/MM/YYYY': {
+        YEARLY: 'YYYY',
+        MONTHLY: 'MM/YYYY',
+        DAILY: 'DD/MM/YYYY',
+    },
+    'Auto display by granularity': {
+        YEARLY: 'YYYY',
+        MONTHLY: 'MM',
+        DAILY: 'DD',
+    },
+} as const;

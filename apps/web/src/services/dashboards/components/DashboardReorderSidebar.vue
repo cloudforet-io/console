@@ -91,8 +91,8 @@ onUnmounted(() => {
                                  height="1rem"
                             />
                             <span class="text"
-                                  :class="{ 'text-gray-400': !widget.name }"
-                            >{{ widget.name || getWidgetDefaultName(widget.widget_type) }}</span>
+                                  :class="{ 'text-gray-400': !widget.options?.widgetHeader?.title }"
+                            >{{ widget.options?.widgetHeader?.title || getWidgetDefaultName(widget.widget_type) }}</span>
                         </div>
                     </div>
                 </draggable>

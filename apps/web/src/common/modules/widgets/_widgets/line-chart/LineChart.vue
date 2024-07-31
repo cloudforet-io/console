@@ -27,9 +27,10 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getApiQueryDateRange,
-    getDateLabelFormat, getReferenceLabel,
+    getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
@@ -38,7 +39,7 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { LineByValue, XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { LineByValue, XAxisValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -81,6 +82,9 @@ const state = reactive({
             formatter: (params) => {
                 const _params = params as any[];
                 let _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
+                if (state.xAxisField === DATE_FIELD.DATE) {
+                    _axisValue = dayjs.utc(_axisValue).format(state.dateFormat);
+                }
                 if (state.unit) _axisValue += ` (${state.unit})`;
                 const _values = _params.map((p) => {
                     const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.lineByField, p.seriesName);
@@ -97,7 +101,7 @@ const state = reactive({
             axisLabel: {
                 formatter: (val) => {
                     if (state.xAxisField === DATE_FIELD.DATE) {
-                        return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
+                        return dayjs.utc(val).format(state.dateFormat);
                     }
                     return getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, val);
                 },
@@ -131,6 +135,10 @@ const state = reactive({
     }),
     // optional fields
     showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    dateFormat: computed<string|undefined>(() => {
+        const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
+        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
+    }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),

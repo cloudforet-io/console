@@ -34,6 +34,11 @@ const stackedAreaChart: WidgetConfig = {
                 excludeDateField: true,
             },
         },
+        dateFormat: {
+            options: {
+                default: 'MMM DD, YYYY',
+            },
+        },
         // formatRules: {
         //     options: {
         //     },

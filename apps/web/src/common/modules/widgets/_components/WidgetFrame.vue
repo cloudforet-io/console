@@ -73,8 +73,6 @@ const handleToggleWidth = () => {
     }
     emit('toggle-size', nextSize);
 };
-const handleShowFullDataPopper = () => {
-};
 const handleClickFullData = () => {
     if (!props.fullDataLinkList?.length) return;
     window.open(router.resolve(props.fullDataLinkList[0].location).href, '_blank');
@@ -103,6 +101,9 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
             <h3 class="title">
                 {{ props.title }}
             </h3>
+            <p class="date-text">
+                {{ props.periodText }}
+            </p>
         </div>
         <div v-if="props.mode !== 'overlay'"
              class="action-button-wrapper"
@@ -123,7 +124,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                        position="top"
             >
                 <p-popover v-if="props.fullDataLinkList.length > 1"
-                           position="bottom-start"
+                           position="bottom-end"
                            :is-visible.sync="state.popperVisible"
                            :trigger="POPOVER_TRIGGER.CLICK"
                 >
@@ -131,7 +132,6 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                                    size="sm"
                                    name="ic_db-where"
                                    shape="square"
-                                   @click="handleShowFullDataPopper"
                     />
                     <template #content>
                         <div class="metadata-content">
@@ -260,9 +260,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
     }
 
     .widget-header {
-        display: flex;
         align-items: center;
-        height: 1.625rem;
         padding-bottom: 0.5rem;
         .title {
             @apply truncate text-label-md;
@@ -272,6 +270,9 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
             display: block;
             -webkit-box-orient: vertical;
             font-weight: 500;
+        }
+        .date-text {
+            @apply text-label-sm text-gray-500;
         }
     }
     .metadata-content {

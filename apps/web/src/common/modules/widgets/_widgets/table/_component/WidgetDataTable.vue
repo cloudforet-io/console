@@ -15,10 +15,17 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
+import {
+    getFormattedDate,
+    getRefinedDateFormatByGranularity,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
-import type { TableDataFieldValue, ComparisonValue, TotalValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    TableDataFieldValue, ComparisonValue, TotalValue,
+    DateFormatValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
@@ -41,6 +48,7 @@ interface Props {
   comparisonInfo?: ComparisonValue;
   subTotalInfo?: TotalValue;
   totalInfo?: TotalValue;
+  dateFormatInfo?: DateFormatValue;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
@@ -59,11 +67,16 @@ const storeState = reactive({
 const state = reactive({
     proxySortBy: useProxyValue('sortBy', props, emit),
     proxyThisPage: useProxyValue('thisPage', props, emit),
+    refinedDateFormat: computed<string|undefined>(() => {
+        if (!props.granularity || !props.dateFormatInfo) return undefined;
+        return getRefinedDateFormatByGranularity(props.granularity, props.dateFormatInfo.value);
+    }),
 });
 
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
 const getField = (field: TableWidgetField): string => {
     if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.reference) return storeState[field.fieldInfo.reference][field.label]?.name || field.label || field.name;
+    if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat) return getFormattedDate(field.name, state.refinedDateFormat);
     return field.label || field.name;
 };
 
@@ -82,6 +95,9 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const referenceKey = REFERENCE_FIELD_MAP[field.name];
             const referenceValueKey = item[field.name];
             return storeState[referenceKey][referenceValueKey]?.label || storeState[referenceKey][referenceValueKey]?.name || referenceValueKey || '-';
+        }
+        if (field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat && item[field.name] !== 'Total') {
+            return getFormattedDate(item[field.name], state.refinedDateFormat);
         }
         return item[field.name] || '-';
     }
