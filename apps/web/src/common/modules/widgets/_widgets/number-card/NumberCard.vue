@@ -38,7 +38,6 @@ import type {
 import type {
     IconValue,
     ComparisonValue,
-    AbbreviationValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
@@ -66,10 +65,7 @@ const state = reactive({
         const _currentDate = dayjs.utc(state.basedOnDate).format(_dateFormat);
         return state.data?.results.find((item) => item[DATE_FIELD.DATE] === _currentDate)?.[state.dataField] ?? 0;
     }),
-    valueText: computed<string|undefined>(() => {
-        if (state.abbreviation) return numberFormatter(state.currentValue, { notation: 'compact' });
-        return numberFormatter(state.currentValue);
-    }),
+    valueText: computed<string|undefined>(() => numberFormatter(state.currentValue, { notation: 'compact' })),
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
@@ -130,7 +126,6 @@ const state = reactive({
         }
         return _text;
     }),
-    abbreviation: computed<boolean>(() => (props.widgetOptions?.abbreviation as AbbreviationValue)?.toggleValue ?? false),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => ({
