@@ -156,7 +156,7 @@ watch(() => storeState.projects, async (projects) => {
     const project = Object.keys(projects)[0];
     state.selectedProjects = [project];
     await analyzeCostReportData();
-});
+}, { immediate: true });
 watch(() => storeState.costReportConfig, async (costReportConfig) => {
     if (!costReportConfig) return;
     await analyzeCostReportData();
