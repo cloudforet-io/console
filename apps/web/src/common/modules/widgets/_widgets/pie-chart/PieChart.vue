@@ -155,10 +155,10 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 };
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
-
     // get chart data
-    const _slicedData = orderBy(rawData.results || [], state.dataField, 'desc')?.slice(0, state.groupByCount);
-    const _etcData = rawData.results?.slice(state.groupByCount).reduce((acc, cur) => {
+    const _orderedData = orderBy(rawData.results || [], state.dataField, 'desc');
+    const _slicedData = _orderedData?.slice(0, state.groupByCount);
+    const _etcData = _orderedData?.slice(state.groupByCount).reduce((acc, cur) => {
         acc[state.groupByField] = 'etc';
         acc[state.dataField] = (acc[state.dataField] || 0) + cur[state.dataField];
         return acc;
