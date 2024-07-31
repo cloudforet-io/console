@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { range, sortBy } from 'lodash';
+import { isEmpty, range, sortBy } from 'lodash';
 
 import {
     PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PFieldTitle,
@@ -156,7 +156,7 @@ const costFilterState = reactive({
         const dataSource = storeState.costDataSources[props.sourceId ?? ''];
         const additionalInfo = dataSource?.data?.plugin_info?.metadata?.additional_info;
         if (!dataSource) return [];
-        if (additionalInfo) {
+        if (additionalInfo && !isEmpty(additionalInfo)) {
             return sortBy(Object.entries(additionalInfo).map(([k]) => ({
                 name: `additional_info.${k}`,
                 label: k,
