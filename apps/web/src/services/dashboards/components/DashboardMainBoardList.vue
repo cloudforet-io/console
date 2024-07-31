@@ -175,12 +175,14 @@ onMounted(() => {
                         <p-badge v-if="showBadge(board)"
                                  badge-type="subtle"
                                  :style-type="getBadgeStyleType(board)"
+                                 class="dashboard-badge"
                         >
                             {{ getBadgeText(board) }}
                         </p-badge>
                         <p-badge v-if="isPrivate(board.dashboard_id)"
                                  badge-type="subtle"
                                  style-type="gray150"
+                                 class="dashboard-badge"
                         >
                             <p-i name="ic_lock-filled"
                                  width="0.75rem"
@@ -269,7 +271,9 @@ onMounted(() => {
 
             .labels-wrapper {
                 @apply flex items-center flex-wrap;
-                gap: 0.375rem;
+                .dashboard-badge {
+                    margin-right: 0.375rem;
+                }
             }
         }
     }

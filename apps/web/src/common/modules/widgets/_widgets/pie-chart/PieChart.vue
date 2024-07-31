@@ -5,6 +5,7 @@ import {
     reactive, ref, watch,
 } from 'vue';
 
+import dayjs from 'dayjs';
 import type { PieSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
 import type {
@@ -25,6 +26,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getApiQueryDateRange,
     getReferenceLabel,
@@ -35,7 +37,7 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { GroupByValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -60,6 +62,9 @@ const state = reactive({
             position: 'inside',
             formatter: (params) => {
                 let _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, params.name);
+                if (state.groupByField === DATE_FIELD.DATE) {
+                    _name = dayjs.utc(_name).format(state.dateFormat);
+                }
                 if (state.unit) _name = `${_name} (${state.unit})`;
                 const _value = numberFormatter(params.value) || '';
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
@@ -77,6 +82,10 @@ const state = reactive({
             itemWidth: 10,
             itemHeight: 10,
             icon: 'circle',
+            formatter: (val) => {
+                if (state.groupByField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
+                return getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, val);
+            },
         },
         series: [
             {
@@ -112,6 +121,10 @@ const state = reactive({
     }),
     // optional fields
     showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    dateFormat: computed<string|undefined>(() => {
+        const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
+        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
+    }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),

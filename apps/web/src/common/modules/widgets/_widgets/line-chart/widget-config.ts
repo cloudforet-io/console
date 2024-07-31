@@ -33,6 +33,11 @@ const lineChart: WidgetConfig = {
                 excludeDateField: true,
             },
         },
+        dateFormat: {
+            options: {
+                default: 'MMM DD, YYYY',
+            },
+        },
     },
 };
 
