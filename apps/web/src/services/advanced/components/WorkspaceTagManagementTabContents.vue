@@ -50,7 +50,7 @@ const tableState = reactive({
         { name: 'value', label: i18n.t('COMMON.TAGS.VALUE') as string },
     ]),
     loading: false,
-    tags: {},
+    tags: {} as Tags,
     tagEditPageVisible: false,
 });
 const convertUserTagsToKeyValueArray = (tags: Tags) => Object.entries(tags).map(([k, v]) => ({
