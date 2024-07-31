@@ -41,14 +41,16 @@ import dayjs from 'dayjs';
 
 import { PBadge } from '@cloudforet/mirinae';
 
-import { store } from '@/store';
+import { useDomainStore } from '@/store/domain/domain-store';
 
 import config from '@/lib/config';
 
+
+const domainStore = useDomainStore();
 const state = reactive({
     // eslint-disable-next-line no-undef
     version: VITE_APP_VER,
-    signInImage: computed<string|undefined>(() => store.getters['domain/domainSignInImage']),
+    signInImage: computed<string|undefined>(() => domainStore.getters.domainSignInImage),
     contactLink: computed(() => config.get('CONTACT_LINK')),
     showNewYearImage: computed(() => {
         const currentDate = dayjs();

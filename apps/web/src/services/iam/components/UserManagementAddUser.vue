@@ -18,15 +18,18 @@ import type { AuthType } from '@/schema/identity/user/type';
 import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-user/api-verbs/find';
 import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
 import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useDomainStore } from '@/store/domain/domain-store';
 
 import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, LocalType } from '@/services/iam/types/user-type';
 
+
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
+const domainStore = useDomainStore();
 
 const containerRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
@@ -138,9 +141,9 @@ const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
     await hideMenu();
 };
 const initAuthTypeList = async () => {
-    if (store.state.domain.extendedAuthType !== undefined) {
+    if (domainStore.state.extendedAuthType !== undefined) {
         authTypeMenuItem.value = [
-            { label: store.getters['domain/extendedAuthTypeLabel'], name: 'EXTERNAL' },
+            { label: domainStore.getters.extendedAuthTypeLabel, name: 'EXTERNAL' },
             ...authTypeMenuItem.value,
         ];
     }

@@ -76,7 +76,6 @@ const state = reactive({
     items: [] as any,
     sortBy: 'name',
     sortDesc: true,
-    domainId: computed(() => store.state.domain.domainId), // TODO: remove this after backend is ready
     totalCount: 0,
     pageLimit: 15,
     isSyncEnabled: computed(() => {

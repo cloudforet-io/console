@@ -28,7 +28,6 @@ const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 const state = reactive({
     isCollapsed: true,
     userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
     proxyIsSentCode: useProxyValue('is-sent-code', props, emit),
 });
 

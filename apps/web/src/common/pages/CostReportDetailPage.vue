@@ -18,11 +18,11 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
-import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { Currency } from '@/store/modules/display/type';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
@@ -63,10 +63,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const chartContext = ref<HTMLElement|null>(null);
 const providerReferenceStore = useProviderReferenceStore();
+const domainStore = useDomainStore();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => providerReferenceStore.state.items ?? {}),
-    domainName: computed<string>(() => store.state.domain.name),
+    domainName: computed<string>(() => domainStore.state.name),
 });
 
 const state = reactive({
