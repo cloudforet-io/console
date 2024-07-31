@@ -1360,10 +1360,6 @@
 			"TITLE": "프로젝트 변경"
 		},
 		"WIDGETS": {
-			"ABBREVIATION": {
-				"ABBREVIATION": "",
-				"CONTENTS": ""
-			},
 			"ACTUAL": "실제 크기",
 			"ADD_WIDGET": "위젯 추가",
 			"ADD_WIDGET_TO_DASHBOARD": "대시보드에 위젯 추가",
