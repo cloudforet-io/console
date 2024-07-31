@@ -136,7 +136,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                     <template #content>
                         <div class="metadata-content">
                             <div class="metadata-item-row">
-                                <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.FULL_DATA_LINK') }}</span>
+                                <span class="metadata-title">{{ $t('COMMON.WIDGETS.VIEW_FULL_DATA') }}</span>
                                 <template v-if="props.fullDataLinkList?.length">
                                     <div class="full-data-link-wrapper">
                                         <p-link v-for="(fullDataLink, idx) in props.fullDataLinkList"
@@ -162,7 +162,8 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                                @click="handleClickFullData"
                 />
             </p-tooltip>
-            <p-select-dropdown style-type="tertiary-icon-button"
+            <p-select-dropdown v-if="!props.disableManageButtons"
+                               style-type="tertiary-icon-button"
                                button-icon="ic_ellipsis-horizontal"
                                class="etc-button"
                                :menu="state.etcMenuItems"
