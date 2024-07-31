@@ -33,10 +33,6 @@ export type ProviderResourceDataItem = ProviderItem & {
 };
 export type ProviderReferenceDataMap = ReferenceMap<ProviderResourceDataItem>;
 export type SummaryDataType = typeof SUMMARY_DATA_TYPE[keyof typeof SUMMARY_DATA_TYPE];
-export type CostReportChartDataType = {
-    date: string;
-    value: number
-};
 
 // bookmark
 export interface EmptyData {

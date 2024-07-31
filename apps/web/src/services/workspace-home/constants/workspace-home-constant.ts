@@ -54,6 +54,11 @@ export const SUMMARY_DATA_TYPE = {
     COST: 'Cost',
     ACCOUNT: 'Account',
 } as const;
+export const COST_SUMMARY_STATE_TYPE = {
+    AGGREGATING: 'AGGREGATING',
+    CONFIRM: 'CONFIRM',
+    ESTIMATED: 'ESTIMATED',
+} as const;
 export const SERVICE_ACCOUNT_SUMMARY_STATE_COLOR = {
     ACTIVE: {
         iconColor: styles.green[600],
@@ -69,6 +74,20 @@ export const SERVICE_ACCOUNT_SUMMARY_STATE_COLOR = {
     },
     INACTIVE: {
         iconColor: styles.gray[400],
+        textColor: styles.gray[700],
+    },
+} as const;
+export const COST_SUMMARY_STATE_COLOR = {
+    AGGREGATING: {
+        iconColor: styles.blue[500],
+        textColor: styles.gray[700],
+    },
+    CONFIRM: {
+        iconColor: styles.green[700],
+        textColor: styles.gray[700],
+    },
+    ESTIMATED: {
+        iconColor: styles.coral[400],
         textColor: styles.gray[700],
     },
 } as const;
