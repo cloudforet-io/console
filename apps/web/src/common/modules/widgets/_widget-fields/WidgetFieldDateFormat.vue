@@ -6,6 +6,8 @@ import {
 import { PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import { i18n } from '@/translations';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { getFormattedDate } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -20,12 +22,16 @@ const BIRTHDAY_OF_WONNY = '2020-01-29';
 const AUTO_DISPLAY_BY_GRANULARITY = 'Auto display by granularity';
 const AUTO_DISPLAY_EXMAPLE_TEXT = '01 or 09 or 2020';
 
+const DATE_FORMAT_LABEL_MAP = {
+    'Auto display by granularity': i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATE_FORMAT_AUTO_DISPLAY'),
+};
+
 const props = defineProps<WidgetFieldComponentProps<DateFormatOptions, DateFormatValue>>();
 const emit = defineEmits<WidgetFieldComponentEmit<DateFormatValue>>();
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => Object.keys(DATE_FORMAT).map((d) => ({
         name: d,
-        label: d,
+        label: DATE_FORMAT_LABEL_MAP[d] ?? d,
     }))),
     proxyValue: useProxyValue('value', props, emit),
     selectedMenuItem: props.value?.value ?? props.widgetConfig?.optionalFieldsSchema.dateFormat?.options?.default ?? Object.keys(DATE_FORMAT)[0] as undefined | MenuItem[] | string,

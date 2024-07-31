@@ -2069,6 +2069,7 @@
 					"DATA_FIELD": "Data Field",
 					"DATA_TABLE": "Data Table",
 					"DATE_FORMAT": "Date Format",
+					"DATE_FORMAT_AUTO_DISPLAY": "Auto display by granularity",
 					"DESCRIPTION": "Description",
 					"DYNAMIC_FIELD": "Dynamic Field",
 					"EDIT_DATA": "Edit Data",
