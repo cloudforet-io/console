@@ -1360,10 +1360,6 @@
 			"TITLE": "プロジェクト変更"
 		},
 		"WIDGETS": {
-			"ABBREVIATION": {
-				"ABBREVIATION": "",
-				"CONTENTS": ""
-			},
 			"ACTUAL": "実際のサイズ",
 			"ADD_WIDGET": "ウィジェットを追加する",
 			"ADD_WIDGET_TO_DASHBOARD": "ダッシュボードにウィジェットを追加する",
