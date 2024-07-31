@@ -1,124 +1,127 @@
 <script lang="ts" setup>
+import { useResizeObserver } from '@vueuse/core/index';
 import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import {
-    cloneDeep, sortBy,
-} from 'lodash';
+import dayjs from 'dayjs';
+import type { LineSeriesOption } from 'echarts/charts';
+import type { EChartsType } from 'echarts/core';
+import { init } from 'echarts/core';
+import { throttle } from 'lodash';
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import { numberFormatter } from '@cloudforet/utils';
+
 
 import type { Currency } from '@/store/modules/settings/type';
 
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { green, blue, coral } from '@/styles/colors';
 
-import { useAmcharts5 } from '@/common/composables/amcharts5';
-
-import { green } from '@/styles/colors';
-
-import type { Legend, XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
-import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
-import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
-import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 
 interface Props {
     period: { start: string; end: string };
-    data: AnalyzeResponse<CostReportDataAnalyzeResult>;
+    data: XYChartData[];
     currency: Currency|undefined;
 }
 const props = withDefaults(defineProps<Props>(), {
-    data: () => ({}),
+    data: () => ([]),
 });
-
-const DATE_FIELD_NAME = 'date';
 
 const chartContext = ref<HTMLElement|null>(null);
-const chartHelper = useAmcharts5(chartContext);
 
 const state = reactive({
-    legends: computed<Legend[]>(() => {
-        const data = props.data?.results ?? [];
-        const legends: Legend[] = getXYChartLegends(data[0].value_sum, DATE_FIELD_NAME);
-        return sortBy<Legend>(legends, (m) => m.name);
-    }),
+    chart: null as EChartsType | null,
     chartData: computed<XYChartData[]>(() => {
-        const data = props.data?.results ?? [];
+        const data = props.data ?? [];
         if (!data) return [];
-
-        const chartData: XYChartData[] = getRefinedXYChartData(data, {
-            arrayDataKey: 'value_sum',
-            categoryKey: DATE_FIELD_NAME,
-            valueKey: 'value',
-        });
-
-        return sortBy<XYChartData>(chartData, (m) => m.date);
+        return data;
     }),
+    chartValueData: computed<string[]>(() => state.chartData.map((m) => m.value)),
+    chartDateData: computed<string[]>(() => state.chartData.map((m) => m.date)),
+    chartPieces: computed(() => {
+        const lastMonth = dayjs().utc().subtract(1, 'month').format('YYYY-MM');
+        const currentMonth = dayjs().utc().format('YYYY-MM');
+        const currentMarkArea = {
+            gt: state.chartDateData.indexOf(currentMonth) - 1,
+            lte: state.chartDateData.indexOf(currentMonth),
+            color: blue[500],
+        };
+        const lastMonthData = state.chartData.find((i) => i.date === lastMonth);
+        if (lastMonthData && !lastMonthData?.is_confirmed) {
+            return [
+                {
+                    lte: state.chartDateData.indexOf(lastMonth),
+                    color: green[700],
+                },
+                {
+                    gt: state.chartDateData.indexOf(lastMonth),
+                    lte: state.chartDateData.indexOf(currentMonth) - 1,
+                    color: coral[400],
+                },
+                currentMarkArea,
+            ];
+        }
+        return [
+            {
+                lte: state.chartDateData.indexOf(currentMonth) - 1,
+                color: green[700],
+            },
+            currentMarkArea,
+        ];
+    }),
+    chartOptions: computed<LineSeriesOption>(() => ({
+        grid: {
+            top: 20,
+            right: 35,
+            bottom: 0,
+            left: 30,
+            containLabel: true,
+        },
+        tooltip: {
+            trigger: 'axis',
+            valueFormatter: (val) => numberFormatter(val) || '',
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: state.chartDateData,
+            axisTick: {
+                alignWithLabel: true,
+            },
+            nameTextStyle: {
+                fontSize: 12,
+            },
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: (val) => numberFormatter(val, { notation: 'compact' }),
+            },
+            splitNumber: 4,
+        },
+        visualMap: {
+            show: false,
+            dimension: 0,
+            pieces: state.chartPieces,
+        },
+        series: [
+            {
+                data: state.chartValueData,
+                type: 'line',
+            },
+        ],
+    })),
 });
 
-const drawChart = () => {
-    chartHelper.refreshRoot();
-    const { chart, xAxis } = chartHelper.createXYDateChart();
-
-    // set base interval of xAxis
-    xAxis.get('baseInterval').timeUnit = 'month';
-    xAxis.get('dateFormats').month = 'yyyy-MM';
-    xAxis.get('periodChangeDateFormats').month = 'yyyy-MM';
-
-    // hide zoom button
-    chart.zoomOutButton.set('forceHidden', true);
-
-    // set cursor
-    chart.get('cursor')?.lineX.setAll({
-        visible: true,
-    });
-
-    // create series
-    const series = chartHelper.createXYLineSeries(chart, {
-        name: '',
-        valueYField: 'value',
-        stroke: chartHelper.color(green[700]),
-        fill: chartHelper.color(green[700]),
-    });
-
-    // set data processor on series
-    series.data.processor = chartHelper.createDataProcessor({
-        dateFormat: 'yyyy-MM',
-        dateFields: [DATE_FIELD_NAME],
-    });
-
-    // create tooltip and set on series
-    const tooltip = chartHelper.createTooltip();
-    const valueFormatter: ((value: any) => string)|undefined = (value) => currencyMoneyFormatter(value, { currency: props.currency }) ?? '';
-    chartHelper.setXYSharedTooltipText(
-        chart,
-        tooltip,
-        valueFormatter,
-    );
-    series.set('tooltip', tooltip);
-
-    // set data on series
-    chart.series.push(series);
-    series.data.setAll(cloneDeep(state.chartData));
-
-    // set series style
-    series.fills.template.setAll({
-        fillOpacity: 0.3,
-        visible: true,
-    });
-    series.fills.template.set('fillGradient', chartHelper.createLinearGradient({
-        stops: [{
-            opacity: 0.3,
-        }, {
-            opacity: 0,
-        }],
-    }));
-};
-
+useResizeObserver(chartContext, throttle(() => {
+    state.chart?.resize();
+}, 300));
 /* Watcher */
-watch(() => chartContext.value, async (_chartContext) => {
-    if (_chartContext && props.data?.results) {
-        drawChart();
+watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.chart = init(chartContext.value);
+        state.chart.setOption(state.chartOptions, true);
     }
 }, { immediate: true });
 </script>

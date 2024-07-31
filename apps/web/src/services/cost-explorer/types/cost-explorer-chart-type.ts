@@ -7,6 +7,7 @@ export interface ChartData {
 export interface XYChartData {
     date: string;
     totalCost?: number;
+    is_confirmed?: boolean;
     aggregation?: number;
     [key: string]: any;
 }

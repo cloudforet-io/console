@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import dayjs from 'dayjs';
@@ -6,7 +7,7 @@ import { isEmpty, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PDivider, PFieldTitle, PLink, PSpinner,
+    PDivider, PFieldTitle, PLink, PSpinner, PStatus, screens,
 } from '@cloudforet/mirinae';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
@@ -32,18 +33,22 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
 import CostSummaryChart from '@/services/workspace-home/components/CostSummaryChart.vue';
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
-import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import { costStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
+import { COST_SUMMARY_STATE_TYPE, SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
-import type { EmptyData, CostReportChartDataType } from '@/services/workspace-home/types/workspace-home-type';
+import type { EmptyData } from '@/services/workspace-home/types/workspace-home-type';
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+
+const { width } = useWindowSize();
 
 const storeState = reactive({
     costReportConfig: computed<CostReportConfigModel|null|undefined>(() => workspaceHomePageState.costReportConfig),
@@ -54,20 +59,10 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
+    isDesktopSize: computed(() => width.value > screens.laptop.max),
     currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency || CURRENCY.USD),
     isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    chartData: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
-    currentMonthValue: computed<CostReportChartDataType>(() => {
-        const data = state.chartData?.results[0]?.value_sum;
-        const sortedData = sortBy(data, 'date');
-        return sortedData[sortedData.length - 1];
-    }),
-    period: computed(() => {
-        const reportMonth = dayjs().utc().subtract(1, 'month');
-        const start = dayjs(reportMonth).utc().subtract(5, 'month').format('YYYY-MM');
-        const end = reportMonth.format('YYYY-MM');
-        return { start, end };
-    }),
+    chartData: undefined as XYChartData[]|undefined,
     emptyData: computed<EmptyData>(() => {
         let result = {} as EmptyData;
         if (storeState.dataSource.length === 0) {
@@ -93,6 +88,24 @@ const state = reactive({
         return result;
     }),
     selectedProjects: [] as Array<string>,
+
+    period: computed(() => {
+        const reportMonth = dayjs().utc();
+        const reportMonthPeriod = state.isDesktopSize ? 12 : 6;
+        const start = dayjs(reportMonth).utc().subtract(reportMonthPeriod, 'month').format('YYYY-MM');
+        const end = reportMonth.format('YYYY-MM');
+        return { start, end };
+    }),
+    recentMonthValue: computed<XYChartData|undefined>(() => state.chartData[state.chartData.length - 2]),
+    currentMonthValue: computed<XYChartData|undefined>(() => state.chartData[state.chartData.length - 1]),
+    recentDateRangeText: computed<string>(() => {
+        const lastMonth = dayjs().utc().subtract(1, 'month');
+        return `${lastMonth.startOf('month').format('YYYY-MM-DD')} ~ ${lastMonth.endOf('month').format('YYYY-MM-DD')}`;
+    }),
+    currentDateRangeText: computed<string>(() => {
+        const currentMonth = dayjs().utc();
+        return `${currentMonth.startOf('month').format('YYYY-MM-DD')} ~ ${currentMonth.format('YYYY-MM-DD')}`;
+    }),
 });
 
 const handleSelectedProject = async (selectedProject: string[]) => {
@@ -103,13 +116,12 @@ const handleSelectedProject = async (selectedProject: string[]) => {
 const analyzeCostReportData = async () => {
     state.loading = true;
     try {
-        state.chartData = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+        const { results } = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
             cost_report_config_id: storeState.costReportConfig?.cost_report_config_id,
-            is_confirmed: true,
             query: {
                 start: state.period.start,
                 end: state.period.end,
-                group_by: state.isWorkspaceMember ? ['project_id'] : undefined,
+                group_by: state.isWorkspaceMember ? ['project_id', 'is_confirmed'] : ['is_confirmed'],
                 fields: {
                     value_sum: {
                         key: `cost.${state.currency}`,
@@ -123,6 +135,11 @@ const analyzeCostReportData = async () => {
                 ] : undefined,
             },
         });
+        const _chartData = (results || []).flatMap((item) => item?.value_sum?.map((valueSum) => ({
+            ...valueSum,
+            is_confirmed: item.is_confirmed,
+        })));
+        state.chartData = sortBy(_chartData, 'date');
     } catch (e) {
         state.chartData = undefined;
         ErrorHandler.handleError(e);
@@ -131,6 +148,9 @@ const analyzeCostReportData = async () => {
     }
 };
 
+watch(() => state.isDesktopSize, async () => {
+    await analyzeCostReportData();
+});
 watch(() => storeState.projects, async (projects) => {
     if (!state.isWorkspaceMember) return;
     const project = Object.keys(projects)[0];
@@ -169,20 +189,20 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
             <p-spinner size="lg" />
         </div>
         <div v-else>
-            <div v-if="state.chartData?.results.length > 0">
+            <div v-if="state.chartData?.length > 0">
                 <div class="content-wrapper">
                     <div class="price-wrapper">
                         <div class="price-view">
                             <p>{{ $t('HOME.COST_SUMMARY_LAST_MONT_TOTAL_COST') }}</p>
                             <p class="price">
                                 <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
-                                <span>{{ currencyMoneyFormatter(state.currentMonthValue.value, { currency: state.currency, style: 'decimal' }) }}</span>
-                                <!--                                <p-status v-bind="stateFormatter(value)"-->
-                                <!--                                          class="capitalize"-->
-                                <!--                                />-->
+                                <span>{{ currencyMoneyFormatter(state.recentMonthValue?.value, { currency: state.currency, style: 'decimal' }) }}</span>
+                                <p-status v-bind="costStateSummaryFormatter(state.recentMonthValue?.is_confirmed ? COST_SUMMARY_STATE_TYPE.CONFIRM : COST_SUMMARY_STATE_TYPE.ESTIMATED)"
+                                          class="capitalize state"
+                                />
                             </p>
                             <p class="date">
-                                2024-03-01 ~ 2024-03-31
+                                {{ state.recentDateRangeText }}
                             </p>
                         </div>
                         <p-divider class="divider"
@@ -192,13 +212,13 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                             <p>{{ $t('HOME.COST_SUMMARY_CURRENT_TOTAL_COST') }}</p>
                             <p class="price">
                                 <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
-                                <span>{{ currencyMoneyFormatter(state.currentMonthValue.value, { currency: state.currency, style: 'decimal' }) }}</span>
-                                <!--                                <p-status v-bind="stateFormatter(value)"-->
-                                <!--                                          class="capitalize"-->
-                                <!--                                />-->
+                                <span>{{ currencyMoneyFormatter(state.currentMonthValue?.value, { currency: state.currency, style: 'decimal' }) }}</span>
+                                <p-status v-bind="costStateSummaryFormatter(COST_SUMMARY_STATE_TYPE.AGGREGATING)"
+                                          class="capitalize state"
+                                />
                             </p>
                             <p class="date">
-                                2024-03-01 ~ 2024-03-31
+                                {{ state.currentDateRangeText }}
                             </p>
                         </div>
                     </div>
@@ -259,13 +279,18 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                 padding-right: 1rem;
                 padding-left: 1rem;
                 .price {
-                    @apply text-display-md;
+                    @apply flex items-center text-display-md;
                     margin-top: 0.25rem;
                     .unit {
                         @apply text-display-sm text-gray-600;
                     }
+                    .state {
+                        @apply text-label-sm;
+                        margin-left: 0.5rem;
+                    }
                 }
                 .date {
+                    @apply text-label-sm text-gray-500;
                     margin-top: 0.5rem;
                 }
             }
