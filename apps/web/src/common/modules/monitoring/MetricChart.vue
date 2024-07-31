@@ -60,6 +60,7 @@ const state = reactive({
         },
         tooltip: {
             trigger: 'axis',
+            confine: true,
             valueFormatter: (val) => numberFormatter(val) || '',
         },
         grid: {
@@ -93,6 +94,7 @@ const drawChart = (rawData) => {
             name: key,
             type: 'line',
             data: value,
+            showSymbol: false,
         });
     });
     state.chartData = _seriesData;
