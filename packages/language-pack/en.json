@@ -2176,7 +2176,7 @@
 		"COST_SUMMARY_CURRENT_TOTAL_COST": "Current Month-to-Date Cost",
 		"COST_SUMMARY_DESC": "The costs above may differ from the costs in the report.",
 		"COST_SUMMARY_GO_TO_REPORT": "Go to Cost Report",
-		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "Last Month Total Cost ",
+		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "Last Month Total Cost",
 		"COST_SUMMARY_RECENT": "Recent Cost Report for {date}",
 		"COST_SUMMARY_TITLE": "Cost Summary",
 		"COST_SUMMARY_TOTAL_SPEND": "Last Month Total Spend:",
