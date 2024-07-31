@@ -5,7 +5,7 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton,
+    PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton, PI,
 } from '@cloudforet/mirinae';
 import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
@@ -99,7 +99,17 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
              class="widget-header"
         >
             <h3 class="title">
-                {{ props.title }}
+                <span>{{ props.title }}</span>
+                <p-tooltip v-if="props.description?.length"
+                           :contents="props.description"
+                           position="bottom"
+                >
+                    <p-i name="ic_info-circle"
+                         width="0.75rem"
+                         height="0.75rem"
+                         class="description-icon"
+                    />
+                </p-tooltip>
             </h3>
             <p class="date-text">
                 {{ props.periodText }}
@@ -270,6 +280,9 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
             display: block;
             -webkit-box-orient: vertical;
             font-weight: 500;
+            .description-icon {
+                margin-left: 0.25rem;
+            }
         }
         .date-text {
             @apply text-label-sm text-gray-500;
