@@ -5,8 +5,12 @@ import { PI, PButton } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+
+
+const domainStore = useDomainStore();
 const storeState = reactive({
-    domainName: computed<string>(() => store.state.domain.name),
+    domainName: computed<string>(() => domainStore.state.name),
     isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     language: computed(() => store.state.user.language),
 });

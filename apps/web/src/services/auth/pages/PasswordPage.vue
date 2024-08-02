@@ -107,6 +107,7 @@ import { i18n } from '@/translations';
 
 import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import type { UserState } from '@/store/modules/user/type';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
@@ -139,6 +140,7 @@ const vm = getCurrentInstance()?.proxy as Vue;
 const router = useRouter();
 const route = useRoute();
 
+const domainStore = useDomainStore();
 const state = reactive({
     loading: false,
     userType: '',
@@ -151,7 +153,7 @@ const state = reactive({
         }
         return i18n.t('AUTH.PASSWORD.RESET.TITLE');
     }),
-    domainId: computed<string>(() => store.state.domain.domainId),
+    domainId: computed<string>(() => domainStore.state.domainId),
     userInfo: computed<UserState>(() => store.state.user),
     tags: {},
 });
