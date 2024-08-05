@@ -27,7 +27,6 @@ const contextMenuItems = [
 const state = reactive({
     loading: false,
     userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
     //
     mfa: computed(() => store.state.user.mfa || undefined),
     isVerified: computed(() => state.mfa?.state === 'ENABLED'),

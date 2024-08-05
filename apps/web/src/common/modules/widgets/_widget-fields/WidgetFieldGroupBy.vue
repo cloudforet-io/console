@@ -189,7 +189,7 @@ watch(() => state.menuItems, (menuItems) => {
                 >
                     <p-text-input type="number"
                                   :min="1"
-                                  :max="props.widgetFieldSchema?.options?.max"
+                                  :max="state.max || 9999"
                                   :invalid="!state.isMaxValid"
                                   :value="state.proxyValue?.count"
                                   @update:value="handleUpdateCount"
@@ -228,7 +228,6 @@ watch(() => state.menuItems, (menuItems) => {
             padding-right: 1.5rem;
         }
     }
-
     .max-items {
         width: 10rem;
 

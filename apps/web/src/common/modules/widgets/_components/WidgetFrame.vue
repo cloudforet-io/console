@@ -5,7 +5,7 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton,
+    PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton, PI,
 } from '@cloudforet/mirinae';
 import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
@@ -99,7 +99,17 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
              class="widget-header"
         >
             <h3 class="title">
-                {{ props.title }}
+                <span>{{ props.title }}</span>
+                <p-tooltip v-if="props.description?.length"
+                           :contents="props.description"
+                           position="bottom"
+                >
+                    <p-i name="ic_info-circle"
+                         width="0.75rem"
+                         height="0.75rem"
+                         class="description-icon"
+                    />
+                </p-tooltip>
             </h3>
             <p class="date-text">
                 {{ props.periodText }}
@@ -136,7 +146,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                     <template #content>
                         <div class="metadata-content">
                             <div class="metadata-item-row">
-                                <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.FULL_DATA_LINK') }}</span>
+                                <span class="metadata-title">{{ $t('COMMON.WIDGETS.VIEW_FULL_DATA') }}</span>
                                 <template v-if="props.fullDataLinkList?.length">
                                     <div class="full-data-link-wrapper">
                                         <p-link v-for="(fullDataLink, idx) in props.fullDataLinkList"
@@ -162,7 +172,8 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                                @click="handleClickFullData"
                 />
             </p-tooltip>
-            <p-select-dropdown style-type="tertiary-icon-button"
+            <p-select-dropdown v-if="!props.disableManageButtons"
+                               style-type="tertiary-icon-button"
                                button-icon="ic_ellipsis-horizontal"
                                class="etc-button"
                                :menu="state.etcMenuItems"
@@ -269,6 +280,9 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
             display: block;
             -webkit-box-orient: vertical;
             font-weight: 500;
+            .description-icon {
+                margin-left: 0.25rem;
+            }
         }
         .date-text {
             @apply text-label-sm text-gray-500;

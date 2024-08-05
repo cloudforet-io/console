@@ -1,4 +1,4 @@
-import type { ExtendedAuthType } from '@/store/modules/domain/type';
+import type { ExtendedAuthType } from '@/store/domain/type';
 
 import { GoogleAuth } from '@/services/auth/authenticator/external/GOOGLE_OAUTH2/authenticator/google-auth';
 import { KeycloakAuth } from '@/services/auth/authenticator/external/KEYCLOAK_OIDC/authenticator/keycloak-auth';

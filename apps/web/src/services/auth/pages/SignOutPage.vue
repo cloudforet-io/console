@@ -5,6 +5,9 @@
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+import { pinia } from '@/store/pinia';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
@@ -15,8 +18,8 @@ export default {
     beforeRouteEnter(to) {
         (async () => {
             try {
-                const authType = store.state.domain.extendedAuthType;
-                await loadAuth(authType).signOut();
+                const domainStore = useDomainStore(pinia);
+                await loadAuth(domainStore.state.extendedAuthType).signOut();
                 await store.dispatch('user/setIsSessionExpired', true);
             } catch (e) {
                 ErrorHandler.handleError(e);

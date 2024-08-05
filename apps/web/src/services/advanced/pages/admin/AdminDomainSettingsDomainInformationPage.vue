@@ -11,6 +11,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dr
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import { languages, timezoneList } from '@/store/modules/user/config';
 import type { LanguageCode } from '@/store/modules/user/type';
 import { usePreferencesStore } from '@/store/preferences/preferences-store';
@@ -19,12 +20,14 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+
 const domainConfigStore = usePreferencesStore();
 const domainConfigGetters = domainConfigStore.getters;
+const domainStore = useDomainStore();
 const storeState = reactive({
-    domainId: computed<string>(() => store.state.domain.domainId),
-    domainName: computed<string>(() => store.state.domain.name),
-    domainConfig: computed(() => store.state.domain.config),
+    domainId: computed<string>(() => domainStore.state.domainId),
+    domainName: computed<string>(() => domainStore.state.name),
+    domainConfig: computed(() => domainStore.state.config),
 });
 const state = reactive({
     isChanged: computed(() => {
