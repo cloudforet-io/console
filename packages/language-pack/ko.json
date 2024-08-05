@@ -1550,6 +1550,17 @@
 				"NO_CHANGE": "변화 없음"
 			},
 			"NUMBER_FIELD_VALIDATION": "값은 {max} 이하이어야 합니다.",
+			"NUMBER_FORMAT": {
+				"AUTO": "자동",
+				"CONFIRM": "확인",
+				"CUSTOM_NUMBER_FORMAT": "",
+				"FULL_NUMBER": "",
+				"HELP": "가이드",
+				"INVALID_NUMBER_FORMAT": "",
+				"NUMBER_FORMAT": "",
+				"SAMPLE": "",
+				"SHORT_NUMBER": ""
+			},
 			"PERIOD": "기간",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "계정 ID",
@@ -3503,7 +3514,7 @@
 			"EXPLORE_WORKSPACE_TITLE": "접근 가능한 워크스페이스를 살펴보세요!",
 			"GET_STARTED_DESC": "워크스페이스는 해당하는 팀 또는 조직에 적합한 멤버 및 자원 할당을 위한 독립된 환경을 제공합니다. 여러 관리자를 추가하여 작업 공간을 생성하고 전체 도메인을 관리할 수 있습니다.",
 			"GET_STARTED_TITLE": "워크스페이스를 생성하고 팀 멤버를 초대해보세요!",
-			"GO_TO_EXPLORE": "바로 가\u001c기",
+			"GO_TO_EXPLORE": "바로 가기",
 			"HELP_LINK": "도움이 필요하신가요?",
 			"INVENTORY_DESC": "모든 리소스를 한 곳에 중앙 집중화하고 체계적으로 관리하세요.",
 			"INVENTORY_TITLE": "인벤토리",

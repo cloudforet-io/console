@@ -50,3 +50,10 @@ export const DATE_FORMAT = {
         DAILY: 'DD',
     },
 } as const;
+
+export const NUMBER_FORMAT = {
+    AUTO: 'AUTO',
+    SHORT_NUMBER: 'SHORT_NUMBER',
+    FULL_NUMBER: 'FULL_NUMBER',
+    CUSTOM: 'CUSTOM',
+} as const;

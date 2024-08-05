@@ -5,12 +5,13 @@ import utc from 'dayjs/plugin/utc';
 import {
     isEmpty, flatten, sortBy, isEqualWith, isEqual, union,
 } from 'lodash';
+import { format } from 'numfmt';
 
 dayjs.extend(tz);
 dayjs.extend(utc);
 
-export const iso8601Formatter = (time: string, timezone: string, format = 'YYYY-MM-DD HH:mm:ss') => {
-    if (time) return dayjs.tz(dayjs(time), timezone).format(format);
+export const iso8601Formatter = (time: string, timezone: string, _format = 'YYYY-MM-DD HH:mm:ss') => {
+    if (time) return dayjs.tz(dayjs(time), timezone).format(_format);
     return '';
 };
 export const durationFormatter = (createdAt: string, finishedAt: string, timezone: string) => {
@@ -59,6 +60,12 @@ export const numberFormatter = (value?: number, options?: Intl.NumberFormatOptio
     }
     return value;
 };
+
+export const customNumberFormatter = (numberFormat: string, value?: number): string => {
+    if (!value) return '';
+    return format(numberFormat, value);
+};
+
 export const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
 
 /**

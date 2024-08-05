@@ -1550,6 +1550,17 @@
 				"NO_CHANGE": "変化なし"
 			},
 			"NUMBER_FIELD_VALIDATION": "値は {max} 以下でなければなりません。",
+			"NUMBER_FORMAT": {
+				"AUTO": "自動",
+				"CONFIRM": "確認",
+				"CUSTOM_NUMBER_FORMAT": "",
+				"FULL_NUMBER": "",
+				"HELP": "ヘルプ",
+				"INVALID_NUMBER_FORMAT": "",
+				"NUMBER_FORMAT": "",
+				"SAMPLE": "",
+				"SHORT_NUMBER": ""
+			},
 			"PERIOD": "期間",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "アカウントID",
