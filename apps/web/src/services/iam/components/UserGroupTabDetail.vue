@@ -9,7 +9,8 @@ import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-const
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.$state;
+const userGroupPageState = userGroupPageStore.state;
+const userGroupPageGetters = userGroupPageStore.getters;
 
 const state = reactive({
     loading: false,
@@ -29,7 +30,7 @@ const state = reactive({
         // { name: 'created', label: 'Created', sortable: false },
     ])),
     data: computed(() => ({
-        ...userGroupPageStore.selectedUsers[0],
+        ...userGroupPageGetters.selectedUsers[0],
         // name: "User Group 04",
         // users: 40,
         // associated_workspaces: 2,
@@ -67,7 +68,7 @@ const handleClickButton = (type: string) => {
 <template>
     <div class="user-group-tab-detail">
         <p-heading heading-type="sub"
-                   :title="i18n.t('IAM.USERGROUP.MAIN.BASE_INFORMATION')"
+                   :title="$t('IAM.USERGROUP.MAIN.BASE_INFORMATION')"
         >
             <template #extra>
                 <div class="toolbox-wrapper">
@@ -76,19 +77,19 @@ const handleClickButton = (type: string) => {
                                   icon-left="ic_edit"
                                   @click="handleClickButton(USER_GROUP_MODAL_TYPE.EDIT)"
                         >
-                            {{ i18n.t('IAM.USERGROUP.MAIN.EDIT') }}
+                            {{ $t('IAM.USERGROUP.MAIN.EDIT') }}
                         </p-button>
                         <p-button style-type="tertiary"
                                   icon-left="ic_delete"
                                   @click="handleClickButton(USER_GROUP_MODAL_TYPE.STATUS)"
                         >
-                            {{ i18n.t('IAM.USERGROUP.MAIN.REMOVE') }}
+                            {{ $t('IAM.USERGROUP.MAIN.REMOVE') }}
                         </p-button>
                     </div>
                 </div>
             </template>
         </p-heading>
-        <p-definition-table v-if="userGroupPageStore.selectedUsers.length === 1"
+        <p-definition-table v-if="userGroupPageGetters.selectedUsers.length === 1"
                             :fields="state.fields"
                             :data="state.data"
                             :loading="userGroupPageState.loading"
@@ -96,9 +97,9 @@ const handleClickButton = (type: string) => {
                             class="user-group-definition-table"
                             v-on="$listeners"
         />
-        <p-definition-table v-else-if="userGroupPageStore.selectedUsers.length > 1"
+        <p-definition-table v-else-if="userGroupPageGetters.selectedUsers.length > 1"
                             :fields="state.fields"
-                            :data="userGroupPageStore.selectedUsers"
+                            :data="userGroupPageGetters.selectedUsers"
                             :loading="userGroupPageState.loading"
                             :skeleton-rows="7"
                             class="user-group-definition-table"

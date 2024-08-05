@@ -7,7 +7,7 @@ import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-const
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.$state;
+const userGroupPageState = userGroupPageStore.state;
 
 const handleCreateUserGroup = (type: string) => {
     switch (type) {
@@ -25,7 +25,7 @@ const handleCreateUserGroup = (type: string) => {
 
 <template>
     <div>
-        <p-heading :title="i18n.t('IAM.USERGROUP.TITLE')"
+        <p-heading :title="$t('IAM.USERGROUP.TITLE')"
                    use-selected-count
                    use-total-count
                    :total-count="userGroupPageState.totalCount"
@@ -37,7 +37,7 @@ const handleCreateUserGroup = (type: string) => {
                           icon-left="ic_plus_bold"
                           @click="handleCreateUserGroup(USER_GROUP_MODAL_TYPE.ADD)"
                 >
-                    {{ i18n.t('IAM.USERGROUP.CREATE') }}
+                    {{ $t('IAM.USERGROUP.CREATE') }}
                 </p-button>
             </template>
         </p-heading>

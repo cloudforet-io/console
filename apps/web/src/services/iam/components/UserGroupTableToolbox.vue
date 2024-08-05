@@ -11,7 +11,7 @@ import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-stor
 
 
 const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.$state;
+const userGroupPageState = userGroupPageStore.state;
 
 const USER_GROUP_TOOLBOX_TYPE = USER_GROUP_MODAL_TYPE;
 
@@ -72,7 +72,7 @@ const handleSelectAction = (type: string) => {
     <p-select-dropdown class="left-toolbox-item"
                        :menu="state.dropdownMenu"
                        reset-selection-on-menu-close
-                       :placeholder="i18n.t('IAM.USERGROUP.MAIN.TOOLBOX_PLACEHOLDER')"
+                       :placeholder="$t('IAM.USERGROUP.MAIN.TOOLBOX_PLACEHOLDER')"
                        @select="handleSelectAction"
     />
 </template>

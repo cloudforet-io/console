@@ -1,3 +1,5 @@
+import { reactive, computed } from 'vue';
+
 import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -13,8 +15,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { UserListItemType } from '@/services/iam/types/user-type';
 
-export const useUserGroupPageStore = defineStore('page-user-group', {
-    state: () => ({
+export const useUserGroupPageStore = defineStore('page-user-group', () => {
+    const state = reactive<any>({
         users: [] as UserListItemType[],
         selectedUser: {} as UserListItemType,
         loading: false,
@@ -30,67 +32,75 @@ export const useUserGroupPageStore = defineStore('page-user-group', {
             themeColor: 'primary',
             visible: '',
         },
-    }),
-    getters: {
-        selectedUsers: (state) => {
+    });
+
+    const getters = reactive({
+        selectedUsers: computed<any>(() => {
             if (state.selectedIndices.length === 1 && !isEmpty(state.selectedUser)) return [state.selectedUser];
             const users: UserListItemType[] = [];
             state.selectedIndices.forEach((d:number) => {
                 users.push(state.users[d]);
             });
             return users ?? [];
-        },
-    },
-    actions: {
-        updateModalSettings({
+        }),
+    });
+
+    const actions = {
+        updateModalSettings: ({
             type, title, visible, themeColor,
-        }) {
-            this.modal.type = type;
-            this.modal.title = title;
-            this.modal.visible = visible;
-            this.modal.themeColor = themeColor;
+        }) => {
+            state.modal.type = type;
+            state.modal.title = title;
+            state.modal.visible = visible;
+            state.modal.themeColor = themeColor;
         },
-        closeModal() {
-            this.modal = {
+        closeModal: () => {
+            state.modal = {
                 type: '',
                 title: '',
                 themeColor: 'primary',
                 visible: '',
             };
         },
-        async listGroups() {
-            this.loading = true;
+        listGroups: async () => {
+            state.loading = true;
 
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.identity.userGroup.list<UserListParameters, ListResponse<UserGroupModel>>();
 
-                this.groups = results || [];
-                this.totalCount = total_count || 0;
-                this.selectedIndices = [];
+                state.groups = results || [];
+                state.totalCount = total_count || 0;
+                state.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.groups = [];
-                this.totalCount = 0;
+                state.groups = [];
+                state.totalCount = 0;
             } finally {
-                this.loading = false;
+                state.loading = false;
             }
         },
-        async listUsers(params: UserListParameters) {
-            this.loading = true;
+        listUsers: async (params: UserListParameters) => {
+            state.loading = true;
 
             try {
                 const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
-                this.users = res.results || [];
-                this.totalCount = res.total_count ?? 0;
-                this.selectedIndices = [];
+                state.users = res.results || [];
+                state.totalCount = res.total_count ?? 0;
+                state.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.users = [];
-                this.totalCount = 0;
+                state.users = [];
+                state.totalCount = 0;
                 throw e;
             } finally {
-                this.loading = false;
+                state.loading = false;
             }
         },
-    },
+    };
+
+    return {
+        state,
+        getters,
+        ...actions,
+    };
 });

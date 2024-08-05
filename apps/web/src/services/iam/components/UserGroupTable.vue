@@ -14,16 +14,12 @@ import { USER_GROUP_SEARCH_HANDLERS, USER_GROUP_STATE } from '@/services/iam/con
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
-
-
-
-
 interface Props {
     tableHeight: number;
 }
 
 const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.$state;
+const userGroupPageState = userGroupPageStore.state;
 
 const userGroupListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(userGroupPageState.pageStart).setPageLimit(userGroupPageState.pageLimit)
@@ -69,7 +65,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const handleSelect = async (index: number[]) => {
-    userGroupPageStore.$patch({ selectedIndices: index });
+    userGroupPageStore.$patch((_state) => { _state.state.selectedIndices = index; });
 };
 
 const handleChange = async (options: any = {}) => {

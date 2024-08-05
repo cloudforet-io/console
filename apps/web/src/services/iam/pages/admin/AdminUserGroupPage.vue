@@ -13,8 +13,8 @@ import UserGroupTable from '@/services/iam/components/UserGroupTable.vue';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.$state;
-console.log('AdminUserGroupPage Setup');
+const userGroupPageState = userGroupPageStore.state;
+
 const userGroupListApiQuery = new ApiQueryHelper()
     .setSort('name', true);
 
@@ -25,9 +25,10 @@ const fetchUserGroup = async () => {
     await userGroupPageStore.listUsers({ query: userGroupListApiQuery.data });
 };
 
-(function init() {
+const init = () => {
     fetchUserGroup();
-}());
+};
+init();
 
 onUnmounted(() => {
     userGroupPageStore.$dispose();

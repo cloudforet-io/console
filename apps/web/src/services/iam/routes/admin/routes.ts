@@ -38,11 +38,11 @@ const adminIamRoutes: RouteConfig = {
             component: UserMainPage as any,
         },
         {
-            path: 'usergroup',
-            name: makeAdminRouteName(IAM_ROUTE.USERGROUP._NAME),
+            path: 'user_group',
+            name: makeAdminRouteName(IAM_ROUTE.USER_GROUP._NAME),
             meta: {
-                menuId: MENU_ID.USERGROUP,
-                translationId: MENU_INFO_MAP[MENU_ID.USERGROUP].translationId,
+                menuId: MENU_ID.USER_GROUP,
+                translationId: MENU_INFO_MAP[MENU_ID.USER_GROUP].translationId,
             },
             component: AdminUserGroupPage as any,
         },

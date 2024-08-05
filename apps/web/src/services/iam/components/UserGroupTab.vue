@@ -13,6 +13,7 @@ import { USER_GROUP_TABS } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
+const userGroupPageGetters = userGroupPageStore.getters;
 
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([
@@ -34,7 +35,7 @@ const multiItemTabState = reactive({
 
 <template>
     <section class="user-group-tab">
-        <p-tab v-if="userGroupPageStore.selectedUsers.length === 1"
+        <p-tab v-if="userGroupPageGetters.selectedUsers.length === 1"
                :tabs="singleItemTabState.tabs"
                :active-tab.sync="singleItemTabState.activeTab"
         >
@@ -48,7 +49,7 @@ const multiItemTabState = reactive({
                 <user-group-tab-workspaces />
             </template>
         </p-tab>
-        <p-tab v-else-if="userGroupPageStore.selectedUsers.length > 1"
+        <p-tab v-else-if="userGroupPageGetters.selectedUsers.length > 1"
                :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
         >
@@ -59,7 +60,7 @@ const multiItemTabState = reactive({
         <div v-else
              id="empty-space"
         >
-            <p-empty>{{ i18n.t('IAM.USERGROUP.MAIN.NO_SELECTED') }}</p-empty>
+            <p-empty>{{ $t('IAM.USERGROUP.MAIN.NO_SELECTED') }}</p-empty>
         </div>
     </section>
 </template>

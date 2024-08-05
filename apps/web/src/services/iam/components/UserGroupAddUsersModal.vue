@@ -3,17 +3,16 @@ import { computed, reactive } from 'vue';
 
 import { PButtonModal, PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
 
-import { i18n } from '@/translations';
-
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 
 const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.$state;
+const userGroupPageGetters = userGroupPageStore.getters;
+const userGroupPageState = userGroupPageStore.state;
 
 const state = reactive({
-    menu: computed(() => userGroupPageStore.selectedUsers.map(({ user_id, name }) => ({
+    menu: computed(() => userGroupPageGetters.selectedUsers.map(({ user_id, name }) => ({
         name: user_id,
         label: name,
         type: 'item',
@@ -49,7 +48,7 @@ const handleDeleteTag = () => {
     >
         <template #body>
             <p-field-group
-                :label="i18n.t('IAM.USERGROUP.MODAL.ADD.USERS')"
+                :label="$t('IAM.USERGROUP.MODAL.ADD.USERS')"
                 style-type="secondary"
                 required
             >

@@ -5,8 +5,8 @@ export const IAM_ROUTE = {
     USER: {
         _NAME: `${MENU_ID.IAM}.${MENU_ID.USER}`,
     },
-    USERGROUP: {
-        _NAME: `${MENU_ID.IAM}.${MENU_ID.USERGROUP}`,
+    USER_GROUP: {
+        _NAME: `${MENU_ID.IAM}.${MENU_ID.USER_GROUP}`,
     },
     APP: {
         _NAME: `${MENU_ID.IAM}.${MENU_ID.APP}`,

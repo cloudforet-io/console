@@ -6,15 +6,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
-import { i18n } from '@/translations';
-
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
-
-
 const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.$state;
+const userGroupPageState = userGroupPageStore.state;
 
 const state = reactive({
     loading: false,
@@ -43,8 +39,8 @@ const fetchListUsers = async () => {
     state.loading = true;
 };
 
-const handleUserMenu: AutocompleteHandler = async (inputText: string) => {
-    await fetchListUsers(inputText);
+const handleUserMenu: AutocompleteHandler = async () => {
+    await fetchListUsers();
 
     return {
         results: state.userMenuItems as SelectDropdownMenuItem[],
@@ -77,16 +73,16 @@ const handleClose = () => {
             <div class="form-wrapper">
                 <p-field-group
                     required
-                    :label="i18n.t('IAM.USERGROUP.MODAL.ADD.GROUP_NAME')"
+                    :label="$t('IAM.USERGROUP.MODAL.ADD.GROUP_NAME')"
                     style-type="secondary"
                 >
                     <p-text-input :value="state.groupName"
-                                  :placeholder="i18n.t('IAM.USERGROUP.MODAL.ADD.GROUP_NAME_PLACEHOLDER')"
+                                  :placeholder="$t('IAM.USERGROUP.MODAL.ADD.GROUP_NAME_PLACEHOLDER')"
                     />
                 </p-field-group>
                 <p-field-group
                     required
-                    :label="i18n.t('IAM.USERGROUP.MODAL.ADD.ACCESSIBLE_ROLES')"
+                    :label="$t('IAM.USERGROUP.MODAL.ADD.ACCESSIBLE_ROLES')"
                     style-type="secondary"
                 >
                     <template #default>
@@ -96,13 +92,13 @@ const handleClose = () => {
                                 appearance-type="stack"
                                 is-fixed-width
                                 readonly
-                                :selected="[{&quot;name&quot;:&quot;berkshire&quot;}]"
+                                :selected="[{ name: 'Berkshire' }]"
                             />
                         </div>
                     </template>
                 </p-field-group>
                 <p-field-group
-                    :label="i18n.t('IAM.USERGROUP.MODAL.ADD.USERS')"
+                    :label="$t('IAM.USERGROUP.MODAL.ADD.USERS')"
                     style-type="secondary"
                 >
                     <template #default>
@@ -141,6 +137,7 @@ const handleClose = () => {
         gap: 1rem;
     }
 
+    /* custom design-system component - p-field-group */
     :deep(.p-field-group) {
         margin-bottom: 32px;
 

@@ -7,10 +7,11 @@ import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-const
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.$state;
+const userGroupPageState = userGroupPageStore.state;
+const userGroupPageGetters = userGroupPageStore.getters;
 
 const tableState = reactive({
-    items: computed(() => userGroupPageStore.selectedUsers),
+    items: computed(() => userGroupPageGetters.selectedUsers),
     fields: computed(() => [
         { name: 'user_id', label: 'User ID' },
         { name: 'name', label: 'Name' },

@@ -8,6 +8,8 @@ import { i18n } from '@/translations';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
+type UserGroupModalType = typeof USER_GROUP_MODAL_TYPE[keyof typeof USER_GROUP_MODAL_TYPE];
+
 const userGroupPageStore = useUserGroupPageStore();
 
 const state = reactive({
@@ -24,7 +26,7 @@ const state = reactive({
     }])),
 });
 
-const handleClickButton = (type: string) => {
+const handleClickButton = (type: UserGroupModalType) => {
     switch (type) {
     case USER_GROUP_MODAL_TYPE.ADD_USERS: userGroupPageStore.updateModalSettings({
         type,
