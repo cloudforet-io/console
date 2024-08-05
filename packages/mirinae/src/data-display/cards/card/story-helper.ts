@@ -1,13 +1,27 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
+
+export const getCardArgs = (): Args => ({
+    header: 'This is header!',
+    styleType: CARD_STYLE_TYPE.gray100,
+    size: CARD_SIZE.md,
+    defaultSlot: 'This is card body!',
+    headerSlot: '',
+});
+
+export const getCardParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
 
 export const getCardArgTypes = (): ArgTypes => ({
     header: {
         name: 'header',
-        type: { name: 'string, boolean' },
+        type: { name: 'string' },
         description: 'Card header',
-        defaultValue: 'This is header!',
         table: {
             type: {
                 summary: 'string, boolean',
@@ -17,15 +31,12 @@ export const getCardArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     styleType: {
         name: 'styleType',
         type: { name: 'string' },
         description: `Card style types. ${Object.values(CARD_STYLE_TYPE)} are available.`,
-        defaultValue: CARD_STYLE_TYPE.gray100,
         table: {
             type: {
                 summary: 'string',
@@ -35,16 +46,13 @@ export const getCardArgTypes = (): ArgTypes => ({
                 summary: `"${CARD_STYLE_TYPE.gray100}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(CARD_STYLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(CARD_STYLE_TYPE),
     },
     size: {
         name: 'size',
         type: { name: 'string' },
         description: `Card size. ${Object.values(CARD_SIZE)} are available.`,
-        defaultValue: CARD_SIZE.md,
         table: {
             type: {
                 summary: 'string',
@@ -54,15 +62,12 @@ export const getCardArgTypes = (): ArgTypes => ({
                 summary: `"${CARD_SIZE.md}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(CARD_SIZE),
-        },
+        control: 'select',
+        options: Object.values(CARD_SIZE),
     },
     defaultSlot: {
         name: 'default',
         description: 'Slot for card body.',
-        defaultValue: 'This is card body!',
         table: {
             type: {
                 summary: null,
@@ -72,14 +77,11 @@ export const getCardArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     headerSlot: {
         name: 'header',
         description: 'Slot for card header.',
-        defaultValue: '',
         table: {
             type: {
                 summary: null,
@@ -89,8 +91,8 @@ export const getCardArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
+    // default
+    default: { table: { disable: true } },
 });

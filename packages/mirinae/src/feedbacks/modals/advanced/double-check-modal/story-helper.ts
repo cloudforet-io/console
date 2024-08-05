@@ -1,16 +1,39 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
-import { getButtonModalArgTypes } from '@/feedbacks/modals/button-modal/story-helper';
+import { getButtonModalArgs, getButtonModalArgTypes } from '@/feedbacks/modals/button-modal/story-helper';
 import { SizeMapping } from '@/feedbacks/modals/type';
+
+export const getDoubleCheckModalArgs = (): Args => {
+    const { loading } = getButtonModalArgs();
+
+    return {
+        modalSize: 'md',
+        visible: false,
+        headerTitle: 'This is header title.',
+        verificationText: 'verification',
+        loading,
+        middleContentsSlot: null,
+        bottomContentsSlot: null,
+        onConfirm: null,
+        onCancel: null,
+    };
+};
+
+export const getDoubleCheckModalParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/t0napBIB14ZZN9RIq9uo3O/Asset-Inventory?node-id=2613%3A371966&t=0A8wuvLdPqlyb3TM-4',
+    },
+});
 
 export const getDoubleCheckModalArgTypes = (): ArgTypes => {
     const buttonModalArgTypes = getButtonModalArgTypes();
+
     return {
         modalSize: {
             name: 'modalSize',
             type: { name: 'string' },
             description: 'Size of modal.',
-            defaultValue: 'md',
             table: {
                 type: {
                     summary: 'string',
@@ -20,16 +43,13 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
                     summary: '"md"',
                 },
             },
-            control: {
-                type: 'select',
-                options: Object.keys(SizeMapping),
-            },
+            control: 'select',
+            options: Object.keys(SizeMapping),
         },
         visible: {
             name: 'visible',
             type: { name: 'boolean' },
             description: 'Whether to show modal or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -39,15 +59,12 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
                     summary: false,
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         headerTitle: {
             name: 'headerTitle',
             type: { name: 'string' },
             description: 'Header title of modal.',
-            defaultValue: 'This is header title.',
             table: {
                 type: {
                     summary: 'string',
@@ -57,15 +74,12 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
                     summary: '"undefined"',
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         verificationText: {
             name: 'verificationText',
             type: { name: 'string' },
             description: 'Verification text.',
-            defaultValue: 'verification',
             table: {
                 type: {
                     summary: 'string',
@@ -75,9 +89,7 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
                     summary: '"null"',
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         loading: buttonModalArgTypes.loading,
 
@@ -85,7 +97,6 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
         middleContentsSlot: {
             name: 'middle-contents',
             description: 'Slots located above the Verification area.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -96,7 +107,6 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
         bottomContentsSlot: {
             name: 'middle-contents',
             description: 'Slots located under the Verification area.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -110,7 +120,6 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
         onConfirm: {
             name: 'confirm',
             description: 'Emitted when confirm button is clicked.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -121,7 +130,6 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
         onCancel: {
             name: 'cancel',
             description: 'Emitted when click cancel button or close button',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -129,5 +137,11 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
                 category: 'events',
             },
         },
+
+        // default
+        'middle-contents': { table: { disable: true } },
+        'bottom-contents': { table: { disable: true } },
+        confirm: { table: { disable: true } },
+        cancel: { table: { disable: true } },
     };
 };

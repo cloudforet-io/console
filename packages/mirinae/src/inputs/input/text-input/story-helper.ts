@@ -1,6 +1,7 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
-import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
+import { getContextMenuArgTypes, getContextMenuArgs } from '@/inputs/context-menu/story-helper';
 import { INPUT_APPEARANCE_TYPES, INPUT_SIZE } from '@/inputs/input/text-input/type';
 
 const initContextMenuArgTypes = (): ArgTypes => {
@@ -12,14 +13,61 @@ const initContextMenuArgTypes = (): ArgTypes => {
     return argTypes;
 };
 
+const initContextMenuArgs = (): Args => {
+    const contextMenuArgs = getContextMenuArgs();
+    const args: Args = {
+        menu: contextMenuArgs.menu,
+        loading: contextMenuArgs.loading,
+    };
+
+    return args;
+};
+
+export const getTextInputArgs = (): Args => {
+    const contextMenuArgs = initContextMenuArgs();
+
+    return {
+        value: '',
+        size: INPUT_SIZE.md,
+        isFocused: false,
+        ...contextMenuArgs,
+        disabled: false,
+        block: false,
+        invalid: false,
+        placeholder: undefined,
+        multiInput: false,
+        selected: [],
+        visibleMenu: false,
+        useFixedMenuStyle: false,
+        disableHandler: false,
+        useAutoComplete: false,
+        maskingMode: false,
+        showPassword: true,
+        appearanceType: INPUT_APPEARANCE_TYPES[0],
+        pageSize: 10,
+        inputAttrs: {},
+        'v-model': '',
+        defaultSlot: null,
+        rightExtraSlot: '',
+        inputRightSlot: '',
+        rightEdgeSlot: '',
+    };
+};
+
+export const getTextInputParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5191%3A2',
+    },
+});
+
 export const getTextInputArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = initContextMenuArgTypes();
     return {
         value: {
             name: 'value',
-            type: { name: 'string, number', required: false },
+            type: { name: 'string', required: false },
             description: 'Input value',
-            defaultValue: '',
             table: {
                 type: {
                     summary: 'string, number',
@@ -29,15 +77,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: '',
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         size: {
             name: 'size',
             type: { name: 'string' },
             description: `TextInput size. ${Object.values(INPUT_SIZE)} are available.`,
-            defaultValue: INPUT_SIZE.md,
             table: {
                 type: {
                     summary: 'string',
@@ -47,16 +92,13 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: `"${INPUT_SIZE.md}"`,
                 },
             },
-            control: {
-                type: 'select',
-                options: Object.values(INPUT_SIZE),
-            },
+            control: 'select',
+            options: Object.values(INPUT_SIZE),
         },
         isFocused: {
             name: 'isFocused',
             type: { name: 'boolean' },
             description: 'focused value for sync.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -66,15 +108,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: null,
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         disabled: {
             name: 'disabled',
             type: { name: 'boolean' },
             description: 'The same with disabled attribute.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -84,15 +123,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: false,
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         block: {
             name: 'block',
             type: { name: 'boolean' },
             description: 'Make input style to be display block',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -102,15 +138,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: false,
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         invalid: {
             name: 'invalid',
             type: { name: 'boolean' },
             description: 'Apply invalid style',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -120,15 +153,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: false,
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         placeholder: {
             name: 'placeholder',
             type: { name: 'string' },
             description: 'Input placeholder.',
-            defaultValue: undefined,
             table: {
                 type: {
                     summary: 'string',
@@ -138,15 +168,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: 'undefined',
                 },
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         multiInput: {
             name: 'multiInput',
             type: { name: 'boolean' },
             description: 'Whether to enable multi input mode or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -156,15 +183,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         selected: {
             name: 'selected',
-            type: { name: 'array' },
+            type: { name: 'array' } as SBType,
             description: 'Selected menu items. this is `sync` prop with `update:selected` event.',
-            defaultValue: [],
             table: {
                 type: {
                     summary: 'array',
@@ -174,15 +198,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: '[]',
                 },
             },
-            control: {
-                type: 'object',
-            },
+            control: 'object',
         },
         visibleMenu: {
             name: 'visibleMenu',
             type: { name: 'boolean' },
             description: 'Use this prop when you want to control menu visibility manually. this is `sync` prop with event `update:visible-menu`.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -192,15 +213,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         useFixedMenuStyle: {
             name: 'useFixedMenuStyle',
             type: { name: 'boolean' },
             description: 'Whether to use position fixed style on menu or not. ',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -210,16 +228,13 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         ...contextMenuArgTypes,
         handler: {
             name: 'handler',
             type: { name: 'function' },
             description: 'Handler that returns auto-completion menu according to input value. If no value is given, the default handler is executed.',
-            defaultValue: undefined,
             table: {
                 type: {
                     summary: 'function',
@@ -235,7 +250,6 @@ export const getTextInputArgTypes = (): ArgTypes => {
             name: 'disableHandler',
             type: { name: 'boolean' },
             description: 'Whether to use handler or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -245,15 +259,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         useAutoComplete: {
             name: 'useAutoComplete',
             type: { name: 'boolean' },
             description: 'Whether to use autocomplete or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -263,15 +274,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         maskingMode: {
             name: 'maskingMode',
             type: { name: 'boolean' },
             description: 'Whether to use input masking or not.',
-            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
@@ -281,9 +289,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: 'false',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         showPassword: {
             name: 'showPassword',
@@ -299,15 +305,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: 'true',
                 },
             },
-            control: {
-                type: 'boolean',
-            },
+            control: 'boolean',
         },
         appearanceType: {
             name: 'appearanceType',
             type: { name: 'string' },
             description: 'Appearance type to display selected items.',
-            defaultValue: INPUT_APPEARANCE_TYPES[0],
             table: {
                 type: {
                     summary: 'string',
@@ -317,16 +320,13 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: `'${INPUT_APPEARANCE_TYPES[0]}'`,
                 },
             },
-            control: {
-                type: 'select',
-                options: INPUT_APPEARANCE_TYPES,
-            },
+            control: 'select',
+            options: INPUT_APPEARANCE_TYPES,
         },
         pageSize: {
             name: 'pageSize',
             type: { name: 'number' },
             description: 'Page size to show items.',
-            defaultValue: 10,
             table: {
                 type: {
                     summary: 'number',
@@ -336,16 +336,12 @@ export const getTextInputArgTypes = (): ArgTypes => {
                     summary: 'undefined',
                 },
             },
-            control: {
-                type: 'number',
-                options: { min: 0 },
-            },
+            control: { type: 'number', min: 0 },
         },
         // attrs
         inputAttrs: {
             name: 'all input attributes',
             description: 'All input attributes are allowed. e.g. type',
-            defaultValue: {},
             table: {
                 type: {
                     summary: null,
@@ -355,16 +351,13 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 },
                 category: 'attrs',
             },
-            control: {
-                type: 'object',
-            },
+            control: 'object',
         },
         // model
         'v-model': {
             name: 'v-model',
-            type: { name: 'string, number', required: false },
+            required: false,
             description: 'Two way binding for `value` props with `input` event.',
-            defaultValue: '',
             table: {
                 type: {
                     summary: 'string, number',
@@ -380,7 +373,6 @@ export const getTextInputArgTypes = (): ArgTypes => {
         defaultSlot: {
             name: 'default',
             description: 'Slot for input element. Use it if you want to customize input element but if you use this slot, you may lose some of features of this component.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -395,7 +387,6 @@ export const getTextInputArgTypes = (): ArgTypes => {
         rightExtraSlot: {
             name: 'right-extra',
             description: 'Slot for right area of input. This slot will be deprecated.',
-            defaultValue: '',
             table: {
                 type: {
                     summary: null,
@@ -405,14 +396,11 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 },
                 category: 'slots',
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         inputRightSlot: {
             name: 'input-right',
             description: 'Slot on the right next to the input.',
-            defaultValue: '',
             table: {
                 type: {
                     summary: null,
@@ -422,14 +410,11 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 },
                 category: 'slots',
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         rightEdgeSlot: {
             name: 'right-edge',
             description: 'Slot on the right edge of the input.',
-            defaultValue: '',
             table: {
                 type: {
                     summary: null,
@@ -439,9 +424,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 },
                 category: 'slots',
             },
-            control: {
-                type: 'text',
-            },
+            control: 'text',
         },
         // events
         onUpdateValue: {
@@ -523,5 +506,10 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 category: 'events',
             },
         },
+        // default
+        default: { table: { disable: true } },
+        'right-extra': { table: { disable: true } },
+        'input-right': { table: { disable: true } },
+        'right-edge': { table: { disable: true } },
     };
 };

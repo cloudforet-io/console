@@ -1,12 +1,28 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 import icon from 'vue-svgicon';
+
+export const getLabelArgs = (): Args => ({
+    leftIcon: '',
+    text: 'Label',
+    deletable: false,
+    clickable: false,
+    itemClick: null,
+    delete: null,
+    labelContentSlot: 'Label Content',
+});
+
+export const getLabelParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'figma url',
+    },
+});
 
 export const getLabelArgTypes = (): ArgTypes => ({
     leftIcon: {
         name: 'leftIcon',
         type: { name: 'string' },
         description: 'Left icon name',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'string',
@@ -16,10 +32,8 @@ export const getLabelArgTypes = (): ArgTypes => ({
                 summary: undefined,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(icon.icons),
-        },
+        control: 'select',
+        options: Object.keys(icon.icons),
     },
     // backgroundColor: {
     //     name: 'backgroundColor',
@@ -40,7 +54,6 @@ export const getLabelArgTypes = (): ArgTypes => ({
         name: 'text',
         type: { name: 'string' },
         description: "The text for label's content",
-        defaultValue: 'Label',
         table: {
             type: {
                 summary: 'string',
@@ -55,7 +68,6 @@ export const getLabelArgTypes = (): ArgTypes => ({
         name: 'deletable',
         type: { name: 'boolean' },
         description: 'Indicates whether the label can be deleted or not. If true, the delete icon button is displayed.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -70,7 +82,6 @@ export const getLabelArgTypes = (): ArgTypes => ({
         name: 'clickable',
         type: { name: 'boolean' },
         description: 'Indicates whether the label can be clicked or not. If true, shows the UI of the clicked label.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -100,7 +111,6 @@ export const getLabelArgTypes = (): ArgTypes => ({
     itemClick: {
         name: 'item-click',
         description: 'This event is emitted when label is clicked.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -114,7 +124,6 @@ export const getLabelArgTypes = (): ArgTypes => ({
     delete: {
         name: 'delete',
         description: 'This event is emitted when label delete icon button is Clicked.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -129,7 +138,6 @@ export const getLabelArgTypes = (): ArgTypes => ({
     labelContentSlot: {
         name: 'labelContentSlot',
         description: 'Slot for label content. This slot replace text props and leftIcon props.',
-        defaultValue: 'Label Content',
         table: {
             type: {
                 summary: null,
@@ -138,4 +146,8 @@ export const getLabelArgTypes = (): ArgTypes => ({
             defaultValue: 'Label Content',
         },
     },
+    // default
+    clickStop: { table: { disable: true } },
+    active: { table: { disable: true } },
+    'label-content': { table: { disable: true } },
 });

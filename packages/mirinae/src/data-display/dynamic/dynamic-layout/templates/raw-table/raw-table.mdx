@@ -1,0 +1,46 @@
+{/* raw-table.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as rawTableStories from './raw-table.stories';
+
+<Meta of={rawTableStories} />
+
+
+# Raw Table Type
+<br/>
+<br/>
+
+## Options Example
+
+<br/>
+
+### Options: Disable Search
+
+```js
+{
+    disable_search: true
+}
+```
+<Canvas of={rawTableStories.DisableSearch} />
+
+
+### Options: Headers
+"headers" option is used to specify the order of the table headers.
+```js
+{
+    headers: ['information', 'age', 'name', 'job']
+}
+```
+<Canvas of={rawTableStories.Headers} />
+
+
+<br/>
+<br/>
+
+## Playground
+<Canvas of={rawTableStories.Playground} />
+<Controls of={rawTableStories.Playground} />
+
+<br/>
+<br/>
