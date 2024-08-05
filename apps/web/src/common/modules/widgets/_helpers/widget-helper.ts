@@ -26,7 +26,7 @@ export const sortWidgetTableFields = (fields: string[]) => {
     const prioritySet = new Set(priorityFields);
 
     const priority = fields.filter((field) => prioritySet.has(field));
-    const others = fields.filter((field) => !prioritySet.has(field)).sort();
+    const others = fields.filter((field) => !prioritySet.has(field));
 
     const sortedPriority = priorityFields.filter((field) => priority.includes(field));
 
