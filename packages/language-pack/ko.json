@@ -2565,7 +2565,8 @@
 					"INVITE_TITLE": "'{workspace_name}'에 사용자 추가",
 					"REMOVE_TITLE": "다음의 사용자들을 워크스페이스로 부터 제거하시겠습니까? ",
 					"REMOVE_WORKSPACE_TITLE": "이 사용자를 워크스페이스에서 제거 하시겠습니까?",
-					"UPDATE_TITLE": "사용자 수정"
+					"UPDATE_TITLE": "사용자 수정",
+					"UPDATE_USERGROUP_TITLE": "사용자 그룹 수정"
 				},
 				"NAME": "이름",
 				"NOTIFICATION": "알림",
@@ -2585,7 +2586,8 @@
 				"TODAY": "오늘 ",
 				"USER_ID": "아이디",
 				"WORKSPACE": "워크스페이스",
-				"YESTERDAY": "어제 "
+				"YESTERDAY": "어제 ",
+				"EDIT_USERGROUP": "사용자 그룹 수정"
 			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "프로젝트 채널 삭제 실패",
@@ -2695,6 +2697,36 @@
 			"TOOLTIP_COST": "비용 리포트 기반",
 			"TOOLTIP_STATE": "휴면 설정이 활성화되면, 사용자가 정의한 임계값보다 총 비용이 낮은 워크스페이스는 자동으로 휴면 상태로 전환됩니다. 임계값은 [환경 설정 > 도메인 설정 > 휴면 정책 설정]에서 변경할 수 있습니다.",
 			"WORKSPACES": "워크스페이스"
+		},
+		"USERGROUP": {
+			"TITLE": "사용자 그룹",
+			"CREATE": "생성",
+			"MODAL": {
+				"ADD": {
+					"TITLE": "새 사용자 그룹 생성",
+					"GROUP_NAME": "사용자 그룹 이름",
+					"GROUP_NAME_PLACEHOLDER": "사용자 그룹 이름 입력",
+					"ACCESSIBLE_ROLES": "접근 가능 역할",
+					"USERS": "사용자"
+				},
+				"REMOVE": {
+					"TITLE": "사용자 그룹 삭제"
+				},
+				"ADD_USERS": {
+					"TITLE":"선택한 사용자 그룹(들)에 사용자 추가"
+				}
+			},
+			"MAIN": {
+				"EDIT": "수정",
+				"REMOVE": "삭제",
+				"ADD_USERS": "사용자 추가",
+				"TOOLBOX_PLACEHOLDER": "작업",
+				"NO_SELECTED": "사용자 그룹을 선택하면 자세한 정보를 볼 수 있습니다.",
+				"DETAIL": "상세 정보",
+				"USER": "사용자",
+				"WORKSPACE": "워크스페이스",
+				"BASE_INFORMATION": "기본 정보"
+			}
 		}
 	},
 	"IDENTITY": {

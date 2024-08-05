@@ -2565,7 +2565,8 @@
 					"INVITE_TITLE": "Invite Users to '{workspace_name}'",
 					"REMOVE_TITLE": "Are you sure you want to remove following user from this workspace?",
 					"REMOVE_WORKSPACE_TITLE": "Are you sure you want to remove this user from the workspace?",
-					"UPDATE_TITLE": "Edit User"
+					"UPDATE_TITLE": "Edit User",
+					"UPDATE_USERGROUP_TITLE": "Edit User Group"
 				},
 				"NAME": "Name",
 				"NOTIFICATION": "Notifications",
@@ -2585,7 +2586,8 @@
 				"TODAY": "Today",
 				"USER_ID": "ID",
 				"WORKSPACE": "Workspaces",
-				"YESTERDAY": "Yesterday"
+				"YESTERDAY": "Yesterday",
+				"EDIT_USERGROUP": "Edit User Group"
 			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "Failed to Delete Project Channel",
@@ -2695,6 +2697,36 @@
 			"TOOLTIP_COST": "based on Cost Report",
 			"TOOLTIP_STATE": "With ‘Dormancy Configuration’ turned on, workspaces with a total cost lower than the user-defined threshold will automatically be set to dormant. The threshold can be changed in [Preferences > Domain Settings > Auto Dormancy Configuration].",
 			"WORKSPACES": "Workspaces"
+		},
+		"USERGROUP": {
+			"TITLE": "User Group",
+			"CREATE": "Create",
+			"MODAL": {
+				"ADD": {
+					"TITLE": "Create New User Group",
+					"GROUP_NAME": "User Group Name",
+					"GROUP_NAME_PLACEHOLDER": "Enter User Group Name",
+					"ACCESSIBLE_ROLES": "Accessible Roles",
+					"USERS": "Users"
+				},
+				"REMOVE": {
+					"TITLE": "Delete User"
+				},
+				"ADD_USERS": {
+					"TITLE":"Add Users to Selected User Group(s)"
+				}
+			},
+			"MAIN": {
+				"EDIT": "Edit",
+				"REMOVE": "Delete",
+				"ADD_USERS": "Add Users",
+				"TOOLBOX_PLACEHOLDER": "Action",
+				"NO_SELECTED": "Select a user group for more details.",
+				"DETAIL": "Details",
+				"USER": "Users",
+				"WORKSPACE": "Workspaces",
+				"BASE_INFORMATION": "Base Information"
+			}
 		}
 	},
 	"IDENTITY": {

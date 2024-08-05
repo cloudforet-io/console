@@ -2565,7 +2565,8 @@
 					"INVITE_TITLE": "ユーザーを'{workspace_name}'に招待",
 					"REMOVE_TITLE": "このユーザーをこのワークスペースから削除してもよろしいですか？",
 					"REMOVE_WORKSPACE_TITLE": "このユーザーをワークスペースから削除してもよろしいですか？",
-					"UPDATE_TITLE": "ユーザーを編集"
+					"UPDATE_TITLE": "ユーザーを編集",
+					"UPDATE_USERGROUP_TITLE": "ユーザー·グループを編集"
 				},
 				"NAME": "名前",
 				"NOTIFICATION": "アラート",
@@ -2585,7 +2586,8 @@
 				"TODAY": "今日",
 				"USER_ID": "ID",
 				"WORKSPACE": "ワークスペース",
-				"YESTERDAY": "昨日"
+				"YESTERDAY": "昨日",
+				"EDIT_USERGROUP": "ユーザー·グループ編集"
 			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "プロジェクトチャンネルの削除に失敗",
@@ -2695,6 +2697,36 @@
 			"TOOLTIP_COST": "コストレポートに基づいて",
 			"TOOLTIP_STATE": "休眠設定が有効になると、ユーザーが定義した閾値よりも総コストが低いワークスペースは自動的に休眠状態に切り替えられます。閾値は[設定 > ドメイン設定 > 休眠ポリシー設定]で変更できます。",
 			"WORKSPACES": "ワークスペース"
+		},
+		"USERGROUP": {
+			"TITLE": "ユーザーグループ",
+			"CREATE": "生成",
+			"MODAL": {
+				"ADD": {
+					"TITLE": "新しいユーザーグループ作成",
+					"GROUP_NAME": "ユーザーグループ名",
+					"GROUP_NAME_PLACEHOLDER": "ユーザーグループ名入力",
+					"ACCESSIBLE_ROLES": "アクセス可能ロール",
+					"USERS": "ユーザー"
+				},
+				"REMOVE": {
+					"TITLE": "ユーザーグループ削除"
+				},
+				"ADD_USERS": {
+					"TITLE":"選択したユーザーグループにユーザーを追加"
+				}
+			},
+			"MAIN": {
+				"EDIT": "修整",
+				"REMOVE": "削除",
+				"ADD_USERS": "ユーザー追加",
+				"TOOLBOX_PLACEHOLDER": "作業",
+				"NO_SELECTED": "ユーザーグループを選択すると、詳細な情報が表示されます。",
+				"DETAIL": "詳細情報",
+				"USER": "ユーザー",
+				"WORKSPACE": "ワークスペース",
+				"BASE_INFORMATION": "基本情報"
+			}
 		}
 	},
 	"IDENTITY": {
