@@ -1550,6 +1550,17 @@
 				"NO_CHANGE": "No change"
 			},
 			"NUMBER_FIELD_VALIDATION": "The value must be {max} or less.",
+			"NUMBER_FORMAT": {
+				"AUTO": "Auto",
+				"CONFIRM": "Confirm",
+				"CUSTOM_NUMBER_FORMAT": "Custom number format",
+				"FULL_NUMBER": "Full Number",
+				"HELP": "Help",
+				"INVALID_NUMBER_FORMAT": "Invalid Number Format",
+				"NUMBER_FORMAT": "Number Format",
+				"SAMPLE": "Sample",
+				"SHORT_NUMBER": "Short Number"
+			},
 			"PERIOD": "Period",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "Account ID",
