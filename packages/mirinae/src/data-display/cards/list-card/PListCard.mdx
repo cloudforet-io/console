@@ -1,0 +1,65 @@
+{/* PListCard.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PListCardStories from './PListCard.stories';
+
+<Meta of={PListCardStories} />
+
+
+# List Card
+<br/>
+<br/>
+
+## Basic
+<Canvas of={PListCardStories.Basic} />
+
+<br/>
+<br/>
+
+## Style Types
+<Canvas of={PListCardStories.StyleTypes} />
+
+<br/>
+<br/>
+
+## Without Header
+
+<br/>
+
+If you give ```false``` to ```header``` props and don't give ```header``` slot, the header will be not displayed.<br/>
+
+<Canvas of={PListCardStories.WithoutHeader} />
+
+<br/>
+<br/>
+
+## Customize with Slots
+<Canvas of={PListCardStories.CustomizeWithSlots} />
+
+<br/>
+<br/>
+
+## Customize Loader
+<Canvas of={PListCardStories.CustomizeLoader} />
+
+<br/>
+<br/>
+
+## Customize Loader and Empty Case
+<Canvas of={PListCardStories.CustomizeLoaderAndEmptyCase} />
+
+<br/>
+<br/>
+
+## Hoverable
+<Canvas of={PListCardStories.Hoverable} />
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas of={PListCardStories.Playground} />
+<Controls of={PListCardStories.Playground} />

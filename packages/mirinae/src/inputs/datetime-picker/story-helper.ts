@@ -1,13 +1,31 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { DATA_TYPE, SELECT_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
 
-export const getDatetimePickerArtTypes = (): ArgTypes => ({
+export const getDatetimePickerArgs = (): Args => ({
+    selectedDates: [],
+    styleType: STYLE_TYPE.default,
+    invalid: false,
+    minDate: undefined,
+    maxDate: undefined,
+    selectMode: SELECT_MODE.single,
+    dataType: DATA_TYPE.yearToDate,
+    'v-model': [],
+});
+
+export const getDatetimePickerParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/adutzilcHKkGuDjayFO7YS/Console-Basic?node-id=18277%3A382149',
+    },
+});
+
+export const getDatetimePickerArgTypes = (): ArgTypes => ({
     selectedDates: {
         name: 'selectedDates',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: 'Array of selected dates, consisting of ISOString.',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'array',
@@ -22,7 +40,6 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
         name: 'styleType',
         type: { name: 'string' },
         description: 'Style type of datetime picker.',
-        defaultValue: STYLE_TYPE.default,
         table: {
             type: {
                 summary: 'string',
@@ -32,16 +49,13 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
                 summary: STYLE_TYPE.default,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(STYLE_TYPE),
-        },
+        control: 'select',
+        options: Object.keys(STYLE_TYPE),
     },
     invalid: {
         name: 'invalid',
         type: { name: 'boolean' },
         description: 'Whether to apply invalid style or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -51,15 +65,12 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     minDate: {
         name: 'minDate',
         type: { name: 'string' },
         description: '<b>[Flatpickr]</b> Specifies the minimum/earliest date. (ex. "2021-09" or "2021-09-30")',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -74,7 +85,6 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
         name: 'maxDate',
         type: { name: 'string' },
         description: '<b>[Flatpickr]</b> Specifies the maximum/latest date. (ex. "2021-10" or "2021-10-31")',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -89,7 +99,6 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
         name: 'selectMode',
         type: { name: 'string' },
         description: 'Select mode of datetime picker.',
-        defaultValue: SELECT_MODE.single,
         table: {
             type: {
                 summary: 'string',
@@ -99,16 +108,13 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
                 summary: SELECT_MODE.single,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(SELECT_MODE),
-        },
+        control: 'select',
+        options: Object.values(SELECT_MODE),
     },
     dataType: {
         name: 'dataType',
         type: { name: 'string' },
         description: 'data types of datetime picker.',
-        defaultValue: DATA_TYPE.yearToDate,
         table: {
             type: {
                 summary: 'string',
@@ -118,17 +124,14 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
                 summary: DATA_TYPE.yearToDate,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(DATA_TYPE),
-        },
+        control: 'select',
+        options: Object.values(DATA_TYPE),
     },
     //
     'v-model': {
         name: 'v-model',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: 'Two way binding for `selectedDates` props with `update:selectedDates` event.',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'array',

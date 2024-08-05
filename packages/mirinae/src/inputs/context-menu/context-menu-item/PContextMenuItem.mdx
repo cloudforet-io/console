@@ -1,0 +1,67 @@
+{/* PContextMenuItem.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PContextMenuItemStories from './PContextMenuItem.stories';
+
+<Meta of={PContextMenuItemStories} />
+
+
+# Context Menu Item
+<br/>
+<br/>
+
+## Basic
+<Canvas of={PContextMenuItemStories.Basic} />
+
+<br/>
+<br/>
+
+## Anchor Case
+<Canvas of={PContextMenuItemStories.AnchorCase} />
+
+<br/>
+<br/>
+
+## Image Icon Case
+<Canvas of={PContextMenuItemStories.ImageIconCase} />
+
+<br/>
+<br/>
+
+## Select Markers
+<Canvas of={PContextMenuItemStories.SelectMarkers} />
+
+<br/>
+<br/>
+
+
+## Highlight Term
+<Canvas of={PContextMenuItemStories.HighlightTerm} />
+
+<br/>
+<br/>
+
+
+## Slots
+
+<br/>
+<br/>
+
+### Slot Props
+
+All props will be provided with the default slot's props. <br/>
+In case of `highlightTerm` prop is given, `TextHighlighting` component's default slot's props will be merged to it. <br/>
+<Canvas of={PContextMenuItemStories.Slots} />
+
+<br/>
+<br/>
+
+
+
+## Playground
+<Canvas of={PContextMenuItemStories.Playground} />
+<Controls of={PContextMenuItemStories.Playground} />
+
+<br/>
+<br/>

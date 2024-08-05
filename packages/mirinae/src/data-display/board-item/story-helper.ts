@@ -1,16 +1,28 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 import icon from 'vue-svgicon';
 
-import {
-    standardIconActionSet,
-} from '@/data-display/board-item/mock';
+import { standardIconActionSet } from '@/data-display/board-item/mock';
+
+export const getBoardItemArgs = (): Args => ({
+    leftIcon: undefined,
+    iconButtonSets: standardIconActionSet,
+    rounded: false,
+    selected: false,
+});
+
+export const getBoardItemParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'figma url',
+    },
+});
 
 export const getBoardItemArgTypes = (): ArgTypes => ({
     leftIcon: {
         name: 'leftIcon',
         type: { name: 'string' },
         description: 'Icon name in Left Content Area.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -20,16 +32,13 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
                 summary: 'ic_refresh',
             },
         },
-        control: {
-            type: 'select',
-            options: Object.keys(icon.icons),
-        },
+        control: 'select',
+        options: Object.keys(icon.icons),
     },
     iconButtonSets: {
         name: 'iconButtonSets',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: 'Array of icon-button-set that will fit into the right overlay content area',
-        defaultValue: standardIconActionSet,
         table: {
             type: {
                 summary: 'array',
@@ -44,7 +53,6 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
         name: 'rounded',
         type: { name: 'boolean' },
         description: 'Use `border-radius` style of the card item.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -54,15 +62,12 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     selected: {
         name: 'selected',
         type: { name: 'boolean' },
         description: 'Selected style',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -72,15 +77,12 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     // slots
     contentSlot: {
         name: 'content',
         description: 'Slot for main contents',
-        defaultValue: 'Board Item Main Content',
         table: {
             type: {
                 summary: null,
@@ -92,7 +94,6 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
     leftContentSlot: {
         name: 'leftContent',
         description: 'Slot to replace left icon',
-        defaultValue: 'Board Item Left Content',
         table: {
             type: {
                 summary: null,
@@ -104,7 +105,6 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
     customRightContentSlot: {
         name: 'customRightContentSlot',
         description: 'Slot to replace right-icon-button-content to custom content',
-        defaultValue: 'Board Item Custom Right Content',
         table: {
             type: {
                 summary: null,
@@ -113,4 +113,9 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
             defaultValue: 'Board Item Custom Right Content',
         },
     },
+    // default
+    'left-content': { table: { disable: true } },
+    content: { table: { disable: true } },
+    'overlay-content': { table: { disable: true } },
+    'custom-right-content': { table: { disable: true } },
 });
