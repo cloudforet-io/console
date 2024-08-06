@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
 import { isEqual } from 'lodash';
@@ -60,6 +60,7 @@ const storeState = reactive({
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
     selectedDataTable: computed(() => widgetGenerateStore.getters.selectedDataTable),
     dataTables: computed(() => widgetGenerateState.dataTables),
+    allDataTableInvalidMap: computed(() => widgetGenerateState.allDataTableInvalidMap),
 });
 
 const state = reactive({
@@ -344,6 +345,19 @@ watch([() => advancedOptionsState.selectedTimeDiff, () => advancedOptionsState.s
     } else if (date) {
         state.dataFieldName = `${defaultFieldName} (- ${date} ${timediffOptions[timediff]})`;
     }
+});
+
+// Validation
+watch(() => validationState.dataTableApplyInvalid, (invalid) => {
+    const _allDataTableInvalidMap = {
+        ...storeState.allDataTableInvalidMap,
+        [state.dataTableId]: invalid,
+    };
+    widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
+}, { immediate: true });
+
+defineExpose({
+    updateDataTable,
 });
 
 </script>

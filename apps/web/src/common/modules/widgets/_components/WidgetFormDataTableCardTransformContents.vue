@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, defineExpose, onMounted, reactive, watch,
+} from 'vue';
 
 import { intersection, isEqual } from 'lodash';
 
@@ -46,6 +48,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
+    allDataTableInvalidMap: computed(() => widgetGenerateState.allDataTableInvalidMap),
 });
 
 const state = reactive({
@@ -246,6 +249,19 @@ const setInitialDataTableForm = () => {
 onMounted(() => {
     // Initial Form Setting
     setInitialDataTableForm();
+});
+
+// Validation
+watch(() => state.applyDisabled, (invalid) => {
+    const _allDataTableInvalidMap = {
+        ...storeState.allDataTableInvalidMap,
+        [state.dataTableId]: invalid,
+    };
+    widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
+}, { immediate: true });
+
+defineExpose({
+    updateDataTable,
 });
 
 </script>

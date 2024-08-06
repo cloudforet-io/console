@@ -63,6 +63,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         dataTableUpdating: false,
         dataTableLoadLoading: false,
         joinRestrictedMap: {} as JoinRestrictedMap, // Flag for handling Join type EXCEPTION RESTRICTION cases. (duplicated data field). Example - { '{dataTalbeId}': true, }
+        allDataTableInvalidMap: {} as Record<string, boolean>, // Flag for handling all data table invalid cases. Example - { '{dataTalbeId}': true, }
     });
 
     const getters = reactive({
@@ -74,6 +75,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             return widgetValidMapValues.every((valid) => valid);
         }),
         widgetState: computed<WidgetState|undefined>(() => state.widget?.state),
+        allDataTableInvalid: computed<boolean>(() => Object.values(state.allDataTableInvalidMap).some((invalid) => invalid)),
     });
 
     /* Mutations */
@@ -116,6 +118,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setJoinRestrictedMap = (value: JoinRestrictedMap) => {
         state.joinRestrictedMap = value;
     };
+    const setAllDataTableInvalidMap = (value: Record<string, boolean>) => {
+        state.allDataTableInvalidMap = value;
+    };
 
     const mutations = {
         setWidgetId,
@@ -131,6 +136,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setSelectedPreviewGranularity,
         setDataTableUpdating,
         setJoinRestrictedMap,
+        setAllDataTableInvalidMap,
     };
     const actions = {
         listDataTable: async () => {
