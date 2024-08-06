@@ -36,13 +36,17 @@ watch([() => state.proxyValue, () => sliderRef.value], ([val, _sliderRef]) => {
 
 <template>
     <div class="p-slider">
-        <input ref="sliderRef"
-               v-model="state.proxyValue"
-               type="range"
-               :min="props.min"
-               :max="props.max"
-               class="custom-slider"
-        >
+        <div class="slider-wrapper">
+            <input ref="sliderRef"
+                   v-model="state.proxyValue"
+                   type="range"
+                   :min="props.min"
+                   :max="props.max"
+                   class="custom-slider"
+            >
+            <span class="bottom-text min">{{ props.min }}</span>
+            <span class="bottom-text max">{{ props.max }}</span>
+        </div>
         <p-text-input v-if="props.showInput"
                       v-model="state.proxyValue"
                       type="number"
@@ -56,11 +60,26 @@ watch([() => state.proxyValue, () => sliderRef.value], ([val, _sliderRef]) => {
     display: flex;
     gap: 0.5rem;
 
-    .custom-slider {
+    .slider-wrapper {
+        position: relative;
         display: inline-block;
         width: 100%;
+        .custom-slider {
+            width: 100%;
 
-        --trackHeight: 0.25rem;
+            --trackHeight: 0.25rem;
+        }
+        .bottom-text {
+            @apply text-label-md;
+            position: absolute;
+            top: 1rem;
+            &.min {
+                left: 0;
+            }
+            &.max {
+                right: 0;
+            }
+        }
     }
 
     /* style the input element with type "range" */
