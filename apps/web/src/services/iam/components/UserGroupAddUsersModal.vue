@@ -2,17 +2,17 @@
 import { computed, reactive } from 'vue';
 
 import { PButtonModal, PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
-
 
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageGetters = userGroupPageStore.getters;
 const userGroupPageState = userGroupPageStore.state;
 
 const state = reactive({
-    menu: computed(() => userGroupPageGetters.selectedUsers.map(({ user_id, name }) => ({
+    menu: computed<SelectDropdownMenuItem[]>(() => userGroupPageGetters.selectedUsers.map(({ user_id, name }) => ({
         name: user_id,
         label: name,
         type: 'item',

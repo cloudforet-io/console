@@ -18,6 +18,10 @@ interface Props {
     tableHeight: number;
 }
 
+const props = withDefaults(defineProps<Props>(), {
+    tableHeight: 400,
+});
+
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
@@ -60,10 +64,6 @@ const tableState = reactive({
     }),
 });
 
-const props = withDefaults(defineProps<Props>(), {
-    tableHeight: 400,
-});
-
 const handleSelect = async (index: number[]) => {
     userGroupPageStore.$patch((_state) => { _state.state.selectedIndices = index; });
 };
@@ -74,18 +74,17 @@ const handleChange = async (options: any = {}) => {
     // page 개수 정할시 options = { pageLimit: 30 }
     userGroupListApiQuery = getApiQueryWithToolboxOptions(userGroupListApiQueryHelper, options) ?? userGroupListApiQuery;
 
-    // 이 코드의 존재 이유 페이지네이션 관련 상태는 userGrioListApiQuery에서 관리되고 다른 곳에서도 userGroupPageStore의 페이지네이션 상태는 사용되지 않는다.
-    // if (options.queryTags !== undefined) {
-    //     userGroupPageStore.$patch((_state) => {
-    //         _state.searchFilters = userGroupListApiQueryHelper.filters;
-    //     });
-    // }
-    // if (options.pageStart !== undefined) userGroupPageStore.$patch({ pageStart: options.pageStart });
-    // if (options.pageLimit !== undefined) userGroupPageStore.$patch({ pageLimit: options.pageLimit });
+    // 모달에서 confirm버튼을 눌렀을 경우 저장된 페이지네이션 상태의 값들로 유저 리스트 정보를 다시 조회하기 때문에 필요한 코드
+    if (options.queryTags !== undefined) {
+        userGroupPageStore.$patch((_state) => {
+            _state.state.searchFilters = userGroupListApiQueryHelper.filters;
+        });
+    }
+    if (options.pageStart !== undefined) userGroupPageStore.$patch((_state) => { _state.state.pageStart = options.pageStart; });
+    if (options.pageLimit !== undefined) userGroupPageStore.$patch((_state) => { _state.state.pageLimit = options.pageLimit; });
 
     await userGroupPageStore.listUsers({ query: userGroupListApiQuery });
 };
-
 </script>
 
 <template>

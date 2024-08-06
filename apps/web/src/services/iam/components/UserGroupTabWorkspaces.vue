@@ -13,6 +13,7 @@ const state = reactive({
         { name: 'state', label: 'State', sortable: false },
     ])),
     data: computed(() => ([{
+        // TODO: 임시데이터, API 개발 완료시 수정 필요
         user_id: 'user01@spaceone.org',
         name: 'User01',
         state: 'Enabled',

@@ -16,6 +16,7 @@ const state = reactive({
     loading: false,
     groupName: '',
     accessibleRoles: [],
+    // TODO: 임시데이터, API 개발 완료시 수정 필요
     userMenuItems: [
         {
             name: 'bded132f-5ada-4329-95c8-c20f837c7344',

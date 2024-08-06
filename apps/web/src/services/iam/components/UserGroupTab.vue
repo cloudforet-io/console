@@ -54,7 +54,7 @@ const multiItemTabState = reactive({
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #detail>
-                유저 그룹들
+                <!-- TODO: 디자인 시안 나오면 변경 필요 -->
             </template>
         </p-tab>
         <div v-else
