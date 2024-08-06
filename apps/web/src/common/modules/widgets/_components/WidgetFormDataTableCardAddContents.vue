@@ -38,13 +38,16 @@ import {
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { AdditionalLabel, DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    AdditionalLabels, DateFormat, DataTableAddOptions, DataTableTransformOptions,
+    AdditionalLabels, DateFormat, DataTableAddOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 interface Props {
     selected: boolean;
     item: PublicDataTableModel|PrivateDataTableModel;
 }
+
+type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
+
 const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
@@ -183,6 +186,54 @@ const modalState = reactive({
 });
 
 
+const updateDataTable = async (): Promise<DataTableModel|undefined> => {
+    if (!state.dataFieldName.length) {
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
+        return undefined;
+    }
+
+    const additionalLabelsRequest = {} as AdditionalLabels;
+    advancedOptionsState.additionalLabels.filter((label) => label.name.length && label.value.length).forEach((label) => {
+        additionalLabelsRequest[label.name] = label.value;
+    });
+    const domainOptions = state.sourceType === DATA_SOURCE_DOMAIN.COST
+        ? { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem }
+        : { metric_id: state.selectedSourceEndItem };
+
+    const costGroupBy = state.selectedGroupByItems.map((group) => ({
+        key: group.name,
+        name: group.label,
+    }));
+    const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
+    const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
+    const groupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
+    const dataTableApiQueryHelper = new ApiQueryHelper();
+    dataTableApiQueryHelper.setFilters(state.consoleFilters);
+
+    const updateParams: DataTableUpdateParameters = {
+        data_table_id: state.dataTableId,
+        options: {
+            [state.sourceType]: domainOptions,
+            group_by: groupBy,
+            filter: dataTableApiQueryHelper.data.filter,
+            data_name: state.dataFieldName,
+            data_unit: state.dataUnit,
+            additional_labels: additionalLabelsRequest,
+            date_format: (advancedOptionsState.separateDate ? 'SEPARATE' : 'SINGLE') as DateFormat,
+            timediff: advancedOptionsState.selectedTimeDiff !== 'none' && Number(advancedOptionsState.selectedTimeDiffDate)
+                ? { [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate) }
+                : undefined,
+        },
+    };
+    const result = await widgetGenerateStore.updateDataTable(updateParams);
+
+    if (result) {
+        setInitialDataTableForm();
+        state.filterFormKey = getRandomId();
+    }
+
+    return result;
+};
 
 /* Events */
 const handleSelectSourceItem = (selectedItem: string) => {
@@ -233,80 +284,13 @@ const handleCancelModal = () => {
     modalState.visible = false;
 };
 const handleUpdateDataTable = async () => {
-    if (!state.dataFieldName.length) {
-        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
-        return;
+    const result = await updateDataTable();
+    if (result) {
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
+        widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
+        widgetGenerateStore.setDataTableUpdating(true);
+        await widgetGenerateStore.loadDataTable({});
     }
-    const additionalLabelsRequest = {} as AdditionalLabels;
-    advancedOptionsState.additionalLabels.filter((label) => label.name.length && label.value.length).forEach((label) => {
-        additionalLabelsRequest[label.name] = label.value;
-    });
-    const domainOptions = state.sourceType === DATA_SOURCE_DOMAIN.COST
-        ? { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem }
-        : { metric_id: state.selectedSourceEndItem };
-
-    const costGroupBy = state.selectedGroupByItems.map((group) => ({
-        key: group.name,
-        name: group.label,
-    }));
-    const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
-    const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
-    const groupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
-    const dataTableApiQueryHelper = new ApiQueryHelper();
-    dataTableApiQueryHelper.setFilters(state.consoleFilters);
-
-    const updateParams: DataTableUpdateParameters = {
-        data_table_id: state.dataTableId,
-        options: {
-            [state.sourceType]: domainOptions,
-            group_by: groupBy,
-            filter: dataTableApiQueryHelper.data.filter,
-            data_name: state.dataFieldName,
-            data_unit: state.dataUnit,
-            additional_labels: additionalLabelsRequest,
-            date_format: (advancedOptionsState.separateDate ? 'SEPARATE' : 'SINGLE') as DateFormat,
-            timediff: advancedOptionsState.selectedTimeDiff !== 'none' && Number(advancedOptionsState.selectedTimeDiffDate)
-                ? { [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate) }
-                : undefined,
-        },
-    };
-    await widgetGenerateStore.updateDataTable(updateParams);
-    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
-    widgetGenerateStore.setDataTableUpdating(true);
-    await widgetGenerateStore.loadDataTable({
-        data_table_id: state.dataTableId,
-    });
-
-    // Update Referenced Transformed DataTable
-    const referencedDataTableIds = [] as string[];
-    storeState.dataTables.forEach((dataTable) => {
-        const transformDataTalbeOptions = dataTable.options as DataTableTransformOptions;
-        const isReferenced = dataTable.data_type === 'TRANSFORMED'
-            && !dataTable?.data_table_id?.startsWith('UNSAVED-')
-            && (
-                transformDataTalbeOptions?.JOIN?.data_tables?.includes(state.dataTableId)
-                || transformDataTalbeOptions?.CONCAT?.data_tables?.includes(state.dataTableId)
-                || transformDataTalbeOptions?.QUERY?.data_table_id === state.dataTableId
-                || transformDataTalbeOptions?.EVAL?.data_table_id === state.dataTableId
-            );
-        if (isReferenced) referencedDataTableIds.push(dataTable.data_table_id as string);
-    });
-    if (referencedDataTableIds.length) {
-        await Promise.all(referencedDataTableIds.map((dataTableId) => {
-            const dataTable = storeState.dataTables.find((_dataTable) => _dataTable.data_table_id === dataTableId) as PublicDataTableModel|PrivateDataTableModel;
-            widgetGenerateStore.updateDataTable({
-                data_table_id: dataTable.data_table_id,
-                name: dataTable.name,
-                options: {
-                    ...dataTable.options,
-                },
-            });
-            return null;
-        }));
-    }
-
-    setInitialDataTableForm();
-    state.filterFormKey = getRandomId();
 };
 
 /* Utils */
