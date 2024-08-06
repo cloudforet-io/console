@@ -43,20 +43,20 @@ const state = reactive({
         const lastMonth = dayjs().utc().subtract(1, 'month').format('YYYY-MM');
         const currentMonth = dayjs().utc().format('YYYY-MM');
         const currentMarkArea = {
-            gt: state.chartDateData.indexOf(currentMonth) - 1,
-            lte: state.chartDateData.indexOf(currentMonth),
+            gt: state.chartDateData.indexOf(currentMonth) - 1 || 0,
+            lte: state.chartDateData.indexOf(currentMonth) || 0,
             color: blue[500],
         };
         const lastMonthData = state.chartData.find((i) => i.date === lastMonth);
         if (lastMonthData && !lastMonthData?.is_confirmed) {
             return [
                 {
-                    lte: state.chartDateData.indexOf(lastMonth),
+                    lte: state.chartDateData.indexOf(lastMonth) - 1,
                     color: green[700],
                 },
                 {
-                    gt: state.chartDateData.indexOf(lastMonth),
-                    lte: state.chartDateData.indexOf(currentMonth) - 1,
+                    gt: state.chartDateData.indexOf(lastMonth) - 1,
+                    lte: state.chartDateData.indexOf(lastMonth),
                     color: coral[400],
                 },
                 currentMarkArea,
@@ -64,7 +64,7 @@ const state = reactive({
         }
         return [
             {
-                lte: state.chartDateData.indexOf(currentMonth) - 1,
+                lte: state.chartDateData.indexOf(currentMonth) - 1 || 0,
                 color: green[700],
             },
             currentMarkArea,
