@@ -1501,6 +1501,10 @@
 			},
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
+			"DISPLAY_ANNOTATION": {
+				"DISPLAY_ANNOTATION": "Display Annotation",
+				"INVALID_VALUE": "Please enter annotation."
+			},
 			"DONE": "Done",
 			"DONUT": "Donut",
 			"EDIT": "Edit",

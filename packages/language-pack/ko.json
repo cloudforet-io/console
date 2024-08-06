@@ -1501,6 +1501,10 @@
 			},
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
+			"DISPLAY_ANNOTATION": {
+				"DISPLAY_ANNOTATION": "",
+				"INVALID_VALUE": ""
+			},
 			"DONE": "완료",
 			"DONUT": "",
 			"EDIT": "편집",
