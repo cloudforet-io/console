@@ -1,11 +1,29 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
+export const getLazyImgArgs = (): Args => ({
+    height: '2rem',
+    width: '2rem',
+    src: '',
+    errorIcon: 'ic_resource_hexagon',
+    errorIconColor: '',
+    loading: undefined,
+    alt: undefined,
+    preloaderSlot: null,
+    errorSlot: null,
+});
+
+export const getLazyImgParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A133538',
+    },
+});
 
 export const getLazyImgArgTypes = (): ArgTypes => ({
     height: {
         name: 'height',
         type: { name: 'string' },
         description: 'Height of image',
-        defaultValue: '2rem',
         table: {
             type: {
                 summary: 'string',
@@ -15,15 +33,12 @@ export const getLazyImgArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     width: {
         name: 'width',
         type: { name: 'string' },
         description: 'Height of image',
-        defaultValue: '2rem',
         table: {
             type: {
                 summary: 'string',
@@ -33,15 +48,12 @@ export const getLazyImgArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     src: {
         name: 'src',
         type: { name: 'string' },
         description: 'Source of image',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'string',
@@ -51,15 +63,12 @@ export const getLazyImgArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     errorIcon: {
         name: 'errorIcon',
         type: { name: 'string' },
         description: 'Alternative icon name when failed to load image. Refer to Icon component.',
-        defaultValue: 'ic_resource_hexagon',
         table: {
             type: {
                 summary: 'string',
@@ -69,15 +78,12 @@ export const getLazyImgArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     errorIconColor: {
         name: 'errorIconColor',
         type: { name: 'string' },
         description: 'Alternative icon\'s color.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'string',
@@ -87,15 +93,12 @@ export const getLazyImgArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     loading: {
         name: 'loading',
         type: { name: 'boolean' },
         description: 'Manual loading controller. If it\'s not given, it works automatically.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'boolean',
@@ -105,15 +108,12 @@ export const getLazyImgArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     alt: {
         name: 'alt',
         type: { name: 'string' },
         description: 'alt attribute of image tag.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -123,15 +123,12 @@ export const getLazyImgArgTypes = (): ArgTypes => ({
             },
             category: 'props',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* slots */
     preloaderSlot: {
         name: 'preloader',
         description: 'Slot for image loader',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -146,7 +143,6 @@ export const getLazyImgArgTypes = (): ArgTypes => ({
     errorSlot: {
         name: 'error',
         description: 'Slot for error icon',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -158,4 +154,7 @@ export const getLazyImgArgTypes = (): ArgTypes => ({
         },
         control: null,
     },
+    // default
+    error: { table: { disable: true } },
+    preloader: { table: { disable: true } },
 });

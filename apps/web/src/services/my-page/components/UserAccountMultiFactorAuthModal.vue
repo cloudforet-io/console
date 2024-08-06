@@ -41,7 +41,6 @@ const state = reactive({
     loading: false,
     data: {} as UserListItemType,
     userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
     isCollapsed: true,
     isSentCode: false,
     isNextStep: false,

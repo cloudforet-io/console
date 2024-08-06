@@ -24,9 +24,9 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useDomainStore } from '@/store/domain/domain-store';
 
 import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
@@ -36,6 +36,7 @@ import IDPWSignIn from '@/services/auth/authenticator/local/template/ID_PW.vue';
 import SignInRightContainer from '@/services/auth/components/SignInRightContainer.vue';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+
 
 interface Props {
     previousPath?: string;
@@ -48,16 +49,16 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const domainStore = useDomainStore();
 
 const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
-    authType: computed(() => store.state.domain.extendedAuthType),
     beforeUser: store.state.user.userId,
     component: computed(() => {
         let component;
-        const auth = state.authType;
+        const auth = domainStore.state.extendedAuthType;
         if (auth) {
             try {
                 component = () => import(`../authenticator/external/${auth}/template/${auth}.vue`);

@@ -1654,6 +1654,7 @@
 				"TITLE": "Trusted Advisor"
 			},
 			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget",
+			"VIEW_FULL_DATA": "View full data",
 			"WIDGET_TITLE_REQUIRED": "Please enter widget title."
 		}
 	},
@@ -2067,6 +2068,8 @@
 					"COLOR_SCHEMA": "Color Schema",
 					"DATA_FIELD": "Data Field",
 					"DATA_TABLE": "Data Table",
+					"DATE_FORMAT": "Date Format",
+					"DATE_FORMAT_AUTO_DISPLAY": "Auto display by granularity",
 					"DESCRIPTION": "Description",
 					"DYNAMIC_FIELD": "Dynamic Field",
 					"EDIT_DATA": "Edit Data",
@@ -2187,8 +2190,13 @@
 		"CONFIG_RECENT_TITLE": "Recent Visits",
 		"CONFIG_STARRED_ALL": "All",
 		"CONFIG_STARRED_TITLE": "Starred",
+		"COST_SUMMARY_AGGREGATING": "Aggregating",
 		"COST_SUMMARY_BY_PROJECT": "by Project",
+		"COST_SUMMARY_CONFIRM": "Confirm",
+		"COST_SUMMARY_CURRENT_TOTAL_COST": "Current Month-to-Date Cost",
+		"COST_SUMMARY_DESC": "The costs above may differ from the costs in the report.",
 		"COST_SUMMARY_GO_TO_REPORT": "Go to Cost Report",
+		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "Last Month Total Cost",
 		"COST_SUMMARY_RECENT": "Recent Cost Report for {date}",
 		"COST_SUMMARY_TITLE": "Cost Summary",
 		"COST_SUMMARY_TOTAL_SPEND": "Last Month Total Spend:",
@@ -2489,6 +2497,7 @@
 				"EMAIL_INVALID": "Invalid e-mail format.",
 				"GENERATE": "Generate",
 				"GENERATE_PLACEHOLDER": "Generate or Enter Password",
+				"ID_INVALID": "Invalid ID format",
 				"MEMBER": "Member",
 				"NAME": "Name",
 				"NAME_VALID": "You can use this ID",

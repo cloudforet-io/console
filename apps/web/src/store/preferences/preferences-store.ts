@@ -10,7 +10,7 @@ import type { DomainConfigListParameters } from '@/schema/config/domain-config/a
 import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config/api-verbs/update';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
-import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
+import { DOMAIN_CONFIG_TYPE } from '@/store/domain/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

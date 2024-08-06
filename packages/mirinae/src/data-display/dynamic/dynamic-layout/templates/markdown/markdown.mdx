@@ -1,0 +1,26 @@
+{/* markdown.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as markdownStories from './markdown.stories';
+
+<Meta of={markdownStories} />
+
+# Markdown Type
+<br/>
+<br/>
+
+## With Data
+
+<Canvas of={markdownStories.WithData} />
+
+## With Language
+<Canvas of={markdownStories.WithLanguage} />
+
+
+## Playground
+<Canvas of={markdownStories.Playground} />
+<Controls of={markdownStories.Playground} />
+
+<br/>
+<br/>

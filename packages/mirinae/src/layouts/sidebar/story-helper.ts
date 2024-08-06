@@ -1,14 +1,34 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { STYLE_TYPE as SIDEBAR_STYLE_TYPE, SIZE as SIDEBAR_SIZE } from '@/layouts/sidebar/type';
 
+
+export const getSidebarArgs = (): Args => ({
+    visible: false,
+    title: 'Title',
+    styleType: SIDEBAR_STYLE_TYPE.primary,
+    size: SIDEBAR_SIZE.md,
+    isFixedSize: false,
+    hideCloseButton: false,
+    'v-model': false,
+    titleSlot: null,
+    default: null,
+    sidebar: null,
+    footerSlot: null,
+});
+
+export const getSidebarParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6980%3A163443',
+    },
+});
 
 export const getSidebarArgTypes = (): ArgTypes => ({
     visible: {
         name: 'visible',
         type: { name: 'boolean', required: true },
         description: 'Switch props for show or hide a sidebar.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -18,15 +38,12 @@ export const getSidebarArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     title: {
         name: 'title',
         type: { name: 'string' },
         description: 'Sidebar title',
-        defaultValue: 'Title',
         table: {
             type: {
                 summary: 'string',
@@ -36,15 +53,12 @@ export const getSidebarArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     styleType: {
         name: 'styleType',
         type: { name: 'string' },
         description: 'sidebar style',
-        defaultValue: SIDEBAR_STYLE_TYPE.primary,
         table: {
             type: {
                 summary: 'string',
@@ -54,16 +68,13 @@ export const getSidebarArgTypes = (): ArgTypes => ({
                 summary: SIDEBAR_STYLE_TYPE.primary,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(SIDEBAR_STYLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(SIDEBAR_STYLE_TYPE),
     },
     size: {
         name: 'size',
         type: { name: 'string' },
         description: 'Sidebar size',
-        defaultValue: SIDEBAR_SIZE.md,
         table: {
             type: {
                 summary: 'string',
@@ -73,16 +84,13 @@ export const getSidebarArgTypes = (): ArgTypes => ({
                 summary: SIDEBAR_SIZE.md,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(SIDEBAR_SIZE),
-        },
+        control: 'select',
+        options: Object.values(SIDEBAR_SIZE),
     },
     isFixedSize: {
         name: 'isFixedSize',
         type: { name: 'boolean' },
         description: 'Whether or not sidebar size is fixed',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -92,15 +100,12 @@ export const getSidebarArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     hideCloseButton: {
         name: 'hideCloseButton',
         type: { name: 'boolean' },
         description: 'Show close button or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -110,15 +115,12 @@ export const getSidebarArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     'v-model': {
         name: 'v-model',
         type: { name: 'boolean', required: false },
         description: 'Two way binding for `visible` props with `update:visible` event.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -134,7 +136,6 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     titleSlot: {
         name: 'title',
         description: 'Slot for title with HTML',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -148,7 +149,6 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     default: {
         name: 'default',
         description: 'Slot for non-sidebar contents',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -162,7 +162,6 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     sidebar: {
         name: 'sidebar',
         description: 'Slot for contents of side bar body',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -176,7 +175,6 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     footerSlot: {
         name: 'footer',
         description: 'Slot for bottom of the content.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -201,4 +199,6 @@ export const getSidebarArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    footer: { table: { disable: true } },
 });

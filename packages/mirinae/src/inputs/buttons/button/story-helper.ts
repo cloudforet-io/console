@@ -1,14 +1,34 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 import icon from 'vue-svgicon';
 
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
+
+export const getButtonArgs = (): Args => ({
+    styleType: BUTTON_STYLE.primary,
+    size: 'md',
+    href: 'https://cloudforet.io',
+    disabled: false,
+    readonly: false,
+    loading: false,
+    block: false,
+    iconLeft: null,
+    iconRight: null,
+    default: 'button',
+    handleClick: "() => console.log('click')",
+});
+
+export const getButtonParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5152%3A122457',
+    },
+});
 
 export const getButtonArgTypes = (): ArgTypes => ({
     styleType: {
         name: 'styleType',
         type: { name: 'string' },
         description: 'Button style',
-        defaultValue: BUTTON_STYLE.primary,
         table: {
             type: {
                 summary: 'string',
@@ -18,16 +38,13 @@ export const getButtonArgTypes = (): ArgTypes => ({
                 summary: BUTTON_STYLE.primary,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(BUTTON_STYLE),
-        },
+        control: 'select',
+        options: Object.values(BUTTON_STYLE),
     },
     size: {
         name: 'size',
-        type: { name: ' string' },
+        type: { name: 'string' },
         description: 'Button size',
-        defaultValue: 'md',
         table: {
             type: {
                 summary: 'string',
@@ -37,16 +54,13 @@ export const getButtonArgTypes = (): ArgTypes => ({
                 summary: 'md',
             },
         },
-        control: {
-            type: 'select',
-            options: ['md', 'sm', 'lg'],
-        },
+        control: 'select',
+        options: ['md', 'sm', 'lg'],
     },
     href: {
         name: 'href',
         type: { name: 'string' },
         description: 'Href of button',
-        defaultValue: 'https://cloudforet.io',
         table: {
             type: {
                 summary: 'string',
@@ -56,15 +70,12 @@ export const getButtonArgTypes = (): ArgTypes => ({
                 summary: 'null',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     disabled: {
         name: 'disabled',
         type: { name: 'boolean' },
         description: 'Disabled when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -74,15 +85,12 @@ export const getButtonArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     readonly: {
         name: 'readonly',
         type: { name: 'boolean' },
         description: 'Whether to make readonly or not',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -92,15 +100,12 @@ export const getButtonArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     loading: {
         name: 'loading',
         type: { name: 'boolean' },
         description: 'Loading when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -110,15 +115,12 @@ export const getButtonArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     block: {
         name: 'block',
         type: { name: 'boolean' },
         description: 'Width became 100% when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -128,15 +130,12 @@ export const getButtonArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     iconLeft: {
         name: 'iconLeft',
         type: { name: 'string' },
         description: 'Name of icon to the left of the text.',
-        defaultValue: null,
         table: {
             type: {
                 summary: 'string',
@@ -146,16 +145,13 @@ export const getButtonArgTypes = (): ArgTypes => ({
                 summary: 'null',
             },
         },
-        control: {
-            type: 'select',
-            options: [null, ...Object.keys(icon.icons)],
-        },
+        control: 'select',
+        options: [null, ...Object.keys(icon.icons)],
     },
     iconRight: {
         name: 'iconRight',
         type: { name: 'string' },
         description: 'Name of icon to the right of the text.',
-        defaultValue: null,
         table: {
             type: {
                 summary: 'string',
@@ -165,41 +161,33 @@ export const getButtonArgTypes = (): ArgTypes => ({
                 summary: 'null',
             },
         },
-        control: {
-            type: 'select',
-            options: [null, ...Object.keys(icon.icons)],
-        },
+        control: 'select',
+        options: [null, ...Object.keys(icon.icons)],
     },
     // slots
     default: {
         name: 'default',
         type: { name: 'string' },
         description: 'Slot for contents of button',
-        defaultValue: 'button',
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     // events
     handleClick: {
         name: 'click',
         type: { name: 'function' },
         description: 'Click function',
-        defaultValue: "()=>{console.log('click')}",
         table: {
             type: {
                 summary: null,
             },
             category: 'event',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
 });

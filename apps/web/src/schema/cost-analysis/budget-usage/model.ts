@@ -1,6 +1,6 @@
 import type { ResourceGroupType } from '@/schema/_common/type';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 
 
 interface ProviderFilter {

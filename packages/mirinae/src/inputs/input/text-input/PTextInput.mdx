@@ -1,0 +1,121 @@
+{/* PTextInput.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PTextInputStories from './PTextInput.stories';
+
+<Meta of={PTextInputStories} />
+
+
+
+# Text Input
+<br/>
+<br/>
+
+## Basic
+<Canvas of={PTextInputStories.Basic} />
+
+<br/>
+<br/>
+
+## Autocomplete
+<Canvas of={PTextInputStories.Autocomplete} />
+
+<br/>
+<br/>
+
+## Multi Input Duplicate Checks
+
+If there are duplicated items in `selected`, It shows invalid style to the duplicated tags. <br/>
+It does not perform duplicate checks on `item.label`. <br/>
+Please note that only `item.name` is checked for duplicates. <br/>
+If you want to get the result of duplicate check, use `update` event. <br/>
+`update` event's first argument is updated `selected` and the second argument is `boolean` which indicates is valid(no duplicated items) or not. <br/>
+<Canvas of={PTextInputStories.MultiInputDuplicateChecks} />
+
+<br/>
+<br/>
+
+## Autocomplete with Page Size
+When using the `handler` prop, the first argument of the handler is the input text, the second argument is the pageStart value, and the third argument is the pageLimit. <br/>
+pageStart and pageLimit are calculated based on the value given to the `pageSize` prop. <br/>
+
+For example, if `pageSize` is 5, pageStart is initially given 1 and pageLimit is given 5. <br/>
+If the value of more in the result of executing the handler is true, the show more button is displayed. <br/>
+When the user presses the show more button, the handler runs again. <br/>
+At this time, 6 is given as the value of the pageStart argument and 10 is given as the value of the pageLimit argument. <br/>
+<Canvas of={PTextInputStories.AutocompletewithPageSize} />
+
+<br/>
+<br/>
+
+
+## Placeholder
+<Canvas of={PTextInputStories.Placeholder} />
+
+<br/>
+<br/>
+
+
+## Number Type
+<Canvas of={PTextInputStories.NumberType} />
+
+<br/>
+<br/>
+
+
+## Password Type
+<Canvas of={PTextInputStories.PasswordType} />
+
+<br/>
+<br/>
+
+## Appearance Type
+<Canvas of={PTextInputStories.AppearanceType} />
+
+<br/>
+<br/>
+
+## Disabled
+<Canvas of={PTextInputStories.Disabled} />
+
+<br/>
+<br/>
+
+
+## Block & Multi Input
+<Canvas of={PTextInputStories.BlockAndMultiInput} />
+
+<br/>
+<br/>
+
+## Invalid
+<Canvas of={PTextInputStories.Invalid} />
+
+<br/>
+<br/>
+
+## Form
+<Canvas of={PTextInputStories.Form} />
+
+<br/>
+<br/>
+
+## Slots
+<Canvas of={PTextInputStories.Slots} />
+
+<br/>
+<br/>
+
+## Input Attributes
+<Canvas of={PTextInputStories.InputAttributes} />
+
+<br/>
+<br/>
+
+## Size
+<Canvas of={PTextInputStories.Size} />
+
+## Playground
+<Canvas of={PTextInputStories.Playground} />
+<Controls of={PTextInputStories.Playground} />

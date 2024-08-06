@@ -7,7 +7,7 @@ import bytes from 'bytes';
 
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 

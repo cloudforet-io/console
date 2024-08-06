@@ -264,6 +264,7 @@ onMounted(() => {
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
                                :value="widgetGenerateState.widgetFormValueMap[fieldName]"
                                :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
+                               :widget-config="state.widgetConfig"
                                @update:value="handleUpdateFieldValue(fieldName, $event)"
                                @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
                                @show-error-modal="handleShowErrorModal"
@@ -296,6 +297,7 @@ onMounted(() => {
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
                                :value="widgetGenerateState.widgetFormValueMap[fieldName]"
                                :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
+                               :widget-config="state.widgetConfig"
                                @update:value="handleUpdateFieldValue(fieldName, $event)"
                                @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
                     />

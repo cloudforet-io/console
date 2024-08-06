@@ -1,0 +1,121 @@
+{/* PDefinitionTable.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PDefinitionTableStories from './PDefinitionTable.stories';
+
+<Meta of={PDefinitionTableStories} />
+
+# Definition Table
+
+<br/>
+<br/>
+<br/>
+
+It uses the [Definition component](?path=/docs/data-display-tables-definition-table-definition--basic) internally. <br/>
+`fields` props is an array of objects whose properties are the set of definition component's props. <br/>
+
+## Basic
+<Canvas of={PDefinitionTableStories.Basic} />
+
+## No Data
+<Canvas of={PDefinitionTableStories.NoData} />
+
+## Loading
+<Canvas of={PDefinitionTableStories.Loading} />
+
+## Slots
+
+| Slot name | Description |
+| ---- | ----------- |
+| data | Slot for all definition field value. It has the highest priority among field value slots. |
+| data-\{field index\} | Slot for definition field value that matched for the field index. It has the second highest priority among field value slots. |
+| data-\{field.name\} | Slot for definition field value. Use it only when all field names are distinct. Otherwise, it can cause unexpected error. It's useful when field names are duplicated. * Don't use 'data-\{field.name\}' slot together. It can cause multiple definition field. It has the lowest priority among field value slots. |
+| key | Slot for replacing field key text. |
+| extra | Slot for right space of field value. |
+| loading | Slot for replacing loader. |
+| no-data | Slot for no data case. |
+
+### SlotScope(Props)
+
+> Except for `no-data` and `loading` slots, all slots provide slot props below:
+
+| Type | Description |
+| ---- | ----------- |
+| name | The name of the item. |
+| label | The label of the item. |
+| data | The data of the item. |
+| value | The actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
+| items | All field and data items ordered by `fields` props. |
+| index | Current item's index. |
+<Canvas of={PDefinitionTableStories.Slots} />
+
+
+## Disable Copy
+
+If you give `true` to `disableCopy` props, it globally off all copy buttons. <br/>
+If you want to off the specific row(field), set `disableCopy` property with `true` to that field's object. <br/>
+
+e.g.<br/>
+
+```javascript
+fields: [
+    { label: 'Id', name: 'collector_id' },
+    { label: 'Name', name: 'name' },
+    { label: 'Provider', name: 'provider', disableCopy: true }, // will be hide copy button to this field
+]
+```
+<Canvas of={PDefinitionTableStories.DisableCopy} />
+
+## Custom Copy Value
+
+You can customize the value to be copied by giving ```copyValue``` or ```copyValueFormatter``` properties to each field item. <br/>
+```copyValueFormatter``` has higher priority than ```copyValue```.<br/>
+<Canvas of={PDefinitionTableStories.CustomCopyValue} />
+
+## Block
+
+If you give `true` to `block` props, it will make all value column's width full. <br/>
+If you want to make block the specific row(field), set `block` property with `true` to that field's object. <br/>
+It is useful when you give something into extra slot and want to align it to the right. <br/>
+
+e.g.
+
+```javascript
+fields: [
+    { label: 'Id', name: 'collector_id' },
+    { label: 'Name', name: 'name' },
+    { label: 'Provider', name: 'provider', block: true }, // will be make block to only this field
+]
+```
+<Canvas of={PDefinitionTableStories.Block} />
+
+## Style Types
+<Canvas of={PDefinitionTableStories.StyleTypes} />
+
+
+## UI Structure and CSS
+
+```css
+.p-definition-table(class=styleType style="position: relative; min-height: 11.25rem;")
+    .no-data(style="min-height: 11.25rem;")
+        slot(name="no-data")
+    table(style="table-layout: fixed;")
+        tbody
+            .p-definition(class="def-row")
+                slot(name="data")
+                    slot(name="data-{item.name}")
+                        slot(name="data-{index}")
+                slot(name="key")
+                slot(name="extra")
+    }
+    .loading-backdrop(style="position: absolute; top: 0; z-index: 1;")
+    .loading(style="position: absolute; top: 0; z-index: 2; max-height: 10rem;")
+```
+
+## Playground
+<Canvas of={PDefinitionTableStories.Playground} />
+<Controls of={PDefinitionTableStories.Playground} />
+
+<br/>
+<br/>

@@ -2,6 +2,9 @@ import Keycloak from 'keycloak-js';
 
 import { store } from '@/store';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+import { pinia } from '@/store/pinia';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { Authenticator } from '@/services/auth/authenticator';
@@ -13,16 +16,17 @@ class KeycloakAuth extends Authenticator {
 
     private static init() {
         /* keycloak init options */
-        const authOptions = store.state.domain.authOptions;
-        const authorizationEndpoint = authOptions.authorization_endpoint;
+        const domainStore = useDomainStore(pinia);
+        const authOptions = domainStore.state.authOptions;
+        const authorizationEndpoint = authOptions?.authorization_endpoint;
         if (!KeycloakAuth.isValidAuthorizationEndpoint(authorizationEndpoint)) {
             throw new Error('authorizationEndpoint is not valid: please check your keycloak configuration.'
                 + ' It should be like "https://{keycloak-server}/realms/{your-realm}/protocol/openid-connect/auth"');
         }
         const parsedIssuer = authorizationEndpoint.split('/realms');
         const baseUrl = parsedIssuer[0];
-        const realm = authOptions.realm;
-        const clientId = authOptions.client_id;
+        const realm = authOptions?.realm;
+        const clientId = authOptions?.client_id;
 
         const initOptions = {
             url: baseUrl,

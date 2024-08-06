@@ -2,9 +2,15 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { UserModel } from '@/schema/identity/user/model';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+import { pinia } from '@/store/pinia';
+
+
 export const initUserAndAuth = async (store, config): Promise<string | undefined> => {
+    const domainStore = useDomainStore(pinia);
     let userId = store.state.user.userId;
-    const domainSettings = store.state.domain.config?.settings;
+
+    const domainSettings = domainStore.state.config?.settings;
     const isTokenAlive = SpaceConnector.isTokenAlive;
     const devMode = config.get('DEV.ENABLED');
     const authEnabled = config.get('DEV.AUTH.ENABLED');

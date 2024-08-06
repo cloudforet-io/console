@@ -1,12 +1,28 @@
 import { faker } from '@faker-js/faker';
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
+export const getTextBeautifierArgs = (): Args => ({
+    value: `${faker.lorem.sentence(30)} ${faker.internet.url()} ${faker.lorem.sentence(30)}`,
+    tag: 'span',
+    // object: undefined,
+    // boolean: false,
+    // select: '',
+    // defaultSlot: null,
+    // onClick: null
+});
+
+export const getTextBeautifierParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
 
 export const getTextBeautifierArgTypes = (): ArgTypes => ({
     value: {
         name: '',
         type: { name: 'string' },
         description: 'The value to beautify',
-        defaultValue: `${faker.lorem.sentence(30)} ${faker.internet.url()} ${faker.lorem.sentence(30)}`,
         table: {
             type: {
                 summary: 'string',
@@ -16,15 +32,12 @@ export const getTextBeautifierArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     tag: {
         name: '',
-        type: { name: 'tag' },
+        type: { name: 'string' },
         description: 'The tag of root element',
-        defaultValue: 'span',
         table: {
             type: {
                 summary: 'string',
@@ -34,16 +47,13 @@ export const getTextBeautifierArgTypes = (): ArgTypes => ({
                 summary: '"span"',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
 
     // object: {
     //     name: '',
     //     type: { name: 'object' },
     //     description: '',
-    //     defaultValue: undefined,
     //     table: {
     //         type: {
     //             summary: 'object',
@@ -53,16 +63,13 @@ export const getTextBeautifierArgTypes = (): ArgTypes => ({
     //             summary: 'undefined',
     //         },
     //     },
-    //     control: {
-    //         type: 'object',
-    //     },
+    //     control: 'object'
     // },
 
     // boolean: {
     //     name: '',
     //     type: { name: 'boolean' },
     //     description: '',
-    //     defaultValue: false,
     //     table: {
     //         type: {
     //             summary: 'boolean',
@@ -72,9 +79,7 @@ export const getTextBeautifierArgTypes = (): ArgTypes => ({
     //             summary: false,
     //         },
     //     },
-    //     control: {
-    //         type: 'boolean',
-    //     },
+    //     control: 'boolean'
     // },
 
     // select: {
@@ -82,7 +87,6 @@ export const getTextBeautifierArgTypes = (): ArgTypes => ({
     //     type: { name: 'string' },
     //     description: `Select XXX. ${
     //         [...Object.values(CONFIG)].map(d => `\`\``)} are available.`,
-    //     defaultValue: '',
     //     table: {
     //         type: {
     //             summary: 'string',
@@ -92,17 +96,14 @@ export const getTextBeautifierArgTypes = (): ArgTypes => ({
     //             summary: '',
     //         },
     //     },
-    //     control: {
-    //         type: 'select',
-    //         options: [...Object.values(CONFIG)],
-    //     },
+    //     control: 'select',
+    //     options: [...Object.values(CONFIG)],
     // },
 
     // slots
     // defaultSlot: {
     //     name: 'default',
     //     description: '',
-    //     defaultValue: null,
     //     table: {
     //         type: {
     //             summary: null,
@@ -116,7 +117,6 @@ export const getTextBeautifierArgTypes = (): ArgTypes => ({
     // onClick: {
     //     name: '',
     //     description: '',
-    //     defaultValue: null,
     //     table: {
     //         type: {
     //             summary: null,

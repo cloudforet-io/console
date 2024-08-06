@@ -1,0 +1,99 @@
+{/* PBoard.mdx */}
+
+import { Canvas, Meta, Story, Controls, Source } from '@storybook/blocks';
+
+import * as PBoardStories from './PBoard.stories';
+
+<Meta of={PBoardStories} />
+
+# Board
+
+<br/>
+<br/>
+
+## Style Type and Style Options
+
+Board component has two style props: `styleType` and `styleOptions`.<br/>
+`styleType` is the highest standard that determines the style of `Board`, and `styleOptions` is an option that each `styleType` has independently.<br/>
+In order to use `Board` component, it is first necessary to understand what `styleOptions` each `styleType` has.
+
+|Style Type|Style Options Properties|Description|
+|-|-|-|
+|`list`| - |It is not affected by any styleOptions.|
+|`cards`|`column`|In the cards type, Board Items have a user-defined number of columns. The default is 1.|
+
+<br/>
+
+### cards - styleOptions
+```
+interface StyleOptions {
+    column: number;
+}
+```
+
+<br/>
+<br/>
+
+
+## Board Set Properties
+
+Board's `boardSets` props is an `array` of `BoardSet`.
+`BoardSet` is an `object` that extends `BoardItemProps` and includes following properties:
+
+
+|Properties|Description|Type|
+|-|-|-|
+|leftIcon|The name of icon-button-name in left content area. Must be a valid icon name for Icons component.|`String`|
+|iconButtonSets|Array of Icon button set that include icon name and icon button event.|`Array of Object`|
+|other properties|Other properties that have 'any' type. It exists for Board Item's content, so any type of data can be injected. |`any`|
+
+<br/>
+
+
+## Basic
+
+<br/>
+<br/>
+<Canvas of={PBoardStories.Basic} />
+
+<br/>
+<br/>
+
+## Style Type
+
+<br/>
+<br/>
+<Canvas of={PBoardStories.StyleType} />
+
+<br/>
+<br/>
+
+### Style Type - Cards
+
+The Board component receives an object type prop called `styleOptions`.<br/>
+In the `cards` type case, `styleOptions` takes the number of columns.<br/>
+
+
+```
+interface StyleOptions {
+    column: number;
+}
+```
+When no value is given to styleOptions, it defaults to 1 column.<br/>
+In screen **breakpoints below tablet (less than 1024px)**, the given number of columns is ignored and **only has one column**.
+
+<br/>
+<Canvas of={PBoardStories.StyleTypeCards} />
+
+<br/>
+<br/>
+
+## Selectable
+<Canvas of={PBoardStories.Selectable} />
+
+<br/>
+<br/>
+
+## Playground
+<Canvas of={PBoardStories.Playground} />
+<Controls of={PBoardStories.Playground} />

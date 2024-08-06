@@ -14,7 +14,7 @@ import type { CostQuerySetDeleteParameters } from '@/schema/cost-analysis/cost-q
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

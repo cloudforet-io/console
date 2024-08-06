@@ -28,6 +28,11 @@ const clusteredColumnChart: WidgetConfig = {
                 default: true,
             },
         },
+        dateFormat: {
+            options: {
+                default: 'MMM DD, YYYY',
+            },
+        },
     },
 };
 

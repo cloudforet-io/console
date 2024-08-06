@@ -22,6 +22,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDomainStore } from '@/store/domain/domain-store';
 import { languages } from '@/store/modules/user/config';
 
 import config from '@/lib/config';
@@ -42,6 +43,7 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 const appContextStore = useAppContextStore();
+const domainStore = useDomainStore();
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
 
@@ -70,7 +72,7 @@ const state = reactive({
     email: computed(() => store.state.user.email),
     language: computed(() => store.getters['user/languageLabel']),
     timezone: computed(() => store.state.user.timezone),
-    domainId: computed(() => store.state.domain.domainId),
+    domainId: computed(() => domainStore.state.domainId),
     userId: computed(() => store.state.user.userId),
     isMyPage: computed(() => route.matched.some((item) => item.name === MY_PAGE_ROUTE._NAME)),
     languageMenuVisible: false,

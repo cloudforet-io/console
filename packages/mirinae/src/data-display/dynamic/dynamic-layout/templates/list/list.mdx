@@ -1,0 +1,26 @@
+{/* list.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as listStories from './list.stories';
+
+<Meta of={listStories} />
+
+# List Type
+<br/>
+<br/>
+
+list type's event parameters are different: <br/>
+
+`[...arguments,  name of layout(string), index of layout(number)]`
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas of={listStories.Playground} />
+<Controls of={listStories.Playground} />
+
+<br/>
+<br/>

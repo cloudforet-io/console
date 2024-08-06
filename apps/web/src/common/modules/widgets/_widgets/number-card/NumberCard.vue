@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { useElementSize } from '@vueuse/core';
+import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive,
+    computed, defineExpose, reactive, ref,
 } from 'vue';
 
 import dayjs from 'dayjs';
+import { throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -32,7 +35,10 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { IconValue, ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    IconValue,
+    ComparisonValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
 
@@ -42,6 +48,8 @@ type Data = ListResponse<{
 }>;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
+const topPartRef = ref<null | HTMLElement>(null);
+const valueTextRef = ref<null | HTMLElement>(null);
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
@@ -57,7 +65,7 @@ const state = reactive({
         const _currentDate = dayjs.utc(state.basedOnDate).format(_dateFormat);
         return state.data?.results.find((item) => item[DATE_FIELD.DATE] === _currentDate)?.[state.dataField] ?? 0;
     }),
-    // required fields
+    valueText: computed<string|undefined>(() => numberFormatter(state.currentValue, { notation: 'compact' })),
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
@@ -129,6 +137,20 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Util */
+const setValueTextFontSize = () => {
+    if (!valueTextRef.value || !topPartRef.value) return;
+    let _fontSize = 56;
+    let _maxWidth = useElementSize(topPartRef).width.value;
+    let _valueTextWidth = useElementSize(valueTextRef).width.value;
+    if (state.iconName) _maxWidth -= 32;
+    while ((_valueTextWidth > _maxWidth) && _fontSize > 0) {
+        _fontSize -= 1;
+        valueTextRef.value.style.fontSize = `${_fontSize}px`;
+        _valueTextWidth = useElementSize(valueTextRef).width.value;
+    }
+};
+
+/* Api */
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
@@ -171,6 +193,10 @@ const loadWidget = async (): Promise<Data|APIErrorToast> => {
     return state.data;
 };
 
+
+useResizeObserver(valueTextRef, throttle(() => {
+    setValueTextFontSize();
+}, 500));
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
     loadWidget,
@@ -182,7 +208,9 @@ defineExpose<WidgetExpose<Data>>({
                   v-on="widgetFrameEventHandlers"
     >
         <div class="content-wrapper">
-            <div class="top-part">
+            <div ref="topPartRef"
+                 class="top-part"
+            >
                 <div v-if="state.iconName"
                      class="icon-wrapper"
                 >
@@ -192,15 +220,11 @@ defineExpose<WidgetExpose<Data>>({
                          :color="state.iconColor"
                     />
                 </div>
-                <span class="value-text"
+                <span ref="valueTextRef"
+                      class="value-text"
                       :class="[props.size]"
-                >{{ numberFormatter(state.currentValue, { notation: 'compact' }) }}</span>
-            </div>
-            <div v-if="state.currentValue && state.currentValue > 1000"
-                 class="original-value"
-                 :class="state.iconName && 'pl-9'"
-            >
-                ({{ numberFormatter(state.currentValue) }})
+                      style="font-size: 56px;"
+                >{{ state.valueText }}</span>
             </div>
             <div v-if="props.widgetOptions?.comparison"
                  class="comparison-wrapper"
@@ -228,14 +252,14 @@ defineExpose<WidgetExpose<Data>>({
         align-items: center;
         gap: 0.5rem;
         .value-text {
-            @apply text-display-xl;
+            flex: 1;
+            line-height: 1.25;
+            display: inline-block;
+            white-space: nowrap;
             &.full {
                 font-size: 8rem;
             }
         }
-    }
-    .original-value {
-        @apply text-paragraph-md text-gray-500;
     }
     .comparison-wrapper {
         @apply text-label-sm text-gray-700;

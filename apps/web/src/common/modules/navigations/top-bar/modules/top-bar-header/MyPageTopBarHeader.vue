@@ -2,9 +2,8 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
-import { store } from '@/store';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDomainStore } from '@/store/domain/domain-store';
 
 interface Props {
     to: Location;
@@ -12,9 +11,9 @@ interface Props {
 
 const props = defineProps<Props>();
 const appContextStore = useAppContextStore();
-
+const domainStore = useDomainStore();
 const state = reactive({
-    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
+    symbolImage: computed<string|undefined>(() => domainStore.getters.domainSymbolImage),
 });
 
 const handleClickLogo = () => {

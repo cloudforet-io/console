@@ -1,0 +1,81 @@
+{/* PDefinition.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PDefinitionStories from './PDefinition.stories';
+
+<Meta of={PDefinitionStories} />
+
+# Definition
+
+<br/>
+<br/>
+<br/>
+
+## Basic
+<Canvas of={PDefinitionStories.Basic} />
+
+## Disable Copy
+<Canvas of={PDefinitionStories.DisableCopy} />
+
+## Custom Copy Value
+<Canvas of={PDefinitionStories.CustomCopyValue} />
+
+## With Formatter
+<Canvas of={PDefinitionStories.WithFormatter} />
+
+## Block
+<Canvas of={PDefinitionStories.Block} />
+
+<br/>
+<br/>
+
+## Auto Key Width
+<Canvas of={PDefinitionStories.AutoKeyWidth} />
+
+## Custom Width of Key
+<Canvas of={PDefinitionStories.CustomWidthofKey} />
+
+## Slots
+| Slot name | Description |
+| ---- | ----------- |
+| default | Slot for replacing definition(value) text. |
+| key | Slot for replacing key text. |
+| extra | Slot for right space of value. |
+
+<br/>
+
+### SlotScope(Props)
+| Type | Description |
+| ---- | ----------- |
+| name | name props. |
+| label | label props. |
+| data | data props. |
+| value | actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
+
+<br/>
+<Canvas of={PDefinitionStories.Slots} />
+
+<br/>
+<br/>
+
+## UI Structure and CSS
+
+```css
+.p-definition
+    .key(style="width: 18rem;")
+        slot(name="key")
+    .value-wrapper(style="max-width: calc(100% - 18rem);")
+        .value
+            .p-copy-button
+                slot(name="default")
+        /* .extra */
+```
+
+
+## Playground
+<Canvas of={PDefinitionStories.Playground} />
+<Controls of={PDefinitionStories.Playground} />
+
+<br/>
+<br/>
