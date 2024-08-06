@@ -5,6 +5,7 @@ import {
     reactive, ref, watch,
 } from 'vue';
 
+import dayjs from 'dayjs';
 import type { PieSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
 import type {
@@ -25,6 +26,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getApiQueryDateRange,
     getReferenceLabel,
@@ -35,7 +37,9 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { GroupByValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 
 type Data = ListResponse<{
@@ -50,12 +54,18 @@ const state = reactive({
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: [],
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<PieSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
         tooltip: {
             trigger: 'item',
             position: 'inside',
             formatter: (params) => {
-                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, params.name);
+                let _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, params.name);
+                if (state.groupByField === DATE_FIELD.DATE) {
+                    _name = dayjs.utc(_name).format(state.dateFormat);
+                }
+                if (state.unit) _name = `${_name} (${state.unit})`;
                 const _value = numberFormatter(params.value) || '';
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
             },
@@ -72,20 +82,15 @@ const state = reactive({
             itemWidth: 10,
             itemHeight: 10,
             icon: 'circle',
-            formatter: (name) => {
-                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, name);
-                const _series = state.chart.getOption().series[0];
-                const _value = _series.data.filter((row) => row.name === name)[0]?.value;
-                if (props.size === 'full') {
-                    return `${_name}  ${numberFormatter(_value)}`;
-                }
-                return `${(_name.length > 15 ? `${_name.slice(0, 15)}...` : _name)}  ${numberFormatter(_value)}`;
+            formatter: (val) => {
+                if (state.groupByField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
+                return getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, val);
             },
         },
         series: [
             {
                 type: 'pie',
-                radius: ['30%', '70%'],
+                ...(state.chartType === 'donut' ? { radius: ['30%', '70%'] } : {}),
                 center: props.size === 'full' ? ['40%', '50%'] : ['30%', '50%'],
                 data: state.chartData,
                 emphasis: {
@@ -108,6 +113,7 @@ const state = reactive({
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy as GroupByValue)?.value as string),
     groupByCount: computed<number>(() => (props.widgetOptions?.groupBy as GroupByValue)?.count as number),
+    chartType: computed<string>(() => props.widgetOptions?.pieChartType as string),
     dateRange: computed<DateRange>(() => {
         const _dateRangeCount = Object.values(DATE_FIELD).includes(state.groupByField) ? state.groupByCount : 1;
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
@@ -115,6 +121,10 @@ const state = reactive({
     }),
     // optional fields
     showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    dateFormat: computed<string|undefined>(() => {
+        const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
+        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
+    }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -158,10 +168,10 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 };
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
-
     // get chart data
-    const _slicedData = orderBy(rawData.results || [], state.dataField, 'desc')?.slice(0, state.groupByCount);
-    const _etcData = rawData.results?.slice(state.groupByCount).reduce((acc, cur) => {
+    const _orderedData = orderBy(rawData.results || [], state.dataField, 'desc');
+    const _slicedData = _orderedData?.slice(0, state.groupByCount);
+    const _etcData = _orderedData?.slice(state.groupByCount).reduce((acc, cur) => {
         acc[state.groupByField] = 'etc';
         acc[state.dataField] = (acc[state.dataField] || 0) + cur[state.dataField];
         return acc;
@@ -174,9 +184,9 @@ const drawChart = (rawData: Data|null) => {
     })) || [];
 };
 
-const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+const loadWidget = async (): Promise<Data|APIErrorToast> => {
     state.loading = true;
-    const res = data ?? await fetchWidget();
+    const res = await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);

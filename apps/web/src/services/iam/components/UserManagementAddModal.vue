@@ -15,11 +15,14 @@ import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-ve
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import type { UserModel } from '@/schema/identity/user/model';
+import type { AuthType } from '@/schema/identity/user/type';
 import type { WorkspaceUserCreateParameters } from '@/schema/identity/workspace-user/api-verbs/create';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+
+import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -30,18 +33,25 @@ import UserManagementAddRole from '@/services/iam/components/UserManagementAddRo
 import UserManagementAddTag from '@/services/iam/components/UserManagementAddTag.vue';
 import UserManagementAddUser from '@/services/iam/components/UserManagementAddUser.vue';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
+import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem } from '@/services/iam/types/user-type';
 
+
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
+const domainStore = useDomainStore();
 
 const route = useRoute();
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
+const storeState = reactive({
+    smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+});
 const state = reactive({
     loading: false,
+    disabledResetPassword: false,
     disabled: computed(() => {
         if (userPageState.isAdminMode && !state.isSetAdminRole) {
             const baseCondition = state.userList.length === 0 || (state.workspace.length === 0 || isEmpty(state.role));
@@ -78,8 +88,11 @@ const handleChangeInput = (items) => {
     if (items.userList) {
         state.userList = items.userList;
         const newUserItem = state.userList.filter((item) => item.isNew);
-        state.localUserItem = state.userList.filter((item) => item.auth_type === 'LOCAL');
+        state.localUserItem = state.userList.filter((item) => item.auth_type === 'EMAIL' || item.auth_type === 'ID');
         state.resetPasswordVisible = state.localUserItem.length > 0 && newUserItem.length > 0;
+        const emailUsers = state.userList.filter((item) => item.auth_type === 'EMAIL');
+        state.isResetPassword = (emailUsers.length === state.userList.length) && storeState.smtpEnabled;
+        state.disabledResetPassword = (emailUsers.length !== state.userList.length) || !storeState.smtpEnabled;
     }
 };
 
@@ -115,13 +128,14 @@ const handleClose = () => {
 };
 /* API */
 const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
-    const domainSettings = store.state.domain.config?.settings;
+    const domainSettings = domainStore.state.config?.settings;
+    const { isValid } = checkEmailFormat(item.user_id || '');
     const userInfoParams: UserCreateParameters|WorkspaceUserCreateParameters = {
         user_id: item.user_id || '',
-        email: item.user_id || '',
-        auth_type: item.auth_type || 'LOCAL',
+        email: !isValid ? '' : item.user_id,
+        auth_type: item.auth_type === 'EMAIL' || item.auth_type === 'ID' ? 'LOCAL' : item.auth_type as AuthType,
         password: state.password || '',
-        reset_password: item.auth_type === 'LOCAL' && state.isResetPassword,
+        reset_password: item.auth_type === 'EMAIL' && state.isResetPassword,
         language: domainSettings?.language || 'en',
         timezone: domainSettings?.timezone || 'UTC',
     };
@@ -205,6 +219,7 @@ watch(() => route.query, (query) => {
                 <user-management-add-password v-if="state.resetPasswordVisible && state.userList.length > 0"
                                               :is-reset.sync="state.isResetPassword"
                                               :password.sync="state.password"
+                                              :disabled-reset-password="state.disabledResetPassword"
                 />
                 <user-management-add-admin-role v-if="userPageState.isAdminMode"
                                                 :is-set-admin-role.sync="state.isSetAdminRole"

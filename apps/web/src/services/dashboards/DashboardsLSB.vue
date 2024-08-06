@@ -146,17 +146,17 @@ const state = reactive({
     }))),
     sharedMenu: computed<LSBItem>(() => ({
         type: MENU_ITEM_TYPE.SLOT,
-        label: i18n.t('COMMON.SHARED'),
+        label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARED'),
         id: 'shared',
     })),
     privateMenu: computed<LSBItem>(() => ({
         type: MENU_ITEM_TYPE.SLOT,
-        label: i18n.t('COMMON.PRIVATE'),
+        label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE'),
         id: 'private',
     })),
     deprecatedMenu: computed<LSBItem>(() => ({
         type: MENU_ITEM_TYPE.SLOT,
-        label: i18n.t('COMMON.DEPRECATED'),
+        label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED'),
         id: 'deprecated',
     })),
     sharedSubItem: computed<LSBMenu[]>(() => (storeState.isWorkspaceOwner ? filterMenuItems(state.workspaceV2MenuSet) : [])),

@@ -18,13 +18,13 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
-import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { useDomainStore } from '@/store/domain/domain-store';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 
@@ -63,10 +63,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const chartContext = ref<HTMLElement|null>(null);
 const providerReferenceStore = useProviderReferenceStore();
+const domainStore = useDomainStore();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => providerReferenceStore.state.items ?? {}),
-    domainName: computed<string>(() => store.state.domain.name),
+    domainName: computed<string>(() => domainStore.state.name),
 });
 
 const state = reactive({
@@ -271,7 +272,7 @@ const fetchTableData = async () => {
 
 const setMetaTag = () => {
     const viewportEl = document.querySelector('head meta[name="viewport"]');
-    if (viewportEl) viewportEl.attributes.content.value = 'width=928';
+    if (viewportEl) (viewportEl as HTMLMetaElement).content = 'width=928';
 };
 const setRootTagStyle = () => {
     const htmlEl = document.querySelector('html');
@@ -281,7 +282,7 @@ const setRootTagStyle = () => {
         htmlEl.style.overflowY = 'auto';
     }
     if (bodyEl) bodyEl.style.height = 'unset';
-    if (appEl) appEl.style.height = 'unset';
+    if (appEl) (appEl as HTMLElement).style.height = 'unset';
 };
 
 const handlePrint = () => {

@@ -2,10 +2,10 @@ import type { RouteConfig } from 'vue-router';
 
 import { store } from '@/store';
 
-import { additionalRoutes } from '@/router/additional-routes';
 import { adminRoutes } from '@/router/admin-routes';
 import { ROOT_ROUTE, ROUTE_SCOPE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
+import { externalRoutes } from '@/router/external-routes';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { workspaceRoutes } from '@/router/workspace-routes';
 
@@ -29,7 +29,7 @@ export const integralRoutes: RouteConfig[] = [
             },
             ...authRoutes,
             landingPageRoutes,
-            ...additionalRoutes,
+            ...externalRoutes,
             {
                 path: 'admin',
                 name: ROOT_ROUTE.ADMIN._NAME,
@@ -60,7 +60,6 @@ export const integralRoutes: RouteConfig[] = [
             },
             myPageRoutes,
             ...errorRoutes,
-
         ],
     },
 ];

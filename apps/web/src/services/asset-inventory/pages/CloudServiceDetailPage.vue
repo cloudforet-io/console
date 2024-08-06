@@ -45,7 +45,7 @@ import { queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string'
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
-import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
+import CustomFieldModalForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/CustomFieldModalForDynamicLayout.vue';
 
 import ExcelExportOptionModal
     from '@/services/asset-inventory/components/CloudServiceDetailExcelExportOptionModal.vue';
@@ -611,17 +611,17 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                                    :selected-index="typeOptionState.selectIndex.length ?? 0"
                                    :timezone="typeOptionState.timezone ?? 'UTC'"
         />
-        <custom-field-modal :visible="tableState.visibleCustomFieldModal"
-                            resource-type="inventory.CloudService"
-                            :options="{
-                                provider: props.provider,
-                                cloudServiceGroup: props.group,
-                                cloudServiceType: props.name,
-                                include_workspace_info: appContextGetters.isAdminMode,
-                            }"
-                            :is-server-page="props.isServerPage"
-                            @update:visible="handleCustomFieldModalVisibleUpdate"
-                            @complete="reloadTable"
+        <custom-field-modal-for-dynamic-layout :visible="tableState.visibleCustomFieldModal"
+                                               resource-type="inventory.CloudService"
+                                               :options="{
+                                                   provider: props.provider,
+                                                   cloudServiceGroup: props.group,
+                                                   cloudServiceType: props.name,
+                                                   include_workspace_info: appContextGetters.isAdminMode,
+                                               }"
+                                               :is-server-page="props.isServerPage"
+                                               @update:visible="handleCustomFieldModalVisibleUpdate"
+                                               @complete="reloadTable"
         />
         <excel-export-option-modal :visible="excelState.visible"
                                    :cloud-service-id="tableState.items[0]?.cloud_service_id"

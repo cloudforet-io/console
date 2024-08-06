@@ -1,7 +1,7 @@
 import { computed, reactive } from 'vue';
 
 import dayjs from 'dayjs';
-import { isEmpty, sortBy } from 'lodash';
+import { cloneDeep, isEmpty, sortBy } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -12,7 +12,7 @@ import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-q
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -73,47 +73,52 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             }
             return 'USD';
         }),
-        defaultGroupByItems: computed<GroupByItem[]>(() => [...getters.managedGroupByItems, ...getters.additionalInfoGroupByItems]),
+        defaultGroupByItems: computed<GroupByItem[]>(() => {
+            if (getters.metadataAdditionalInfoItems.length) {
+                return [...getters.managedGroupByItems, ...getters.metadataAdditionalInfoItems];
+            }
+            return [...getters.managedGroupByItems, ...getters.additionalInfoKeysItems];
+        }),
         managedGroupByItems: computed<GroupByItem[]>(() => {
-            if (_state.isAdminMode) return Object.values(GROUP_BY_ITEM_MAP);
             const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
             const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
             let _additionalInfoGroupBy: GroupByItem[] = [];
-            if (metadataAdditionalInfo) {
+            if (metadataAdditionalInfo && !isEmpty(metadataAdditionalInfo)) {
                 _additionalInfoGroupBy = Object.entries(metadataAdditionalInfo)
                     .filter(([, value]) => value?.visible)
                     .map(([key, value]) => ({
                         name: `additional_info.${key}`,
                         label: value?.name,
                     }));
+            } else {
+                _additionalInfoGroupBy = cloneDeep(getters.additionalInfoKeysItems);
             }
-            const _managedGroupByItems = Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
+            const _managedGroupByItems = _state.isAdminMode ? Object.values(GROUP_BY_ITEM_MAP) : Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
             return [..._managedGroupByItems, ..._additionalInfoGroupBy];
         }),
-        additionalInfoGroupByItems: computed<GroupByItem[]>(() => {
-            let additionalInfoGroupBy: GroupByItem[] = [];
-            if (costQuerySetState.selectedDataSourceId) {
-                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-                if (!targetDataSource) return [];
-
-                const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
-                if (metadataAdditionalInfo) {
-                    additionalInfoGroupBy = Object.entries(metadataAdditionalInfo)
-                        .filter(([, value]) => !value?.visible)
-                        .map(([key, value]) => ({
-                            name: `additional_info.${key}`,
-                            label: value?.name,
-                        }));
-                } else { // HACK: will be deprecated
-                    const costAdditionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys;
-                    additionalInfoGroupBy = costAdditionalInfoKeys
-                        .filter((d) => !getters.managedGroupByItems.find((item) => item.label === d))
-                        .map((d) => ({
-                            name: `additional_info.${d}`,
-                            label: d,
-                        }));
-                }
-            }
+        metadataAdditionalInfoItems: computed<GroupByItem[]>(() => {
+            if (!costQuerySetState.selectedDataSourceId) return [];
+            const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
+            if (!targetDataSource) return [];
+            const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
+            if (!metadataAdditionalInfo) return [];
+            return Object.entries(metadataAdditionalInfo)
+                .filter(([, value]) => !value?.visible)
+                .map(([key, value]) => ({
+                    name: `additional_info.${key}`,
+                    label: value?.name,
+                }));
+        }),
+        additionalInfoKeysItems: computed<GroupByItem[]>(() => {
+            if (!costQuerySetState.selectedDataSourceId) return [];
+            const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
+            if (!targetDataSource) return [];
+            const costAdditionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys ?? [];
+            const additionalInfoGroupBy: GroupByItem[] = costAdditionalInfoKeys
+                .map((d) => ({
+                    name: `additional_info.${d}`,
+                    label: d,
+                }));
             return [...sortBy(additionalInfoGroupBy, 'label')];
         }),
         consoleFilters: computed<ConsoleFilter[]>(() => {

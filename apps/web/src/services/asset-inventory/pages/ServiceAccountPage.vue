@@ -33,8 +33,8 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap, ProviderItem } from '@/store/reference/provider-reference-store';
 
@@ -49,7 +49,7 @@ import AutoSyncState from '@/common/components/badge/AutoSyncState.vue';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
+import CustomFieldModalForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/CustomFieldModalForDynamicLayout.vue';
 
 import { gray } from '@/styles/colors';
 
@@ -464,11 +464,11 @@ onMounted(async () => {
                 </template>
             </p-dynamic-layout>
         </component>
-        <custom-field-modal :visible="tableState.visibleCustomFieldModal"
-                            :resource-type="tableState.isTrustedAccount ? 'identity.TrustedAccount' : 'identity.ServiceAccount'"
-                            :options="{provider: state.selectedProvider}"
-                            @update:visible="handleVisibleCustomFieldModal"
-                            @complete="reloadTable"
+        <custom-field-modal-for-dynamic-layout :visible="tableState.visibleCustomFieldModal"
+                                               :resource-type="tableState.isTrustedAccount ? 'identity.TrustedAccount' : 'identity.ServiceAccount'"
+                                               :options="{provider: state.selectedProvider}"
+                                               @update:visible="handleVisibleCustomFieldModal"
+                                               @complete="reloadTable"
         />
     </section>
 </template>

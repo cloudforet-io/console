@@ -1,6 +1,19 @@
 import { faker } from '@faker-js/faker';
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
+export const getCollapsiblePanelArgs = (): Args => ({
+    'v-model': '',
+    isCollapsed: true,
+    lineClamp: 2,
+    defaultSlot: faker.lorem.sentence(40),
+});
+
+export const getCollapsiblePanelParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
 
 export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
     /* props */
@@ -8,7 +21,6 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
         name: 'v-model',
         type: { name: 'boolean' },
         description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'boolean',
@@ -24,7 +36,6 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
         name: 'isCollapsed',
         type: { name: 'boolean' },
         description: 'Collapsed state of toggle button.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -34,15 +45,12 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     lineClamp: {
         name: 'lineClamp',
         type: { name: 'number' },
         description: 'It refers to the number of content lines to be displayed in the collapsed state.',
-        defaultValue: 2,
         table: {
             type: {
                 summary: 'number',
@@ -52,25 +60,20 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
                 summary: 2,
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     /* slot */
     defaultSlot: {
         name: 'default',
         type: { name: 'string' },
         description: 'Slot for contents.',
-        defaultValue: faker.lorem.sentence(40),
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* event */
     onUpdateIsCollapsed: {
@@ -86,4 +89,6 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
 });

@@ -118,11 +118,9 @@ export const getSharedDashboardLayouts = async (
                 const _dataTableId = _widget.data_table_id;
                 const [_dataTables, _dataTableIndex] = _getSharedDataTableInfoList(_widgetDataTablesMap, _widget.widget_id, _dataTableId);
                 const _sharedWidgetInfo: SharedWidgetInfo = {
-                    name: _widget.name,
                     widget_type: _widget.widget_type,
                     size: _widget.size,
                     options: _widget.options,
-                    description: _widget.description,
                     data_tables: _dataTables,
                     data_table_id: _dataTableIndex > -1 ? _dataTableIndex : 0,
                 };

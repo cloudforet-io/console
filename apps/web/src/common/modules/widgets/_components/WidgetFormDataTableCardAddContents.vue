@@ -347,6 +347,21 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     advancedOptionsState.selectedTimeDiff = 'none';
 });
 
+// Set 'dataFieldName' by 'selectedTimeDiff' and 'selectedTimeDiffDate'
+watch([() => advancedOptionsState.selectedTimeDiff, () => advancedOptionsState.selectedTimeDiffDate], ([timediff, date]) => {
+    const defaultFieldName = state.selectableSourceItems.find((source) => source.name === state.selectedSourceEndItem)?.label;
+    const timediffOptions = {
+        none: '',
+        months: 'month',
+        years: 'year',
+    };
+    if (timediff === 'none') {
+        state.dataFieldName = defaultFieldName;
+    } else if (date) {
+        state.dataFieldName = `${defaultFieldName} (- ${date} ${timediffOptions[timediff]})`;
+    }
+});
+
 </script>
 
 <template>

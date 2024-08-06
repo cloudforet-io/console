@@ -25,16 +25,19 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getApiQueryDateRange,
-    getDateLabelFormat, getReferenceLabel,
+    getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
-import type { StackByValue, YAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { StackByValue, YAxisValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 
 type Data = ListResponse<{
@@ -51,7 +54,9 @@ const state = reactive({
     yAxisData: [],
     chartData: [],
     chart: null as EChartsType | null,
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<BarSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
         legend: {
             type: 'scroll',
             show: state.showLegends,
@@ -60,13 +65,20 @@ const state = reactive({
             icon: 'circle',
             itemWidth: 10,
             itemHeight: 10,
-            formatter: (val) => getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, val),
+            formatter: (val) => {
+                if (state.stackByField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
+                return getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, val);
+            },
         },
         tooltip: {
             formatter: (params) => {
                 const _params = Array.isArray(params) ? params : [params];
                 return _params.map((p) => {
-                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, p.seriesName);
+                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, p.seriesName);
+                    if (state.stackByField === DATE_FIELD.DATE) {
+                        _seriesName = dayjs.utc(_seriesName).format(state.dateFormat);
+                    }
+                    if (state.unit) _seriesName = `${_seriesName} (${state.unit})`;
                     const _value = numberFormatter(p.value) || '';
                     return `${_seriesName}<br>${p.marker} ${params.name}: <b>${_value}</b>`;
                 }).join('<br>');
@@ -89,7 +101,7 @@ const state = reactive({
             axisLabel: {
                 formatter: (val) => {
                     if (state.yAxisField === DATE_FIELD.DATE) {
-                        return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
+                        return dayjs.utc(val).format(state.dateFormat);
                     }
                     return getReferenceLabel(props.allReferenceTypeInfo, state.yAxisField, val);
                 },
@@ -117,6 +129,10 @@ const state = reactive({
     }),
     // optional fields
     showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    dateFormat: computed<string|undefined>(() => {
+        const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
+        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
+    }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -209,9 +225,9 @@ const drawChart = (rawData?: Data|null) => {
     });
     state.chartData = _seriesData;
 };
-const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+const loadWidget = async (): Promise<Data|APIErrorToast> => {
     state.loading = true;
-    const res = data ?? await fetchWidget();
+    const res = await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);

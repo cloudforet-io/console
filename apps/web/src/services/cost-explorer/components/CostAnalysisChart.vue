@@ -11,7 +11,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton,
+    PButton, PSelectButton,
     PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
@@ -152,6 +152,14 @@ watch(() => costAnalysisPageState.chartGroupBy, () => {
                                class="group-by-select-dropdown"
                                @select="handleChartGroupByItem"
             />
+            <div class="select-button-wrapper">
+                <p-select-button :selected="true"
+                                 icon-name="ic_chart-bar"
+                                 layout="icon-only"
+                                 style-type="gray"
+                                 size="sm"
+                />
+            </div>
         </div>
         <div class="bottom-part">
             <div class="bottom-right-part">
@@ -184,6 +192,15 @@ watch(() => costAnalysisPageState.chartGroupBy, () => {
     margin-bottom: 1rem;
 
     .top-part {
+        display: flex;
+        justify-content: space-between;
+        text-align: right;
+        .select-button-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.375rem;
+            padding-bottom: 0.5rem;
+        }
         .group-by-select-dropdown {
             width: 24%;
         }

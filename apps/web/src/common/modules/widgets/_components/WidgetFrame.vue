@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import {
-    reactive, computed,
+    reactive, computed, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PI, PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton,
+    PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton, PI,
 } from '@cloudforet/mirinae';
 import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
@@ -20,22 +21,22 @@ import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-fra
 
 const props = defineProps<WidgetFrameProps>();
 const emit = defineEmits<WidgetFrameEmit>();
-
+const router = useRouter();
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     showWidthToggleButton: computed(() => props.widgetSizes.length > 1 && !props.loading && props.mode === 'edit-layout'),
     etcMenuItems: computed<MenuItem[]>(() => ([
-        {
-            type: 'item',
-            name: 'expand',
-            label: i18n.t('COMMON.WIDGETS.EXPAND'),
-            icon: 'ic_arrows-expand-all',
-        },
         ...(props.disableManageButtons ? [] : [{
             type: 'item',
             name: 'edit',
             label: i18n.t('COMMON.WIDGETS.EDIT'),
             icon: 'ic_edit',
+        },
+        {
+            type: 'item',
+            name: 'clone',
+            label: i18n.t('COMMON.WIDGETS.CLONE'),
+            icon: 'ic_clone',
         },
         { type: 'divider', name: '' },
         {
@@ -46,19 +47,21 @@ const state = reactive({
         }] as MenuItem[]),
     ])),
     etcMenuVisible: false,
+    popperVisible: false,
     sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
         type: 'item',
         name: size,
         label: WIDGET_WIDTH_STR_MAP[size],
     }))),
+    unitText: computed<string>(() => Object.values(props.unitMap || {}).join(', ') || '--'),
 });
 
 /* Event */
 const handleSelectEtcMenu = (selected: MenuItem) => {
-    if (selected.name === 'expand') {
-        emit('click-expand');
-    } else if (selected.name === 'edit') {
+    if (selected.name === 'edit') {
         emit('click-edit');
+    } else if (selected.name === 'clone') {
+        emit('click-clone');
     } else if (selected.name === 'delete') {
         emit('click-delete');
     }
@@ -70,6 +73,21 @@ const handleToggleWidth = () => {
     }
     emit('toggle-size', nextSize);
 };
+const handleClickFullData = () => {
+    if (!props.fullDataLinkList?.length) return;
+    window.open(router.resolve(props.fullDataLinkList[0].location).href, '_blank');
+};
+
+watch(() => state.popperVisible, (_popperVisible) => {
+    if (_popperVisible) {
+        state.etcMenuVisible = false;
+    }
+});
+watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
+    if (_etcMenuVisible) {
+        state.popperVisible = false;
+    }
+});
 </script>
 
 <template>
@@ -77,67 +95,85 @@ const handleToggleWidth = () => {
          :class="{ full: state.isFull, [props.size]: props.size }"
          :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
-        <div class="widget-header">
+        <div v-if="props.title !== undefined"
+             class="widget-header"
+        >
             <h3 class="title">
-                {{ props.title }}
-            </h3>
-            <p-popover v-if="!props.errorMessage && props.widgetState === 'ACTIVE'"
-                       class="metadata-popover"
-                       position="bottom-start"
-                       :trigger="POPOVER_TRIGGER.CLICK"
-            >
-                <div class="metadata-button">
+                <span>{{ props.title }}</span>
+                <p-tooltip v-if="props.description?.length"
+                           :contents="props.description"
+                           position="bottom"
+                >
                     <p-i name="ic_info-circle"
                          width="0.75rem"
                          height="0.75rem"
+                         class="description-icon"
                     />
-                </div>
-                <template #content>
-                    <div class="metadata-content">
-                        <div class="metadata-item-row">
-                            <span class="metadata-title">{{ $t('COMMON.WIDGETS.PERIOD') }}</span>
-                            <span>{{ props.periodText }}</span>
-                        </div>
-                        <div class="metadata-item-row">
-                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>
-                            <span>{{ props.unit || '--' }}</span>
-                        </div>
-                        <div class="metadata-item-row">
-                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.FULL_DATA_LINK') }}</span>
-                            <template v-if="props.fullDataLinkList?.length">
-                                <div class="full-data-link-wrapper">
-                                    <p-link v-for="fullDataLink in props.fullDataLinkList"
-                                            :key="`${fullDataLink?.name}-${fullDataLink?.location}`"
-                                            new-tab
-                                            highlight
-                                            action-icon="internal-link"
-                                            :to="fullDataLink?.location"
-                                    >
-                                        {{ fullDataLink?.name }}
-                                    </p-link>
-                                </div>
-                            </template>
-                            <template v-else>
-                                <span>--</span>
-                            </template>
-                        </div>
-                        <div v-if="props.description"
-                             class="metadata-item-row"
-                        >
-                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.DESCRIPTION') }}</span>
-                            <div class="description">
-                                {{ props.description }}
-                            </div>
-                        </div>
-                    </div>
-                </template>
-            </p-popover>
+                </p-tooltip>
+            </h3>
+            <p class="date-text">
+                {{ props.periodText }}
+            </p>
         </div>
         <div v-if="props.mode !== 'overlay'"
              class="action-button-wrapper"
-             :class="{ 'selected': state.etcMenuVisible }"
+             :class="{ 'selected': state.etcMenuVisible || state.popperVisible }"
         >
-            <p-select-dropdown style-type="tertiary-icon-button"
+            <p-tooltip :contents="$t('COMMON.WIDGETS.EXPAND')"
+                       position="top"
+            >
+                <p-icon-button style-type="tertiary"
+                               size="sm"
+                               name="ic_arrows-expand-all"
+                               shape="square"
+                               @click="emit('click-expand')"
+                />
+            </p-tooltip>
+            <p-tooltip v-if="props.fullDataLinkList?.length && !props.errorMessage && props.widgetState === 'ACTIVE'"
+                       :contents="$t('COMMON.WIDGETS.VIEW_FULL_DATA')"
+                       position="top"
+            >
+                <p-popover v-if="props.fullDataLinkList.length > 1"
+                           position="bottom-end"
+                           :is-visible.sync="state.popperVisible"
+                           :trigger="POPOVER_TRIGGER.CLICK"
+                >
+                    <p-icon-button style-type="tertiary"
+                                   size="sm"
+                                   name="ic_db-where"
+                                   shape="square"
+                    />
+                    <template #content>
+                        <div class="metadata-content">
+                            <div class="metadata-item-row">
+                                <span class="metadata-title">{{ $t('COMMON.WIDGETS.VIEW_FULL_DATA') }}</span>
+                                <template v-if="props.fullDataLinkList?.length">
+                                    <div class="full-data-link-wrapper">
+                                        <p-link v-for="(fullDataLink, idx) in props.fullDataLinkList"
+                                                :key="`${idx}-${fullDataLink?.name}`"
+                                                new-tab
+                                                highlight
+                                                action-icon="internal-link"
+                                                :to="fullDataLink?.location"
+                                        >
+                                            {{ fullDataLink?.name }}
+                                        </p-link>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </p-popover>
+                <p-icon-button v-else
+                               style-type="tertiary"
+                               size="sm"
+                               name="ic_db-where"
+                               shape="square"
+                               @click="handleClickFullData"
+                />
+            </p-tooltip>
+            <p-select-dropdown v-if="!props.disableManageButtons"
+                               style-type="tertiary-icon-button"
                                button-icon="ic_ellipsis-horizontal"
                                class="etc-button"
                                :menu="state.etcMenuItems"
@@ -158,7 +194,7 @@ const handleToggleWidth = () => {
                      class="empty-content"
                      :title="$t('COMMON.WIDGETS.DATA_NOT_DISPLAYED')"
                      :show-image="props.size !== WIDGET_SIZE.sm"
-                     :show-button="props.mode === 'view'"
+                     :show-button="props.mode === 'view' && !props.disableManageButtons"
             >
                 <template #image>
                     <img class="empty-image"
@@ -203,16 +239,13 @@ const handleToggleWidth = () => {
         <div v-if="state.showWidthToggleButton"
              class="widget-toggle-button-wrapper"
         >
-            <p-tooltip :contents="state.isFull ? $t('COMMON.WIDGETS.DEFAULT_WIDTH') : $t('COMMON.WIDGETS.FULL_WIDTH')"
-                       position="bottom"
+            <p-button style-type="tertiary"
+                      :icon-left="state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all'"
+                      class="width-toggle-button"
+                      @click="handleToggleWidth"
             >
-                <p-icon-button style-type="tertiary"
-                               :name="state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all'"
-                               shape="square"
-                               class="width-toggle-button"
-                               @click="handleToggleWidth"
-                />
-            </p-tooltip>
+                {{ state.isFull ? $t('COMMON.WIDGETS.DEFAULT_WIDTH') : $t('COMMON.WIDGETS.FULL_WIDTH') }}
+            </p-button>
         </div>
     </div>
 </template>
@@ -232,14 +265,12 @@ const handleToggleWidth = () => {
     }
     &:hover {
         .action-button-wrapper {
-            display: block;
+            display: flex;
         }
     }
 
     .widget-header {
-        display: flex;
         align-items: center;
-        height: 1.625rem;
         padding-bottom: 0.5rem;
         .title {
             @apply truncate text-label-md;
@@ -249,44 +280,33 @@ const handleToggleWidth = () => {
             display: block;
             -webkit-box-orient: vertical;
             font-weight: 500;
+            .description-icon {
+                margin-left: 0.25rem;
+            }
         }
-        .metadata-button {
-            @apply text-gray-700;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            padding-left: 0.75rem;
+        .date-text {
+            @apply text-label-sm text-gray-500;
         }
-        .metadata-content {
-            @apply text-label-md;
+    }
+    .metadata-content {
+        @apply text-label-md;
+        display: flex;
+        line-height: normal;
+        flex-direction: column;
+        gap: 0.5rem;
+        max-height: 20rem;
+        min-width: 20rem;
+        max-width: 25rem;
+        overflow-y: auto;
+        z-index: 100;
+        .metadata-item-row {
             display: flex;
-            line-height: unset;
-            flex-direction: column;
-            gap: 0.5rem;
-            min-height: 6.25rem;
-            max-height: 20rem;
-            min-width: 20rem;
-            max-width: 25rem;
-            overflow-y: auto;
-            z-index: 100;
-            padding-top: 0.5rem;
-            .metadata-item-row {
+            justify-content: flex-start;
+            .full-data-link-wrapper {
                 display: flex;
-                justify-content: flex-start;
-                .metadata-title {
-                    @apply text-gray-600;
-                    width: 7rem;
-                }
-                .full-data-link-wrapper {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.125rem;
-                }
-                .description {
-                    @apply text-gray-700;
-                    max-width: 18rem;
-                    display: block;
-                }
+                flex-direction: column;
+                gap: 0.125rem;
+                padding-left: 2rem;
             }
         }
     }
@@ -320,9 +340,14 @@ const handleToggleWidth = () => {
         right: 0.25rem;
         top: 0.25rem;
         display: none;
+        gap: 0.25rem;
+        z-index: 1000;
         padding: 0.25rem;
         &.selected {
-            display: block;
+            display: flex;
+        }
+        .etc-button {
+            @apply bg-white;
         }
     }
 }

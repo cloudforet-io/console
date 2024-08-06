@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
-import { store } from '@/store';
+import { useDomainStore } from '@/store/domain/domain-store';
 
 const props = withDefaults(defineProps<{
     to?: Location|null;
@@ -10,9 +10,10 @@ const props = withDefaults(defineProps<{
     to: null,
 });
 
+const domainStore = useDomainStore();
 const state = reactive({
-    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
-    wordTypeLogoImage: computed<string|undefined>(() => store.getters['domain/domainWordTypeLogoImage']),
+    symbolImage: computed<string|undefined>(() => domainStore.getters.domainSymbolImage),
+    wordTypeLogoImage: computed<string|undefined>(() => domainStore.getters.domainWordTypeLogoImage),
 });
 </script>
 

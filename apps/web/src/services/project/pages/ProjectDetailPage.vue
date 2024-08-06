@@ -113,6 +113,7 @@ const state = reactive({
         const excludeRoutes = [
             PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
             PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
+            PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME,
         ];
         return route.name ? !excludeRoutes.includes(route.name) : true;
     }),

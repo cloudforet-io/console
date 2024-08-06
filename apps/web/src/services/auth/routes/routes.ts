@@ -6,7 +6,6 @@ const SignInContainer = () => import('@/services/auth/components/SignInContainer
 const SignOutPage = () => import('@/services/auth/pages/SignOutPage.vue');
 const SignInPage = () => import('@/services/auth/pages/SignInPage.vue');
 const KeycloakPage = () => import('@/services/auth/pages/KeycloakPage.vue');
-const KB_SSO = () => import('@/services/auth/pages/KB_SSOPage.vue');
 const PasswordPage = () => import('@/services/auth/pages/PasswordPage.vue');
 const ValidationEmailPage = () => import('@/services/auth/pages/ValidationEmailPage.vue');
 const MultiFactorAuthPage = () => import('@/services/auth/pages/MultiFactorAuthPage.vue');
@@ -36,7 +35,8 @@ export default [
                     isSignInPage: true,
                 },
                 props: (route) => ({
-                    nextPath: route.query.nextPath,
+                    previousPath: route.query.previousPath,
+                    redirectPath: route.query.redirectPath,
                 }),
                 component: SignInPage,
             },
@@ -47,7 +47,8 @@ export default [
                     isSignInPage: true,
                 },
                 props: (route) => ({
-                    nextPath: route.query.nextPath,
+                    previousPath: route.query.previousPath,
+                    redirectPath: route.query.redirectPath,
                 }),
                 component: KeycloakPage,
             },
@@ -58,7 +59,8 @@ export default [
                     isSignInPage: true,
                 },
                 props: (route) => ({
-                    nextPath: route.query.nextPath,
+                    previousPath: route.query.previousPath,
+                    redirectPath: route.query.redirectPath,
                 }),
                 component: MultiFactorAuthPage,
             },
@@ -98,19 +100,5 @@ export default [
             isSignInPage: false,
         },
         component: ValidationEmailPage,
-    },
-    {
-        path: '/kbsso/checkauth.jsp',
-        name: AUTH_ROUTE.SIGN_IN.KB._NAME,
-        meta: {
-            isSignInPage: true,
-        },
-        props: ({ query }) => ({
-            secureToken: query.secureToken,
-            secureSessionId: query.secureSessionId,
-            resultCode: query.resultCode,
-            nextPath: query.nextPath,
-        }),
-        component: KB_SSO,
     },
 ] as RouteConfig[];

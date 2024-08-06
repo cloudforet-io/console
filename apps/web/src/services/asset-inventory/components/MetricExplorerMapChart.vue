@@ -17,6 +17,8 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 
 import { getReferenceLabel } from '@/common/modules/widgets/_helpers/widget-date-helper';
 
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
     MetricDataAnalyzeResult,
@@ -49,6 +51,7 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartData: [],
     chartOptions: computed<TreemapSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
         tooltip: {
             trigger: 'item',
             position: 'inside',

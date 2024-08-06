@@ -1,14 +1,30 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
 import { EmptyImageSize } from '@/data-display/empty/type';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
+
+export const getEmptyArgs = (): Args => ({
+    showImage: false,
+    imageSize: EmptyImageSize.sm,
+    title: undefined,
+    showButton: false,
+    buttonStyleType: BUTTON_STYLE.substitutive,
+    buttonTitle: 'Button',
+    defaultSlot: 'No Data',
+});
+
+export const getEmptyParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A179434',
+    },
+});
 
 export const getEmptyArgTypes = (): ArgTypes => ({
     showImage: {
         name: 'showImage',
         type: { name: 'boolean' },
         description: 'Disabled when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -18,15 +34,12 @@ export const getEmptyArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     imageSize: {
         name: 'imageSize',
         type: { name: 'string' },
         description: `Image size. ${Object.keys(EmptyImageSize).map((d) => `\`${d}\``).join(', ')} are available.`,
-        defaultValue: EmptyImageSize.sm,
         table: {
             type: {
                 summary: 'string',
@@ -36,16 +49,13 @@ export const getEmptyArgTypes = (): ArgTypes => ({
                 summary: EmptyImageSize.sm,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(EmptyImageSize),
-        },
+        control: 'select',
+        options: Object.values(EmptyImageSize),
     },
     title: {
         name: 'title',
         type: { name: 'string' },
         description: 'Empty title',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -55,15 +65,12 @@ export const getEmptyArgTypes = (): ArgTypes => ({
                 summary: undefined,
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     showButton: {
         name: 'showButton',
         type: { name: 'boolean' },
         description: 'Disabled when true',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -73,15 +80,12 @@ export const getEmptyArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     buttonStyleType: {
         name: 'buttonStyleType',
         type: { name: 'string' },
         description: 'Button style',
-        defaultValue: BUTTON_STYLE.substitutive,
         table: {
             type: {
                 summary: 'string',
@@ -91,16 +95,13 @@ export const getEmptyArgTypes = (): ArgTypes => ({
                 summary: undefined,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(BUTTON_STYLE),
-        },
+        control: 'select',
+        options: Object.values(BUTTON_STYLE),
     },
     buttonTitle: {
         name: 'buttonTitle',
         type: { name: 'string' },
         description: 'Button title',
-        defaultValue: 'Button',
         table: {
             type: {
                 summary: 'string',
@@ -110,30 +111,24 @@ export const getEmptyArgTypes = (): ArgTypes => ({
                 summary: undefined,
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* slot */
     defaultSlot: {
         name: 'default',
         type: { name: 'string' },
         description: 'Slot for contents of empty',
-        defaultValue: 'No Data',
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     imageSlot: {
         name: 'image',
         description: 'Slot for image of empty.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: null,
@@ -144,7 +139,6 @@ export const getEmptyArgTypes = (): ArgTypes => ({
     buttonSlot: {
         name: 'button',
         description: 'Slot for button of empty.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: null,
@@ -167,4 +161,9 @@ export const getEmptyArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    image: { table: { disable: true } },
+    default: { table: { disable: true } },
+    button: { table: { disable: true } },
+    'click-button': { table: { disable: true } },
 });

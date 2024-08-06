@@ -19,6 +19,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 interface Props {
+    isProjectDashboard?: boolean;
     loading?: boolean;
     disableSaveButton?: boolean;
     originVars?: DashboardVars;
@@ -42,7 +43,9 @@ const state = reactive({
         if (storeState.isAdminMode) {
             _defaultDashboardVariables.workspace = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key];
         }
-        _defaultDashboardVariables.project = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project.key];
+        if (!props.isProjectDashboard) {
+            _defaultDashboardVariables.project = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project.key];
+        }
         _defaultDashboardVariables.service_account = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.service_account.key];
         _defaultDashboardVariables.region = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.region.key];
         return _defaultDashboardVariables;

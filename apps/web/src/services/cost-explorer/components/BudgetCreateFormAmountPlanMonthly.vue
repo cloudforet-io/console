@@ -8,8 +8,8 @@ import dayjs from 'dayjs';
 
 import { PButton, PDivider, PFieldTitle } from '@cloudforet/mirinae';
 
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap, CostDataSourceItems } from '@/store/reference/cost-data-source-reference-store';
 

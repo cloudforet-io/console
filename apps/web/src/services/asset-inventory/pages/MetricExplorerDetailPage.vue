@@ -81,7 +81,10 @@ const setQueryOptions = (urlQuery: MetricExplorerPageUrlQuery) => {
 
     if (_granularity) metricExplorerPageStore.setGranularity(_granularity as Granularity);
     metricExplorerPageStore.setSelectedGroupByList(_groupBy || []);
-    if (!isEmpty(_period)) metricExplorerPageStore.setPeriod(_period);
+    if (!isEmpty(_period)) {
+        metricExplorerPageStore.setRelativePeriod(undefined);
+        metricExplorerPageStore.setPeriod(_period);
+    }
     if (!isEmpty(_filters)) metricExplorerPageStore.setFilters(_filters);
 };
 

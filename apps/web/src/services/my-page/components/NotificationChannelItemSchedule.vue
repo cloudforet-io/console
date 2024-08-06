@@ -42,8 +42,8 @@ const state = reactive({
     scheduleModeForEdit: props.channelData.is_scheduled,
     scheduleForEdit: props.channelData.schedule,
     isScheduleValid: false,
-    displayStartHour: computed(() => utcToTimezoneFormatter(props.channelData.schedule?.start_hour, timezoneForFormatter)),
-    displayEndHour: computed(() => utcToTimezoneFormatter(props.channelData.schedule?.end_hour, timezoneForFormatter)),
+    displayStartHour: computed(() => utcToTimezoneFormatter((props.channelData.schedule?.start_hour || 0), timezoneForFormatter)),
+    displayEndHour: computed(() => utcToTimezoneFormatter((props.channelData.schedule?.end_hour || 0), timezoneForFormatter)),
 });
 const {
     state: notificationItemState,

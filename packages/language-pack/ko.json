@@ -1403,6 +1403,8 @@
 			"CANCEL": "취소",
 			"CHANGE_DATA_MODAL_DESCRIPTION": "아래 설정된 모든 옵션이 재설정됩니다.",
 			"CHANGE_DATA_MODAL_TITLE": "데이터를 변경하시겠습니까?",
+			"CLONE": "복제",
+			"CLONE_SUCCESS_MSG": "",
 			"CLOUD_SERVICE": {
 				"HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
 				"NO_DATA": "클라우드 리소스가 없습니다.",
@@ -1500,6 +1502,7 @@
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
 			"DONE": "완료",
+			"DONUT": "",
 			"EDIT": "편집",
 			"EDIT_WIDGET": "위젯 수정",
 			"EXPAND": "확장",
@@ -1573,6 +1576,8 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "지난 7일 ~ 예정 일정"
 			},
+			"PIE": "",
+			"PIE_CHART_TYPE": "",
 			"PREVIEW_TABLE_EMPTY_DESC": "여기에 데이터 구성의 미리보기가 표시됩니다.",
 			"PREVIEW_TABLE_EMPTY_TITLE": "데이터를 추가해 주세요.",
 			"REQUIRED_FIELDS_ARE_MISSING": "필수 필드 중 입력 누락 존재",
@@ -1648,7 +1653,9 @@
 				"SUB_TITLE_PROJECT_SUMMARY": "요약 정보",
 				"TITLE": "Trusted Advisor"
 			},
-			"UNABLE_TO_LOAD_WIDGET": "위젯 표시 불가"
+			"UNABLE_TO_LOAD_WIDGET": "위젯 표시 불가",
+			"VIEW_FULL_DATA": "",
+			"WIDGET_TITLE_REQUIRED": ""
 		}
 	},
 	"COST_EXPLORER": {
@@ -1664,7 +1671,7 @@
 			}
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "이상 비용 탐지 설정",
-		"COST_ADVANCED_SETTINGS": ""
+		"COST_ADVANCED_SETTINGS": "고급 설정"
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
@@ -1685,7 +1692,7 @@
 			"LABEL_VIWERS": "공개 여부",
 			"PRIVATE": "비공개",
 			"PROJECT": "프로젝트",
-			"SHARED": "공유",
+			"SHARED": "공유됨",
 			"SINGLE_PROJECT": "개별 프로젝트",
 			"TOOLTIP_CLONE": "복제",
 			"TOOLTIP_DELETE": "삭제",
@@ -1824,7 +1831,10 @@
 			}
 		},
 		"DETAIL": {
+			"1": "",
 			"ADD_WIDGET": "위젯 추가",
+			"ALL_PROJECTS": "모든 프로젝트",
+			"ALL_WORKSPACES": "전체 워크스페이스",
 			"ALT_S_SHARE_DASHBOARD": "대시보드 공유 완료",
 			"ALT_S_UNSHARE_DASHBOARD": "대시보드 공유 해제 완료",
 			"APPLY": "확인",
@@ -1863,10 +1873,17 @@
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "공유",
 			"SHARED_BY_ADMIN": "Admin에 의해 공유됨",
+			"SHARED_TO_ALL_PROJECTS": "전체 프로젝트에 공유됨",
 			"SHARED_TO_WORKSPACES": "워크스페이스에 공유됨",
+			"SHARE_DASHBOARD": "대시보드 공유",
+			"SHARE_TO_ALL_PROJECTS": "전체 프로젝트에 공유",
+			"SHARE_TO_ALL_PROJECTS_DESC": "이 대시보드를 모든 프로젝트에 공유 하시겠습니까?",
 			"SHARE_TO_ALL_WORKSPACES": "전체 워크스페이스에 공유",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "이 대시보드를 전체 워크스페이스에 공유하시겠습니까?",
 			"SHARE_WITH_CODE": "코드로 공유",
+			"UNSHARE_DASHBOARD": "대시보드 공유 해제",
+			"UNSHARE_FROM_ALL_PROJECTS": "전체 프로젝트에 공유 해제",
+			"UNSHARE_FROM_ALL_PROJECTS_DESC": "이 대시보드를 모든 프로젝트에서 공유 해제하시겠습니까?",
 			"UNSHARE_FROM_ALL_WORKSPACES": "전체 워크스페이스 공유 해제",
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "이 대시보드를 모든 워크스페이스에서 공유 해제하시겠습니까?"
 		},
@@ -1877,6 +1894,7 @@
 			"ALT_E_EDIT_NAME": "대시보드 이름 수정 실패",
 			"ALT_E_UPDATE_DASHBOARD_NAME": "대시보드 이름 수정 실패",
 			"ALT_S_DELETE_DASHBOARD": "대시보드 삭제 완료",
+			"ALT_S_EDIT_NAME": "대시보드 이름 수정 성공",
 			"CLONE_TITLE": "대시보드 복제",
 			"CUSTOM_DATE_FROM": "시작",
 			"CUSTOM_DATE_TITLE": "기간 선택",
@@ -1912,10 +1930,10 @@
 			"SAVE": "저장"
 		},
 		"LNB": {
-			"DEPRECATED": "",
+			"DEPRECATED": "지원 중지된",
 			"ONLY_FAVORITE": "즐겨찾기 항목만 노출",
-			"PRIVATE": "",
-			"SHARED": ""
+			"PRIVATE": "비공개",
+			"SHARED": "공유됨"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
@@ -2050,6 +2068,8 @@
 					"COLOR_SCHEMA": "색상 스키마",
 					"DATA_FIELD": "데이터 필드",
 					"DATA_TABLE": "데이터 테이블",
+					"DATE_FORMAT": "날짜 형식",
+					"DATE_FORMAT_AUTO_DISPLAY": "세부기준(Granuarity)별 자동 표시",
 					"DESCRIPTION": "설명",
 					"DYNAMIC_FIELD": "동적 필드",
 					"EDIT_DATA": "데이터 수정",
@@ -2082,7 +2102,7 @@
 						"PROGRESS_CARD_DESC": "이 차트를 올바르게 표시하려면, 데이터에 최소 2개 이상의 데이터 필드가 있어야 합니다. ",
 						"TITLE": "추가 필드가 필요합니다."
 					},
-					"WIDGET_INFO": "위젯 기본 정보",
+					"WIDGET_HEADER": "",
 					"X_AXIS": "X축",
 					"Y_AXIS": "Y축"
 				}
@@ -2588,6 +2608,8 @@
 				"ALT_S_DISABLE_USER_CHANNEL": "사용자 채널 비활성화 완료",
 				"ALT_S_ENABLE_PROJECT_CHANNEL": "프로젝트 채널 활성화 완료",
 				"ALT_S_ENABLE_USER_CHANNEL": "사용자 채널 활성화 완료",
+				"ASSOCIATED_MEMBER": "멤버 채널로 알림",
+				"ASSOCIATED_MEMBER_DESC": "워크스페이스 멤버별 설정된 개인 채널로 알림 발송됩니다.",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "슬랙 토큰은 편집할 수 없습니다.",
 				"CANNOT_EDIT_TOKEN": "입력된 Token은 편집할 수 없습니다.",
@@ -2759,7 +2781,7 @@
 				"DELETE": "삭제됨",
 				"MANAGED_INFO": "Admin 모드에서만 상태를 변경할 수 있습니다.",
 				"NO_SELECTED_ACCOUNT": "서비스 어카운트를 선택하시면 세부 내용을 볼 수 있습니다.",
-				"PENDING": "생성중",
+				"PENDING": "처리중",
 				"PROVIDERS_TITLE": "서비스 제공자",
 				"STATE": "상태",
 				"TAB_CREDENTIALS": "암호화 키",
@@ -3743,9 +3765,11 @@
 				"DETAILS": {
 					"ADDITIONAL_INFO": "추가 정보",
 					"DETAILS": "상세 정보",
+					"RESOURCE": "리소스",
 					"RESOURCE_ID": "리소스 ID",
 					"RESOURCE_NAME": "리소스 이름",
-					"RESOURCE_TYPE": "리소스 타입"
+					"RESOURCE_TYPE": "리소스 타입",
+					"RESPONDER": "응답자"
 				},
 				"EDIT_MODAL_TITLE": "얼럿 이름 수정",
 				"HEADER": {
@@ -3771,7 +3795,7 @@
 					"URGENCY": "긴급도"
 				},
 				"INFO": {
-					"ACCOUNT_ID": "Account ID",
+					"ACCOUNT_ID": "어카운트 아이디",
 					"ACKNOWLEDGED": "확인 시간",
 					"ALERT_ID": "얼럿 ID",
 					"ALT_E_UPDATE_DESCRIPTION": "설명 수정 실패",
@@ -3823,10 +3847,12 @@
 					"CURRENT": "현재",
 					"HIDE": "숨기기",
 					"LEVEL": "레벨",
+					"NOTIFICATION": "알림",
 					"NO_RESPONDER": "수신자 없음",
 					"RESPONDER": "수신자",
 					"SHOW_RESPONDERS": "수신자 보기"
 				},
+				"SIGN_IN_BUTTON": "",
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "상태 업데이트 실패",
 					"ALT_S_UPDATE_STATUS": "상태 업데이트 완료 ",
@@ -4207,6 +4233,7 @@
 			"ALT_S_ACTIVATE_ALERT": "얼럿 활성화 완료",
 			"ALT_S_ADD_MEMBER": "멤버 추가 완료",
 			"ALT_S_ADD_WEBHOOK": "웹훅 추가 완료",
+			"ALT_S_COPIED": "복사됨",
 			"ALT_S_DELETE_MEMBER": "멤버 삭제 완료",
 			"ALT_S_DELETE_PROJECT": "프로젝트 삭제 완료",
 			"ALT_S_DELETE_WEBHOOK": "웹훅 삭제 완료",
@@ -4217,11 +4244,21 @@
 			"ALT_S_UPDATE_PROJECT": "프로젝트 업데이트 완료",
 			"ALT_S_UPDATE_PROJECT_TYPE": "프로젝트 엑세스 방식 변경 완료",
 			"ALT_S_UPDATE_WEBHOOK": "웹훅 업데이트 완료",
+			"CLOSE": "닫기",
+			"CREATE": "생성",
+			"CREATE_WEBHOOK_DESC": "외부 모니터링 서비스에서 발생한 이벤트를 수신할 플러그인을 선택하세요.",
+			"CREATE_WEBHOOK_TITLE": "신규 웹훅 생성",
 			"DASHBOARD": {
-				"DASHBOARD": "대시보드 "
+				"DASHBOARD": "대시보드 ",
+				"DASHBOARD_LIST": "대시보드 리스트",
+				"NO_DASHBOARD": "",
+				"NO_DASHBOARD_DESC": ""
 			},
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
+			"FAILED": "실패",
+			"GO_TO_DASHBOARD": "",
+			"HELP": "가이드",
 			"INVITE_ONLY": "초대된 사용자만",
 			"MEMBER": {
 				"ADD": "추가",
@@ -4293,6 +4330,9 @@
 			"MODAL_VALIDATION_LENGTH": "40자 이하로 입력해주세요. ",
 			"MODAL_VALIDATION_REQUIRED": "이름을 입력해 주세요.",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "로딩중...",
+			"NOTIFICATION_ALL_USERS": "이 프로젝트의 모든 멤버",
+			"NOTIFICATION_SPECIFIC_MEMBER": "특정 멤버",
+			"NO_DATA": "데이터가 없습니다.",
 			"PROJECT_ALERT_ACTIVATE": "얼럿 활성화",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "이 프로젝트의 얼럿 설정하기",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "통합된 외부 이벤트를 수신하거나 이 프로젝트를 관리하려면 '얼럿 활성화' 버튼을 클릭하세요.",
@@ -4328,7 +4368,8 @@
 			"WEBHOOK_DELETE": "삭제",
 			"WEBHOOK_DISABLE": "비활성화",
 			"WEBHOOK_ENABLE": "활성화",
-			"WEBHOOK_UPDATE": "변경"
+			"WEBHOOK_UPDATE": "변경",
+			"WORKSPACE_MEMBER": "워크스페이스 멤버"
 		},
 		"EVENT_RULE": {
 			"ADD": "추가",

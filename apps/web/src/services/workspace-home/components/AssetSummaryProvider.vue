@@ -4,6 +4,8 @@ import {
     computed, reactive, ref,
 } from 'vue';
 
+import { sortBy } from 'lodash';
+
 import { PIconButton } from '@cloudforet/mirinae';
 
 import AssetSummaryProviderItem from '@/services/workspace-home/components/AssetSummaryProviderItem.vue';
@@ -32,6 +34,7 @@ const state = reactive({
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_PADDING) / PROVIDER_DEFAULT_WIDTH)),
     pageStart: 0,
     pageMax: computed<number>(() => Math.max(storeState.providers.length - state.visibleCount, 0)),
+    providerList: computed<ProviderResourceDataItem[]>(() => sortBy(storeState.providers, (i) => i.data.order) as ProviderResourceDataItem[]),
 });
 
 const handleClickArrowButton = (increment: number) => {
@@ -55,7 +58,7 @@ const handleClickArrowButton = (increment: number) => {
         <div ref="providerEl"
              class="row-items-container"
         >
-            <asset-summary-provider-item v-for="(item, idx) in storeState.providers"
+            <asset-summary-provider-item v-for="(item, idx) in state.providerList"
                                          :key="`asset-summary-item-${idx}`"
                                          :item="item"
             />

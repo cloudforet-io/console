@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { range, sortBy } from 'lodash';
+import { isEmpty, range, sortBy } from 'lodash';
 
 import {
     PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PFieldTitle,
@@ -90,7 +90,8 @@ const advancedOptionsState = reactive({
         { label: 'None', name: 'none' },
         { label: 'Year', name: 'years' },
         { label: 'Month', name: 'months' },
-        { label: 'Day', name: 'days' },
+        // TODO: to be deprecated
+        // { label: 'Day', name: 'days' },
     ]),
     timeDiffDateMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => ({
         years: range(3).map((i) => ({
@@ -101,10 +102,11 @@ const advancedOptionsState = reactive({
             label: i === 0 ? 'Last 1 Month' : `Last ${i + 1} Months`,
             name: String(i + 1),
         })),
-        days: range(31).map((i) => ({
-            label: i === 0 ? 'Last 1 Day' : `Last ${i + 1} Days`,
-            name: String(i + 1),
-        })),
+        // TODO: to be deprecated
+        // days: range(31).map((i) => ({
+        //     label: i === 0 ? 'Last 1 Day' : `Last ${i + 1} Days`,
+        //     name: String(i + 1),
+        // })),
     })),
 });
 
@@ -154,13 +156,13 @@ const costFilterState = reactive({
         const dataSource = storeState.costDataSources[props.sourceId ?? ''];
         const additionalInfo = dataSource?.data?.plugin_info?.metadata?.additional_info;
         if (!dataSource) return [];
-        if (additionalInfo) {
+        if (additionalInfo && !isEmpty(additionalInfo)) {
             return sortBy(Object.entries(additionalInfo).map(([k]) => ({
                 name: `additional_info.${k}`,
                 label: k,
             })), 'label');
         }
-        return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys
+        return dataSource ? sortBy((dataSource.data?.cost_additional_info_keys ?? [])
             .map((key) => ({
                 name: `additional_info.${key}`,
                 label: key,

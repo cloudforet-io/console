@@ -6,15 +6,17 @@ import {
 import { PTab, PI, PTooltip } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import { store } from '@/store';
+import { useDomainStore } from '@/store/domain/domain-store';
+
 
 const emit = defineEmits<{(event: 'close'): void;
 }>();
 
 const labelRef = ref<HTMLElement|null>(null);
 
+const domainStore = useDomainStore();
 const state = reactive({
-    integrationMenus: computed(() => store.getters['domain/domainExtraMenu']?.contents ?? []),
+    integrationMenus: computed(() => domainStore.getters.domainExtraMenu?.contents ?? []),
     tabs: computed(() => state.integrationMenus.map((menu) => ({
         label: menu.title,
         name: menu.title,

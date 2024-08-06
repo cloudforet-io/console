@@ -12,7 +12,7 @@ type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 
 export type SharedDataTableInfo = Pick<DataTableModel, 'name' | 'data_type' | 'source_type' | 'operator' | 'options' | 'labels_info' | 'data_info'>;
 export type SharedWidgetInfo =
-    Pick<WidgetModel, 'name' | 'description' | 'size' | 'widget_type' | 'options'> & {
+    Pick<WidgetModel, 'size' | 'widget_type' | 'options'> & {
     data_tables: SharedDataTableInfo[];
     data_table_id: number;
 };

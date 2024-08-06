@@ -27,9 +27,10 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getApiQueryDateRange,
-    getDateLabelFormat, getReferenceLabel,
+    getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
@@ -38,7 +39,9 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { XAxisValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 
 type Data = ListResponse<{
@@ -56,6 +59,12 @@ const state = reactive({
     xAxisData: [],
     chartData: [],
     chartOptions: computed<BarSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
+        grid: {
+            left: 10,
+            right: 10,
+            containLabel: true,
+        },
         legend: {
             type: 'scroll',
             show: state.showLegends,
@@ -69,9 +78,14 @@ const state = reactive({
             trigger: 'axis',
             formatter: (params) => {
                 const _params = params as any[];
-                const _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
+                let _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
+                if (state.xAxisField === DATE_FIELD.DATE) {
+                    _axisValue = dayjs.utc(_axisValue).format(state.dateFormat);
+                }
                 const _values = _params.map((p) => {
-                    const _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
+                    const _unit = widgetFrameProps.value.unitMap?.[p.seriesName];
+                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
+                    if (_unit) _seriesName = `${_seriesName} (${_unit})`;
                     const _value = numberFormatter(p.value) || '';
                     return `${p.marker} ${_seriesName}: <b>${_value}</b>`;
                 });
@@ -83,7 +97,7 @@ const state = reactive({
             axisLabel: {
                 formatter: (val) => {
                     if (state.xAxisField === DATE_FIELD.DATE) {
-                        return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
+                        return dayjs.utc(val).format(state.dateFormat);
                     }
                     return getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, val);
                 },
@@ -114,6 +128,10 @@ const state = reactive({
     }),
     // optional fields
     showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    dateFormat: computed<string|undefined>(() => {
+        const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
+        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
+    }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -201,9 +219,9 @@ const drawChart = (rawData: Data|null) => {
     state.chartData = _seriesData;
 };
 
-const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+const loadWidget = async (): Promise<Data|APIErrorToast> => {
     state.loading = true;
-    const res = data ?? await fetchWidget();
+    const res = await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);

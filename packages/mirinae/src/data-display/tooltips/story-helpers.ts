@@ -1,13 +1,28 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
 import { POSITIONS } from '@/data-display/tooltips/type';
+
+export const getTooltipArgs = (): Args => ({
+    tag: 'span',
+    contents: 'Tooltip contents',
+    defaultSlot: null,
+    position: 'top',
+    options: { autoHide: false },
+});
+
+export const getTooltipParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124040',
+    },
+});
 
 export const getTooltipArgTypes = (): ArgTypes => ({
     tag: {
         name: 'tag',
         type: { name: 'string' },
         description: 'Root element tag',
-        defaultValue: 'span',
         table: {
             type: {
                 summary: 'string',
@@ -17,15 +32,12 @@ export const getTooltipArgTypes = (): ArgTypes => ({
                 summary: 'span',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     contents: {
         name: 'contents',
         type: { name: 'string' },
         description: 'Tooltip contents.',
-        defaultValue: 'Tooltip contents',
         table: {
             type: {
                 summary: 'string',
@@ -35,15 +47,12 @@ export const getTooltipArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     position: {
         name: 'position',
         type: { name: 'string' },
         description: 'Position of tooltip.',
-        defaultValue: 'top',
         table: {
             type: {
                 summary: 'string',
@@ -53,16 +62,13 @@ export const getTooltipArgTypes = (): ArgTypes => ({
                 summary: 'top',
             },
         },
-        control: {
-            type: 'select',
-            options: [...Object.values(POSITIONS)],
-        },
+        control: 'select',
+        options: [...Object.values(POSITIONS)],
     },
     options: {
         name: 'options',
-        type: { name: 'object' },
+        type: { name: 'object' } as SBType,
         description: 'Options of Tooltip. This must be options of [v-tooltip](https://www.npmjs.com/package/v-tooltip#other-options).',
-        defaultValue: { autoHide: false },
         table: {
             type: {
                 summary: 'object',
@@ -72,15 +78,12 @@ export const getTooltipArgTypes = (): ArgTypes => ({
                 summary: '{}',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     /* slots */
     defaultSlot: {
         name: 'default',
         description: 'Slot for contents.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -88,4 +91,6 @@ export const getTooltipArgTypes = (): ArgTypes => ({
             category: 'slots',
         },
     },
+    // default
+    default: { table: { disable: true } },
 });

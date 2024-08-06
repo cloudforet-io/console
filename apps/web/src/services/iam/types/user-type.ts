@@ -5,6 +5,9 @@ import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 
+import type { LOCAL_TYPE } from '@/services/iam/constants/user-constant';
+
+export type LocalType = typeof LOCAL_TYPE[keyof typeof LOCAL_TYPE];
 interface RoleBindingState {
     type: RoleType;
     name: string;
@@ -28,7 +31,7 @@ export interface AddModalMenuItem extends MenuItem {
     name?: string;
     user_id?: string;
     role_type?: RoleType;
-    auth_type?: AuthType;
+    auth_type?: AuthType|LocalType;
     isNew?: boolean;
     workspace_id?: string;
 }

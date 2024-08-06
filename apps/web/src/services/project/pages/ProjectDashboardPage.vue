@@ -15,6 +15,7 @@ import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
 import ProjectSummaryAlertWidget from '@/services/project/components/ProjectSummaryAlertWidget.vue';
 import ProjectSummaryAllSummaryWidget from '@/services/project/components/ProjectSummaryAllSummaryWidget.vue';
+// import ProjectSummaryBillingWidget from '@/services/project/components/ProjectSummaryBillingWidget.vue';
 import ProjectSummaryBillingWidget from '@/services/project/components/ProjectSummaryBillingWidget.vue';
 import ProjectSummaryPersonalHealthDashboardWidget from '@/services/project/components/ProjectSummaryPersonalHealthDashboardWidget.vue';
 import ProjectSummaryServiceAccountsWidget from '@/services/project/components/ProjectSummaryServiceAccountsWidget.vue';
@@ -60,6 +61,10 @@ const getProjectAlertConfig = async () => {
                 class="col-span-12"
                 :project-id="props.id"
             />
+            <!--            <project-summary-billing-widget-->
+            <!--                class="col-span-12"-->
+            <!--                :project-id="props.id"-->
+            <!--            />-->
             <project-summary-billing-widget
                 class="col-span-12"
                 :project-id="props.id"
@@ -133,3 +138,4 @@ const getProjectAlertConfig = async () => {
     }
 }
 </style>
+

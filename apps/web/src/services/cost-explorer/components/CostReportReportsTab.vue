@@ -17,8 +17,8 @@ import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-s
 
 import { i18n } from '@/translations';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
