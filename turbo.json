@@ -33,7 +33,7 @@
       "cache": true
     },
     "storybook#build": {
-      "outputs": ["./.out/**"],
+      "outputs": ["./.storybook-static/**"],
       "inputs": [
         "../../packages/mirinae/src/**", "../../packages/mirinae/postcss.config.js", "../../packages/mirinae/tailwind.config.js",  "../../packages/mirinae/package.json",
         "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
