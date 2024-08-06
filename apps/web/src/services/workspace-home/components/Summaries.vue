@@ -10,7 +10,7 @@ import CostSummary from '@/services/workspace-home/components/CostSummary.vue';
             <asset-summary class="box-wrapper" />
             <account-summary class="box-wrapper" />
         </div>
-        <cost-summary class="box-wrapper" />
+        <cost-summary class="box-wrapper cost" />
     </div>
 </template>
 
@@ -30,6 +30,10 @@ import CostSummary from '@/services/workspace-home/components/CostSummary.vue';
         padding-top: 1.375rem;
         border-radius: 0.375rem;
         flex: 1;
+        &.cost {
+            @apply w-full;
+            max-width: initial;
+        }
     }
 
     @screen laptop {
