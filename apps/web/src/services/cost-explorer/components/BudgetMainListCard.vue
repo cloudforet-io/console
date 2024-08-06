@@ -11,8 +11,8 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';

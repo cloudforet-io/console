@@ -19,6 +19,7 @@ import {
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
 
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
@@ -34,10 +35,11 @@ const grantAndLoadByCurrentScope = async (scope: GrantScope, workspaceId?: strin
         workspace_id: workspaceId,
     };
 
+    const errorStore = useErrorStore(pinia);
     await SpaceRouter.router.app?.$store.dispatch('user/grantRoleAndLoadReferenceData', grantRequest);
-    const grantAcessFailStatus = SpaceRouter.router.app?.$store.state.error.grantAccessFailStatus;
+    const grantAccessFailStatus = errorStore.state.grantAccessFailStatus;
     return {
-        failStatus: !!grantAcessFailStatus,
+        failStatus: !!grantAccessFailStatus,
     };
 };
 export class SpaceRouter {
@@ -54,7 +56,7 @@ export class SpaceRouter {
             routes,
         });
 
-        let nextPath: string;
+        let previousPath: string;
         const appContextStore = useAppContextStore(pinia);
         const userWorkspaceStore = useUserWorkspaceStore(pinia);
 
@@ -65,9 +67,9 @@ export class SpaceRouter {
                 const lastCheckedTime = LocalStorageAccessor.getItem(CHUNK_LOAD_REFRESH_STORAGE_KEY);
                 if (!lastCheckedTime) {
                     LocalStorageAccessor.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, getCurrentTime().toString());
-                    window.location.href = nextPath ?? '/';
+                    window.location.href = previousPath ?? '/';
                 } else if (getCurrentTime() - parseInt(lastCheckedTime) < 10) {
-                    window.location.href = nextPath ?? '/';
+                    window.location.href = previousPath ?? '/';
                 }
             }
         });

@@ -20,6 +20,7 @@ import { setI18nLocale } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useErrorStore } from '@/store/error/error-store';
 import { MANAGED_ROLES } from '@/store/modules/user/config';
 // eslint-disable-next-line import/no-cycle
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -106,6 +107,7 @@ const getRoleTypeFromToken = (token: string): RoleType => {
 export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
+    const errorStore = useErrorStore();
     const fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.grant)<TokenGrantParameters, TokenGrantModel>;
 
     try {
@@ -143,7 +145,7 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
                 const allReferenceStore = useAllReferenceStore();
                 allReferenceStore.flush();
             }
-            commit('error/setGrantAccessFailStatus', false, { root: true });
+            errorStore.setGrantAccessFailStatus(false);
         }
     } catch (error) {
         console.error(error);
@@ -162,11 +164,11 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
 
         if (isInstanceOfAPIError(error)) {
             if (error.code === 'ERROR_WORKSPACE_STATE') {
-                commit('error/setGrantAccessFailStatus', true, { root: true });
+                errorStore.setGrantAccessFailStatus(true);
             } else if (error.code === 'ERROR_NOT_FOUND') {
-                commit('error/setGrantAccessFailStatus', true, { root: true });
+                errorStore.setGrantAccessFailStatus(true);
             } else if (error.code === 'ERROR_PERMISSION_DENIED') {
-                commit('error/setGrantAccessFailStatus', true, { root: true });
+                errorStore.setGrantAccessFailStatus(true);
             } else if (error.code === 'ERROR_AUTHENTICATE_FAILURE') {
                 SpaceConnector.flushToken();
             } else {

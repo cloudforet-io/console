@@ -20,12 +20,10 @@ import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-wid
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
-import config from '@/lib/config';
 import getRandomId from '@/lib/random-id-generator';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -36,7 +34,6 @@ import type {
     CreateDashboardParameters, DashboardModel, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-
 
 
 interface WidgetValidMap {
@@ -90,7 +87,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const appContextStore = useAppContextStore();
     const storeState = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        domainId: computed(() => store.state.domain.domainId),
     });
     const state = reactive({
         dashboardInfo: null as DashboardModel|null,
@@ -129,9 +125,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         isDeprecatedDashboard: computed<boolean>(() => state.dashboardInfo?.version === '1.0'),
         isSharedDashboard: computed<boolean>(() => state.dashboardInfo?.workspace_id === '*'),
         disableManageButtons: computed<boolean>(() => {
-            const editableDomains = config.get('DASHBOARD_EDITABLE_DOMAINS');
-            if (!storeState.isAdminMode && getters.isSharedDashboard) return true;
-            return !editableDomains?.includes(storeState.domainId);
+            if (state.projectId) return true;
+            return !storeState.isAdminMode && getters.isSharedDashboard;
         }),
         refinedVariablesSchema: computed<DashboardVariablesSchema>(() => {
             const _storedVariablesSchema = cloneDeep(state.variablesSchema);
@@ -159,8 +154,13 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             return _refinedVariablesSchema;
         }),
         refinedVars: computed<DashboardVars>(() => {
+            const isProjectSharedDashboard = !!state.projectId;
             const _vars: Record<string, string[]> = {};
-            Object.entries(state.vars).forEach(([k, v]) => {
+            const originVars = state.vars;
+            if (isProjectSharedDashboard && !!state.projectId) {
+                originVars.project = [state.projectId];
+            }
+            Object.entries(originVars).forEach(([k, v]) => {
                 const idKey = MANAGED_VARIABLE_MODELS[k]?.meta.idKey;
                 if (idKey) _vars[idKey] = v;
             });
@@ -199,6 +199,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setDashboardInfo = (dashboardInfo: DashboardModel|null) => {
         state.dashboardInfo = dashboardInfo;
     };
+    const setDashboardWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>) => {
+        state.dashboardWidgets = dashboardWidgets;
+    };
     const setLoadingWidgets = (loading: boolean) => {
         state.loadingWidgets = loading;
     };
@@ -226,6 +229,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setLabels([]);
         setDashboardType('PUBLIC');
         setDashboardScope('WORKSPACE');
+        setVars({});
         //
         setDashboardWidgetInfoList([]);
         setLoadingWidgets(false);
@@ -256,7 +260,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        state.projectId = _dashboardInfo.project_id;
         state.vars = _dashboardInfo.vars ?? {};
         state.dashboardLayouts = _dashboardInfo.layouts ?? [];
     };
@@ -444,6 +447,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariables,
         setVariablesInitMap,
         setDashboardInfo,
+        setDashboardWidgets,
         setLoadingWidgets,
         setDashboardType,
         setDashboardScope,

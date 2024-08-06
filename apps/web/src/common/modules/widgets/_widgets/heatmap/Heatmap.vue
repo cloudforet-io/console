@@ -27,9 +27,10 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getApiQueryDateRange,
-    getDateLabelFormat, getReferenceLabel,
+    getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
@@ -40,6 +41,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     ColorSchemaValue, XAxisValue, YAxisValue, ColorValue,
+    DateFormatValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
@@ -60,6 +62,7 @@ const state = reactive({
     yAxisData: [],
     chartData: [],
     heatmapMaxValue: computed(() => max(state.chartData.map((d) => d?.[2] || 0)) ?? 1),
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<HeatmapSeriesOption>(() => ({
         grid: {
             left: 0,
@@ -72,7 +75,7 @@ const state = reactive({
             axisLabel: {
                 formatter: (val) => {
                     if (state.xAxisField === DATE_FIELD.DATE) {
-                        return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
+                        return dayjs.utc(val).format(state.dateFormat);
                     }
                     return getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, val);
                 },
@@ -87,7 +90,7 @@ const state = reactive({
             axisLabel: {
                 formatter: (val) => {
                     if (state.yAxisField === DATE_FIELD.DATE) {
-                        return dayjs.utc(val).format(getDateLabelFormat(state.granularity));
+                        return dayjs.utc(val).format(state.dateFormat);
                     }
                     return getReferenceLabel(props.allReferenceTypeInfo, state.yAxisField, val);
                 },
@@ -97,7 +100,9 @@ const state = reactive({
             position: 'top',
             confine: true,
             formatter: (params) => {
-                const _name = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.name);
+                let _name = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, params.name);
+                if (state.xAxisField === DATE_FIELD.DATE) _name = dayjs.utc(_name).format(state.dateFormat);
+                if (state.unit) _name = `${_name} (${state.unit})`;
                 const _value = numberFormatter(params.value[2]) || '';
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
             },
@@ -149,6 +154,10 @@ const state = reactive({
     }),
     // optional fields
     showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    dateFormat: computed<string|undefined>(() => {
+        const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
+        return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
+    }),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -228,9 +237,9 @@ const drawChart = (rawData: Data|null) => {
     state.chartData = _chartData;
 };
 
-const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
+const loadWidget = async (): Promise<Data|APIErrorToast> => {
     state.loading = true;
-    const res = data ?? await fetchWidget();
+    const res = await fetchWidget();
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);

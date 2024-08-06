@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { CostReportDetailPath } from '@/router/constant';
+import { useDomainStore } from '@/store/domain/domain-store';
+import { pinia } from '@/store/pinia';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
@@ -8,25 +9,20 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 
-const SSO_TOKEN_PAGES = ['/reset-password', '/expired-link', CostReportDetailPath];
 
 
 export const checkSsoAccessToken = async (store) => {
     const currentPath = window.location.pathname;
-    if (SSO_TOKEN_PAGES.includes(currentPath)) {
-        if (isMobile() && (currentPath !== CostReportDetailPath)) store.dispatch('display/showMobileGuideModal');
-        return;
-    }
-
     const queryString = window.location.search;
     const params = new URLSearchParams(queryString);
     const ssoAccessToken = params.get('sso_access_token');
+    const domainStore = useDomainStore(pinia);
 
-    // signOut
-    if (ssoAccessToken) {
+    // only for reset-password page
+    if (ssoAccessToken && currentPath === '/') {
         if (SpaceConnector.isTokenAlive) {
             try {
-                const authType = store.state.domain.extendedAuthType;
+                const authType = domainStore.state.extendedAuthType;
                 await loadAuth(authType).signOut();
                 await store.dispatch('user/setIsSessionExpired', true);
             } catch (e) {

@@ -1403,6 +1403,8 @@
 			"CANCEL": "Cancel",
 			"CHANGE_DATA_MODAL_DESCRIPTION": "Note that all options set below will be reset.",
 			"CHANGE_DATA_MODAL_TITLE": "Do you want to change the data?",
+			"CLONE": "Clone",
+			"CLONE_SUCCESS_MSG": "Successfully cloned as a new widget.",
 			"CLOUD_SERVICE": {
 				"HELP": "Displays only major services in cloud service.",
 				"NO_DATA": "No Cloud Resources",
@@ -1500,6 +1502,7 @@
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
 			"DONE": "Done",
+			"DONUT": "Donut",
 			"EDIT": "Edit",
 			"EDIT_WIDGET": "Edit Widget",
 			"EXPAND": "Expand",
@@ -1573,6 +1576,8 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "Upcoming and Past 7 days"
 			},
+			"PIE": "Pie",
+			"PIE_CHART_TYPE": "Pie Chart Type",
 			"PREVIEW_TABLE_EMPTY_DESC": "The preview will be displayed here.",
 			"PREVIEW_TABLE_EMPTY_TITLE": "To get started, add your data.",
 			"REQUIRED_FIELDS_ARE_MISSING": "Required fields are missing.",
@@ -1648,7 +1653,9 @@
 				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
 				"TITLE": "Trusted Advisor"
 			},
-			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget"
+			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget",
+			"VIEW_FULL_DATA": "View full data",
+			"WIDGET_TITLE_REQUIRED": "Please enter widget title."
 		}
 	},
 	"COST_EXPLORER": {
@@ -1824,7 +1831,10 @@
 			}
 		},
 		"DETAIL": {
+			"1": "Share with Code",
 			"ADD_WIDGET": "Add Widget",
+			"ALL_PROJECTS": "All Projects",
+			"ALL_WORKSPACES": "All Workspaces",
 			"ALT_S_SHARE_DASHBOARD": "Dashboard successfully shared",
 			"ALT_S_UNSHARE_DASHBOARD": "Dashboard successfully unshared",
 			"APPLY": "Confirm",
@@ -1863,10 +1873,17 @@
 			"SET_HOME": "Set as Home Dashboard",
 			"SHARE": "Share",
 			"SHARED_BY_ADMIN": "Shared by Admin",
+			"SHARED_TO_ALL_PROJECTS": "Shared to All Projects",
 			"SHARED_TO_WORKSPACES": "Shared to Workspaces",
+			"SHARE_DASHBOARD": "Share Dashboard",
+			"SHARE_TO_ALL_PROJECTS": "Share to All Projects",
+			"SHARE_TO_ALL_PROJECTS_DESC": "Are you sure you want to share this dashboard to all projects?",
 			"SHARE_TO_ALL_WORKSPACES": "Share to All Workspaces",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "Are you sure you want to share this dashboard to all workspace?",
 			"SHARE_WITH_CODE": "Share with Code",
+			"UNSHARE_DASHBOARD": "Unshare Dashboard",
+			"UNSHARE_FROM_ALL_PROJECTS": "Unshare from All Projects",
+			"UNSHARE_FROM_ALL_PROJECTS_DESC": "Are you sure you want to unshare this dashboard from all projects?",
 			"UNSHARE_FROM_ALL_WORKSPACES": "Unshare from All Workspaces",
 			"UNSHARE_FROM_ALL_WORKSPACES_DESC": "Are you sure you want to unshare this dashboard from all workspace?"
 		},
@@ -1877,6 +1894,7 @@
 			"ALT_E_EDIT_NAME": "Failed to update dashboard name",
 			"ALT_E_UPDATE_DASHBOARD_NAME": "Failed to update the dashboard name",
 			"ALT_S_DELETE_DASHBOARD": "Dashboard successfully deleted",
+			"ALT_S_EDIT_NAME": "Dashboard name successfully edited",
 			"CLONE_TITLE": "Clone Dashboard",
 			"CUSTOM_DATE_FROM": "FROM",
 			"CUSTOM_DATE_TITLE": "Custom Range",
@@ -2050,6 +2068,8 @@
 					"COLOR_SCHEMA": "Color Schema",
 					"DATA_FIELD": "Data Field",
 					"DATA_TABLE": "Data Table",
+					"DATE_FORMAT": "Date Format",
+					"DATE_FORMAT_AUTO_DISPLAY": "Auto display by granularity",
 					"DESCRIPTION": "Description",
 					"DYNAMIC_FIELD": "Dynamic Field",
 					"EDIT_DATA": "Edit Data",
@@ -2082,7 +2102,7 @@
 						"PROGRESS_CARD_DESC": "To illustrate this chart properly, the data requires at least 2 data fields.",
 						"TITLE": "Additional fields are required"
 					},
-					"WIDGET_INFO": "Widget Info",
+					"WIDGET_HEADER": "Widget Header",
 					"X_AXIS": "X-Axis",
 					"Y_AXIS": "Y-Axis"
 				}
@@ -2583,6 +2603,8 @@
 				"ALT_S_DISABLE_USER_CHANNEL": "User Channel successfully disabled ",
 				"ALT_S_ENABLE_PROJECT_CHANNEL": "Project Channel successfully enabled ",
 				"ALT_S_ENABLE_USER_CHANNEL": "User Channel successfully enabled ",
+				"ASSOCIATED_MEMBER": "Notify to Member Channel",
+				"ASSOCIATED_MEMBER_DESC": "Forward to workspace members' personal notification channels.",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "Slack Token is unable to edit.",
 				"CANNOT_EDIT_TOKEN": "Token is unable to edit.",
@@ -3738,9 +3760,11 @@
 				"DETAILS": {
 					"ADDITIONAL_INFO": "Additional Information",
 					"DETAILS": "Details",
+					"RESOURCE": "Resource",
 					"RESOURCE_ID": "Resource ID",
 					"RESOURCE_NAME": "Resource Name",
-					"RESOURCE_TYPE": "Resource Type"
+					"RESOURCE_TYPE": "Resource Type",
+					"RESPONDER": "Responder"
 				},
 				"EDIT_MODAL_TITLE": "Edit Alert Name",
 				"HEADER": {
@@ -3818,10 +3842,12 @@
 					"CURRENT": "Current",
 					"HIDE": "hide",
 					"LEVEL": "Level",
+					"NOTIFICATION": "Notification",
 					"NO_RESPONDER": "No Responder",
 					"RESPONDER": "Responder",
 					"SHOW_RESPONDERS": "show responders"
 				},
+				"SIGN_IN_BUTTON": "Sign in to Manage Details",
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "Failed to Update Status",
 					"ALT_S_UPDATE_STATUS": "Status successfully updated ",
@@ -4202,6 +4228,7 @@
 			"ALT_S_ACTIVATE_ALERT": "Alert successfully activated",
 			"ALT_S_ADD_MEMBER": "Successfully Added Member ",
 			"ALT_S_ADD_WEBHOOK": "Webhook successfully added ",
+			"ALT_S_COPIED": "Copied",
 			"ALT_S_DELETE_MEMBER": "Member successfully deleted ",
 			"ALT_S_DELETE_PROJECT": "Project successfully deleted ",
 			"ALT_S_DELETE_WEBHOOK": "Webhook successfully deleted ",
@@ -4212,11 +4239,21 @@
 			"ALT_S_UPDATE_PROJECT": "Project successfully updated ",
 			"ALT_S_UPDATE_PROJECT_TYPE": "Project Access successfully updated ",
 			"ALT_S_UPDATE_WEBHOOK": "Webhook successfully updated ",
+			"CLOSE": "Close",
+			"CREATE": "Create",
+			"CREATE_WEBHOOK_DESC": "Select a Plugin to receive events that occured in external monitoring services.",
+			"CREATE_WEBHOOK_TITLE": "Create New Webhook",
 			"DASHBOARD": {
-				"DASHBOARD": "Dashboard"
+				"DASHBOARD": "Dashboard",
+				"DASHBOARD_LIST": "Dashboards",
+				"NO_DASHBOARD": "No Dashboard",
+				"NO_DASHBOARD_DESC": "Shared dashboard can be added here."
 			},
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
+			"FAILED": "Failed",
+			"GO_TO_DASHBOARD": "Go to Dashboard",
+			"HELP": "Help",
 			"INVITE_ONLY": "Invite only",
 			"MEMBER": {
 				"ADD": "Add",
@@ -4288,6 +4325,9 @@
 			"MODAL_VALIDATION_LENGTH": "Must be longer than 40 characters.",
 			"MODAL_VALIDATION_REQUIRED": "Required field",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "Loading...",
+			"NOTIFICATION_ALL_USERS": "All Members in this project",
+			"NOTIFICATION_SPECIFIC_MEMBER": "Specific Members",
+			"NO_DATA": "No Data",
 			"PROJECT_ALERT_ACTIVATE": "Activate Alert",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "Set an Alert of this Project",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "Click ‘Activate Alert’ to receive integrated external events or manage of this project.",
@@ -4323,7 +4363,8 @@
 			"WEBHOOK_DELETE": "Delete",
 			"WEBHOOK_DISABLE": "Disable",
 			"WEBHOOK_ENABLE": "Enable",
-			"WEBHOOK_UPDATE": "Update"
+			"WEBHOOK_UPDATE": "Update",
+			"WORKSPACE_MEMBER": "Workspace Member"
 		},
 		"EVENT_RULE": {
 			"ADD": "Add",
@@ -4366,7 +4407,7 @@
 			"PAUSE_NOTIFICATION": "Pause Notifications",
 			"PROJECT_ROUTING": "Project Routing",
 			"SAVE": "Save",
-			"SNOOZED_NOTIFICATIONS": "No Notifications",
+			"SNOOZED_NOTIFICATIONS": "Silence",
 			"THEN_STOP_PROCESSING": "Then stop processing",
 			"THESE_THINGS": "these things",
 			"TITLE_INFO_MESSAGE": "Event rules are executed in ascending order.",

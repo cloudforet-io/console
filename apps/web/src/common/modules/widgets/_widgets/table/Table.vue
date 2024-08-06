@@ -9,6 +9,7 @@ import { orderBy, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import { PTextPagination } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
@@ -40,6 +41,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
+    DateFormatValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -94,9 +96,12 @@ const state = reactive({
     subTotalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.subTotal as TotalValue),
     totalInfo: computed<TotalValue|undefined>(() => props.widgetOptions?.total as TotalValue),
     progressBarInfo: computed<ProgressBarValue|undefined>(() => props.widgetOptions?.progressBar as ProgressBarValue),
+    dateFormatInfo: computed<DateFormatValue|undefined>(() => props.widgetOptions?.dateFormat as DateFormatValue),
     // table
     tableFields: computed<TableWidgetField[]>(() => {
-        const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map((field) => ({ name: field, label: field, fieldInfo: { type: 'labelField' } })) ?? [];
+        const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map(
+            (field) => ({ name: field, label: field, fieldInfo: { type: 'labelField', additionalType: field === 'Date' ? 'dateFormat' : undefined } }),
+        ) ?? [];
         let dataFields: TableWidgetField[] = [];
         if (state.tableDataFieldType === 'staticField') {
             state.tableDataField?.forEach((field) => {
@@ -124,7 +129,7 @@ const state = reactive({
         else { // None Time Series Dynamic Field Case
             state.finalConvertedData?.results?.[0]?.[state.tableDataCriteria].forEach((d) => {
                 if (d[state.tableDataField] === 'sub_total') return;
-                const fieldName = d[state.tableDataField];
+                const fieldName = `${d[state.tableDataField]}`;
                 const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
                 if (fieldName && fieldName.startsWith('comparison_')) {
                     if (state.comparisonInfo?.format && state.isComparisonEnabled && d[state.tableDataField] !== 'etc') {
@@ -164,6 +169,13 @@ const state = reactive({
         return basicFields;
     }),
     dataInfo: computed<DataInfo|undefined>(() => state.dataTable?.data_info),
+    sortBy: [],
+    thisPage: 1,
+    pageSize: computed<number>(() => (props.size === 'full' ? 30 : 10)),
+    allPage: computed(() => {
+        const totalCount = state.data?.total_count ?? 0;
+        return Math.ceil(totalCount / state.pageSize) || 1;
+    }),
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -201,7 +213,7 @@ const getWidgetTableDateFields = (
         dateFields.push({
             name: now.format(labelDateFormat),
             label: now.format(labelDateFormat),
-            fieldInfo: { type: 'dataField', unit: state.dataInfo?.[criteria]?.unit },
+            fieldInfo: { type: 'dataField', additionalType: 'dateFormat', unit: state.dataInfo?.[criteria]?.unit },
         });
         now = now.add(1, timeUnit);
     }
@@ -240,7 +252,11 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
                 group_by: _groupBy,
                 field_group: _field_group,
                 fields: _fields,
-                sort: _sort,
+                sort: state.sortBy.length ? state.sortBy : _sort,
+                page: {
+                    start: (state.pageSize * (state.thisPage - 1)) + 1,
+                    limit: state.pageSize,
+                },
             },
             vars: props.dashboardVars,
         });
@@ -254,14 +270,30 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
         state.loading = false;
     }
 };
-const loadWidget = async (data?: Data): Promise<Data|APIErrorToast> => {
-    const res = data ?? await fetchWidget();
+const loadWidget = async (manualLoad?: boolean): Promise<Data|APIErrorToast> => {
+    if (!manualLoad) {
+        state.sortBy = [];
+        state.thisPage = 1;
+    }
+    const res = await fetchWidget();
     const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget(true) : null;
     if (typeof res === 'function') return res;
     state.data = res;
     state.comparisonData = comparisonRes;
     return state.data;
 };
+
+const handleManualLoadWidget = async () => {
+    await loadWidget(true);
+};
+const handleUpdateThisPage = async (_thisPage: number) => {
+    state.thisPage = _thisPage;
+    await loadWidget(true);
+};
+
+watch([() => props.size], async () => {
+    await loadWidget(true);
+});
 
 // Data Converting
 watch(() => state.data, () => {
@@ -385,7 +417,7 @@ watch(() => state.data, () => {
             if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
             const fieldForTotal = results?.[0]?.[state.tableDataCriteria] ?? [];
             totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
-                const fieldName = item[state.tableDataField];
+                const fieldName = `${item[state.tableDataField]}`;
                 if (fieldName.startsWith('comparison_')) {
                     const targetTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.target || 0), 0);
                     const subjectTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.subject || 0), 0);
@@ -436,6 +468,16 @@ defineExpose<WidgetExpose<Data>>({
                                    :total-info="state.totalInfo"
                                    :granularity="state.granularity"
                                    :data-info="state.dataInfo"
+                                   :date-format-info="state.dateFormatInfo"
+                                   :sort-by.sync="state.sortBy"
+                                   :this-page.sync="state.thisPage"
+                                   @load="handleManualLoadWidget"
+                />
+            </div>
+            <div class="table-pagination-wrapper">
+                <p-text-pagination :this-page="state.thisPage"
+                                   :all-page="state.allPage"
+                                   @pageChange="handleUpdateThisPage"
                 />
             </div>
         </div>
@@ -444,11 +486,17 @@ defineExpose<WidgetExpose<Data>>({
 
 <style lang="postcss" scoped>
 .table-wrapper {
-    @apply flex justify-center h-full;
-    max-height: 100%;
+    @apply flex justify-center w-full;
+    max-height: calc(100% - 1.5rem);
+    height: calc(100% - 1.5rem);
+
     overflow: hidden;
     .data-table {
         height: 100%;
     }
+}
+.table-pagination-wrapper {
+    @apply flex justify-center items-center;
+    height: 1.5rem;
 }
 </style>

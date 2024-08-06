@@ -21,7 +21,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ProjectAlert from '@/services/project/components/ProjectAlertListTab.vue';
 import ProjectSettings from '@/services/project/components/ProjectAlertSettingsTab.vue';
-import ProjectWebhook from '@/services/project/components/ProjectWebhookTab.vue';
+import ProjectWebhook from '@/services/project/components/ProjectAlertWebhookTab.vue';
 
 
 interface Props {

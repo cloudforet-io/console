@@ -9,13 +9,13 @@ export type DataTableOperator = typeof DATA_TABLE_OPERATOR[keyof typeof DATA_TAB
 export type DataTableDataType = typeof DATA_TABLE_TYPE[keyof typeof DATA_TABLE_TYPE];
 export type AdditionalLabels = Record<string, string>;
 export type DateFormat = 'SINGLE' | 'SEPARATE';
-export type TimeDiff = Record<string, any>; // years|months|days
-export type TimeSeriesAnalyzeQuery = Record<string, any>;
+export type TimeDiff = Record<TimeDiffItem, number>; // years|months|days
 export type LabelsInfo = Record<string, object>;
-export type DataInfo = Record<string, { unit: string }>;
+export type DataInfo = Record<string, { unit?: string, timediff?: TimeDiff }>;
 export type DataTableOptions = DataTableAddOptions | DataTableTransformOptions;
 export type JoinType = typeof JOIN_TYPE[keyof typeof JOIN_TYPE];
 export type WidgetState = 'CREATING' | 'INACTIVE' | 'ACTIVE';
+export type TimeDiffItem = 'years' | 'months';
 /* ADD Data Type Options */
 export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;
@@ -35,6 +35,7 @@ export interface AssetOptions {
 
 export interface CostOptions {
     data_source_id: string;
+    plugin_id?: string;
     data_key: string;
 }
 

@@ -22,11 +22,21 @@ const pieChart: WidgetConfig = {
                 excludeDateField: true,
             },
         },
+        pieChartType: {
+            options: {
+                default: 'pie',
+            },
+        },
     },
     optionalFieldsSchema: {
         legend: {
             options: {
                 default: true,
+            },
+        },
+        dateFormat: {
+            options: {
+                default: 'MMM DD, YYYY',
             },
         },
     },

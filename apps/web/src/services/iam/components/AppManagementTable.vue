@@ -56,7 +56,6 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
     userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
 });
 const state = reactive({
     loading: false,

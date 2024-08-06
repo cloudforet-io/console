@@ -10,8 +10,6 @@ export interface PrivateWidgetModel {
     dashboard_id: string;
     user_id: string;
     widget_id: string;
-    name: string;
-    description: string;
     size: WidgetSize;
     data_table_id: string;
     widget_type: WidgetType;

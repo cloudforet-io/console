@@ -41,7 +41,10 @@ import {
 
 import { store } from '@/store';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
+
 
 export default {
     name: 'SignInRightContainer',
@@ -57,9 +60,10 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const domainStore = useDomainStore();
         const { width } = useWindowSize();
         const state = reactive({
-            symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
+            symbolImage: computed<string|undefined>(() => domainStore.getters.domainSymbolImage),
             isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
         });
 

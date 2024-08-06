@@ -1,13 +1,23 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { Args, ArgTypes, Parameters } from '@storybook/vue';
 
 import { TOAST_GROUP } from '@/feedbacks/alert/toast-alert/config';
+
+export const getToastAlertArgs = (): Args => ({
+    group: TOAST_GROUP.toastTopCenter,
+});
+
+export const getToastAlertParameters = ():Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A88918&t=kwTRXVZQtJLDw0Ei-4',
+    },
+});
 
 export const getToastAlertArgTypes = (): ArgTypes => ({
     group: {
         name: 'group',
         type: { name: 'string' },
         description: 'Name of target toast group.',
-        defaultValue: TOAST_GROUP.toastTopCenter,
         table: {
             type: {
                 summary: 'string',
@@ -17,9 +27,7 @@ export const getToastAlertArgTypes = (): ArgTypes => ({
                 summary: `"${TOAST_GROUP.toastTopCenter}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(TOAST_GROUP),
-        },
+        control: 'select',
+        options: Object.values(TOAST_GROUP),
     },
 });

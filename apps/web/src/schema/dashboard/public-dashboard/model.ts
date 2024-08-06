@@ -6,6 +6,7 @@ import type {
     DashboardVariables,
     DashboardVariablesSchema,
     DashboardVars,
+    DashboardScope,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
@@ -21,6 +22,7 @@ export interface PublicDashboardModel {
     variables?: DashboardVariables; // will be deprecated
     labels?: string[];
     shared: boolean;
+    scope: DashboardScope;
     //
     tags: Tags;
     folder_id: string;

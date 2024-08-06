@@ -1,4 +1,7 @@
-export const initDomain = async (store, config): Promise<string> => {
+import { useDomainStore } from '@/store/domain/domain-store';
+import { pinia } from '@/store/pinia';
+
+export const initDomain = async (config): Promise<string> => {
     let domainName;
     if (config.get('DOMAIN_NAME_REF') === 'hostname') {
         const { hostname } = window.location;
@@ -8,8 +11,9 @@ export const initDomain = async (store, config): Promise<string> => {
     }
 
     try {
-        await store.dispatch('domain/load', domainName);
-        return store.state.domain.domainId;
+        const domainStore = useDomainStore(pinia);
+        await domainStore.initDomainInfo(domainName);
+        return domainStore.state.domainId as string;
     } catch (e) {
         console.error(e);
         throw new Error('Failed to load domain.');

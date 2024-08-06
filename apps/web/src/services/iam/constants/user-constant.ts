@@ -85,3 +85,8 @@ export const USER_TABS = {
     DATA: 'data',
 } as const;
 
+export const LOCAL_TYPE = {
+    EMAIL: 'EMAIL',
+    ID: 'ID',
+} as const;
+

@@ -1,5 +1,5 @@
-import { CURRENCY } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 
 
 /*

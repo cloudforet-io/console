@@ -151,7 +151,7 @@ const listNotifications = async () => {
             state.items = state.items.concat(convertNotificationItem(response.results ?? []));
             await setReadNotifications(response.results ?? []);
             // update last read
-            await store.commit('settings/setGnbNotificationLastReadTime', dayjs.utc().toISOString(), { root: true });
+            await store.commit('display/setGnbNotificationLastReadTime', dayjs.utc().toISOString(), { root: true });
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));

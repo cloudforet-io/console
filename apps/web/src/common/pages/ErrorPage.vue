@@ -16,20 +16,18 @@ export default defineComponent({
 <script setup lang="ts">
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates
-import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton } from '@cloudforet/mirinae';
 
-
-import { store } from '@/store';
-
 import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDomainStore } from '@/store/domain/domain-store';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+
 
 interface Props {
     statusCode?: string;
@@ -39,8 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     statusCode: '404',
 });
 const appContextStore = useAppContextStore();
-
-const domainName = computed(() => store.state.domain.name);
+const domainStore = useDomainStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -79,7 +76,7 @@ const handleClickHome = () => {
                     {{ $t('COMMON.ERROR.404_MSG') }}
                 </template>
             </h3>
-            <div v-if="domainName"
+            <div v-if="domainStore.state.name"
                  class="utils-button"
             >
                 <p-button style-type="transparent"

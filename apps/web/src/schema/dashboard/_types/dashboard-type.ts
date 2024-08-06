@@ -53,6 +53,8 @@ interface MultiSelectDashboardVariables {
     [key: string]: string[];
 }
 
+export type DashboardScope = 'WORKSPACE'|'PROJECT';
+
 export type RefreshIntervalOption = keyof typeof REFRESH_INTERVAL_OPTIONS_MAP;
 // dashboard options types
 export interface DashboardOptions {

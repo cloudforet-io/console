@@ -1,7 +1,9 @@
 import type { ManipulateType } from 'dayjs';
 import dayjs from 'dayjs';
 
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateFormat } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
@@ -90,7 +92,7 @@ export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, fi
     if (field === 'Provider' || field === 'provider') {
         return allReferenceTypeInfo.provider.referenceMap[val]?.label || val;
     }
-    if (field === 'Service Account') {
+    if (field === 'Service Account' || field === 'service_account_id') {
         return allReferenceTypeInfo.service_account.referenceMap[val]?.label || val;
     }
     return val;
@@ -124,4 +126,12 @@ export const getApiQueryDateRange = (granularity: string, dateRange: DateRange):
         }
     }
     return dateRange;
+};
+
+export const getRefinedDateFormatByGranularity = (granularity: string, dateFormat: DateFormat): string => DATE_FORMAT[dateFormat][granularity];
+
+export const getFormattedDate = (date: string, dateFormat: string): string => {
+    const dateFormatsWithMMM = Object.values(DATE_FORMAT['MMM DD, YYYY']) as string[];
+    if (dateFormatsWithMMM.includes(dateFormat)) return dayjs.utc(date).locale('en').format(dateFormat);
+    return dayjs.utc(date).format(dateFormat);
 };

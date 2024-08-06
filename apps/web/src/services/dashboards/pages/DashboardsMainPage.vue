@@ -213,22 +213,20 @@ onUnmounted(() => {
             />
             <template v-else>
                 <dashboard-main-board-list v-if="state.sharedDashboardList.length"
-                                           dashboard-type="SHARED"
                                            class="dashboard-list"
                                            :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SHARED')"
                                            :dashboard-list="state.sharedDashboardList"
                 />
                 <dashboard-main-board-list v-if="state.privateDashboardList.length"
-                                           dashboard-type="PRIVATE"
                                            class="dashboard-list"
                                            :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
                                            :dashboard-list="state.privateDashboardList"
                 />
                 <dashboard-main-board-list v-if="state.deprecatedDashboardList.length"
-                                           dashboard-type="DEPRECATED"
                                            class="dashboard-list"
                                            :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED')"
                                            :dashboard-list="state.deprecatedDashboardList"
+                                           is-collapsed
                 />
             </template>
         </p-data-loader>

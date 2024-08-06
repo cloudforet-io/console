@@ -1,0 +1,58 @@
+{/* PTextEditor.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PTextEditorStories from './PTextEditor.stories';
+
+<Meta of={PTextEditorStories} />
+
+
+# Text Editor
+<br/>
+<br/>
+
+
+## Basic
+<br/>
+<br/>
+<Canvas of={PTextEditorStories.Basic} />
+
+<br/>
+<br/>
+
+## Loading
+<br/>
+<br/>
+<Canvas of={PTextEditorStories.Loading} />
+
+<br/>
+<br/>
+
+## Highlight Lines
+<br/>
+<br/>
+<Canvas of={PTextEditorStories.HighlightLines} />
+
+<br/>
+<br/>
+
+## Change Code
+<br/>
+<br/>
+<Canvas of={PTextEditorStories.ChangeCode} />
+
+<br/>
+<br/>
+
+## Auto Reformat on Code Change (string only)
+<br/>
+<br/>
+<Canvas of={PTextEditorStories.AutoReformatonCodeChangeStringOnly} />
+
+<br/>
+<br/>
+
+
+## Playground
+<Canvas of={PTextEditorStories.Playground} />
+<Controls of={PTextEditorStories.Playground} />
