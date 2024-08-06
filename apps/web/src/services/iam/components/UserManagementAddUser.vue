@@ -108,11 +108,18 @@ const getUserList = async () => {
     }
 };
 const checkEmailValidation = () => {
+    const { isValid, invalidText } = checkEmailFormat(formState.searchText);
     if (formState.selectedMenuItem === 'EMAIL') {
-        const { isValid, invalidText } = checkEmailFormat(formState.searchText);
         if (!isValid) {
             validationState.userIdInvalid = true;
             validationState.userIdInvalidText = invalidText;
+            return false;
+        }
+    }
+    if (formState.selectedMenuItem === 'ID') {
+        if (isValid) {
+            validationState.userIdInvalid = true;
+            validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.ID_INVALID');
             return false;
         }
     }
@@ -230,7 +237,7 @@ onMounted(() => {
                        :invalid="validationState.userIdInvalid"
                        :invalid-text="validationState.userIdInvalidText"
                        class="user-info-field-group"
-                       :class="{'is-admin-mode': userPageState.isAdminMode}"
+                       :class="{'is-admin-mode': userPageState.isAdminMode, 'is-id-format': formState.selectedMenuItem === 'ID'}"
         >
             <template #label>
                 <span>
@@ -389,6 +396,11 @@ onMounted(() => {
         @apply absolute;
         bottom: -1.125rem;
         left: 8rem;
+    }
+    &.is-id-format {
+        .invalid-feedback {
+            left: 7rem;
+        }
     }
 }
 </style>
