@@ -1501,6 +1501,10 @@
 			},
 			"DEFAULT_WIDTH": "デフォルト幅",
 			"DELETE": "削除",
+			"DISPLAY_ANNOTATION": {
+				"DISPLAY_ANNOTATION": "",
+				"INVALID_VALUE": ""
+			},
 			"DONE": "完了",
 			"DONUT": "",
 			"EDIT": "編集",
