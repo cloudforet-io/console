@@ -90,7 +90,12 @@ export interface NumberFormatValue {
     };
 }
 
+export interface DisplayAnnotationValue {
+    toggleValue: boolean;
+    annotation?: string;
+}
+
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
-    | WidgetHeaderValue | DateFormatValue | NumberFormatValue;
+    | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DisplayAnnotationValue;
