@@ -3,7 +3,7 @@ import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/
 
 import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type { FormatRulesValue, WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { FormatRulesValue, WidgetFieldValues, DateFormat } from '@/common/modules/widgets/types/widget-field-value-type';
 
 export interface DataFieldOptions {
     multiSelectable?: boolean;
@@ -100,6 +100,10 @@ export interface ProgressBarOptions {
     baseColor?: string;
 }
 
+export interface DateFormatOptions {
+    default: DateFormat;
+}
+
 export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_TYPE];
 export interface FormatRulesOptions {
     formatRulesType: FormatRulesType;
@@ -116,7 +120,7 @@ export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxi
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
-    | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions;
+    | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -131,7 +135,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'progressBar'
     | 'formatRules'
     | 'granularity' | 'colorSchema' | 'pieChartType'
-    | 'widgetHeader';
+    | 'widgetHeader' | 'dateFormat';
 
 export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;

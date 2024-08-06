@@ -7,12 +7,15 @@ import {
 import { PLazyImg, PButton } from '@cloudforet/mirinae';
 
 import type { Metadata } from '@/schema/identity/domain/api-verbs/get-auth-info';
-import { store } from '@/store';
+
+import { useDomainStore } from '@/store/domain/domain-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+
+const domainStore = useDomainStore();
 const state = reactive({
-    authOptions: computed<Metadata>(() => store.state.domain.authOptions),
+    authOptions: computed<Metadata>(() => domainStore.state.authOptions),
 });
 
 const handleLogin = () => {

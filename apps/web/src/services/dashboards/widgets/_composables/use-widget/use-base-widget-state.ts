@@ -7,8 +7,8 @@ import type {
     AssetDataField, ChartType, CostDataField, Granularity,
 } from '@/schema/dashboard/_types/widget-type';
 
-import { CURRENCY } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 
 import type { MergedBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
 import {

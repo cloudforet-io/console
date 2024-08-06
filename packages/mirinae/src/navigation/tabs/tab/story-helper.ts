@@ -1,14 +1,35 @@
 import { reactive, toRefs } from 'vue';
 
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import PButton from '@/inputs/buttons/button/PButton.vue';
+
+export const getTabArgs = (): Args => ({
+    tabs: [
+        { name: 'detail', label: 'Detail' },
+        { name: 'info', label: 'Info' },
+        { name: 'tags', label: 'Tags' },
+    ],
+    activeTab: 'detail',
+    stretch: false,
+    defaultSlot: 'This is tab body!',
+    extraSlot: null,
+    footerSlot: null,
+});
+
+export const getTabParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6013%3A121728',
+    },
+});
 
 export const getTabArgTypes = (): ArgTypes => ({
     /* props */
     tabs: {
         name: 'tabs',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: `Tab items. 
         It is array of \`string\` or array of 
         \`{
@@ -17,11 +38,6 @@ export const getTabArgTypes = (): ArgTypes => ({
           keepAlive?: boolean;
         }\`
         .`,
-        defaultValue: [
-            { name: 'detail', label: 'Detail' },
-            { name: 'info', label: 'Info' },
-            { name: 'tags', label: 'Tags' },
-        ],
         table: {
             type: {
                 summary: 'array',
@@ -31,15 +47,12 @@ export const getTabArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     activeTab: {
         name: 'activeTab',
         type: { name: 'string', required: true },
         description: 'Active tab name. `sync` props.',
-        defaultValue: 'detail',
         table: {
             type: {
                 summary: 'string',
@@ -49,15 +62,12 @@ export const getTabArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     stretch: {
         name: 'stretch',
         type: { name: 'boolean' },
         description: 'Whether to stretch tab items or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -67,15 +77,12 @@ export const getTabArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     /* slots */
     defaultSlot: {
         name: 'default',
         description: 'Use it to insert something to every tab body.',
-        defaultValue: 'This is tab body!',
         table: {
             type: {
                 summary: null,
@@ -85,14 +92,11 @@ export const getTabArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     extraSlot: {
         name: 'extra',
         description: 'Use it to insert something to right extra space of every tab.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -106,7 +110,6 @@ export const getTabArgTypes = (): ArgTypes => ({
     footerSlot: {
         name: 'footer',
         description: 'Use when all tabs require a common footer ui.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -147,6 +150,11 @@ export const getTabArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    'v-model': { table: { disable: true } },
+    extra: { table: { disable: true } },
+    default: { table: { disable: true } },
+    footer: { table: { disable: true } },
 });
 
 export const Inner = {

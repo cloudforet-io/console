@@ -23,6 +23,11 @@ const treemap: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
+        dateFormat: {
+            options: {
+                default: 'MMM DD, YYYY',
+            },
+        },
     },
 };
 

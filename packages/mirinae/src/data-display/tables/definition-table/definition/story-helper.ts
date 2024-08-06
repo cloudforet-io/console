@@ -1,11 +1,33 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
+
+export const getDefinitionArgs = (): Args => ({
+    name: 'name',
+    label: 'label',
+    data: 'data',
+    disableCopy: false,
+    formatter: undefined,
+    block: false,
+    copyValue: undefined,
+    copyValueFormatter: undefined,
+    autoKeyWidth: false,
+    customKeyWidth: undefined,
+    defaultSlot: null,
+    keySlot: null,
+    extraSlot: null,
+});
+
+export const getDifinitionParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5373%3A6989',
+    },
+});
 
 export const getDefinitionArgTypes = (): ArgTypes => ({
     name: {
         name: 'name',
         type: { name: 'string' },
         description: 'Name of key.',
-        defaultValue: 'name',
         table: {
             type: {
                 summary: 'string',
@@ -15,15 +37,12 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     label: {
         name: 'label',
         type: { name: 'string' },
         description: 'Label of key.',
-        defaultValue: 'label',
         table: {
             type: {
                 summary: 'string',
@@ -33,15 +52,11 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     data: {
         name: 'data',
-        type: { name: 'any' },
         description: 'Data for value.',
-        defaultValue: 'data',
         table: {
             type: {
                 summary: 'any',
@@ -51,15 +66,12 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
                 summary: '""',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     disableCopy: {
         name: 'disableCopy',
         type: { name: 'boolean' },
         description: 'Whether to disable copy button or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -69,15 +81,12 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     formatter: {
         name: 'formatter',
         type: { name: 'function' },
         description: 'A function that receives `data` props and all props as arguments, and returns display data for value.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -92,7 +101,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
         name: 'block',
         type: { name: 'boolean' },
         description: 'Whether to show value with full width or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -105,9 +113,8 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     },
     copyValue: {
         name: 'copyValue',
-        type: { name: 'string, number' },
+        type: { name: 'string' },
         description: 'If the displayed data and the value to be copied are different, give the value to be copied.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string, number',
@@ -122,7 +129,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
         name: 'copyValueFormatter',
         type: { name: 'function' },
         description: 'Use it with the same purpose of `copyValue` props. Arguments are the same with the `formatter` props.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'function',
@@ -137,7 +143,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
         name: 'autoKeyWidth',
         type: { name: 'boolean' },
         description: 'Make key width auto',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'string',
@@ -152,7 +157,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
         name: 'customKeyWidth',
         type: { name: 'string' },
         description: 'Custom Width of key',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -167,7 +171,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     defaultSlot: {
         name: 'default',
         description: 'Slot for value.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -181,7 +184,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     keySlot: {
         name: 'copy',
         description: 'Slot for key.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -195,7 +197,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     extraSlot: {
         name: 'extra',
         description: 'Slot for right space of value.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -206,4 +207,8 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
             category: 'slots',
         },
     },
+    // default
+    default: { table: { disable: true } },
+    key: { table: { disable: true } },
+    extra: { table: { disable: true } },
 });

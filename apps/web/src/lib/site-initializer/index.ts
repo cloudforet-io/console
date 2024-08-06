@@ -58,9 +58,9 @@ const init = async (store) => {
     try {
         await initConfig();
         await initApiClient(store, config);
-        const domainId = await initDomain(store, config);
+        const domainId = await initDomain(config);
         const userId = await initUserAndAuth(store, config);
-        initDomainSettings(store);
+        initDomainSettings();
         initModeSetting();
         await initWorkspace(userId);
         initRouter(domainId);

@@ -1654,6 +1654,7 @@
 				"TITLE": "Trusted Advisor"
 			},
 			"UNABLE_TO_LOAD_WIDGET": "위젯 표시 불가",
+			"VIEW_FULL_DATA": "",
 			"WIDGET_TITLE_REQUIRED": ""
 		}
 	},
@@ -2067,6 +2068,8 @@
 					"COLOR_SCHEMA": "색상 스키마",
 					"DATA_FIELD": "데이터 필드",
 					"DATA_TABLE": "데이터 테이블",
+					"DATE_FORMAT": "날짜 형식",
+					"DATE_FORMAT_AUTO_DISPLAY": "세부기준(Granuarity)별 자동 표시",
 					"DESCRIPTION": "설명",
 					"DYNAMIC_FIELD": "동적 필드",
 					"EDIT_DATA": "데이터 수정",
@@ -2187,8 +2190,13 @@
 		"CONFIG_RECENT_TITLE": "최근 방문",
 		"CONFIG_STARRED_ALL": "모두",
 		"CONFIG_STARRED_TITLE": "즐겨찾기",
+		"COST_SUMMARY_AGGREGATING": "집계중",
 		"COST_SUMMARY_BY_PROJECT": "프로젝트별",
+		"COST_SUMMARY_CONFIRM": "확인",
+		"COST_SUMMARY_CURRENT_TOTAL_COST": "이번 달 누적 비용",
+		"COST_SUMMARY_DESC": "위 비용은 비용 리포트의 금액과 다를 수 있습니다.",
 		"COST_SUMMARY_GO_TO_REPORT": "비용 리포트로 이동",
+		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "지난달 총 비용",
 		"COST_SUMMARY_RECENT": "최근 비용 리포트({date})",
 		"COST_SUMMARY_TITLE": "비용 현황",
 		"COST_SUMMARY_TOTAL_SPEND": "지난달 총 소비:",
@@ -2489,6 +2497,7 @@
 				"EMAIL_INVALID": "잘못된 이메일 형식입니다. ",
 				"GENERATE": "생성",
 				"GENERATE_PLACEHOLDER": "비밀번호 자동 생성 또는 입력",
+				"ID_INVALID": "잘못된 ID 형식입니다.",
 				"MEMBER": "멤버",
 				"NAME": "이름",
 				"NAME_VALID": "사용 가능한 아이디입니다.",

@@ -14,8 +14,8 @@ import type { TrustedAccountModel } from '@/schema/identity/trusted-account/mode
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 
 import { gray, indigo } from '@/styles/colors';
 

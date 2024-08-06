@@ -1,11 +1,21 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getDividerParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6980%3A163403',
+    },
+});
+
+export const getDividerArgs = (): Args => ({
+    vertical: false,
+});
 
 export const getDividerArgTypes = (): ArgTypes => ({
     vertical: {
         name: 'vertical',
-        type: { name: 'boolean' },
+        type: 'boolean',
         description: 'Is vertical divider or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -15,8 +25,6 @@ export const getDividerArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
 });

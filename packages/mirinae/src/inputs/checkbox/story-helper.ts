@@ -1,12 +1,29 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
+
+export const getCheckboxArgs = (): Args => ({
+    'v-model': [],
+    value: true,
+    selected: [],
+    disabled: false,
+    predicate: undefined,
+    invalid: false,
+    indeterminate: false,
+    defaultSlot: 'click me!',
+    iconSlot: null,
+});
+
+export const getCheckboxParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A162064',
+    },
+});
 
 export const getCheckboxArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
-        type: { name: 'any' },
         description: 'Two way binding for `selected` props with `change` event.',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'any',
@@ -20,9 +37,7 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
     },
     value: {
         name: 'value',
-        type: { name: 'any' },
         description: 'The value to be compared for the \'selected\' props.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'any',
@@ -32,15 +47,11 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     selected: {
         name: 'selected',
-        type: { name: 'any, any[]' },
         description: 'Selected value(s).',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'any, any[]',
@@ -50,15 +61,12 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     disabled: {
         name: 'disabled',
         type: { name: 'boolean' },
         description: 'Whether to disable selection or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -68,16 +76,13 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     predicate: {
         name: 'predicate',
-        type: { name: 'func' },
+        type: { name: 'function' },
         description: `Function that predicate two arguments are the same or not.
         It's useful when the props \`value\` is an object.`,
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'func',
@@ -94,7 +99,6 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
         name: 'invalid',
         type: { name: 'boolean' },
         description: 'Apply invalid style',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -104,15 +108,12 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     indeterminate: {
         name: 'indeterminate',
         type: { name: 'boolean' },
         description: 'Apply indeterminate style',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -122,15 +123,12 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     /* slot */
     defaultSlot: {
         name: 'default',
         description: 'Slot for the additional selectable area that explains checkbox.',
-        defaultValue: 'click me!',
         table: {
             type: {
                 summary: null,
@@ -140,14 +138,11 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     iconSlot: {
         name: 'icon',
         description: 'Slot for custom checkbox icon.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -157,9 +152,7 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* event */
     onChange: {
@@ -177,4 +170,7 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
+    icon: { table: { disable: true } },
 });

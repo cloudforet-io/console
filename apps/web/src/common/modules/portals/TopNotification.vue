@@ -8,8 +8,10 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useErrorStore } from '@/store/error/error-store';
 
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+
 
 const props = withDefaults(defineProps<{
     styleType?: string;
@@ -17,14 +19,14 @@ const props = withDefaults(defineProps<{
     styleType: 'dark',
 });
 const userWorkspaceStore = useUserWorkspaceStore();
-
+const errorStore = useErrorStore();
 const route = useRoute();
 
 const storeState = reactive({
     hasPermission: computed(() => store.getters['user/hasPermission']),
     isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed(() => userWorkspaceStore.getters.workspaceList),
-    visibleAuthorizationError: computed(() => store.state.error.visibleAuthorizationError),
+    visibleAuthorizationError: computed(() => errorStore.state.visibleAuthorizationError),
 });
 const state = reactive({
     visible: computed({
@@ -40,7 +42,9 @@ const state = reactive({
 
             return result;
         },
-        set(val) { store.commit('error/setVisibleAuthorizationError', val); },
+        set(val) {
+            errorStore.setVisibleAuthorizationError(val);
+        },
     }),
     notificationText: computed(() => {
         if (storeState.workspaceList.length === 0) {

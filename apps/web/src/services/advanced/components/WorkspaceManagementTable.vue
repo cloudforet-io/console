@@ -23,8 +23,8 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';

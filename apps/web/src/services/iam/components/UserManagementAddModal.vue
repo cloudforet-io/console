@@ -18,8 +18,9 @@ import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';
 import type { WorkspaceUserCreateParameters } from '@/schema/identity/workspace-user/api-verbs/create';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useDomainStore } from '@/store/domain/domain-store';
 
 import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -36,8 +37,10 @@ import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-va
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem } from '@/services/iam/types/user-type';
 
+
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
+const domainStore = useDomainStore();
 
 const route = useRoute();
 
@@ -125,7 +128,7 @@ const handleClose = () => {
 };
 /* API */
 const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
-    const domainSettings = store.state.domain.config?.settings;
+    const domainSettings = domainStore.state.config?.settings;
     const { isValid } = checkEmailFormat(item.user_id || '');
     const userInfoParams: UserCreateParameters|WorkspaceUserCreateParameters = {
         user_id: item.user_id || '',

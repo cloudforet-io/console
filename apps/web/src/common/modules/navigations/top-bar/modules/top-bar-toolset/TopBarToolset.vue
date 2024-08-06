@@ -7,6 +7,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDomainStore } from '@/store/domain/domain-store';
 
 import TopBarAdminToggleButton from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-admin-toggle-button/TopBarAdminToggleButton.vue';
 import TopBarFavorite
@@ -29,6 +30,7 @@ const emit = defineEmits<{(event: 'hide-menu'): void;
 }>();
 
 const appContextStore = useAppContextStore();
+const domainStore = useDomainStore();
 const state = reactive({
     isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -37,7 +39,7 @@ const state = reactive({
         adminToggle: (state.isAdminMode ? i18n.t('COMMON.GNB.TOOLTIP.EXIT_ADMIN_MODE') : i18n.t('COMMON.GNB.TOOLTIP.ENABLE_ADMIN_MODE')) as string,
     })),
     integrationMenu: computed<string>(() => {
-        const extraMenu = store.getters['domain/domainExtraMenu'];
+        const extraMenu = domainStore.getters.domainExtraMenu;
         return extraMenu?.title;
     }),
 });

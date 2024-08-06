@@ -20,7 +20,6 @@ import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-wid
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -35,7 +34,6 @@ import type {
     CreateDashboardParameters, DashboardModel, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-
 
 
 interface WidgetValidMap {
@@ -89,7 +87,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const appContextStore = useAppContextStore();
     const storeState = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        domainId: computed(() => store.state.domain.domainId),
     });
     const state = reactive({
         dashboardInfo: null as DashboardModel|null,

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
-import { store } from '@/store';
+import { useDomainStore } from '@/store/domain/domain-store';
+
 
 interface Props {
     sizeRatio?: number;
@@ -19,9 +19,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'click'): void; }>();
 
+const domainStore = useDomainStore();
 const state = reactive({
-    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
-    wordTypeLogoImage: computed<string|undefined>(() => store.getters['domain/domainWordTypeLogoImage']),
+    symbolImage: computed<string|undefined>(() => domainStore.getters.domainSymbolImage),
+    wordTypeLogoImage: computed<string|undefined>(() => domainStore.getters.domainWordTypeLogoImage),
     logoImageStyle: computed(() => ({
         width: `${56 * props.sizeRatio}px`,
         height: `${56 * props.sizeRatio}px`,

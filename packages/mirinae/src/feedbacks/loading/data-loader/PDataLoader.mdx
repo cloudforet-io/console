@@ -1,0 +1,81 @@
+{/* PDataLoader.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PDataLoaderStories from './PDataLoader.stories';
+
+<Meta of={PDataLoaderStories} />
+
+# Data Loader
+<br/>
+<br/>
+
+## How it works with data prop?
+
+If the `data` prop is `undefined` or `null` , it is assumed that initial loading has not occurred yet. <br/>
+So the empty case screen is not visible. <br/>
+
+On the other hand, if the `data` prop is an empty `array` or an empty `object`, it is assumed that the data is empty and an empty case screen is displayed.<br/>
+
+When the type of `data` prop is `boolean`, if the value is `true`, data is considered to exist, and if `false`, data is considered empty.<br/>
+When you simply want to control whether an empty screen is shown or not, you can solve it by putting a `boolean` value in the `data` prop.<br/>
+<Canvas of={PDataLoaderStories.Basic} />
+
+<br/>
+<br/>
+
+## Disable Empty Case
+
+`isEmpty` slot prop will be given for the default slot.
+<Canvas of={PDataLoaderStories.DisableEmptyCase} />
+
+<br/>
+<br/>
+
+## Show Data From Scratch
+<Canvas of={PDataLoaderStories.ShowDataFromScratch} />
+
+<br/>
+<br/>
+
+## Min Loading
+<Canvas of={PDataLoaderStories.MinLoading} />
+
+<br/>
+<br/>
+
+
+## Lazy Loading & Min Loading
+<Canvas of={PDataLoaderStories.LazyLoadingAndMinLoading} />
+
+<br/>
+<br/>
+
+## Loader Backdrop Opacity & Color
+
+You can adjust the opacity of the loader backdrop through the `loaderBackdropOpacity` prop.<br/>
+You can also change the backdrop color through the `loaderBackdropColor` prop.<br/>
+<br/>
+
+For the `loaderBackdropColor` prop, you can give the name of the color token. <br/>
+e.g. `gray.900`
+<Canvas of={PDataLoaderStories.LoaderBackdropOpacityAndColor} />
+
+<br/>
+<br/>
+
+## Disable Transition
+<Canvas of={PDataLoaderStories.DisableTransition} />
+
+<br/>
+<br/>
+
+## No Data
+<Canvas of={PDataLoaderStories.NoData} />
+
+## Playground
+<Canvas of={PDataLoaderStories.Playground} />
+<Controls of={PDataLoaderStories.Playground} />
+
+<br/>
+<br/>

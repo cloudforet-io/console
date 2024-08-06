@@ -1,0 +1,86 @@
+{/* PSearch.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PSearchStories from './PSearch.stories';
+
+<Meta of={PSearchStories} />
+
+
+# Search
+<br/>
+<br/>
+
+## Basic
+<Canvas of={PSearchStories.Basic} />
+
+<br/>
+<br/>
+
+## Auto Complete
+
+`useAutoComplete` = `true`
+
+Auto Complete function is available when you set `useAutoComplete` prop to `true`.
+
+
+When you enter a keyword in a search input, the `PContextMenu` is displayed.
+
+<br/>
+
+Below is an example of each handler.
+
+<br/>
+<br/>
+
+### Disable Handler
+`disableHandler` = `true`
+
+<br/>
+
+Menu items are not filtered because there is no handler.
+<Canvas of={PSearchStories.DisableHandler} />
+
+
+<br/>
+<br/>
+
+### Injected Handler
+
+<br/>
+
+`handler` must be defined. The `handler` is a function that returns a list of filtered menu items.
+<Canvas of={PSearchStories.InjectedHandler} />
+
+<br/>
+<br/>
+
+### Default Handler
+
+<br/>
+
+If `handler` is not defined, it is filtered through the built-in default `handler`.
+<Canvas of={PSearchStories.DefaultHandler} />
+
+
+<br/>
+<br/>
+
+## Invalid
+<Canvas of={PSearchStories.Invalid} />
+
+<br/>
+<br/>
+
+## Disabled
+<Canvas of={PSearchStories.Disabled} />
+
+<br/>
+<br/>
+
+## Readonly
+<Canvas of={PSearchStories.Readonly} />
+
+## Playground
+<Canvas of={PSearchStories.Playground} />
+<Controls of={PSearchStories.Playground} />

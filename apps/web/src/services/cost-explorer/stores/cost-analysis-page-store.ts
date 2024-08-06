@@ -12,7 +12,7 @@ import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-q
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -80,11 +80,10 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             return [...getters.managedGroupByItems, ...getters.additionalInfoKeysItems];
         }),
         managedGroupByItems: computed<GroupByItem[]>(() => {
-            if (_state.isAdminMode) return Object.values(GROUP_BY_ITEM_MAP);
             const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
             const metadataAdditionalInfo = targetDataSource?.data?.plugin_info?.metadata?.additional_info;
             let _additionalInfoGroupBy: GroupByItem[] = [];
-            if (metadataAdditionalInfo) {
+            if (metadataAdditionalInfo && !isEmpty(metadataAdditionalInfo)) {
                 _additionalInfoGroupBy = Object.entries(metadataAdditionalInfo)
                     .filter(([, value]) => value?.visible)
                     .map(([key, value]) => ({
@@ -94,7 +93,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             } else {
                 _additionalInfoGroupBy = cloneDeep(getters.additionalInfoKeysItems);
             }
-            const _managedGroupByItems = Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
+            const _managedGroupByItems = _state.isAdminMode ? Object.values(GROUP_BY_ITEM_MAP) : Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
             return [..._managedGroupByItems, ..._additionalInfoGroupBy];
         }),
         metadataAdditionalInfoItems: computed<GroupByItem[]>(() => {
@@ -114,7 +113,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             if (!costQuerySetState.selectedDataSourceId) return [];
             const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
             if (!targetDataSource) return [];
-            const costAdditionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys;
+            const costAdditionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys ?? [];
             const additionalInfoGroupBy: GroupByItem[] = costAdditionalInfoKeys
                 .map((d) => ({
                     name: `additional_info.${d}`,
