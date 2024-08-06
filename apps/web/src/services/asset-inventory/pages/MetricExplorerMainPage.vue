@@ -83,8 +83,7 @@ const handleRouteToMetricDetail = (metricId: string) => {
     });
 };
 const handleClickLearnMore = () => {
-    const language = storeState.language === 'ko' ? 'ko/' : '';
-    window.open(`https://cloudforet.io/${language}/docs/guides/asset-inventory/asset-analysis`, '_blank');
+    window.open('https://cloudforet.io/ko/docs/guides/asset-inventory/metric-explorer', '_blank');
 };
 
 const fetchRecentList = async () => {
