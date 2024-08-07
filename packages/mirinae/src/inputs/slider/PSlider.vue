@@ -24,7 +24,9 @@ const state = reactive({
 });
 
 const setCSSProgress = (val: number) => {
-    const _percentage = val / (props.max - props.min) * 100;
+    const _rangeValue = props.max - props.min;
+    const _valuePosition = val - props.min;
+    const _percentage = (_valuePosition / _rangeValue) * 100;
     sliderRef.value?.style.setProperty('--ProgressPercent', `${_percentage}%`);
 };
 
@@ -50,6 +52,8 @@ watch([() => state.proxyValue, () => sliderRef.value], ([val, _sliderRef]) => {
         <p-text-input v-if="props.showInput"
                       v-model="state.proxyValue"
                       type="number"
+                      :min="props.min"
+                      :max="props.max"
                       class="value-text-input"
         />
     </div>
