@@ -97,7 +97,6 @@ const state = reactive({
         },
         xAxis: {
             type: 'category',
-            boundaryGap: false,
             data: state.xAxisData,
             axisLabel: {
                 formatter: (val) => {
