@@ -1505,6 +1505,13 @@
 				"DISPLAY_ANNOTATION": "",
 				"INVALID_VALUE": ""
 			},
+			"DISPLAY_SERIES_LABEL": {
+				"DISPLAY_SERIES_LABEL": "",
+				"POSITION": "",
+				"ROTATE": "",
+				"ROTATE_MAX_INVALID_TEXT": "",
+				"ROTATE_MIN_INVALID_TEXT": ""
+			},
 			"DONE": "完了",
 			"DONUT": "",
 			"EDIT": "編集",
