@@ -1,3 +1,5 @@
+import { indigo } from '@/styles/colors.cjs';
+
 export const AVATAR_SIZE = {
     SM: 'sm',
     MD: 'md',
@@ -5,8 +7,8 @@ export const AVATAR_SIZE = {
 } as const;
 
 export const AVATAR_COLOR = {
-    INDIGO_200: 'indigo200',
-    INDIGO_300: 'indigo300',
+    indigo200: indigo[200],
+    indigo300: indigo[300],
 } as const;
 
 export const ICON_SIZE: Record<SizeType, string> = {

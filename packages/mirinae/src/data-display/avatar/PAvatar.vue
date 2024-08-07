@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { get, isNull } from 'lodash';
-
-import type { SizeType, ColorType } from '@/data-display/avatar/type';
+import type { SizeType } from '@/data-display/avatar/type';
 import { AVATAR_SIZE, AVATAR_COLOR, ICON_SIZE } from '@/data-display/avatar/type';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import PI from '@/foundation/icons/PI.vue';
 
-
-import colors from '@/styles/colors.cjs';
+import { indigo } from '@/styles/colors.cjs';
 
 interface AvatarProps {
-    color?: ColorType;
+    color?: string;
     size?: SizeType;
     icon?: string;
     imgSrc?: string;
@@ -21,13 +18,11 @@ interface AvatarProps {
 const props = withDefaults(defineProps<AvatarProps>(), {
     imgSrc: '',
     icon: 'ic_avatar-filled',
-    color: AVATAR_COLOR.INDIGO_200,
+    color: indigo[200],
     size: AVATAR_SIZE.MD,
 });
 
 const state = reactive({
-    imgSrc: computed(() => props.imgSrc),
-    iconName: computed(() => props.icon),
     iconSize: computed(() => ICON_SIZE[props.size]),
     avatarInlineStyles: computed(() => {
         const iconSize = ICON_SIZE[props.size];
@@ -37,27 +32,7 @@ const state = reactive({
             height: iconSize,
         };
     }),
-    wrapperInlineStyles: computed(() => {
-        const defaultStyle = { backgroundColor: AVATAR_COLOR.INDIGO_200 };
-
-        const colorNum = props.color.match(/\d{3}/)?.[0];
-
-        if (isNull(colorNum)) {
-            return defaultStyle;
-        }
-
-        const colorStr = props.color.match(/[a-z]+/)?.[0];
-
-        if (isNull(colorStr)) {
-            return defaultStyle;
-        }
-
-        const color = get(colors, `${colorStr}[${colorNum}]`);
-
-        return {
-            backgroundColor: color,
-        };
-    }),
+    wrapperInlineStyles: computed(() => ({ backgroundColor: AVATAR_COLOR[props.color] || props.color })),
 });
 </script>
 
@@ -65,8 +40,8 @@ const state = reactive({
     <div class="p-avatar"
          :style="state.avatarInlineStyles"
     >
-        <p-lazy-img v-if="state.imgSrc"
-                    :src="state.imgSrc"
+        <p-lazy-img v-if="props.imgSrc"
+                    :src="props.imgSrc"
                     :width="state.iconSize"
                     :height="state.iconSize"
         />
@@ -74,7 +49,7 @@ const state = reactive({
              :class="['icon-wrapper', `avatar-${props.size}`]"
              :style="state.wrapperInlineStyles"
         >
-            <p-i :name="state.iconName"
+            <p-i :name="props.icon"
                  color="inherit"
                  width="100%"
                  height="100%"
@@ -83,27 +58,23 @@ const state = reactive({
     </div>
 </template>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .p-avatar {
-    /* custom design-system component - p-i-icon */
-    :deep(.p-i-icon) {
+    @apply rounded-full overflow-hidden;
+
+    .p-i-icon {
         display: block;
     }
 
-    /* custom design-system component - p-lazy-img */
-    :deep(.p-lazy-img .img-container) {
-        @apply rounded-full;
-    }
-
     .icon-wrapper {
-        @apply rounded-full text-white;
+        @apply text-white;
 
         &.avatar-sm, &.avatar-md {
-            padding: 4px;
+            padding: 0.25rem;
         }
 
         &.avatar-xl {
-            padding: 8px;
+            padding: 0.5rem;
         }
     }
 }

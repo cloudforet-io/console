@@ -67,7 +67,7 @@ export const Color: Story = {
         components: { PAvatar },
         setup() {
             return {
-                colors: Object.values(AVATAR_COLOR),
+                colors: Object.keys(AVATAR_COLOR),
             };
         },
         template: `

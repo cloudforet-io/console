@@ -6,7 +6,7 @@ import { AVATAR_SIZE, AVATAR_COLOR } from '@/data-display/avatar/type';
 export const getAvatarArgs = (): Args => ({
     imgSrc: '',
     icon: 'ic_avatar-filled',
-    color: AVATAR_COLOR.INDIGO_200,
+    color: 'indigo200',
     size: AVATAR_SIZE.MD,
 });
 
@@ -63,7 +63,7 @@ export const getAvatarArgTypes = (): ArgTypes => ({
             },
         },
         control: 'select',
-        options: [...Object.values(AVATAR_COLOR)],
+        options: [...Object.keys(AVATAR_COLOR)],
     },
     size: {
         name: 'size',
