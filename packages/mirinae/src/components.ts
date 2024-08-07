@@ -77,6 +77,7 @@ export { default as PSelectCard } from './inputs/select-card/PSelectCard.vue';
 export { default as PSelectStatus } from './inputs/select-status/PSelectStatus.vue';
 export { default as PTextEditor } from './inputs/text-editor/PTextEditor.vue';
 export { default as PTextarea } from './inputs/textarea/PTextarea.vue';
+export { default as PSlider } from './inputs/slider/PSlider.vue';
 
 
 /* Layouts */
