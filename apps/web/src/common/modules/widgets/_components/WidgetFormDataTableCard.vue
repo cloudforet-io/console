@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    computed, reactive, ref,
 } from 'vue';
 
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
@@ -22,10 +22,25 @@ const props = defineProps<Props>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 
+const addContents = ref<WidgetFormDataTableCardAddContents|null>(null);
+const transformContents = ref<WidgetFormDataTableCardTransformContents|null>(null);
+
 const state = reactive({
     dataTableId: computed<string>(() => props.item.data_table_id),
     dataType: computed<DataTableDataType>(() => props.item.data_type),
     selected: computed<boolean>(() => widgetGenerateState.selectedDataTableId === state.dataTableId),
+});
+
+const updateDataTable = async () => {
+    if (state.dataType === DATA_TABLE_TYPE.ADDED) {
+        await addContents?.value?.updateDataTable();
+    } else if (state.dataType === DATA_TABLE_TYPE.TRANSFORMED) {
+        await transformContents?.value?.updateDataTable();
+    }
+};
+
+defineExpose({
+    updateDataTable,
 });
 
 </script>
@@ -33,10 +48,12 @@ const state = reactive({
 <template>
     <div class="widget-form-data-table-card">
         <widget-form-data-table-card-add-contents v-if="state.dataType === DATA_TABLE_TYPE.ADDED"
+                                                  ref="addContents"
                                                   :item="props.item"
                                                   :selected="state.selected"
         />
         <widget-form-data-table-card-transform-contents v-else-if="state.dataType === DATA_TABLE_TYPE.TRANSFORMED"
+                                                        ref="transformContents"
                                                         :item="props.item"
                                                         :selected="state.selected"
         />
