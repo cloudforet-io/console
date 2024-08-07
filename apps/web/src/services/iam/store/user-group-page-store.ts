@@ -4,17 +4,17 @@ import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { UserGroupModel } from '@/schema/identity/user-group/model';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { UserListItemType } from '@/services/iam/types/user-type';
-import type { UserGroupModel } from '@/schema/identity/user-group/model';
+
 
 export const useUserGroupPageStore = defineStore('page-user-group', () => {
     const state = reactive<any>({
