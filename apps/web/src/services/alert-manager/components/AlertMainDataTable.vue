@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
 
@@ -56,6 +57,8 @@ import type {
     AlertAssignedFilter,
 } from '@/services/alert-manager/types/alert-type';
 
+const router = useRouter();
+const route = useRoute();
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const props = withDefaults(defineProps<{
@@ -182,6 +185,9 @@ const state = reactive({
         return fields;
     }),
     items: [] as AlertModel[],
+    thisPage: 1,
+    pageLimit: 15,
+    pageStart: 1,
     totalCount: 0,
     tags: computed(() => queryTagsHelper.queryTags.value),
     visibleAlertFormModal: false,
@@ -250,8 +256,27 @@ const getAlerts = async () => {
 
 /* event */
 const handleChange = async (options: ToolboxOptions = {}) => {
-    if (options.pageStart !== undefined) alertApiQueryHelper.setPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) alertApiQueryHelper.setPageLimit(options.pageLimit);
+    if (options.pageStart !== undefined) {
+        alertApiQueryHelper.setPageStart(options.pageStart);
+        state.pageStart = options.pageStart;
+        state.thisPage = Math.ceil(options.pageStart / state.pageLimit);
+        router.replace({
+            query: {
+                ...router.currentRoute.query,
+                pageStart: options.pageStart?.toString(),
+            },
+        }).catch(() => {});
+    }
+    if (options.pageLimit !== undefined) {
+        alertApiQueryHelper.setPageLimit(options.pageLimit);
+        state.pageLimit = options.pageLimit;
+        router.replace({
+            query: {
+                ...router.currentRoute.query,
+                pageLimit: options.pageLimit?.toString(),
+            },
+        }).catch(() => {});
+    }
     if (options.sortBy !== undefined) alertApiQueryHelper.setSort(options.sortBy, options.sortDesc);
 
     if (options.queryTags !== undefined) {
@@ -275,7 +300,6 @@ const handleExportToExcel = async () => {
 };
 
 const handleUpdateBottomFilters = async (filters: AlertBottomFilters) => {
-    state.thisPage = 1;
     updateBottomFilterQuery(filters);
     emitUpdate(filters);
     await getAlerts();
@@ -304,6 +328,11 @@ const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
 /* Init */
 const initPage = () => {
     (async () => {
+        if (route.query.pageStart) {
+            state.pageStart = Number(route.query.pageStart) || state.pageStart;
+            state.pageLimit = Number(route.query.pageLimit) || state.pageLimit;
+            alertApiQueryHelper.setPageStart(state.pageStart);
+        }
         state.tags = queryTagsHelper.queryTags;
         updateBottomFilterQuery({
             state: props.alertState,
@@ -311,6 +340,11 @@ const initPage = () => {
             assigned: props.assigned,
         });
         await getAlerts();
+
+        // thisPage should be the last to change.
+        // The reason is that if there is a change in totalCount, it will be changed to 1.
+        // The cause is inferred from checking the event relationship of PToolboxTable, PToolbox, PTextPagination.
+        state.thisPage = Math.ceil(state.pageStart / state.pageLimit);
     })();
 };
 
@@ -334,6 +368,7 @@ initPage();
                 :select-index.sync="state.selectIndex"
                 :total-count="state.totalCount"
                 :query-tags="state.tags"
+                :this-page="state.thisPage"
                 :key-item-sets="keyItemSets"
                 :value-handler-map="valueHandlerMap"
                 settings-visible
