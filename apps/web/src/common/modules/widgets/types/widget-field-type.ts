@@ -146,7 +146,8 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'progressBar'
     | 'formatRules'
     | 'granularity' | 'colorSchema' | 'pieChartType'
-    | 'widgetHeader' | 'dateFormat' | 'numberFormat' | 'displayAnnotation';
+    | 'widgetHeader' | 'dateFormat' | 'numberFormat'
+    | 'displayAnnotation' | 'displaySeriesLabel';
 
 export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;

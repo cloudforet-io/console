@@ -95,7 +95,14 @@ export interface DisplayAnnotationValue {
     annotation?: string;
 }
 
+export interface DisplaySeriesLabelValue {
+    toggleValue: boolean;
+    position?: 'left' | 'center' | 'right';
+    rotate?: number;
+}
+
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
-    | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DisplayAnnotationValue;
+    | WidgetHeaderValue | DateFormatValue | NumberFormatValue
+    | DisplayAnnotationValue | DisplaySeriesLabelValue;
