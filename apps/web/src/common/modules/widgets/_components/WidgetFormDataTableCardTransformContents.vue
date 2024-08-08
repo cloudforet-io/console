@@ -86,6 +86,7 @@ const state = reactive({
         dataTables: [] as string[],
         dataTableId: undefined,
     } as TransformDataTableInfo,
+    failStatus: false,
 });
 
 const modalState = reactive({
@@ -120,6 +121,9 @@ const originState = reactive({
     }))),
 });
 
+const setFailStatus = (status: boolean) => {
+    state.failStatus = status;
+};
 const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     const isValidDataTableId = state.dataTableInfo.dataTableId && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTableId);
     const isValidDataTables = state.dataTableInfo.dataTables.length === 2
@@ -128,6 +132,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
     if (!isValidDataTableId && !isValidDataTables) {
         showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
+        setFailStatus(true);
         return undefined;
     }
 
@@ -144,6 +149,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
                 [state.dataTableId]: true,
             });
             showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_JOIN_FAIL_WARNING', { first_data: firstDataTable?.name || '', second_data: secondDataTable?.name || '' }), '');
+            setFailStatus(true);
             return undefined;
         }
     }
@@ -187,7 +193,10 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         if (dataTable) {
             widgetGenerateStore.setSelectedDataTableId(dataTable.data_table_id);
             widgetGenerateStore.setDataTableUpdating(true);
+            setFailStatus(false);
+            return dataTable;
         }
+        setFailStatus(true);
         return undefined;
     }
     const updateParams = {
@@ -196,6 +205,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         options: { [state.operator]: options() },
     };
     const result = await widgetGenerateStore.updateDataTable(updateParams);
+    if (!result) setFailStatus(true);
+    else setFailStatus(false);
     return result;
 };
 /* Events */
@@ -268,7 +279,7 @@ defineExpose({
 
 <template>
     <div class="widget-form-data-table-card-transform-contents"
-         :class="{ 'selected': props.selected }"
+         :class="{ 'selected': props.selected, 'failed': state.failStatus }"
     >
         <div class="card-header">
             <widget-form-data-table-card-header-title :data-table-id="state.dataTableId"
@@ -317,6 +328,11 @@ defineExpose({
         .card-header {
             @apply bg-violet-100 border border-violet-200;
         }
+    }
+
+    &.failed {
+        @apply border-red-400;
+        box-shadow: 0 0 0 0.1875rem rgba(255, 193, 193, 1);
     }
 
     .card-header {
