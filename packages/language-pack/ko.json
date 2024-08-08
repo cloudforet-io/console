@@ -1463,6 +1463,7 @@
 					"RESET_DESC": "재설정 시, 모든 입력값이 가장 마지막 입력값으로 되돌아갑니다. 이 작업은 취소할 수 없습니다.",
 					"RESET_HEADER": "데이터 옵션을 리셋하시겠습니까?"
 				},
+				"APPLY_ALL_SUCCESS": "",
 				"EMPTY_DESC": "[+] 버튼으로 새로운 데이터를 추가하거나, \nConcatenate, Join, Query, Evaluate과 같은 다양한 방법으로 데이터를 변경하세요.",
 				"EMPTY_TITLE": "데이터를 추가해주세요",
 				"FORM": {
