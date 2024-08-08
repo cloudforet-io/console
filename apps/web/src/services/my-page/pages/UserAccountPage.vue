@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PHeading, PPaneLayout, PLazyImg } from '@cloudforet/mirinae';
+import {
+    PHeading, PPaneLayout, PLazyImg, PAvatar,
+} from '@cloudforet/mirinae';
 
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
 import UserImage from '@/assets/images/role/img_avatar_no-role.png';
@@ -49,11 +51,16 @@ const state = reactive({
         <p-heading :title="$t('MY_PAGE.ACCOUNT.ACCOUNT_N_PROFILE')" />
         <div class="contents-wrapper">
             <p-pane-layout class="role-card-content">
-                <p-lazy-img :src="state.icon"
-                            class="user-icon"
-                            width="4rem"
-                            height="4rem"
-                />
+                <div class="icon-wrapper">
+                    <!-- TODO: Will add user image src -->
+                    <p-avatar size="xl" />
+                    <p-lazy-img v-if="state.roleType === 'Admin'"
+                                :src="state.icon"
+                                class="user-icon"
+                                width="1.5rem"
+                                height="1.5rem"
+                    />
+                </div>
                 <span class="role-type-name">
                     {{ state.roleType }}
                 </span>
@@ -92,6 +99,16 @@ const state = reactive({
         }
         .user-account-wrapper {
             flex: 1;
+        }
+
+        .icon-wrapper {
+            position: relative;
+
+            & .user-icon {
+                bottom: 0;
+                right: 0;
+                position: absolute;
+            }
         }
     }
 }
