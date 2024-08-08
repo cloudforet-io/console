@@ -80,6 +80,15 @@ const handleUpdateLabels = async (labels: string[]) => {
             .button-text {
                 @apply text-label-sm font-bold text-gray-900;
             }
+
+            /* custom design-system component - p-badge */
+            :deep(.p-badge) {
+                @apply text-label-sm;
+                height: 1rem;
+                min-height: 1rem;
+                padding: 0 0.375rem;
+                line-height: unset;
+            }
         }
     }
     .content-wrapper {
