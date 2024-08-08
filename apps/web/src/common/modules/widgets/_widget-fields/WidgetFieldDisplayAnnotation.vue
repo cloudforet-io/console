@@ -39,6 +39,7 @@ const {
 /* Event */
 const handleUpdateToggle = (value: boolean) => {
     if (!value) {
+        setForm('annotation', '');
         state.proxyValue = undefined;
         return;
     }
@@ -67,10 +68,7 @@ onMounted(() => {
         state.proxyValue = undefined;
         return;
     }
-    state.proxyValue = {
-        toggleValue: props.value?.toggleValue ?? false,
-        annotation: props.value?.annotation,
-    };
+    setForm('annotation', props.value.annotation);
 });
 </script>
 
