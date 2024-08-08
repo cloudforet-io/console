@@ -1505,6 +1505,13 @@
 				"DISPLAY_ANNOTATION": "Display Annotation",
 				"INVALID_VALUE": "Please enter annotation."
 			},
+			"DISPLAY_SERIES_LABEL": {
+				"DISPLAY_SERIES_LABEL": "Display Series Label",
+				"POSITION": "Position",
+				"ROTATE": "Rotate",
+				"ROTATE_MAX_INVALID_TEXT": "Must be smaller than 90",
+				"ROTATE_MIN_INVALID_TEXT": "Must be bigger than -90"
+			},
 			"DONE": "Done",
 			"DONUT": "Donut",
 			"EDIT": "Edit",

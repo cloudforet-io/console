@@ -261,7 +261,6 @@ onMounted(() => {
 
             .left {
                 flex-shrink: 0;
-                width: 10rem;
             }
 
             .compare-with {
@@ -274,7 +273,6 @@ onMounted(() => {
             .left {
                 @apply flex gap-3;
                 flex-shrink: 0;
-                width: 10rem;
             }
         }
     }
