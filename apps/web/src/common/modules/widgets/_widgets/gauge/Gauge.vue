@@ -23,10 +23,10 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import {
-    getFormattedNumber,
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,

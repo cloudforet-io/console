@@ -1,14 +1,10 @@
-import bytes from 'bytes';
 import type { ManipulateType } from 'dayjs';
 import dayjs from 'dayjs';
 
-import { byteFormatter, customNumberFormatter, numberFormatter } from '@cloudforet/utils';
-
-import { DATE_FORMAT, NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
-import type { DateFormat, NumberFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { DateFormat } from '@/common/modules/widgets/types/widget-field-value-type';
 
-import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
@@ -138,27 +134,4 @@ export const getFormattedDate = (date: string, dateFormat: string): string => {
     const dateFormatsWithMMM = Object.values(DATE_FORMAT['MMM DD, YYYY']) as string[];
     if (dateFormatsWithMMM.includes(dateFormat)) return dayjs.utc(date).locale('en').format(dateFormat);
     return dayjs.utc(date).format(dateFormat);
-};
-
-/* Widget Number Format */
-export const getFormattedNumber = (val: number, dataField: string, numberFormatValue?: NumberFormatValue, unit?: string): string => {
-    if (!numberFormatValue) return numberFormatter(val) || '--';
-    const _targetNumberFormat = numberFormatValue[dataField];
-    switch (_targetNumberFormat?.format) {
-    case NUMBER_FORMAT.AUTO:
-        if (unit && SIZE_UNITS.includes(unit)) {
-            const _originalVal = bytes.parse(`${val}${unit}`);
-            return byteFormatter(_originalVal);
-        }
-        return numberFormatter(val, { notation: 'compact' }) || '--';
-    case NUMBER_FORMAT.SHORT_NUMBER:
-        return numberFormatter(val, { notation: 'compact' }) || '--';
-    case NUMBER_FORMAT.FULL_NUMBER:
-        return val.toString();
-    case NUMBER_FORMAT.CUSTOM:
-        if (!_targetNumberFormat.customNumberFormat) return val.toString();
-        return customNumberFormatter(_targetNumberFormat.customNumberFormat, val) || '--';
-    default:
-        return val.toString();
-    }
 };
