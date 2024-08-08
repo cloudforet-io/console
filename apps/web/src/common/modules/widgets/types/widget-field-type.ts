@@ -7,8 +7,9 @@ import type {
     FormatRulesValue,
     WidgetFieldValues,
     DateFormat,
-    NumberFormatValue,
+    NumberFormat,
 } from '@/common/modules/widgets/types/widget-field-value-type';
+
 
 export interface DataFieldOptions {
     multiSelectable?: boolean;
@@ -123,7 +124,7 @@ export interface ColorSchemaOptions {
 }
 
 export interface NumberFormatOptions {
-    default?: NumberFormatValue;
+    default?: NumberFormat;
 }
 
 export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions

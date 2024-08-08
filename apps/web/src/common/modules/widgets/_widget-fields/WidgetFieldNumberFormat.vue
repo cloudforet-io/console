@@ -15,9 +15,8 @@ import { i18n } from '@/translations';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type {
-    NumberFormatOptions,
     WidgetFieldComponentProps,
-    WidgetFieldComponentEmit,
+    WidgetFieldComponentEmit, NumberFormatOptions,
 } from '@/common/modules/widgets/types/widget-field-type';
 import type { NumberFormatValue, NumberFormat } from '@/common/modules/widgets/types/widget-field-value-type';
 
@@ -128,7 +127,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
     const _proxyValue: NumberFormatValue = {};
     dataFieldList.forEach((d) => {
         _proxyValue[d] = {
-            format: state.proxyValue?.[d]?.format ?? NUMBER_FORMAT.AUTO,
+            format: state.proxyValue?.[d]?.format ?? props.widgetConfig?.optionalFieldsSchema.numberFormat?.options?.default ?? NUMBER_FORMAT.AUTO,
             customNumberFormat: state.proxyValue?.[d]?.customNumberFormat ?? undefined,
         };
     });
@@ -144,13 +143,30 @@ watch(() => state.customModalVisible, (modalVisible) => {
         <p-field-group :label="$t('COMMON.WIDGETS.NUMBER_FORMAT.NUMBER_FORMAT')"
                        required
         >
-            <p-field-group v-for="dataField in state.dataFieldList"
-                           :key="`number-format-data-field-${dataField}`"
-                           :label="dataField"
-                           style-type="secondary"
-                           required
-            >
-                <p-select-dropdown class="w-full"
+            <template v-if="state.dataFieldList.length > 1">
+                <p-field-group v-for="dataField in state.dataFieldList"
+                               :key="`number-format-data-field-${dataField}`"
+                               :label="dataField"
+                               style-type="secondary"
+                               required
+                >
+                    <p-select-dropdown class="w-full"
+                                       use-fixed-menu-style
+                                       reset-selection-on-menu-close
+                                       :menu="state.menuItems"
+                                       :selected="state.proxyValue?.[dataField]?.format"
+                                       @select="handleSelectMenuItem(dataField, $event)"
+                    >
+                        <template #dropdown-button="item">
+                            <span>{{ getDropdownButtonText(item.label, dataField) }}</span>
+                        </template>
+                    </p-select-dropdown>
+                </p-field-group>
+            </template>
+            <template v-else>
+                <p-select-dropdown v-for="dataField in state.dataFieldList"
+                                   :key="`number-format-data-field-${dataField}`"
+                                   class="w-full"
                                    use-fixed-menu-style
                                    reset-selection-on-menu-close
                                    :menu="state.menuItems"
@@ -161,7 +177,7 @@ watch(() => state.customModalVisible, (modalVisible) => {
                         <span>{{ getDropdownButtonText(item.label, dataField) }}</span>
                     </template>
                 </p-select-dropdown>
-            </p-field-group>
+            </template>
         </p-field-group>
         <p-button-modal hide-footer-confirm-button
                         :visible="state.customModalVisible"
