@@ -7,6 +7,11 @@ import {
     PI, PTooltip, PButton,
 } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
 import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';
 import WidgetFormOverlayPreviewTable from '@/common/modules/widgets/_components/WidgetFormOverlayPreviewTable.vue';
@@ -53,13 +58,18 @@ const displayState = reactive({
 /* Event */
 
 const handleClickAllApply = async () => {
-    dataTableCardRef.value.forEach((_ref) => {
-        if (_ref) {
-            if (typeof _ref?.updateDataTable === 'function') {
-                _ref?.updateDataTable();
+    try {
+        dataTableCardRef.value.forEach((_ref) => {
+            if (_ref) {
+                if (typeof _ref?.updateDataTable === 'function') {
+                    _ref?.updateDataTable();
+                }
             }
-        }
-    });
+        });
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.APPLY_ALL_SUCCESS'), '');
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
 /* Hide Toggle */
@@ -154,7 +164,7 @@ onMounted(async () => {
                               :disabled="storeState.allDataTableInvalid"
                               @click="handleClickAllApply"
                     >
-                        {{ $t('Apply All') }}
+                        {{ $t('COMMON.WIDGETS.DATA_TABLE.APPLY_ALL') }}
                     </p-button>
                 </div>
                 <div class="gradation-bottom-area" />
