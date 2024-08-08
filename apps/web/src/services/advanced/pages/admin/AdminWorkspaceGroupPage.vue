@@ -2,6 +2,7 @@
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
 import WorkspaceGroupHeader from '@/services/advanced/components/WorkspaceGroupHeader.vue';
+import WorkspaceGroupTab from '@/services/advanced/components/WorkspaceGroupTab.vue';
 import WorkspaceGroupTable from '@/services/advanced/components/WorkspaceGroupTable.vue';
 
 </script>
@@ -14,5 +15,6 @@ import WorkspaceGroupTable from '@/services/advanced/components/WorkspaceGroupTa
                 <workspace-group-table :table-height="height" />
             </template>
         </p-horizontal-layout>
+        <workspace-group-tab />
     </section>
 </template>

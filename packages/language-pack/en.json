@@ -2712,6 +2712,13 @@
 				"TOOLBOX_PLACEHOLDER": "Action",
 				"EDIT": "Edit",
 				"DELETE": "Delete"
+			},
+			"TAB": {
+				"GROUP_USER": "Group User",
+				"WORKSPACE": "Workspace",
+				"ADD_USER": "Add User",
+				"ADD_WORKSPACE": "Add Workspace",
+				"REMOVE": "Remove"
 			}
 		}
 	},
