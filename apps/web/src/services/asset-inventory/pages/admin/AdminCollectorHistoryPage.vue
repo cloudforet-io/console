@@ -96,7 +96,7 @@ const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    workspaces: computed(() => allReferenceStore.getters.sworkspace),
+    workspaces: computed(() => allReferenceStore.getters.workspace),
 });
 const state = reactive({
     loading: true,
