@@ -49,7 +49,7 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
 
 const route = useRoute();
 const router = useRouter();
-console.log(store.state.user);
+
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     userIcon: computed<string>(() => {
@@ -190,7 +190,7 @@ const handleClickSignOut = async () => {
                   @click.stop="handleProfileButtonClick"
                   @keydown.enter="openProfileMenu"
             >
-                <!-- TODO: 유저 이미지 src 추가 필요 -->
+                <!-- TODO: Will add user image src -->
                 <p-avatar class="menu-icon"
                           size="md"
                 />
