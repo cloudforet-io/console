@@ -50,6 +50,7 @@ const table: WidgetConfig = {
         //     },
         // },
         dateFormat: {},
+        displayAnnotation: {},
     },
     dependencies: {
         groupBy: ['comparison'],

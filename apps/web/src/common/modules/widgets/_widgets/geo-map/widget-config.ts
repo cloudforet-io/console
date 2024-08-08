@@ -24,6 +24,7 @@ const geoMap: WidgetConfig = {
                 default: true,
             },
         },
+        displayAnnotation: {},
     },
 };
 

@@ -41,6 +41,7 @@ const stackedColumnChart: WidgetConfig = {
                 default: 'MMM DD, YYYY',
             },
         },
+        displayAnnotation: {},
     },
 };
 

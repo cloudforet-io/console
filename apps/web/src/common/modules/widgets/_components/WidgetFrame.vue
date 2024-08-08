@@ -111,9 +111,16 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                     />
                 </p-tooltip>
             </h3>
-            <p class="date-text">
-                {{ props.periodText }}
-            </p>
+            <div class="title-bottom-text-wrapper">
+                <span class="date-text">
+                    {{ props.periodText }}
+                </span>
+                <span v-if="props.annotation"
+                      class="annotation-text"
+                >
+                    {{ props.annotation }}
+                </span>
+            </div>
         </div>
         <div v-if="props.mode !== 'overlay'"
              class="action-button-wrapper"
@@ -270,6 +277,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
     }
 
     .widget-header {
+        position: relative;
         align-items: center;
         padding-bottom: 0.5rem;
         .title {
@@ -284,7 +292,10 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                 margin-left: 0.25rem;
             }
         }
-        .date-text {
+        .title-bottom-text-wrapper {
+            display: flex;
+            justify-content: space-between;
+
             @apply text-label-sm text-gray-500;
         }
     }
