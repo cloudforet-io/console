@@ -57,3 +57,18 @@ export const NUMBER_FORMAT = {
     FULL_NUMBER: 'FULL_NUMBER',
     CUSTOM: 'CUSTOM',
 } as const;
+
+export const XY_CHART_SERIES_LABEL_POSITION = {
+    inside: 'inside',
+    left: 'left',
+    right: 'right',
+    insideLeft: 'insideLeft',
+    insideRight: 'insideRight',
+    insideTop: 'insideTop',
+    insideBottom: 'insideBottom',
+} as const;
+
+export const PIE_CHART_SERIES_LABEL_POSITION = {
+    inner: 'inner',
+    outer: 'outer',
+} as const;

@@ -11,6 +11,10 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dr
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import {
+    PIE_CHART_SERIES_LABEL_POSITION,
+    XY_CHART_SERIES_LABEL_POSITION,
+} from '@/common/modules/widgets/_constants/widget-field-constant';
 import type {
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
@@ -26,11 +30,18 @@ const emit = defineEmits<WidgetFieldComponentEmit<DisplaySeriesLabelValue>>();
 const props = defineProps<WidgetFieldComponentProps<undefined, DisplaySeriesLabelValue>>();
 const state = reactive({
     proxyValue: useProxyValue<DisplaySeriesLabelValue|undefined>('value', props, emit),
-    menuItems: computed<SelectDropdownMenuItem[]>(() => [
-        { name: 'center', label: 'Center' },
-        { name: 'left', label: 'Left' },
-        { name: 'right', label: 'Right' },
-    ]),
+    menuItems: computed<SelectDropdownMenuItem[]>(() => {
+        if (props.widgetConfig?.widgetName === 'pieChart') {
+            return Object.entries(PIE_CHART_SERIES_LABEL_POSITION).map(([k, v]) => ({
+                name: k,
+                label: v,
+            }));
+        }
+        return Object.entries(XY_CHART_SERIES_LABEL_POSITION).map(([k, v]) => ({
+            name: k,
+            label: v,
+        }));
+    }),
     isRotateValid: computed<boolean>(() => {
         if (!state.proxyValue?.toggleValue) return true;
         if (state.proxyValue?.rotate === undefined) return false;
@@ -57,7 +68,7 @@ const handleUpdateToggle = (value: boolean) => {
     }
     state.proxyValue = {
         toggleValue: value,
-        position: 'center',
+        position: state.menuItems[0].name,
         rotate: 0,
     };
 };
@@ -86,7 +97,7 @@ onMounted(() => {
     }
     state.proxyValue = {
         toggleValue: props.value?.toggleValue ?? false,
-        position: props.value?.position ?? 'center',
+        position: props.value?.position ?? state.menuItems[0].name,
         rotate: props.value?.rotate ?? 0,
     };
 });
