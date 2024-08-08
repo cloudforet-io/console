@@ -39,7 +39,7 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { XAxisValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { XAxisValue, DateFormatValue, DisplaySeriesLabelValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -132,6 +132,7 @@ const state = reactive({
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -173,8 +174,16 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         return ErrorHandler.makeAPIErrorToast(e);
     }
 };
+const getThreshold = (rawData: Data): number => {
+    const maxNumber = rawData?.results?.reduce((max, obj) => {
+        const values = Object.values(obj).filter((val) => typeof val === 'number');
+        return Math.max(max, ...values);
+    }, 0);
+    return maxNumber * 0.08;
+};
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
+    const _threshold = getThreshold(rawData);
 
     // sort and slice Data, etc
     const _sortedData = sortBy(rawData?.results, (v) => state.dataField.reduce((acc, field) => acc + (v[field] as number), 0)).reverse();
@@ -210,6 +219,16 @@ const drawChart = (rawData: Data|null) => {
             type: 'bar',
             barMaxWidth: 24,
             barGap: 0,
+            label: {
+                show: !!state.displaySeriesLabel?.toggleValue,
+                position: state.displaySeriesLabel?.position,
+                rotate: state.displaySeriesLabel?.rotate,
+                fontSize: 10,
+                formatter: (p) => {
+                    if (p.value < _threshold) return '';
+                    return numberFormatter(p.value, { notation: 'compact' });
+                },
+            },
             data: _xAxisData.map((d) => {
                 const _data = _slicedData.find((v) => v[state.xAxisField] === d);
                 return _data ? _data[field] : undefined;
