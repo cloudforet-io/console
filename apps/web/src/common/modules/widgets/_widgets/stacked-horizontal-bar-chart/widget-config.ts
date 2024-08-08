@@ -44,6 +44,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
             },
         },
         displayAnnotation: {},
+        displaySeriesLabel: {},
     },
 };
 

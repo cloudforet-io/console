@@ -42,6 +42,7 @@ const stackedColumnChart: WidgetConfig = {
             },
         },
         displayAnnotation: {},
+        displaySeriesLabel: {},
     },
 };
 

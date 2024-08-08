@@ -40,6 +40,7 @@ const pieChart: WidgetConfig = {
             },
         },
         displayAnnotation: {},
+        displaySeriesLabel: {},
     },
 };
 
