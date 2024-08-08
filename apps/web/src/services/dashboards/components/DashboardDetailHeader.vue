@@ -24,6 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
 import DashboardControlButtons from '@/services/dashboards/components/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
+import DashboardLabelsButton from '@/services/dashboards/components/DashboardLabelsButton.vue';
 import DashboardNameEditModal from '@/services/dashboards/components/DashboardNameEditModal.vue';
 import DashboardShareWithCodeModal from '@/services/dashboards/components/DashboardShareWithCodeModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -254,6 +255,7 @@ const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
                                    reset-selection-on-menu-close
                                    @select="handleSelectItem"
                 />
+                <dashboard-labels-button :dashboard-id="props.dashboardId" />
             </template>
             <template v-if="!dashboardDetailGetters.isDeprecatedDashboard"
                       #extra
