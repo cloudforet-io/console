@@ -110,6 +110,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
         id: MENU_ID.ADVANCED,
         subMenuList: [
             { id: MENU_ID.WORKSPACES },
+            { id: MENU_ID.WORKSPACE_GROUP },
             { id: MENU_ID.BOOKMARK },
             { id: MENU_ID.AUTO_DORMANCY_CONFIGURATION },
             { id: MENU_ID.PREFERENCES },

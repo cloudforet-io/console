@@ -203,6 +203,13 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ADMINISTRATION_WORKSPACES',
         icon: 'ic_service_workspaces',
     },
+    [MENU_ID.WORKSPACE_GROUP]: {
+        menuId: MENU_ID.WORKSPACE_GROUP,
+        routeName: ADVANCED_ROUTE.WORKSPACE_GROUP._NAME,
+        translationId: 'MENU.ADMINISTRATION_WORKSPACE_GROUP',
+        icon: 'ic_workspaces',
+        highlightTag: 'new',
+    },
     [MENU_ID.BOOKMARK]: {
         menuId: MENU_ID.BOOKMARK,
         routeName: ADVANCED_ROUTE.BOOKMARK._NAME,
