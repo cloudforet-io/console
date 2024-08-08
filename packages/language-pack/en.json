@@ -1463,6 +1463,7 @@
 					"RESET_DESC": "Resetting the data options will revert all inputs to their most recent values. This action cannot be undone.",
 					"RESET_HEADER": "Are you sure you want to reset the data options?"
 				},
+				"APPLY_ALL": "Apply All",
 				"APPLY_ALL_SUCCESS": "Changes have been set.",
 				"EMPTY_DESC": "Click the [+] button to add new data or transform data using various methods such as Concatenate, Join, Query, and Evaluate.",
 				"EMPTY_TITLE": "Add Data to Get Started",
