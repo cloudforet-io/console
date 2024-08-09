@@ -80,13 +80,12 @@ const getField = (field: TableWidgetField): string => {
     return field.label || field.name;
 };
 
-const valueFormatter = (value, field: TableWidgetField) => {
+const valueFormatter = (value: number, field: TableWidgetField) => {
     let _unit = field.fieldInfo?.unit;
-    let dataField = field.name;
+    let dataField = field.name.replace('comparison_', '');
     if (props.fieldType === 'dynamicField') {
         dataField = props.criteria as string;
         _unit = props.dataInfo?.[dataField]?.unit;
-        return getFormattedNumber(value, dataField, props.numberFormatInfo, _unit);
     }
     return getFormattedNumber(value, dataField, props.numberFormatInfo, _unit);
 };
