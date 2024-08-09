@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { PToolboxTable } from '@cloudforet/mirinae';
 
@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const tableState = reactive({
     // TODO: temp data
-    fields: computed(() => [
+    fields: [
         { name: 'name', label: 'Name' },
         { name: 'workspace', label: 'Workspace' },
         { name: 'group_user', label: 'Group User' },
@@ -23,9 +23,9 @@ const tableState = reactive({
         { name: 'service_account', label: 'Service Account' },
         { name: 'cost', label: 'Cost' },
         { name: 'created_at', label: 'Created' },
-    ]),
+    ],
     // TODO: temp data
-    items: computed(() => [{
+    items: [{
         name: 'East Vickyboro',
         workspace: 5,
         group_user: 28,
@@ -78,7 +78,7 @@ const tableState = reactive({
         service_account: 17,
         cost: 16434,
         created_at: 'yyyy-mm-dd hh:mm:ss',
-    }]),
+    }],
 });
 </script>
 

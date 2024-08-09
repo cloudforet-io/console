@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { PHeading, PButton, PToolboxTable } from '@cloudforet/mirinae';
 
 const tableState = reactive({
-    fields: computed(() => [
+    fields: [
         // TODO: temp data
         { name: 'user_id', label: 'User ID' },
         { name: 'name', label: 'Name' },
         { name: 'state', label: 'State' },
         { name: 'role', label: 'Role' },
         { name: 'remove_button', label: ' ' },
-    ]),
-    items: computed(() => [{
+    ],
+    items: [{
         // TODO: temp data
         user_id: 'Kara_Herzog@yahoo.com',
         name: '',
         state: 'Enabled',
         role: 'Workspace Member Role',
-    }]),
+    }],
 });
 </script>
 
