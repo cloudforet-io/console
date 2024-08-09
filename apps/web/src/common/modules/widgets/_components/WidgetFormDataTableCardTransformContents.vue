@@ -191,8 +191,11 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         };
         const dataTable = await widgetGenerateStore.createTransformDataTable(createParams, state.dataTableId);
         if (dataTable) {
-            widgetGenerateStore.setSelectedDataTableId(dataTable.data_table_id);
-            widgetGenerateStore.setDataTableUpdating(true);
+            const _allDataTableInvalidMap = {
+                ...storeState.allDataTableInvalidMap,
+            };
+            delete _allDataTableInvalidMap[state.dataTableId];
+            widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
             setFailStatus(false);
             return dataTable;
         }
@@ -242,7 +245,7 @@ const handleUpdateDataTable = async () => {
     const result = await updateDataTable();
     if (result) {
         showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
-        widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
+        widgetGenerateStore.setSelectedDataTableId(result.data_table_id);
         widgetGenerateStore.setDataTableUpdating(true);
         await widgetGenerateStore.loadDataTable({});
     }
