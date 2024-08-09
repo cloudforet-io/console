@@ -2724,7 +2724,10 @@
 			},
 			"MODAL": {
 				"CREAET_DROP_DOWN_PLACEHOLDER": "Select workspaces",
-				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created"
+				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
+				"CREATE_TITLE": "Create Workspace Group",
+				"EDIT_TITLE": "Edit Workspace Group",
+				"DELETE_TITLE": "Delete Workspace Group"
 			}
 		}
 	},

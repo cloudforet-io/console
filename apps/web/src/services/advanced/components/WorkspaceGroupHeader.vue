@@ -11,7 +11,7 @@ const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const handleCreateButtonClick = () => {
     workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.CREATE,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.CREATE.TITLE'),
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.CREATE_TITLE'),
         visible: WORKSPACE_GROUP_MODAL_TYPE.CREATE,
     });
 };

@@ -7,7 +7,9 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 import { i18n } from '@/translations';
 
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
+import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
+const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 
 const WORKSPACE_GROUP_TOOLBOX_TYPE = WORKSPACE_GROUP_MODAL_TYPE;
 
@@ -32,7 +34,27 @@ const state = reactive({
     ])),
 });
 
-const handleSelectAction = () => {};
+const handleSelectAction = (type) => {
+    switch (type) {
+    case WORKSPACE_GROUP_MODAL_TYPE.EDIT:
+        workspaceGroupPageStore.updateModalSettings({
+            type,
+            title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.EDIT_TITLE'),
+            visible: type,
+        });
+        break;
+    case WORKSPACE_GROUP_MODAL_TYPE.DELETE:
+        workspaceGroupPageStore.updateModalSettings({
+            type,
+            title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_TITLE'),
+            visible: type,
+            themeColor: 'alert',
+        });
+        break;
+    default:
+        break;
+    }
+};
 </script>
 
 <template>
