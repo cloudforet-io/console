@@ -96,7 +96,7 @@ const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    workspaces: computed(() => allReferenceStore.getters.sworkspace),
+    workspaces: computed(() => allReferenceStore.getters.workspace),
 });
 const state = reactive({
     loading: true,
@@ -165,6 +165,7 @@ const handleChange = async (options: ToolboxOptions = {}) => {
 };
 const handleChangePagination = () => {
     state.pageStart = getPageStart(state.thisPage, state.pageSize);
+    apiQueryHelper.setPage(state.pageStart, state.pageSize);
     getJobs();
 };
 
