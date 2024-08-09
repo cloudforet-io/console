@@ -64,7 +64,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
 
 <template>
     <div class="widget-field-number-format">
-        <p-field-group :label="$t('COMMON.WIDGETS.NUMBER_FORMAT.NUMBER_FORMAT')"
+        <p-field-group :label="$t('COMMON.WIDGETS.DATA_FIELD_HEATMAP_COLOR.DATA_FIELD_HEATMAP_COLOR')"
                        required
         >
             <template v-if="state.dataFieldList.length > 1">
