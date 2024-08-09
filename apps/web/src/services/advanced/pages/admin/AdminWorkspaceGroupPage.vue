@@ -1,10 +1,20 @@
 <script setup lang="ts">
+import { onUnmounted } from 'vue';
+
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
+import WorkspaceGroupCreateModal from '@/services/advanced/components/WorkspaceGroupCreateModal.vue';
 import WorkspaceGroupHeader from '@/services/advanced/components/WorkspaceGroupHeader.vue';
 import WorkspaceGroupTab from '@/services/advanced/components/WorkspaceGroupTab.vue';
 import WorkspaceGroupTable from '@/services/advanced/components/WorkspaceGroupTable.vue';
+import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
+const workspaceGroupPageStore = useWorkspaceGroupPageStore();
+
+onUnmounted(() => {
+    workspaceGroupPageStore.$dispose();
+    workspaceGroupPageStore.$reset();
+});
 </script>
 
 <template>
@@ -16,5 +26,6 @@ import WorkspaceGroupTable from '@/services/advanced/components/WorkspaceGroupTa
             </template>
         </p-horizontal-layout>
         <workspace-group-tab />
+        <workspace-group-create-modal />
     </section>
 </template>

@@ -2721,6 +2721,10 @@
 				"ADD_USER": "Add User",
 				"ADD_WORKSPACE": "Add Workspace",
 				"REMOVE": "Remove"
+			},
+			"MODAL": {
+				"CREAET_DROP_DOWN_PLACEHOLDER": "Select workspaces",
+				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created"
 			}
 		}
 	},

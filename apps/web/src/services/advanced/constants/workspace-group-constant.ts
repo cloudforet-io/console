@@ -1,4 +1,5 @@
 export const WORKSPACE_GROUP_MODAL_TYPE = {
+    CREATE: 'create',
     EDIT: 'edit',
     DELETE: 'delete',
 } as const;
