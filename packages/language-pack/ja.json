@@ -2388,7 +2388,7 @@
 			"EDIT": "編集",
 			"FORM": {
 				"ACCESS": "アクセス",
-				"ADMIN_MODE": "Adminモード",
+				"ADMIN_CENTER": "",
 				"ALL": "全体",
 				"ALL_WORKSPACES": "すべてのワークスペース内のすべてのメニュー",
 				"ALT_E_CREATE_ROLE": "ロール作成失敗",
@@ -2408,6 +2408,7 @@
 				"MANAGE": "Manage",
 				"MENU": "メニュー",
 				"PERMISSION": "権限",
+				"READ_ONLY_PERMISSIONS": "",
 				"ROLE_TYPE_DOMAIN": "すべてのプロジェクトにアクセス可能",
 				"ROLE_TYPE_PROJECT": "招待されたり、直接作成したプロジェクトのみアクセス可能",
 				"SAVE": "保存",
