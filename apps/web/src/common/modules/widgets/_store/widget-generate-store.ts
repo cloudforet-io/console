@@ -288,6 +288,11 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         deleteDataTable: async (deleteParams: DataTableDeleteParameters, unsaved?: boolean) => {
             if (unsaved) {
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== deleteParams.data_table_id);
+                const _allDataTableInvalidMap = {
+                    ...state.allDataTableInvalidMap,
+                };
+                delete _allDataTableInvalidMap[deleteParams.data_table_id];
+                setAllDataTableInvalidMap(_allDataTableInvalidMap);
                 return;
             }
             const isPrivate = state.widgetId.startsWith('private');
@@ -297,6 +302,11 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             try {
                 await fetcher(deleteParams);
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== deleteParams.data_table_id);
+                const _allDataTableInvalidMap = {
+                    ...state.allDataTableInvalidMap,
+                };
+                delete _allDataTableInvalidMap[deleteParams.data_table_id];
+                setAllDataTableInvalidMap(_allDataTableInvalidMap);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
@@ -362,6 +372,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.size = 'full';
             state.widgetValidMap = {};
             state.widgetFormValueMap = {};
+            state.allDataTableInvalidMap = {};
         },
         setWidgetForm: (widgetInfo?: WidgetModel) => {
             state.selectedWidgetName = widgetInfo?.widget_type || 'table';
