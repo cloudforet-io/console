@@ -7,6 +7,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { i18n } from '@/translations';
 
 import WorkspaceGroupTabGroupUser from '@/services/advanced/components/WorkspaceGroupTabGroupUser.vue';
+import WorkspaceGroupTabWorkspace from '@/services/advanced/components/WorkspaceGroupTabWorkspace.vue';
 import { WORKSPACE_GROUP_TABS } from '@/services/advanced/constants/workspace-group-constant';
 
 const singleItemTabState = reactive({
@@ -25,6 +26,9 @@ const singleItemTabState = reactive({
         >
             <template #group_user>
                 <workspace-group-tab-group-user />
+            </template>
+            <template #workspace>
+                <workspace-group-tab-workspace />
             </template>
         </p-tab>
     </section>

@@ -2709,6 +2709,7 @@
 		"WORKSPACE_GROUP": {
 			"TITLE": "Workspace Group",
 			"CREATE": "Create",
+			"ALT_S_UPDATE_ROLE": "Workspace role successfully changed",
 			"MAIN": {
 				"TOOLBOX_PLACEHOLDER": "Action",
 				"EDIT": "Edit",
