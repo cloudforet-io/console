@@ -11,6 +11,8 @@ import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { hexToRgba } from '@/lib/helper/color-convert-helper';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
@@ -25,9 +27,21 @@ import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-t
 import type {
     TableDataFieldValue, ComparisonValue, TotalValue,
     DateFormatValue,
-    NumberFormatValue,
+    NumberFormatValue, DataFieldHeatmapColorValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
+
+import {
+    blue, green, red, yellow,
+} from '@/styles/colors';
+
+const HEATMAP_COLOR_HEX_MAP = {
+    RED: red[200],
+    BLUE: blue[200],
+    YELLOW: yellow[200],
+    GREEN: green[200],
+};
+const SKIP_HEATMAP_FIELD = ['subTotal', 'comparison'];
 
 
 interface Props {
@@ -49,6 +63,7 @@ interface Props {
   totalInfo?: TotalValue;
   dateFormatInfo?: DateFormatValue;
   numberFormatInfo?: NumberFormatValue;
+  dataFieldHeatmapColorInfo?: DataFieldHeatmapColorValue;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
@@ -71,6 +86,16 @@ const state = reactive({
         if (!props.granularity || !props.dateFormatInfo) return undefined;
         return getRefinedDateFormatByGranularity(props.granularity, props.dateFormatInfo.value);
     }),
+    dataItems: computed(() => {
+        if (!props.totalInfo?.toggleValue && props.items?.length) {
+            return props.items.slice(0, props.items.length - 1);
+        }
+        return props.items;
+    }),
+    totalItem: computed(() => {
+        if (!props.items?.length) return undefined;
+        return props.items[props.items.length - 1];
+    }),
 });
 
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
@@ -80,14 +105,15 @@ const getField = (field: TableWidgetField): string => {
     return field.label || field.name;
 };
 
-const valueFormatter = (value: number, field: TableWidgetField) => {
+const valueFormatter = (value, field: TableWidgetField) => {
+    const _value = value || 0;
     let _unit = field.fieldInfo?.unit;
     let dataField = field.name.replace('comparison_', '');
     if (props.fieldType === 'dynamicField') {
         dataField = props.criteria as string;
         _unit = props.dataInfo?.[dataField]?.unit;
     }
-    return getFormattedNumber(value, dataField, props.numberFormatInfo, _unit);
+    return getFormattedNumber(_value, dataField, props.numberFormatInfo, _unit);
 };
 
 const getValue = (item: TableDataItem, field: TableWidgetField) => {
@@ -195,6 +221,35 @@ const isSortable = (field: TableWidgetField) => {
     return !isDynamicDataField && !isStaticSubTotal;
 };
 
+const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
+    const _style: Record<string, string> = {};
+    const heatmapSkipCondition = field.fieldInfo?.type === 'labelField'
+        || (field?.fieldInfo?.additionalType && SKIP_HEATMAP_FIELD.includes(field?.fieldInfo?.additionalType));
+    if (heatmapSkipCondition) return _style;
+
+    let _dataField = '';
+    let _value = 0;
+    let _totalValue = 100;
+    if (props.fieldType === 'staticField') {
+        _value = item[field.name] || 0;
+        _totalValue = state.totalItem?.[field.name] || 100;
+        _dataField = field.name;
+    } else if (props.fieldType === 'dynamicField') {
+        _value = item[props.criteria || '']?.find((data) => data[props.dataField as string] === field.name)?.value || 0;
+        _totalValue = state.totalItem?.[props.criteria || '']?.find((data) => data[props.dataField as string] === field.name)?.value || 100;
+        _dataField = props.criteria as string;
+    }
+
+    const opacity = 0.1 + (0.9 * (_value / _totalValue));
+    const _colorInfo = props.dataFieldHeatmapColorInfo?.[_dataField]?.value;
+    if (_colorInfo && _colorInfo !== 'NONE') {
+        const rgbaString = hexToRgba(HEATMAP_COLOR_HEX_MAP[_colorInfo], opacity);
+        if (rgbaString) _style.backgroundColor = rgbaString;
+    }
+
+    return _style;
+};
+
 // const getTimeDiffSubText = (field: TableWidgetField): string => {
 //     if (!props.dataInfo?.[field.name]) return '';
 //     const { timediff } = props.dataInfo[field.name];
@@ -251,7 +306,7 @@ const isSortable = (field: TableWidgetField) => {
                 </tr>
             </thead>
             <tbody ref="tbodyRef">
-                <tr v-for="(item, rowIndex) in props.items"
+                <tr v-for="(item, rowIndex) in state.dataItems"
                     :key="`tr-${props.widgetId}-${rowIndex}`"
                     :data-index="rowIndex"
                 >
@@ -265,6 +320,7 @@ const isSortable = (field: TableWidgetField) => {
                             'total': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1,
                             'total-freeze': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1 && props.totalInfo?.freeze,
                         }"
+                        :style="rowIndex !== props.items?.length - 1 ? getHeatmapColorStyle(item, field) : {}"
                     >
                         <span ref="labelRef"
                               class="td-contents"
