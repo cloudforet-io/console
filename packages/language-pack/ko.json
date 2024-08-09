@@ -2388,7 +2388,7 @@
 			"EDIT": "수정",
 			"FORM": {
 				"ACCESS": "접근",
-				"ADMIN_MODE": "Admin 모드",
+				"ADMIN_CENTER": "",
 				"ALL": "전체",
 				"ALL_WORKSPACES": "모든 워크스페이스의 전체 서비스 메뉴",
 				"ALT_E_CREATE_ROLE": "역할(Role) 생성 실패",
@@ -2408,6 +2408,7 @@
 				"MANAGE": "Manage",
 				"MENU": "메뉴",
 				"PERMISSION": "권한",
+				"READ_ONLY_PERMISSIONS": "",
 				"ROLE_TYPE_DOMAIN": "모든 프로젝트 접근 가능",
 				"ROLE_TYPE_PROJECT": "초대받았거나 직접 생성한 프로젝트만 접근 가능",
 				"SAVE": "저장",

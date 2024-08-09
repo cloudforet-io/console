@@ -56,6 +56,7 @@ watch(() => props.initialData, (initialData) => {
     <p-pane-layout class="role-update-page-base-information">
         <p-heading heading-type="sub"
                    :title="$t('IAM.ROLE.DETAIL.BASE_INFORMATION')"
+                   class="heading"
         />
         <div class="input-wrapper">
             <p-field-group
@@ -80,6 +81,9 @@ watch(() => props.initialData, (initialData) => {
 .role-update-page-base-information {
     @apply mx-0;
     max-width: 100%;
+    .heading {
+        margin-bottom: 1.5rem;
+    }
     .input-wrapper {
         @apply mx-4 flex flex-wrap gap-1 flex-col;
         margin-bottom: 1.5rem;

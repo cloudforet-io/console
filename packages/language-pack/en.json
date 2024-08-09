@@ -2388,7 +2388,7 @@
 			"EDIT": "Edit",
 			"FORM": {
 				"ACCESS": "Access",
-				"ADMIN_MODE": "Admin mode",
+				"ADMIN_CENTER": "Admin Center",
 				"ALL": "All",
 				"ALL_WORKSPACES": "All menus within all workspaces",
 				"ALT_E_CREATE_ROLE": "Failed to create role",
@@ -2408,6 +2408,7 @@
 				"MANAGE": "Manage",
 				"MENU": "Menu",
 				"PERMISSION": "Permission",
+				"READ_ONLY_PERMISSIONS": "Read-only Access Permissions",
 				"ROLE_TYPE_DOMAIN": "All projects",
 				"ROLE_TYPE_PROJECT": "Invited projects only",
 				"SAVE": "Save",

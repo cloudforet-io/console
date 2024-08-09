@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { PFieldTitle, PI } from '@cloudforet/mirinae';
+import { PFieldTitle, PI, PToggleButton } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
-import { green } from '@/styles/colors';
+import { gray, green } from '@/styles/colors';
 
 import RoleUpdateFormAccessMenuItem from '@/services/iam/components/RoleUpdateFormAccessMenuItem.vue';
 import type { PageAccessMenuItem, UpdateFormDataType } from '@/services/iam/types/role-type';
@@ -27,11 +27,15 @@ const emit = defineEmits<{(e: 'update', value: UpdateFormDataType): void,
 const state = reactive({
     hideAllMenu: computed(() => props.menuItems?.find((d) => d.id === 'all')?.hideMenu),
     menuItems: [] as PageAccessMenuItem[],
+    isReadOnly: false,
 });
 
 /* Component */
 const handleUpdate = (value: UpdateFormDataType) => {
     emit('update', value);
+};
+const handleChangeToggle = (value: boolean) => {
+    state.isReadOnly = value;
 };
 
 /* Watcher */
@@ -47,37 +51,43 @@ watch(() => props.menuItems, (menuItems) => {
                        font-weight="bold"
                        size="md"
         />
-        <div v-if="props.roleType === ROLE_TYPE.DOMAIN_ADMIN"
-             class="page-access-info-wrapper"
-        >
-            <p-i name="ic_settings"
-                 width="2rem"
-                 height="2rem"
-                 class="setting-icon"
-                 color="inherit"
-            />
-            <div class="page-access-info">
-                <p class="title">
-                    {{ $t('IAM.ROLE.FORM.FULL_ACCESS') }}
-                </p>
-                <div class="page-access-desc">
-                    <p-i name="ic_check-circle"
-                         width="1.125rem"
-                         height="1.125rem"
-                         class="check-circle-icon"
-                         :color="green[600]"
-                    />
-                    <span class="desc">{{ $t('IAM.ROLE.FORM.ADMIN_MODE') }}</span>
+        <div v-if="props.roleType === ROLE_TYPE.DOMAIN_ADMIN">
+            <div class="page-access-info-wrapper">
+                <p-i name="ic_settings"
+                     width="2rem"
+                     height="2rem"
+                     class="setting-icon"
+                     :color="gray[900]"
+                />
+                <div class="page-access-info">
+                    <p class="title">
+                        {{ $t('IAM.ROLE.FORM.FULL_ACCESS') }}
+                    </p>
+                    <div class="page-access-desc">
+                        <p-i name="ic_check-circle"
+                             width="1.125rem"
+                             height="1.125rem"
+                             class="check-circle-icon"
+                             :color="green[600]"
+                        />
+                        <span class="desc">{{ $t('IAM.ROLE.FORM.ADMIN_CENTER') }}</span>
+                    </div>
+                    <div class="page-access-desc">
+                        <p-i name="ic_check-circle"
+                             width="1.125rem"
+                             height="1.125rem"
+                             class="check-circle-icon"
+                             :color="green[600]"
+                        />
+                        <span class="desc">{{ $t('IAM.ROLE.FORM.ALL_WORKSPACES') }}</span>
+                    </div>
                 </div>
-                <div class="page-access-desc">
-                    <p-i name="ic_check-circle"
-                         width="1.125rem"
-                         height="1.125rem"
-                         class="check-circle-icon"
-                         :color="green[600]"
-                    />
-                    <span class="desc">{{ $t('IAM.ROLE.FORM.ALL_WORKSPACES') }}</span>
-                </div>
+            </div>
+            <div class="page-access-info-wrapper">
+                <p-toggle-button :value="state.isReadOnly"
+                                 @change-toggle="handleChangeToggle"
+                />
+                <span>{{ $t('IAM.ROLE.FORM.READ_ONLY_PERMISSIONS') }}</span>
             </div>
         </div>
         <div v-else
@@ -118,7 +128,7 @@ watch(() => props.menuItems, (menuItems) => {
 <style scoped lang="postcss">
 .role-update-page-access {
     @apply flex flex-col;
-    margin: 0 1rem 2.5rem 1rem;
+    margin: 0 1rem 1.5rem 1rem;
     gap: 0.5rem;
     .page-access-menu {
         @apply border border-gray-200 rounded-md;
@@ -156,17 +166,24 @@ watch(() => props.menuItems, (menuItems) => {
         padding: 1.375rem 1rem;
         gap: 0.5rem;
         .setting-icon {
-            margin-top: -0.125rem;
+            margin-top: -0.375rem;
         }
         .page-access-info {
             @apply flex flex-col;
             gap: 0.25rem;
             .title {
+                @apply text-gray-900 font-medium;
                 margin-bottom: 0.375rem;
             }
             .desc {
                 @apply text-label-md text-gray-700;
             }
+        }
+        & + .page-access-info-wrapper {
+            @apply items-center;
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
         }
     }
 }

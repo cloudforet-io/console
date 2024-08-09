@@ -116,6 +116,7 @@ watchEffect(() => {
     <p-pane-layout class="role-create-page-permission-form">
         <p-heading heading-type="sub"
                    :title="$t('IAM.ROLE.FORM.PERMISSION')"
+                   class="heading"
         />
         <role-update-form-access :menu-items="menuItems"
                                  :role-type="props.roleType"
@@ -131,5 +132,8 @@ watchEffect(() => {
 <style lang="postcss" scoped>
 .role-create-page-permission-form {
     @apply mx-0;
+    .heading {
+        margin-bottom: 1.5rem;
+    }
 }
 </style>
