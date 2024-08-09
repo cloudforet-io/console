@@ -1,3 +1,4 @@
+import { NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 // import { indigo, red, yellow } from '@/styles/colors';
@@ -50,6 +51,11 @@ const table: WidgetConfig = {
         //     },
         // },
         dateFormat: {},
+        numberFormat: {
+            options: {
+                default: NUMBER_FORMAT.FULL_NUMBER,
+            },
+        },
         displayAnnotation: {},
     },
     dependencies: {

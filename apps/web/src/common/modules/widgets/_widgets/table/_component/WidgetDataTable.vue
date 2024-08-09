@@ -2,11 +2,10 @@
 
 import { computed, reactive } from 'vue';
 
-import bytes from 'bytes';
 
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { PI, PTooltip } from '@cloudforet/mirinae';
-import { byteFormatter, numberFormatter } from '@cloudforet/utils';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -19,16 +18,16 @@ import {
     getFormattedDate,
     getRefinedDateFormatByGranularity,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     TableDataFieldValue, ComparisonValue, TotalValue,
     DateFormatValue,
+    NumberFormatValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
-
-import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 
 
 interface Props {
@@ -49,6 +48,7 @@ interface Props {
   subTotalInfo?: TotalValue;
   totalInfo?: TotalValue;
   dateFormatInfo?: DateFormatValue;
+  numberFormatInfo?: NumberFormatValue;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
@@ -82,11 +82,7 @@ const getField = (field: TableWidgetField): string => {
 
 const valueFormatter = (value, field: TableWidgetField) => {
     const _unit = field.fieldInfo?.unit;
-    if (_unit && SIZE_UNITS.includes(_unit)) {
-        const _originalVal = bytes.parse(`${value}${_unit}`);
-        return byteFormatter(_originalVal);
-    }
-    return numberFormatter(value, { notation: 'compact' });
+    return getFormattedNumber(value, field.name, props.numberFormatInfo, _unit);
 };
 
 const getValue = (item: TableDataItem, field: TableWidgetField) => {
