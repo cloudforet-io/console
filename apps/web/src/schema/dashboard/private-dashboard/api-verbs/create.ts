@@ -1,17 +1,20 @@
 import type { Tags } from '@/schema/_common/model';
 import type {
-    DashboardLayoutWidgetInfo, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
+    DashboardLayout, DashboardOptions, DashboardVariables, DashboardVariablesSchema,
+    DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
 export interface PrivateDashboardCreateParameters {
     name: string;
-    template_id: string;
-    template_type: string;
-    layouts?: DashboardLayoutWidgetInfo[][];
+    description?: string;
+    layouts?: DashboardLayout[];
+    options?: DashboardOptions;
+    vars?: DashboardVars;
     variables?: DashboardVariables;
-    settings?: DashboardSettings;
     variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;
+    folder_id?: string;
+    workspace_id?: string;
 }

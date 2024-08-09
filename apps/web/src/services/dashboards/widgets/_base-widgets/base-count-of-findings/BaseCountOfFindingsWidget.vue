@@ -5,13 +5,13 @@ import {
 
 import { percent, array } from '@amcharts/amcharts5';
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import { PDataLoader, PTextPagination } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader, PTextPagination } from '@cloudforet/mirinae';
 
 import { ASSET_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';

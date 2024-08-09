@@ -1,14 +1,47 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Args, Parameters } from '@storybook/vue';
 
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import { getKeyItemSets, getQueryTags, getValueHandlerMap } from '@/navigation/toolbox/mock';
+
+
+export const getToolboxArgs = (): Args => ({
+    paginationVisible: true,
+    pageSizeChangeable: true,
+    settingsVisible: false,
+    sortable: false,
+    exportable: false,
+    refreshable: true,
+    searchable: true,
+    filtersVisible: true,
+    searchType: SEARCH_TYPES.plain,
+    thisPage: 1,
+    pageSize: 24,
+    totalCount: undefined,
+    hasNextPage: false,
+    sortBy: '',
+    pageSizeOptions: [24, 36, 48],
+    sortByOptions: [],
+    keyItemSets: getKeyItemSets(),
+    valueHandlerMap: getValueHandlerMap(),
+    queryTags: getQueryTags(),
+    searchText: '',
+    timezone: 'UTC',
+    leftAreaSlot: undefined,
+});
+
+export const getToolboxParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A179180',
+    },
+});
 
 export const getToolboxArgTypes = (): ArgTypes => ({
     paginationVisible: {
         name: 'paginationVisible',
         type: { name: 'boolean' },
         description: 'Whether to show pagination or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -18,15 +51,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     pageSizeChangeable: {
         name: 'pageSizeChangeable',
         type: { name: 'boolean' },
         description: 'Whether to show page size options and allow changing page size or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -36,15 +66,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     settingsVisible: {
         name: 'settingsVisible',
         type: { name: 'boolean' },
         description: 'Whether to show settings button or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -54,15 +81,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     sortable: {
         name: 'sortable',
         type: { name: 'boolean' },
         description: 'Whether to show sort menu and allow changing sort key or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -72,15 +96,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     exportable: {
         name: 'exportable',
         type: { name: 'boolean' },
         description: 'Whether to show excel button and allow export or not.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -90,15 +111,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     refreshable: {
         name: 'refreshable',
         type: { name: 'boolean' },
         description: 'Whether to show refresh button and allow refresh or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -108,15 +126,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     searchable: {
         name: 'searchable',
         type: { name: 'boolean' },
         description: 'Whether to show search input and allow search or not.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -126,15 +141,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     filtersVisible: {
         name: 'filtersVisible',
         type: { name: 'boolean' },
         description: 'Whether to show search filters or not. Filters exist only when search type is `query`.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -144,15 +156,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: true,
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     searchType: {
         name: 'searchType',
         type: { name: 'string' },
         description: `Search type. ${Object.values(SEARCH_TYPES)} are available.`,
-        defaultValue: SEARCH_TYPES.plain,
         table: {
             type: {
                 summary: 'string',
@@ -162,16 +171,13 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: SEARCH_TYPES.plain,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(SEARCH_TYPES),
-        },
+        control: 'select',
+        options: Object.values(SEARCH_TYPES),
     },
     thisPage: {
         name: 'thisPage',
         type: { name: 'number' },
         description: 'Current page. sync props.',
-        defaultValue: 1,
         table: {
             type: {
                 summary: 'number',
@@ -181,15 +187,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'number',
-        },
+        control: 'number',
     },
     pageSize: {
         name: 'pageSize',
         type: { name: 'number' },
         description: 'Page size to show data. sync props.',
-        defaultValue: 24,
         table: {
             type: {
                 summary: 'number',
@@ -199,16 +202,13 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'select',
-            options: [24, 36, 48],
-        },
+        control: 'select',
+        options: [24, 36, 48],
     },
     totalCount: {
         name: 'totalCount',
         type: { name: 'number' },
         description: 'Total count of data for calculating pagination.',
-        defaultValue: undefined,
         table: {
             type: {
                 summary: 'number',
@@ -218,16 +218,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'number',
-            options: { min: 0 },
-        },
+        control: { type: 'number', min: 0 },
     },
     hasNextPage: {
         name: 'hasNextPage',
         type: { name: 'boolean' },
         description: 'Whether to show indication that there is next page or not.  It cannot be used with totalCount prop.',
-        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
@@ -237,15 +233,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: 'false',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     sortBy: {
         name: 'sortBy',
         type: { name: 'string' },
         description: 'Sort key. sync props.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'string',
@@ -255,15 +248,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: '',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     pageSizeOptions: {
         name: 'pageSizeOptions',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: 'Options for dropdown of page sizes.',
-        defaultValue: [24, 36, 48],
         table: {
             type: {
                 summary: 'array',
@@ -273,15 +263,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: '[24, 36, 48]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     sortByOptions: {
         name: 'sortByOptions',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: 'Options for dropdown of sort keys.',
-        defaultValue: [],
         table: {
             type: {
                 summary: 'array',
@@ -291,15 +278,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     keyItemSets: {
         name: 'keyItemSets',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: 'Query search key item sets. Follow the QuerySearch component spec.',
-        defaultValue: getKeyItemSets(),
         table: {
             type: {
                 summary: 'array',
@@ -309,15 +293,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     valueHandlerMap: {
         name: 'valueHandlerMap',
-        type: { name: 'object' },
+        type: { name: 'object' } as SBType,
         description: 'Query search value handler map. Follow the QuerySearch component spec.',
-        defaultValue: getValueHandlerMap(),
         table: {
             type: {
                 summary: 'object',
@@ -327,15 +308,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: '{}',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     queryTags: {
         name: 'queryTags',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: 'Query search tags. Follow the QuerySearchTags component spec. sync props.',
-        defaultValue: getQueryTags(),
         table: {
             type: {
                 summary: 'array',
@@ -345,15 +323,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: '[]',
             },
         },
-        control: {
-            type: 'object',
-        },
+        control: 'object',
     },
     searchText: {
         name: 'searchText',
         type: { name: 'string' },
         description: 'Search text for plain search. Works only with plain search. sync props.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'string',
@@ -363,15 +338,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: null,
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     timezone: {
         name: 'timezone',
         type: { name: 'string' },
         description: 'Timezone that is used for display time value of query search tags.',
-        defaultValue: 'UTC',
         table: {
             type: {
                 summary: 'string',
@@ -381,15 +353,12 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: 'UTC',
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* slots */
     leftAreaSlot: {
         name: 'left-area',
         description: 'Slot for left area of toolbox',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -399,9 +368,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
                 summary: null,
             },
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* events */
     onChange: {
@@ -457,4 +424,10 @@ export const getToolboxArgTypes = (): ArgTypes => ({
             },
         },
     },
+    // default
+    'left-area': { table: { disable: true } },
+    'pagination-area': { table: { disable: true } },
+    export: { table: { disable: true } },
+    'click-settings': { table: { disable: true } },
+    refresh: { table: { disable: true } },
 });

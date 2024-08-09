@@ -3,14 +3,14 @@ import {
     computed, defineExpose, defineProps, reactive, toRef,
 } from 'vue';
 
-import {
-    PProgressBar,
-} from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PProgressBar,
+} from '@cloudforet/mirinae';
 import { getRGBFromHex, numberFormatter } from '@cloudforet/utils';
 
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';

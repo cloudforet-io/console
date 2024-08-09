@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PTextButton, PCollapsibleToggle } from '@spaceone/design-system';
+import { PTextButton, PCollapsibleToggle } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 
@@ -28,7 +28,6 @@ const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 const state = reactive({
     isCollapsed: true,
     userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
     proxyIsSentCode: useProxyValue('is-sent-code', props, emit),
 });
 

@@ -5,16 +5,16 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
-import {
-    PBadge, PDivider, PI, PLink,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { get } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PBadge, PDivider, PI, PLink,
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
@@ -71,12 +71,12 @@ const state = reactive({
         const escalationPolicyId: string|undefined = get(props.escalationPolicy, 'escalation_policy_id');
         if (!escalationPolicyId) return undefined;
         filters.push({ k: 'escalation_policy_id', o: '=', v: escalationPolicyId });
-        return {
+        return getProperRouteLocation({
             name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
             query: {
                 filters: queryHelper.setFilters(filters).rawQueryStrings,
             },
-        };
+        });
     }),
 });
 
@@ -119,7 +119,7 @@ onActivated(async () => {
             <p-link class="value"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
-                    :to="getProperRouteLocation(state.escalationPolicyLink)"
+                    :to="state.escalationPolicyLink"
                     highlight
             >
                 {{ state.escalationPolicyName }}

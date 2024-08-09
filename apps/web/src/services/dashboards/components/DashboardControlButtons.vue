@@ -1,48 +1,51 @@
 <script setup lang="ts">
-import { PButton } from '@spaceone/design-system';
+import { reactive } from 'vue';
 
-import { SpaceRouter } from '@/router';
+import { PButton } from '@cloudforet/mirinae';
+
+import { store } from '@/store';
+
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+const widgetGenerateStore = useWidgetGenerateStore();
+const state = reactive({
+    loading: false,
+});
 
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-
-
-const emit = defineEmits(['update:visible-clone-modal']);
-const { getProperRouteLocation } = useProperRouteLocation();
-
-const handleVisibleCloneModal = () => {
-    emit('update:visible-clone-modal');
+/* Event */
+const handleAddWidget = async () => {
+    state.loading = true;
+    widgetGenerateStore.setOverlayType('ADD');
+    widgetGenerateStore.setShowOverlay(true);
+    state.loading = false;
 };
-
-const props = defineProps<{
-    dashboardId: string;
-    name?: string;
-}>();
-
-const handleClickCustomize = () => {
-    SpaceRouter.router.push(getProperRouteLocation({
-        name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-        params: { dashboardId: props.dashboardId },
-    }));
+const handleClickWidgetReorder = () => {
+    if (store.state.display.visibleSidebar) {
+        store.dispatch('display/hideSidebar');
+    } else {
+        store.dispatch('display/showWidget');
+    }
 };
-
 </script>
 
 <template>
     <div class="dashboard-control-buttons">
-        <p-button icon-left="ic_dashboard-customize"
-                  style-type="tertiary"
-                  @click="handleClickCustomize"
+        <p-button :icon-left="store.state.display.visibleSidebar ? 'ic_check' : 'ic_edit'"
+                  :style-type="store.state.display.visibleSidebar ? 'substitutive' : 'tertiary'"
+                  size="sm"
+                  :disabled="store.state.display.visibleSidebar"
+                  @click="handleClickWidgetReorder"
         >
-            {{ $t('DASHBOARDS.DETAIL.CUSTOMIZE') }}
+            {{ $t('DASHBOARDS.DETAIL.EDIT_LAYOUT') }}
         </p-button>
-        <p-button icon-left="ic_duplicate"
-                  style-type="tertiary"
-                  @click="handleVisibleCloneModal"
+        <p-button icon-left="ic_plus"
+                  style-type="secondary"
+                  size="sm"
+                  :loading="state.loading"
+                  @click="handleAddWidget"
         >
-            {{ $t('DASHBOARDS.DETAIL.CLONE') }}
+            {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
         </p-button>
     </div>
 </template>
@@ -50,6 +53,6 @@ const handleClickCustomize = () => {
 <style lang="postcss">
 .dashboard-control-buttons {
     @apply flex justify-end;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 </style>

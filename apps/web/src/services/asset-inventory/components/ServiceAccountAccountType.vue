@@ -48,7 +48,7 @@ import {
 
 import {
     PPaneLayout, PHeading, PSelectCard, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 
 import type { AccountType } from '@/schema/identity/service-account/type';

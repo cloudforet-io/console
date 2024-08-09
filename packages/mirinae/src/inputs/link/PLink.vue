@@ -156,7 +156,7 @@ const state = reactive({
     }
 
     &:not(.disabled) {
-        &:focus, &:active, &focus-within {
+        &:focus, &:active, &:focus-within {
             > .text {
                 @apply underline;
             }

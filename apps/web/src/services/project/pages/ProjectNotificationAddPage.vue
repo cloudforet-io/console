@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PHeading } from '@spaceone/design-system';
+import { PHeading } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -33,7 +33,10 @@ const state = reactive({
         const protocols = allReferenceStore.getters.protocol;
         return protocols[state.protocolId]?.label;
     }, '', { lazy: true, onError: (e) => console.error(e) }),
-    pageTitle: computed(() => i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: state.protocolLabel })),
+    pageTitle: computed(() => (state.protocolType === 'INTERNAL'
+        ? i18n.t('IAM.USER.NOTIFICATION.ASSOCIATED_MEMBER')
+        : i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: state.protocolLabel })
+    )),
     projectId: computed<string>(() => route.params.id),
     protocolId: computed<string>(() => route.params.protocolId),
     protocolType: computed<ProjectNotificationAddPageUrlQueryValue['protocolType']>(() => {

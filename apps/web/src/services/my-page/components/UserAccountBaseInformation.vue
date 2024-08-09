@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { map } from 'lodash';
+
 import {
     PButton, PFieldGroup, PSelectDropdown, PTextInput,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { map } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

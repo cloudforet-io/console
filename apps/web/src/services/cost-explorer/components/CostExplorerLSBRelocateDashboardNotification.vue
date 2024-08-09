@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PTextButton } from '@spaceone/design-system';
+import { PTextButton } from '@cloudforet/mirinae';
 
 const emit = defineEmits<{(e: 'click-dismiss'): void;
     (e: 'click-learn-more'): void;

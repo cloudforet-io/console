@@ -16,8 +16,8 @@ export const useWidgetDateRange = (props: WidgetProps, widgetState: UnwrapRef<Ba
     const dateRange = computed<DateRange>(() => {
         if (overrides.dateRange) return overrides.dateRange as DateRange;
         const dateRangeFormat = widgetState.granularity === GRANULARITY.YEARLY ? 'YYYY' : 'YYYY-MM';
-        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(dateRangeFormat);
-        const start = dayjs.utc(widgetState.settings?.date_range?.start).format(dateRangeFormat);
+        const end = dayjs.utc(widgetState.dashboardOptions?.date_range?.end).format(dateRangeFormat);
+        const start = dayjs.utc(widgetState.dashboardOptions?.date_range?.start).format(dateRangeFormat);
         return { start, end };
     });
     return dateRange;

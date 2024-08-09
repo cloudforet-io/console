@@ -4,17 +4,18 @@ import {
     computed, reactive, watch, onMounted,
 } from 'vue';
 
-import {
-    PFieldGroup, PRadio, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI, PTab, PJsonSchemaForm,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PFieldGroup, PRadio, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI, PTab, PJsonSchemaForm,
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { SchemaListParameters } from '@/schema/identity/schema/api-verbs/list';

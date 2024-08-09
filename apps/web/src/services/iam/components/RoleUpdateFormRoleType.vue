@@ -8,7 +8,7 @@ import {
     PHeading,
     PPaneLayout,
     PSelectCard,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';

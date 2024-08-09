@@ -4,15 +4,15 @@ import {
 } from 'vue';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
-import {
-    PI, PDataLoader, PProgressBar,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PI, PDataLoader, PProgressBar,
+} from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
@@ -74,15 +74,15 @@ const { colorSet } = useWidgetColorSet({
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
         if (widgetState.options.granularity === GRANULARITY.YEARLY) {
-            const end = dayjs.utc(widgetState.settings?.date_range?.end).format(state.dateFormat);
+            const end = dayjs.utc(widgetState.dashboardOptions?.date_range?.end).format(state.dateFormat);
             const start = dayjs.utc(end).subtract(2, 'year').format(state.dateFormat);
             return { start, end };
         } if (widgetState.options.granularity === GRANULARITY.DAILY) {
-            const end = dayjs.utc(widgetState.settings?.date_range?.end).format(state.dateFormat);
+            const end = dayjs.utc(widgetState.dashboardOptions?.date_range?.end).format(state.dateFormat);
             const start = dayjs.utc(end).subtract(13, 'day').format(state.dateFormat);
             return { start, end };
         }
-        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(state.dateFormat);
+        const end = dayjs.utc(widgetState.dashboardOptions?.date_range?.end).format(state.dateFormat);
         const start = dayjs.utc(end).subtract(11, 'month').format(state.dateFormat);
         return { start, end };
     }),

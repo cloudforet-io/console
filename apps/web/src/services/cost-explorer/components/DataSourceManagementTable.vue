@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PToolboxTable, PLazyImg, PI } from '@spaceone/design-system';
-import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PToolboxTable, PLazyImg, PI } from '@cloudforet/mirinae';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -30,6 +30,7 @@ const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
     dataSourceList: computed<DataSourceItem[]>(() => dataSourcesPageGetters.dataSourceList),
+    dataSourceListTotalCount: computed<number>(() => dataSourcesPageState.dataSourceListTotalCount),
     selectedIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
     dataSourceListPageStart: computed<number>(() => dataSourcesPageState.dataSourceListPageStart),
     dataSourceListPageLimit: computed<number>(() => dataSourcesPageState.dataSourceListPageLimit),
@@ -90,8 +91,12 @@ let datasourceListApiQuery = datasourceListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
-const handleUpdateSelectIndex = (indices: number[]) => {
+const handleUpdateSelectIndex = async (indices: number[]) => {
     dataSourcesPageStore.setSelectedDataSourceIndices(indices[0]);
+    const item = storeState.dataSourceList[indices[0]];
+    await dataSourcesPageStore.fetchDataSourceItem({
+        data_source_id: item.data_source_id,
+    });
 };
 const handleChange = (options: any = {}) => {
     datasourceListApiQuery = getApiQueryWithToolboxOptions(datasourceListApiQueryHelper, options) ?? datasourceListApiQuery;
@@ -129,6 +134,7 @@ const fetchDataSourceList = async () => {
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
                          :loading="state.loading"
+                         :total-count="storeState.dataSourceListTotalCount"
                          :style="{height: `${props.tableHeight}px`}"
                          @change="handleChange"
                          @refresh="fetchDataSourceList"

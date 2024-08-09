@@ -1,4 +1,4 @@
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 import * as styles from '@/styles/colors';
 
@@ -83,5 +83,10 @@ export const USER_TABS = {
     TAG: 'tag',
     API_KEY: 'api_key',
     DATA: 'data',
+} as const;
+
+export const LOCAL_TYPE = {
+    EMAIL: 'EMAIL',
+    ID: 'ID',
 } as const;
 

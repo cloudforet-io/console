@@ -56,11 +56,11 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PLazyImg, PDivider, PTooltip } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { PLazyImg, PDivider, PTooltip } from '@cloudforet/mirinae';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

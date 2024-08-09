@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { PFieldGroup, PTextInput } from '@spaceone/design-system';
-
+import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap, CostDataSourceItems } from '@/store/reference/cost-data-source-reference-store';
 

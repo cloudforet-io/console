@@ -5,12 +5,14 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PIconButton, PSelectDropdown } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { PIconButton, PSelectDropdown } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { REFRESH_INTERVAL_OPTIONS_MAP } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { RefreshIntervalOption } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -31,8 +33,10 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'refresh'): void;
 }>();
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     intervalOptionList: computed<{label: TranslateResult; value: RefreshIntervalOption}[]>(() => [
@@ -51,8 +55,9 @@ const state = reactive({
         label: interval.label,
     }))),
     intervalDuration: computed<number|undefined>(() => {
-        if (!REFRESH_INTERVAL_OPTIONS.includes(dashboardDetailState.settings.refresh_interval_option)) return undefined;
-        return REFRESH_INTERVAL_OPTIONS_MAP[dashboardDetailState.settings.refresh_interval_option];
+        if (!dashboardDetailState.options?.refresh_interval_option) return undefined;
+        if (!REFRESH_INTERVAL_OPTIONS.includes(dashboardDetailState.options.refresh_interval_option)) return undefined;
+        return REFRESH_INTERVAL_OPTIONS_MAP[dashboardDetailState.options.refresh_interval_option];
     }),
 });
 
@@ -80,13 +85,22 @@ const executeRefreshInterval = () => {
 };
 
 const handleSelectRefreshIntervalOption = (option) => {
-    dashboardDetailStore.setSettings({
-        ...dashboardDetailState.settings,
+    dashboardDetailStore.setOptions({
+        ...dashboardDetailState.options,
         refresh_interval_option: option,
     });
     if (props.refreshDisabled) return;
     clearRefreshInterval();
     executeRefreshInterval();
+
+    if (!dashboardDetailGetters.disableManageButtons) {
+        dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
+            options: {
+                ...dashboardDetailState.dashboardInfo?.options || {},
+                refresh_interval_option: option,
+            },
+        });
+    }
 };
 
 watch([() => props.dashboardId, () => props.loading], ([dashboardId, loading], prev) => {
@@ -126,14 +140,16 @@ const handleRefresh = () => {
         <p-icon-button class="left-icon-button"
                        name="ic_renew"
                        style-type="tertiary"
+                       size="sm"
                        shape="square"
                        :disabled="props.refreshDisabled || props.loading"
                        :animation="props.loading ? 'reserve-spin' : undefined"
                        @click="handleRefresh"
         />
         <p-select-dropdown class="currency-select-dropdown"
+                           size="sm"
                            :menu="state.intervalOptionItems"
-                           :selected="dashboardDetailState.settings.refresh_interval_option"
+                           :selected="dashboardDetailState.options.refresh_interval_option"
                            :read-only="props.loading"
                            :class="{ loading: props.loading }"
                            menu-position="right"
@@ -163,6 +179,7 @@ const handleRefresh = () => {
     /* custom design-system component - p-select-dropdown */
     :deep(.currency-select-dropdown) {
         .dropdown-button {
+            height: 1.5rem;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }

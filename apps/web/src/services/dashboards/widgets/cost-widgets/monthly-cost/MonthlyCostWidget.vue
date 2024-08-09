@@ -4,20 +4,20 @@ import {
 } from 'vue';
 
 import type { AxisRenderer, DateAxis } from '@amcharts/amcharts5/xy';
-import {
-    PDivider, PDataLoader, PI, PSkeleton,
-} from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PDivider, PDataLoader, PI, PSkeleton,
+} from '@cloudforet/mirinae';
 
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { CurrencySymbol } from '@/store/modules/settings/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { CurrencySymbol } from '@/store/modules/display/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -67,7 +67,7 @@ interface ChartData {
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT);
+        const end = dayjs.utc(widgetState.dashboardOptions?.date_range?.end).format(DATE_FORMAT);
         const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
         return { start, end };
     }),

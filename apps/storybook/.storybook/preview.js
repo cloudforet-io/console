@@ -2,9 +2,7 @@ import '@/styles/style.pcss';
 
 import Vue from 'vue';
 
-import { applyAmchartsGlobalSettings } from '@/plugins/amcharts';
 import { i18n, I18nConnector } from '@/translations';
-import { withDesign } from 'storybook-addon-designs';
 import VTooltip from 'v-tooltip';
 import velocity from 'velocity-animate';
 import Fragment from 'vue-fragment';
@@ -17,7 +15,6 @@ import webFontLoader from 'webfontloader';
 import screens from '@/styles/screens.cjs';
 import { fontUrls, webFonts } from '@/styles/web-fonts.cjs';
 
-
 import SpaceOneTheme from './CloudforetTheme';
 
 Vue.use(VueRouter);
@@ -29,8 +26,6 @@ Vue.use(SvgIcon, {
 });
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
-
-applyAmchartsGlobalSettings();
 
 Vue.prototype.toJSON = function () {
     return this;
@@ -45,7 +40,6 @@ webFontLoader.load({
     },
 });
 
-
 const viewports = {};
 Object.keys(screens).forEach((k) => {
     const v = screens[k];
@@ -58,21 +52,8 @@ Object.keys(screens).forEach((k) => {
     };
 });
 
-
-
-export const decorators = [
-    withDesign,
-    (story, { globals: { locale } }) => {
-        i18n.locale = locale;
-        return {
-            i18n,
-            router: new VueRouter(),
-            template: '<story/>',
-        };
-    },
-];
-
-export const parameters = {
+const preview = {
+  parameters : {
     controls: { expanded: true },
     layout: 'centered',
     docs: {
@@ -88,23 +69,36 @@ export const parameters = {
         viewports,
     },
     options: {
-        storySort: (a, b) => (a[1].kind === b[1].kind ? 0 : a[1].id.localeCompare(b[1].id, undefined, { numeric: true })),
+      storySort: (a, b) => a.title === b.title ? 0 : a.id.localeCompare(b.id, undefined, { numeric: true }),
     },
     actions: { argTypesRegex: '^on.*' },
+  },
+  decorators: [
+    (story, { globals: { locale } }) => {
+        i18n.locale = locale;
+        return {
+            components: { story },
+            i18n,
+            router: new VueRouter(),
+            template: '<story/>',
+        };
+    },
+  ],
+  globalTypes: {
+    locale: {
+      name: 'locale',
+      description: 'Internationalization locale',
+      defaultValue: 'en',
+      toolbar: {
+          icon: 'globe',
+          items: [
+              { value: 'en', right: '🇺🇸', title: 'English' },
+              { value: 'ko', right: '🇰🇷', title: '한국어' },
+              { value: 'jp', right: '🇯🇵', title: '日本語' },
+          ],
+      },
+    },
+  }
 };
 
-export const globalTypes = {
-    locale: {
-        name: 'locale',
-        description: 'Internationalization locale',
-        defaultValue: 'en',
-        toolbar: {
-            icon: 'globe',
-            items: [
-                { value: 'en', right: '🇺🇸', title: 'English' },
-                { value: 'ko', right: '🇰🇷', title: '한국어' },
-                { value: 'jp', right: '🇯🇵', title: '日本語' },
-            ],
-        },
-    },
-};
+export default preview;

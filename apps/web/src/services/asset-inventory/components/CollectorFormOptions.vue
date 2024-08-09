@@ -61,13 +61,14 @@ import {
     defineProps, computed, reactive, watch,
 } from 'vue';
 
-import {
-    PJsonSchemaForm, PButton, PI, PDataLoader, PFieldTitle, PSpinner,
-} from '@spaceone/design-system';
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PJsonSchemaForm, PButton, PI, PDataLoader, PFieldTitle, PSpinner,
+} from '@cloudforet/mirinae';
+import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
+
 
 
 import type {

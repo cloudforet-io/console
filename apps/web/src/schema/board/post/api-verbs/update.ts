@@ -9,4 +9,5 @@ export interface PostUpdateParameters {
         is_pinned: boolean;
     };
     writer?: string;
+    workspaces?: string[];
 }

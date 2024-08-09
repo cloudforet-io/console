@@ -4,11 +4,11 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PSelectCard,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProjectAlertConfigUpdateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/update';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';

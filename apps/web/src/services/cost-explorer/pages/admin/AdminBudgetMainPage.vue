@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PDivider, PButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 

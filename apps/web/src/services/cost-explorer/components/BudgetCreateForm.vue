@@ -4,9 +4,9 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PButton } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButton } from '@cloudforet/mirinae';
+
 
 import { SpaceRouter } from '@/router';
 import type { BudgetCreateParameters } from '@/schema/cost-analysis/budget/api-verbs/create';

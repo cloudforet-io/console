@@ -194,6 +194,7 @@ export default defineComponent<ContextMenuItemProps>({
 .p-context-menu-item {
     @apply text-gray-900 text-label-md;
     display: flex;
+    align-items: center;
     padding: 0.5rem;
     cursor: pointer;
     &:not(.disabled) {
@@ -223,7 +224,6 @@ export default defineComponent<ContextMenuItemProps>({
     }
     > .left-icon {
         margin-right: 0.25rem;
-        margin-top: 0.25rem;
         flex-shrink: 0;
     }
     > .label-wrapper {

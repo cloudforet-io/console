@@ -4,18 +4,18 @@ import {
     defineProps, nextTick, reactive, ref,
 } from 'vue';
 
-import { PDataLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader, PSkeleton, PProgressBar } from '@cloudforet/mirinae';
 
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { CurrencySymbol } from '@/store/modules/settings/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { CurrencySymbol } from '@/store/modules/display/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -54,7 +54,7 @@ const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(widgetState.settings?.date_range?.end).format('YYYY-MM');
+        const end = dayjs.utc(widgetState.dashboardOptions?.date_range?.end).format('YYYY-MM');
         const start = dayjs.utc(end).subtract(11, 'month').format('YYYY-MM');
         return { start, end };
     }),

@@ -2,11 +2,11 @@
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProjectChannelCreateParameters } from '@/schema/notification/project-channel/api-verbs/create';
@@ -181,7 +181,7 @@ const onChangeTopic = ({ topicMode, selectedTopic, isTopicValid }: NotificationA
     }
 }
 .content-wrapper {
-    padding: 2rem 1rem 3.5rem;
+    padding: 2rem 1rem 2.5rem;
 }
 .content-title {
     font-size: 1.5rem;

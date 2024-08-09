@@ -3,14 +3,14 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive,
 } from 'vue';
 
-import {
-    PProgressBar,
-} from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PProgressBar,
+} from '@cloudforet/mirinae';
 
 import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 
@@ -48,7 +48,7 @@ const state = reactive({
     data: undefined as Response | undefined,
     tableFields: computed<Field[]>(() => [
         { label: 'Budget', name: 'name' },
-        { label: 'Target', name: 'target', textOptions: { type: 'reference', referenceType: 'projectGroup' } },
+        { label: 'Target', name: 'target', textOptions: { type: 'reference', referenceType: 'project_group' } },
         {
             label: 'Total spent', name: 'total_spent', textOptions: { type: 'cost' }, textAlign: 'right',
         },

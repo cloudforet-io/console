@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
     PHeading, PPaneLayout,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import NotificationChannelList from '@/services/my-page/components/NotificationChannelList.vue';
 </script>

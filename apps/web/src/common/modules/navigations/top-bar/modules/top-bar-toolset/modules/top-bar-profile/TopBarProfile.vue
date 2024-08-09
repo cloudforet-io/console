@@ -6,16 +6,23 @@ import {
 import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import {
-    PI, PDivider, PButton, PCopyButton, PTooltip,
-} from '@spaceone/design-system';
 import ejs from 'ejs';
 
+import {
+    PI, PDivider, PButton, PCopyButton, PTooltip, PLazyImg,
+} from '@cloudforet/mirinae';
+
+import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
+import UserImage from '@/assets/images/role/img_avatar_no-role.png';
+import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
+import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
+import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDomainStore } from '@/store/domain/domain-store';
 import { languages } from '@/store/modules/user/config';
 
 import config from '@/lib/config';
@@ -24,7 +31,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+
 
 interface Props {
     visible: boolean
@@ -34,6 +43,7 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 const appContextStore = useAppContextStore();
+const domainStore = useDomainStore();
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
 
@@ -43,12 +53,12 @@ const router = useRouter();
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     userIcon: computed<string>(() => {
-        if (store.getters['user/isSystemAdmin']) return 'img_avatar_system-admin';
-        if (store.getters['user/isDomainAdmin']) return 'img_avatar_admin';
+        if (store.getters['user/isSystemAdmin']) return SystemAdminImage;
+        if (store.getters['user/isDomainAdmin']) return DomainAdminImage;
         const currentRoleType = state.currentRoleType;
-        if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return 'img_avatar_workspace-owner';
-        if (currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'img_avatar_workspace-member';
-        return 'img_avatar_no-role';
+        if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return WorkspaceOwnerImage;
+        if (currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return WorkspaceMemberImage;
+        return UserImage;
     }),
     baseRoleType: computed(() => store.state.user.roleType),
     currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
@@ -62,7 +72,7 @@ const state = reactive({
     email: computed(() => store.state.user.email),
     language: computed(() => store.getters['user/languageLabel']),
     timezone: computed(() => store.state.user.timezone),
-    domainId: computed(() => store.state.domain.domainId),
+    domainId: computed(() => domainStore.state.domainId),
     userId: computed(() => store.state.user.userId),
     isMyPage: computed(() => route.matched.some((item) => item.name === MY_PAGE_ROUTE._NAME)),
     languageMenuVisible: false,
@@ -114,7 +124,10 @@ const handleLanguageDropdownClick = () => {
 
 const handleClickGoToMyPage = () => {
     appContextStore.setGlobalGrantLoading(true);
-    const currentWorkspace = route.params?.workspaceId ?? 'admin';
+    let currentWorkspace:string|undefined;
+    if (route.name === LANDING_ROUTE.DOMAIN._NAME || route.name === LANDING_ROUTE.WORKSPACE._NAME) {
+        currentWorkspace = 'landing';
+    } else currentWorkspace = route.params?.workspaceId ?? 'admin';
     router.push({
         name: MY_PAGE_ROUTE._NAME,
         ...(currentWorkspace && {
@@ -122,6 +135,16 @@ const handleClickGoToMyPage = () => {
                 beforeWorkspace: currentWorkspace,
             },
         }),
+    }).catch(() => {});
+    hideProfileMenu();
+};
+const handleClickGoToConsoleHome = () => {
+    appContextStore.setGlobalGrantLoading(true);
+    router.push({
+        name: LANDING_ROUTE.DOMAIN._NAME,
+        params: {
+            force: 'true',
+        },
     }).catch(() => {});
     hideProfileMenu();
 };
@@ -146,7 +169,7 @@ const handleClickSignOut = async () => {
     if (state.isAdminMode) appContextStore.exitAdminMode();
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
-        query: { nextPath: route.fullPath },
+        query: { previousPath: route.fullPath },
     };
     await router.push(res);
 };
@@ -167,10 +190,10 @@ const handleClickSignOut = async () => {
                   @click.stop="handleProfileButtonClick"
                   @keydown.enter="openProfileMenu"
             >
-                <p-i :name="state.userIcon"
-                     class="menu-icon"
-                     width="1.75rem"
-                     height="1.75rem"
+                <p-lazy-img :src="state.userIcon"
+                            class="menu-icon"
+                            width="1.75rem"
+                            height="1.75rem"
                 />
             </span>
         </p-tooltip>
@@ -178,7 +201,7 @@ const handleClickSignOut = async () => {
              class="profile-menu-wrapper"
         >
             <div class="user-info">
-                <p-i :name="state.userIcon" />
+                <p-lazy-img :src="state.userIcon" />
                 <span class="value">{{ state.userId }}</span>
             </div>
             <div class="info-wrapper">
@@ -256,6 +279,17 @@ const handleClickSignOut = async () => {
                 <div class="info-menu">
                     <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
                     <span class="value">{{ state.timezone }}</span>
+                </div>
+                <div v-if="!route.path.includes('landing')"
+                     class="info-menu"
+                >
+                    <p-button style-type="tertiary"
+                              size="sm"
+                              class="console-home-button"
+                              @click="handleClickGoToConsoleHome"
+                    >
+                        {{ $t('COMMON.GNB.ACCOUNT.GO_TO_CONSOLE_HOME') }}
+                    </p-button>
                 </div>
                 <div v-if="!route.path.includes('my-page')"
                      class="info-menu"
@@ -372,6 +406,11 @@ const handleClickSignOut = async () => {
                     padding-right: 0.5rem;
                 }
 
+                .console-home-button {
+                    @apply w-full;
+                    margin-top: 0.75rem;
+                }
+
                 .my-page-button {
                     @apply w-full;
                     margin-top: 0.75rem;
@@ -449,4 +488,8 @@ const handleClickSignOut = async () => {
     }
 }
 
+/* custom design-system component - p-lazy-img */
+:deep(.p-lazy-img .img-container) {
+    @apply rounded-full;
+}
 </style>

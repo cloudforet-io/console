@@ -1,4 +1,4 @@
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
 
 import type { STATE } from '@/schema/inventory/collector/constant';
 

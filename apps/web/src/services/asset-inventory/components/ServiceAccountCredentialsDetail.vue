@@ -3,10 +3,10 @@ import { computed, reactive } from 'vue';
 
 import {
     PDataLoader, PDynamicLayout, PButton,
-} from '@spaceone/design-system';
-import { DEFINITION_TABLE_STYLE_TYPE } from '@spaceone/design-system/src/data-display/tables/definition-table/config';
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+} from '@cloudforet/mirinae';
+import { DEFINITION_TABLE_STYLE_TYPE } from '@cloudforet/mirinae/src/data-display/tables/definition-table/config';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
 
 
 import { SpaceRouter } from '@/router';

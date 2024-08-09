@@ -4,10 +4,11 @@ import type Vue from 'vue';
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { debounce } from 'lodash';
+
 import {
     PTab, screens, PLazyImg, PI,
-} from '@spaceone/design-system';
-import { debounce } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 

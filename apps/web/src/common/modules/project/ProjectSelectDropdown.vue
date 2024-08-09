@@ -3,8 +3,8 @@ import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PCheckbox, PI, PRadio, PSelectDropdown, PTree, PBadge,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { SpaceRouter } from '@/router';
 
@@ -23,7 +23,6 @@ import type {
     ProjectTreeNode,
 } from '@/services/project/types/project-tree-type';
 
-
 interface ProjectGroupSelectOptions {
     id: string;
     currentProjectGroupId?: string;
@@ -39,6 +38,9 @@ interface Props {
     readonly?: boolean;
     useFixedMenuStyle?: boolean;
     projectGroupSelectOptions?: ProjectGroupSelectOptions;
+    position?: 'left' | 'right';
+    selectionLabel?: string;
+    hideCreateButton?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -51,6 +53,9 @@ const props = withDefaults(defineProps<Props>(), {
     readonly: false,
     useFixedMenuStyle: true,
     projectGroupSelectOptions: undefined,
+    position: 'left',
+    selectionLabel: undefined,
+    hideCreateButton: false,
 });
 
 const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
@@ -257,7 +262,9 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                            :disabled="props.disabled"
                            :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
                            :selected.sync="state.selectedItems"
+                           :selection-label="props.selectionLabel"
                            :readonly="props.readonly"
+                           :menu-position="props.position"
                            disable-handler
                            appearance-type="stack"
                            is-filterable
@@ -273,6 +280,7 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                 <p-badge v-if="props.projectGroupSelectOptions && state.selectedItems.some((d) => d.name === props.projectGroupSelectOptions.currentProjectGroupId)"
                          badge-type="subtle"
                          style-type="gray200"
+                         class="current-badge"
                 >
                     {{ $t('COMMON.PROJECT_SELECT_DROPDOWN.CURRENT') }}
                 </p-badge>
@@ -324,7 +332,9 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                         </span>
                     </template>
                 </p-tree>
-                <div class="button-wrapper">
+                <div v-if="!props.hideCreateButton"
+                     class="button-wrapper"
+                >
                     <p-button icon-left="ic_plus_bold"
                               class="create-button"
                               style-type="secondary"
@@ -341,6 +351,9 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
 
 <style lang="postcss" scoped>
 .project-select-dropdown {
+    .current-badge {
+        white-space: nowrap;
+    }
     .button-wrapper {
         padding: 0.5rem;
 

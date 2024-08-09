@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PJsonSchemaForm, PFieldTitle, PPaneLayout, PToggleButton, PFieldGroup,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+
+import {
+    PJsonSchemaForm, PFieldTitle, PPaneLayout, PToggleButton, PFieldGroup,
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

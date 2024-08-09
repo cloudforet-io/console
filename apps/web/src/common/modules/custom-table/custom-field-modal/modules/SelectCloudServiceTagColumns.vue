@@ -17,17 +17,17 @@ import {
     ref, watch,
 } from 'vue';
 
-import {
-    PQueryInput,
-} from '@spaceone/design-system';
-import type {
-    QueryItem, ValueHandlerMap, ValueHandler, KeyItemSet,
-} from '@spaceone/design-system/types/inputs/search/query-search/type';
 import { isEqual } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+import {
+    PQueryInput,
+} from '@cloudforet/mirinae';
+import type {
+    QueryItem, ValueHandlerMap, ValueHandler, KeyItemSet,
+} from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';

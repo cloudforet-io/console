@@ -13,11 +13,15 @@ import type { DataSourceAccountAnalyzeParameters } from '@/schema/cost-analysis/
 import type { CostDataSourceAccountListParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/list';
 import type { CostDataSourceAccountResetParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/reset';
 import type { CostDataSourceAccountUpdateParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/update';
-import type { CostDataSourceAccountModel, CostDataSourceAnalyzeModel } from '@/schema/cost-analysis/data-source-account/model';
+import type {
+    CostDataSourceAccountModel,
+    CostDataSourceAnalyzeModel,
+} from '@/schema/cost-analysis/data-source-account/model';
+import type { CostDataSourceGetParameters } from '@/schema/cost-analysis/data-source/api-verbs/get';
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
+import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
 import type { CostJobModel } from '@/schema/cost-analysis/job/model';
-import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
 import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -45,6 +49,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         dataSourceListTotalCount: 0,
         dataSourceListSearchFilters: [] as ConsoleFilter[],
         selectedDataSourceIndices: undefined as number|undefined,
+        selectedDataSourceItem: {} as DataSourceItem,
 
         jobList: [] as CostJobModel[],
         jobListTotalCount: 0,
@@ -90,12 +95,12 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         })))),
         selectedDataSourceItem: computed<DataSourceItem>(() => {
             if (state.selectedDataSourceIndices === undefined) return {} as DataSourceItem;
-            const item = getters.dataSourceList[state.selectedDataSourceIndices];
-            if (!item) return {} as DataSourceItem;
-            const pluginItem = _getters.plugin[item.plugin_info?.plugin_id || ''];
+            if (!state.selectedDataSourceItem) return {} as DataSourceItem;
+            const pluginItem = _getters.plugin[state.selectedDataSourceItem.plugin_info?.plugin_id || ''];
             return {
-                ...item,
-                description: pluginItem.description || '',
+                ...state.selectedDataSourceItem,
+                icon: assetUrlConverter(pluginItem?.icon),
+                description: pluginItem?.description || '',
             };
         }),
     });
@@ -168,7 +173,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         fetchDataSourceList: async (params?: CostDataSourceListParameters) => {
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<DataSourceModel>>(params);
+                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>(params);
                 const analyzeDataList = await actions.fetchLinkedAccountAnalyze();
                 state.dataSourceList = (results || []).map((item) => {
                     const matchingItem = analyzeDataList?.find((entry) => entry.data_source_id === item.data_source_id);
@@ -186,6 +191,14 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 ErrorHandler.handleError(e);
                 state.dataSourceList = [];
                 state.dataSourceListTotalCount = 0;
+            }
+        },
+        fetchDataSourceItem: async (params?: CostDataSourceListParameters) => {
+            try {
+                state.selectedDataSourceItem = await SpaceConnector.clientV2.costAnalysis.dataSource.get<CostDataSourceGetParameters, CostDataSourceModel>(params);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.selectedDataSourceItem = {} as DataSourceItem;
             }
         },
         fetchJobList: async (params: CostJobListParameters) => {

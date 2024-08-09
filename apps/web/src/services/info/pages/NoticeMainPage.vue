@@ -9,7 +9,7 @@
 
 import {
     PHeading,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import NoticeList from '@/services/info/components/NoticeList.vue';
 

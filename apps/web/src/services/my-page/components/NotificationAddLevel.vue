@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
+import { PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
 
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 

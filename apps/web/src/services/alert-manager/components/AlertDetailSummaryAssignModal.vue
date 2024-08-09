@@ -3,7 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
+import { PButtonModal, PToolboxTable } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

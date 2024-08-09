@@ -12,5 +12,6 @@ export interface PostCreateParameters {
         is_pinned: boolean;
     };
     writer?: string;
-    resource_group: Extract<ResourceGroupType, 'SYSTEM'|'DOMAIN'>;
+    resource_group: Extract<ResourceGroupType, 'SYSTEM'|'DOMAIN'|'WORKSPACE'>;
+    workspaces?: string[];
 }

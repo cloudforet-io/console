@@ -3,22 +3,22 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PButton, PHeading, PI, PToolboxTable, PSelectDropdown, PBadge, PTextButton,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import dayjs from 'dayjs';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButton, PHeading, PI, PToolboxTable, PSelectDropdown, PBadge, PTextButton,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 import { i18n } from '@/translations';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -84,7 +84,6 @@ const tableState = reactive({
 
 const costReportListApiQueryHelper = new ApiQueryHelper()
     .setSort('issue_date', true);
-let costReportListApiQuery = costReportListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
@@ -161,7 +160,7 @@ const handleClickLinkButton = async (id: string) => {
 
 /* API */
 const getCostReportsList = (options: any = {}) => {
-    costReportListApiQuery = getApiQueryWithToolboxOptions(costReportListApiQueryHelper, options) ?? costReportListApiQuery;
+    setApiQueryWithToolboxOptions(costReportListApiQueryHelper, options);
     if (options.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
         tableState.searchFilters = costReportListApiQueryHelper.filters;
@@ -170,7 +169,7 @@ const getCostReportsList = (options: any = {}) => {
     if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
     costReportListApiQueryHelper.setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit);
     costReportPageStore.fetchCostReportsList({
-        query: costReportListApiQuery,
+        query: costReportListApiQueryHelper.data,
     });
 };
 

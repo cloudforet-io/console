@@ -1,0 +1,54 @@
+{/* PTextHighlighting.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PTextHighlightingStories from './PTextHighlighting.stories';
+
+<Meta of={PTextHighlightingStories} />
+
+
+# Text Highlighting
+<br/>
+<br/>
+
+
+## Basic
+<Canvas of={PTextHighlightingStories.Basic} />
+
+<br/>
+<br/>
+
+## Style Types
+<Canvas of={PTextHighlightingStories.StyleTypes} />
+
+<br/>
+<br/>
+
+## Slots
+
+<br/>
+
+### default Slot's Props
+
+| name | description |
+| ---- | ----------- |
+| textList | The text is split into multiple texts(```textList```) based on the term. ```{ text: string; matched: boolean; }[]``` |
+| regex | The regex for text highlighting. |
+| text | Each text of textList. |
+| index | The index of the current text in textList. |
+| matched | Whether the current text in textList is matched or not. |
+
+
+
+
+
+
+
+<Canvas of={PTextHighlightingStories.Slots} />
+
+## Playground
+<Canvas of={PTextHighlightingStories.Playground} />
+<Controls of={PTextHighlightingStories.Playground} />
+
+<br/>
+<br/>

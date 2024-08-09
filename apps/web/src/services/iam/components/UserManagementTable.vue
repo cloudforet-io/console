@@ -3,16 +3,16 @@ import {
     computed, reactive,
 } from 'vue';
 
-import {
-    PBadge, PStatus, PToolboxTable, PButton, PSelectDropdown, PTooltip,
-} from '@spaceone/design-system';
-import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PBadge, PStatus, PToolboxTable, PButton, PSelectDropdown, PTooltip,
+} from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';

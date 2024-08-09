@@ -84,3 +84,5 @@ export const NAME_FORM_MODAL_TYPE = {
     // example
     SAVE_AS_EXAMPLE: 'SAVE_AS_EXAMPLE',
 } as const;
+
+export const SIZE_UNITS = ['bytes', 'Bytes', 'b', 'gb', 'kb', 'mb', 'pb', 'tb', 'B', 'GB', 'KB', 'MB', 'PB', 'TB'];

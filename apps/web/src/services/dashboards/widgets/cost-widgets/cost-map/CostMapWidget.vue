@@ -5,11 +5,11 @@ import {
     defineProps, nextTick, reactive, ref,
 } from 'vue';
 
-import { PDataLoader } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';

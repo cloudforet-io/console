@@ -1,6 +1,20 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
+
+export const getCollapsibleToggleArgs = (): Args => ({
+    'v-model': '',
+    isCollapsed: true,
+    toggleType: COLLAPSIBLE_TOGGLE_TYPE.text,
+    defaultSlot: 'Show',
+});
+
+export const getCollapsibleToggleParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508',
+    },
+});
 
 
 export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
@@ -9,7 +23,6 @@ export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
         name: 'v-model',
         type: { name: 'boolean' },
         description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
-        defaultValue: '',
         table: {
             type: {
                 summary: 'boolean',
@@ -25,7 +38,6 @@ export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
         name: 'isCollapsed',
         type: { name: 'boolean' },
         description: 'Collapsed state of toggle button.',
-        defaultValue: true,
         table: {
             type: {
                 summary: 'boolean',
@@ -35,15 +47,12 @@ export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
                 summary: 'true',
             },
         },
-        control: {
-            type: 'boolean',
-        },
+        control: 'boolean',
     },
     toggleType: {
         name: 'toggleType',
         type: { name: 'string' },
         description: 'type of toggle button.',
-        defaultValue: COLLAPSIBLE_TOGGLE_TYPE.text,
         table: {
             type: {
                 summary: 'string',
@@ -53,26 +62,21 @@ export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
                 summary: COLLAPSIBLE_TOGGLE_TYPE.text,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(COLLAPSIBLE_TOGGLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(COLLAPSIBLE_TOGGLE_TYPE),
     },
     /* slot */
     defaultSlot: {
         name: 'default',
         type: { name: 'string' },
         description: 'Slot for toggle button contents.',
-        defaultValue: 'Show',
         table: {
             type: {
                 summary: null,
             },
             category: 'slots',
         },
-        control: {
-            type: 'text',
-        },
+        control: 'text',
     },
     /* event */
     onUpdateIsCollapsed: {
@@ -88,4 +92,6 @@ export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    // default
+    default: { table: { disable: true } },
 });

@@ -3,7 +3,7 @@
 import { reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PButton, PTextEditor, PTextHighlighting } from '@spaceone/design-system';
+import { PButton, PTextEditor, PTextHighlighting } from '@cloudforet/mirinae';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 

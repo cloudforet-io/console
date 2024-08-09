@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { cloneDeep } from 'lodash';
+
 import {
     PDoubleCheckModal,
-} from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import type { AppModel } from '@/schema/identity/app/model';
 

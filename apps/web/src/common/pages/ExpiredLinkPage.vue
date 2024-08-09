@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router/composables';
 
-import { PButton, PI } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButton, PI } from '@cloudforet/mirinae';
+
 
 import { ROOT_ROUTE } from '@/router/constant';
 

@@ -3,12 +3,12 @@ import {
     computed, reactive,
 } from 'vue';
 
-import {
-    PBadge, PButton, PI, PSelectDropdown, PTableCheckModal,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PBadge, PButton, PI, PSelectDropdown, PTableCheckModal,
+} from '@cloudforet/mirinae';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { AlertDeleteParameters } from '@/schema/monitoring/alert/api-verbs/delete';

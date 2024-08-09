@@ -45,7 +45,7 @@ export const widgetWidthAssigner = (widgetSizeList: WidgetSize[], containerWidth
         } else {
             const pMinWidth = WIDGET_WIDTH_RANGE_LIST[widgetSize]?.[0];
             const rowWidthSum = sum(sizeRow.map((d) => WIDGET_WIDTH_RANGE_LIST[d]?.[0]));
-            if (containerWidth - ((sizeRow.length - 1) * WIDGET_GAP) - rowWidthSum >= pMinWidth) {
+            if (containerWidth - ((sizeRow.length - 1) * WIDGET_GAP) - rowWidthSum > pMinWidth) {
                 sizeRow.push(widgetSize);
             } else {
                 results.push(getWidthRow(sizeRow, containerWidth));

@@ -2,7 +2,7 @@
 import { reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PIconButton, PI } from '@spaceone/design-system';
+import { PIconButton, PI } from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -16,7 +16,7 @@ interface Props {
     type?: 'info' | 'danger' | 'warning';
     hideHeaderCloseButton?: boolean;
     visible?: boolean;
-    layout: 'insection' | 'full-width';
+    layout?: 'insection' | 'full-width';
 }
 
 const props = withDefaults(defineProps<Props>(), {

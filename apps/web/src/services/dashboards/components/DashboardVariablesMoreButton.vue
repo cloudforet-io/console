@@ -6,11 +6,12 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import {
     cloneDeep, debounce, union, merge,
 } from 'lodash';
+
+import { PButton, PContextMenu, useContextMenuController } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { DashboardVariableSchemaProperty, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 
@@ -32,6 +33,7 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const route = useRoute();
 const router = useRouter();
@@ -41,18 +43,18 @@ const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any | null,
     searchText: '',
-    variableSchema: computed<DashboardVariablesSchema>(() => dashboardDetailState.variablesSchema),
-    variableList: computed<MenuItem[]>(() => state.variableSchema.order.map((property) => {
+    variableSchema: computed<DashboardVariablesSchema>(() => dashboardDetailGetters.refinedVariablesSchema),
+    variableList: computed<MenuItem[]>(() => state.variableSchema?.order?.map((property) => {
         const currentProperty = state.variableSchema.properties[property];
         return ({
             name: property,
             label: currentProperty?.name ?? property,
             disabled: currentProperty?.fixed,
         });
-    })),
+    }) ?? []),
     selected: computed<MenuItem[]>(() => {
         const result = [] as MenuItem[];
-        state.variableSchema.order.forEach((property) => {
+        state.variableSchema?.order?.forEach((property) => {
             const currentProperty = state.variableSchema.properties[property];
             if (!currentProperty?.use) return;
             result.push({ name: property, label: currentProperty.name, disabled: currentProperty.fixed });
@@ -124,7 +126,7 @@ const beforeSelect = (item: MenuItem, idx: number, isSelected: boolean): boolean
     if (!property) return false;
     if (property.fixed || property.readonly) return false;
 
-    if (property.variable_type !== 'CUSTOM') return true;
+    if (property.variable_type === 'MANAGED') return true;
     if (isSelected) return true;
 
     state.affectedWidgetTitlesByCustomVariable = getAffectedWidgetTitlesByCustomVariable(key);
@@ -188,7 +190,7 @@ const handleSelectVariable = (item: MenuItem, idx: number, isSelected: boolean) 
 };
 
 const handleClearSelection = () => {
-    const variablesSchema: DashboardVariablesSchema = cloneDeep(dashboardDetailState.variablesSchema);
+    const variablesSchema: DashboardVariablesSchema = cloneDeep(dashboardDetailGetters.refinedVariablesSchema);
     Object.keys(variablesSchema.properties).forEach((k) => {
         const property = variablesSchema.properties[k];
         if (property.readonly || property.fixed) return;
@@ -264,7 +266,9 @@ const {
                         @clear-selection="handleClearSelection"
                         @update:search-text="handleUpdateSearchText"
         >
-            <template #bottom>
+            <template v-if="!dashboardDetailGetters.isDeprecatedDashboard"
+                      #bottom
+            >
                 <p-button class="manage-variable-button"
                           style-type="secondary"
                           icon-left="ic_settings-filled"

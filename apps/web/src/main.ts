@@ -2,10 +2,11 @@ import Vue from 'vue';
 import Fragment from 'vue-fragment';
 
 import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
-import SpaceDesignSystem from '@spaceone/design-system';
 import { PiniaVuePlugin } from 'pinia';
 import PortalVue from 'portal-vue';
 import VTooltip from 'v-tooltip';
+
+import SpaceDesignSystem from '@cloudforet/mirinae';
 
 import directive from '@/directives';
 import { SpaceRouter } from '@/router';
@@ -20,8 +21,8 @@ import App from './App.vue';
 
 import '@/styles/style.pcss';
 // eslint-disable-next-line
-import '@spaceone/design-system/css/light-style.css';
-import '@spaceone/design-system/dist/style.css';
+import '@cloudforet/mirinae/css/light-style.css';
+import '@cloudforet/mirinae/dist/style.css';
 
 
 /** ********** SET VUE PLUGINS ************** */

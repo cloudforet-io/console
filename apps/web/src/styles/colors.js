@@ -1,6 +1,6 @@
 import {
     colors,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 export const palette = colors.palette;
 export const semanticColors = colors.semanticColors;

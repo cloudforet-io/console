@@ -9,11 +9,12 @@ export interface AlertModel {
     state: AlertState;
     description: string;
     assignee: string;
+    responder: string;
     urgency: AlertUrgency;
     severity: AlertSeverity;
     rule: string;
     image_url: string;
-    resource: AlertResource;
+    resources: AlertResource[];
     provider: string;
     account: string;
     additional_info: Record<string, any>;

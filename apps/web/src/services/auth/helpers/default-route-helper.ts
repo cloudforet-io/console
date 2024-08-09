@@ -2,14 +2,13 @@ import type { Location } from 'vue-router/types/router';
 
 import { ROOT_ROUTE } from '@/router/constant';
 
-
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const GENERAL_USER_DEFAULT_ROUTE = Object.freeze({
     name: ROOT_ROUTE.WORKSPACE._NAME,
 });
 const NO_ROLE_USER_DEFAULT_ROUTE = Object.freeze({
-    name: MY_PAGE_ROUTE._NAME,
+    name: LANDING_ROUTE._NAME,
 });
 
 export const getDefaultRouteAfterSignIn = (hasBoundWorkpsace: boolean): Location => {

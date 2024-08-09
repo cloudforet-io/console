@@ -12,7 +12,7 @@ import type { ProtocolModel } from '@/schema/notification/protocol/model';
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

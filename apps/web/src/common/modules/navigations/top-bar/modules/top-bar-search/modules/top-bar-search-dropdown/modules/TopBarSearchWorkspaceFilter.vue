@@ -6,12 +6,12 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PCheckboxGroup, PCheckbox, PTooltip, PToggleButton, PTextButton, PContextMenu, PIconButton,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ResourceSearchParameters, ResourceSearchResponse } from '@/schema/search/resource/api-verbs/search';
 import type { ResourceModel } from '@/schema/search/resource/model';

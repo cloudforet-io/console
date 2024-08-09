@@ -3,8 +3,8 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PHeading, PTab } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+import { PHeading, PTab } from '@cloudforet/mirinae';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import { i18n } from '@/translations';
 
@@ -19,10 +19,10 @@ const props = withDefaults(defineProps<{
 
 const tabState = reactive({
     tabs: computed(() => ([
+        { name: 'details', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.ADDITIONAL_INFO') },
         { name: 'pushed-event', label: i18n.t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT') },
-        { name: 'details', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS') },
     ] as TabItem[])),
-    activeTab: 'pushed-event',
+    activeTab: 'details',
 });
 </script>
 

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PDataLoader, PDefinitionTable, PStatus } from '@spaceone/design-system';
-import type { StatusProps } from '@spaceone/design-system/types/data-display/status/type';
 import dayjs from 'dayjs';
+
+import { PDataLoader, PDefinitionTable, PStatus } from '@cloudforet/mirinae';
+import type { StatusProps } from '@cloudforet/mirinae/types/data-display/status/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

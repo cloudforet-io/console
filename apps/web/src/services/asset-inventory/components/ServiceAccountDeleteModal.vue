@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PButtonModal, PDoubleCheckModal, PLink } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButtonModal, PDoubleCheckModal, PLink } from '@cloudforet/mirinae';
+
 
 import { SpaceRouter } from '@/router';
 import type { ServiceAccountDeleteParameters } from '@/schema/identity/service-account/api-verbs/detele';

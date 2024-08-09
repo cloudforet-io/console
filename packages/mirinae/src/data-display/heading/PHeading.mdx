@@ -1,0 +1,40 @@
+{/* PHeading.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PHeadingStories from './PHeading.stories';
+
+<Meta of={PHeadingStories} />
+
+# Heading
+
+<br/>
+<br/>
+
+## Heading Type
+<Canvas of={PHeadingStories.HeadingType} />
+
+<br/>
+<br/>
+
+## Back Button Mode
+<Canvas of={PHeadingStories.BackButtonMode} />
+
+## Total Count
+<Canvas of={PHeadingStories.TotalCount} />
+
+## Selected Count
+<Canvas of={PHeadingStories.SelectedCount} />
+
+## Long Title
+<Canvas of={PHeadingStories.LongTitle} />
+
+## Slots
+<Canvas of={PHeadingStories.Slots} />
+
+## Playground
+<Canvas of={PHeadingStories.Playground} />
+<Controls of={PHeadingStories.Playground} />
+
+<br/>
+<br/>

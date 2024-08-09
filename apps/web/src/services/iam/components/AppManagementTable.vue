@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PToolboxTable, PSelectDropdown, PStatus, PCopyButton, PBadge,
-} from '@spaceone/design-system';
-import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { cloneDeep, isEmpty } from 'lodash';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PToolboxTable, PSelectDropdown, PStatus, PCopyButton, PBadge,
+} from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { APP_STATUS_TYPE } from '@/schema/identity/app/constant';
@@ -56,7 +56,6 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
     userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
 });
 const state = reactive({
     loading: false,

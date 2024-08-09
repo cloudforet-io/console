@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -60,7 +60,7 @@ const state = reactive({
 
 const updateDashboard = async () => {
     try {
-        await dashboardDetailStore.updateDashboard(props.dashboardId, {
+        await dashboardStore.updateDashboard(props.dashboardId, {
             name: _name.value,
         });
     } catch (e) {

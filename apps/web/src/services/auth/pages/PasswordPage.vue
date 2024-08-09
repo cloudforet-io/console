@@ -92,12 +92,12 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 import type { Vue } from 'vue/types/vue';
 
-import { PButton, PDataLoader, PIconButton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButton, PDataLoader, PIconButton } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import type { UserProfileResetPasswordParameters } from '@/schema/identity/user-profile/api-verbs/reset-password';
@@ -107,6 +107,7 @@ import { i18n } from '@/translations';
 
 import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import type { UserState } from '@/store/modules/user/type';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
@@ -139,6 +140,7 @@ const vm = getCurrentInstance()?.proxy as Vue;
 const router = useRouter();
 const route = useRoute();
 
+const domainStore = useDomainStore();
 const state = reactive({
     loading: false,
     userType: '',
@@ -151,7 +153,7 @@ const state = reactive({
         }
         return i18n.t('AUTH.PASSWORD.RESET.TITLE');
     }),
-    domainId: computed<string>(() => store.state.domain.domainId),
+    domainId: computed<string>(() => domainStore.state.domainId),
     userInfo: computed<UserState>(() => store.state.user),
     tags: {},
 });

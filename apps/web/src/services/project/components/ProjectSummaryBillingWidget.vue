@@ -1,51 +1,37 @@
 <script setup lang="ts">
 import {
-    computed, onUnmounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 
-import {
-    XYChart, CategoryAxis, ValueAxis, LineSeries, CircleBullet, XYCursor,
-} from '@amcharts/amcharts4/charts';
-import { create, color, LinearGradientModifier } from '@amcharts/amcharts4/core';
-import {
-    PSelectButton, PDataLoader, PCollapsibleToggle, PDataTable, PI, PIconButton, PSkeleton, PSelectDropdown, PLazyImg,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
-import { orderBy, range } from 'lodash';
+import type { LineSeriesOption } from 'echarts/charts';
+import type { EChartsType } from 'echarts/core';
+import { init } from 'echarts/core';
+import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PSelectButton, PCollapsibleToggle, PDataTable, PI, PIconButton, PSkeleton, PSelectDropdown, PLazyImg,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
-import { CURRENCY } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { CURRENCY } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
-import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import {
-    gray, safe, secondary, secondary1, green, blue,
-} from '@/styles/colors';
+import { getWidgetDateFields } from '@/common/modules/widgets/_helpers/widget-date-helper';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
-
-interface ChartData {
-    date: string;
-    value: number;
-    color?: string;
-    dash?: string;
-    tooltipTextColor?: string;
-    tooltipBorderColor?: string;
-}
 
 enum DATE_TYPE {
     daily = 'DAILY',
@@ -68,7 +54,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    chart: null as XYChart | null,
     skeletons: range(4),
     dateTypes: computed(() => ([
         { name: DATE_TYPE.daily, label: i18n.t('COMMON.WIDGETS.BILLING.DAY') },
@@ -171,105 +156,49 @@ const tableState = reactive({
     }),
 });
 const chartState = reactive({
-    registry: {},
-    data: computed(() => getRefinedChartData(state.data)),
-});
-
-/* util */
-const disposeChart = (_chartContext) => {
-    if (chartState.registry[_chartContext]) {
-        chartState.registry[_chartContext].dispose();
-        delete chartState.registry[_chartContext];
-    }
-};
-const drawChart = (_chartContext) => {
-    const createChart = () => {
-        disposeChart(_chartContext);
-        chartState.registry[_chartContext] = create(_chartContext, XYChart);
-        return chartState.registry[_chartContext];
-    };
-    const chart = createChart();
-    if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-    chart.paddingLeft = -5;
-    chart.paddingBottom = -10;
-    chart.paddingTop = 10;
-    chart.data = chartState.data;
-
-    const dateAxis = chart.xAxes.push(new CategoryAxis());
-    dateAxis.dataFields.category = 'date';
-    dateAxis.tooltip.disabled = true;
-    dateAxis.renderer.minGridDistance = 40;
-    dateAxis.renderer.labels.template.fill = color(gray[600]);
-    dateAxis.fontSize = 11;
-
-    const valueAxis = chart.yAxes.push(new ValueAxis());
-    valueAxis.tooltip.disabled = true;
-    valueAxis.renderer.minGridDistance = 30;
-    valueAxis.renderer.labels.template.fill = color(secondary1);
-    valueAxis.renderer.labels.template.adapter.add('text', (text, target) => numberFormatter(target.dataItem.value));
-    valueAxis.fontSize = 11;
-    valueAxis.extraMax = 0.25;
-
-    const series = chart.series.push(new LineSeries());
-    series.dataFields.categoryX = 'date';
-    series.dataFields.valueY = 'value';
-    series.stroke = color(secondary1);
-    series.fill = color(secondary1);
-    series.strokeWidth = 2;
-    series.fillOpacity = 1;
-    series.propertyFields.fill = 'color';
-    series.propertyFields.stroke = 'color';
-    series.propertyFields.strokeDasharray = 'dash';
-
-    series.adapter.add('tooltipText', (text, target) => {
-        if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-            return `[bold]${currencyMoneyFormatter(target.tooltipDataItem.dataContext.value, { notation: 'standard' })}`;
-        }
-        return text;
-    });
-    series.tooltip.fontSize = 14;
-    series.tooltip.strokeWidth = 0;
-    series.tooltip.dy = -5;
-    series.tooltip.getFillFromObject = false;
-    series.tooltip.pointerOrientation = 'down';
-    series.tooltip.label.propertyFields.fill = 'tooltipTextColor';
-    series.tooltip.background.propertyFields.stroke = 'tooltipBorderColor';
-
-    const fillModifier = new LinearGradientModifier();
-    fillModifier.opacities = [0.3, 0];
-    fillModifier.offsets = [0, 0.5];
-    fillModifier.gradient.rotation = 90;
-    series.segments.template.fillModifier = fillModifier;
-
-    const circleBullet = series.bullets.push(new CircleBullet());
-    circleBullet.circle.strokeWidth = 0;
-    circleBullet.fillOpacity = 0;
-    circleBullet.circle.fill = color(secondary);
-    circleBullet.circle.propertyFields.fill = 'tooltipTextColor';
-    circleBullet.circle.propertyFields.stroke = 'tooltipTextColor';
-    const circleBulletState = circleBullet.states.create('hover');
-    circleBulletState.properties.fillOpacity = 1;
-    circleBulletState.properties.strokeOpacity = 1;
-
-    chart.cursor = new XYCursor();
-    chart.cursor.lineX.strokeOpacity = 0;
-    chart.cursor.lineY.strokeOpacity = 0;
-    chart.cursor.behavior = 'none';
-
-    state.chart = chart;
-};
-
-/* Api */
-const costAnalyzeQueryHelper = new QueryHelper();
-const fetchTrendData = async (dataSourceId: string) => {
-    try {
-        state.loading = true;
+    chart: null as EChartsType | null,
+    chartData: [],
+    xAxisData: [],
+    chartOptions: computed<LineSeriesOption>(() => ({
+        legend: {
+            show: false,
+        },
+        tooltip: {
+            trigger: 'axis',
+            valueFormatter: (val) => numberFormatter(val) || '',
+        },
+        grid: {
+            top: 10,
+            bottom: 20,
+        },
+        xAxis: {
+            type: 'category',
+            data: chartState.xAxisData,
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: (val) => numberFormatter(val, { notation: 'compact' }),
+            },
+        },
+        series: chartState.chartData,
+    })),
+    dateRange: computed(() => {
         let start = dayjs.utc().subtract(DAY_COUNT - 1, 'day').format('YYYY-MM-DD');
         let end = dayjs.utc().format('YYYY-MM-DD');
         if (state.selectedDateType === 'MONTHLY') {
             start = dayjs.utc().subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
             end = dayjs.utc().format('YYYY-MM');
         }
+        return { start, end };
+    }),
+});
+
+/* Api */
+const costAnalyzeQueryHelper = new QueryHelper();
+const fetchTrendData = async (dataSourceId: string) => {
+    try {
+        state.loading = true;
         costAnalyzeQueryHelper.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             data_source_id: dataSourceId,
@@ -283,8 +212,8 @@ const fetchTrendData = async (dataSourceId: string) => {
                 },
                 sort: [{ key: 'date', desc: false }],
                 filter: costAnalyzeQueryHelper.apiQuery.filter,
-                start,
-                end,
+                start: chartState.dateRange.start,
+                end: chartState.dateRange.end,
             },
         });
         state.data = results;
@@ -351,44 +280,21 @@ const setCountData = (results) => {
     summaryState.pastCost = results.find((d) => d.date === start)?.value_sum || 0;
     summaryState.currentCost = results.find((d) => d.date === end)?.value_sum || 0;
 };
-const getRefinedChartData = (results): ChartData[] => {
-    const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
-    let data;
-    if (results.length > 0) {
-        data = results.map((d) => ({
-            date: dayjs(d.date),
-            value: d.value_sum,
-        }));
-    } else {
-        data = [];
-    }
-
-    const orderedData = orderBy(data, ['date'], ['asc']);
-    return orderedData.map((d, index) => {
-        let date;
-        if (state.selectedDateType === DATE_TYPE.monthly && (d.date.format('M') === '1' || d.date.format('M') === '12')) {
-            date = d.date.format('MMM, YY');
-        } else {
-            date = d.date.format(dateFormat);
-        }
-
-        const chartData: ChartData = {
-            date,
-            value: d.value,
-        };
-        if (index === orderedData.length - 2) {
-            chartData.color = safe;
-            chartData.dash = '2, 2';
-        }
-        if (index === orderedData.length - 1) {
-            chartData.tooltipTextColor = safe;
-            chartData.tooltipBorderColor = green[300];
-        } else {
-            chartData.tooltipTextColor = secondary;
-            chartData.tooltipBorderColor = blue[300];
-        }
-        return chartData;
+const drawChart = (rawData) => {
+    if (!rawData.length) return;
+    chartState.xAxisData = getWidgetDateFields(state.selectedDateType, chartState.dateRange.start, chartState.dateRange.end);
+    const _seriesData: number[] = [];
+    chartState.xAxisData.forEach((date) => {
+        const data = rawData.find((d) => d.date === date);
+        _seriesData.push(data?.value_sum || 0);
     });
+    chartState.chartData = {
+        name: 'Cost',
+        type: 'line',
+        data: _seriesData,
+    };
+    chartState.chart = init(chartContext.value);
+    chartState.chart.setOption(chartState.chartOptions, true);
 };
 
 /* Event */
@@ -421,12 +327,8 @@ watch([() => state.selectedDateType, () => state.selectedDataSourceId], async ([
         setCountData(state.data);
     }
 }, { immediate: true });
-watch([() => chartState.data, () => chartContext.value], async ([, _chartContext]) => {
-    if (_chartContext) drawChart(_chartContext);
-});
-
-onUnmounted(() => {
-    if (state.chart) state.chart.dispose();
+watch([() => state.data, () => chartContext.value], async ([data, _chartContext]) => {
+    if (_chartContext) drawChart(data);
 });
 </script>
 
@@ -473,18 +375,14 @@ onUnmounted(() => {
             </div>
             <div class="col-span-12 md:col-span-9">
                 <div class="chart-wrapper">
-                    <p-data-loader :loading="state.loading"
-                                   :data="chartState.data"
-                    >
-                        <template #loader>
-                            <p-skeleton width="100%"
-                                        height="100%"
-                            />
-                        </template>
-                        <div ref="chartContext"
-                             class="chart"
-                        />
-                    </p-data-loader>
+                    <p-skeleton v-if="state.loading"
+                                width="100%"
+                                height="100%"
+                    />
+                    <div v-else
+                         ref="chartContext"
+                         class="chart"
+                    />
                 </div>
             </div>
             <div class="col-span-12 md:col-span-3 grid grid-cols-12 summary-group">
@@ -543,26 +441,6 @@ onUnmounted(() => {
                     <template #th-service-format>
                         <span />
                     </template>
-                    <!--                    <template v-for="field in tableState.fields"-->
-                    <!--                              #[`col-${field.name}-format`]="{value}"-->
-                    <!--                    >-->
-                    <!--                        <template v-if="field.name !== 'service'">-->
-                    <!--                            <span v-if="value"-->
-                    <!--                                  :key="field.name"-->
-                    <!--                                  :style="{ 'color': value.color }"-->
-                    <!--                            >{{ value.cost }}</span>-->
-                    <!--                            <span v-else-->
-                    <!--                                  :key="field.name"-->
-                    <!--                            >-</span>-->
-                    <!--                        </template>-->
-                    <!--                        <span v-else-->
-                    <!--                              :key="field.name"-->
-                    <!--                              class="col-service"-->
-                    <!--                              :class="{'link-text': !!value.to.name }"-->
-                    <!--                        >-->
-                    <!--                            <span>{{ value.name }}</span>-->
-                    <!--                        </span>-->
-                    <!--                    </template>-->
                 </p-data-table>
                 <div v-if="tableState.data.length > 5"
                      class="toggle-button-wrapper"
@@ -664,6 +542,7 @@ onUnmounted(() => {
         margin-bottom: 1rem;
         .chart {
             height: 13rem;
+            width: 100%;
         }
 
         /* custom design-system component - p-data-loader */

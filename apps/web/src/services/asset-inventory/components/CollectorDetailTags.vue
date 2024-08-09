@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { PTag, PFieldTitle, PEmpty } from '@spaceone/design-system';
-
+import { PTag, PFieldTitle, PEmpty } from '@cloudforet/mirinae';
 import { isNotEmpty } from '@cloudforet/utils';
 
 import type { Tags } from '@/schema/_common/model';

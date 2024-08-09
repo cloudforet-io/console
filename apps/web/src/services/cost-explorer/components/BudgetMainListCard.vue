@@ -3,14 +3,16 @@ import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PDivider, PI, PBadge,
-} from '@spaceone/design-system';
+    PDivider, PI, PBadge, PStatus,
+} from '@cloudforet/mirinae';
 
 import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
@@ -20,6 +22,8 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import BudgetMainUsageProgressBar from '@/services/cost-explorer/components/BudgetMainUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
@@ -36,12 +40,15 @@ const props = withDefaults(defineProps<Props>(), {
 const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetters = userWorkspaceStore.getters;
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     costDataSource: computed(() => allReferenceStore.getters.costDataSource),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
 });
 const state = reactive({
     linkLocation: computed<Location>(() => (getProperRouteLocation({
@@ -103,6 +110,7 @@ const state = reactive({
         const result = (state.currency && currentSymbol) && `${currentSymbol}${state.currency}`;
         return result || `${CURRENCY_SYMBOL.USD}${CURRENCY.USD}`;
     }),
+    workspaceInfo: computed<WorkspaceModel|undefined>(() => getWorkspaceInfo(props.budgetUsage?.workspace_id || '', storeState.workspaceList)),
 });
 
 </script>
@@ -133,6 +141,10 @@ const state = reactive({
                              height="1em"
                         />
                     </span>
+                    <p-status v-if="state.workspaceInfo?.is_dormant"
+                              v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                              class="capitalize state"
+                    />
                 </div>
                 <p class="budget-name">
                     {{ props.budgetUsage.name }}
@@ -217,6 +229,12 @@ const state = reactive({
             &.target {
                 @apply text-gray-700;
             }
+        }
+        .state {
+            @apply text-label-sm;
+            margin-left: 0.25rem;
+            padding-right: 0.5rem;
+            padding-left: 0.5rem;
         }
         .right-part {
             display: flex;

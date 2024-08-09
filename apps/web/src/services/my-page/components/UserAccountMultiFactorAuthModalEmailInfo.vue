@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import {
     PI, PTooltip, PDivider, PButton, PTextInput, PFieldGroup,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -36,7 +36,6 @@ const state = reactive({
     loading: false,
     data: {} as UserListItemType,
     userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
     proxyIsSentCode: useProxyValue('isSentCode', props, emit),
     originEmail: props.email,
 });

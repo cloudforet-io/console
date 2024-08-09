@@ -1,12 +1,12 @@
 import type {
     DynamicField,
     EnumOptions,
-} from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
+} from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     DynamicLayoutType,
     SearchSchema,
-} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
+} from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import { forEach } from 'lodash';
 
 import {

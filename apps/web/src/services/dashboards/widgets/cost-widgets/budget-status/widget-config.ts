@@ -22,10 +22,10 @@ const budgetStatusWidgetConfig: WidgetConfig = {
         granularity: GRANULARITY.MONTHLY,
     },
     options_schema: getWidgetOptionsSchema([
-        'cost_data_source',
+        ['cost_data_source', { fixed: true, hidden: true }],
+        ['filters.project_group', { fixed: true }],
+        ['filters.project', { fixed: true }],
         'filters.provider',
-        'filters.project_group',
-        'filters.project',
     ]),
 };
 

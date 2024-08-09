@@ -3,15 +3,15 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PFieldGroup, PRadio, PSelectDropdown } from '@spaceone/design-system';
-import type {
-    AutocompleteHandler,
-    SelectDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { PFieldGroup, PRadio, PSelectDropdown } from '@cloudforet/mirinae';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';

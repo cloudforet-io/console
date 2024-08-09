@@ -1,8 +1,12 @@
 <template>
-    <div class="p-field-group">
+    <div class="p-field-group"
+         :class="[styleType]"
+    >
         <div class="field-title-box">
             <p-field-title v-if="label || $scopedSlots.label"
                            class="form-label"
+                           :size="styleType === 'primary' ? 'md' : 'sm'"
+                           :color="styleType === 'primary' ? 'dark' : 'gray'"
                            @click="$emit('click-field-title')"
             >
                 <slot name="label">
@@ -47,7 +51,8 @@ import type { TranslateResult } from 'vue-i18n';
 
 import PFieldTitle from '@/data-display/field-title/PFieldTitle.vue';
 
-interface PFieldGroup {
+type FieldGroupStyleType = 'primary' | 'secondary';
+interface Props {
     label?: string|TranslateResult;
     helpText?: string|TranslateResult;
     invalidText?: string;
@@ -55,9 +60,10 @@ interface PFieldGroup {
     invalid?: boolean;
     valid?: boolean;
     required?: boolean;
+    styleType?: FieldGroupStyleType;
 }
 
-export default defineComponent<PFieldGroup>({
+export default defineComponent<Props>({
     name: 'PFieldGroup',
     components: { PFieldTitle },
     props: {
@@ -89,13 +95,23 @@ export default defineComponent<PFieldGroup>({
             type: Boolean,
             default: false,
         },
+        styleType: {
+            type: String,
+            default: 'primary',
+        },
     },
 });
 </script>
 
 <style lang="postcss">
 .p-field-group {
-    margin-bottom: 1rem;
+    &.primary {
+        margin-bottom: 1rem;
+    }
+    &.secondary {
+        margin-bottom: 0.5rem;
+    }
+
     .form-label {
         padding-bottom: 0.25rem;
     }

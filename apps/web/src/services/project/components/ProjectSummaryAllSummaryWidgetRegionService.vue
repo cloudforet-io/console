@@ -1,33 +1,31 @@
 <script lang="ts" setup>
 import {
-    reactive, watch, onUnmounted, computed, ref,
+    reactive, watch, computed, ref,
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PieChart } from '@amcharts/amcharts4/charts';
-import {
-    create, percent, color, Label,
-} from '@amcharts/amcharts4/core';
-import {
-    PSkeleton, PDataLoader,
-} from '@spaceone/design-system';
-import bytes from 'bytes';
-import { range, orderBy } from 'lodash';
+import type { PieSeriesOption } from 'echarts/charts';
+import type { EChartsType } from 'echarts/core';
+import { init } from 'echarts/core';
+import { range, orderBy, isEmpty } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PSkeleton, PDataLoader,
+} from '@cloudforet/mirinae';
+import { byteFormatter } from '@cloudforet/utils';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
-import config from '@/lib/config';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
-    gray, white, coral, yellow, secondary1,
+    gray, coral, yellow, secondary1,
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -54,73 +52,47 @@ const queryHelper = new QueryHelper();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 const state = reactive({
     loading: true,
     skeletons: range(3),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     data: [] as Data[],
-    chart: null as null | any,
-    chartRegistry: {},
+    chart: null as EChartsType | null,
+    chartData: [],
+    chartOptions: computed<PieSeriesOption>(() => ({
+        tooltip: {
+            show: false,
+        },
+        grid: {
+            containLabel: true,
+        },
+        legend: {
+            show: false,
+        },
+        series: [
+            {
+                type: 'pie',
+                radius: ['20%', '50%'],
+                center: ['30%', '50%'],
+                data: state.chartData,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)',
+                    },
+                },
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                },
+            },
+        ],
+    })),
 });
 
-/* util */
-const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
-const disposeChart = (ctx) => {
-    if (state.chartRegistry[ctx]) {
-        state.chartRegistry[ctx].dispose();
-        delete state.chartRegistry[ctx];
-    }
-};
-const drawChart = (ctx) => {
-    const createChart = () => {
-        disposeChart(ctx);
-        state.chartRegistry[ctx] = create(ctx, PieChart);
-        return state.chartRegistry[ctx];
-    };
-    const chart = createChart();
-    state.chart = chart;
-    if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-    chart.responsive.enabled = true;
-    chart.innerRadius = percent(63);
-
-    chart.data = state.data;
-
-    const series = chart.series.create();
-    series.slices.template.togglable = false;
-    series.slices.template.clickable = false;
-    series.dataFields.value = 'total';
-    series.dataFields.category = 'region';
-    series.slices.template.fill = color(gray[400]);
-    series.slices.template.propertyFields.fill = 'color';
-    series.slices.template.stroke = color(white);
-    series.slices.template.strokeWidth = 2;
-    series.slices.template.strokeOpacity = 1;
-    series.slices.template.states.getKey('hover').properties.scale = 1;
-    series.tooltip.disabled = true;
-    series.ticks.template.disabled = true;
-    series.labels.template.text = '';
-
-    const label = new Label();
-    label.parent = series;
-    label.horizontalCenter = 'middle';
-    label.verticalCenter = 'middle';
-    label.fontSize = 16;
-    label.fontWeight = 'lighter';
-    label.fill = color(gray[900]);
-    if (props.count) {
-        if (props.label === 'Storage') {
-            label.text = byteFormatter(props.count).split(' ')[0];
-        } else {
-            label.text = props.count;
-        }
-    } else {
-        label.text = '{values.value.sum}';
-    }
-
-    state.chart = chart;
-};
-
+/* Util */
 const getLocation = (provider: string, region: string, projectId: string, label: string) => {
     const query: Location['query'] = {
         provider: primitiveToQueryString(provider),
@@ -140,8 +112,21 @@ const getLocation = (provider: string, region: string, projectId: string, label:
     };
     return location;
 };
+const drawChart = (rawData) => {
+    if (isEmpty(rawData)) return;
 
-/* api */
+    state.chartData = rawData?.map((d) => ({
+        name: d.region,
+        value: d.count,
+        itemStyle: {
+            color: d.color,
+        },
+    })) || [];
+    state.chart = init(chartContext.value);
+    state.chart.setOption(state.chartOptions, true);
+};
+
+/* Api */
 const getData = async () => {
     try {
         state.loading = true;
@@ -158,11 +143,11 @@ const getData = async () => {
         const colors = [coral[500], yellow[400], secondary1];
         let data = orderBy(res.results, ['total'], ['desc']);
         data = data.map((d, idx) => ({
-            provider: state.providers[d.provider]?.label,
+            provider: storeState.providers[d.provider]?.label,
             region: d.region_code,
             total: d.total,
             count: d.label === 'Storage' ? byteFormatter(d.total) : d.total,
-            providerColor: state.providers[d.provider]?.color,
+            providerColor: storeState.providers[d.provider]?.color,
             color: colors[idx] || gray[400],
             to: getLocation(d.provider, d.region_code, props.projectId, props.label),
         }));
@@ -175,17 +160,14 @@ const getData = async () => {
     }
 };
 
-watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => {
-    if (!loading && chartCtx) {
-        drawChart(chartCtx);
-    }
-}, { immediate: true });
+/* Watcher */
 watch(() => props.label, async () => {
     await getData();
 }, { immediate: false });
-
-onUnmounted(() => {
-    if (state.chart) state.chart.dispose();
+watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => {
+    if (!loading && chartCtx) {
+        drawChart(state.data);
+    }
 });
 
 (async () => {
@@ -267,6 +249,8 @@ onUnmounted(() => {
     }
     .chart-wrapper {
         .chart {
+            width: 100%;
+            height: 100%;
             max-width: 6rem;
             max-height: 6rem;
             margin: auto;

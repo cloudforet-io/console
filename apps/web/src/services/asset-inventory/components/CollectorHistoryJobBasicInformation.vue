@@ -48,9 +48,8 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PLink, PLazyImg, PPaneLayout } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
+import { PLink, PLazyImg, PPaneLayout } from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { JobModel } from '@/schema/inventory/job/model';

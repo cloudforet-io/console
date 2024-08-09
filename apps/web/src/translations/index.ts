@@ -2,11 +2,11 @@ import Vue from 'vue';
 import type { IVueI18n, LocaleMessageObject } from 'vue-i18n';
 import VueI18n from 'vue-i18n';
 
-import { messages } from '@spaceone/design-system';
 
 import en from '@cloudforet/language-pack/en.json';
 import ja from '@cloudforet/language-pack/ja.json';
 import ko from '@cloudforet/language-pack/ko.json';
+import { messages } from '@cloudforet/mirinae';
 
 import { loadDayjsLocale } from '@/translations/vendors/dayjs';
 

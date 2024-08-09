@@ -1,6 +1,10 @@
 import type { Tags } from '@/schema/_common/model';
 import type { WebhookPluginInfo, WebhookState } from '@/schema/monitoring/webhook/type';
 
+type WebhookRequestsType = {
+    total: number;
+    error: number;
+};
 export interface WebhookModel {
     webhook_id: string;
     name: string;
@@ -14,4 +18,5 @@ export interface WebhookModel {
     workspace_id: string;
     domain_id: string;
     created_at: string;
+    requests: WebhookRequestsType
 }

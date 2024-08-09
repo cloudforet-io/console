@@ -1,4 +1,4 @@
-import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
+import type { InputItem } from '@cloudforet/mirinae/types/inputs/input/text-input/type';
 
 import type { Tags } from '@/schema/_common/model';
 

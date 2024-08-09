@@ -6,7 +6,7 @@ import {
 
 import {
     PI, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import TopBarFavoriteContextMenu

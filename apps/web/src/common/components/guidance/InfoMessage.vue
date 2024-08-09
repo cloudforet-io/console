@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TranslateResult } from 'vue-i18n';
 
-import { PI } from '@spaceone/design-system';
+import { PI } from '@cloudforet/mirinae';
 
 type StyleType = 'gray' | 'secondary' | 'peacock';
 

@@ -2,38 +2,41 @@
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PLink, PDataTable, PIconButton } from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
-import { cloneDeep, sortBy, sum } from 'lodash';
+import type { PieSeriesOption } from 'echarts/charts';
+import { init } from 'echarts/core';
+import {
+    sortBy, sum,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PLink, PDataTable, PIconButton } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
-import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
+import { useDomainStore } from '@/store/domain/domain-store';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import TableHeader from '@/common/components/cost-report-page/table-header.vue';
-import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { gray, white } from '@/styles/colors';
+import { gray } from '@/styles/colors';
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
-
 
 
 const router = useRouter();
@@ -46,13 +49,6 @@ type CostReportDataAnalyzeResult = {
     }>|number;
     _total_value_sum?: number;
 };
-interface ChartData {
-    category: string;
-    value: number;
-    pieSettings: {
-        fill: string;
-    };
-}
 interface Props {
     accessToken?: string;
     costReportId?: string;
@@ -66,12 +62,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const chartContext = ref<HTMLElement|null>(null);
-const chartHelper = useAmcharts5(chartContext);
 const providerReferenceStore = useProviderReferenceStore();
+const domainStore = useDomainStore();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => providerReferenceStore.state.items ?? {}),
-    domainName: computed<string>(() => store.state.domain.name),
+    domainName: computed<string>(() => domainStore.state.name),
 });
 
 const state = reactive({
@@ -88,13 +84,44 @@ const state = reactive({
         return `${startDate} ~ ${endDate}`;
     }),
     totalCost: computed<number>(() => sum(tableState.costByProduct.map((d) => d._total_value_sum))),
-    chartData: computed<ChartData[]>(() => tableState.costByProduct?.map((d) => ({
-        category: storeState.providers[d.provider]?.name ?? d.provider,
-        value: d._total_value_sum as number,
-        pieSettings: {
-            fill: storeState.providers[d.provider]?.color,
+    chartOptions: computed<PieSeriesOption>(() => ({
+        color: MASSIVE_CHART_COLORS,
+        grid: {
+            containLabel: true,
         },
-    })) ?? []),
+        tooltip: {
+            trigger: 'item',
+            position: 'inside',
+            formatter: (params) => {
+                const _name = storeState.providers[params.name]?.label ?? params.name;
+                const _value = numberFormatter(params.value) || '';
+                return `${params.marker} ${_name}: <b>${_value}</b>`;
+            },
+        },
+        legend: {
+            show: false,
+        },
+        series: [
+            {
+                type: 'pie',
+                radius: ['30%', '70%'],
+                center: ['30%', '50%'],
+                data: state.chartData,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)',
+                    },
+                },
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                },
+            },
+        ],
+    })),
+    chartData: [],
     numberFormatterOption: computed<Intl.NumberFormatOptions>(() => ({ currency: state.currency, style: 'decimal', notation: 'standard' })),
     printMode: false,
 });
@@ -159,27 +186,16 @@ const getSortedTableData = (rawData: CostReportDataAnalyzeResult[]) => {
     return results;
 };
 const drawChart = () => {
-    chartHelper.refreshRoot();
-    const chart = chartHelper.createDonutChart({
-        paddingLeft: 20,
-        paddingRight: 20,
-        innerRadius: 40,
-    });
-    const seriesSettings = {
-        categoryField: 'category',
-        valueField: 'value',
-    };
-    const series = chartHelper.createPieSeries(seriesSettings);
-    chart.series.push(series);
-    series.slices.template.setAll({
-        stroke: chartHelper.color(white),
-        templateField: 'pieSettings',
-    });
-    const tooltip = chartHelper.createTooltip();
-    const valueFormatter = (val) => numberFormatter(val, { minimumFractionDigits: 2 }) as string;
-    chartHelper.setPieTooltipText(series, tooltip, valueFormatter);
-    series.slices.template.set('tooltip', tooltip);
-    series.data.setAll(cloneDeep(state.chartData));
+    state.chartData = tableState.costByProduct.map((d) => ({
+        name: d.provider,
+        value: d._total_value_sum,
+        itemStyle: {
+            color: storeState.providers[d.provider]?.color,
+        },
+    }));
+
+    state.chart = init(chartContext.value);
+    state.chart.setOption(state.chartOptions, true);
 };
 
 /* Api */
@@ -256,7 +272,7 @@ const fetchTableData = async () => {
 
 const setMetaTag = () => {
     const viewportEl = document.querySelector('head meta[name="viewport"]');
-    if (viewportEl) viewportEl.attributes.content.value = 'width=928';
+    if (viewportEl) (viewportEl as HTMLMetaElement).content = 'width=928';
 };
 const setRootTagStyle = () => {
     const htmlEl = document.querySelector('html');
@@ -266,7 +282,7 @@ const setRootTagStyle = () => {
         htmlEl.style.overflowY = 'auto';
     }
     if (bodyEl) bodyEl.style.height = 'unset';
-    if (appEl) appEl.style.height = 'unset';
+    if (appEl) (appEl as HTMLElement).style.height = 'unset';
 };
 
 const handlePrint = () => {

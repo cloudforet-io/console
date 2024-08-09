@@ -15,12 +15,13 @@
 
 import { computed, reactive, toRefs } from 'vue';
 
-import {
-    PSelectDropdown,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+
+import {
+    PSelectDropdown,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 

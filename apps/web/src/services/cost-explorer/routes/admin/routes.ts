@@ -17,11 +17,14 @@ import { DYNAMIC_COST_QUERY_SET_PARAMS, MANAGED_COST_QUERY_SET_IDS } from '@/ser
 import CostExplorerHome from '@/services/cost-explorer/pages/CostExplorerHome.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
+const CostAdvancedSettingsContainer = () => import('@/services/cost-explorer/components/CostAdvancedSettingsContainer.vue');
+
 const CostExplorerContainer = () => import('@/services/cost-explorer/CostExplorerContainer.vue');
 
 const AdminBudgetMainPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetMainPage.vue');
 const AdminBudgetCreatePage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetCreatePage.vue');
 const AdminBudgetDetailPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetDetailPage.vue');
+const AdminDomainSettingsAnomalyDetectionConfigurationPage = () => import('@/services/cost-explorer/pages/admin/AdminAdvancedSettingsAnomalyDetectionConfigurationPage.vue');
 
 const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin/AdminCostAnalysisPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
@@ -190,6 +193,26 @@ const adminCostExplorerRoutes: RouteConfig = {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.DATA_SOURCES._NAME),
                     component: DataSourcesPage as any,
+                },
+            ],
+        },
+        {
+            path: 'cost-advanced-settings',
+            name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME),
+            meta: {
+                menuId: MENU_ID.COST_ADVANCED_SETTINGS,
+                translationId: MENU_INFO_MAP[MENU_ID.COST_ADVANCED_SETTINGS].translationId,
+            },
+            redirect: () => ({
+                name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME),
+            }),
+            component: CostAdvancedSettingsContainer,
+            children: [
+                {
+                    path: '/anomaly-detection-configuration',
+                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME),
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION].translationId },
+                    component: AdminDomainSettingsAnomalyDetectionConfigurationPage,
                 },
             ],
         },

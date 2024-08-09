@@ -3,16 +3,16 @@ import {
     computed, nextTick, reactive, watch,
 } from 'vue';
 
-import {
-    PLink, PToolboxTable, PTooltip,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PLink, PToolboxTable, PTooltip,
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { store } from '@/store';

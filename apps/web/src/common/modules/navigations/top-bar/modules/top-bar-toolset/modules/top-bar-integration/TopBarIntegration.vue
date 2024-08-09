@@ -6,7 +6,7 @@ import {
 
 import {
     PI, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

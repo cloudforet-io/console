@@ -2,16 +2,17 @@ import type { RouteConfig } from 'vue-router';
 
 import { store } from '@/store';
 
-import { additionalRoutes } from '@/router/additional-routes';
 import { adminRoutes } from '@/router/admin-routes';
 import { ROOT_ROUTE, ROUTE_SCOPE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
+import { externalRoutes } from '@/router/external-routes';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { workspaceRoutes } from '@/router/workspace-routes';
 
 import authRoutes from '@/services/auth/routes/routes';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
+import landingPageRoutes from '@/services/landing/routes/routes';
 import myPageRoutes from '@/services/my-page/routes/routes';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 
 export const integralRoutes: RouteConfig[] = [
@@ -27,14 +28,15 @@ export const integralRoutes: RouteConfig[] = [
                 }),
             },
             ...authRoutes,
-            ...additionalRoutes,
+            landingPageRoutes,
+            ...externalRoutes,
             {
                 path: 'admin',
                 name: ROOT_ROUTE.ADMIN._NAME,
                 meta: { scope: ROUTE_SCOPE.DOMAIN },
                 redirect: () => {
                     if (!store.getters['user/isDomainAdmin']) return { name: ROOT_ROUTE.WORKSPACE._NAME };
-                    return ({ name: makeAdminRouteName(HOME_DASHBOARD_ROUTE._NAME) });
+                    return ({ name: makeAdminRouteName(WORKSPACE_HOME_ROUTE._NAME) });
                 },
                 component: { template: '<router-view />' },
                 children: [
@@ -46,7 +48,7 @@ export const integralRoutes: RouteConfig[] = [
                 name: ROOT_ROUTE.WORKSPACE._NAME,
                 meta: { scope: ROUTE_SCOPE.WORKSPACE },
                 redirect: (to) => ({
-                    name: HOME_DASHBOARD_ROUTE._NAME,
+                    name: WORKSPACE_HOME_ROUTE._NAME,
                     params: {
                         ...to.params,
                     },
@@ -58,7 +60,6 @@ export const integralRoutes: RouteConfig[] = [
             },
             myPageRoutes,
             ...errorRoutes,
-
         ],
     },
 ];

@@ -73,12 +73,6 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PButtonTab, PDynamicLayout, PHeading, PSelectStatus, PDataLoader,
-} from '@spaceone/design-system';
-import type { DynamicLayoutEventListener } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
@@ -86,6 +80,12 @@ import { debounce, isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButtonTab, PDynamicLayout, PHeading, PSelectStatus, PDataLoader,
+} from '@cloudforet/mirinae';
+import type { DynamicLayoutEventListener } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
+import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DataSourceListParameters } from '@/schema/monitoring/data-source/api-verbs/list';

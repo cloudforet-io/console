@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PFieldTitle, PSelectCard } from '@spaceone/design-system';
+import { PFieldTitle, PSelectCard } from '@cloudforet/mirinae';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';

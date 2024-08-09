@@ -3,9 +3,9 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PBadge, PSelectStatus } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PBadge, PSelectStatus } from '@cloudforet/mirinae';
+
 
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';

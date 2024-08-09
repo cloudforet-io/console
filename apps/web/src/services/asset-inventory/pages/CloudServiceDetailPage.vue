@@ -3,18 +3,6 @@ import { debouncedWatch } from '@vueuse/core';
 import { reactive, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import {
-    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge,
-} from '@spaceone/design-system';
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type {
-    DynamicLayoutEventListener, DynamicLayoutFetchOptions,
-    DynamicLayoutFieldHandler,
-} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
-import type {
-    DynamicLayout,
-    DynamicLayoutOptions,
-} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { isEmpty, get, cloneDeep } from 'lodash';
 
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
@@ -22,6 +10,18 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge,
+} from '@cloudforet/mirinae';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type {
+    DynamicLayoutEventListener, DynamicLayoutFetchOptions,
+    DynamicLayoutFieldHandler,
+} from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
+import type {
+    DynamicLayout,
+    DynamicLayoutOptions,
+} from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';
@@ -45,7 +45,7 @@ import { queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string'
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
-import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
+import CustomFieldModalForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/CustomFieldModalForDynamicLayout.vue';
 
 import ExcelExportOptionModal
     from '@/services/asset-inventory/components/CloudServiceDetailExcelExportOptionModal.vue';
@@ -611,17 +611,17 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                                    :selected-index="typeOptionState.selectIndex.length ?? 0"
                                    :timezone="typeOptionState.timezone ?? 'UTC'"
         />
-        <custom-field-modal :visible="tableState.visibleCustomFieldModal"
-                            resource-type="inventory.CloudService"
-                            :options="{
-                                provider: props.provider,
-                                cloudServiceGroup: props.group,
-                                cloudServiceType: props.name,
-                                include_workspace_info: appContextGetters.isAdminMode,
-                            }"
-                            :is-server-page="props.isServerPage"
-                            @update:visible="handleCustomFieldModalVisibleUpdate"
-                            @complete="reloadTable"
+        <custom-field-modal-for-dynamic-layout :visible="tableState.visibleCustomFieldModal"
+                                               resource-type="inventory.CloudService"
+                                               :options="{
+                                                   provider: props.provider,
+                                                   cloudServiceGroup: props.group,
+                                                   cloudServiceType: props.name,
+                                                   include_workspace_info: appContextGetters.isAdminMode,
+                                               }"
+                                               :is-server-page="props.isServerPage"
+                                               @update:visible="handleCustomFieldModalVisibleUpdate"
+                                               @complete="reloadTable"
         />
         <excel-export-option-modal :visible="excelState.visible"
                                    :cloud-service-id="tableState.items[0]?.cloud_service_id"

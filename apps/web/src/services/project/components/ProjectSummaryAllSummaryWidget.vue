@@ -7,9 +7,6 @@ import type { Location } from 'vue-router';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import {
-    PBalloonTab, PSelectButton, PDataLoader, PSkeleton, PSpinner,
-} from '@spaceone/design-system';
 import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
 import {
@@ -20,6 +17,9 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PBalloonTab, PSelectButton, PDataLoader, PSkeleton, PSpinner,
+} from '@cloudforet/mirinae';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
@@ -36,7 +36,8 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import ProjectSummaryAllSummaryWidgetRegionService from '@/services/project/components/ProjectSummaryAllSummaryWidgetRegionService.vue';
+import ProjectSummaryAllSummaryWidgetRegionService
+    from '@/services/project/components/ProjectSummaryAllSummaryWidgetRegionService.vue';
 import { SERVICE_CATEGORY } from '@/services/project/constants/project-summary-constant';
 import type { DateType, ServiceCategory } from '@/services/project/types/project-summary-type';
 

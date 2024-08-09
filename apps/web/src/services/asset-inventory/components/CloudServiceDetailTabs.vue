@@ -2,13 +2,14 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    PDynamicLayout, PTab, PEmpty, PTextButton, PI,
-} from '@spaceone/design-system';
-import type { DynamicLayoutFieldHandler } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
 import { get } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PDynamicLayout, PTab, PEmpty, PTextButton, PI,
+} from '@cloudforet/mirinae';
+import type { DynamicLayoutFieldHandler } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
+
 
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';

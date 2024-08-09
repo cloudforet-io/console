@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { reactive, nextTick } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDivider, PIconButton, PPaneLayout, PToggleButton, PFieldTitle,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProjectChannelDeleteParameters } from '@/schema/notification/project-channel/api-verbs/delete';
 import type { ProjectChannelDisableParameters } from '@/schema/notification/project-channel/api-verbs/disable';
@@ -188,7 +188,7 @@ const onEdit = (value?: EditTarget) => {
 <template>
     <p-pane-layout class="channel-card-wrapper">
         <div class="card-header">
-            <p-field-title :label="props.channelData.protocol_name">
+            <p-field-title :label="props.channelData.protocol_name.toLowerCase().includes('spaceone') ? i18n.t('IAM.USER.NOTIFICATION.ASSOCIATED_MEMBER') : props.channelData.protocol_name">
                 <template #left>
                     <p-toggle-button :value="state.isActivated"
                                      :disabled="props.manageDisabled"

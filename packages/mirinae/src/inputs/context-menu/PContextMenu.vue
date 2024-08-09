@@ -350,11 +350,6 @@ defineExpose({
                         </div>
                     </template>
                 </slot>
-                <div v-if="slots.bottom"
-                     class="bottom-slot-area"
-                >
-                    <slot name="bottom" />
-                </div>
             </slot>
             <div v-show="menu.length === 0"
                  class="no-data"
@@ -365,6 +360,11 @@ defineExpose({
                     {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
                 </slot>
             </div>
+        </div>
+        <div v-if="slots.bottom"
+             class="bottom-slot-area"
+        >
+            <slot name="bottom" />
         </div>
         <div v-show="loading"
              class="loader-wrapper"
@@ -441,9 +441,6 @@ defineExpose({
             padding: 0.5rem;
             min-width: 7rem;
         }
-        > .bottom-slot-area {
-            padding: 0.5rem;
-        }
 
         > .no-data {
             @apply text-gray-300;
@@ -451,6 +448,9 @@ defineExpose({
             line-height: 1.25;
             font-size: 0.875rem;
         }
+    }
+    > .bottom-slot-area {
+        padding: 0.5rem;
     }
     > .loader-wrapper {
         @apply absolute w-full h-full overflow-hidden;

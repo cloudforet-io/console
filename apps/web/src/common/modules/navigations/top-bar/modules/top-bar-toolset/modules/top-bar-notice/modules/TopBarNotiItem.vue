@@ -4,10 +4,11 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import dayjs from 'dayjs';
+
 import {
     PI, PIconButton,
-} from '@spaceone/design-system';
-import dayjs from 'dayjs';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 

@@ -3,13 +3,13 @@ import {
     defineProps, defineEmits, reactive, computed,
 } from 'vue';
 
-import {
-    PButtonModal, PToggleButton, PFieldTitle,
-} from '@spaceone/design-system';
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButtonModal, PToggleButton, PFieldTitle,
+} from '@cloudforet/mirinae';
+import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportOption, ExportParameter } from '@/schema/_common/api-verbs/export';

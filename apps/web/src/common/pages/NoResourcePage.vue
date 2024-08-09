@@ -5,7 +5,7 @@ import {
 import type { RouteConfig } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { PButton } from '@spaceone/design-system';
+import { PButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router/composables';
 
 import {
     PTextButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';

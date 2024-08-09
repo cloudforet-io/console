@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PI, PTextHighlighting } from '@spaceone/design-system';
+import { PI, PTextHighlighting } from '@cloudforet/mirinae';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 

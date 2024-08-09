@@ -3,12 +3,12 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PI } from '@spaceone/design-system';
 import { findKey } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PI } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

@@ -1,17 +1,17 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PButton, PFieldGroup, PTextInput } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButton, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
+
 
 import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
 import type { TokenIssueModel } from '@/schema/identity/token/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import type { UpdateUserRequest } from '@/store/modules/user/type';
 
 
@@ -28,9 +28,10 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import UserAccountModuleContainer
     from '@/services/my-page/components/UserAccountModuleContainer.vue';
 
+
+const domainStore = useDomainStore();
 const state = reactive({
     userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
     isCheckedToken: false,
 });
 const {
@@ -85,7 +86,7 @@ const handleClickPasswordConfirm = async () => {
 const checkCurrentPassword = async () => {
     try {
         const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
-            domain_id: state.domainId,
+            domain_id: domainStore.state.domainId,
             auth_type: 'LOCAL',
             credentials: {
                 user_id: state.userId,

@@ -6,26 +6,25 @@ import {
 import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar, PDataLoader,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
 import { store } from '@/store';
 
-import { CostReportDetailPath } from '@/router/constant';
-import { getRouteScope, makeAdminRouteName } from '@/router/helpers/route-helper';
+import { EXTERNAL_PAGE_ROUTE } from '@/router/constant';
+import { getRouteScope } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useErrorStore } from '@/store/error/error-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
 import config from '@/lib/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
-import HasNoWorkspaceModal from '@/common/components/modals/HasNoWorkspaceModal.vue';
 import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
@@ -37,28 +36,28 @@ import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const router = useRouter();
 const route = useRoute();
 
 const state = reactive({
     routeScope: computed(() => getRouteScope(route)),
-    showGNB: computed(() => route.matched[1]?.name === 'admin' || route.matched[1]?.name === 'workspace' || state.isMyPage),
+    showGNB: computed(() => !state.isWorkspaceLandingPage && (route.matched[1]?.name === 'admin' || route.matched[1]?.name === 'workspace' || state.isMyPage)),
+    isWorkspaceLandingPage: computed(() => route.name === LANDING_ROUTE._NAME),
     isMyPage: computed(() => route.path.startsWith('/my-page')),
-    isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && state.routeScope !== 'EXCLUDE_AUTH'),
+    isExpired: computed(() => !state.isRoutingToSignIn && errorStore.state.visibleSessionExpiredError && state.routeScope !== 'EXCLUDE_AUTH'),
     isRoutingToSignIn: false,
     isEmailVerified: computed(() => store.state.user.emailVerified),
     userId: computed<string>(() => store.state.user.userId),
     email: computed<string>(() => store.state.user.email),
     notificationEmailModalVisible: false,
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
-    hasNoWorkspace: false,
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
 });
 
 const appContextStore = useAppContextStore();
-const userWorkspaceStore = useUserWorkspaceStore();
+const errorStore = useErrorStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
 
@@ -72,17 +71,17 @@ const goToSignIn = async () => {
     state.isRoutingToSignIn = true;
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
-        query: { nextPath: route.fullPath },
+        query: { previousPath: route.fullPath },
     };
     store.commit('user/setCurrentGrantInfo', undefined);
-    store.commit('error/setVisibleSessionExpiredError', false);
+    errorStore.setVisibleSessionExpiredError(false);
 
     await router.push(res);
     state.isRoutingToSignIn = false;
 };
 const showsBrowserRecommendation = () => {
     const currentPath = window.location.pathname;
-    if (currentPath === CostReportDetailPath) return false;
+    if (currentPath === `/${EXTERNAL_PAGE_ROUTE.COST_REPORT_DETAIL._NAME}`) return false;
     return (!supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation'));
 };
 
@@ -93,16 +92,9 @@ watch(() => route.path, () => {
         && !LocalStorageAccessor.getItem('hideNotificationEmailModal');
 }, { immediate: true });
 
-
-watch(() => route.name, (routeName) => {
-    if (routeName && routeName !== makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH') {
-        state.hasNoWorkspace = userWorkspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
-    }
-}, { immediate: true });
-
 watch(() => state.userId, (userId) => {
     if (userId) {
-        store.dispatch('settings/initSettings');
+        store.dispatch('display/initSettings');
     }
 }, { immediate: true });
 </script>
@@ -185,7 +177,6 @@ watch(() => state.userId, (userId) => {
                           button-type="primary"
                           @clickButton="goToSignIn"
             />
-            <has-no-workspace-modal :visible.sync="state.hasNoWorkspace" />
             <notification-email-modal
                 v-if="state.smtpEnabled"
                 :user-id="state.userId"

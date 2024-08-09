@@ -3,7 +3,7 @@ import { reactive, watch } from 'vue';
 
 import {
     PFieldTitle, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';

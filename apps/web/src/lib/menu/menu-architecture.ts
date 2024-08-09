@@ -3,7 +3,7 @@ import { MENU_ID } from '@/lib/menu/config';
 
 export const MENU_LIST: Menu[] = [
     {
-        id: MENU_ID.HOME_DASHBOARD,
+        id: MENU_ID.WORKSPACE_HOME,
         needPermissionByRole: true,
     },
     {
@@ -28,6 +28,7 @@ export const MENU_LIST: Menu[] = [
         needPermissionByRole: true,
         subMenuList: [
             { id: MENU_ID.COST_ANALYSIS, needPermissionByRole: true },
+            { id: MENU_ID.ANOMALY_DETECTION, needPermissionByRole: true },
             { id: MENU_ID.BUDGET, needPermissionByRole: true },
             { id: MENU_ID.COST_REPORT, needPermissionByRole: true },
         ],
@@ -71,17 +72,18 @@ export const MENU_LIST: Menu[] = [
 export const ADMIN_MENU_LIST: Menu[] = [
     // HACK: hide for now
     // {
-    //     id: MENU_ID.HOME_DASHBOARD,
+    //     id: MENU_ID.WORKSPACE_HOME,
     // },
-    // {
-    //     id: MENU_ID.DASHBOARDS,
-    // },
+    {
+        id: MENU_ID.DASHBOARDS,
+    },
     {
         id: MENU_ID.ASSET_INVENTORY,
         subMenuList: [
             { id: MENU_ID.CLOUD_SERVICE },
             { id: MENU_ID.SERVER },
             { id: MENU_ID.SECURITY },
+            { id: MENU_ID.METRIC_EXPLORER },
             { id: MENU_ID.COLLECTOR },
             { id: MENU_ID.SERVICE_ACCOUNT },
         ],
@@ -93,6 +95,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
             { id: MENU_ID.BUDGET },
             { id: MENU_ID.COST_REPORT },
             { id: MENU_ID.DATA_SOURCES },
+            { id: MENU_ID.COST_ADVANCED_SETTINGS },
         ],
     },
     {
@@ -104,10 +107,12 @@ export const ADMIN_MENU_LIST: Menu[] = [
         ],
     },
     {
-        id: MENU_ID.PREFERENCE,
+        id: MENU_ID.ADVANCED,
         subMenuList: [
             { id: MENU_ID.WORKSPACES },
-            { id: MENU_ID.DOMAIN_SETTINGS },
+            { id: MENU_ID.BOOKMARK },
+            { id: MENU_ID.AUTO_DORMANCY_CONFIGURATION },
+            { id: MENU_ID.PREFERENCES },
         ],
     },
     {

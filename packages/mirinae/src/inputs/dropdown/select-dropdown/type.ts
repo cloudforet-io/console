@@ -15,6 +15,7 @@ export const SELECT_DROPDOWN_STYLE_TYPE = {
     ROUNDED: 'rounded',
     TRANSPARENT: 'transparent',
     ICON_BUTTON: 'icon-button',
+    TERTIARY_ICON_BUTTON: 'tertiary-icon-button',
 } as const;
 
 export const SELECT_DROPDOWN_APPEARANCE_TYPE = {
@@ -28,6 +29,7 @@ export const SELECT_DROPDOWN_APPEARANCE_TYPE = {
 export type ContextMenuPosition = typeof CONTEXT_MENU_POSITION[keyof typeof CONTEXT_MENU_POSITION];
 export type SelectDropdownStyleType = typeof SELECT_DROPDOWN_STYLE_TYPE[keyof typeof SELECT_DROPDOWN_STYLE_TYPE];
 export type SelectDropdownAppearanceType = typeof SELECT_DROPDOWN_APPEARANCE_TYPE[keyof typeof SELECT_DROPDOWN_APPEARANCE_TYPE];
+export type SelectDropdownSize = 'sm' | 'md';
 
 export type HandlerRes = MenuAttachHandlerRes<SelectDropdownMenuItem>;
 export type AutocompleteHandler = MenuAttachHandler<SelectDropdownMenuItem>;

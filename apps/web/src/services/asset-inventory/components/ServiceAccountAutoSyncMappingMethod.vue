@@ -2,7 +2,7 @@
 
 import { computed, reactive, watch } from 'vue';
 
-import { PFieldTitle, PRadio } from '@spaceone/design-system';
+import { PFieldTitle, PRadio } from '@cloudforet/mirinae';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

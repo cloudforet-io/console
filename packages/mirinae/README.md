@@ -65,16 +65,16 @@ https://www.amcharts.com/online-store/licenses-explained/
 ### 1. Install
 
 ```shell
-npm install @spaceone/design-system vue vue-router vue-i18n vue-fragment @amcharts
+npm install @cloudforet/mirinae vue vue-router vue-fragment
 ```
-You need to use `vue-router` and `vue-i18n` plug-ins in your project to use several components that have dependencies with these plug-ins.
+You need to use `vue-router` plug-in in your project to use several components that have dependencies with these plug-ins.
 
 ### 2. Set plugin
    
 Add following lines to ```main.js``` file. <br/>
 
 ```javascript
-import MirinaeDesignSystem from '@spaceone/design-system';
+import MirinaeDesignSystem from '@cloudforet/mirinae';
 
 Vue.use(MirinaeDesignSystem, pluginOptions);
 ```
@@ -85,13 +85,11 @@ Vue.use(MirinaeDesignSystem, pluginOptions);
 |------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | vueI18n                | Whether to set your Vue I18n configs. If you use Vue I18n and want to use your Vue I18n configs, give your Vue I18n to this option. In Mirinae, some components use Vue I18n. |
 | installFragment        | Whether to install Vue Fragment. Some components use Vue Fragment, so don't give this option if you have already installed it in your application.                            |
-| amchartsLicenses       | If you use the amcharts library such as Dynamic Chart, license the amcharts as a string array.                                                                                |
 
 ```typescript
 interface MirinaeDSOptions {
     vueI18n?: VueI18n;
     installFragment?: boolean;
-    amchartsLicenses?: string[];
 }
 ```
 
@@ -100,7 +98,7 @@ interface MirinaeDSOptions {
 Example: 
 
 ```javascript
-import { PButtonTab, PDynamicLayout } from '@spaceone/design-system';
+import { PButtonTab, PDynamicLayout } from '@cloudforet/mirinae';
 
 export default {
     components: {
@@ -117,7 +115,6 @@ These components require plug-ins `vue-router` and `vue-i18n` installed in your 
 | Plug-in          | Components                            |
 |------------------|---------------------------------------|
 | Vue Router       | - `PLink` <br/> - `PBreadcrumbs`      |
-| Vue I18n         | - `PSearch` <br/> - `PDatetimePicker` |
 
 
 <br/>
@@ -132,8 +129,8 @@ Mirinae Design System is based on Tailwindcss.<br/>
 If your project doesn't use tailwindcss, add the code below to ```main.ts```.
 
 ```javascript
-import '@spaceone/design-system/dist/css/style.css';
-import '@spaceone/design-system/dist/style.css';
+import '@cloudforet/mirinae/css/style.css';
+import '@cloudforet/mirinae/dist/style.css';
 ```
 
 ### Case 2. Without tailwindcss styles
@@ -141,7 +138,7 @@ If your project use tailwindcss, you don't need to import all styles. <br/>
 In that case, add codes below to your ```tailwind.config.js```.
 
 ```javascript
-const mirinaeTailwind = require('@spaceone/design-system/tailwind.config.js')
+const mirinaeTailwind = require('@cloudforet/mirinae/tailwind.config.js')
 
 module.exports = {
     theme: {
@@ -161,8 +158,8 @@ module.exports = {
 Also, you need to add codes below to your ```main.js```.
 
 ```javascript
-import '@spaceone/design-system/dist/css/light-style.css';
-import '@spaceone/design-system/dist/style.css';
+import '@cloudforet/mirinae/css/light-style.css';
+import '@cloudforet/mirinae/dist/style.css';
 ```
 
 

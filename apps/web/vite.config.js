@@ -15,7 +15,7 @@ export default defineConfig(async ({ command, mode }) => {
     return {
         optimizeDeps: {
             include: [
-                '@spaceone/design-system/tailwind.config.cjs',
+                '@cloudforet/mirinae/tailwind.config.cjs',
                 'prosemirror-state',
                 'prosemirror-transform',
                 'prosemirror-model',
@@ -35,10 +35,17 @@ export default defineConfig(async ({ command, mode }) => {
                 emitFile: true,
                 filename: 'stats.html',
             })]),
+            visualizer({
+                filename: './dist/report.html',
+                open: true,
+                brotliSize: true,
+                sourcemap: false,
+                gzipSize: true,
+            }),
         ],
         build: {
             rollupOptions: {
-                external: ['@spaceone/design-system/css/*'],
+                external: ['@cloudforet/mirinae/css/*'],
             },
         },
         server: { port: 8080 },

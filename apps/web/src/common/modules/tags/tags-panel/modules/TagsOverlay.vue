@@ -4,10 +4,11 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { isEmpty } from 'lodash';
+
 import {
     PIconButton, PPaneLayout, PButton,
-} from '@spaceone/design-system';
-import { isEmpty } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';

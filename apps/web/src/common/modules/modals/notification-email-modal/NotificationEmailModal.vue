@@ -103,6 +103,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import {
     PButton,
     PButtonModal,
@@ -110,9 +111,8 @@ import {
     PFieldGroup,
     PI,
     PTextInput,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

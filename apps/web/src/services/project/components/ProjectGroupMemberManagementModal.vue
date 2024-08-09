@@ -4,13 +4,14 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PButtonModal, PDataLoader, PEmpty, PFieldGroup, PTextInput, PIconButton,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep, difference } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PButtonModal, PDataLoader, PEmpty, PFieldGroup, PTextInput, PIconButton,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { ProjectGroupAddUsersParameters } from '@/schema/identity/project-group/api-verbs/add-users';
 import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';

@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PCard, PLazyImg, PBadge,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import { i18n } from '@/translations';

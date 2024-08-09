@@ -23,7 +23,7 @@
 <script lang="ts">
 import { reactive, toRefs } from 'vue';
 
-import { PButtonModal } from '@spaceone/design-system';
+import { PButtonModal } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 

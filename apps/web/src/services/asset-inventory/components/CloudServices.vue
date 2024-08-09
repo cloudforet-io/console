@@ -105,15 +105,15 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import {
-    PSkeleton, PI, PLazyImg, PEmpty, PDataLoader,
-} from '@spaceone/design-system';
 import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSkeleton, PI, PLazyImg, PEmpty, PDataLoader,
+} from '@cloudforet/mirinae';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 

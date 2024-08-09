@@ -3,9 +3,9 @@ import {
     defineProps, defineEmits, reactive,
 } from 'vue';
 
-import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';

@@ -1,7 +1,8 @@
 import { computed, reactive } from 'vue';
 
-import { styleVariables } from '@spaceone/design-system';
 import { defineStore } from 'pinia';
+
+import { styleVariables } from '@cloudforet/mirinae';
 
 export const useGlobalUIStore = defineStore('global-ui', () => {
     const gnbHeight = styleVariables['top-bar-height'];

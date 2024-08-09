@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PTextButton, PDataLoader } from '@spaceone/design-system';
+import { PTextButton, PDataLoader } from '@cloudforet/mirinae';
 
 interface Props {
     loading: boolean

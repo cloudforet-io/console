@@ -18,9 +18,9 @@
 <script lang="ts" setup>
 import { reactive } from 'vue';
 
-import { PButtonModal } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButtonModal } from '@cloudforet/mirinae';
+
 
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type { CollectorModel } from '@/schema/inventory/collector/model';

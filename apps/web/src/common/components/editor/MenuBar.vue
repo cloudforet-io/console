@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import type { Editor } from '@tiptap/vue-2';
+
 import {
     PDivider, PI, PIconButton, PPopover, PSelectDropdown,
-} from '@spaceone/design-system';
-import type { Editor } from '@tiptap/vue-2';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

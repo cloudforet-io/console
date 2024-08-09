@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PDivider } from '@spaceone/design-system';
+import { PDivider } from '@cloudforet/mirinae';
 
 </script>
 

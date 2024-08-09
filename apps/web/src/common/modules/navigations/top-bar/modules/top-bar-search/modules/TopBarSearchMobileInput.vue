@@ -3,7 +3,7 @@ import { vOnClickOutside } from '@vueuse/components';
 import { useFocus, useWindowSize } from '@vueuse/core';
 import { computed, reactive, ref } from 'vue';
 
-import { PI, screens, PIconButton } from '@spaceone/design-system';
+import { PI, screens, PIconButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

@@ -11,7 +11,7 @@
              width="1.25rem"
              height="1.25rem"
         />
-        <div class="contents">
+        <div class="select-card-contents">
             <slot v-bind="{isSelected}">
                 <p-lazy-img v-if="imageUrl || icon"
                             :src="imageUrl"
@@ -158,7 +158,8 @@ export default defineComponent<Props>({
             ) return;
 
             // sibling means other cards on the same depth
-            const siblings = (e?.target as HTMLDivElement)?.parentElement?.children as HTMLCollectionOf<HTMLDivElement>;
+            const siblings = (e?.target as HTMLDivElement)?.parentElement?.children as HTMLDivElement[]|undefined;
+            if (!siblings) return;
             const lastIndex = siblings.length - 1;
 
             let nextTarget = 0;
@@ -212,6 +213,9 @@ export default defineComponent<Props>({
     &.disabled {
         @apply border-gray-200 text-gray-400;
         cursor: not-allowed;
+        .contents {
+            opacity: 20%;
+        }
     }
     .marker {
         @apply absolute;
@@ -219,7 +223,7 @@ export default defineComponent<Props>({
         top: 0.75rem;
         z-index: 1;
     }
-    .contents {
+    .select-card-contents {
         display: flex;
         flex-direction: column;
         justify-content: center;

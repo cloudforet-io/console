@@ -13,7 +13,7 @@ import type { DashboardVariables } from '@/schema/dashboard/_types/dashboard-typ
 import type { InheritOptions } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -99,8 +99,8 @@ export const useWidgetLifecycle = <Data = any>({
     let stopCurrencyWatch;
     let stopLanguageWatch;
 
-    if (widgetState.settings) {
-        stopSettingsWatch = watch(() => widgetState.settings, (current, previous) => {
+    if (widgetState.dashboardOptions) {
+        stopSettingsWatch = watch(() => widgetState.dashboardOptions, (current, previous) => {
             if (!current || !previous || props.disableRefreshOnVariableChange) return;
             if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
                 refreshWidgetAndEmitEvent();

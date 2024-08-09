@@ -10,11 +10,9 @@ import SvgIcon from 'vue-svgicon';
 
 import { i18n, I18nConnector } from '@/translations';
 
-import { applyAmchartsGlobalSettings } from './plugins/amcharts';
 
 export interface MirinaeOptions {
     installFragment?: boolean;
-    amchartsLicenses?: string[];
     vueI18n?: VueI18n;
 }
 
@@ -54,8 +52,6 @@ export class MirinaeInstaller {
 
         // Fragment is to be removed after vue 3 migration.
         if (options?.installFragment) vueConstructor.use(Fragment.Plugin);
-
-        applyAmchartsGlobalSettings(options?.amchartsLicenses);
     }
 
     static install: PluginFunction<MirinaeOptions> = (vueConstructor: VueConstructor, options: MirinaeOptions = {}) => {

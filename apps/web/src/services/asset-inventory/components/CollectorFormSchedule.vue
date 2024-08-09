@@ -47,13 +47,13 @@ import {
     defineProps, reactive, computed, watch,
 } from 'vue';
 
-import {
-    PFieldGroup, PFieldTitle, PToggleButton, PDataLoader,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range, size } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PFieldGroup, PFieldTitle, PToggleButton, PDataLoader,
+} from '@cloudforet/mirinae';
 
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type { CollectorModel } from '@/schema/inventory/collector/model';

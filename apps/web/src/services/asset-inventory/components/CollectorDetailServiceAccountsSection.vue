@@ -47,11 +47,11 @@ import {
 } from 'vue';
 
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type {

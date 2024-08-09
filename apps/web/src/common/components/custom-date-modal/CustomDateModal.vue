@@ -3,9 +3,10 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
-import type { DATA_TYPE } from '@spaceone/design-system/types/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
+
+import { PButtonModal, PDatetimePicker, PFieldGroup } from '@cloudforet/mirinae';
+import type { DATA_TYPE } from '@cloudforet/mirinae/types/inputs/datetime-picker/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -98,7 +99,7 @@ const handleUpdateSelectedDates = (type: 'start'|'end', selectedDates: string[])
     if (!selectedDates.length) return;
 
     const originDates = type === 'start' ? state.startDates : state.endDates;
-    if (dayjs.utc(originDates[0]).isSame(dayjs.utc(selectedDates[0]), 'day')) return;
+    if (originDates.length && dayjs.utc(originDates[0]).isSame(dayjs.utc(selectedDates[0]), 'day')) return;
 
     if (type === 'start') {
         state.startDates = selectedDates;

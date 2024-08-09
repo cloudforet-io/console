@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PButtonModal } from '@spaceone/design-system';
+import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

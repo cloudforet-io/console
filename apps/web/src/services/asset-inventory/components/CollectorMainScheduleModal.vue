@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { PButtonModal } from '@spaceone/design-system';
+import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type { CollectorModel } from '@/schema/inventory/collector/model';

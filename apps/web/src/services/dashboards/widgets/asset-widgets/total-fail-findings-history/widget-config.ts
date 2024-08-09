@@ -21,13 +21,13 @@ const totalFailFindingsHistoryWidgetConfig: WidgetConfig = {
         granularity: GRANULARITY.MONTHLY,
     },
     options_schema: getWidgetOptionsSchema([
-        'cloud_service_query_set',
+        ['cloud_service_query_set', { fixed: true, hidden: true }],
         ['granularity', { fixed: true }],
-        'filters.project_group',
-        'filters.project',
+        ['filters.project_group', { fixed: true }],
+        ['filters.project', { fixed: true }],
+        ['filters.service_account', { fixed: true }],
+        ['filters.region', { fixed: true }],
         'filters.provider',
-        'filters.region',
-        'filters.asset_account',
     ]),
 };
 

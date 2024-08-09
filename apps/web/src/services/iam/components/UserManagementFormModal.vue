@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { PButtonModal } from '@spaceone/design-system';
 import { cloneDeep, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';

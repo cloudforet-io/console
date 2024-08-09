@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { PPaneLayout } from '@spaceone/design-system';
+import { PPaneLayout } from '@cloudforet/mirinae';
 
 export default {
     name: 'WidgetLayout',

@@ -4,12 +4,12 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PDataTable, PLink, PBadge,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { Tags } from '@/schema/_common/model';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';

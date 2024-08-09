@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { PHeading, PButton } from '@spaceone/design-system';
+import { watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
+
 import { cloneDeep } from 'lodash';
+
+import { PHeading, PButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -13,6 +17,8 @@ import type { ModalSettingState } from '@/services/iam/types/user-type';
 const userWorkspaceStore = useUserWorkspaceStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
+
+const route = useRoute();
 
 /* Component */
 const handleClickButton = (type: string) => {
@@ -50,6 +56,18 @@ const updateModalSettings = ({
         _state.modal = cloneDeep(_state.modal);
     });
 };
+
+watch(() => route.query, (query) => {
+    if (!query) return;
+    if (query.isAddUser) {
+        updateModalSettings({
+            type: USER_MODAL_TYPE.ADD,
+            title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE') as string,
+            themeColor: 'primary',
+            addVisible: true,
+        });
+    }
+}, { immediate: true });
 </script>
 
 <template>

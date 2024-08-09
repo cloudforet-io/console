@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
     PTextarea, PButton, PTextBeautifier, PCollapsiblePanel,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useAlertInfoItem } from '@/services/alert-manager/composables/alert-info';
 import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';

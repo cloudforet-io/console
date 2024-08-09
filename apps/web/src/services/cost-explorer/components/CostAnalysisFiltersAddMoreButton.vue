@@ -4,14 +4,14 @@ import {
     computed, defineEmits, reactive, ref, toRef, watch,
 } from 'vue';
 
-import {
-    PButton, PContextMenu, useContextMenuController,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { debounce } from 'lodash';
 
-import { VariableModel } from '@/lib/variable-models';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import {
+    PButton, PContextMenu, useContextMenuController,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+
+import CostTagKeyVariableModel from '@/lib/variable-models/managed-model/custom-resource-model/cost-tag-key-variable-model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -29,7 +29,9 @@ const costAnalysisPageState = costAnalysisPageStore.state;
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
         const tagsMenuItems = state.tagsMenuItems;
-        if (!tagsMenuItems.length) return costAnalysisPageGetters.defaultGroupByItems;
+        if (!tagsMenuItems.length) {
+            return costAnalysisPageGetters.defaultGroupByItems;
+        }
         return [
             ...costAnalysisPageGetters.defaultGroupByItems,
             { type: 'header', label: 'Tags', name: 'tags' },
@@ -67,14 +69,14 @@ const {
 });
 onClickOutside(containerRef, hideContextMenu);
 
-const costTagKeysVariableModel = new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key });
 /* Api */
 const getTagsResources = async (): Promise<{name: string; key: string}[]> => {
     try {
         const options = {
             cost_data_source: state.dataSourceId,
         };
-        const response = await costTagKeysVariableModel.list({ options });
+        const costTagKeyVariableModel = new CostTagKeyVariableModel();
+        const response = await costTagKeyVariableModel.list({ options });
         return response.results;
     } catch (e: any) {
         ErrorHandler.handleError(e);

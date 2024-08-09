@@ -3,12 +3,12 @@ import {
     computed, reactive,
 } from 'vue';
 
-import {
-    PDataLoader, PI, PDivider, PEmpty,
-} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PDataLoader, PI, PDivider, PEmpty,
+} from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

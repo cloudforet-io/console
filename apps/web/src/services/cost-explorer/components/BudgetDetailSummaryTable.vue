@@ -2,11 +2,11 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PCollapsibleToggle, PDataTable, PLink } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import cloneDeep from 'lodash/cloneDeep';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { PCollapsibleToggle, PDataTable, PLink } from '@cloudforet/mirinae';
 
 import type { BudgetUsageModel } from '@/schema/cost-analysis/budget-usage/model';
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';

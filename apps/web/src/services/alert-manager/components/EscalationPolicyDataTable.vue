@@ -4,9 +4,9 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PDataTable, PLink, PBadge,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';

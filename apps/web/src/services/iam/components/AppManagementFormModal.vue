@@ -2,15 +2,16 @@
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { InputItem } from '@cloudforet/mirinae/types/inputs/input/text-input/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';

@@ -13,7 +13,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import type { MenuId } from '@/lib/menu/config';
 
-import TopBarHeader from '@/common/modules/navigations/top-bar/modules/top-bar-header/TopBarWorkspaces.vue';
+import TopBarWorkspaces from '@/common/modules/navigations/top-bar/modules/top-bar-header/TopBarWorkspaces.vue';
 import TopBarSearch from '@/common/modules/navigations/top-bar/modules/top-bar-search/TopBarSearch.vue';
 import TopBarToolset from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/TopBarToolset.vue';
 
@@ -32,7 +32,7 @@ const state = reactive({
 });
 
 const topBarRef = ref<HTMLElement|null>(null);
-const topBarHeaderRef = ref<InstanceType<typeof TopBarHeader>>();
+const topBarWorkspaceRef = ref<InstanceType<typeof TopBarWorkspaces>>();
 
 /* event */
 const hideMenu = () => {
@@ -51,10 +51,10 @@ const handleOpenMenu = (menuId: MenuId) => {
     <div ref="topBarRef"
          :class="{'top-bar': true, 'admin-top-bar': state.isAdminMode}"
     >
-        <top-bar-header ref="topBarHeaderRef"
-                        :to="state.logoLink"
-                        :is-admin-mode="state.isAdminMode"
-                        class="top-bar-header"
+        <top-bar-workspaces ref="topBarWorkspaceRef"
+                            :to="state.logoLink"
+                            :is-admin-mode="state.isAdminMode"
+                            class="top-bar-workspace"
         />
         <div class="middle-section">
             <top-bar-search v-if="!state.isAdminMode"
@@ -83,7 +83,7 @@ const handleOpenMenu = (menuId: MenuId) => {
         box-shadow: 0 0.125rem 0.25rem 0 rgba(0, 0, 0, 0.12);
     }
 
-    .top-bar-header {
+    .top-bar-workspace {
         flex: 0 0;
     }
 

@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import {
     PI, PTextHighlighting, PLink, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';

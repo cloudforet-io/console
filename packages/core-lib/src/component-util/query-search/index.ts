@@ -1,10 +1,10 @@
-import type { SearchEnums, SearchEnumItem } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { SearchEnums, SearchEnumItem } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type {
     KeyDataType, KeyItem,
     KeyItemSet,
     ValueHandler, ValueHandlerMap,
     ValueItem,
-} from '@spaceone/design-system/types/inputs/search/query-search/type';
+} from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import {
     map, size, flatMap, flatten, uniq, cloneDeep,
 } from 'lodash';

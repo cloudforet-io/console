@@ -7,8 +7,8 @@ import { useRouter } from 'vue-router/composables';
 
 import {
     PButton, PDataLoader, PEmpty, PI, PIconButton,
-} from '@spaceone/design-system';
-import type { ContextMenuType, MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import type { ContextMenuType, MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
@@ -197,7 +197,7 @@ const state = reactive({
         if (!isUserAccessibleToDashboards) return [];
         return convertDashboardConfigToReferenceData(
             favoriteGetters.dashboardItems ?? [],
-            [...dashboardGetters.workspaceItems, ...dashboardGetters.projectItems, ...dashboardGetters.privateItems],
+            [...dashboardGetters.workspaceItems, ...dashboardGetters.privateItems],
         );
     }),
     favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {

@@ -12,10 +12,10 @@ import type { ServiceAccountModel } from '@/schema/identity/service-account/mode
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -42,9 +42,9 @@ export const useServiceAccountReferenceStore = defineStore('reference-service-ac
             return state.items ?? {};
         }, {}, { lazy: true }),
         serviceAccountTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.name,
+            type: MANAGED_VARIABLE_MODELS.service_account.meta.key,
+            key: MANAGED_VARIABLE_MODELS.service_account.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.service_account.meta.name,
             referenceMap: getters.serviceAccountItems,
         })),
     });

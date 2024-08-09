@@ -3,10 +3,10 @@ import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
-import { PLink } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { PLink } from '@cloudforet/mirinae';
 import { isNotEmpty } from '@cloudforet/utils';
 
 import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';

@@ -5,8 +5,8 @@ import {
 
 import {
     PIconModal, PButton, PProgressBar, PFieldGroup, PTextInput, PI, PSpinner, PLink, PDivider, PRadioGroup, PRadio, PCollapsibleToggle,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import type { AgentModel } from '@/schema/identity/agent/model';
 import { store } from '@/store';

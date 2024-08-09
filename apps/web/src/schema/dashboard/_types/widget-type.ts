@@ -8,7 +8,15 @@ import type {
     WIDGET_SIZE,
 } from '@/schema/dashboard/_constants/widget-constant';
 
-import type { VariableModelConfig } from '@/lib/variable-models';
+import type { VariableModelType } from '@/lib/variable-models';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+
+
+interface WidgetItemOptions {
+    type: VariableModelType;
+    key: ManagedVariableModelKey;
+    dataKey?: string;
+}
 
 /*
  * inheritance_mode: how to inherit widget options from dashboard variables.
@@ -23,10 +31,10 @@ export interface WidgetOptionsSchemaProperty {
     selection_type?: 'SINGLE'|'MULTI';
     readonly?: boolean;
     fixed?: boolean;
-    optional?: boolean;
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
-    item_options?: Array<VariableModelConfig>;
+    item_options?: WidgetItemOptions[];
     scope?: 'GLOBAL'|'LOCAL'; // default: 'LOCAL'
+    hidden?: boolean;
 }
 
 export type WidgetFilterKey = keyof typeof WIDGET_OPTION_FILTER_KEY_MAP;
@@ -74,6 +82,8 @@ interface LegendOptions {
     show_at?: 'table'|'chart';
 }
 
+export type DataMapping = Record<string, string|string[]>;
+
 /* widget filters */
 export interface WidgetFilter {
     k?: string;
@@ -84,7 +94,7 @@ export interface WidgetFilter {
 export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
 
 /* widget options */
-export interface WidgetOptions {
+export interface WidgetOptions { // to be deprecated
     // cost
     cost_data_source?: string;
     cost_data_type?: string;
@@ -106,6 +116,8 @@ export interface WidgetOptions {
     filters?: WidgetFiltersMap;
 }
 
+export type NewWidgetFilters = Record<string, string[]>;
+
 
 export interface InheritOption {
     enabled?: boolean;
@@ -115,4 +127,5 @@ export type InheritOptions = Partial<Record<WidgetOptionKey, {
     enabled?: boolean;
     variable_key?: string;
 }>>;
+
 

@@ -20,7 +20,7 @@ import {
     reactive, computed, watch, defineExpose,
 } from 'vue';
 
-import { PFieldGroup, PTextInput } from '@spaceone/design-system';
+import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

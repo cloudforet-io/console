@@ -7,7 +7,7 @@ export default defineComponent({
         if (from?.meta?.isSignInPage) {
             next((vm) => {
                 vm.$router.replace({
-                    query: { ...to.query, nextPath: from.query.nextPath },
+                    query: { ...to.query, previousPath: from.query.previousPath, redirectPath: from.query.redirectPath },
                 }).catch(() => {});
             });
         } else next();
@@ -24,35 +24,41 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useDomainStore } from '@/store/domain/domain-store';
+
+import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import IDPWSignIn from '@/services/auth/authenticator/local/template/ID_PW.vue';
 import SignInRightContainer from '@/services/auth/components/SignInRightContainer.vue';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+
 
 interface Props {
-    nextPath?: string;
+    previousPath?: string;
+    redirectPath?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    nextPath: undefined,
+    previousPath: undefined,
+    redirectPath: undefined,
 });
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const domainStore = useDomainStore();
 
 const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
-    authType: computed(() => store.state.domain.extendedAuthType),
     beforeUser: store.state.user.userId,
     component: computed(() => {
         let component;
-        const auth = state.authType;
+        const auth = domainStore.state.extendedAuthType;
         if (auth) {
             try {
                 component = () => import(`../authenticator/external/${auth}/template/${auth}.vue`);
@@ -73,13 +79,27 @@ const onSignIn = async (userId:string) => {
         const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
         const hasBoundWorkspaces = userWorkspaceStore.getters.workspaceList.length > 0;
         const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspaces);
+        const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
 
-        if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {
+        if (props.redirectPath) {
+            await router.push(router.resolve(props.redirectPath).location).catch(() => {
+                router.push(defaultRoute).catch(() => {});
+            });
+            return;
+        }
+
+        if (!lastAccessedWorkspaceId) {
+            await router.push({
+                name: LANDING_ROUTE._NAME,
+            });
+            return;
+        }
+        if (!props.previousPath || !isSameUserAsPreviouslyLoggedInUser) {
             await router.push(defaultRoute).catch(() => {});
             return;
         }
 
-        const resolvedRoute = router.resolve(props.nextPath);
+        const resolvedRoute = router.resolve(props.previousPath);
         const allRoutes = SpaceRouter.router.getRoutes();
 
         const isValidRoute = allRoutes.some((route) => route.name === resolvedRoute.route.name);

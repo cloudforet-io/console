@@ -1,14 +1,30 @@
-import type { ArgTypes } from '@storybook/addons';
+import type { SBType } from '@storybook/types';
+import type { ArgTypes, Parameters, Args } from '@storybook/vue';
 
 import { boardStandardItemSets } from '@/data-display/board/mock';
 import { BOARD_STYLE_TYPE } from '@/data-display/board/type';
+
+
+export const getBoardArgs = (): Args => ({
+    styleType: BOARD_STYLE_TYPE.list,
+    styleOptions: {},
+    boardSets: boardStandardItemSets,
+    pageLimit: 10,
+    selectable: 10,
+});
+
+export const getBoardParameters = (): Parameters => ({
+    design: {
+        type: 'figma',
+        url: 'figma url',
+    },
+});
 
 export const getBoardArgTypes = (): ArgTypes => ({
     styleType: {
         name: 'styleType',
         type: { name: 'string' },
         description: `Board style types. [${Object.values(BOARD_STYLE_TYPE)}] are available`,
-        defaultValue: BOARD_STYLE_TYPE.list,
         table: {
             type: {
                 summary: 'string',
@@ -18,16 +34,13 @@ export const getBoardArgTypes = (): ArgTypes => ({
                 summary: `"${BOARD_STYLE_TYPE.list}"`,
             },
         },
-        control: {
-            type: 'select',
-            options: Object.values(BOARD_STYLE_TYPE),
-        },
+        control: 'select',
+        options: Object.values(BOARD_STYLE_TYPE),
     },
     styleOptions: {
         name: 'styleOptions',
-        type: { name: 'object' },
+        type: { name: 'object' } as SBType,
         description: "Board style type's options. Each styleType has a different styleOptions. Optional props",
-        defaultValue: {},
         table: {
             type: {
                 summary: 'object',
@@ -40,9 +53,8 @@ export const getBoardArgTypes = (): ArgTypes => ({
     },
     boardSets: {
         name: 'boardSets',
-        type: { name: 'array' },
+        type: { name: 'array' } as SBType,
         description: 'Board items',
-        defaultValue: boardStandardItemSets,
         table: {
             type: {
                 summary: 'array',
@@ -57,7 +69,6 @@ export const getBoardArgTypes = (): ArgTypes => ({
         name: 'pageLimit',
         type: { name: 'number' },
         description: '',
-        defaultValue: 10,
         table: {
             type: {
                 summary: 'number',
@@ -72,7 +83,6 @@ export const getBoardArgTypes = (): ArgTypes => ({
         name: 'selectable',
         type: { name: 'boolean' },
         description: '',
-        defaultValue: 10,
         table: {
             type: {
                 summary: 'boolean',
@@ -85,9 +95,8 @@ export const getBoardArgTypes = (): ArgTypes => ({
     },
     // slots
     itemContentSlot: {
-        name: 'itemContentSlot',
+        name: 'item-content',
         description: 'Slot for board item content. This slot must be created in order to inject content into the board item.',
-        defaultValue: 'Board Item Main Content',
         table: {
             type: {
                 summary: null,
@@ -99,7 +108,6 @@ export const getBoardArgTypes = (): ArgTypes => ({
     itemLeftContentSlot: {
         name: 'itemLeftContentSlot',
         description: "Slot to replace board item's left icon",
-        defaultValue: 'Board Item Left Content',
         table: {
             type: {
                 summary: null,
@@ -111,7 +119,6 @@ export const getBoardArgTypes = (): ArgTypes => ({
     itemCustomRightContentSlot: {
         name: 'itemCustomRightContentSlot',
         description: "Slot to replace board item's right-icon-button-content to custom content",
-        defaultValue: 'Board Item Custom Right Content',
         table: {
             type: {
                 summary: null,
@@ -123,7 +130,6 @@ export const getBoardArgTypes = (): ArgTypes => ({
     itemOverlayContentSlot: {
         name: 'itemOverlayContentSlot',
         description: "Slot to replace board item's overlay-content to custom content",
-        defaultValue: 'Board Item Custom Item Overlay Content',
         table: {
             type: {
                 summary: null,
@@ -136,7 +142,6 @@ export const getBoardArgTypes = (): ArgTypes => ({
     itemClick: {
         name: 'item-click',
         description: 'This event is emitted when board item is clicked.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -147,4 +152,9 @@ export const getBoardArgTypes = (): ArgTypes => ({
             },
         },
     },
+    // default
+    'item-content': { table: { disable: true } },
+    'item-left-content': { table: { disable: true } },
+    'item-custom-right-content': { table: { disable: true } },
+    'item-overlay-content': { table: { disable: true } },
 });

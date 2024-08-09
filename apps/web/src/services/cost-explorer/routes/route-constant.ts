@@ -6,6 +6,19 @@ export const COST_EXPLORER_ROUTE = Object.freeze({
         _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.COST_ANALYSIS}`,
         QUERY_SET: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.COST_ANALYSIS}.query_set` },
     },
+    ANOMALY_DETECTION: {
+        _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}`,
+        CONFIGURATION: {
+            _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.configuration`,
+            CREATE: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.configuration.create` },
+            DETAIL: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.configuration.detail` },
+        },
+        POLICY: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.policy` },
+        HISTORY: {
+            _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.history`,
+            DETAIL: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}.history.detail` },
+        },
+    },
     BUDGET: {
         _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.BUDGET}`,
         DETAIL: { _NAME: `${MENU_ID.COST_EXPLORER}.${MENU_ID.BUDGET}.detail` },
@@ -20,5 +33,9 @@ export const COST_EXPLORER_ROUTE = Object.freeze({
     },
     LANDING: {
         _NAME: `${MENU_ID.COST_EXPLORER}.landing`,
+    },
+    COST_ADVANCED_SETTINGS: {
+        _NAME: `${MENU_ID.COST_EXPLORER}.advanced_settings`,
+        ANOMALY_DETECTION_DOMAIN_CONFIGURATION: { _NAME: `${MENU_ID.COST_EXPLORER}.anomaly_detection_domain_configuration` },
     },
 });

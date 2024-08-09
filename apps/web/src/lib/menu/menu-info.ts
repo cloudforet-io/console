@@ -1,28 +1,29 @@
 import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
-    [MENU_ID.HOME_DASHBOARD]: {
-        menuId: MENU_ID.HOME_DASHBOARD,
-        routeName: HOME_DASHBOARD_ROUTE._NAME,
-        translationId: 'MENU.HOME_DASHBOARD',
+    [MENU_ID.WORKSPACE_HOME]: {
+        menuId: MENU_ID.WORKSPACE_HOME,
+        routeName: WORKSPACE_HOME_ROUTE._NAME,
+        translationId: 'MENU.WORKSPACE_HOME',
         icon: 'ic_service_home',
     },
     [MENU_ID.DASHBOARDS]: {
         menuId: MENU_ID.DASHBOARDS,
         routeName: DASHBOARDS_ROUTE._NAME,
         translationId: 'MENU.DASHBOARDS',
+        highlightTag: 'update',
         icon: 'ic_service_dashboard',
     },
     [MENU_ID.PROJECT]: {
@@ -53,7 +54,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.SECURITY,
         routeName: ASSET_INVENTORY_ROUTE.SECURITY._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SECURITY',
-        highlightTag: 'new',
         icon: 'ic_service_security',
     },
     [MENU_ID.COLLECTOR]: {
@@ -78,7 +78,14 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.COST_ANALYSIS,
         routeName: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
-        icon: 'ic_service_cost-anlaysis',
+        icon: 'ic_service_cost-analysis',
+    },
+    [MENU_ID.ANOMALY_DETECTION]: {
+        menuId: MENU_ID.ANOMALY_DETECTION,
+        routeName: COST_EXPLORER_ROUTE.ANOMALY_DETECTION._NAME,
+        translationId: 'MENU.COST_EXPLORER_ANOMALY_DETECTION',
+        highlightTag: 'new',
+        icon: 'ic_anomaly_detection',
     },
     [MENU_ID.BUDGET]: {
         menuId: MENU_ID.BUDGET,
@@ -90,7 +97,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.COST_REPORT,
         routeName: COST_EXPLORER_ROUTE.COST_REPORT._NAME,
         translationId: 'MENU.COST_EXPLORER_REPORT',
-        highlightTag: 'new',
         icon: 'ic_service_cost-report',
     },
     [MENU_ID.DATA_SOURCES]: {
@@ -99,6 +105,19 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.COST_EXPLORER_DATA_SOURCES',
         highlightTag: 'new',
         icon: 'ic_service_data-sources',
+    },
+    [MENU_ID.COST_ADVANCED_SETTINGS]: {
+        menuId: MENU_ID.COST_ADVANCED_SETTINGS,
+        routeName: COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME,
+        translationId: 'COST_EXPLORER.COST_ADVANCED_SETTINGS',
+        highlightTag: 'new',
+        icon: 'ic_service_advanced-settings',
+    },
+    [MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION]: {
+        menuId: MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION,
+        routeName: COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
+        translationId: 'COST_EXPLORER.ANOMALY_DETECTION_CONFIGURATION',
+        highlightTag: 'new',
     },
     [MENU_ID.ALERT_MANAGER]: {
         menuId: MENU_ID.ALERT_MANAGER,
@@ -148,22 +167,48 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ADMINISTRATION_APP',
         icon: 'ic_service_app',
     },
-    [MENU_ID.PREFERENCE]: {
-        menuId: MENU_ID.PREFERENCE,
-        routeName: PREFERENCE_ROUTE._NAME,
-        translationId: 'MENU.ADMINISTRATION_PREFERENCE',
+    [MENU_ID.ADVANCED]: {
+        menuId: MENU_ID.ADVANCED,
+        routeName: ADVANCED_ROUTE._NAME,
+        translationId: 'MENU.ADMINISTRATION_ADVANCED',
     },
-    [MENU_ID.DOMAIN_SETTINGS]: {
-        menuId: MENU_ID.DOMAIN_SETTINGS,
-        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS._NAME,
-        translationId: 'MENU.ADMINISTRATION_DOMAIN_SETTINGS',
+    [MENU_ID.PREFERENCES]: {
+        menuId: MENU_ID.PREFERENCES,
+        routeName: ADVANCED_ROUTE.PREFERENCES._NAME,
+        translationId: 'MENU.ADMINISTRATION_PREFERENCES',
         icon: 'ic_service_domain-settings',
+    },
+    [MENU_ID.DOMAIN_INFORMATION]: {
+        menuId: MENU_ID.DOMAIN_INFORMATION,
+        routeName: ADVANCED_ROUTE.PREFERENCES.DOMAIN_INFORMATION._NAME,
+        translationId: 'IAM.DOMAIN_SETTINGS.DOMAIN_INFORMATION',
+    },
+
+    [MENU_ID.APPEARANCE]: {
+        menuId: MENU_ID.APPEARANCE,
+        routeName: ADVANCED_ROUTE.PREFERENCES.APPEARANCE._NAME,
+        translationId: 'IAM.DOMAIN_SETTINGS.APPEARANCE',
+    },
+
+    [MENU_ID.AUTO_DORMANCY_CONFIGURATION]: {
+        menuId: MENU_ID.AUTO_DORMANCY_CONFIGURATION,
+        routeName: ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME,
+        translationId: 'IAM.AUTO_DORMANCY_CONFIGURATION',
+        highlightTag: 'new',
+        icon: 'ic_service_dormancy-configuration',
     },
     [MENU_ID.WORKSPACES]: {
         menuId: MENU_ID.WORKSPACES,
-        routeName: PREFERENCE_ROUTE.WORKSPACES._NAME,
+        routeName: ADVANCED_ROUTE.WORKSPACES._NAME,
         translationId: 'MENU.ADMINISTRATION_WORKSPACES',
         icon: 'ic_service_workspaces',
+    },
+    [MENU_ID.BOOKMARK]: {
+        menuId: MENU_ID.BOOKMARK,
+        routeName: ADVANCED_ROUTE.BOOKMARK._NAME,
+        translationId: 'MENU.ADMINISTRATION_BOOKMARK',
+        highlightTag: 'new',
+        icon: 'ic_service_bookmark',
     },
     [MENU_ID.MY_PAGE]: {
         menuId: MENU_ID.MY_PAGE,

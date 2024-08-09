@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PButton, PCollapsibleToggle, PFieldGroup, PI, PTextInput, PTextButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 // CAUTION: To prevent the issue of i18n imported in the template not being applied in the 'script setup' structure.
@@ -22,10 +22,10 @@ import CollapsibleContents from '@/services/auth/components/CollapsibleContents.
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
+
 const route = useRoute();
 const router = useRouter();
 const userWorkspaceStore = useUserWorkspaceStore();
-
 
 const {
     password, userId, mfaEmail, accessToken,
@@ -35,7 +35,6 @@ const state = reactive({
     loading: false,
     isLocalLogin: computed(() => userId && !accessToken),
     confirmLoading: false,
-    domainId: computed(() => store.state.domain.domainId),
     isCollapsed: true,
     credentials: computed(() => {
         if (!accessToken) {

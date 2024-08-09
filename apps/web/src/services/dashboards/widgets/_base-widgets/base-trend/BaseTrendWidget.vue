@@ -7,7 +7,6 @@ import type { Location } from 'vue-router/types/router';
 
 import type { Series } from '@amcharts/amcharts5';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep, sortBy, uniqBy } from 'lodash';
 
@@ -15,6 +14,7 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader } from '@cloudforet/mirinae';
 import { sortArrayInObjectArray } from '@cloudforet/utils';
 
 import { CHART_TYPE, COST_DATA_FIELD_MAP, WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
@@ -90,7 +90,7 @@ const { colorSet } = useWidgetColorSet({
 const { getProperRouteLocation } = useProperRouteLocation();
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT);
+        const end = dayjs.utc(widgetState.dashboardOptions?.date_range?.end).format(DATE_FORMAT);
         const range = props.size === WIDGET_SIZE.full ? 11 : 3;
         const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
         return { start, end };

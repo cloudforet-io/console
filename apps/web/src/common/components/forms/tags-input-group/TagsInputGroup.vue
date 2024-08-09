@@ -3,10 +3,11 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { isEmpty } from 'lodash';
+
 import {
     PButton, PFieldGroup, PIconButton, PTextInput,
-} from '@spaceone/design-system';
-import { isEmpty } from 'lodash';
+} from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

@@ -5,14 +5,14 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
-import {
-    PListCard, PSelectButton, PTextPagination,
-} from '@spaceone/design-system';
 import { find } from 'lodash';
 
 import { getAllPage, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PListCard, PSelectButton, PTextPagination,
+} from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -93,7 +93,7 @@ const state = reactive({
 
 /* util */
 const alertLinkFormatter = (alertState): Location => ({
-    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
+    name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
     query: {
         state: alertState,
     } as AlertListPageUrlQuery,

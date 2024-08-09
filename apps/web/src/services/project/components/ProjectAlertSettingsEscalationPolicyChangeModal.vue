@@ -3,14 +3,14 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PButtonModal, PBoxTab,
-} from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButtonModal, PBoxTab,
+} from '@cloudforet/mirinae';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { EscalationPolicyCreateParameters } from '@/schema/monitoring/escalation-policy/api-verbs/create';

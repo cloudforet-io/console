@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { PButton } from '@spaceone/design-system';
+import { PButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -38,6 +38,10 @@ const handleBackToWorkspace = () => {
     appContextStore.setGlobalGrantLoading(true);
     if (state.beforeWorkspace === 'admin') {
         router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+        return;
+    }
+    if (state.beforeWorkspace === 'landing') {
+        router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
         return;
     }
     if (state.beforeWorkspace) {

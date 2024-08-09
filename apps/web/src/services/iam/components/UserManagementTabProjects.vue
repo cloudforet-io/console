@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PDataTable, PHeading, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';

@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue';
 
-import { cloneDeep, get } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -26,24 +26,6 @@ import type {
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
-// const getItems = (items: DashboardModel[], filters: ConsoleFilter[]): DashboardModel[] => {
-//     let result = items;
-//     filters.forEach((d) => {
-//         if (d.k === 'label' && Array.isArray(d.v)) {
-//             d.v.forEach((value) => {
-//                 if (typeof value === 'string') {
-//                     result = result.filter((item) => item.labels.includes(value));
-//                 }
-//             });
-//         } else if (!d.k && d.v) {
-//             if (typeof d.v === 'string') {
-//                 const regex = getTextHighlightRegex(d.v);
-//                 result = result.filter((item) => regex.test(item.name));
-//             }
-//         }
-//     });
-//     return result;
-// };
 
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
@@ -70,8 +52,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const getters = reactive({
         allItems: computed<Array<DashboardModel>>(() => [...state.privateDashboardItems, ...state.publicDashboardItems] as DashboardModel[]),
         domainItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'DOMAIN')),
-        workspaceItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'WORKSPACE')),
-        projectItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'PROJECT')),
+        workspaceItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems
+            .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
+            .filter((item) => !(item.resource_group === 'DOMAIN' && item.scope === 'PROJECT'))),
         privateItems: computed<PrivateDashboardModel[]>(() => state.privateDashboardItems),
     });
 
@@ -127,7 +110,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const publicDashboardApiQueryHelper = new ApiQueryHelper();
-    const load = async () => {
+    const load = async (isProject?: boolean) => {
         publicDashboardApiQueryHelper.setFilters([]);
         if (_state.isAdminMode) {
             publicDashboardApiQueryHelper.addFilter({
@@ -138,11 +121,15 @@ export const useDashboardStore = defineStore('dashboard', () => {
         } else {
             publicDashboardApiQueryHelper.addFilter({
                 k: 'resource_group',
-                v: ['WORKSPACE', 'PROJECT'],
-                o: '',
-            }, {
-                k: 'workspace_id',
-                v: _state.currentWorkspace?.workspace_id || '',
+                v: ['WORKSPACE', 'DOMAIN'],
+                o: '=',
+            });
+        }
+
+        if (isProject) {
+            publicDashboardApiQueryHelper.addFilter({
+                k: 'project_id',
+                v: '*',
                 o: '=',
             });
         }
@@ -154,6 +141,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
         };
         state.loading = true;
         if (_state.isAdminMode) {
+            await fetchDashboard('PUBLIC', _publicDashboardParams);
+        } else if (isProject) {
             await fetchDashboard('PUBLIC', _publicDashboardParams);
         } else {
             await Promise.allSettled([
@@ -187,13 +176,16 @@ export const useDashboardStore = defineStore('dashboard', () => {
             ? SpaceConnector.clientV2.dashboard.privateDashboard.update
             : SpaceConnector.clientV2.dashboard.publicDashboard.update;
         try {
-            const result = await fetcher<UpdateDashboardParameters, DashboardModel>(params);
+            const result = await fetcher<UpdateDashboardParameters, DashboardModel>({
+                dashboard_id: dashboardId,
+                ...params,
+            });
             if (isPrivate) {
-                const targetIndex = state.privateDashboardItems.findIndex((item) => item.private_dashboard_id === get(params, 'private_dashboard_id'));
+                const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1, result as PrivateDashboardModel);
                 state.privateDashboardItems = cloneDeep(state.privateDashboardItems);
             } else {
-                const targetIndex = state.publicDashboardItems.findIndex((item) => item.public_dashboard_id === get(params, 'public_dashboard_id'));
+                const targetIndex = state.publicDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.publicDashboardItems.splice(targetIndex, 1, result as PublicDashboardModel);
                 state.publicDashboardItems = cloneDeep(state.publicDashboardItems);
             }
@@ -208,15 +200,15 @@ export const useDashboardStore = defineStore('dashboard', () => {
         const fetcher = isPrivate
             ? SpaceConnector.clientV2.dashboard.privateDashboard.delete
             : SpaceConnector.clientV2.dashboard.publicDashboard.delete;
-        const params: DeleteDashboardParameters = isPrivate ? { private_dashboard_id: dashboardId } : { public_dashboard_id: dashboardId };
+        const params: DeleteDashboardParameters = { dashboard_id: dashboardId };
         try {
             await fetcher<DeleteDashboardParameters>(params);
             if (isPrivate) {
-                const targetIndex = state.privateDashboardItems.findIndex((item) => item.private_dashboard_id === dashboardId);
+                const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1);
                 state.privateDashboardItems = cloneDeep(state.privateDashboardItems);
             } else {
-                const targetIndex = state.publicDashboardItems.findIndex((item) => item.public_dashboard_id === dashboardId);
+                const targetIndex = state.publicDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.publicDashboardItems.splice(targetIndex, 1);
                 state.publicDashboardItems = cloneDeep(state.publicDashboardItems);
             }
@@ -236,8 +228,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     };
     //
     const getDashboardNameList = (dashboardType: DashboardType) => {
-        if (dashboardType === 'PRIVATE') return state.privateDashboardItems.map((item) => item.name);
-        return state.publicDashboardItems.map((item) => item.name);
+        if (dashboardType === 'PRIVATE') return (state.privateDashboardItems.filter((i) => i.version === '2.0')).map((item) => item.name);
+        return state.publicDashboardItems.filter((i) => i.version === '2.0').map((item) => item.name);
     };
 
 
@@ -261,4 +253,3 @@ export const useDashboardStore = defineStore('dashboard', () => {
         ...mutations,
     };
 });
-

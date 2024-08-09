@@ -3,12 +3,12 @@ import {
     computed, defineExpose, defineProps, reactive,
 } from 'vue';
 
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import { range } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader, PSkeleton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 

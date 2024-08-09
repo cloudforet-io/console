@@ -6,7 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton, PButtonModal, PFieldGroup, PI, PTextInput, PTooltip,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -41,7 +41,6 @@ const state = reactive({
     loading: false,
     data: {} as UserListItemType,
     userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
     isCollapsed: true,
     isSentCode: false,
     isNextStep: false,

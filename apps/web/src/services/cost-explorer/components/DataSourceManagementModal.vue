@@ -2,11 +2,11 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PButtonModal, PSelectDropdown, PFieldTitle } from '@spaceone/design-system';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PButtonModal, PSelectDropdown, PFieldTitle } from '@cloudforet/mirinae';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostDataSourceAccountModel } from '@/schema/cost-analysis/data-source-account/model';

@@ -4,21 +4,22 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import {
-    PDynamicLayout, PButtonTab, PTextButton, PI,
-} from '@spaceone/design-system';
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type {
-    DynamicLayoutEventListener, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
-} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
-import type { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
 import { isTableTypeInDynamicLayoutType } from '@cloudforet/core-lib/component-util/dynamic-layout';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PDynamicLayout, PButtonTab, PTextButton, PI,
+} from '@cloudforet/mirinae';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type {
+    DynamicLayoutEventListener, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
+} from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
+import type { DynamicLayout, DynamicLayoutType } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
+
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';

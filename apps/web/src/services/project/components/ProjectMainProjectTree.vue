@@ -3,12 +3,12 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PI, PIconButton, PTree, PButton, PDataLoader,
-} from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PI, PIconButton, PTree, PButton, PDataLoader,
+} from '@cloudforet/mirinae';
 
 import type { ProjectGroupChangeParentGroupParameters } from '@/schema/identity/project-group/api-verbs/change-parent-group';
 import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';

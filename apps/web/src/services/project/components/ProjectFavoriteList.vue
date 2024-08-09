@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI } from '@spaceone/design-system';
+import { PI } from '@cloudforet/mirinae';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -43,7 +43,7 @@ const state = reactive({
     }),
     hoveredItem: null as null|FavoriteItem,
     isExpanded: false,
-    selectedItem: computed(() => (route.name === PROJECT_ROUTE._NAME ? route.query.select_pg : route.params.id)),
+    selectedItem: computed(() => (route.name === PROJECT_ROUTE._NAME ? route.params.projectGroupId : route.params.id)),
 });
 
 const getResourceType = (type: FavoriteType) => {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, defineProps, reactive } from 'vue';
 
-import { PLink, PDivider, PFieldTitle } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import { PLink, PDivider, PFieldTitle } from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';

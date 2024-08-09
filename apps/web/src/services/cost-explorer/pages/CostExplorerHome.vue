@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { PLink, PButton, PPaneLayout } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import { PLink, PButton, PPaneLayout } from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { i18n } from '@/translations';
 

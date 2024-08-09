@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router/composables';
 
 import {
     PHorizontalLayout, PHeading, PButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 

@@ -6,7 +6,7 @@
 import { useElementHover } from '@vueuse/core';
 import { computed, ref } from 'vue';
 
-import { PI, useSelect } from '@spaceone/design-system';
+import { PI, useSelect } from '@cloudforet/mirinae';
 
 import { gray } from '@/styles/colors';
 

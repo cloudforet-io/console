@@ -1,4 +1,4 @@
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import type { Tags } from '@/schema/_common/model';
 import type { MonitoringType } from '@/schema/monitoring/data-source/type';
@@ -35,4 +35,8 @@ export interface DataSourceModel {
     connected_workspace_count?: number;
     domain_id: string;
     created_at: string;
+    permissions?: {
+        deny: string[];
+    }
+    cost_data_keys?: string[];
 }

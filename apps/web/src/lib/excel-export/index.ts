@@ -1,6 +1,7 @@
-import type { DynamicFieldOptions, ListOptions } from '@spaceone/design-system/src/data-display/dynamic/dynamic-field/type/field-schema';
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import { forEach } from 'lodash';
+
+import type { DynamicFieldOptions, ListOptions } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 
 interface ExcelDataField {

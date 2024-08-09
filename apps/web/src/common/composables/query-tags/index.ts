@@ -1,15 +1,15 @@
 import type { ComputedRef, Ref } from 'vue';
 import { computed, isRef, reactive } from 'vue';
 
-import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
-import type {
-    KeyItem as MirinaeKeyItem,
-    OperatorType,
-} from '@spaceone/design-system/types/inputs/search/query-search/type';
 import { flatten, forEach } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilterOperator, ConsoleFilterValue, ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
+import type {
+    KeyItem as MirinaeKeyItem,
+    OperatorType,
+} from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
 
 import type { useAllReferenceStore } from '@/store/reference/all-reference-store';

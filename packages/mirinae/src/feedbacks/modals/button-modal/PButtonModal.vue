@@ -303,6 +303,7 @@ export default defineComponent<ButtonModalProps>({
 
                 &.alert-header {
                     @apply relative;
+                    word-break: break-all;
                     text-indent: 2rem;
                     .modal-alert {
                         @apply text-red-400;

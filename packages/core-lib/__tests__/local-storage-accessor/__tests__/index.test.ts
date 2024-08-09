@@ -51,7 +51,6 @@ describe('LocalStorageAccessor:default', () => {
         const key = 'test';
         const value = { a: undefined, b: null };
         LocalStorageAccessor.setItem(key, value);
-        console.log('>>>', LocalStorageAccessor.getItem(key));
         expect(LocalStorageAccessor.getItem(key)).toEqual({ b: null });
     });
 });

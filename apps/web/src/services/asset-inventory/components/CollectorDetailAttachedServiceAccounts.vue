@@ -3,16 +3,15 @@ import {
     defineProps, defineEmits, reactive, computed, watch,
 } from 'vue';
 
-import {
-    PLink, PBadge, PButton, PRadio, PRadioGroup, PToolboxTable,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
-import type { ToolboxTableOptions } from '@spaceone/design-system/types/data-display/tables/toolbox-table/type';
-
 import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PLink, PBadge, PButton, PRadio, PRadioGroup, PToolboxTable,
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
+import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';

@@ -113,12 +113,12 @@
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown, PI, screens,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';

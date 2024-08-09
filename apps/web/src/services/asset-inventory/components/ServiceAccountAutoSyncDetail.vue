@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PFieldGroup, PFieldTitle } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+
+import { PFieldGroup, PFieldTitle } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

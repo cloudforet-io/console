@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import {
     PHeading, PDivider, PButton,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';

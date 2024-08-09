@@ -78,8 +78,8 @@
             </div>
             <template v-else>
                 <div class="metric-chart-wrapper grid grid-cols-12">
-                    <metric-chart v-for="(item, index) in metricChartDataList"
-                                  :key="index"
+                    <metric-chart v-for="(item, idx) in metricChartDataList"
+                                  :key="`${item.metric.key}-${idx}`"
                                   :loading="item.loading"
                                   :labels="item.labels"
                                   :dataset="item.dataset"
@@ -108,10 +108,6 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import {
-    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 import {
     debounce, find, capitalize, chain, range, sortBy, get,
@@ -120,18 +116,22 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 import { MONITORING_TYPE } from '@/schema/monitoring/data-source/constant';
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import MetricChart from '@/common/components/charts/metric-chart/MetricChart.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { StatisticsType } from '@/common/modules/monitoring/config';
 import {
     COLORS, STATISTICS_TYPE, TIME_RANGE,
 } from '@/common/modules/monitoring/config';
+import MetricChart from '@/common/modules/monitoring/MetricChart.vue';
 import type {
     AvailableResource,
     Metric, MetricChartData, StatItem,
@@ -148,12 +148,13 @@ const LOAD_LIMIT = 12;
 export default {
     name: 'Monitoring',
     components: {
+        MetricChart,
         PButton,
         PSelectDropdown,
         PSelectButtonGroup,
         PIconButton,
         PLink,
-        MetricChart,
+        // MetricChart,
         PSpinner,
     },
     props: {

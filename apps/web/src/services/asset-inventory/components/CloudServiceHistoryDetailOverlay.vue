@@ -105,9 +105,8 @@ import type { Vue } from 'vue/types/vue';
 
 import {
     PPaneLayout, PHeading, PTab, PCopyButton, PBadge, PDivider, PSpinner, PTooltip,
-} from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
+} from '@cloudforet/mirinae';
+import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';

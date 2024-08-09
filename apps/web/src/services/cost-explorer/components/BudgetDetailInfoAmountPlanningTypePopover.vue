@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PPopover } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+
+import { PPopover } from '@cloudforet/mirinae';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 

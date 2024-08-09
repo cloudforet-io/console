@@ -6,16 +6,16 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PDataLoader, PButtonModal, PI, PLink, PDefinitionTable, PButton, PEmpty, PTextBeautifier,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PDataLoader, PButtonModal, PI, PLink, PDefinitionTable, PButton, PEmpty, PTextBeautifier,
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -151,7 +151,7 @@ const listNotifications = async () => {
             state.items = state.items.concat(convertNotificationItem(response.results ?? []));
             await setReadNotifications(response.results ?? []);
             // update last read
-            await store.commit('settings/setGnbNotificationLastReadTime', dayjs.utc().toISOString(), { root: true });
+            await store.commit('display/setGnbNotificationLastReadTime', dayjs.utc().toISOString(), { root: true });
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));

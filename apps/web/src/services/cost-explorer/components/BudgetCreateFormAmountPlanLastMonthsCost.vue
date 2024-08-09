@@ -10,7 +10,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';

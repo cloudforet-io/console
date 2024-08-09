@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PSelectDropdown } from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import { PSelectDropdown } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type {
@@ -42,7 +42,7 @@ const state = reactive({
         } return [];
     }),
     headerMenuItems: computed<MenuItem[]>(() => {
-        const costAlias: string|undefined = state.targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
+        const costAlias: string|undefined = state.targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost || state.targetCostDataSource?.data?.plugin_info?.metadata?.cost_info?.name;
         const usageAlias: string|undefined = state.targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
         return [
             { type: 'item', name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },

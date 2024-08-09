@@ -2,56 +2,67 @@
 import {
     computed, reactive,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ProjectGroupDeleteParameters } from '@/schema/identity/project-group/api-verbs/delete';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
-import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-const projectGroupStore = useProjectGroupReferenceStore();
-const projectPageStore = useProjectPageStore();
-const projectPageState = projectPageStore.state;
-const projectPageGetters = projectPageStore.getters;
+interface Props {
+    visible: boolean;
+    projectGroupId: string;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+    (e: 'confirm'): void;
+}>();
+
+const router = useRouter();
 const userWorkspaceStore = useUserWorkspaceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 
 const state = reactive({
-    proxyVisible: computed({
-        get() { return projectPageState.projectGroupDeleteCheckModalVisible; },
-        set(val) { projectPageStore.setProjectGroupDeleteCheckModalVisible(val); },
-    }),
-    groupId: computed((() => projectPageGetters.groupId)),
+    proxyVisible: useProxyValue('visible', props, emit),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 
 const deleteProjectGroup = async () => {
     try {
-        const groupId = state.groupId;
-        await projectPageStore.deleteProjectGroup();
-        await projectGroupStore.load({ force: true });
+        await SpaceConnector.clientV2.identity.projectGroup.delete<ProjectGroupDeleteParameters>({
+            project_group_id: props.projectGroupId,
+        });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
-        const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === groupId);
+        emit('confirm');
+        const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === props.projectGroupId);
         if (isFavoriteItem) {
             await favoriteStore.deleteFavorite({
                 itemType: FAVORITE_TYPE.PROJECT_GROUP,
                 workspaceId: state.currentWorkspaceId || '',
-                itemId: groupId,
+                itemId: props.projectGroupId,
             });
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
     } finally {
-        projectPageStore.setProjectGroupDeleteCheckModalVisible(false);
+        state.proxyVisible = false;
+        await router.replace({
+            name: PROJECT_ROUTE._NAME,
+        });
     }
 };
 </script>

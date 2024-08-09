@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PToggleButton, PI } from '@spaceone/design-system';
+import { PToggleButton, PI } from '@cloudforet/mirinae';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 

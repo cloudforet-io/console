@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 
-import { PI, PLazyImg } from '@spaceone/design-system';
+import { PI, PLazyImg } from '@cloudforet/mirinae';
 
 import type { LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
 
@@ -9,6 +9,7 @@ interface Props {
     item: LSBCollapsibleItem;
     isSubItem?: boolean;
     overrideCollapsed?: boolean;
+    showSubItemCount?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -53,7 +54,9 @@ watch(() => props.overrideCollapsed, (changedCollapsed) => {
                             height="1rem"
                 />
             </slot>
-            <span>{{ props.item.label }}</span>
+            <span>{{ props.item.label }} <span v-if="props.showSubItemCount && props.item.subItems?.length"
+                                               class="sub-item-count"
+            >({{ props.item.subItems?.length }})</span></span>
         </div>
         <div class="collapsible-contents">
             <slot name="collapsible-contents"
@@ -66,6 +69,8 @@ watch(() => props.overrideCollapsed, (changedCollapsed) => {
 <style scoped lang="postcss">
 .l-s-b-collapsible-menu-item {
     @apply flex flex-col text-label-md;
+    width: 100%;
+    overflow: hidden;
     .collapsible-title {
         @apply flex items-center font-bold;
         height: 1.5rem;
@@ -75,6 +80,9 @@ watch(() => props.overrideCollapsed, (changedCollapsed) => {
         }
         .title-image {
             margin-right: 0.25rem;
+        }
+        .sub-item-count {
+            @apply font-normal;
         }
     }
     .collapsible-contents {

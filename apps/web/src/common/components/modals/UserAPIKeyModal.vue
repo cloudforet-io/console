@@ -2,11 +2,12 @@
 import type { Ref, UnwrapRef } from 'vue';
 import { reactive, watch } from 'vue';
 
+import yaml from 'js-yaml';
+
 import {
     PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PTextEditor,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import yaml from 'js-yaml';
+} from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
 
 import type { AppModel } from '@/schema/identity/app/model';

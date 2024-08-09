@@ -14,6 +14,7 @@ const state: DisplayState = {
     uncheckedNoticeCount: 0,
     isSignInFailed: false,
     visibleMobileGuideModal: false,
+    gnbNotificationLastReadTime: '',
 };
 
 export default {

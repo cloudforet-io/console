@@ -1,4 +1,4 @@
-import type { DynamicLayoutOptions } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayoutOptions } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 
 // NOTE: Temporary hard coding for agent mode, before separating or adding more agent.

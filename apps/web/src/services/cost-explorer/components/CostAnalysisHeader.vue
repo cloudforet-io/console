@@ -2,19 +2,19 @@
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PIconButton, PHeading, PLazyImg, PDivider, PI,
-} from '@spaceone/design-system';
+} from '@cloudforet/mirinae';
 
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import type { CostQuerySetDeleteParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/delete';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

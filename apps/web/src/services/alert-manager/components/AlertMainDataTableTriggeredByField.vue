@@ -4,11 +4,11 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PLink } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { PLink } from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+
+
 
 import type { ReferenceItem } from '@/store/reference/type';
 
@@ -35,11 +35,12 @@ const state = reactive({
         if (props.disableLink) return undefined;
         if (props.webhookReference) {
             return {
-                name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME,
+                name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                 params: {
                     id: props.projectId ?? '',
                 },
                 query: {
+                    tab: 'webhook',
                     filters: queryHelper.setFilters([{ k: 'webhook_id', v: props.value ?? '', o: '=' }]).rawQueryStrings,
                 },
             };

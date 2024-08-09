@@ -4,12 +4,12 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PBadge, PCollapsibleList, PPaneLayout, PHeading, PEmpty,
-} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PBadge, PCollapsibleList, PPaneLayout, PHeading, PEmpty,
+} from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
@@ -98,7 +98,7 @@ const listEscalationPolicy = async () => {
     <p-pane-layout class="alert-detail-responder">
         <article class="responder-wrapper">
             <p-heading heading-type="sub"
-                       :title="$t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER')"
+                       :title="$t('MONITORING.ALERT.DETAIL.RESPONDER.NOTIFICATION')"
                        class="panel-title"
             >
                 <template #extra>

@@ -1,0 +1,43 @@
+{/* PTypography.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PTypographyStories from './PTypography.stories';
+
+<Meta of={PTypographyStories} />
+
+# Typography
+
+<br/>
+<br/>
+
+## Typefaces
+|Scope|Font Type|
+|-|-|
+|English / Number|Noto Sans|
+|Korean|Noto Sans KR|
+|Code|Inconsolata|
+<br/>
+<br/>
+
+## Font Weight
+<Canvas of={PTypographyStories.FontWeight} />
+
+<br/>
+<br/>
+
+## Font Size
+Font Size is used in combination with line-height and letter-spacing to ensure design consistency. When requested, declare line-height and letter-spacing separately. Otherwise, the default value is automatically applied.
+<Canvas of={PTypographyStories.FontSize} />
+
+## Line Height
+<Canvas of={PTypographyStories.LineHeight} />
+
+<br/>
+<br/>
+
+## Letter Spacing
+<Canvas of={PTypographyStories.LetterSpacing} />
+
+<br/>
+<br/>

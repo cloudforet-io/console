@@ -7,12 +7,13 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import { color } from '@amcharts/amcharts5';
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader, PSkeleton } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';

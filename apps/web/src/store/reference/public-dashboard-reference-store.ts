@@ -12,10 +12,8 @@ import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/m
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap,
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap,
 } from '@/store/reference/type';
-
-
 
 
 interface PublicDashboardResourceItemData {
@@ -41,7 +39,7 @@ export const usePublicDashboardReferenceStore = defineStore('reference-dashboard
         }, {}, { lazy: true }),
         publicDashboardTypeInfo: computed(() => ({
             type: 'public_dashboard',
-            key: 'public_dashboard_id',
+            key: 'dashboard_id',
             name: 'Public Dashboard',
             referenceMap: getters.publicDashboardItems,
         })),
@@ -58,7 +56,7 @@ export const usePublicDashboardReferenceStore = defineStore('reference-dashboard
 
         const params: PublicDashboardListParameters = {
             query: {
-                only: ['public_dashboard_id', 'name', 'project_id', 'resource_group'],
+                only: ['dashboard_id', 'name', 'project_id', 'resource_group'],
             },
         };
         const res = await SpaceConnector.clientV2.dashboard.publicDashboard.list<PublicDashboardListParameters, ListResponse<PublicDashboardModel>>(params);
@@ -67,8 +65,8 @@ export const usePublicDashboardReferenceStore = defineStore('reference-dashboard
 
         // eslint-disable-next-line no-restricted-syntax
         res?.results?.forEach((dashboardInfo) => {
-            dashboardReferenceMap[dashboardInfo.public_dashboard_id] = {
-                key: dashboardInfo.public_dashboard_id,
+            dashboardReferenceMap[dashboardInfo.dashboard_id] = {
+                key: dashboardInfo.dashboard_id,
                 label: dashboardInfo.name,
                 name: dashboardInfo.name,
                 data: {
@@ -85,8 +83,8 @@ export const usePublicDashboardReferenceStore = defineStore('reference-dashboard
     const sync = async (dashboard: PublicDashboardModel) => {
         state.items = {
             ...state.items,
-            [dashboard.public_dashboard_id]: {
-                key: dashboard.public_dashboard_id,
+            [dashboard.dashboard_id]: {
+                key: dashboard.dashboard_id,
                 label: dashboard.name,
                 name: dashboard.name,
                 data: {

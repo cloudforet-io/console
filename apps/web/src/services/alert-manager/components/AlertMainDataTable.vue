@@ -1,14 +1,6 @@
 <script setup lang="ts">
-import {
-    computed, onActivated, reactive,
-} from 'vue';
+import { computed, reactive } from 'vue';
 
-import {
-    PToolboxTable, PButton, PHeading, PBadge, PI, PLink,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
 
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -16,6 +8,13 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PToolboxTable, PButton, PHeading, PBadge, PI, PLink,
+} from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { AlertListParameters, AlertListResponse } from '@/schema/monitoring/alert/api-verbs/list';
@@ -35,6 +34,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
+import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
 import { red } from '@/styles/colors';
 
@@ -144,34 +144,31 @@ const valueHandlerMap = computed<ValueHandlerMap>(() => {
     };
 });
 
+const DEFAULT_FIELD:DataTableFieldType[] = [
+    { name: 'alert_number', label: 'No' },
+    { name: 'title', label: 'Title', width: '20rem' },
+    { name: 'state', label: 'State' },
+    { name: 'urgency', label: 'Urgency' },
+    { name: 'resources', label: 'Resource', width: '20rem' },
+    { name: 'created_at', label: 'Created' },
+    { name: 'duration', label: 'Duration', sortable: false },
+    { name: 'assignee', label: 'Assigned to' },
+    { name: 'triggered_by', label: 'Triggered by' },
+];
+
 /* States */
 const state = reactive({
     loading: true,
     selectIndex: [] as number[],
     selectedItems: computed(() => state.selectIndex.map((d) => state.items[d])),
-    fields: computed(() => {
-        const fields = [
-            { name: 'alert_number', label: 'No' },
-            { name: 'title', label: 'Title', width: '437px' },
-            { name: 'state', label: 'State' },
-            { name: 'urgency', label: 'Urgency' },
-            { name: 'assignee', label: 'Assigned to' },
-            { name: 'project_id', label: 'Project', sortable: false },
-            { name: 'triggered_by', label: 'Triggered by' },
-            { name: 'duration', label: 'Duration', sortable: false },
-            { name: 'created_at', label: 'Created' },
-        ];
-
-        if (state.totalCount === 0) { fields[1].width = 'auto'; }
-        return fields;
-    }),
+    fields: DEFAULT_FIELD,
     excelFields: computed(() => {
         const fields = [
             { key: 'alert_number', name: 'No' },
             { key: 'title', name: 'Title' },
             { key: 'state', name: 'State' },
             { key: 'urgency', name: 'Urgency' },
-            { key: 'resource', name: 'Resource' },
+            { key: 'resources', name: 'Resource' },
             { key: 'project_id', name: 'Project' },
             { key: 'assignee', name: 'Assigned to' },
             { key: 'triggered_by', name: 'Triggered by' },
@@ -190,6 +187,7 @@ const state = reactive({
     visibleAlertFormModal: false,
     alertStateLabels: useAlertStateI18n(),
     urgencyLabels: useAlertUrgencyI18n(),
+    visibleCustomFieldModal: false,
 });
 
 /* formatters & autocomplete handlers */
@@ -288,6 +286,21 @@ const handleAlertFormConfirm = () => {
     getAlerts();
 };
 
+const handleClickSettings = () => {
+    state.visibleCustomFieldModal = true;
+};
+
+const handleVisibleCustomFieldModal = (visible) => {
+    state.visibleCustomFieldModal = visible;
+};
+
+const handleCustomFieldModalConfirm = () => {
+    getAlerts();
+};
+
+const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
+    state.fields = fields;
+};
 /* Init */
 const initPage = () => {
     (async () => {
@@ -301,17 +314,11 @@ const initPage = () => {
     })();
 };
 
-onActivated(() => {
-    initPage();
-});
-
-if (!props.keepAlive) {
-    initPage();
-}
+initPage();
 </script>
 
 <template>
-    <fragment>
+    <div>
         <div class="alert-data-table">
             <p-toolbox-table
                 searchable
@@ -329,7 +336,9 @@ if (!props.keepAlive) {
                 :query-tags="state.tags"
                 :key-item-sets="keyItemSets"
                 :value-handler-map="valueHandlerMap"
+                settings-visible
                 @change="handleChange"
+                @click-settings="handleClickSettings"
                 @refresh="getAlerts()"
                 @export="handleExportToExcel"
             >
@@ -375,7 +384,7 @@ if (!props.keepAlive) {
                                     params: { id: item.alert_id }
                                 }"
                         >
-                            {{ value }}
+                            <span class="title-link">{{ value }}</span>
                         </p-link>
                     </template>
                 </template>
@@ -405,8 +414,15 @@ if (!props.keepAlive) {
                     />
                     <span>{{ state.urgencyLabels[value] }}</span>
                 </template>
-                <template #col-resource-format="{ value }">
-                    {{ value ? value.name : '' }}
+                <template #col-resources-format="{ value }">
+                    <span v-if="(value ?? []).length === 0">
+                        --
+                    </span>
+                    <template v-else>
+                        <p class="additional-info">
+                            {{ value?.[0]?.name }}
+                        </p>
+                    </template>
                 </template>
                 <template #col-project_id-format="{ value }">
                     <template v-if="value">
@@ -448,12 +464,30 @@ if (!props.keepAlive) {
             :project-id="props.projectId"
             @confirm="handleAlertFormConfirm"
         />
-    </fragment>
+        <custom-field-modal :visible="state.visibleCustomFieldModal"
+                            resource-type="monitoring.alert"
+                            :default-field="DEFAULT_FIELD"
+                            @update:visible="handleVisibleCustomFieldModal"
+                            @complete="handleCustomFieldModalConfirm"
+                            @custom-field-loaded="handleCustomFieldUpdate"
+        />
+    </div>
 </template>
 
 <style lang="postcss" scoped>
 .alert-data-table {
     @apply col-span-12;
+
+    .title-link {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+
+        /* display: inline-block; */
+        -webkit-box-orient: vertical;
+    }
 
     /* custom design-system component - p-toolbox-table */
     :deep(.p-toolbox-table) {

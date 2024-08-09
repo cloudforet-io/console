@@ -11,4 +11,5 @@ export interface PostListParameters {
     is_pinned?: boolean;
     is_popup?: boolean;
     domain_id?: string;
+    workspace_id?: string;
 }

@@ -5,11 +5,12 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { clone, isEmpty } from 'lodash';
+
 import {
     PIconButton, PBreadcrumbs, PCopyButton, screens, PTooltip,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { clone, isEmpty } from 'lodash';
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 
@@ -29,6 +30,9 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
+
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
@@ -52,9 +56,16 @@ const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     routes: computed(() => {
         let routes: Breadcrumb[] = [];
-        if (!storeState.isAdminMode) {
+        if (route.name?.includes(MY_PAGE_ROUTE._NAME)) {
             routes.push({
-                name: i18n.t('MENU.HOME_DASHBOARD'),
+                name: i18n.t('MENU.CONSOLE_HOME'),
+                to: {
+                    name: LANDING_ROUTE._NAME,
+                },
+            });
+        } else if (!storeState.isAdminMode && storeState.currentWorkspaceId) {
+            routes.push({
+                name: i18n.t('MENU.WORKSPACE_HOME'),
                 to: {
                     name: ROOT_ROUTE.WORKSPACE._NAME,
                     params: {
@@ -63,7 +74,7 @@ const state = reactive({
                 },
             });
         }
-        if (gnbGetters.breadcrumbs.length === 0) {
+        if (gnbGetters.breadcrumbs?.length === 0) {
             routes = [...routes, ...breadcrumbs.value];
         }
         routes = [...routes, ...gnbGetters.breadcrumbs];
@@ -72,7 +83,7 @@ const state = reactive({
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
         return targetMenuId;
     }),
     currentMenuId: computed(() => route.matched[route.matched.length - 1].meta?.menuId),
@@ -135,7 +146,7 @@ watch(() => state.currentMenuId, async () => {
                            @click="handleClickBreadcrumbsItem"
                            @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"
             />
-            <favorite-button v-if="state.routes.length > 0 && !isEmpty(gnbGetters.favoriteItem) && state.currentMenuId !== MENU_ID.HOME_DASHBOARD"
+            <favorite-button v-if="state.routes.length > 0 && !isEmpty(gnbGetters.favoriteItem) && state.currentMenuId !== MENU_ID.WORKSPACE_HOME"
                              :item-id="gnbGetters.favoriteItem.id || ''"
                              :favorite-type="gnbGetters.favoriteItem.type || ''"
                              scale="0.8"

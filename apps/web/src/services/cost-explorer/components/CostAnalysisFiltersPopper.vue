@@ -3,21 +3,37 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    PSelectDropdown, PTextButton,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import {
+    PSelectDropdown, PTextButton, PStatus,
+} from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
-import { VariableModel } from '@/lib/variable-models';
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
-import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import { VariableModelFactory } from '@/lib/variable-models';
+import type {
+    ManagedVariableModelKey,
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import {
+    MANAGED_VARIABLE_MODEL_KEY_MAP,
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import type {
+    VariableModelMenuHandlerInfo,
+} from '@/lib/variable-models/variable-model-menu-handler';
+import {
+    getVariableModelMenuHandler,
+} from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import CostAnalysisFiltersAddMoreButton
     from '@/services/cost-explorer/components/CostAnalysisFiltersAddMoreButton.vue';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -26,16 +42,23 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-a
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetters = userWorkspaceStore.getters;
 
-const GROUP_BY_TO_VAR_MODELS: Record<string, VariableModel[]> = {
-    [GROUP_BY.WORKSPACE]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key })],
-    [GROUP_BY.PROJECT_GROUP]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key })],
-    [GROUP_BY.PROJECT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key })],
-    [GROUP_BY.PRODUCT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key })],
-    [GROUP_BY.PROVIDER]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key })],
-    [GROUP_BY.SERVICE_ACCOUNT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key })],
-    [GROUP_BY.REGION]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key })],
-    [GROUP_BY.USAGE_TYPE]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key })],
+interface VariableOption {
+    key: ManagedVariableModelKey;
+    dataKey?: string;
+}
+
+const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
+    [GROUP_BY.WORKSPACE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
+    [GROUP_BY.PROJECT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
+    [GROUP_BY.PROJECT_GROUP]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group },
+    [GROUP_BY.PRODUCT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'product' },
+    [GROUP_BY.PROVIDER]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
+    [GROUP_BY.SERVICE_ACCOUNT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
+    [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.region },
+    [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
 };
 
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({
@@ -45,6 +68,9 @@ const props = defineProps<{
     visible: boolean;
 }>();
 
+const storeState = reactive({
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+});
 const state = reactive({
     loading: true,
     enabledFilters: computed<SelectDropdownMenuItem[]>(() => {
@@ -57,32 +83,38 @@ const state = reactive({
             return { name: d, label: d };
         });
     }),
-    listQueryOptions: computed<Partial<Record<ManagedVariableModelKey, any>>>(() => ({
-        cost_data_source: costAnalysisPageGetters.selectedDataSourceId,
+    primaryCostStatOptions: computed<Record<string, any>>(() => ({
+        data_source_id: costAnalysisPageGetters.selectedDataSourceId,
     })),
-    selectedItemsMap: getInitialSelectedItemsMap() as Record<string, SelectDropdownMenuItem[]>,
+    selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
         state.enabledFilters.forEach(({ name }) => {
-            handlerMaps[name] = getMenuHandler(name, state.listQueryOptions);
+            handlerMaps[name] = getMenuHandler(name, {}, state.primaryCostStatOptions);
         });
         return handlerMaps;
     }),
 });
 
 /* Util */
-const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
+const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>, primaryOptions: Record<string, any>): AutocompleteHandler => {
     try {
-        let variableModels: VariableModel|VariableModel[] = GROUP_BY_TO_VAR_MODELS[groupBy];
-        if (!variableModels) {
-            variableModels = new VariableModel({
-                type: 'RESOURCE_VALUE',
-                resource_type: 'cost_analysis.Cost',
-                reference_key: groupBy,
-                name: groupBy,
-            });
+        let variableModelInfo: VariableModelMenuHandlerInfo;
+        const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
+        if (_variableOption) {
+            variableModelInfo = {
+                variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableOption.key }),
+                dataKey: _variableOption.dataKey,
+            };
+        } else {
+            const CostVariableModel = new VariableModelFactory({ type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.cost });
+            CostVariableModel[groupBy] = CostVariableModel.generateProperty({ key: groupBy });
+            variableModelInfo = {
+                variableModel: CostVariableModel,
+                dataKey: groupBy,
+            };
         }
-        const handler = getVariableModelMenuHandler(variableModels, listQueryOptions);
+        const handler = getVariableModelMenuHandler([variableModelInfo], listQueryOptions, primaryOptions);
 
         return async (...args) => {
             if (!groupBy) return { results: [] };
@@ -106,7 +138,7 @@ const initSelectedFilters = () => {
     const _filters = costAnalysisPageState.filters;
     const _selectedItemsMap = {};
     Object.keys(_filters ?? {}).forEach((groupBy) => {
-        _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d })) ?? [];
+        _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d, label: d })) ?? [];
         if (costAnalysisPageState.enabledFiltersProperties?.indexOf(groupBy) === -1) {
             costAnalysisPageStore.setEnabledFiltersProperties([
                 ...(costAnalysisPageState.enabledFiltersProperties ?? []),
@@ -179,7 +211,27 @@ watch(() => props.visible, (visible) => {
             :show-delete-all-button="false"
             :page-size="10"
             @update:selected="handleUpdateFiltersDropdown(groupBy.name, $event)"
-        />
+        >
+            <template v-if="groupBy.name === GROUP_BY.WORKSPACE"
+                      #menu-item--format="{item}"
+            >
+                <div class="menu-item-wrapper"
+                     :class="{'is-dormant': getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant}"
+                >
+                    <div class="label">
+                        <workspace-logo-icon :text="item?.label || ''"
+                                             :theme="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.tags?.theme"
+                                             size="xs"
+                        />
+                        <span class="label-text">{{ item.label }}</span>
+                        <p-status v-if="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant"
+                                  v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                                  class="capitalize state"
+                        />
+                    </div>
+                </div>
+            </template>
+        </p-select-dropdown>
         <cost-analysis-filters-add-more-button @disable-filter="handleDisabledFilters(false, $event)"
                                                @disable-all-filters="handleDisabledFilters(true, $event)"
         />
@@ -206,6 +258,27 @@ watch(() => props.visible, (visible) => {
         display: inline-block;
         vertical-align: middle;
         padding: 0.5rem 0;
+    }
+
+    .menu-item-wrapper {
+        @apply flex justify-between;
+        max-width: 18rem;
+
+        .label {
+            @apply flex items-center gap-2;
+        }
+        .state {
+            @apply text-label-sm;
+        }
+        .label-text {
+            @apply truncate;
+            max-width: 8.375rem;
+        }
+        &.is-dormant {
+            .label-text {
+                max-width: 4.125rem;
+            }
+        }
     }
 }
 

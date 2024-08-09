@@ -14,6 +14,7 @@ export interface ToolboxOptions {
 export interface ToolboxProps {
     paginationVisible?: boolean;
     pageSizeChangeable?: boolean;
+    placeholder?: string;
     settingsVisible?: boolean;
     sortable?: boolean;
     exportable?: boolean;
