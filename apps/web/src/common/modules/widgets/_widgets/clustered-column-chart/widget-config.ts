@@ -34,6 +34,7 @@ const clusteredColumnChart: WidgetConfig = {
             },
         },
         displayAnnotation: {},
+        displaySeriesLabel: {},
     },
 };
 

@@ -35,7 +35,9 @@ import {
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
-import type { StackByValue, YAxisValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    StackByValue, YAxisValue, DateFormatValue, DisplaySeriesLabelValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -133,6 +135,7 @@ const state = reactive({
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -183,6 +186,9 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 const drawChart = (rawData?: Data|null) => {
     if (isEmpty(rawData)) return;
 
+    const _maxTotalCount = rawData?.results?.[0]?.[`_total_${state.dataField}`] ?? 0;
+    const _threshold = _maxTotalCount * 0.08;
+
     // set yAxisData
     if (state.yAxisField === DATE_FIELD.DATE) {
         state.yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
@@ -218,6 +224,16 @@ const drawChart = (rawData?: Data|null) => {
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
+            label: {
+                show: !!state.displaySeriesLabel?.toggleValue,
+                position: state.displaySeriesLabel?.position,
+                rotate: state.displaySeriesLabel?.rotate,
+                fontSize: 10,
+                formatter: (p) => {
+                    if (p.value < _threshold) return '';
+                    return numberFormatter(p.value, { notation: 'compact' });
+                },
+            },
             data: state.yAxisData.map((d) => {
                 const _data = value.find((v) => v[state.yAxisField] === d);
                 return _data ? _data?.value : undefined;

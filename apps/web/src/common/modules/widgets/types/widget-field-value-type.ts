@@ -1,4 +1,8 @@
-import type { COLOR_SCHEMA, DATE_FORMAT, NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type {
+    COLOR_SCHEMA, DATE_FORMAT, NUMBER_FORMAT,
+    PIE_CHART_SERIES_LABEL_POSITION,
+    XY_CHART_SERIES_LABEL_POSITION,
+} from '@/common/modules/widgets/_constants/widget-field-constant';
 
 
 export interface Icon {
@@ -95,9 +99,11 @@ export interface DisplayAnnotationValue {
     annotation?: string;
 }
 
+type BarChartSeriesLabelPosition = typeof XY_CHART_SERIES_LABEL_POSITION[keyof typeof XY_CHART_SERIES_LABEL_POSITION];
+type PieChartSeriesLabelPosition = typeof PIE_CHART_SERIES_LABEL_POSITION[keyof typeof PIE_CHART_SERIES_LABEL_POSITION];
 export interface DisplaySeriesLabelValue {
     toggleValue: boolean;
-    position?: 'left' | 'center' | 'right';
+    position?: BarChartSeriesLabelPosition | PieChartSeriesLabelPosition;
     rotate?: number;
 }
 
