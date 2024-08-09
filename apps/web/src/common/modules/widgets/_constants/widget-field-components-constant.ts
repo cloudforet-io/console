@@ -5,6 +5,7 @@ import categoryBy from '@/common/modules/widgets/_widget-fields/WidgetFieldCateg
 import colorSchema from '@/common/modules/widgets/_widget-fields/WidgetFieldColorSchema.vue';
 import comparison from '@/common/modules/widgets/_widget-fields/WidgetFieldComparison.vue';
 import dataField from '@/common/modules/widgets/_widget-fields/WidgetFieldDataField.vue';
+import dataFieldHeatmapColor from '@/common/modules/widgets/_widget-fields/WidgetFieldDataFieldHeatmapColor.vue';
 import dateFormat from '@/common/modules/widgets/_widget-fields/WidgetFieldDateFormat.vue';
 import displayAnnotation from '@/common/modules/widgets/_widget-fields/WidgetFieldDisplayAnnotation.vue';
 import displaySeriesLabel from '@/common/modules/widgets/_widget-fields/WidgetFieldDisplaySeriesLabel.vue';
@@ -54,6 +55,7 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     pieChartType,
     dateFormat,
     numberFormat,
+    dataFieldHeatmapColor,
     displayAnnotation,
     displaySeriesLabel,
 };
