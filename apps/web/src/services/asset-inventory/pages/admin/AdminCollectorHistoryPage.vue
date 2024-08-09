@@ -165,6 +165,7 @@ const handleChange = async (options: ToolboxOptions = {}) => {
 };
 const handleChangePagination = () => {
     state.pageStart = getPageStart(state.thisPage, state.pageSize);
+    apiQueryHelper.setPage(state.pageStart, state.pageSize);
     getJobs();
 };
 
