@@ -81,8 +81,14 @@ const getField = (field: TableWidgetField): string => {
 };
 
 const valueFormatter = (value, field: TableWidgetField) => {
-    const _unit = field.fieldInfo?.unit;
-    return getFormattedNumber(value, field.name, props.numberFormatInfo, _unit);
+    let _unit = field.fieldInfo?.unit;
+    let dataField = field.name;
+    if (props.fieldType === 'dynamicField') {
+        dataField = props.criteria as string;
+        _unit = props.dataInfo?.[dataField]?.unit;
+        return getFormattedNumber(value, dataField, props.numberFormatInfo, _unit);
+    }
+    return getFormattedNumber(value, dataField, props.numberFormatInfo, _unit);
 };
 
 const getValue = (item: TableDataItem, field: TableWidgetField) => {
