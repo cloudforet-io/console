@@ -1,4 +1,6 @@
-import type { COLOR_SCHEMA, DATE_FORMAT, NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type {
+    COLOR_SCHEMA, DATE_FORMAT, NUMBER_FORMAT, DATA_FIELD_HEATMAP_COLOR,
+} from '@/common/modules/widgets/_constants/widget-field-constant';
 
 
 export interface Icon {
@@ -90,6 +92,13 @@ export interface NumberFormatValue {
     };
 }
 
+export type DataFieldHeatmapColor = keyof typeof DATA_FIELD_HEATMAP_COLOR;
+export interface DataFieldHeatmapColorValue {
+    [key: string]: {
+        value: DataFieldHeatmapColor;
+    };
+}
+
 export interface DisplayAnnotationValue {
     toggleValue: boolean;
     annotation?: string;
@@ -104,5 +113,5 @@ export interface DisplaySeriesLabelValue {
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
-    | WidgetHeaderValue | DateFormatValue | NumberFormatValue
+    | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
     | DisplayAnnotationValue | DisplaySeriesLabelValue;

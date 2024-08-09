@@ -57,3 +57,31 @@ export const NUMBER_FORMAT = {
     FULL_NUMBER: 'FULL_NUMBER',
     CUSTOM: 'CUSTOM',
 } as const;
+
+export const DATA_FIELD_HEATMAP_COLOR = {
+    NONE: {
+        key: 'NONE',
+        label: 'None',
+        color: undefined,
+    },
+    RED: {
+        key: 'RED',
+        label: 'Red',
+        color: 'red-200',
+    },
+    BLUE: {
+        key: 'BLUE',
+        label: 'Blue',
+        color: 'blue-200',
+    },
+    GREEN: {
+        key: 'GREEN',
+        label: 'Green',
+        color: 'green-200',
+    },
+    YELLOW: {
+        key: 'YELLOW',
+        label: 'Yellow',
+        color: 'yellow-200',
+    },
+} as const;

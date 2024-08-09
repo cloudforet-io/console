@@ -56,6 +56,7 @@ const table: WidgetConfig = {
                 default: NUMBER_FORMAT.FULL_NUMBER,
             },
         },
+        dataFieldHeatmapColor: {},
         displayAnnotation: {},
     },
     dependencies: {
