@@ -5,12 +5,18 @@ import {
     PHeading, PButton, PToolboxTable, PLink, PStatus,
 } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
+import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
+
+const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 
 const tableState = reactive({
     // TODO: temp data
@@ -56,6 +62,14 @@ const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
     },
 });
 
+const handleRemoveButtonClick = () => {
+    workspaceGroupPageStore.updateModalSettings({
+        type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_WORKSPACES_TITLE'),
+        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
+        themeColor: 'alert',
+    });
+};
 </script>
 
 <template>
@@ -68,8 +82,8 @@ const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
         >
             <template #extra>
                 <div class="workspace-group-tab-workspace-button-wrapper">
-                    <p-button style-type="secondary"
-                              disabled
+                    <p-button style-type="negative-primary"
+                              @click="handleRemoveButtonClick"
                     >
                         {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
                     </p-button>
@@ -118,7 +132,7 @@ const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
             <template #col-remove_button-format>
                 <p-button size="sm"
                           style-type="tertiary"
-                          @click.stop=""
+                          @click.stop="handleRemoveButtonClick"
                 >
                     {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
                 </p-button>

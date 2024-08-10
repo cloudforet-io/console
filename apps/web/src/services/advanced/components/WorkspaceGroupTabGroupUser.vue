@@ -10,9 +10,11 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
+import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 
-
+const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 
 const tableState = reactive({
     fields: [
@@ -62,6 +64,15 @@ const dropdownMenuHandler = () => ({
 const handleRoleMenuItemClick = () => {
     showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.ALT_S_UPDATE_ROLE'), '');
 };
+
+const handleRemoveButtonClick = () => {
+    workspaceGroupPageStore.updateModalSettings({
+        type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER,
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_GROUP_USER_TITLE'),
+        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER,
+        themeColor: 'alert',
+    });
+};
 </script>
 
 <template>
@@ -74,8 +85,8 @@ const handleRoleMenuItemClick = () => {
         >
             <template #extra>
                 <div class="workspace-group-tab-group-user-button-wrapper">
-                    <p-button style-type="secondary"
-                              disabled
+                    <p-button style-type="negative-primary"
+                              @click="handleRemoveButtonClick"
                     >
                         {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
                     </p-button>
@@ -136,6 +147,7 @@ const handleRoleMenuItemClick = () => {
             <template #col-remove_button-format="{}">
                 <p-button size="sm"
                           style-type="tertiary"
+                          @click.stop="handleRemoveButtonClick"
                 >
                     {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
                 </p-button>
