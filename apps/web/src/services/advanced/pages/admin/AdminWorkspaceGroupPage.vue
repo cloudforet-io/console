@@ -4,6 +4,7 @@ import { onUnmounted } from 'vue';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
 import WorkspaceGroupCreateModal from '@/services/advanced/components/WorkspaceGroupCreateModal.vue';
+import WorkspaceGroupDeleteModal from '@/services/advanced/components/WorkspaceGroupDeleteModal.vue';
 import WorkspaceGroupEditModal from '@/services/advanced/components/WorkspaceGroupEditModal.vue';
 import WorkspaceGroupHeader from '@/services/advanced/components/WorkspaceGroupHeader.vue';
 import WorkspaceGroupTab from '@/services/advanced/components/WorkspaceGroupTab.vue';
@@ -29,5 +30,6 @@ onUnmounted(() => {
         <workspace-group-tab />
         <workspace-group-create-modal />
         <workspace-group-edit-modal />
+        <workspace-group-delete-modal />
     </section>
 </template>

@@ -2710,6 +2710,8 @@
 			"TITLE": "Workspace Group",
 			"CREATE": "Create",
 			"ALT_S_UPDATE_ROLE": "Workspace role successfully changed",
+			"TOOLTIP_STATE": "With ‘Auto Dormancy Configuration’ turned on, workspaces with a total cost lower than the user-defined threshold will automatically be set to dormant. The threshold can be changed in [Preferences > Domain Settings > Auto Dormancy Configuration].",
+			"TOOLTIP_COST": "based on Cost Report",
 			"MAIN": {
 				"TOOLBOX_PLACEHOLDER": "Action",
 				"EDIT": "Edit",
@@ -2727,7 +2729,11 @@
 				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
 				"CREATE_TITLE": "Create Workspace Group",
 				"EDIT_TITLE": "Edit Workspace Group",
-				"DELETE_TITLE": "Delete Workspace Group"
+				"DELETE_TITLE": "Delete Workspace Group",
+				"DELETE_MODAL_FIRST_MESSAGE": "Are you sure you want to delete “Workspace Group Name”? This workspace group includes the following workspaces and users:",
+				"DELETE_MODAL_LAST_MESSAGE": "Are you sure you want to delete this workspace group?",
+				"DELETE_MODAL_WARNING_MESSAGE": "Once the workspace group deleted, all group users will lose access to the included workspaces, and this action cannot be undone.",
+				"DELETE_BUTTON": "Delete"
 			}
 		}
 	},
