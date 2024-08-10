@@ -3,6 +3,7 @@ export const WORKSPACE_GROUP_MODAL_TYPE = {
     EDIT: 'edit',
     DELETE: 'delete',
     ADD_WORKSPACES: 'add_workspaces',
+    ADD_USERS: 'add_users',
     REMOVE_GROUP_USER: 'remove_group_user',
     REMOVE_WORKSPACES: 'remove_workspaces',
 } as const;

@@ -7,8 +7,6 @@ import {
 
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
@@ -35,6 +33,7 @@ const tableState = reactive({
 });
 
 const selectDropdownState = reactive({
+    // TODO: temp data
     items: [{
         label: 'Workspace Member',
         name: 'managed-workspace-member',
@@ -53,25 +52,37 @@ const selectDropdownState = reactive({
     {
         label: 'show more',
         type: 'showMore',
-    },
-    ],
+    }],
 });
+
+const setupModal = (type) => {
+    switch (type) {
+    case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER: workspaceGroupPageStore.updateModalSettings({
+        type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER,
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_GROUP_USER_TITLE'),
+        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER,
+        themeColor: 'alert',
+    }); break;
+    case WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS: workspaceGroupPageStore.updateModalSettings({
+        type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: 'yubeom group' }),
+        visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
+    }); break;
+    default:
+        break;
+    }
+};
 
 const dropdownMenuHandler = () => ({
     results: selectDropdownState.items,
 });
 
-const handleRoleMenuItemClick = () => {
-    showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.ALT_S_UPDATE_ROLE'), '');
+const handleAddUsersButtonClick = () => {
+    setupModal(WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS);
 };
 
 const handleRemoveButtonClick = () => {
-    workspaceGroupPageStore.updateModalSettings({
-        type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_GROUP_USER_TITLE'),
-        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER,
-        themeColor: 'alert',
-    });
+    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER);
 };
 </script>
 
@@ -92,6 +103,7 @@ const handleRemoveButtonClick = () => {
                     </p-button>
                     <p-button style-type="secondary"
                               icon-left="ic_plus_bold"
+                              @click="handleAddUsersButtonClick"
                     >
                         {{ $t('IAM.WORKSPACE_GROUP.TAB.ADD_USER') }}
                     </p-button>
@@ -125,9 +137,7 @@ const handleRemoveButtonClick = () => {
                             <span>{{ value.name }}</span>
                         </template>
                         <template #menu-item--format="{ item }">
-                            <div class="role-menu-item"
-                                 @click="handleRoleMenuItemClick"
-                            >
+                            <div class="role-menu-item">
                                 <img :src="useRoleFormatter(item.role_type).image"
                                      alt="role-type-icon"
                                      class="role-type-icon"
@@ -170,11 +180,13 @@ const handleRemoveButtonClick = () => {
     .role-type {
         @apply flex items-center;
         gap: 0.5rem;
+
         .role-type-icon {
             @apply rounded-full;
             width: 1.5rem;
             height: 1.5rem;
         }
+
         .role-select-dropdown {
             width: auto;
             .role-menu-item {

@@ -2736,7 +2736,15 @@
 				"DELETE_MODAL_LAST_MESSAGE": "Are you sure you want to delete this workspace group?",
 				"DELETE_MODAL_WARNING_MESSAGE": "Once the workspace group deleted, all group users will lose access to the included workspaces, and this action cannot be undone.",
 				"DELETE_BUTTON": "Delete",
-				"ADD_WORKSPACES_TITLE": "Add Workspaces to {name}"
+				"ADD_WORKSPACES_TITLE": "Add Workspaces to {name}",
+				"ALT_S_ADD_USRES": "Users successfully added",
+				"WORKSPACE_SELECT_DROP_DOWN_TITLE": "Included Workspaces",
+				"ROLE_DROP_DOWN_PLACEHOLDER": "Select a role",
+				"ROLE_SELECT_DROP_DOWN_TITLE": "Role",
+				"USER_SELECT_DROP_DOWN_TITLE": "User",
+				"USER_DROP_DOWN_PLACEHOLDER": "Add Users",
+				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
+				"ADD": "Add"
 			}
 		}
 	},

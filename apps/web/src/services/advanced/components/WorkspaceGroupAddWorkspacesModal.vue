@@ -69,6 +69,7 @@ const dropdownMenuHandler = () => ({
         <template #body>
             <div class="form-wrapper">
                 <p-field-group required
+                               :label="$t('IAM.WORKSPACE_GROUP.MODAL.WORKSPACE_SELECT_DROP_DOWN_TITLE')"
                                style-type="secondary"
                 >
                     <template #default>
