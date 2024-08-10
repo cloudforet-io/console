@@ -3,6 +3,7 @@ import { onUnmounted } from 'vue';
 
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
+import WorkspaceGroupAddWorkspacesModal from '@/services/advanced/components/WorkspaceGroupAddWorkspacesModal.vue';
 import WorkspaceGroupCreateModal from '@/services/advanced/components/WorkspaceGroupCreateModal.vue';
 import WorkspaceGroupDeleteModal from '@/services/advanced/components/WorkspaceGroupDeleteModal.vue';
 import WorkspaceGroupDeleteStatusModal from '@/services/advanced/components/WorkspaceGroupDeleteStatusModal.vue';
@@ -33,5 +34,6 @@ onUnmounted(() => {
         <workspace-group-edit-modal />
         <workspace-group-delete-modal />
         <workspace-group-delete-status-modal />
+        <workspace-group-add-workspaces-modal />
     </section>
 </template>

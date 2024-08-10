@@ -62,13 +62,30 @@ const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
     },
 });
 
-const handleRemoveButtonClick = () => {
-    workspaceGroupPageStore.updateModalSettings({
+const setupModal = (type) => {
+    switch (type) {
+    case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
         title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_WORKSPACES_TITLE'),
         visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
         themeColor: 'alert',
-    });
+    }); break;
+    case WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES: workspaceGroupPageStore.updateModalSettings({
+        type: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_WORKSPACES_TITLE', { name: 'yubeom kim' }),
+        visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
+    }); break;
+    default:
+        break;
+    }
+};
+
+const handleAddWorkspaceButtonClick = () => {
+    setupModal(WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES);
+};
+
+const handleRemoveButtonClick = () => {
+    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES);
 };
 </script>
 
@@ -89,6 +106,7 @@ const handleRemoveButtonClick = () => {
                     </p-button>
                     <p-button style-type="secondary"
                               icon-left="ic_plus_bold"
+                              @click="handleAddWorkspaceButtonClick"
                     >
                         {{ $t('IAM.WORKSPACE_GROUP.TAB.ADD_WORKSPACE') }}
                     </p-button>
