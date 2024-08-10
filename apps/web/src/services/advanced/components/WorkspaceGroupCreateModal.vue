@@ -77,16 +77,16 @@ const dropdownMenuHandler = () => ({
             <div class="form-wrapper">
                 <p-field-group
                     required
-                    :label="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE.GROUP_NAME')"
+                    :label="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_GROUP_NAME')"
                     style-type="secondary"
                 >
                     <p-text-input :value="state.groupName"
-                                  :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE.GROUP_NAME_PLACEHOLDER')"
+                                  :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_GROUP_NAME_PLACEHOLDER')"
                                   block
                     />
                 </p-field-group>
                 <p-field-group
-                    :label="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE.WORKSPACES')"
+                    :label="$t('IAM.WORKSPACE_GROUP.MODAL.WORKSPACE_SELECT_DROP_DOWN_TITLE')"
                     style-type="secondary"
                 >
                     <template #default>
@@ -101,7 +101,7 @@ const dropdownMenuHandler = () => ({
                                 page-size="10"
                                 show-select-marker
                                 :handler="dropdownMenuHandler"
-                                :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREAET_DROP_DOWN_PLACEHOLDER')"
+                                :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_DROP_DOWN_PLACEHOLDER')"
                                 class="workspace-select-dropdown"
                             >
                                 <template #menu-item--format="{ item }">
@@ -130,7 +130,7 @@ const dropdownMenuHandler = () => ({
     </p-button-modal>
 </template>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 .workspace-select-dropdown {
     .menu-item-wrapper {
         @apply flex justify-between;

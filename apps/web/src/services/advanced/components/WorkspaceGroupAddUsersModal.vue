@@ -120,6 +120,7 @@ const userDropdownMenuHandler = () => ({
                         </p-select-dropdown>
                     </template>
                 </p-field-group>
+                <!-- TODO: selected user -->
             </div>
         </template>
         <template #confirm-button>
@@ -128,7 +129,7 @@ const userDropdownMenuHandler = () => ({
     </p-button-modal>
 </template>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 .workspace-group-add-users-modal {
     .role-select-dropdown {
         .role-menu-item {

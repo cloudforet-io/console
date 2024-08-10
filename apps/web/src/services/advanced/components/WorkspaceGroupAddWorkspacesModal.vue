@@ -84,7 +84,7 @@ const dropdownMenuHandler = () => ({
                                 page-size="10"
                                 show-select-marker
                                 :handler="dropdownMenuHandler"
-                                :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREAET_DROP_DOWN_PLACEHOLDER')"
+                                :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_DROP_DOWN_PLACEHOLDER')"
                                 class="workspace-select-dropdown"
                             >
                                 <template #menu-item--format="{ item }">

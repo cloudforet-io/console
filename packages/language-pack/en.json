@@ -2725,7 +2725,7 @@
 				"REMOVE": "Remove"
 			},
 			"MODAL": {
-				"CREAET_DROP_DOWN_PLACEHOLDER": "Select workspaces",
+				"CREATE_DROP_DOWN_PLACEHOLDER": "Select workspaces",
 				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
 				"CREATE_TITLE": "Create Workspace Group",
 				"EDIT_TITLE": "Edit Workspace Group",
@@ -2743,8 +2743,11 @@
 				"ROLE_SELECT_DROP_DOWN_TITLE": "Role",
 				"USER_SELECT_DROP_DOWN_TITLE": "User",
 				"USER_DROP_DOWN_PLACEHOLDER": "Add Users",
-				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
-				"ADD": "Add"
+				"CREATE_GROUP_NAME_PLACEHOLDER": "Enter Name",				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
+				"ADD": "Add",
+				"CREATE_GROUP_NAME": "Name",
+				"EDIT_GROUP_NAME": "Name",
+				"EDIT_GROUP_NAME_PLACEHOLDER": "Enter Name"
 			}
 		}
 	},

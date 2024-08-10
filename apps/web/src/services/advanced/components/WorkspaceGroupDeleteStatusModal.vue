@@ -142,7 +142,7 @@ const handleClose = () => {
     </p-table-check-modal>
 </template>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 .workspace-group-delete-status-modal {
     .name-wrapper {
         display: flex;

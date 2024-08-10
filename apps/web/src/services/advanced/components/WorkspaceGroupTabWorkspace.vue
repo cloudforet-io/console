@@ -2,12 +2,14 @@
 import { reactive } from 'vue';
 
 import {
-    PHeading, PButton, PToolboxTable, PLink, PStatus,
+    PHeading, PButton, PToolboxTable, PLink, PStatus, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+
+import { gray } from '@/styles/colors';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
@@ -27,7 +29,7 @@ const tableState = reactive({
         { name: 'service_account', label: 'Service Account' },
         { name: 'cost', label: 'Cost' },
         { name: 'created_at', label: 'Created' },
-        { name: 'remove_button', label: ' ' },
+        { name: 'remove_button', label: ' ', sortable: false },
     ],
     // TODO: temp data
     items: [{
@@ -117,7 +119,44 @@ const handleRemoveButtonClick = () => {
                          :fields="tableState.fields"
                          :items="tableState.items"
                          selectable
+                         sortable
         >
+            <template #th-state-format="{ field }">
+                <div class="th-tooltip">
+                    <span>{{ field.label }}</span>
+                    <p-tooltip
+                        :contents="$t('IAM.WORKSPACE_GROUP.TOOLTIP_STATE')"
+                        position="bottom"
+                        class="tooltip-wrapper"
+                        content-class="custom-tooltip-content"
+                    >
+                        <p-i name="ic_info-circle"
+                             class="title-tooltip"
+                             height="1rem"
+                             width="1rem"
+                             :color="gray[500]"
+                        />
+                    </p-tooltip>
+                </div>
+            </template>
+            <template #th-cost-format="{ field }">
+                <div class="th-tooltip">
+                    <span>{{ field.label }}</span>
+                    <p-tooltip
+                        :contents="$t('IAM.WORKSPACE_GROUP.TOOLTIP_COST')"
+                        position="bottom"
+                        class="tooltip-wrapper"
+                        content-class="custom-tooltip-content"
+                    >
+                        <p-i name="ic_info-circle"
+                             class="title-tooltip"
+                             height="1rem"
+                             width="1rem"
+                             :color="gray[500]"
+                        />
+                    </p-tooltip>
+                </div>
+            </template>
             <template #col-name-format="{ value, item }">
                 <div class="name-wrapper">
                     <workspace-logo-icon :text="value"
@@ -174,6 +213,24 @@ const handleRemoveButtonClick = () => {
             align-items: center;
             gap: 8px;
         }
+
+        .th-tooltip {
+            @apply flex items-center;
+            gap: 0.25rem;
+            .tooltip-wrapper {
+                margin-top: -0.125rem;
+            }
+        }
+    }
+}
+</style>
+
+<style lang="postcss">
+/* custom design-system component - p-tooltip */
+.p-tooltip {
+    .tooltip-inner {
+        white-space: pre-line;
+        max-width: 16rem;
     }
 }
 </style>

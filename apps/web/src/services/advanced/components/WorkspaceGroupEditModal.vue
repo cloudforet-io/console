@@ -42,11 +42,11 @@ const handleClose = () => {
             <div class="form-wrapper">
                 <p-field-group
                     required
-                    :label="$t('IAM.WORKSPACE_GROUP.MODAL.EDIT.GROUP_NAME')"
+                    :label="$t('IAM.WORKSPACE_GROUP.MODAL.EDIT_GROUP_NAME')"
                     style-type="secondary"
                 >
                     <p-text-input :value="state.groupName"
-                                  :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.EDIT.GROUP_NAME_PLACEHOLDER')"
+                                  :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.EDIT_GROUP_NAME_PLACEHOLDER')"
                                   block
                     />
                 </p-field-group>

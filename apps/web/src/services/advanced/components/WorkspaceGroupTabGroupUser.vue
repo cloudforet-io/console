@@ -21,7 +21,7 @@ const tableState = reactive({
         { name: 'name', label: 'Name' },
         { name: 'state', label: 'State' },
         { name: 'role', label: 'Role' },
-        { name: 'remove_button', label: ' ' },
+        { name: 'remove_button', label: ' ', sortable: false },
     ],
     items: [{
         // TODO: temp data
@@ -114,6 +114,7 @@ const handleRemoveButtonClick = () => {
                          :fields="tableState.fields"
                          :items="tableState.items"
                          selectable
+                         sortable
         >
             <template #col-state-format="{ value }">
                 <p-status v-bind="workspaceStateFormatter(value)" />
