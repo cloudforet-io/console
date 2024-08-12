@@ -149,10 +149,12 @@ watch(() => props.dateRange, () => {
 
 <template>
     <div class="dashboard-date-dropdown">
+        <span class="label-text">
+            {{ $t('DASHBOARDS.DETAIL.BASED_ON') }}:
+        </span>
         <p-select-dropdown
+            size="sm"
             :menu="state.monthMenuItems"
-            :selection-label="$t('DASHBOARDS.DETAIL.BASED_ON')"
-            style-type="rounded"
             :selected="state.selectedMonthMenuItem.name"
             menu-position="right"
             reset-selection-on-menu-close
@@ -174,5 +176,9 @@ watch(() => props.dateRange, () => {
 .dashboard-date-dropdown {
     @apply flex items-center justify-center;
     min-height: 2rem;
+    gap: 0.125rem;
+    .label-text {
+        @apply text-label-md font-bold text-gray-800;
+    }
 }
 </style>

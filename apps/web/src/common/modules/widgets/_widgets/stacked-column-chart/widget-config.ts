@@ -24,7 +24,7 @@ const stackedColumnChart: WidgetConfig = {
             options: {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
-                max: 10,
+                max: 30,
                 defaultIndex: 0,
                 excludeDateField: true,
             },
@@ -41,6 +41,7 @@ const stackedColumnChart: WidgetConfig = {
                 default: 'MMM DD, YYYY',
             },
         },
+        displayAnnotation: {},
     },
 };
 

@@ -22,6 +22,8 @@ const numberCard: WidgetConfig = {
                 toggle: true,
             },
         },
+        numberFormat: {},
+        displayAnnotation: {},
     },
 };
 

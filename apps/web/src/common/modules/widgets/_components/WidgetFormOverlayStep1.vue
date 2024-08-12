@@ -4,23 +4,32 @@ import {
 } from 'vue';
 
 import {
-    PI, PTooltip,
+    PI, PTooltip, PButton,
 } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
 import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';
 import WidgetFormOverlayPreviewTable from '@/common/modules/widgets/_components/WidgetFormOverlayPreviewTable.vue';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+
+import { violet } from '@/styles/colors';
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const dataTableContentsRef = ref<HTMLElement|null>(null);
+const dataTableCardRef = ref<WidgetFormDataTableCard[]>([]);
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
     selectedDataTable: computed(() => widgetGenerateGetters.selectedDataTable),
+    allDataTableInvalid: computed(() => widgetGenerateGetters.allDataTableInvalid),
 });
 
 const displayState = reactive({
@@ -47,6 +56,21 @@ const displayState = reactive({
 
 
 /* Event */
+
+const handleClickAllApply = async () => {
+    try {
+        dataTableCardRef.value.forEach((_ref) => {
+            if (_ref) {
+                if (typeof _ref?.updateDataTable === 'function') {
+                    _ref?.updateDataTable();
+                }
+            }
+        });
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.APPLY_ALL_SUCCESS'), '');
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
 
 /* Hide Toggle */
 const offTransition = () => { displayState.transition = false; };
@@ -99,14 +123,6 @@ documentEventMount('mouseup', endResizing);
 onMounted(async () => {
     // Reset Join Restricted Map at init Data Table form init
     widgetGenerateStore.setJoinRestrictedMap({});
-
-    // Initial Load
-    if (widgetGenerateState.selectedDataTableId) {
-        widgetGenerateStore.setDataTableUpdating(true);
-        await widgetGenerateStore.loadDataTable({
-            data_table_id: widgetGenerateState.selectedDataTableId,
-        });
-    }
 });
 
 </script>
@@ -119,7 +135,8 @@ onMounted(async () => {
             <div class="data-table-area">
                 <div class="data-table-scroll-wrapper">
                     <div class="data-table-contents-wrapper">
-                        <widget-form-data-table-card v-for="(dataTable) in storeState.dataTables"
+                        <widget-form-data-table-card v-for="(dataTable, index) in storeState.dataTables"
+                                                     :ref="el => dataTableCardRef[index] = el"
                                                      :key="`data-table-${dataTable.data_table_id}`"
                                                      :item="dataTable"
                         />
@@ -135,6 +152,20 @@ onMounted(async () => {
                             </p>
                         </div>
                     </div>
+                </div>
+                <div class="all-apply-wrapper">
+                    <p-i name="ic_roket"
+                         :color="violet[600]"
+                         width="1.25rem"
+                         height="1.25rem"
+                    />
+                    <p-button icon-left="ic_refresh"
+                              style-type="secondary"
+                              :disabled="storeState.allDataTableInvalid"
+                              @click="handleClickAllApply"
+                    >
+                        {{ $t('COMMON.WIDGETS.DATA_TABLE.APPLY_ALL') }}
+                    </p-button>
                 </div>
                 <div class="gradation-bottom-area" />
                 <div class="gradation-top-area" />
@@ -183,6 +214,14 @@ onMounted(async () => {
             //padding: 1rem 1rem 1.125rem;
             //margin-bottom: 1.125rem;
             overflow: hidden;
+
+            .all-apply-wrapper {
+                @apply flex items-center justify-between absolute gap-2 rounded-md bg-violet-150;
+                right: 1.5rem;
+                bottom: 1.5rem;
+                width: 9.875rem;
+                padding: 0.5rem 0.5rem 0.5rem 1rem;
+            }
             .data-table-scroll-wrapper {
                 @apply relative;
                 height: 100%;

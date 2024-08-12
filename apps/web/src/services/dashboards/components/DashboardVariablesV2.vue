@@ -62,6 +62,7 @@ const state = reactive({
         return results;
     }),
     showSaveButton: computed<boolean>(() => !props.disableSaveButton && state.modifiedVariablesSchemaProperties.length > 0),
+    notChanged: computed(() => state.modifiedVariablesSchemaProperties.length === 0),
 });
 
 const handleClickSaveButton = () => {
@@ -94,7 +95,7 @@ const handleResetVariables = () => {
         </template>
         <p-text-button style-type="highlight"
                        class="reset-button"
-                       :disabled="props.loading"
+                       :disabled="props.loading || state.notChanged"
                        @click="handleResetVariables"
         >
             <p-i name="ic_refresh"
@@ -120,6 +121,8 @@ const handleResetVariables = () => {
 
 <style lang="postcss" scoped>
 .dashboard-variables-select-dropdown {
+    @apply w-full rounded-xl border border-gray-200 bg-white;
+    padding: 1rem;
     .variable-selector-box {
         position: relative;
         .circle-mark {

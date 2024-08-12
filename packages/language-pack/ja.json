@@ -1451,6 +1451,9 @@
 			"DAILY_UPDATE_HELP": "管理しているリソースの使用量を確認します",
 			"DAILY_UPDATE_NO_DATA": "本日の変更事項はありません。",
 			"DAILY_UPDATE_TITLE": "本日の変更事項",
+			"DATA_FIELD_HEATMAP_COLOR": {
+				"DATA_FIELD_HEATMAP_COLOR": ""
+			},
 			"DATA_NOT_DISPLAYED": "データが表示されません",
 			"DATA_NOT_DISPLAYED_DESC": "すべての必須フィールドを設定し、[適用]ボタンをクリックしてウィジェットの設定を完了してください。",
 			"DATA_TABLE": {
@@ -1463,6 +1466,8 @@
 					"RESET_DESC": "データオプションをリセットすると、すべての入力が最新の値に戻ります。この操作は元に戻せません。",
 					"RESET_HEADER": "データオプションをリセットしてもよろしいですか？"
 				},
+				"APPLY_ALL": "",
+				"APPLY_ALL_SUCCESS": "",
 				"EMPTY_DESC": "[+] ボタンを使用して新しいデータを追加するか 連結、\n結合、クエリ、評価などのさまざまな方法を使用してデータを変更してください。",
 				"EMPTY_TITLE": "データを追加して開始する",
 				"FORM": {
@@ -1501,6 +1506,17 @@
 			},
 			"DEFAULT_WIDTH": "デフォルト幅",
 			"DELETE": "削除",
+			"DISPLAY_ANNOTATION": {
+				"DISPLAY_ANNOTATION": "",
+				"INVALID_VALUE": ""
+			},
+			"DISPLAY_SERIES_LABEL": {
+				"DISPLAY_SERIES_LABEL": "",
+				"POSITION": "",
+				"ROTATE": "",
+				"ROTATE_MAX_INVALID_TEXT": "",
+				"ROTATE_MIN_INVALID_TEXT": ""
+			},
 			"DONE": "完了",
 			"DONUT": "",
 			"EDIT": "編集",
@@ -1550,6 +1566,17 @@
 				"NO_CHANGE": "変化なし"
 			},
 			"NUMBER_FIELD_VALIDATION": "値は {max} 以下でなければなりません。",
+			"NUMBER_FORMAT": {
+				"AUTO": "自動",
+				"CONFIRM": "確認",
+				"CUSTOM_NUMBER_FORMAT": "",
+				"FULL_NUMBER": "",
+				"HELP": "ヘルプ",
+				"INVALID_NUMBER_FORMAT": "",
+				"NUMBER_FORMAT": "",
+				"SAMPLE": "",
+				"SHORT_NUMBER": ""
+			},
 			"PERIOD": "期間",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "アカウントID",

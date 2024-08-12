@@ -232,9 +232,6 @@ const handleConfirmDataSource = async () => {
         state.showPopover = false;
         if (!widgetGenerateState.selectedDataTableId && result) {
             widgetGenerateStore.setSelectedDataTableId(result?.data_table_id);
-            await widgetGenerateStore.loadDataTable({
-                data_table_id: result?.data_table_id,
-            });
         }
     }
     state.loading = false;

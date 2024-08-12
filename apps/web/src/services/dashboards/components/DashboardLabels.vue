@@ -77,43 +77,45 @@ const handleDelete = (index: number) => {
 </script>
 
 <template>
-    <div v-on-click-outside="handleEscape"
-         class="dashboard-labels"
+    <div class="dashboard-labels"
          @keydown.esc="handleEscape"
          @keydown.enter="handlePushLabel"
     >
-        <p-label
-            v-for="(label, index) in state.labelList"
-            :key="`dashboard-label-${index}`"
-            :text="label"
-            :deletable="props.editable"
-            @delete="handleDelete(index)"
-        />
-        <p-icon-button v-if="!state.inputMode && props.editable"
-                       style-type="tertiary"
-                       name="ic_plus_bold"
-                       size="sm"
-                       shape="square"
-                       @click="handleClickPlus"
-        />
-        <span v-if="!state.inputMode && !state.labelList.length && props.editable"
-              class="dashboard-labels-add-info"
-              @click="handleClickPlus"
+        <div class="label-wrapper">
+            <p-label
+                v-for="(label, index) in state.labelList"
+                :key="`dashboard-label-${index}`"
+                :text="label"
+                :deletable="props.editable"
+                @delete="handleDelete(index)"
+            />
+            <p-icon-button v-if="!state.inputMode && props.editable"
+                           style-type="tertiary"
+                           name="ic_plus_bold"
+                           size="sm"
+                           shape="square"
+                           @click="handleClickPlus"
+            />
+            <span v-if="!state.inputMode && !state.labelList.length && props.editable"
+                  class="dashboard-labels-add-info"
+                  @click="handleClickPlus"
+            >
+                {{ $t('DASHBOARDS.CUSTOMIZE.ADD_LABEL') }}
+            </span>
+        </div>
+        <p-field-group v-if="state.inputMode"
+                       v-on-click-outside="handleEscape"
+                       class="label-input"
+                       :invalid="invalidState.inputText"
+                       :invalid-text="invalidTexts.inputText"
         >
-            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_LABEL') }}
-        </span>
-        <p-field-group
-            v-if="state.inputMode"
-            :invalid="invalidState.inputText"
-            :invalid-text="invalidTexts.inputText"
-        >
-            <p-text-input
-                :value="inputText"
-                :is-focused.sync="state.isInputFocused"
-                :invalid="invalidState.inputText"
-                size="sm"
-                :placeholder="$t('DASHBOARDS.CUSTOMIZE.ENTER_NEW_LABEL')"
-                @update:value="setForm('inputText', $event)"
+            <p-text-input :value="inputText"
+                          :is-focused.sync="state.isInputFocused"
+                          :invalid="invalidState.inputText"
+                          block
+                          size="sm"
+                          :placeholder="$t('DASHBOARDS.CUSTOMIZE.ENTER_NEW_LABEL')"
+                          @update:value="setForm('inputText', $event)"
             />
         </p-field-group>
     </div>
@@ -121,18 +123,18 @@ const handleDelete = (index: number) => {
 
 <style lang="postcss" scoped>
 .dashboard-labels {
-    display: flex;
-    flex-flow: wrap;
-    column-gap: 0.25rem;
-    row-gap: 0.25rem;
-    max-width: calc(100% - 14rem);
-    min-height: 2rem;
-    padding-top: 0.25rem;
+    .label-wrapper {
+        @apply flex flex-wrap items-center;
+        width: 100%;
+        gap: 0.25rem;
+    }
+    .label-input {
+        max-width: 10.25rem;
+    }
 }
 .p-icon-button {
     margin-right: 0.25rem;
 }
-
 .dashboard-labels-add-info {
     @apply text-gray-500 text-xs pt-1 cursor-pointer;
 }
@@ -153,11 +155,16 @@ const handleDelete = (index: number) => {
 .p-field-group {
     @apply relative;
     margin-bottom: 0;
+    .field-title-box {
+        @apply hidden;
+    }
 }
 
 /* custom design-system component - p-text-input */
 :deep(.p-text-input) {
+    height: 1.5rem;
     .input-container {
+        max-width: 10.25rem;
         min-height: 1.5rem;
         height: 1.5rem;
     }

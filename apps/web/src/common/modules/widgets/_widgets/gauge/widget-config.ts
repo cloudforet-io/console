@@ -40,6 +40,8 @@ const gauge: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
+        numberFormat: {},
+        displayAnnotation: {},
     },
 };
 

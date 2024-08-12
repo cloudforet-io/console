@@ -53,9 +53,6 @@ const handleSelectDataTable = async (dataTableId: string) => {
         return;
     }
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    await widgetGenerateStore.loadDataTable({
-        data_table_id: dataTableId,
-    });
 };
 const handleUpdateDataTableName = (value: string) => {
     if (value.length <= 60) {
@@ -79,7 +76,7 @@ const handleClickNameConfirm = async () => {
     await widgetGenerateStore.updateDataTable({
         data_table_id: props.dataTableId,
         name: editedDataTableName,
-    }, state.isUnsavedTransformed);
+    }, { unsaved: state.isUnsavedTransformed, preventReferenceUpdating: true });
     showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_TABLE_NAME_SUCCESS'), '');
     dataTableNameState.editMode = false;
 };

@@ -192,8 +192,9 @@ const getLineByData = (rawData: Data) => {
     // slice lineByData by lineByCount
     const _slicedByLineBy: any[] = [];
     rawData.results?.forEach((d) => {
-        const _slicedData = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.lineByCount);
-        const _etcData = d[state.dataField]?.slice(state.lineByCount).reduce((acc, v) => {
+        const _orderedData = orderBy(d[state.dataField], 'value', 'desc') ?? [];
+        const _slicedData = _orderedData.slice(0, state.lineByCount);
+        const _etcData = _orderedData.slice(state.lineByCount).reduce((acc, v) => {
             acc[state.lineByField] = 'etc';
             acc.value += v.value || 0;
             return acc;
