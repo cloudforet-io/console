@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PToolboxTable, PTooltip, PI } from '@cloudforet/mirinae';
-
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
@@ -38,7 +31,7 @@ const tableState = reactive({
         { name: 'workspace', label: 'Workspace' },
         { name: 'group_user', label: 'Group User' },
         { name: 'created_at', label: 'Created' },
-        // TODO:
+        // TODO: temp data
         // { name: 'all_users', label: 'All User' },
         // { name: 'service_account', label: 'Service Account' },
         // { name: 'cost', label: 'Cost' },
@@ -53,40 +46,11 @@ const tableState = reactive({
     }))),
 });
 
-const fetchWorkspaceGroups = async () => {
-    state.loading = true;
-
-    try {
-        // TODO: apply Destructuring
-        const results = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>({}) as WorkspaceGroupModel[];
-
-        workspaceGroupPageState.groups = results;
-        workspaceGroupPageState.selectedIndices = [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        workspaceGroupPageState.groups = [];
-    } finally {
-        state.loading = false;
-    }
-};
-
-const initWorkspaceGroups = async () => {
-    await fetchWorkspaceGroups();
-
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedIndices = [0];
-    });
-};
-
 const handleUpdateSelectIndex = (indices: number[]) => {
     workspaceGroupPageStore.$patch((_state) => {
         _state.state.selectedIndices = indices;
     });
 };
-
-(() => {
-    initWorkspaceGroups();
-})();
 </script>
 
 <template>
