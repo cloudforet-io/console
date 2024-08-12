@@ -405,8 +405,8 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
     tbody {
         tr {
             &:nth-child(odd) {
-                @apply bg-gray-100;
                 td {
+                    @apply bg-gray-100;
                     &.sub-total {
                         @apply bg-violet-150;
                     }

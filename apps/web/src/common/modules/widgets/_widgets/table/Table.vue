@@ -9,7 +9,7 @@ import { orderBy, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
-import { PTextPagination } from '@cloudforet/mirinae';
+import { PPagination } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
@@ -231,7 +231,7 @@ const getTotalDataItem = (data: TableDataItem[], type: 'static'|'time_series'|'d
 
     const totalDataItem: TableDataItem = {};
     const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
-    if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
+    if (_sortedGroupByFields.length) totalDataItem[_sortedGroupByFields[0]] = 'Total';
     if (type === 'static') {
         [...state.tableDataField, 'sub_total'].forEach((field) => {
             totalDataItem[field] = data.reduce((acc, cur) => acc + cur[field], 0);
@@ -582,9 +582,11 @@ defineExpose<WidgetExpose<Data>>({
                 />
             </div>
             <div class="table-pagination-wrapper">
-                <p-text-pagination :this-page="state.thisPage"
-                                   :all-page="state.allPage"
-                                   @pageChange="handleUpdateThisPage"
+                <p-pagination :this-page="state.thisPage"
+                              :page-size="state.pageSize"
+                              :total-count="state.data?.total_count ?? 0"
+                              size="sm"
+                              @change="handleUpdateThisPage"
                 />
             </div>
         </div>
@@ -594,8 +596,8 @@ defineExpose<WidgetExpose<Data>>({
 <style lang="postcss" scoped>
 .table-wrapper {
     @apply flex justify-center w-full;
-    max-height: calc(100% - 1.5rem);
-    height: calc(100% - 1.5rem);
+    max-height: calc(100% - 2.5rem);
+    height: calc(100% - 2.5rem);
 
     overflow: hidden;
     .data-table {
@@ -604,6 +606,7 @@ defineExpose<WidgetExpose<Data>>({
 }
 .table-pagination-wrapper {
     @apply flex justify-center items-center;
-    height: 1.5rem;
+    height: 2.5rem;
+    padding: 0.5rem 0;
 }
 </style>
