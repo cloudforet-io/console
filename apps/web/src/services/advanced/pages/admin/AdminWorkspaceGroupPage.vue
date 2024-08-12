@@ -72,7 +72,7 @@ onUnmounted(() => {
             </template>
         </p-horizontal-layout>
         <workspace-group-tab />
-        <workspace-group-create-modal />
+        <workspace-group-create-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-edit-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-status-modal />

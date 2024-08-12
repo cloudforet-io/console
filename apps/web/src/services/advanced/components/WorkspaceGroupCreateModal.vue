@@ -1,66 +1,125 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WorkspaceGroupCreateParameters } from '@/schema/identity/workspace-group/api-verbs/create';
+import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import type { CreateModalMenuItem } from '@/schema/identity/workspace-group/type';
+import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
+
+
+
+
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+
+const emit = defineEmits<{(e: 'confirm'): void,
+}>();
 
 const state = reactive({
-    groupName: '',
     loading: false,
-    // TODO: temp data
-    items: [{
-        is_dormant: undefined,
-        label: '🫠',
-        name: 'workspace-6282f1404a07',
-        tags: {
-            description: 'hi',
-            theme: 'green',
-        },
-    },
-    {
-        is_dormant: undefined,
-        label: '🙏🏻',
-        name: 'workspace-440db588c999',
-        tags: {
-            description: '',
-            theme: 'blue',
-        },
-    },
-    {
-        type: 'showMore',
-        label: 'show more',
-    }],
+    groupName: '',
+    selectedItems: [] as CreateModalMenuItem[],
 });
 
-const handleConfirm = () => {
+const dropdownState = reactive({
+    loading: false,
+    searchText: '',
+    menuItems: [] as SelectDropdownMenuItem[],
+});
+
+const resetState = () => {
+    state.groupName = '';
+    state.selectedItems = [];
+};
+
+const workspaceListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(1).setPageLimit(15)
+    .setSort('name', true);
+
+const createWorkspaceGroup = async () => {
+    state.loading = true;
+
+    try {
+        await SpaceConnector.clientV2.identity.workspaceGroup.create<WorkspaceGroupCreateParameters, WorkspaceGroupModel>({
+            name: workspaceGroupPageGetters.selectedGroup.name,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+const handleConfirm = async () => {
+    await createWorkspaceGroup();
     showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_CREATE_WORKSPACE'), '');
     workspaceGroupPageStore.closeModal();
+    resetState();
+    emit('confirm');
 };
 
 const handleCancel = () => {
     workspaceGroupPageStore.closeModal();
+    resetState();
 };
 
 const handleClose = () => {
     workspaceGroupPageStore.closeModal();
+    resetState();
 };
 
-const dropdownMenuHandler = () => ({
-    results: state.items,
-});
+const fetchWorkspaceList = async (inputText: string) => {
+    dropdownState.loading = true;
+
+    workspaceListApiQueryHelper.setFilters([
+        { k: 'name', v: inputText, o: '' },
+        { k: 'state', v: 'ENABLED', o: '' },
+    ]);
+
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+            query: workspaceListApiQueryHelper.data,
+        });
+        dropdownState.menuItems = (results ?? []).map((workspace) => ({
+            label: workspace.name,
+            name: workspace.workspace_id,
+            tags: workspace.tags,
+            is_dormant: workspace.is_dormant,
+        }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        dropdownState.loading = false;
+    }
+};
+
+const dropdownMenuHandler = async (inputText: string) => {
+    await fetchWorkspaceList(inputText);
+
+    return {
+        results: dropdownState.menuItems,
+    };
+};
 </script>
 
 <template>
@@ -80,7 +139,7 @@ const dropdownMenuHandler = () => ({
                     :label="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_GROUP_NAME')"
                     style-type="secondary"
                 >
-                    <p-text-input :value="state.groupName"
+                    <p-text-input v-model="state.groupName"
                                   :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_GROUP_NAME_PLACEHOLDER')"
                                   block
                     />
@@ -92,7 +151,7 @@ const dropdownMenuHandler = () => ({
                     <template #default>
                         <div class="dropdown-wrapper">
                             <p-select-dropdown
-                                :loading="state.loading"
+                                :loading="dropdownState.loading"
                                 appearance-type="stack"
                                 is-filterable
                                 multi-selectable
@@ -101,6 +160,8 @@ const dropdownMenuHandler = () => ({
                                 page-size="10"
                                 show-select-marker
                                 :handler="dropdownMenuHandler"
+                                :search-text.sync="dropdownState.searchText"
+                                :selected.sync="state.selectedItems"
                                 :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_DROP_DOWN_PLACEHOLDER')"
                                 class="workspace-select-dropdown"
                             >
