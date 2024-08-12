@@ -42,7 +42,7 @@ import type {
 import type {
     GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
     DateFormatValue,
-    NumberFormatValue,
+    NumberFormatValue, DataFieldHeatmapColorValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -99,6 +99,7 @@ const state = reactive({
     progressBarInfo: computed<ProgressBarValue|undefined>(() => props.widgetOptions?.progressBar as ProgressBarValue),
     dateFormatInfo: computed<DateFormatValue|undefined>(() => props.widgetOptions?.dateFormat as DateFormatValue),
     numberFormatInfo: computed<NumberFormatValue|undefined>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    dataFieldHeatmapColorInfo: computed<DataFieldHeatmapColorValue|undefined>(() => props.widgetOptions?.dataFieldHeatmapColor as DataFieldHeatmapColorValue),
     // table
     tableFields: computed<TableWidgetField[]>(() => {
         const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map(
@@ -321,22 +322,23 @@ watch(() => state.data, () => {
             return dataItem;
         });
 
-        if (state.totalInfo?.toggleValue) {
-            const totalDataItem: TableDataItem = {};
-            const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
-            if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
-            [...state.tableDataField, 'sub_total'].forEach((field) => {
-                totalDataItem[field] = results.reduce((acc, cur) => acc + cur[field], 0);
-                if (field !== 'sub_total' && hasComparisonInfo) {
-                    const comparisionFieldName = `comparison_${field}`;
-                    totalDataItem[comparisionFieldName] = {
-                        target: totalDataItem[field],
-                        subject: results.reduce((acc, cur) => acc + cur[comparisionFieldName].subject, 0),
-                    };
-                }
-            });
-            results.push(totalDataItem);
-        }
+        // if (state.totalInfo?.toggleValue) {
+        // Total Data
+        const totalDataItem: TableDataItem = {};
+        const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
+        if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
+        [...state.tableDataField, 'sub_total'].forEach((field) => {
+            totalDataItem[field] = results.reduce((acc, cur) => acc + cur[field], 0);
+            if (field !== 'sub_total' && hasComparisonInfo) {
+                const comparisionFieldName = `comparison_${field}`;
+                totalDataItem[comparisionFieldName] = {
+                    target: totalDataItem[field],
+                    subject: results.reduce((acc, cur) => acc + cur[comparisionFieldName].subject, 0),
+                };
+            }
+        });
+        results.push(totalDataItem);
+        // }
 
         state.staticFieldSlicedData = { results };
     } else if (isDateField(state.tableDataField)) {
@@ -351,18 +353,19 @@ watch(() => state.data, () => {
             };
         });
 
-        if (state.totalInfo?.toggleValue) {
-            const totalDataItem: TableDataItem = {};
-            const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
-            if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
-            totalDataItem[state.tableDataCriteria] = [...state.tableFields, 'sub_total']
-                .filter((field) => field.fieldInfo?.type === 'dataField')
-                .map((field) => {
-                    const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === field.name)?.value || 0), 0);
-                    return { [state.tableDataField]: field.name, value: totalValue };
-                });
-            results.push(totalDataItem);
-        }
+        // if (state.totalInfo?.toggleValue) {
+        // Total Data
+        const totalDataItem: TableDataItem = {};
+        const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
+        if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
+        totalDataItem[state.tableDataCriteria] = [...state.tableFields, 'sub_total']
+            .filter((field) => field.fieldInfo?.type === 'dataField')
+            .map((field) => {
+                const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === field.name)?.value || 0), 0);
+                return { [state.tableDataField]: field.name, value: totalValue };
+            });
+        results.push(totalDataItem);
+        // }
 
         state.timeSeriesDynamicFieldSlicedData = { results };
     } else {
@@ -413,29 +416,30 @@ watch(() => state.data, () => {
             };
         });
 
-        if (state.totalInfo?.toggleValue) {
-            const totalDataItem: TableDataItem = {};
-            const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
-            if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
-            const fieldForTotal = results?.[0]?.[state.tableDataCriteria] ?? [];
-            totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
-                const fieldName = `${item[state.tableDataField]}`;
-                if (fieldName.startsWith('comparison_')) {
-                    const targetTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.target || 0), 0);
-                    const subjectTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.subject || 0), 0);
-                    return {
-                        [state.tableDataField]: fieldName,
-                        value: {
-                            target: targetTotalValue,
-                            subject: subjectTotalValue,
-                        },
-                    };
-                }
-                const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value || 0), 0);
-                return { [state.tableDataField]: fieldName, value: totalValue };
-            });
-            results.push(totalDataItem);
-        }
+        // if (state.totalInfo?.toggleValue) {
+        // Total Data
+        const totalDataItem: TableDataItem = {};
+        const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
+        if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
+        const fieldForTotal = results?.[0]?.[state.tableDataCriteria] ?? [];
+        totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
+            const fieldName = `${item[state.tableDataField]}`;
+            if (fieldName.startsWith('comparison_')) {
+                const targetTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.target || 0), 0);
+                const subjectTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.subject || 0), 0);
+                return {
+                    [state.tableDataField]: fieldName,
+                    value: {
+                        target: targetTotalValue,
+                        subject: subjectTotalValue,
+                    },
+                };
+            }
+            const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value || 0), 0);
+            return { [state.tableDataField]: fieldName, value: totalValue };
+        });
+        results.push(totalDataItem);
+        // }
 
         state.noneTimeSeriesDynamicFieldSlicedData = { results };
     }
@@ -472,6 +476,7 @@ defineExpose<WidgetExpose<Data>>({
                                    :data-info="state.dataInfo"
                                    :date-format-info="state.dateFormatInfo"
                                    :number-format-info="state.numberFormatInfo"
+                                   :data-field-heatmap-color-info="state.dataFieldHeatmapColorInfo"
                                    :sort-by.sync="state.sortBy"
                                    :this-page.sync="state.thisPage"
                                    @load="handleManualLoadWidget"
