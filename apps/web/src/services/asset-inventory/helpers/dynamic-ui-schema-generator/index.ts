@@ -106,4 +106,4 @@ const colorBindFactory = (colorMapping, textFnc) => (value) => ({
     ...colorMapping[value],
 });
 
-export const stateFormatter = colorBindFactory(ACCOUNT_STATE_COLOR, (value) => value.toLowerCase());
+export const stateFormatter = colorBindFactory(ACCOUNT_STATE_COLOR, (value:string|undefined) => value?.toLowerCase());

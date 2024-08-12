@@ -270,10 +270,10 @@ onDeactivated(() => {
         >
             <span v-if="value === '*'">Global</span>
             <p-link v-else
-                    :to="getProperRouteLocation({
+                    :to="{
                         name: ROOT_ROUTE.WORKSPACE._NAME,
                         params: { workspaceId: value },
-                    })"
+                    }"
                     action-icon="internal-link"
                     new-tab
                     :text="storeState.workspaces[value]?.label"

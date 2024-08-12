@@ -29,9 +29,9 @@ const handleSignIn = async () => {
 
 onMounted(async () => {
     const { refresh_token } = route.query;
-    if (!refresh_token) {
+    if (refresh_token === 'unauthorized') {
         loadAuth('SAML').signOut();
-        router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
+        router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME, query: { error: 'error' } });
         return;
     }
     try {
