@@ -21,8 +21,6 @@ import WorkspaceGroupTab from '@/services/advanced/components/WorkspaceGroupTab.
 import WorkspaceGroupTable from '@/services/advanced/components/WorkspaceGroupTable.vue';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
-
-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 
@@ -76,7 +74,7 @@ onUnmounted(() => {
         <workspace-group-tab />
         <workspace-group-create-modal />
         <workspace-group-edit-modal @confirm="fetchWorkspaceGroups" />
-        <workspace-group-delete-modal />
+        <workspace-group-delete-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-status-modal />
         <workspace-group-add-workspaces-modal />
         <workspace-group-add-users-modal />
