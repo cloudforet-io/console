@@ -1,6 +1,7 @@
 <template>
-    <nav class="pagination">
+    <nav :class="{'pagination': true, [size]: true}">
         <p-icon-button class="text"
+                       :size="size"
                        name="ic_chevron-left"
                        color="inherit transparent"
                        :disabled="proxyState.thisPage === 1"
@@ -12,16 +13,16 @@
                       :key="page"
                       @click="clickPage(page)"
                 >
-                    <span v-if="page === proxyState.thisPage"
-                          class="page-number"
-                    ><b>{{ proxyState.thisPage }}</b></span>
-                    <span v-else
-                          class="page-number"
+                    <span :class="{
+                        'page-number': true,
+                        selected: page === proxyState.thisPage
+                    }"
                     > {{ page }} </span>
                 </span>
             </div>
         </div>
         <p-icon-button class="text"
+                       :size="size"
                        name="ic_chevron-right"
                        color="inherit transparent"
                        :disabled="proxyState.thisPage === pageList.totalPages"
@@ -30,12 +31,15 @@
     </nav>
 </template>
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed, reactive,
 } from 'vue';
 
 import { useProxyValue } from '@/hooks';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import type { PaginationSize } from '@/navigation/pagination/pagination/type';
+import { PAGINATION_SIZE } from '@/navigation/pagination/pagination/type';
 
 export default {
     name: 'PPagination',
@@ -55,6 +59,13 @@ export default {
         totalCount: {
             type: Number,
             required: true,
+        },
+        size: {
+            type: String as PropType<PaginationSize>,
+            default: PAGINATION_SIZE.md,
+            validator(size: PaginationSize) {
+                return Object.values(PAGINATION_SIZE).includes(size);
+            },
         },
     },
     setup(props, { emit }) {
@@ -173,20 +184,41 @@ export default {
     @screen lg {
         @apply min-w-16;
     }
-}
-.page-number-wrapper {
-    @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-pointer;
-    .page-number-list {
-        line-height: 1.2rem;
-        font-size: 0.875rem;
-        padding-left: 1.5rem;
-        .page-number {
-            padding-right: 1.5rem;
+    .page-number-wrapper {
+        @apply min-h-8 min-w-12 items-center justify-center inline-flex cursor-pointer;
+        .page-number-list {
+            @apply flex items-center text-label-md;
+            padding-left: 1.5rem;
+            .page-number {
+                @apply text-gray-500;
+                padding-right: 1.5rem;
+
+                &:hover {
+                    @apply text-blue-600;
+                }
+
+                &.selected {
+                    @apply font-bold text-gray-900;
+                }
+            }
+        }
+
+        @screen lg {
+            @apply min-w-16;
         }
     }
-
-    @screen lg {
-        @apply min-w-16;
+    &.sm {
+        .page-number-wrapper {
+            .page-number-list {
+                @apply text-label-sm;
+                min-height: 1.5rem;
+                min-width: 2.25rem;
+                padding-left: 0.75rem;
+                .page-number {
+                    padding-right: 0.75rem;
+                }
+            }
+        }
     }
 }
 

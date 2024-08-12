@@ -47,6 +47,7 @@ const SKIP_HEATMAP_FIELD = ['subTotal', 'comparison'];
 interface Props {
   fields: TableWidgetField[];
   items?: any[];
+  pageTotal?: TableDataItem;
   currency?: Currency;
   size?: WidgetSize;
   widgetId: string;
@@ -86,16 +87,7 @@ const state = reactive({
         if (!props.granularity || !props.dateFormatInfo) return undefined;
         return getRefinedDateFormatByGranularity(props.granularity, props.dateFormatInfo.value);
     }),
-    dataItems: computed(() => {
-        if (!props.totalInfo?.toggleValue && props.items?.length) {
-            return props.items.slice(0, props.items.length - 1);
-        }
-        return props.items;
-    }),
-    totalItem: computed(() => {
-        if (!props.items?.length) return undefined;
-        return props.items[props.items.length - 1];
-    }),
+    totalItem: computed<TableDataItem|undefined>(() => props.pageTotal),
 });
 
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
@@ -258,6 +250,8 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 //     return `( ${value} ${key} )`;
 // };
 
+
+
 </script>
 
 <template>
@@ -306,7 +300,7 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
                 </tr>
             </thead>
             <tbody ref="tbodyRef">
-                <tr v-for="(item, rowIndex) in state.dataItems"
+                <tr v-for="(item, rowIndex) in props.items"
                     :key="`tr-${props.widgetId}-${rowIndex}`"
                     :data-index="rowIndex"
                 >
@@ -411,8 +405,8 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
     tbody {
         tr {
             &:nth-child(odd) {
-                @apply bg-gray-100;
                 td {
+                    @apply bg-gray-100;
                     &.sub-total {
                         @apply bg-violet-150;
                     }

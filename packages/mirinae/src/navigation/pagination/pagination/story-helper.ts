@@ -14,6 +14,22 @@ export const getPaginationParameters = (): Parameters => ({
 });
 
 export const getPaginationArgTypes = (): ArgTypes => ({
+    size: {
+        name: 'size',
+        type: { name: 'string' },
+        description: 'Pagination size',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'md',
+            },
+        },
+        control: 'select',
+        options: ['md', 'sm'],
+    },
     thisPage: {
         name: 'thisPage',
         type: { name: 'number' },

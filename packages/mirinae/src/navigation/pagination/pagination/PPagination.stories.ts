@@ -31,6 +31,7 @@ const Template: Story = {
         components: { PPagination },
         template: `
             <p-pagination
+                :size="size"
                 :this-page.sync="thisPage"
                 :page-size.sync="pageSize"
                 :total-count="totalCount"

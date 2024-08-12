@@ -294,8 +294,7 @@ onUnmounted(() => {
                 height: 1rem;
             }
             .toolbox-wrapper {
-                display: flex;
-                align-items: center;
+                @apply flex items-center;
                 gap: 0.5rem;
                 .dashboard-variables-select-dropdown {
                     @apply relative flex items-center flex-wrap;
