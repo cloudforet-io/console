@@ -41,10 +41,11 @@ const state = reactive({
             name: NUMBER_FORMAT.AUTO,
             label: i18n.t('COMMON.WIDGETS.NUMBER_FORMAT.AUTO'),
         },
-        {
-            name: NUMBER_FORMAT.SHORT_NUMBER,
-            label: i18n.t('COMMON.WIDGETS.NUMBER_FORMAT.SHORT_NUMBER'),
-        },
+        // NOTE: temporary remove short number
+        // {
+        //     name: NUMBER_FORMAT.SHORT_NUMBER,
+        //     label: i18n.t('COMMON.WIDGETS.NUMBER_FORMAT.SHORT_NUMBER'),
+        // },
         {
             name: NUMBER_FORMAT.FULL_NUMBER,
             label: i18n.t('COMMON.WIDGETS.NUMBER_FORMAT.FULL_NUMBER'),
