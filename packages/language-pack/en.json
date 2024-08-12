@@ -1434,7 +1434,7 @@
 				"FORMAT": "Format",
 				"INCREASE": "Increase",
 				"INFO_TOOLTIP": "Compare based on granularity.",
-				"INFO_TOOLTIP_TABLE": "Compare based on granularity.\nIn Table Widget, cannot be performed\nif the Data field or Group by is set to date.",
+				"INFO_TOOLTIP_TABLE": "This feature is for comparison based on granularity. Not available if 'Data' or 'Group by' is set to 'date.'",
 				"NAME_INVALID_TEXT": "Please write at least one letter.",
 				"PERCENT": "Percentage",
 				"PREVIOUS_DAY": "Previous Day",
@@ -1452,7 +1452,7 @@
 			"DAILY_UPDATE_NO_DATA": "No Daily Update",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
 			"DATA_FIELD_HEATMAP_COLOR": {
-				"DATA_FIELD_HEATMAP_COLOR": "Data Field Heatmap Color"
+				"DATA_FIELD_HEATMAP_COLOR": "Heatmap Color by Data Field"
 			},
 			"DATA_NOT_DISPLAYED": "Data Not Displayed",
 			"DATA_NOT_DISPLAYED_DESC": "Please complete all required fields and click the [Apply] button to display the data.",
@@ -1507,8 +1507,8 @@
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
 			"DISPLAY_ANNOTATION": {
-				"DISPLAY_ANNOTATION": "Display Annotation",
-				"INVALID_VALUE": "Please enter annotation."
+				"DISPLAY_ANNOTATION": "Additional Info",
+				"INVALID_VALUE": "Please enter info."
 			},
 			"DISPLAY_SERIES_LABEL": {
 				"DISPLAY_SERIES_LABEL": "Display Series Label",
