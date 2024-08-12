@@ -29,7 +29,7 @@ export const getWidgetDataTable = async (dataTableId: string): Promise<PrivateDa
     }
 };
 
-export const sortWidgetTableFields = (fields: string[]) => {
+export const sortWidgetTableFields = (fields: string[]): string[] => {
     const priorityFields = Object.values(DATE_FIELD) as string[];
     const prioritySet = new Set(priorityFields);
 

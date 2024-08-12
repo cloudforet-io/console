@@ -152,13 +152,13 @@ watch(() => props.dateRange, () => {
         <span class="label-text">
             {{ $t('DASHBOARDS.DETAIL.BASED_ON') }}:
         </span>
-        <p-select-dropdown
-            size="sm"
-            :menu="state.monthMenuItems"
-            :selected="state.selectedMonthMenuItem.name"
-            menu-position="right"
-            reset-selection-on-menu-close
-            @select="handleSelectMonthMenuItem"
+        <p-select-dropdown class="date-dropdown"
+                           size="sm"
+                           :menu="state.monthMenuItems"
+                           :selected="state.selectedMonthMenuItem.name"
+                           menu-position="right"
+                           reset-selection-on-menu-close
+                           @select="handleSelectMonthMenuItem"
         >
             <template #menu-item--format="{ item }">
                 <span>{{ item.label }}</span>
@@ -179,6 +179,10 @@ watch(() => props.dateRange, () => {
     gap: 0.125rem;
     .label-text {
         @apply text-label-md font-bold text-gray-800;
+        width: 4.5rem;
+    }
+    .date-dropdown {
+        width: 8.5rem;
     }
 }
 </style>

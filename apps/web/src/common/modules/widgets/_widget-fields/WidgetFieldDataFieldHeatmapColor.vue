@@ -84,7 +84,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                         <template #dropdown-button="item">
                             <div class="menu-item">
                                 <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
-                                     :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}-300`]: !!getDataFieldHeatmapColor(item.name)}"
+                                     :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}-300`]: true}"
                                 />
                                 <span>{{ item.label }}</span>
                             </div>
@@ -92,7 +92,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                         <template #menu-item--format="{item}">
                             <div class="menu-item">
                                 <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
-                                     :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}-300`]: !!getDataFieldHeatmapColor(item.name)}"
+                                     :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}-300`]: true}"
                                 />
                                 <span>{{ item.label }}</span>
                             </div>
@@ -113,7 +113,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                     <template #dropdown-button="item">
                         <div class="menu-item">
                             <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
-                                 :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}`]: !!getDataFieldHeatmapColor(item.name)}"
+                                 :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}-300`]: true}"
                             />
                             <span>{{ item.label }}</span>
                         </div>
@@ -121,7 +121,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                     <template #menu-item--format="{item}">
                         <div class="menu-item">
                             <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
-                                 :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}`]: !!getDataFieldHeatmapColor(item.name)}"
+                                 :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}-300`]: true}"
                             />
                             <span>{{ item.label }}</span>
                         </div>
