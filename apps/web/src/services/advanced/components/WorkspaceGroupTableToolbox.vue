@@ -10,11 +10,12 @@ import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/worksp
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
+const workspaceGroupPageState = workspaceGroupPageStore.state;
 
 const WORKSPACE_GROUP_TOOLBOX_TYPE = WORKSPACE_GROUP_MODAL_TYPE;
 
 const state = reactive({
-    isSelected: computed(() => true),
+    isSelected: computed(() => !!workspaceGroupPageState.selectedIndices.length),
     dropdownMenu: computed<MenuItem[]>(() => ([
         {
             type: 'item',
