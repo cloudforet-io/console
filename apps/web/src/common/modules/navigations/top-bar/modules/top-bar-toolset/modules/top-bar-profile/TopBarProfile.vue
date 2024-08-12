@@ -9,7 +9,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import ejs from 'ejs';
 
 import {
-    PI, PDivider, PButton, PCopyButton, PTooltip, PLazyImg,
+    PI, PDivider, PButton, PCopyButton, PTooltip, PAvatar,
 } from '@cloudforet/mirinae';
 
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
@@ -190,10 +190,9 @@ const handleClickSignOut = async () => {
                   @click.stop="handleProfileButtonClick"
                   @keydown.enter="openProfileMenu"
             >
-                <p-lazy-img :src="state.userIcon"
-                            class="menu-icon"
-                            width="1.75rem"
-                            height="1.75rem"
+                <!-- TODO: Will add user image src -->
+                <p-avatar class="menu-icon"
+                          size="md"
                 />
             </span>
         </p-tooltip>
@@ -201,7 +200,7 @@ const handleClickSignOut = async () => {
              class="profile-menu-wrapper"
         >
             <div class="user-info">
-                <p-lazy-img :src="state.userIcon" />
+                <p-avatar size="sm" />
                 <span class="value">{{ state.userId }}</span>
             </div>
             <div class="info-wrapper">

@@ -48,6 +48,7 @@ const progressCard: WidgetConfig = {
                 toggle: true,
             },
         },
+        displayAnnotation: {},
     },
 };
 

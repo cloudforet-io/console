@@ -140,12 +140,14 @@ const handleRefresh = () => {
         <p-icon-button class="left-icon-button"
                        name="ic_renew"
                        style-type="tertiary"
+                       size="sm"
                        shape="square"
                        :disabled="props.refreshDisabled || props.loading"
                        :animation="props.loading ? 'reserve-spin' : undefined"
                        @click="handleRefresh"
         />
         <p-select-dropdown class="currency-select-dropdown"
+                           size="sm"
                            :menu="state.intervalOptionItems"
                            :selected="dashboardDetailState.options.refresh_interval_option"
                            :read-only="props.loading"
@@ -177,6 +179,7 @@ const handleRefresh = () => {
     /* custom design-system component - p-select-dropdown */
     :deep(.currency-select-dropdown) {
         .dropdown-button {
+            height: 1.5rem;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }

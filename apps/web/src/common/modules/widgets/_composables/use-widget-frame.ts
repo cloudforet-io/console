@@ -22,7 +22,7 @@ import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetFrameEmit, WidgetProps, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
-import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { WidgetFieldValues, DisplayAnnotationValue } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { FullDataLink, WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -188,6 +188,11 @@ export const useWidgetFrame = (
             if (props.loading || overrides.widgetLoading?.value) return false;
             return overrides.noData?.value || false;
         }),
+        annotation: computed<string|undefined>(() => {
+            const _displayAnnotation = props.widgetOptions?.displayAnnotation as DisplayAnnotationValue;
+            if (!_displayAnnotation?.toggleValue) return undefined;
+            return _displayAnnotation?.annotation;
+        }),
     });
     const widgetFrameProps = computed<WidgetFrameProps>(() => ({
         widgetId: props.widgetId,
@@ -208,6 +213,7 @@ export const useWidgetFrame = (
         periodText: _state.periodText,
         unitMap: _state.unitMap,
         fullDataLinkList: _state.fullDataLinkList,
+        annotation: _state.annotation,
     }));
 
     const widgetFrameEventHandlers = {

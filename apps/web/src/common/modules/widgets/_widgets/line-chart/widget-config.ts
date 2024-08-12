@@ -38,6 +38,7 @@ const lineChart: WidgetConfig = {
                 default: 'MMM DD, YYYY',
             },
         },
+        displayAnnotation: {},
     },
 };
 

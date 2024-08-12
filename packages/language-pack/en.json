@@ -1451,6 +1451,9 @@
 			"DAILY_UPDATE_HELP": "Check your resource updates on daily usage.",
 			"DAILY_UPDATE_NO_DATA": "No Daily Update",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
+			"DATA_FIELD_HEATMAP_COLOR": {
+				"DATA_FIELD_HEATMAP_COLOR": "Data Field Heatmap Color"
+			},
 			"DATA_NOT_DISPLAYED": "Data Not Displayed",
 			"DATA_NOT_DISPLAYED_DESC": "Please complete all required fields and click the [Apply] button to display the data.",
 			"DATA_TABLE": {
@@ -1463,6 +1466,8 @@
 					"RESET_DESC": "Resetting the data options will revert all inputs to their most recent values. This action cannot be undone.",
 					"RESET_HEADER": "Are you sure you want to reset the data options?"
 				},
+				"APPLY_ALL": "Apply All",
+				"APPLY_ALL_SUCCESS": "Changes have been set.",
 				"EMPTY_DESC": "Click the [+] button to add new data or transform data using various methods such as Concatenate, Join, Query, and Evaluate.",
 				"EMPTY_TITLE": "Add Data to Get Started",
 				"FORM": {
@@ -1501,6 +1506,17 @@
 			},
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
+			"DISPLAY_ANNOTATION": {
+				"DISPLAY_ANNOTATION": "Display Annotation",
+				"INVALID_VALUE": "Please enter annotation."
+			},
+			"DISPLAY_SERIES_LABEL": {
+				"DISPLAY_SERIES_LABEL": "Display Series Label",
+				"POSITION": "Position",
+				"ROTATE": "Rotate",
+				"ROTATE_MAX_INVALID_TEXT": "Must be smaller than 90",
+				"ROTATE_MIN_INVALID_TEXT": "Must be bigger than -90"
+			},
 			"DONE": "Done",
 			"DONUT": "Donut",
 			"EDIT": "Edit",
@@ -1550,6 +1566,17 @@
 				"NO_CHANGE": "No change"
 			},
 			"NUMBER_FIELD_VALIDATION": "The value must be {max} or less.",
+			"NUMBER_FORMAT": {
+				"AUTO": "Auto",
+				"CONFIRM": "Confirm",
+				"CUSTOM_NUMBER_FORMAT": "Custom number format",
+				"FULL_NUMBER": "Full Number",
+				"HELP": "Help",
+				"INVALID_NUMBER_FORMAT": "Invalid Number Format",
+				"NUMBER_FORMAT": "Number Format",
+				"SAMPLE": "Sample",
+				"SHORT_NUMBER": "Short Number"
+			},
 			"PERIOD": "Period",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "Account ID",

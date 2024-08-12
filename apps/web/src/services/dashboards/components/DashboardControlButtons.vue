@@ -31,14 +31,6 @@ const handleClickWidgetReorder = () => {
 
 <template>
     <div class="dashboard-control-buttons">
-        <p-button icon-left="ic_plus"
-                  style-type="tertiary"
-                  size="sm"
-                  :loading="state.loading"
-                  @click="handleAddWidget"
-        >
-            {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
-        </p-button>
         <p-button :icon-left="store.state.display.visibleSidebar ? 'ic_check' : 'ic_edit'"
                   :style-type="store.state.display.visibleSidebar ? 'substitutive' : 'tertiary'"
                   size="sm"
@@ -47,12 +39,20 @@ const handleClickWidgetReorder = () => {
         >
             {{ $t('DASHBOARDS.DETAIL.EDIT_LAYOUT') }}
         </p-button>
+        <p-button icon-left="ic_plus"
+                  style-type="secondary"
+                  size="sm"
+                  :loading="state.loading"
+                  @click="handleAddWidget"
+        >
+            {{ $t('DASHBOARDS.DETAIL.ADD_WIDGET') }}
+        </p-button>
     </div>
 </template>
 
 <style lang="postcss">
 .dashboard-control-buttons {
     @apply flex justify-end;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 </style>

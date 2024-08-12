@@ -39,10 +39,7 @@ const stackedAreaChart: WidgetConfig = {
                 default: 'MMM DD, YYYY',
             },
         },
-        // formatRules: {
-        //     options: {
-        //     },
-        // },
+        displayAnnotation: {},
     },
 };
 

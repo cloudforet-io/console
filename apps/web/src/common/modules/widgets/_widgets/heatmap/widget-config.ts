@@ -42,6 +42,7 @@ const heatmap: WidgetConfig = {
                 default: 'MMM DD, YYYY',
             },
         },
+        displayAnnotation: {},
     },
 };
 

@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, defineExpose, onMounted, reactive, watch,
+} from 'vue';
 
 import { intersection, isEqual } from 'lodash';
 
@@ -7,7 +9,7 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAlertModal
@@ -36,6 +38,8 @@ interface Props {
     selected: boolean;
     item: PublicDataTableModel|PrivateDataTableModel;
 }
+type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
+
 const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
@@ -44,6 +48,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
+    allDataTableInvalidMap: computed(() => widgetGenerateState.allDataTableInvalidMap),
 });
 
 const state = reactive({
@@ -81,6 +86,7 @@ const state = reactive({
         dataTables: [] as string[],
         dataTableId: undefined,
     } as TransformDataTableInfo,
+    failStatus: false,
 });
 
 const modalState = reactive({
@@ -115,37 +121,10 @@ const originState = reactive({
     }))),
 });
 
-
-/* Events */
-const handleClickDeleteDataTable = async () => {
-    modalState.mode = 'DELETE';
-    modalState.visible = true;
+const setFailStatus = (status: boolean) => {
+    state.failStatus = status;
 };
-const handleClickResetDataTable = () => {
-    modalState.mode = 'RESET';
-    modalState.visible = true;
-};
-const handleConfirmModal = async () => {
-    if (modalState.mode === 'DELETE') {
-        const beforeSelectedDataTableId = storeState.selectedDataTableId;
-        const deleteParams = {
-            data_table_id: state.dataTableId,
-        };
-        await widgetGenerateStore.deleteDataTable(deleteParams, state.isUnsaved);
-        if (beforeSelectedDataTableId === state.dataTableId) {
-            const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
-            widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
-        }
-    }
-    if (modalState.mode === 'RESET') {
-        setInitialDataTableForm();
-    }
-    modalState.visible = false;
-};
-const handleCancelModal = () => {
-    modalState.visible = false;
-};
-const handleUpdateDataTable = async () => {
+const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     const isValidDataTableId = state.dataTableInfo.dataTableId && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTableId);
     const isValidDataTables = state.dataTableInfo.dataTables.length === 2
         && !state.dataTableInfo.dataTables.includes(undefined)
@@ -153,7 +132,8 @@ const handleUpdateDataTable = async () => {
         && storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.dataTableInfo.dataTables[1]);
     if (!isValidDataTableId && !isValidDataTables) {
         showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
-        return;
+        setFailStatus(true);
+        return undefined;
     }
 
     // Duplicated Data Field Handling in 'JOIN'
@@ -169,7 +149,8 @@ const handleUpdateDataTable = async () => {
                 [state.dataTableId]: true,
             });
             showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_JOIN_FAIL_WARNING', { first_data: firstDataTable?.name || '', second_data: secondDataTable?.name || '' }), '');
-            return;
+            setFailStatus(true);
+            return undefined;
         }
     }
     const firstUpdating = state.isUnsaved;
@@ -210,53 +191,63 @@ const handleUpdateDataTable = async () => {
         };
         const dataTable = await widgetGenerateStore.createTransformDataTable(createParams, state.dataTableId);
         if (dataTable) {
-            widgetGenerateStore.setSelectedDataTableId(dataTable.data_table_id);
-            widgetGenerateStore.setDataTableUpdating(true);
-            await widgetGenerateStore.loadDataTable({
-                data_table_id: dataTable.data_table_id,
-            });
+            const _allDataTableInvalidMap = {
+                ...storeState.allDataTableInvalidMap,
+            };
+            delete _allDataTableInvalidMap[state.dataTableId];
+            widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
+            setFailStatus(false);
+            return dataTable;
         }
-        return;
+        setFailStatus(true);
+        return undefined;
     }
     const updateParams = {
         data_table_id: state.dataTableId,
         name: state.dataTableName,
         options: { [state.operator]: options() },
     };
-    await widgetGenerateStore.updateDataTable(updateParams);
-    widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
-    widgetGenerateStore.setDataTableUpdating(true);
-    await widgetGenerateStore.loadDataTable({
-        data_table_id: state.dataTableId,
-    });
-
-
-    // Update Referenced Transformed DataTable
-    const referencedDataTableIds = [] as string[];
-    storeState.dataTables.forEach((dataTable) => {
-        const transformDataTalbeOptions = dataTable.options as DataTableTransformOptions;
-        const isReferenced = dataTable.data_type === 'TRANSFORMED'
-            && !dataTable?.data_table_id?.startsWith('UNSAVED-')
-            && (
-                transformDataTalbeOptions?.JOIN?.data_tables?.includes(state.dataTableId)
-                || transformDataTalbeOptions?.CONCAT?.data_tables?.includes(state.dataTableId)
-                || transformDataTalbeOptions?.QUERY?.data_table_id === state.dataTableId
-                || transformDataTalbeOptions?.EVAL?.data_table_id === state.dataTableId
-            );
-        if (isReferenced) referencedDataTableIds.push(dataTable.data_table_id as string);
-    });
-    if (referencedDataTableIds.length) {
-        await Promise.all(referencedDataTableIds.map((dataTableId) => {
-            const dataTable = storeState.dataTables.find((_dataTable) => _dataTable.data_table_id === dataTableId) as PublicDataTableModel|PrivateDataTableModel;
-            widgetGenerateStore.updateDataTable({
-                data_table_id: dataTable.data_table_id,
-                name: dataTable.name,
-                options: {
-                    ...dataTable.options,
-                },
-            });
-            return null;
-        }));
+    const result = await widgetGenerateStore.updateDataTable(updateParams);
+    if (!result) setFailStatus(true);
+    else setFailStatus(false);
+    return result;
+};
+/* Events */
+const handleClickDeleteDataTable = async () => {
+    modalState.mode = 'DELETE';
+    modalState.visible = true;
+};
+const handleClickResetDataTable = () => {
+    modalState.mode = 'RESET';
+    modalState.visible = true;
+};
+const handleConfirmModal = async () => {
+    if (modalState.mode === 'DELETE') {
+        const beforeSelectedDataTableId = storeState.selectedDataTableId;
+        const deleteParams = {
+            data_table_id: state.dataTableId,
+        };
+        await widgetGenerateStore.deleteDataTable(deleteParams, state.isUnsaved);
+        if (beforeSelectedDataTableId === state.dataTableId) {
+            const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
+            widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
+        }
+    }
+    if (modalState.mode === 'RESET') {
+        setInitialDataTableForm();
+    }
+    modalState.visible = false;
+};
+const handleCancelModal = () => {
+    modalState.visible = false;
+};
+const handleUpdateDataTable = async () => {
+    const result = await updateDataTable();
+    if (result) {
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
+        widgetGenerateStore.setSelectedDataTableId(result.data_table_id);
+        widgetGenerateStore.setDataTableUpdating(true);
+        await widgetGenerateStore.loadDataTable({});
     }
 };
 
@@ -274,11 +265,24 @@ onMounted(() => {
     setInitialDataTableForm();
 });
 
+// Validation
+watch(() => state.applyDisabled, (invalid) => {
+    const _allDataTableInvalidMap = {
+        ...storeState.allDataTableInvalidMap,
+        [state.dataTableId]: invalid,
+    };
+    widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
+}, { immediate: true });
+
+defineExpose({
+    updateDataTable,
+});
+
 </script>
 
 <template>
     <div class="widget-form-data-table-card-transform-contents"
-         :class="{ 'selected': props.selected }"
+         :class="{ 'selected': props.selected, 'failed': state.failStatus }"
     >
         <div class="card-header">
             <widget-form-data-table-card-header-title :data-table-id="state.dataTableId"
@@ -327,6 +331,11 @@ onMounted(() => {
         .card-header {
             @apply bg-violet-100 border border-violet-200;
         }
+    }
+
+    &.failed {
+        @apply border-red-400;
+        box-shadow: 0 0 0 0.1875rem rgba(255, 193, 193, 1);
     }
 
     .card-header {

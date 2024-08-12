@@ -193,8 +193,9 @@ const drawChart = (rawData?: Data|null) => {
     // slice stackByData by stackByCount
     const _slicedByStackBy: any[] = [];
     rawData.results?.forEach((d) => {
-        const _slicedData = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.stackByCount);
-        const _etcData = d[state.dataField]?.slice(state.stackByCount).reduce((acc, v) => {
+        const _orderedData = orderBy(d[state.dataField], 'value', 'desc') ?? [];
+        const _slicedData = _orderedData.slice(0, state.stackByCount);
+        const _etcData = _orderedData.slice(state.stackByCount).reduce((acc, v) => {
             acc[state.stackByField] = 'etc';
             acc.value += v.value || 0;
             return acc;

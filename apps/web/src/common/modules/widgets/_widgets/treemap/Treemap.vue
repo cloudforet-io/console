@@ -145,9 +145,9 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 };
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
-    const _sortedData = orderBy(rawData.results, [state.dataField], ['desc']);
-    const _slicedData = _sortedData.slice(0, state.categoryByCount);
-    const _etcValue = _sortedData.slice(state.categoryByCount).reduce((acc, v) => acc + v[state.dataField], 0);
+    const _orderedData = orderBy(rawData.results, [state.dataField], ['desc']);
+    const _slicedData = _orderedData.slice(0, state.categoryByCount);
+    const _etcValue = _orderedData.slice(state.categoryByCount).reduce((acc, v) => acc + v[state.dataField], 0);
     const _etcData = _etcValue ? {
         [state.categoryByField]: 'etc',
         [state.dataField]: _etcValue,

@@ -50,3 +50,33 @@ export const DATE_FORMAT = {
         DAILY: 'DD',
     },
 } as const;
+
+export const NUMBER_FORMAT = {
+    AUTO: 'AUTO',
+    SHORT_NUMBER: 'SHORT_NUMBER',
+    FULL_NUMBER: 'FULL_NUMBER',
+    CUSTOM: 'CUSTOM',
+} as const;
+
+export const DATA_FIELD_HEATMAP_COLOR = {
+    NONE: {
+        key: 'NONE',
+        label: 'None',
+    },
+    RED: {
+        key: 'RED',
+        label: 'Red',
+    },
+    BLUE: {
+        key: 'BLUE',
+        label: 'Blue',
+    },
+    GREEN: {
+        key: 'GREEN',
+        label: 'Green',
+    },
+    YELLOW: {
+        key: 'YELLOW',
+        label: 'Yellow',
+    },
+} as const;

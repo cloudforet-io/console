@@ -29,6 +29,7 @@ export { default as PTooltip } from './data-display/tooltips/PTooltip.vue';
 export { default as PTree } from './data-display/tree/PTree.vue';
 export { default as PTreeView } from './data-display/tree/tree-view/PTreeView.vue';
 export { default as PTreeItem } from './data-display/tree/tree-view/PTreeItem.vue';
+export { default as PAvatar } from './data-display/avatar/PAvatar.vue';
 
 /* Feedbacks */
 export { default as PNoticeAlert } from './feedbacks/alert/notice-alert/PNoticeAlert.vue';
@@ -77,6 +78,7 @@ export { default as PSelectCard } from './inputs/select-card/PSelectCard.vue';
 export { default as PSelectStatus } from './inputs/select-status/PSelectStatus.vue';
 export { default as PTextEditor } from './inputs/text-editor/PTextEditor.vue';
 export { default as PTextarea } from './inputs/textarea/PTextarea.vue';
+export { default as PSlider } from './inputs/slider/PSlider.vue';
 
 
 /* Layouts */

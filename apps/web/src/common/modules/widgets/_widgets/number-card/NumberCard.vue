@@ -31,6 +31,7 @@ import {
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
@@ -38,6 +39,7 @@ import type {
 import type {
     IconValue,
     ComparisonValue,
+    NumberFormatValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
@@ -54,6 +56,7 @@ const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     previousValue: computed<number>(() => {
         const _dateFormat = getDateFormat(state.granularity);
         const _timeUnit = getTimeUnit(state.granularity);
@@ -65,7 +68,10 @@ const state = reactive({
         const _currentDate = dayjs.utc(state.basedOnDate).format(_dateFormat);
         return state.data?.results.find((item) => item[DATE_FIELD.DATE] === _currentDate)?.[state.dataField] ?? 0;
     }),
-    valueText: computed<string|undefined>(() => numberFormatter(state.currentValue, { notation: 'compact' })),
+    valueText: computed<string|undefined>(() => {
+        const _numberFormatMap = props.widgetOptions?.numberFormat as NumberFormatValue;
+        return getFormattedNumber(state.currentValue, state.dataField, _numberFormatMap, state.unit);
+    }),
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),

@@ -188,7 +188,9 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
         state.thisPage = 1;
         state.sortBy = [];
     }
-});
+    widgetGenerateStore.setDataTableUpdating(true);
+    await widgetGenerateStore.loadDataTable({});
+}, { immediate: true });
 
 watch(() => storeState.dataTableUpdating, () => {
     if (storeState.dataTableUpdating) {

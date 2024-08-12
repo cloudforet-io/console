@@ -12,7 +12,6 @@ import { init } from 'echarts/core';
 import { isEmpty, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
@@ -27,12 +26,13 @@ import {
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { FormatRulesValue, NumberFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
 
@@ -47,6 +47,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
+    unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     data: null as Data | null,
     chart: null as EChartsType | null,
     chartData: undefined as undefined|number,
@@ -76,15 +77,15 @@ const state = reactive({
                     },
                 },
                 axisLabel: {
-                    distance: -45,
+                    distance: -55,
                     color: gray[700],
                     fontSize: 12,
-                    formatter: (val) => numberFormatter(val, { notation: 'compact' }) || '--',
+                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormatter, state.unit),
                 },
                 detail: {
                     offsetCenter: [0, 0],
                     fontSize: 32,
-                    formatter: (val) => numberFormatter(val, { notation: 'compact' }) || '--',
+                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormatter, state.unit),
                     color: gray[700],
                 },
                 data: [
@@ -125,6 +126,8 @@ const state = reactive({
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 2);
         return { start: _start, end: _end };
     }),
+    // optional fields
+    numberFormatter: computed(() => props.widgetOptions?.numberFormat as NumberFormatValue),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => ({
