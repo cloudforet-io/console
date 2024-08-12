@@ -352,7 +352,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
         top: 0.25rem;
         display: none;
         gap: 0.25rem;
-        z-index: 1000;
+        z-index: 100;
         padding: 0.25rem;
         &.selected {
             display: flex;
