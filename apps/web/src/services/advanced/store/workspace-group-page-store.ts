@@ -1,19 +1,28 @@
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+
 export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', () => {
     const state = reactive({
-        groups: [],
+        groups: [] as WorkspaceGroupModel[],
         groupUsers: [],
         workspaces: [],
-        selectedGroup: {},
+        selectedIndices: [] as number[],
         modal: {
             type: '',
             title: '',
             themeColor: 'primary',
             visible: '',
         },
+    });
+
+    const getters = reactive({
+        selectedGroup: computed(() => {
+            const [index] = state.selectedIndices;
+            return state.groups[index];
+        }),
     });
 
     const actions = {
@@ -39,6 +48,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
 
     return {
         state,
+        getters,
         ...actions,
     };
 });
