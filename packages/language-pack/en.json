@@ -2705,6 +2705,22 @@
 			"TOOLTIP_COST": "based on Cost Report",
 			"TOOLTIP_STATE": "With ‘Dormancy Configuration’ turned on, workspaces with a total cost lower than the user-defined threshold will automatically be set to dormant. The threshold can be changed in [Preferences > Domain Settings > Auto Dormancy Configuration].",
 			"WORKSPACES": "Workspaces"
+		},
+		"WORKSPACE_GROUP": {
+			"TITLE": "Workspace Group",
+			"CREATE": "Create",
+			"MAIN": {
+				"TOOLBOX_PLACEHOLDER": "Action",
+				"EDIT": "Edit",
+				"DELETE": "Delete"
+			},
+			"TAB": {
+				"GROUP_USER": "Group User",
+				"WORKSPACE": "Workspace",
+				"ADD_USER": "Add User",
+				"ADD_WORKSPACE": "Add Workspace",
+				"REMOVE": "Remove"
+			}
 		}
 	},
 	"IDENTITY": {
