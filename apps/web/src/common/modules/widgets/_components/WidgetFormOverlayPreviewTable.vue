@@ -415,7 +415,7 @@ watch(() => storeState.dataTableUpdating, () => {
         .td-contents {
             @apply inline-flex gap-2 items-center;
             width: 100%;
-            height: 2.25rem;
+            min-height: 2.25rem;
 
             &.data-field {
                 @apply justify-end;
