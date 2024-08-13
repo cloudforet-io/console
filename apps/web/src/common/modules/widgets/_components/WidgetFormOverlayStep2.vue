@@ -14,6 +14,7 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import WidgetFormOverlayStep2WidgetForm
@@ -44,8 +45,13 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(event: 'watch-options-changed', value: boolean): void;}>();
+
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 
 const state = reactive({
     mounted: false,
@@ -82,6 +88,7 @@ const state = reactive({
     //
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
+    isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared && !storeState.isAdminMode),
 });
 
 const {
@@ -211,7 +218,7 @@ onUnmounted(() => {
                                                 :is-project-dashboard="!!dashboardDetailState.projectId"
                         />
                     </div>
-                    <p-button v-if="!dashboardDetailState.projectId && widgetGenerateState.overlayType === 'EXPAND'"
+                    <p-button v-if="!state.isSharedDashboard && !dashboardDetailState.projectId && widgetGenerateState.overlayType === 'EXPAND'"
                               style-type="tertiary"
                               icon-left="ic_edit"
                               class="edit-button"

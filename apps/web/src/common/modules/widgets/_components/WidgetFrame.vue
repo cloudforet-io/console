@@ -267,9 +267,6 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
     display: inline-flex;
     flex-direction: column;
     padding: 1rem;
-    &.sm {
-        height: 11rem;
-    }
     &:hover {
         .action-button-wrapper {
             display: flex;

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useElementSize } from '@vueuse/core';
-import { useResizeObserver } from '@vueuse/core/index';
+import { useElementSize, useResizeObserver } from '@vueuse/core';
 import {
     computed, defineExpose, reactive, ref,
 } from 'vue';
@@ -252,6 +251,7 @@ defineExpose<WidgetExpose<Data>>({
 
 <style lang="postcss" scoped>
 .content-wrapper {
+    @apply flex flex-col justify-center;
     height: 100%;
     .top-part {
         display: flex;
