@@ -47,7 +47,6 @@ const SKIP_HEATMAP_FIELD = ['subTotal', 'comparison'];
 interface Props {
   fields: TableWidgetField[];
   items?: any[];
-  pageTotal?: TableDataItem;
   currency?: Currency;
   size?: WidgetSize;
   widgetId: string;
@@ -87,7 +86,34 @@ const state = reactive({
         if (!props.granularity || !props.dateFormatInfo) return undefined;
         return getRefinedDateFormatByGranularity(props.granularity, props.dateFormatInfo.value);
     }),
-    totalItem: computed<TableDataItem|undefined>(() => props.pageTotal),
+    linearInterpolationValueMap: computed<Record<string, { min: number, max: number }>>(() => {
+        if (!props.items || !props.items.length) return {};
+        const dataItems = props.totalInfo?.toggleValue ? props.items.slice(0, -1) : props.items;
+        if (props.fieldType === 'staticField') {
+            return props.fields.reduce((acc, field) => {
+                if (field.fieldInfo?.type === 'dataField') {
+                    const dataField = field.name;
+                    const maxValue = Math.max(...dataItems.map((item) => item[dataField] || 0));
+                    const minValue = Math.min(...dataItems.map((item) => item[dataField] || 0));
+                    return { ...acc, [dataField]: { min: minValue, max: maxValue } };
+                }
+                return acc;
+            }, {});
+        }
+        if (props.fieldType === 'dynamicField') {
+            return props.fields.reduce((acc, field) => {
+                if (field.fieldInfo?.type === 'dataField') {
+                    const dataField = field.name;
+                    if (field.name === 'Total') return acc;
+                    const maxValue = Math.max(...dataItems.map((item) => item[props.criteria || '']?.find((data) => data[props.dataField as string] === dataField)?.value || 0));
+                    const minValue = Math.min(...dataItems.map((item) => item[props.criteria || '']?.find((data) => data[props.dataField as string] === dataField)?.value || 0));
+                    return { ...acc, [dataField]: { min: minValue, max: maxValue } };
+                }
+                return acc;
+            }, {});
+        }
+        return {};
+    }),
 });
 
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
@@ -221,18 +247,18 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 
     let _dataField = '';
     let _value = 0;
-    let _totalValue = 100;
+    const minValue = state.linearInterpolationValueMap[field.name].min;
+    const maxValue = state.linearInterpolationValueMap[field.name].max;
+    const absGapValue = maxValue - minValue;
     if (props.fieldType === 'staticField') {
         _value = item[field.name] || 0;
-        _totalValue = state.totalItem?.[field.name] || 100;
         _dataField = field.name;
     } else if (props.fieldType === 'dynamicField') {
         _value = item[props.criteria || '']?.find((data) => data[props.dataField as string] === field.name)?.value || 0;
-        _totalValue = state.totalItem?.[props.criteria || '']?.find((data) => data[props.dataField as string] === field.name)?.value || 100;
         _dataField = props.criteria as string;
     }
 
-    const opacity = 0.1 + (0.9 * (_value / _totalValue));
+    const opacity = 0.1 + (0.9 * ((_value - minValue) / absGapValue));
     const _colorInfo = props.dataFieldHeatmapColorInfo?.[_dataField]?.value;
     if (_colorInfo && _colorInfo !== 'NONE') {
         const rgbaString = hexToRgba(HEATMAP_COLOR_HEX_MAP[_colorInfo], opacity);

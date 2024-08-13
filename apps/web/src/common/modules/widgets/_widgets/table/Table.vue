@@ -70,7 +70,6 @@ const state = reactive({
     staticFieldSlicedData: null as Data | null,
     timeSeriesDynamicFieldSlicedData: null as Data | null,
     noneTimeSeriesDynamicFieldSlicedData: null as Data | null,
-    pageTotalData: undefined as TableDataItem|undefined,
     // data fetch options
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
@@ -384,9 +383,6 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
             return dataItem;
         });
 
-        // Page Total Data
-        state.pageTotalData = getTotalDataItem(results, 'static');
-
         // Full Total Data
         if (state.totalInfo?.toggleValue) {
             const fullDataComparison = state.fullPageComparisonData?.results ?? [];
@@ -423,9 +419,6 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
                 [state.tableDataCriteria]: [...d[state.tableDataCriteria].slice(-state.tableDataMaxCount), subTotal],
             };
         });
-
-        // Page Total Data
-        state.pageTotalData = getTotalDataItem(results, 'time_series');
 
         // Full Total Data
         if (state.totalInfo?.toggleValue) {
@@ -491,9 +484,6 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
                 ],
             };
         });
-
-        // Page Total Data
-        state.pageTotalData = getTotalDataItem(results, 'dynamic');
 
         // Full Total Data
         if (state.totalInfo?.toggleValue) {
@@ -564,7 +554,6 @@ defineExpose<WidgetExpose<Data>>({
                                    :widget-id="props.widgetId"
                                    :fields="state.tableFields"
                                    :items="state.finalConvertedData?.results"
-                                   :page-total="state.pageTotalData"
                                    :field-type="state.tableDataFieldType"
                                    :criteria="state.tableDataCriteria"
                                    :data-field="state.tableDataField"
