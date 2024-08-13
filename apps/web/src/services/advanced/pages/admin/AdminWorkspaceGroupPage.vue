@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUnmounted, reactive } from 'vue';
+import { onUnmounted } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
@@ -24,16 +24,12 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 
-const state = reactive({
-    loading: false,
-});
-
 const fetchWorkspaceGroups = async () => {
-    state.loading = true;
+    workspaceGroupPageState.loading = true;
 
     try {
         // TODO: apply Destructuring
-        const results = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>({}) as WorkspaceGroupModel[];
+        const results = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>() as WorkspaceGroupModel[];
 
         workspaceGroupPageState.groups = results;
         workspaceGroupPageState.selectedIndices = [];
@@ -41,7 +37,7 @@ const fetchWorkspaceGroups = async () => {
         ErrorHandler.handleError(e);
         workspaceGroupPageState.groups = [];
     } finally {
-        state.loading = false;
+        workspaceGroupPageState.loading = false;
     }
 };
 
@@ -68,7 +64,9 @@ onUnmounted(() => {
         <workspace-group-header />
         <p-horizontal-layout class="user-group-toolbox-layout">
             <template #container="{ height }">
-                <workspace-group-table :table-height="height" />
+                <workspace-group-table :table-height="height"
+                                       @confirm="fetchWorkspaceGroups"
+                />
             </template>
         </p-horizontal-layout>
         <workspace-group-tab />
