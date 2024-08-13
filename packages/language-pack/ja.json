@@ -1404,7 +1404,7 @@
 			"CHANGE_DATA_MODAL_DESCRIPTION": "下記に設定されたすべてのオプションがリセットされます。",
 			"CHANGE_DATA_MODAL_TITLE": "データを変更しますか？",
 			"CLONE": "複製",
-			"CLONE_SUCCESS_MSG": "",
+			"CLONE_SUCCESS_MSG": "新しいウィジェットとして正常にクローンされました。",
 			"CLOUD_SERVICE": {
 				"HELP": "サービスしている主要なクラウドサービスリストを表示します",
 				"NO_DATA": "クラウドリソースがありません。",
@@ -1433,8 +1433,8 @@
 				"FIXED": "固定金額",
 				"FORMAT": "フォーマット",
 				"INCREASE": "増加する",
-				"INFO_TOOLTIP": "",
-				"INFO_TOOLTIP_TABLE": "",
+				"INFO_TOOLTIP": "粒度に基づいて比較する",
+				"INFO_TOOLTIP_TABLE": "この機能は粒度に基づく比較のためのものです。'データ' または 'グループ化' が '日付' に設定されている場合は使用できません。",
 				"NAME_INVALID_TEXT": "少なくとも1つの文字を書いてください。",
 				"PERCENT": "比率",
 				"PREVIOUS_DAY": "前日",
@@ -1452,7 +1452,7 @@
 			"DAILY_UPDATE_NO_DATA": "本日の変更事項はありません。",
 			"DAILY_UPDATE_TITLE": "本日の変更事項",
 			"DATA_FIELD_HEATMAP_COLOR": {
-				"DATA_FIELD_HEATMAP_COLOR": ""
+				"DATA_FIELD_HEATMAP_COLOR": "データ別ヒートマップ色"
 			},
 			"DATA_NOT_DISPLAYED": "データが表示されません",
 			"DATA_NOT_DISPLAYED_DESC": "すべての必須フィールドを設定し、[適用]ボタンをクリックしてウィジェットの設定を完了してください。",
@@ -1466,8 +1466,8 @@
 					"RESET_DESC": "データオプションをリセットすると、すべての入力が最新の値に戻ります。この操作は元に戻せません。",
 					"RESET_HEADER": "データオプションをリセットしてもよろしいですか？"
 				},
-				"APPLY_ALL": "",
-				"APPLY_ALL_SUCCESS": "",
+				"APPLY_ALL": "すべて適用",
+				"APPLY_ALL_SUCCESS": "変更が正常に適用されました。",
 				"EMPTY_DESC": "[+] ボタンを使用して新しいデータを追加するか 連結、\n結合、クエリ、評価などのさまざまな方法を使用してデータを変更してください。",
 				"EMPTY_TITLE": "データを追加して開始する",
 				"FORM": {
@@ -1507,18 +1507,18 @@
 			"DEFAULT_WIDTH": "デフォルト幅",
 			"DELETE": "削除",
 			"DISPLAY_ANNOTATION": {
-				"DISPLAY_ANNOTATION": "",
-				"INVALID_VALUE": ""
+				"DISPLAY_ANNOTATION": "追加情報",
+				"INVALID_VALUE": "情報を入力してください。"
 			},
 			"DISPLAY_SERIES_LABEL": {
-				"DISPLAY_SERIES_LABEL": "",
-				"POSITION": "",
-				"ROTATE": "",
-				"ROTATE_MAX_INVALID_TEXT": "",
-				"ROTATE_MIN_INVALID_TEXT": ""
+				"DISPLAY_SERIES_LABEL": "系列ラベルを表示",
+				"POSITION": "位置",
+				"ROTATE": "回転",
+				"ROTATE_MAX_INVALID_TEXT": "90より小さい必要があります",
+				"ROTATE_MIN_INVALID_TEXT": "-90より大きい必要があります"
 			},
 			"DONE": "完了",
-			"DONUT": "",
+			"DONUT": "Donut",
 			"EDIT": "編集",
 			"EDIT_WIDGET": "ウィジェット編集",
 			"EXPAND": "展開する",
@@ -1569,13 +1569,13 @@
 			"NUMBER_FORMAT": {
 				"AUTO": "自動",
 				"CONFIRM": "確認",
-				"CUSTOM_NUMBER_FORMAT": "",
-				"FULL_NUMBER": "",
+				"CUSTOM_NUMBER_FORMAT": "カスタム数値形式",
+				"FULL_NUMBER": "フル表示",
 				"HELP": "ヘルプ",
-				"INVALID_NUMBER_FORMAT": "",
-				"NUMBER_FORMAT": "",
-				"SAMPLE": "",
-				"SHORT_NUMBER": ""
+				"INVALID_NUMBER_FORMAT": "無効な数値形式",
+				"NUMBER_FORMAT": "数値形式",
+				"SAMPLE": "サンプル",
+				"SHORT_NUMBER": "短縮表示"
 			},
 			"PERIOD": "期間",
 			"PERSONAL_HEALTH_DASHBOARD": {
@@ -1603,8 +1603,8 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "過去7日〜予定日程"
 			},
-			"PIE": "",
-			"PIE_CHART_TYPE": "",
+			"PIE": "Pie",
+			"PIE_CHART_TYPE": "円グラフのタイプ",
 			"PREVIEW_TABLE_EMPTY_DESC": "プレビューがここに表示されます。",
 			"PREVIEW_TABLE_EMPTY_TITLE": "データを追加してください。",
 			"REQUIRED_FIELDS_ARE_MISSING": "必須フィールドが欠落しています。",
@@ -1681,8 +1681,8 @@
 				"TITLE": "Trusted Advisor"
 			},
 			"UNABLE_TO_LOAD_WIDGET": "ウィジェット表示不可",
-			"VIEW_FULL_DATA": "",
-			"WIDGET_TITLE_REQUIRED": ""
+			"VIEW_FULL_DATA": "データ全体を表示",
+			"WIDGET_TITLE_REQUIRED": "ウィジェットのタイトルを入力してください。"
 		}
 	},
 	"COST_EXPLORER": {
@@ -1858,7 +1858,7 @@
 			}
 		},
 		"DETAIL": {
-			"1": "",
+			"1": "コードで共有",
 			"ADD_WIDGET": "ウィジェットを追加する",
 			"ALL_PROJECTS": "すべてのプロジェクト",
 			"ALL_WORKSPACES": "すべてのワークスペース",
@@ -2129,7 +2129,7 @@
 						"PROGRESS_CARD_DESC": "このグラフを適切に表示するには、少なくとも2つのデータフィールドが必要です。",
 						"TITLE": "追加のフィールドが必要です。"
 					},
-					"WIDGET_HEADER": "",
+					"WIDGET_HEADER": "ウィジェットヘッダー",
 					"X_AXIS": "X軸",
 					"Y_AXIS": "Y軸"
 				}
@@ -3623,7 +3623,7 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "追加設定",
 		"ADMINISTRATION": "管理",
-		"ADMINISTRATION_ADVANCED": "",
+		"ADMINISTRATION_ADVANCED": "高度な設定",
 		"ADMINISTRATION_APP": "アプリ",
 		"ADMINISTRATION_BOOKMARK": "ブックマーク",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "ドメイン設定",
@@ -4273,13 +4273,13 @@
 			"DASHBOARD": {
 				"DASHBOARD": "ダッシュボード",
 				"DASHBOARD_LIST": "ダッシュボードリスト",
-				"NO_DASHBOARD": "",
-				"NO_DASHBOARD_DESC": ""
+				"NO_DASHBOARD": "ダッシュボードなし",
+				"NO_DASHBOARD_DESC": "共有ダッシュボードを追加。"
 			},
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
 			"FAILED": "失敗",
-			"GO_TO_DASHBOARD": "",
+			"GO_TO_DASHBOARD": "ダッシュボードに移動",
 			"HELP": "ヘルプ",
 			"INVITE_ONLY": "招待のみ",
 			"MEMBER": {

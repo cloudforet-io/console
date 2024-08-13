@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { onClickOutside } from '@vueuse/core';
+import { computed, reactive, ref } from 'vue';
 
 import { PButton, PBadge, PPopover } from '@cloudforet/mirinae';
 
@@ -19,6 +20,7 @@ const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
+const labelPopoverRef = ref<HTMLElement|null>(null);
 
 const storeState = reactive({
     labelList: computed(() => dashboardDetailState.labels),
@@ -37,11 +39,14 @@ const handleUpdateLabels = async (labels: string[]) => {
         ErrorHandler.handleError(e);
     }
 };
+
+onClickOutside(labelPopoverRef, () => { state.visible = false; });
 </script>
 
 <template>
     <div class="dashboard-labels-button">
-        <p-popover :is-visible.sync="state.visible"
+        <p-popover ref="labelPopoverRef"
+                   :is-visible.sync="state.visible"
                    tag="div"
                    position="bottom"
         >

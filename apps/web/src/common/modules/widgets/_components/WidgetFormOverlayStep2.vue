@@ -199,11 +199,14 @@ onUnmounted(() => {
         <div class="left-part">
             <div class="dashboard-settings-wrapper">
                 <div class="toolbox-wrapper">
-                    <dashboard-toolset-date-dropdown :date-range="state.dashboardOptionsSnapshot.date_range" />
+                    <dashboard-toolset-date-dropdown widget-mode
+                                                     :date-range="state.dashboardOptionsSnapshot.date_range"
+                    />
                     <p-divider vertical
                                class="divider"
                     />
                     <dashboard-variables-v2 disable-save-button
+                                            widget-mode
                                             :is-project-dashboard="!!dashboardDetailState.projectId"
                     />
                     <p-button v-if="!dashboardDetailState.projectId && widgetGenerateState.overlayType === 'EXPAND'"
@@ -309,6 +312,8 @@ onUnmounted(() => {
                 display: flex;
                 gap: 0.5rem;
                 align-items: center;
+                justify-content: end;
+                min-width: 14rem;
                 .divider {
                     height: 1.5rem;
                 }
