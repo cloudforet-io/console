@@ -211,15 +211,12 @@ onMounted(async () => {
         @apply bg-gray-100 border border-gray-150 rounded-md relative w-full flex flex-col;
         .data-table-area {
             @apply relative flex-1 h-full w-full;
-            //padding: 1rem 1rem 1.125rem;
-            //margin-bottom: 1.125rem;
             overflow: hidden;
 
             .all-apply-wrapper {
                 @apply flex items-center justify-between absolute gap-2 rounded-md bg-violet-150;
                 right: 1.5rem;
                 bottom: 1.5rem;
-                width: 9.875rem;
                 padding: 0.5rem 0.5rem 0.5rem 1rem;
             }
             .data-table-scroll-wrapper {
