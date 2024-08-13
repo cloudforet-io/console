@@ -89,7 +89,7 @@ onMounted(() => {
                 <template #default="{invalid}">
                     <p-text-input :value="annotation"
                                   type="text"
-                                  placeholder=""
+                                  :placeholder="$t('COMMON.WIDGETS.DISPLAY_ANNOTATION.PLACEHOLDER')"
                                   :invalid="invalid"
                                   @update:value="handleUpdateAnnotation"
                     />
@@ -112,5 +112,10 @@ onMounted(() => {
             width: 100%;
         }
     }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
 }
 </style>

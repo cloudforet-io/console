@@ -199,16 +199,18 @@ onUnmounted(() => {
         <div class="left-part">
             <div class="dashboard-settings-wrapper">
                 <div class="toolbox-wrapper">
-                    <dashboard-toolset-date-dropdown widget-mode
-                                                     :date-range="state.dashboardOptionsSnapshot.date_range"
-                    />
-                    <p-divider vertical
-                               class="divider"
-                    />
-                    <dashboard-variables-v2 disable-save-button
-                                            widget-mode
-                                            :is-project-dashboard="!!dashboardDetailState.projectId"
-                    />
+                    <div class="left-wrapper">
+                        <dashboard-toolset-date-dropdown widget-mode
+                                                         :date-range="state.dashboardOptionsSnapshot.date_range"
+                        />
+                        <p-divider vertical
+                                   class="divider"
+                        />
+                        <dashboard-variables-v2 disable-save-button
+                                                widget-mode
+                                                :is-project-dashboard="!!dashboardDetailState.projectId"
+                        />
+                    </div>
                     <p-button v-if="!dashboardDetailState.projectId && widgetGenerateState.overlayType === 'EXPAND'"
                               style-type="tertiary"
                               icon-left="ic_edit"
@@ -297,14 +299,17 @@ onUnmounted(() => {
                 height: 1rem;
             }
             .toolbox-wrapper {
-                @apply flex items-center;
-                gap: 0.5rem;
-                .dashboard-variables-select-dropdown {
-                    @apply relative flex items-center flex-wrap;
+                @apply flex items-center justify-between w-full;
+                .left-wrapper {
+                    @apply flex items-center;
                     gap: 0.5rem;
+                    .dashboard-variables-select-dropdown {
+                        @apply relative flex items-center flex-wrap;
+                        gap: 0.5rem;
+                    }
                 }
                 .edit-button {
-                    position: absolute;
+                    position: relative;
                     right: 4.5rem;
                 }
             }
