@@ -247,8 +247,10 @@ const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
                     />
                     {{ state.badgeText }}
                 </p-badge>
-                <p-select-dropdown style-type="icon-button"
+                <p-select-dropdown class="dashboard-setting-dropdown"
+                                   style-type="tertiary-icon-button"
                                    button-icon="ic_ellipsis-horizontal"
+                                   size="sm"
                                    :menu="state.menuItems"
                                    :selected="[]"
                                    use-fixed-menu-style
@@ -335,6 +337,9 @@ const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
 <style lang="postcss" scoped>
 .dashboard-detail-header {
     margin-bottom: 0.75rem;
+    .dashboard-setting-dropdown {
+        margin-right: 0.5rem;
+    }
     .p-heading {
         align-items: center;
         margin-bottom: 0;
