@@ -23,6 +23,7 @@ interface Props {
     loading?: boolean;
     disableSaveButton?: boolean;
     originVars?: DashboardVars;
+    widgetMode?: boolean; // NOTE: this for widget mode (temporary)
 }
 
 const props = defineProps<Props>();
@@ -76,7 +77,7 @@ const handleResetVariables = () => {
 </script>
 
 <template>
-    <div class="dashboard-variables-select-dropdown">
+    <div :class="{'dashboard-variables-select-dropdown': true, 'detail-page': !props.widgetMode}">
         <template v-for="([propertyName, property], idx) in Object.entries(state.variableProperties)">
             <div :key="`${propertyName}-${idx}`"
                  class="variable-selector-box"
@@ -121,8 +122,10 @@ const handleResetVariables = () => {
 
 <style lang="postcss" scoped>
 .dashboard-variables-select-dropdown {
-    @apply w-full rounded-xl border border-gray-200 bg-white;
-    padding: 1rem;
+    &.detail-page {
+        @apply w-full rounded-xl border border-gray-200 bg-white;
+        padding: 1rem;
+    }
     .variable-selector-box {
         position: relative;
         .circle-mark {
