@@ -1508,7 +1508,8 @@
 			"DELETE": "削除",
 			"DISPLAY_ANNOTATION": {
 				"DISPLAY_ANNOTATION": "追加情報",
-				"INVALID_VALUE": "情報を入力してください。"
+				"INVALID_VALUE": "情報を入力してください。",
+				"PLACEHOLDER": "基準: 1万円"
 			},
 			"DISPLAY_SERIES_LABEL": {
 				"DISPLAY_SERIES_LABEL": "系列ラベルを表示",
@@ -1645,6 +1646,7 @@
 			"SERVICE_SUMMARY_SERVER": "サーバ",
 			"SET_CHART_OPTIONS": "チャートオプション設定",
 			"SET_DATA_SOURCE": "データソース設定",
+			"TABLE_HEATMAP_COLOR_NONE": "ない",
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "プロジェクト作成",
 				"NO_PROJECT": "プロジェクトなし",

@@ -1508,7 +1508,8 @@
 			"DELETE": "삭제",
 			"DISPLAY_ANNOTATION": {
 				"DISPLAY_ANNOTATION": "부가 정보 표시",
-				"INVALID_VALUE": "추가로 표시할 내용을 입력해주세요."
+				"INVALID_VALUE": "추가로 표시할 내용을 입력해주세요.",
+				"PLACEHOLDER": "기준: 만원"
 			},
 			"DISPLAY_SERIES_LABEL": {
 				"DISPLAY_SERIES_LABEL": "시리즈 레이블 표시 ",
@@ -1569,11 +1570,11 @@
 			"NUMBER_FORMAT": {
 				"AUTO": "자동",
 				"CONFIRM": "확인",
-				"CUSTOM_NUMBER_FORMAT": "사용자 지정 포맷",
+				"CUSTOM_NUMBER_FORMAT": "사용자 지정",
 				"FULL_NUMBER": "전체 숫자 ",
 				"HELP": "가이드",
-				"INVALID_NUMBER_FORMAT": "잘못된 숫자 포맷입니다.",
-				"NUMBER_FORMAT": "숫자 포맷",
+				"INVALID_NUMBER_FORMAT": "잘못된 숫자 서식입니다.",
+				"NUMBER_FORMAT": "숫자 서식",
 				"SAMPLE": "샘플",
 				"SHORT_NUMBER": "축약형 숫자"
 			},
@@ -1645,6 +1646,7 @@
 			"SERVICE_SUMMARY_SERVER": "서버 ",
 			"SET_CHART_OPTIONS": "차트 옵션 설정",
 			"SET_DATA_SOURCE": "데이터 소스 설정",
+			"TABLE_HEATMAP_COLOR_NONE": "없음",
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "프로젝트 생성",
 				"NO_PROJECT": "프로젝트 없음",

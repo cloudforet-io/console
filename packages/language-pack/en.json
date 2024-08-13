@@ -1508,7 +1508,8 @@
 			"DELETE": "Delete",
 			"DISPLAY_ANNOTATION": {
 				"DISPLAY_ANNOTATION": "Additional Info",
-				"INVALID_VALUE": "Please enter info."
+				"INVALID_VALUE": "Please enter info.",
+				"PLACEHOLDER": "Values shown in thousands of USD"
 			},
 			"DISPLAY_SERIES_LABEL": {
 				"DISPLAY_SERIES_LABEL": "Display Series Label",
@@ -1645,6 +1646,7 @@
 			"SERVICE_SUMMARY_SERVER": "Server",
 			"SET_CHART_OPTIONS": "Set Chart Options",
 			"SET_DATA_SOURCE": "Set Data Source",
+			"TABLE_HEATMAP_COLOR_NONE": "None",
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "Create Project",
 				"NO_PROJECT": "No Project",

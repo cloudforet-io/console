@@ -88,7 +88,7 @@ onClickOutside(labelPopoverRef, () => { state.visible = false; });
 
             /* custom design-system component - p-badge */
             :deep(.p-badge) {
-                @apply text-label-sm;
+                @apply text-label-sm font-normal;
                 height: 1rem;
                 min-height: 1rem;
                 padding: 0 0.375rem;
