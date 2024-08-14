@@ -141,7 +141,7 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
                     >
                         <div class="page-access-menu">
                             <div class="header-wrapper">
-                                <span class="left-part">{{ $t('IAM.ROLE.FORM.MENU') }}</span>
+                                <span class="left-part">{{ $t('IAM.ROLE.FORM.SERVICE') }}</span>
                                 <span class="right-part mr-6">{{ $t('IAM.ROLE.FORM.ACCESS') }}</span>
                             </div>
                             <div class="content-wrapper">

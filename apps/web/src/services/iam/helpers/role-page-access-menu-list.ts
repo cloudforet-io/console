@@ -4,6 +4,7 @@ import type { RoleType } from '@/schema/identity/role/type';
 
 import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-helper';
 import type { Menu, MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -23,30 +24,30 @@ const flattenSubMenuList = (subMenuList: Menu[], defaultMenuIds: MenuId[], trans
                 id: subMenu.id,
                 translationIds: [...translationIds || [], menuInfo.translationId],
                 isAccessible: false,
-                hideMenu: false,
             });
         }
     });
     return results;
 };
 
-export const getPageAccessMenuListByRoleType = (defaultItems: PageAccessMenuItem[] = [], roleType: RoleType): PageAccessMenuItem[] => {
+export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessMenuItem[] => {
     const results: PageAccessMenuItem[] = [];
     const defaultMenuIdsByRoleType = getDefaultPageAccessPermissionList(roleType);
     MENU_LIST.forEach((menu) => {
         if (menu.needPermissionByRole && defaultMenuIdsByRoleType.includes(menu.id)) {
+            if (menu.id === MENU_ID.WORKSPACE_HOME) return;
             const menuInfo = MENU_INFO_MAP[menu.id];
             results.push({
                 id: menu.id,
                 translationIds: [menuInfo.translationId],
-                isAccessible: false,
-                hideMenu: false,
+                isAccessible: true,
                 isParent: true,
+                accessType: 'read_write',
                 subMenuList: flattenSubMenuList(menu?.subMenuList ?? [], defaultMenuIdsByRoleType),
             });
         }
     });
-    return defaultItems.concat(results);
+    return results;
 };
 
 export const getPageAccessList = (menuItems: PageAccessMenuItem[]): string[] => {

@@ -1,15 +1,29 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
-import { PFieldTitle, PI, PToggleButton } from '@cloudforet/mirinae';
+import { filter } from 'lodash';
+
+import {
+    PFieldTitle, PI, PToggleButton, PDataTable, PSelectDropdown, PCheckboxGroup, PCheckbox,
+} from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
+import { i18n } from '@/translations';
+
+import { MENU_ID } from '@/lib/menu/config';
 
 import { gray, green } from '@/styles/colors';
 
-import RoleUpdateFormAccessMenuItem from '@/services/iam/components/RoleUpdateFormAccessMenuItem.vue';
-import type { PageAccessMenuItem, UpdateFormDataType } from '@/services/iam/types/role-type';
+import type { PageAccessMenuItem } from '@/services/iam/types/role-type';
+
+interface TableItem {
+    id: string;
+    service: TranslateResult;
+    page_access?: string;
+    accessible_menu?: PageAccessMenuItem[];
+}
 
 interface Props {
     menuItems?: PageAccessMenuItem[]
@@ -21,18 +35,62 @@ const props = withDefaults(defineProps<Props>(), {
     roleType: ROLE_TYPE.DOMAIN_ADMIN,
 });
 
-const emit = defineEmits<{(e: 'update', value: UpdateFormDataType): void,
+const emit = defineEmits<{(e: 'update', value: PageAccessMenuItem): void,
 }>();
 
 const state = reactive({
-    hideAllMenu: computed(() => props.menuItems?.find((d) => d.id === 'all')?.hideMenu),
     menuItems: [] as PageAccessMenuItem[],
+    accessibleMenuList: computed<PageAccessMenuItem[]>(() => state.menuItems.flatMap((i) => i.subMenuList)),
     isReadOnly: false,
+});
+const tableState = reactive({
+    fields: computed(() => [
+        { name: 'service', label: i18n.t('IAM.ROLE.FORM.SERVICE') },
+        { name: 'page_access', label: i18n.t('IAM.ROLE.FORM.ACCESS') },
+        { name: 'accessible_menu_list', label: i18n.t('IAM.ROLE.FORM.ACCESSIBLE_MENU') },
+    ]),
+    items: computed<TableItem[]|undefined>(() => state.menuItems?.map((i) => ({
+        id: i.id,
+        service: i.translationIds ? i.translationIds[0] : '',
+        page_access: i.isParent ? i.accessType : undefined,
+        accessible_menu_list: i?.subMenuList,
+        isInValid: i?.subMenuList.every((j) => !j.isAccessible),
+    }))),
+    selectedMenuIds: [] as PageAccessMenuItem[],
 });
 
 /* Component */
-const handleUpdate = (value: UpdateFormDataType) => {
-    emit('update', value);
+const getDropdownItems = (id: string) => {
+    if (id === MENU_ID.DASHBOARDS || id === MENU_ID.PROJECT) {
+        return [
+            { name: 'read_write', label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
+            { name: 'no_access', label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
+        ];
+    }
+    return [
+        { name: 'read_write', label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
+        { name: 'read_only', label: i18n.t('IAM.ROLE.FORM.READ_ONLY'), icon: 'ic_no-edit' },
+        { name: 'no_access', label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
+    ];
+};
+const handleChangeSelectedMenu = (values: PageAccessMenuItem[]) => {
+    tableState.selectedMenuIds = values;
+
+    const valueIds = new Set(values.map((i) => i.id));
+
+    state.accessibleMenuList?.forEach((i) => {
+        const isAccessible = valueIds.has(i.id);
+        emit('update', {
+            ...i,
+            isAccessible,
+        });
+    });
+};
+const handleChangeSelectedAccess = (value: string, item: PageAccessMenuItem) => {
+    emit('update', {
+        ...item,
+        accessType: value,
+    });
 };
 const handleChangeToggle = (value: boolean) => {
     state.isReadOnly = value;
@@ -41,6 +99,7 @@ const handleChangeToggle = (value: boolean) => {
 /* Watcher */
 watch(() => props.menuItems, (menuItems) => {
     state.menuItems = menuItems || [];
+    tableState.selectedMenuIds = state.menuItems.flatMap((i) => filter(i.subMenuList, { isAccessible: true }));
 }, { immediate: true });
 </script>
 
@@ -90,38 +149,54 @@ watch(() => props.menuItems, (menuItems) => {
                 <span>{{ $t('IAM.ROLE.FORM.READ_ONLY_PERMISSIONS') }}</span>
             </div>
         </div>
-        <div v-else
-             class="page-access-menu"
+        <p-data-table v-else
+                      :fields="tableState.fields"
+                      :items="tableState.items"
+                      class="page-access-menu"
         >
-            <div class="header-wrapper">
-                <span class="left-part">{{ $t('IAM.ROLE.FORM.MENU') }}</span>
-                <span class="right-part mr-6">{{ $t('IAM.ROLE.FORM.ACCESS') }}</span>
-            </div>
-            <div class="content-wrapper">
-                <template v-for="menu in props.menuItems">
-                    <div v-if="menu.id === 'all' || !state.hideAllMenu"
-                         :key="menu.id"
-                         class="menu-wrapper"
-                         :class="menu.id"
-                    >
-                        <role-update-form-access-menu-item :menu="menu"
-                                                           @update="handleUpdate"
+            <template #col-service-format="{value}">
+                <span>{{ $t(value) }}</span>
+            </template>
+            <template #col-page_access-format="{value, item: pageAccessItem}">
+                <p-select-dropdown :selected="value"
+                                   class="menu-dropdown"
+                                   :menu="getDropdownItems(pageAccessItem.id)"
+                                   use-fixed-menu-style
+                                   @select="handleChangeSelectedAccess($event, pageAccessItem)"
+                >
+                    <template #dropdown-button="item">
+                        <p-i :name="item.icon"
+                             width="1.25rem"
+                             height="1.25rem"
+                             color="inherit"
                         />
-                        <template v-for="subMenu in menu.subMenuList">
-                            <div v-if="menu.subMenuList && !menu.hideMenu && !state.hideAllMenu"
-                                 :key="subMenu.id"
-                                 class="sub-menu-wrapper"
-                            >
-                                <role-update-form-access-menu-item :menu="subMenu"
-                                                                   is-sub-menu
-                                                                   @update="handleUpdate"
-                                />
-                            </div>
-                        </template>
-                    </div>
-                </template>
-            </div>
-        </div>
+                        <span>{{ item.label }}</span>
+                    </template>
+                </p-select-dropdown>
+            </template>
+            <template #col-accessible_menu_list-format="{value, item}">
+                <div>
+                    <p-checkbox-group direction="horizontal">
+                        <p-checkbox v-for="menu in value"
+                                    :key="menu.name"
+                                    :invalid="item.isInValid"
+                                    class="accessible-item"
+                                    :disabled="item.page_access === 'no_access'"
+                                    :selected="tableState.selectedMenuIds"
+                                    :value="menu"
+                                    @change="handleChangeSelectedMenu"
+                        >
+                            {{ $t(menu.translationIds[0]) }}
+                        </p-checkbox>
+                        <p v-if="item.isInValid"
+                           class="invalid"
+                        >
+                            {{ $t('IAM.ROLE.FORM.ALT_E_SELECT') }}
+                        </p>
+                    </p-checkbox-group>
+                </div>
+            </template>
+        </p-data-table>
     </div>
 </template>
 
@@ -134,31 +209,43 @@ watch(() => props.menuItems, (menuItems) => {
         @apply border border-gray-200 rounded-md;
         font-size: 0.875rem;
         line-height: 1.25;
-        .header-wrapper {
-            @apply text-gray-500 border-b border-gray-200;
-            display: flex;
-            font-size: 0.75rem;
-            line-height: 1.25;
-            padding: 0.5rem 1rem;
+        .menu-dropdown {
+            min-width: 9.5rem;
         }
-        .content-wrapper {
-            height: 27.875rem;
-            overflow-y: auto;
+        .accessible-item {
+            @apply inline-flex;
+            gap: 0.25rem;
         }
-        .menu-wrapper {
-            @apply bg-gray-100 border border-gray-200 rounded-md;
-            margin: 0.5rem 1rem;
-            &.all {
-                @apply bg-transparent border-none;
-                margin: 0.5rem 1rem 0.5rem 0;
-            }
-            .sub-menu-wrapper {
-                @apply bg-white rounded-md;
-                margin: 0.25rem 0.5rem;
+        .invalid {
+            @apply text-label-sm text-alert;
+        }
+    }
+
+    /* custom design-system component - p-text-input */
+    &:deep(.p-data-table) {
+        th {
+            border-top: none;
+            &:first-child {
+                @apply bg-gray-100;
             }
         }
-        .left-part {
-            flex-grow: 1;
+        tr {
+            &:hover {
+                @apply bg-transparent;
+            }
+            td {
+                height: initial;
+                padding-top: 0.625rem;
+                padding-bottom: 0.625rem;
+                &:first-child {
+                    @apply bg-gray-100;
+                }
+            }
+            &:last-child {
+                td {
+                    border-bottom: none;
+                }
+            }
         }
     }
     .page-access-info-wrapper {
