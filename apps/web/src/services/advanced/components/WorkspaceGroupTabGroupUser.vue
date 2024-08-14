@@ -5,6 +5,7 @@ import {
     PHeading, PButton, PToolboxTable, PStatus, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
@@ -37,17 +38,17 @@ const selectDropdownState = reactive({
     items: [{
         label: 'Workspace Member',
         name: 'managed-workspace-member',
-        role_type: 'WORKSPACE_MEMBER',
+        role_type: ROLE_TYPE.WORKSPACE_MEMBER,
     },
     {
         label: 'Workspace Member',
         name: 'managed-workspace-member',
-        role_type: 'WORKSPACE_MEMBER',
+        role_type: ROLE_TYPE.WORKSPACE_MEMBER,
     },
     {
         label: 'Workspace Member',
         name: 'managed-workspace-member',
-        role_type: 'WORKSPACE_MEMBER',
+        role_type: ROLE_TYPE.WORKSPACE_MEMBER,
     },
     {
         label: 'show more',

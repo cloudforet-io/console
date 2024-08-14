@@ -43,11 +43,7 @@ const handleConfirm = () => {
     workspaceGroupPageStore.closeModal();
 };
 
-const handleCancel = () => {
-    workspaceGroupPageStore.closeModal();
-};
-
-const handleClose = () => {
+const handleModalClose = () => {
     workspaceGroupPageStore.closeModal();
 };
 
@@ -63,8 +59,8 @@ const dropdownMenuHandler = () => ({
                     :loading="state.loading"
                     size="sm"
                     @confirm="handleConfirm"
-                    @cancel="handleCancel"
-                    @close="handleClose"
+                    @cancel="handleModalClose"
+                    @close="handleModalClose"
     >
         <template #body>
             <div class="form-wrapper">
