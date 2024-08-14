@@ -1,8 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/"
-    }
-  ]
+  "buildCommand": "npm run build -- --filter=web...",
+  "outputDirectory": "apps/web/dist"
 }
