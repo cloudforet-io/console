@@ -2755,7 +2755,7 @@
 				"REMOVE": "Remove",
 				"WORKSPACE": "Workspace"
 			},
-			"TITLE": "Workspace Group"
+			"TITLE": "Workspace Group",
 			"MODAL": {
 				"CREATE_DROP_DOWN_PLACEHOLDER": "Select workspaces",
 				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
@@ -2775,7 +2775,8 @@
 				"ROLE_SELECT_DROP_DOWN_TITLE": "Role",
 				"USER_SELECT_DROP_DOWN_TITLE": "User",
 				"USER_DROP_DOWN_PLACEHOLDER": "Add Users",
-				"CREATE_GROUP_NAME_PLACEHOLDER": "Enter Name",				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
+				"CREATE_GROUP_NAME_PLACEHOLDER": "Enter Name",
+				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
 				"ADD": "Add",
 				"CREATE_GROUP_NAME": "Name",
 				"EDIT_GROUP_NAME": "Name",
