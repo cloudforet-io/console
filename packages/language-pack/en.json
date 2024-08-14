@@ -2414,11 +2414,13 @@
 			},
 			"EDIT": "Edit",
 			"FORM": {
-				"ACCESS": "Access",
+				"ACCESS": "Page Access",
+				"ACCESSIBLE_MENU": "Accessible Menu",
 				"ADMIN_CENTER": "Admin Center",
 				"ALL": "All",
 				"ALL_WORKSPACES": "All menus within all workspaces",
 				"ALT_E_CREATE_ROLE": "Failed to create role",
+				"ALT_E_SELECT": "Select at least one.",
 				"ALT_E_UPDATE_ROLE": "Failed to update role",
 				"ALT_S_CREATE_ROLE": "Role successfully created ",
 				"ALT_S_UPDATE_ROLE": "Role successfully updated ",
@@ -2433,13 +2435,16 @@
 				"EDIT_TITLE": "Edit Role",
 				"FULL_ACCESS": "Admin role has full access.",
 				"MANAGE": "Manage",
-				"MENU": "Menu",
+				"NO_ACCESS": "No Access",
 				"PERMISSION": "Permission",
+				"READ_AND_WRITE": "Read & Write",
+				"READ_ONLY": "Read-only",
 				"READ_ONLY_PERMISSIONS": "Read-only Access Permissions",
 				"ROLE_TYPE_DOMAIN": "All projects",
 				"ROLE_TYPE_PROJECT": "Invited projects only",
 				"SAVE": "Save",
 				"SELECTED": "selected",
+				"SERVICE": "Service",
 				"TOOLTIP_ACTION": "Action",
 				"TOOLTIP_ADD_SERVICE_ACCOUNT": "Add Service Account",
 				"TOOLTIP_ADD_USER": "Add User",
@@ -2734,23 +2739,23 @@
 			"WORKSPACES": "Workspaces"
 		},
 		"WORKSPACE_GROUP": {
-			"TITLE": "Workspace Group",
 			"CREATE": "Create",
 			"ALT_S_UPDATE_ROLE": "Workspace role successfully changed",
 			"TOOLTIP_STATE": "With ‘Auto Dormancy Configuration’ turned on, workspaces with a total cost lower than the user-defined threshold will automatically be set to dormant. The threshold can be changed in [Preferences > Domain Settings > Auto Dormancy Configuration].",
 			"TOOLTIP_COST": "based on Cost Report",
 			"MAIN": {
-				"TOOLBOX_PLACEHOLDER": "Action",
+				"DELETE": "Delete",
 				"EDIT": "Edit",
-				"DELETE": "Delete"
+				"TOOLBOX_PLACEHOLDER": "Action"
 			},
 			"TAB": {
-				"GROUP_USER": "Group User",
-				"WORKSPACE": "Workspace",
 				"ADD_USER": "Add User",
 				"ADD_WORKSPACE": "Add Workspace",
-				"REMOVE": "Remove"
+				"GROUP_USER": "Group User",
+				"REMOVE": "Remove",
+				"WORKSPACE": "Workspace"
 			},
+			"TITLE": "Workspace Group"
 			"MODAL": {
 				"CREATE_DROP_DOWN_PLACEHOLDER": "Select workspaces",
 				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
