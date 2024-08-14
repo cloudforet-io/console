@@ -1,4 +1,6 @@
 // eslint-disable-next-line import/no-cycle
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 import type { KeyDataType } from '@/inputs/search/query-search/type';
@@ -76,6 +78,7 @@ export interface QuerySearchTableOptions extends CommonOptions {
     search: SearchSchema;
     disable_search?: boolean;
     default_sort?: Sort;
+    default_filter: ApiFilter[];
 }
 
 export type RawOptions = CommonOptions;

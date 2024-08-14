@@ -7,9 +7,10 @@ import { isEmpty, get, cloneDeep } from 'lodash';
 
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { ApiFilterOperator } from '@cloudforet/core-lib/space-connector/type';
 import {
     PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge,
 } from '@cloudforet/mirinae';
@@ -114,8 +115,16 @@ const typeOptionState = reactive({
 });
 
 const tableHeight = assetInventorySettingsStore.getCloudServiceTableHeight;
+
+interface Condition {
+    key: string;
+    value: ConsoleFilterValue | ConsoleFilterValue[];
+    operator: ApiFilterOperator;
+}
+
 const tableState = reactive({
     schema: null as null|DynamicLayout,
+    defaultFilter: computed<Condition[]|undefined>(() => tableState.schema?.options?.default_filter ?? []),
     items: [],
     selectedItems: computed(() => typeOptionState.selectIndex.map((d) => tableState.items[d])),
     consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
@@ -431,16 +440,36 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
     if (!props.isServerPage && !props.name) return;
     tableState.schema = await getTableSchema();
     resetSort(tableState.schema.options);
-    await fetchTableData();
+    if (!tableState.defaultFilter?.length) await fetchTableData();
 }, { immediate: true, debounce: 200 });
+
+
+const ApiQueryToRawQueryMap = {
+    eq: '=',
+    not: '!=',
+} as const;
+const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((condition) => ({
+    k: condition.key,
+    v: condition.value,
+    o: ApiQueryToRawQueryMap[condition.operator] ?? '=',
+}));
+
+watch(() => tableState.defaultFilter, async (defaultFilter) => {
+    if (!defaultFilter?.length) return;
+    queryTagsHelper.setFilters(convertToQueryTag(defaultFilter));
+    await fetchTableData();
+});
 
 (() => {
     const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : [route.query.default_filters]);
-    tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined)).filter((d) => d);
-    excelQuery.setFiltersAsRawQueryString(route.query.filters);
-    cloudServiceDetailPageStore.$patch((_state) => {
-        _state.searchFilters = excelQuery.filters;
-    });
+    if (defaultSearchQuery.length) {
+        tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined))
+            .filter((d) => d);
+        excelQuery.setFiltersAsRawQueryString(route.query.filters);
+        cloudServiceDetailPageStore.$patch((_state) => {
+            _state.searchFilters = excelQuery.filters;
+        });
+    }
 })();
 </script>
 
