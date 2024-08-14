@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PToolboxTable } from '@cloudforet/mirinae';
+import { PToolboxTable, PTooltip, PI } from '@cloudforet/mirinae';
+
+import { gray } from '@/styles/colors';
 
 import WorkspaceGroupTableToolbox from '@/services/advanced/components/WorkspaceGroupTableToolbox.vue';
+
 
 interface Props {
     tableHeight: number;
@@ -89,11 +92,44 @@ const tableState = reactive({
             :fields="tableState.fields"
             :items="tableState.items"
             selectable
+            sortable
             :multi-select="false"
         >
             <template #toolbox-left>
                 <workspace-group-table-toolbox />
             </template>
+            <template #th-cost-format="{ field }">
+                <div class="th-tooltip">
+                    <span>{{ field.label }}</span>
+                    <p-tooltip
+                        :contents="$t('IAM.WORKSPACE_GROUP.TOOLTIP_COST')"
+                        position="bottom"
+                        class="tooltip-wrapper"
+                        content-class="custom-tooltip-content"
+                    >
+                        <p-i name="ic_info-circle"
+                             class="title-tooltip"
+                             height="1rem"
+                             width="1rem"
+                             :color="gray[500]"
+                        />
+                    </p-tooltip>
+                </div>
+            </template>
         </p-toolbox-table>
     </section>
 </template>
+
+<style lang="postcss" scoped>
+.workspace-group-table {
+    border: none;
+
+    .th-tooltip {
+        @apply flex items-center;
+        gap: 0.25rem;
+        .tooltip-wrapper {
+            margin-top: -0.125rem;
+        }
+    }
+}
+</style>

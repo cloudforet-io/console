@@ -1,0 +1,236 @@
+<script setup lang="ts">
+import { reactive } from 'vue';
+
+import {
+    PHeading, PButton, PToolboxTable, PLink, PStatus, PTooltip, PI,
+} from '@cloudforet/mirinae';
+
+import { i18n } from '@/translations';
+
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+
+import { gray } from '@/styles/colors';
+
+import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
+import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
+
+const workspaceGroupPageStore = useWorkspaceGroupPageStore();
+
+const tableState = reactive({
+    // TODO: temp data
+    fields: [
+        { name: 'name', label: 'Name' },
+        { name: 'state', label: 'State' },
+        { name: 'user', label: 'User' },
+        { name: 'service_account', label: 'Service Account' },
+        { name: 'cost', label: 'Cost' },
+        { name: 'created_at', label: 'Created' },
+        { name: 'remove_button', label: ' ', sortable: false },
+    ],
+    // TODO: temp data
+    items: [{
+        name: 'cloudone-mz',
+        state: 'ENABLED',
+        user: 24,
+        service_account: 23,
+        cost: 5160.09,
+        created_at: '2022-03-10 12:02:41',
+        workspace_id: 'workspace-15fb37788416',
+    }],
+});
+
+const getWorkspaceRouteLocationByWorkspaceId = (item) => ({
+    name: WORKSPACE_HOME_ROUTE._NAME,
+    params: {
+        workspaceId: item?.workspace_id,
+    },
+});
+
+const getUserRouteLocationByWorkspaceId = (item) => ({
+    name: IAM_ROUTE.USER._NAME,
+    params: {
+        workspaceId: item?.workspace_id,
+    },
+});
+
+const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
+    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+    params: {
+        workspaceId: item?.workspace_id,
+    },
+});
+
+const setupModal = (type) => {
+    switch (type) {
+    case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES: workspaceGroupPageStore.updateModalSettings({
+        type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_WORKSPACES_TITLE'),
+        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
+        themeColor: 'alert',
+    }); break;
+    case WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES: workspaceGroupPageStore.updateModalSettings({
+        type: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_WORKSPACES_TITLE', { name: 'yubeom kim' }),
+        visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
+    }); break;
+    default:
+        break;
+    }
+};
+
+const handleAddWorkspaceButtonClick = () => {
+    setupModal(WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES);
+};
+
+const handleRemoveButtonClick = () => {
+    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES);
+};
+</script>
+
+<template>
+    <section class="workspace-group-tab-workspace">
+        <p-heading class="workspace-group-tab-workspace-header"
+                   :title="$t('IAM.WORKSPACE_GROUP.TAB.WORKSPACE')"
+                   use-total-count
+                   :total-count="28"
+                   heading-type="sub"
+        >
+            <template #extra>
+                <div class="workspace-group-tab-workspace-button-wrapper">
+                    <p-button style-type="negative-primary"
+                              @click="handleRemoveButtonClick"
+                    >
+                        {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
+                    </p-button>
+                    <p-button style-type="secondary"
+                              icon-left="ic_plus_bold"
+                              @click="handleAddWorkspaceButtonClick"
+                    >
+                        {{ $t('IAM.WORKSPACE_GROUP.TAB.ADD_WORKSPACE') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-heading>
+        <p-toolbox-table class="workspace-group-tab-workspace-table"
+                         :fields="tableState.fields"
+                         :items="tableState.items"
+                         selectable
+                         sortable
+        >
+            <template #th-state-format="{ field }">
+                <div class="th-tooltip">
+                    <span>{{ field.label }}</span>
+                    <p-tooltip
+                        :contents="$t('IAM.WORKSPACE_GROUP.TOOLTIP_STATE')"
+                        position="bottom"
+                        class="tooltip-wrapper"
+                        content-class="custom-tooltip-content"
+                    >
+                        <p-i name="ic_info-circle"
+                             class="title-tooltip"
+                             height="1rem"
+                             width="1rem"
+                             :color="gray[500]"
+                        />
+                    </p-tooltip>
+                </div>
+            </template>
+            <template #th-cost-format="{ field }">
+                <div class="th-tooltip">
+                    <span>{{ field.label }}</span>
+                    <p-tooltip
+                        :contents="$t('IAM.WORKSPACE_GROUP.TOOLTIP_COST')"
+                        position="bottom"
+                        class="tooltip-wrapper"
+                        content-class="custom-tooltip-content"
+                    >
+                        <p-i name="ic_info-circle"
+                             class="title-tooltip"
+                             height="1rem"
+                             width="1rem"
+                             :color="gray[500]"
+                        />
+                    </p-tooltip>
+                </div>
+            </template>
+            <template #col-name-format="{ value, item }">
+                <div class="name-wrapper">
+                    <workspace-logo-icon :text="value"
+                                         size="xs"
+                    />
+                    <p-link :text="value"
+                            action-icon="internal-link"
+                            new-tab
+                            :to="getWorkspaceRouteLocationByWorkspaceId(item)"
+                    />
+                </div>
+            </template>
+            <template #col-state-format="{ value }">
+                <p-status v-bind="workspaceStateFormatter(value)" />
+            </template>
+            <template #col-user-format="{ value, item }">
+                <p-link :text="value"
+                        action-icon="internal-link"
+                        new-tab
+                        :to="getUserRouteLocationByWorkspaceId(item)"
+                />
+            </template>
+            <template #col-service_account-format="{ value, item }">
+                <p-link :text="value"
+                        action-icon="internal-link"
+                        new-tab
+                        :to="getServiceAccountRouteLocationByWorkspaceId(item)"
+                />
+            </template>
+            <template #col-remove_button-format>
+                <p-button size="sm"
+                          style-type="tertiary"
+                          @click.stop="handleRemoveButtonClick"
+                >
+                    {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
+                </p-button>
+            </template>
+        </p-toolbox-table>
+    </section>
+</template>
+
+<style lang="postcss" scoped>
+.workspace-group-tab-workspace {
+    .workspace-group-tab-workspace-button-wrapper {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .workspace-group-tab-workspace-table {
+        border: none;
+
+        .name-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .th-tooltip {
+            @apply flex items-center;
+            gap: 0.25rem;
+            .tooltip-wrapper {
+                margin-top: -0.125rem;
+            }
+        }
+    }
+}
+</style>
+
+<style lang="postcss">
+/* custom design-system component - p-tooltip */
+.p-tooltip {
+    .tooltip-inner {
+        white-space: pre-line;
+        max-width: 16rem;
+    }
+}
+</style>
