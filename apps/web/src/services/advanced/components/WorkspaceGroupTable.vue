@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { PToolboxTable, PTooltip, PI } from '@cloudforet/mirinae';
+import { PToolboxTable } from '@cloudforet/mirinae';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
@@ -14,8 +14,6 @@ import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/mode
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
-
-import { gray } from '@/styles/colors';
 
 import WorkspaceGroupTableToolbox from '@/services/advanced/components/WorkspaceGroupTableToolbox.vue';
 import { WORKSPACE_GROUP_SEARCH_HANDLERS } from '@/services/advanced/constants/workspace-group-constant';
@@ -47,7 +45,7 @@ const tableState = reactive({
         { name: 'workspace', label: 'Workspace' },
         { name: 'group_user', label: 'Group User' },
         { name: 'created_at', label: 'Created' },
-        // TODO: temp data
+        // TODO: Will be added when the design is changed
         // { name: 'all_users', label: 'All User' },
         // { name: 'service_account', label: 'Service Account' },
         // { name: 'cost', label: 'Cost' },
@@ -76,12 +74,11 @@ const fetchWorkspaceGroups = async () => {
     workspaceGroupPageState.loading = true;
 
     try {
-        // TODO: apply Destructuring
-        const results = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>({
+        const { results } = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>({
             query: workspaceGroupListApiQuery,
-        }) as WorkspaceGroupModel[];
+        });
 
-        workspaceGroupPageState.groups = results;
+        workspaceGroupPageState.groups = results || [];
         workspaceGroupPageState.selectedIndices = [];
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -145,7 +142,8 @@ const handleChange = (options: any = {}) => {
             <template #toolbox-left>
                 <workspace-group-table-toolbox />
             </template>
-            <template #th-cost-format="{ field }">
+            <!-- TODO: Will be added when the design is changed -->
+            <!-- <template #th-cost-format="{ field }">
                 <div class="th-tooltip">
                     <span>{{ field.label }}</span>
                     <p-tooltip
@@ -162,6 +160,9 @@ const handleChange = (options: any = {}) => {
                         />
                     </p-tooltip>
                 </div>
+            </template> -->
+            <template #col-created_at-format="{ value }">
+                {{ iso8601Formatter(value, 'UTC') }}
             </template>
         </p-toolbox-table>
     </section>
