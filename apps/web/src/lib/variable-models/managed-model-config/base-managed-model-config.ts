@@ -22,6 +22,7 @@ import SecretVariableModel from '@/lib/variable-models/managed-model/resource-mo
 import ServiceAccountVariableModel from '@/lib/variable-models/managed-model/resource-model/service-account-variable-model';
 import UserVariableModel from '@/lib/variable-models/managed-model/resource-model/user-variable-model';
 import WebhookVariableModel from '@/lib/variable-models/managed-model/resource-model/webhook-variable-model';
+import WorkspaceGroupVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-group-variable-model';
 import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
 
 
@@ -46,6 +47,7 @@ const RESOURCE_VARIABLE_MODELS = {
     user: UserVariableModel,
     webhook: WebhookVariableModel,
     workspace: WorkspaceVariableModel,
+    workspace_group: WorkspaceGroupVariableModel,
     cost: CostVariableModel,
     metric_data: MetricDataVariableModel,
 } as const;
