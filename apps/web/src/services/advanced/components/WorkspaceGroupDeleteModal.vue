@@ -13,6 +13,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { WORKSPACE_GROUP_MODAL_TYPE, WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
@@ -24,6 +25,18 @@ const emit = defineEmits<{(e: 'confirm'): void,
 const state = reactive({
     sequence: 'first',
     loading: false,
+});
+
+const moveWorkspaceGroupTabWorkspace = () => ({
+    name: LANDING_ROUTE.WORKSPACE._NAME,
+    // TODO: add queryString
+    // query: {}
+});
+
+const moveWorkspaceGroupTabGroupUser = () => ({
+    name: LANDING_ROUTE.WORKSPACE._NAME,
+    // TODO: add queryString
+    // query: {}
 });
 
 const deleteWorkspaceGroups = async () => {
@@ -100,6 +113,7 @@ const handleClose = () => {
                             <p-link new-tab
                                     action-icon="internal-link"
                                     size="lg"
+                                    :to="moveWorkspaceGroupTabWorkspace()"
                             />
                         </p-button>
                     </div>
@@ -117,6 +131,7 @@ const handleClose = () => {
                             <p-link new-tab
                                     action-icon="internal-link"
                                     size="lg"
+                                    :to="moveWorkspaceGroupTabGroupUser()"
                             />
                         </p-button>
                     </div>
