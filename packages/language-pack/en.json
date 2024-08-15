@@ -2772,7 +2772,13 @@
 				"ROLE_SELECT_DROP_DOWN_TITLE": "Role",
 				"USER_DROP_DOWN_PLACEHOLDER": "Add Users",
 				"USER_SELECT_DROP_DOWN_TITLE": "User",
-				"WORKSPACE_SELECT_DROP_DOWN_TITLE": "Included Workspaces"
+				"USER_DROP_DOWN_PLACEHOLDER": "Add Users",
+				"CREATE_GROUP_NAME_PLACEHOLDER": "Enter Name",
+				"ADD": "Add",
+				"CREATE_GROUP_NAME": "Name",
+				"EDIT_GROUP_NAME": "Name",
+				"EDIT_GROUP_NAME_PLACEHOLDER": "Enter Name",
+				"CREATE_NAME_INVALID_DUPLICATED": "Workspace group name is duplicated."
 			},
 			"TAB": {
 				"ADD_USER": "Add User",

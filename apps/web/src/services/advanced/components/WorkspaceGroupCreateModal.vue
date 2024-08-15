@@ -1,67 +1,96 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WorkspaceGroupAddWorkspaceParameters } from '@/schema/identity/workspace-group/api-verbs/add_workspaces';
 import type { WorkspaceGroupCreateParameters } from '@/schema/identity/workspace-group/api-verbs/create';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
-import type { CreateModalMenuItem } from '@/schema/identity/workspace-group/type';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { WorkspaceGroupReferenceMap } from '@/store/reference/workspace-group-reference-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFormValidator } from '@/common/composables/form-validator';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
 
 
-
-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+
+const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(e: 'confirm'): void,
 }>();
 
 const state = reactive({
+    workspaceGroups: computed<WorkspaceGroupReferenceMap>(() => allReferenceStore.getters.workspace_group),
+    workspaceGroupNames: computed(() => Object.values(state.workspaceGroups).map((item:any) => item.name)),
     loading: false,
-    groupName: '',
-    selectedItems: [] as CreateModalMenuItem[],
 });
 
-const dropdownState = reactive({
-    loading: false,
-    searchText: '',
-    menuItems: [] as SelectDropdownMenuItem[],
+const {
+    forms: { groupName }, invalidState, invalidTexts, setForm,
+} = useFormValidator({ groupName: '' }, {
+    groupName: (value: string) => {
+        if (!value.length) {
+            return false;
+        }
+        if (state.workspaceGroupNames.includes(value)) {
+            return i18n.t('IAM.WORKSPACE_GROUP.MODAL.CREATE_NAME_INVALID_DUPLICATED');
+        }
+
+        return true;
+    },
+});
+const {
+    loading, searchText, menuList, selectedItems, handleClickShowMore,
+} = useSelectDropDownList({
+    pageSize: 10,
+    transformer: (_workspace) => ({
+        name: _workspace.workspace_id,
+        label: _workspace.name,
+        tags: _workspace.tags,
+        is_dormant: _workspace.is_dormant,
+    }),
+    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+        query: apiQueryHelper.data,
+    }),
 });
 
 const resetState = () => {
     state.groupName = '';
-    state.selectedItems = [];
 };
-
-const workspaceListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('name', true);
 
 const createWorkspaceGroup = async () => {
     state.loading = true;
 
     try {
-        await SpaceConnector.clientV2.identity.workspaceGroup.create<WorkspaceGroupCreateParameters, WorkspaceGroupModel>({
-            name: workspaceGroupPageGetters.selectedGroup.name,
+        const { workspace_group_id } = await SpaceConnector.clientV2.identity.workspaceGroup.create<WorkspaceGroupCreateParameters, WorkspaceGroupModel>({
+            name: state.groupName,
+        });
+
+        if (!selectedItems.value.length) {
+            return;
+        }
+
+        await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<WorkspaceGroupAddWorkspaceParameters, WorkspaceGroupModel>({
+            workspace_group_id,
+            workspaces: selectedItems.value.map((item) => item.name as string),
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -76,49 +105,16 @@ const handleConfirm = async () => {
     workspaceGroupPageStore.closeModal();
     resetState();
     emit('confirm');
+    workspaceGroupPageStore.updateModalSettings({
+        type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: state.groupName }),
+        visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
+    });
 };
 
-const handleCancel = () => {
+const handleModalClose = () => {
     workspaceGroupPageStore.closeModal();
     resetState();
-};
-
-const handleClose = () => {
-    workspaceGroupPageStore.closeModal();
-    resetState();
-};
-
-const fetchWorkspaceList = async (inputText: string) => {
-    dropdownState.loading = true;
-
-    workspaceListApiQueryHelper.setFilters([
-        { k: 'name', v: inputText, o: '' },
-        { k: 'state', v: 'ENABLED', o: '' },
-    ]);
-
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
-            query: workspaceListApiQueryHelper.data,
-        });
-        dropdownState.menuItems = (results ?? []).map((workspace) => ({
-            label: workspace.name,
-            name: workspace.workspace_id,
-            tags: workspace.tags,
-            is_dormant: workspace.is_dormant,
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        dropdownState.loading = false;
-    }
-};
-
-const dropdownMenuHandler = async (inputText: string) => {
-    await fetchWorkspaceList(inputText);
-
-    return {
-        results: dropdownState.menuItems,
-    };
 };
 </script>
 
@@ -128,20 +124,24 @@ const dropdownMenuHandler = async (inputText: string) => {
                     :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.CREATE"
                     :loading="state.loading"
                     size="sm"
+                    :disabled="(groupName === '' || invalidState.groupName)"
                     @confirm="handleConfirm"
-                    @cancel="handleCancel"
-                    @close="handleClose"
+                    @cancel="handleModalClose"
+                    @close="handleModalClose"
     >
         <template #body>
             <div class="form-wrapper">
                 <p-field-group
-                    required
+                    :required="true"
                     :label="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_GROUP_NAME')"
+                    :invalid="invalidState.groupName"
+                    :invalid-text="invalidTexts.groupName"
                     style-type="secondary"
                 >
-                    <p-text-input v-model="state.groupName"
+                    <p-text-input :value="groupName"
                                   :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_GROUP_NAME_PLACEHOLDER')"
                                   block
+                                  @update:value="setForm('groupName', $event)"
                     />
                 </p-field-group>
                 <p-field-group
@@ -151,19 +151,20 @@ const dropdownMenuHandler = async (inputText: string) => {
                     <template #default>
                         <div class="dropdown-wrapper">
                             <p-select-dropdown
-                                :loading="dropdownState.loading"
+                                :loading="loading"
+                                :search-text.sync="searchText"
                                 appearance-type="stack"
                                 is-filterable
                                 multi-selectable
                                 show-delete-all-button
                                 use-fixed-menu-style
-                                page-size="10"
                                 show-select-marker
-                                :handler="dropdownMenuHandler"
-                                :search-text.sync="dropdownState.searchText"
-                                :selected.sync="state.selectedItems"
+                                disable-handler
+                                :menu="menuList"
+                                :selected.sync="selectedItems"
                                 :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_DROP_DOWN_PLACEHOLDER')"
                                 class="workspace-select-dropdown"
+                                @click-show-more="handleClickShowMore"
                             >
                                 <template #menu-item--format="{ item }">
                                     <div class="menu-item-wrapper"

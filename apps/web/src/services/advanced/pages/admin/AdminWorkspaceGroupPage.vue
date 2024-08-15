@@ -19,6 +19,7 @@ import WorkspaceGroupEditModal from '@/services/advanced/components/WorkspaceGro
 import WorkspaceGroupHeader from '@/services/advanced/components/WorkspaceGroupHeader.vue';
 import WorkspaceGroupTab from '@/services/advanced/components/WorkspaceGroupTab.vue';
 import WorkspaceGroupTable from '@/services/advanced/components/WorkspaceGroupTable.vue';
+import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
@@ -28,10 +29,9 @@ const fetchWorkspaceGroups = async () => {
     workspaceGroupPageState.loading = true;
 
     try {
-        // TODO: apply Destructuring
-        const results = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>() as WorkspaceGroupModel[];
+        const { results } = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>();
 
-        workspaceGroupPageState.groups = results;
+        workspaceGroupPageState.groups = results || [];
         workspaceGroupPageState.selectedIndices = [];
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -70,7 +70,9 @@ onUnmounted(() => {
             </template>
         </p-horizontal-layout>
         <workspace-group-tab />
-        <workspace-group-create-modal @confirm="fetchWorkspaceGroups" />
+        <workspace-group-create-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.CREATE"
+                                      @confirm="fetchWorkspaceGroups"
+        />
         <workspace-group-edit-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-status-modal />
