@@ -80,7 +80,7 @@ const emit = defineEmits([
 ]);
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({

@@ -43,7 +43,7 @@ import { i18n } from '@/translations';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 const props = defineProps<{
     getVersionsOnPluginIdChange?: boolean;
@@ -53,7 +53,7 @@ const emit = defineEmits<{(event: 'update-valid', value: boolean): void;
 }>();
 
 const state = reactive({
-    pluginId: computed<string|undefined>(() => collectorFormStore.pluginId),
+    pluginId: computed<string|undefined>(() => collectorFormState.pluginId),
     versionItems: computed<MenuItem[]>(() => collectorFormState.versions.map((value, index) => {
         if (index === 0) return { type: 'item', label: `${value} (latest)`, name: value };
         return { type: 'item', label: value, name: value };
@@ -72,14 +72,14 @@ const initSelectedVersion = () => {
     if (collectorFormState.originCollector) {
         const originAutoUpgrade = collectorFormState.originCollector?.plugin_info?.upgrade_mode === 'AUTO';
         const originVersion = collectorFormState.originCollector?.plugin_info?.version;
-        collectorFormStore.$patch({
-            version: originVersion ?? collectorFormState.versions[0] ?? '',
-            autoUpgrade: originAutoUpgrade ?? true,
+        collectorFormStore.$patch((_state) => {
+            _state.state.version = originVersion ?? collectorFormState.versions[0] ?? '';
+            _state.state.autoUpgrade = originAutoUpgrade ?? true;
         });
     } else {
-        collectorFormStore.$patch({
-            version: collectorFormState.versions[0] ?? '',
-            autoUpgrade: true,
+        collectorFormStore.$patch((_state) => {
+            _state.state.version = collectorFormState.versions[0] ?? '';
+            _state.state.autoUpgrade = true;
         });
     }
 };

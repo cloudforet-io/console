@@ -12,7 +12,6 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-
 export const useCollectorDetailPageStore = defineStore('page-collector-detail', () => {
     const appContextStore = useAppContextStore();
 
@@ -26,10 +25,7 @@ export const useCollectorDetailPageStore = defineStore('page-collector-detail', 
             if (appContextStore.getters.isAdminMode) {
                 return true;
             }
-            if (getters.isManagedCollector) {
-                return false;
-            }
-            return true;
+            return !getters.isManagedCollector;
         }),
     });
 
@@ -37,10 +33,9 @@ export const useCollectorDetailPageStore = defineStore('page-collector-detail', 
     const action = {
         fetchCollector: async (collectorId: string) => {
             try {
-                const res = await SpaceConnector.clientV2.inventory.collector.get<CollectorGetParameters, CollectorModel>({
+                state.collector = await SpaceConnector.clientV2.inventory.collector.get<CollectorGetParameters, CollectorModel>({
                     collector_id: collectorId,
                 });
-                state.collector = res;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

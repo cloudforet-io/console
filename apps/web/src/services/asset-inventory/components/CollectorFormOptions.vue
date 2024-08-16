@@ -86,7 +86,7 @@ import {
 
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 const props = defineProps<{
     hasMetadata?: boolean; // MEMO: if true, use metadata(state.schema) of collectorFormState.originCollector. And if false, call api for get metadata(state.schema).
@@ -151,7 +151,7 @@ const handleClickReloadButton = () => {
 };
 
 
-watch(() => collectorFormStore.collectorId, async (collectorId) => {
+watch(() => collectorFormState.collectorId, async (collectorId) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetAttachedServiceAccount();
     await getPluginMetadata(collectorFormState.provider);
