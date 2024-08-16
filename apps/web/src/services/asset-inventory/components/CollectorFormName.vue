@@ -33,7 +33,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/stores/collect
 
 
 interface Props {
-    loading: boolean;
+    loading?: boolean;
 }
 
 const allReferenceStore = useAllReferenceStore();
