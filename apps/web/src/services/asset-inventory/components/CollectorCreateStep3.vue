@@ -6,6 +6,7 @@
                                            @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid"
             />
             <collector-form-options show-title-on-empty-schema
+                                    class="collector-form-options"
                                     @update:isValid="handleChangeIsSchemaFormValid"
             />
             <collector-form-rule />
@@ -114,6 +115,10 @@ const handleClose = () => {
 
     .input-form {
         .attached-service-account-form {
+            margin-bottom: 2rem;
+        }
+
+        .collector-form-options {
             margin-bottom: 2rem;
         }
     }

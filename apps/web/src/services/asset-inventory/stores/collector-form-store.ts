@@ -20,6 +20,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { AdditionalRule } from '@/services/asset-inventory/types/type';
 
 
 /**
@@ -54,6 +55,7 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         attachedServiceAccountType: 'all' as AttachedServiceAccountType,
         selectedServiceAccountFilterOption: 'include' as ServiceAccountFilterOption,
         options: {} as CollectorOptions,
+        additionalRules: [{ order: 1, tag: undefined, stop_processing: false }] as AdditionalRule[],
         versions: [] as string[],
         isScheduleError: false,
         // getters
