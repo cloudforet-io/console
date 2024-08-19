@@ -3127,7 +3127,10 @@
 		},
 		"COLLECTOR": {
 			"ACCOUNT": "어카운트",
+			"ACTIONS": "",
 			"ADDITIONAL_OPTIONS": "추가 옵션",
+			"ADDITIONAL_RULE": "",
+			"ADD_RULE": "",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "컬렉터 이름 수정 실패",
 			"ALT_E_COLLECTOR_SCHEDULE": "스케줄은 최대 2개까지만 선택이 가능합니다. ",
 			"ALT_E_COLLECT_DATA": "데이터 수집 실패",
@@ -3145,6 +3148,8 @@
 			"ALT_S_UPDATE_COLLECTOR_OPTIONS": "컬렉터 옵션 수정 완료",
 			"ALT_S_UPDATE_SCHEDULE": "스케줄 수정 완료",
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "서비스 어카운트 수정 완료",
+			"CLOUD_SERVICE_TAG": "",
+			"CONDITIONS": "",
 			"CREATE": {
 				"ALL": "전체",
 				"ALT_E_COLLECT_EXECUTION": "데이터 수집 시작 실패",
@@ -3281,7 +3286,9 @@
 			},
 			"NO_DATA": "데이터가 없습니다.",
 			"NO_JOB": "최근 작업내역 없음",
-			"NO_OPTIONS": "추가 옵션이 없습니다."
+			"NO_OPTIONS": "추가 옵션이 없습니다.",
+			"PROJECT_ROUTING": "",
+			"THEN_STOP_PROCESSING": ""
 		},
 		"CREATE_COLLECTOR": "컬렉터 생성",
 		"EMPTY_CLOUD_SERVICE": "클라우드 서비스를 이용하려면 서비스 어카운트를 추가해주세요. ",

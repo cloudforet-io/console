@@ -3127,7 +3127,10 @@
 		},
 		"COLLECTOR": {
 			"ACCOUNT": "アカウント",
+			"ACTIONS": "",
 			"ADDITIONAL_OPTIONS": "追加オプション",
+			"ADDITIONAL_RULE": "",
+			"ADD_RULE": "",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
 			"ALT_E_COLLECTOR_SCHEDULE": "1日に最大2回までスケジュールを設定できます。",
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
@@ -3145,6 +3148,8 @@
 			"ALT_S_UPDATE_COLLECTOR_OPTIONS": "コレクターオプションの更新に成功しました",
 			"ALT_S_UPDATE_SCHEDULE": "スケジュールの変更完了",
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "サービスアカウントの更新に成功しました",
+			"CLOUD_SERVICE_TAG": "",
+			"CONDITIONS": "",
 			"CREATE": {
 				"ALL": "全体",
 				"ALT_E_COLLECT_EXECUTION": "データ収集は開始に失敗しました",
@@ -3281,7 +3286,9 @@
 			},
 			"NO_DATA": "データがありません",
 			"NO_JOB": "近のジョブはありません",
-			"NO_OPTIONS": "選択可能なオプションはありません。"
+			"NO_OPTIONS": "選択可能なオプションはありません。",
+			"PROJECT_ROUTING": "",
+			"THEN_STOP_PROCESSING": ""
 		},
 		"CREATE_COLLECTOR": "コレクタ生成",
 		"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",

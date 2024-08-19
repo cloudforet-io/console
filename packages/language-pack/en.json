@@ -3127,7 +3127,10 @@
 		},
 		"COLLECTOR": {
 			"ACCOUNT": "Account",
+			"ACTIONS": "Actions",
 			"ADDITIONAL_OPTIONS": "Additional Options",
+			"ADDITIONAL_RULE": "Additional Rule",
+			"ADD_RULE": "Add Rule",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "Failed to Change Collector Name",
 			"ALT_E_COLLECTOR_SCHEDULE": "You can set a schedule with a maximum of 2 times (a day). ",
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",
@@ -3145,6 +3148,8 @@
 			"ALT_S_UPDATE_COLLECTOR_OPTIONS": "Collector options successfully updated",
 			"ALT_S_UPDATE_SCHEDULE": "Schedule successfully updated ",
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "Attached Service Accounts successfully updated",
+			"CLOUD_SERVICE_TAG": "Cloud Service Tag",
+			"CONDITIONS": "Conditions",
 			"CREATE": {
 				"ALL": "All",
 				"ALT_E_COLLECT_EXECUTION": "Data collection failed to start",
@@ -3281,7 +3286,9 @@
 			},
 			"NO_DATA": "No Data",
 			"NO_JOB": "No recent jobs",
-			"NO_OPTIONS": "No Selectable Options"
+			"NO_OPTIONS": "No Selectable Options",
+			"PROJECT_ROUTING": "Project Routing",
+			"THEN_STOP_PROCESSING": "Then stop processing"
 		},
 		"CREATE_COLLECTOR": "Create Collector",
 		"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
