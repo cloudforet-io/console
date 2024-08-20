@@ -81,3 +81,18 @@ export const DATA_FIELD_HEATMAP_COLOR = {
         label: 'Yellow',
     },
 } as const;
+
+export const XY_CHART_SERIES_LABEL_POSITION = {
+    inside: 'inside',
+    left: 'left',
+    right: 'right',
+    insideLeft: 'insideLeft',
+    insideRight: 'insideRight',
+    insideTop: 'insideTop',
+    insideBottom: 'insideBottom',
+} as const;
+
+export const PIE_CHART_SERIES_LABEL_POSITION = {
+    inner: 'inner',
+    outer: 'outer',
+} as const;
