@@ -1,3 +1,5 @@
+import { computed, reactive } from 'vue';
+
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -37,8 +39,8 @@ export type AttachedServiceAccountType = 'all'|'specific';
 
 export type ServiceAccountFilterOption = 'include'|'exclude';
 
-export const useCollectorFormStore = defineStore('collector-form', {
-    state: () => ({
+export const useCollectorFormStore = defineStore('collector-form', () => {
+    const state = reactive({
         originCollector: null as CollectorModel|null, // data from inventory.collector.get api.
         repositoryPlugin: null as PluginModel|null, // data from repository.plugin.list api. it's used when creating collector.
         provider: undefined as string|undefined,
@@ -54,100 +56,115 @@ export const useCollectorFormStore = defineStore('collector-form', {
         options: {} as CollectorOptions,
         versions: [] as string[],
         isScheduleError: false,
-    }),
-    getters: {
-        collectorId(): string|undefined {
-            return this.originCollector?.collector_id;
-        },
-        pluginId(): string|undefined {
-            return this.originCollector?.plugin_info?.plugin_id ?? this.repositoryPlugin?.plugin_id;
-        },
-        collectorProvider(): string|undefined {
-            return this.originCollector?.provider;
-        },
-        serviceAccounts(): string[] {
-            return this.attachedServiceAccount.map((d) => d.name as string);
-        },
-    },
-    actions: {
+        // getters
+        collectorId: computed<string|undefined>(() => state.originCollector?.collector_id),
+        pluginId: computed<string|undefined>(() => state.originCollector?.plugin_info?.plugin_id ?? state.repositoryPlugin?.plugin_id),
+        collectorProvider: computed<string|undefined>(() => state.originCollector?.provider),
+        serviceAccounts: computed<string[]>(() => state.attachedServiceAccount.map((d) => d.name as string)),
+    });
+
+    const actions = {
         async setOriginCollector(collector: CollectorModel) {
-            this.originCollector = collector;
+            state.originCollector = collector;
             await this.resetForm();
         },
         setRepositoryPlugin(pluginInfo: PluginModel|null) {
-            this.repositoryPlugin = pluginInfo;
+            state.repositoryPlugin = pluginInfo;
         },
         async resetForm() {
-            this.resetName();
-            this.resetTags();
-            this.resetVersion();
-            this.resetSchedule();
-            this.resetOptions();
+            actions.resetName();
+            actions.resetTags();
+            actions.resetVersion();
+            actions.resetSchedule();
+            actions.resetOptions();
             await this.resetAttachedServiceAccount();
         },
         setProvider(provider: string) {
-            this.provider = provider;
+            state.provider = provider;
         },
         setTags(tags: Tag) {
-            this.tags = tags;
+            state.tags = tags;
         },
         resetTags() {
-            this.tags = this.originCollector?.tags ?? {};
+            state.tags = state.originCollector?.tags ?? {};
         },
         setName(name: string) {
-            this.name = name;
+            state.name = name;
         },
         resetName() {
-            this.name = this.originCollector?.name ?? '';
+            state.name = state.originCollector?.name ?? '';
         },
         setVersion(version: string) {
-            this.version = version;
+            state.version = version;
         },
         resetVersion() {
-            this.version = this.originCollector?.plugin_info?.version ?? '';
+            state.version = state.originCollector?.plugin_info?.version ?? '';
         },
         setAutoUpgrade(autoUpgrade: boolean) {
-            this.autoUpgrade = autoUpgrade;
+            state.autoUpgrade = autoUpgrade;
         },
         resetAutoUpgrade() {
-            const pluginUpgradeMode = this.originCollector?.plugin_info.upgrade_mode ?? 'AUTO';
-            this.autoUpgrade = pluginUpgradeMode === 'AUTO';
+            const pluginUpgradeMode = state.originCollector?.plugin_info.upgrade_mode ?? 'AUTO';
+            state.autoUpgrade = pluginUpgradeMode === 'AUTO';
         },
         resetSchedule(hoursOnly = false) {
-            this.scheduleHours = this.originCollector?.schedule?.hours ?? [];
-            this.isScheduleError = false;
-            if (!hoursOnly) this.schedulePower = this.originCollector?.schedule?.state === 'ENABLED' ?? false;
+            state.scheduleHours = state.originCollector?.schedule?.hours ?? [];
+            state.isScheduleError = false;
+            if (!hoursOnly) state.schedulePower = state.originCollector?.schedule?.state === 'ENABLED' ?? false;
         },
         resetSchedulePower() {
-            this.schedulePower = this.originCollector?.schedule?.state === 'ENABLED' ?? false;
+            state.schedulePower = state.originCollector?.schedule?.state === 'ENABLED' ?? false;
         },
         async resetAttachedServiceAccount() {
             const allReferenceStore = useAllReferenceStore();
             const accountItems = allReferenceStore.getters.serviceAccount;
-            const secretFilter = this.originCollector?.secret_filter;
-            const attachedServiceAccount = this.selectedServiceAccountFilterOption === 'include' ? secretFilter?.service_accounts : secretFilter?.exclude_service_accounts;
-            this.attachedServiceAccount = (attachedServiceAccount ?? []).map((d) => ({
+            const secretFilter = state.originCollector?.secret_filter;
+            const attachedServiceAccount = state.selectedServiceAccountFilterOption === 'include' ? secretFilter?.service_accounts : secretFilter?.exclude_service_accounts;
+            state.attachedServiceAccount = (attachedServiceAccount ?? []).map((d) => ({
                 label: accountItems[d]?.label ?? d,
                 name: d,
             })) ?? [];
-            this.attachedServiceAccountType = this.originCollector?.secret_filter?.state === 'ENABLED' ? 'specific' : 'all';
+            state.attachedServiceAccountType = state.originCollector?.secret_filter?.state === 'ENABLED' ? 'specific' : 'all';
         },
         setOptions(options: CollectorOptions) {
-            this.options = options;
+            state.options = options;
         },
         resetOptions() {
-            this.options = this.originCollector?.plugin_info?.options ?? {};
+            state.options = state.originCollector?.plugin_info?.options ?? {};
         },
         async getVersions(pluginId: string) {
             try {
                 const res = await SpaceConnector.clientV2.repository.plugin.getVersions<PluginGetVersionsParameters, ListResponse<string> >({
                     plugin_id: pluginId,
                 });
-                this.versions = res.results ?? [];
+                state.versions = res.results ?? [];
             } catch (e) {
-                this.versions = [];
+                state.versions = [];
                 ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
             }
         },
-    },
+        resetState() {
+            state.originCollector = null;
+            state.repositoryPlugin = null;
+            state.provider = undefined;
+            state.tags = {};
+            state.name = '';
+            state.version = '';
+            state.autoUpgrade = true;
+            state.scheduleHours = [];
+            state.schedulePower = false;
+            state.attachedServiceAccount = [];
+            state.attachedServiceAccountType = 'all';
+            state.selectedServiceAccountFilterOption = 'include';
+            state.options = {};
+            state.additionalRules = [{ order: 1, tag: undefined }];
+            state.versions = [];
+            state.isScheduleError = false;
+        },
+    };
+
+    return {
+        state,
+        ...actions,
+    };
 });
