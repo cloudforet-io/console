@@ -2414,11 +2414,13 @@
 			},
 			"EDIT": "編集",
 			"FORM": {
-				"ACCESS": "アクセス",
+				"ACCESS": "",
+				"ACCESSIBLE_MENU": "",
 				"ADMIN_CENTER": "",
 				"ALL": "全体",
 				"ALL_WORKSPACES": "すべてのワークスペース内のすべてのメニュー",
 				"ALT_E_CREATE_ROLE": "ロール作成失敗",
+				"ALT_E_SELECT": "",
 				"ALT_E_UPDATE_ROLE": "ロール変更失敗",
 				"ALT_S_CREATE_ROLE": "ロール作成完了",
 				"ALT_S_UPDATE_ROLE": "ロール変更完了",
@@ -2433,13 +2435,16 @@
 				"EDIT_TITLE": "ロール修正",
 				"FULL_ACCESS": "管理者ロールにはフルアクセス権限があります。",
 				"MANAGE": "Manage",
-				"MENU": "メニュー",
+				"NO_ACCESS": "",
 				"PERMISSION": "権限",
+				"READ_AND_WRITE": "",
+				"READ_ONLY": "",
 				"READ_ONLY_PERMISSIONS": "",
 				"ROLE_TYPE_DOMAIN": "すべてのプロジェクトにアクセス可能",
 				"ROLE_TYPE_PROJECT": "招待されたり、直接作成したプロジェクトのみアクセス可能",
 				"SAVE": "保存",
 				"SELECTED": "個選択済み",
+				"SERVICE": "",
 				"TOOLTIP_ACTION": "作業",
 				"TOOLTIP_ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
 				"TOOLTIP_ADD_USER": "ユーザー追加",
@@ -2732,6 +2737,22 @@
 			"TOOLTIP_COST": "コストレポートに基づいて",
 			"TOOLTIP_STATE": "休眠設定が有効になると、ユーザーが定義した閾値よりも総コストが低いワークスペースは自動的に休眠状態に切り替えられます。閾値は[設定 > ドメイン設定 > 休眠ポリシー設定]で変更できます。",
 			"WORKSPACES": "ワークスペース"
+		},
+		"WORKSPACE_GROUP": {
+			"CREATE": "",
+			"MAIN": {
+				"DELETE": "",
+				"EDIT": "",
+				"TOOLBOX_PLACEHOLDER": ""
+			},
+			"TAB": {
+				"ADD_USER": "",
+				"ADD_WORKSPACE": "",
+				"GROUP_USER": "",
+				"REMOVE": "",
+				"WORKSPACE": ""
+			},
+			"TITLE": ""
 		}
 	},
 	"IDENTITY": {
@@ -3640,6 +3661,7 @@
 		"ADMINISTRATION_ROLE": "役割",
 		"ADMINISTRATION_USER": "ユーザー",
 		"ADMINISTRATION_WORKSPACES": "ワークスペース",
+		"ADMINISTRATION_WORKSPACE_GROUP": "",
 		"ALERT_MANAGER": "アラートマネージャー",
 		"ALERT_MANAGER_ALERT": "アラート",
 		"ALERT_MANAGER_DASHBOARD": "ダッシュボード",

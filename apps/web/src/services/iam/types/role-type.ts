@@ -10,15 +10,17 @@ export interface RoleFormData {
 // Page Access
 export interface PageAccessMenuItem {
     id: string;
-    translationIds: string[];
+    translationIds?: string[];
     isAccessible: boolean;
     isParent?: boolean;
-    hideMenu: boolean;
     subMenuList?: PageAccessMenuItem[];
+    accessType?: string;
+    isValid?: boolean;
+    accessMenuList?: string[];
 }
 
 export type UpdateFormDataType = {
     id: string;
-    val: boolean;
-    isHideMenu?: boolean;
+    val?: boolean;
+    type?: string;
 };
