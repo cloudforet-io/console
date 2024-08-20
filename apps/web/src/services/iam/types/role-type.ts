@@ -1,3 +1,5 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { RoleType } from '@/schema/identity/role/type';
 
 export interface RoleFormData {
@@ -8,6 +10,12 @@ export interface RoleFormData {
 }
 
 // Page Access
+export interface TableItem {
+    id: string;
+    service: TranslateResult;
+    page_access?: string;
+    accessible_menu?: PageAccessMenuItem[];
+}
 export interface PageAccessMenuItem {
     id: string;
     translationIds?: string[];
@@ -23,4 +31,8 @@ export type UpdateFormDataType = {
     id: string;
     val?: boolean;
     type?: string;
+};
+export type AccessType = {
+    label: TranslateResult;
+    icon: string;
 };
