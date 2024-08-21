@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import { filter } from 'lodash';
 
@@ -16,14 +15,7 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { gray, green } from '@/styles/colors';
 
-import type { PageAccessMenuItem } from '@/services/iam/types/role-type';
-
-interface TableItem {
-    id: string;
-    service: TranslateResult;
-    page_access?: string;
-    accessible_menu?: PageAccessMenuItem[];
-}
+import type { PageAccessMenuItem, TableItem } from '@/services/iam/types/role-type';
 
 interface Props {
     menuItems?: PageAccessMenuItem[]
