@@ -114,8 +114,28 @@ export interface DisplaySeriesLabelValue {
     rotate?: number;
 }
 
+export interface TextWrapValue {
+    toggleValue: boolean;
+}
+
+export type CustomColumnWidthItem = {
+    fieldKey: string;
+    width: number;
+};
+
+export interface TableColumnWidthValue {
+    minimumWidth: number;
+    widthType: 'auto' | 'fixed';
+    fixedWidth?: number;
+}
+
+export interface CustomTableColumnWidthValue {
+    toggleValue: boolean;
+    value: CustomColumnWidthItem[];
+}
+
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
     | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
-    | DisplayAnnotationValue | DisplaySeriesLabelValue;
+    | DisplayAnnotationValue | DisplaySeriesLabelValue | TextWrapValue | TableColumnWidthValue | CustomTableColumnWidthValue;
