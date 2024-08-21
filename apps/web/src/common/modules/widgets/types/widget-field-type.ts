@@ -17,6 +17,8 @@ export interface DataFieldOptions {
 }
 export interface TableDataFieldOptions {
     max?: number;
+    hideDynamicFieldMaxCount?: boolean;
+    hideStaticFieldMaxCount?: boolean;
 }
 export interface XAxisOptions {
     dataTarget?: string;
