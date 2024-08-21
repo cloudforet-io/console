@@ -22,6 +22,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 interface Props {
     dateRange?: DateRange;
+    widgetMode?: boolean; // NOTE: this for widget mode (temporary)
 }
 const props = withDefaults(defineProps<Props>(), {
     dateRange: undefined,
@@ -148,17 +149,21 @@ watch(() => props.dateRange, () => {
 </script>
 
 <template>
-    <div class="dashboard-date-dropdown">
-        <span class="label-text">
+    <div :class="{'dashboard-date-dropdown': true, 'detail-page': !props.widgetMode}">
+        <span v-if="!props.widgetMode"
+              class="label-text"
+        >
             {{ $t('DASHBOARDS.DETAIL.BASED_ON') }}:
         </span>
-        <p-select-dropdown
-            size="sm"
-            :menu="state.monthMenuItems"
-            :selected="state.selectedMonthMenuItem.name"
-            menu-position="right"
-            reset-selection-on-menu-close
-            @select="handleSelectMonthMenuItem"
+        <p-select-dropdown class="date-dropdown"
+                           :size="props.widgetMode ? 'md' : 'sm'"
+                           :style-type="props.widgetMode ? 'rounded': 'default'"
+                           :selection-label="props.widgetMode ? $t('DASHBOARDS.DETAIL.BASED_ON') : undefined"
+                           :menu="state.monthMenuItems"
+                           :selected="state.selectedMonthMenuItem.name"
+                           menu-position="right"
+                           reset-selection-on-menu-close
+                           @select="handleSelectMonthMenuItem"
         >
             <template #menu-item--format="{ item }">
                 <span>{{ item.label }}</span>
@@ -176,9 +181,12 @@ watch(() => props.dateRange, () => {
 .dashboard-date-dropdown {
     @apply flex items-center justify-center;
     min-height: 2rem;
-    gap: 0.125rem;
-    .label-text {
-        @apply text-label-md font-bold text-gray-800;
+
+    &.detail-page {
+        gap: 0.125rem;
+        .label-text {
+            @apply text-label-md font-bold text-gray-800;
+        }
     }
 }
 </style>

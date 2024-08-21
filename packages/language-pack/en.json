@@ -1434,7 +1434,7 @@
 				"FORMAT": "Format",
 				"INCREASE": "Increase",
 				"INFO_TOOLTIP": "Compare based on granularity.",
-				"INFO_TOOLTIP_TABLE": "Compare based on granularity.\nIn Table Widget, cannot be performed\nif the Data field or Group by is set to date.",
+				"INFO_TOOLTIP_TABLE": "This feature is for comparison based on granularity. Not available if 'Data' or 'Group by' is set to 'date.'",
 				"NAME_INVALID_TEXT": "Please write at least one letter.",
 				"PERCENT": "Percentage",
 				"PREVIOUS_DAY": "Previous Day",
@@ -1452,7 +1452,7 @@
 			"DAILY_UPDATE_NO_DATA": "No Daily Update",
 			"DAILY_UPDATE_TITLE": "Daily Updates",
 			"DATA_FIELD_HEATMAP_COLOR": {
-				"DATA_FIELD_HEATMAP_COLOR": "Data Field Heatmap Color"
+				"DATA_FIELD_HEATMAP_COLOR": "Heatmap Color by Data Field"
 			},
 			"DATA_NOT_DISPLAYED": "Data Not Displayed",
 			"DATA_NOT_DISPLAYED_DESC": "Please complete all required fields and click the [Apply] button to display the data.",
@@ -1507,8 +1507,9 @@
 			"DEFAULT_WIDTH": "Default Width",
 			"DELETE": "Delete",
 			"DISPLAY_ANNOTATION": {
-				"DISPLAY_ANNOTATION": "Display Annotation",
-				"INVALID_VALUE": "Please enter annotation."
+				"DISPLAY_ANNOTATION": "Additional Info",
+				"INVALID_VALUE": "Please enter info.",
+				"PLACEHOLDER": "Values shown in thousands of USD"
 			},
 			"DISPLAY_SERIES_LABEL": {
 				"DISPLAY_SERIES_LABEL": "Display Series Label",
@@ -1645,6 +1646,7 @@
 			"SERVICE_SUMMARY_SERVER": "Server",
 			"SET_CHART_OPTIONS": "Set Chart Options",
 			"SET_DATA_SOURCE": "Set Data Source",
+			"TABLE_HEATMAP_COLOR_NONE": "None",
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "Create Project",
 				"NO_PROJECT": "No Project",
@@ -2175,6 +2177,7 @@
 		"ACCOUNT_SUMMARY_SHOW_MORE": "Show More Service Account",
 		"ACTIVATION_REQUIRED": "Activation Required",
 		"ACTIVATION_REQUIRED_DESC": "This contains Cost Analysis, Budget, and Cost Report.",
+		"AGGREGATING": "Aggregating",
 		"ALT_E_DUPLICATED_NAME": "Folder name is duplicated.",
 		"ALT_E_INVALID_LINK": "Sorry could not save bookmark. Please check if the link is a valid URL.",
 		"ALT_E_MAX_LENGTH_INVALID": "{max} characters in max",
@@ -2217,17 +2220,17 @@
 		"CONFIG_RECENT_TITLE": "Recent Visits",
 		"CONFIG_STARRED_ALL": "All",
 		"CONFIG_STARRED_TITLE": "Starred",
-		"COST_SUMMARY_AGGREGATING": "Aggregating",
+		"CONFIRM": "Confirm",
 		"COST_SUMMARY_BY_PROJECT": "by Project",
-		"COST_SUMMARY_CONFIRM": "Confirm",
 		"COST_SUMMARY_CURRENT_TOTAL_COST": "Current Month-to-Date Cost",
-		"COST_SUMMARY_DESC": "The costs above may differ from the costs in the report.",
+		"COST_SUMMARY_DESC": "The cost above may differ from the costs in the report",
 		"COST_SUMMARY_GO_TO_REPORT": "Go to Cost Report",
 		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "Last Month Total Cost",
 		"COST_SUMMARY_RECENT": "Recent Cost Report for {date}",
 		"COST_SUMMARY_TITLE": "Cost Summary",
 		"COST_SUMMARY_TOTAL_SPEND": "Last Month Total Spend:",
 		"EMPTY_LINK": "No Link",
+		"ESTIMATED": "Estimated",
 		"FORM_DESELECT": "Deselect",
 		"FORM_FOLDER": "Folder",
 		"FORM_LINK": "Link",
@@ -2530,7 +2533,6 @@
 				"EMAIL_INVALID": "Invalid e-mail format.",
 				"GENERATE": "Generate",
 				"GENERATE_PLACEHOLDER": "Generate or Enter Password",
-				"ID_INVALID": "Invalid ID format",
 				"MEMBER": "Member",
 				"NAME": "Name",
 				"NAME_VALID": "You can use this ID",

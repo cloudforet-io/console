@@ -1404,7 +1404,7 @@
 			"CHANGE_DATA_MODAL_DESCRIPTION": "아래 설정된 모든 옵션이 재설정됩니다.",
 			"CHANGE_DATA_MODAL_TITLE": "데이터를 변경하시겠습니까?",
 			"CLONE": "복제",
-			"CLONE_SUCCESS_MSG": "",
+			"CLONE_SUCCESS_MSG": "새로운 위젯으로 복제 완료 ",
 			"CLOUD_SERVICE": {
 				"HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
 				"NO_DATA": "클라우드 리소스가 없습니다.",
@@ -1433,8 +1433,8 @@
 				"FIXED": "금액 고정",
 				"FORMAT": "포멧",
 				"INCREASE": "증가",
-				"INFO_TOOLTIP": "",
-				"INFO_TOOLTIP_TABLE": "",
+				"INFO_TOOLTIP": "세부 기준(Granuarity)기반의 이전 데이터 비교",
+				"INFO_TOOLTIP_TABLE": "세부 기준(Granualrity)기반의 이전 데이터와 비교를 위해 사용할 수 있습니다. 단, 데이터 필드 또는 그룹별 통계(Group by)가 'Date'로 선택된 경우, 본 옵션 사용이 불가합니다.",
 				"NAME_INVALID_TEXT": "한 글자 이상 입력해주세요.",
 				"PERCENT": "비율",
 				"PREVIOUS_DAY": "전",
@@ -1452,7 +1452,7 @@
 			"DAILY_UPDATE_NO_DATA": "일간 변동 사항이 없습니다.",
 			"DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
 			"DATA_FIELD_HEATMAP_COLOR": {
-				"DATA_FIELD_HEATMAP_COLOR": ""
+				"DATA_FIELD_HEATMAP_COLOR": "데이터 필드별 히트맵 색상"
 			},
 			"DATA_NOT_DISPLAYED": "데이터 표시 불가",
 			"DATA_NOT_DISPLAYED_DESC": "모든 필수 필드를 설정하고, [적용하기] 버튼을 클릭하여 위젯 설정을 완료해주세요.",
@@ -1466,8 +1466,8 @@
 					"RESET_DESC": "재설정 시, 모든 입력값이 가장 마지막 입력값으로 되돌아갑니다. 이 작업은 취소할 수 없습니다.",
 					"RESET_HEADER": "데이터 옵션을 리셋하시겠습니까?"
 				},
-				"APPLY_ALL": "",
-				"APPLY_ALL_SUCCESS": "",
+				"APPLY_ALL": "전체 적용하기",
+				"APPLY_ALL_SUCCESS": "변경 사항 반영 완료",
 				"EMPTY_DESC": "[+] 버튼으로 새로운 데이터를 추가하거나, \nConcatenate, Join, Query, Evaluate과 같은 다양한 방법으로 데이터를 변경하세요.",
 				"EMPTY_TITLE": "데이터를 추가해주세요",
 				"FORM": {
@@ -1507,18 +1507,19 @@
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
 			"DISPLAY_ANNOTATION": {
-				"DISPLAY_ANNOTATION": "",
-				"INVALID_VALUE": ""
+				"DISPLAY_ANNOTATION": "부가 정보 표시",
+				"INVALID_VALUE": "추가로 표시할 내용을 입력해주세요.",
+				"PLACEHOLDER": "기준: 만원"
 			},
 			"DISPLAY_SERIES_LABEL": {
-				"DISPLAY_SERIES_LABEL": "",
-				"POSITION": "",
-				"ROTATE": "",
-				"ROTATE_MAX_INVALID_TEXT": "",
-				"ROTATE_MIN_INVALID_TEXT": ""
+				"DISPLAY_SERIES_LABEL": "시리즈 레이블 표시 ",
+				"POSITION": "위치",
+				"ROTATE": "회전",
+				"ROTATE_MAX_INVALID_TEXT": "90 이하로 설정해주세요.",
+				"ROTATE_MIN_INVALID_TEXT": "-90 이상으로 설정해주세요."
 			},
 			"DONE": "완료",
-			"DONUT": "",
+			"DONUT": "도넛 차트",
 			"EDIT": "편집",
 			"EDIT_WIDGET": "위젯 수정",
 			"EXPAND": "확장",
@@ -1569,13 +1570,13 @@
 			"NUMBER_FORMAT": {
 				"AUTO": "자동",
 				"CONFIRM": "확인",
-				"CUSTOM_NUMBER_FORMAT": "",
-				"FULL_NUMBER": "",
+				"CUSTOM_NUMBER_FORMAT": "사용자 지정",
+				"FULL_NUMBER": "전체 숫자 ",
 				"HELP": "가이드",
-				"INVALID_NUMBER_FORMAT": "",
-				"NUMBER_FORMAT": "",
-				"SAMPLE": "",
-				"SHORT_NUMBER": ""
+				"INVALID_NUMBER_FORMAT": "잘못된 숫자 서식입니다.",
+				"NUMBER_FORMAT": "숫자 서식",
+				"SAMPLE": "샘플",
+				"SHORT_NUMBER": "축약형 숫자"
 			},
 			"PERIOD": "기간",
 			"PERSONAL_HEALTH_DASHBOARD": {
@@ -1603,8 +1604,8 @@
 				"TITLE": "Personal Health Dashboard",
 				"UPCOMING_AND_PAST_7_DAYS": "지난 7일 ~ 예정 일정"
 			},
-			"PIE": "",
-			"PIE_CHART_TYPE": "",
+			"PIE": "파이 차트",
+			"PIE_CHART_TYPE": "차트 유형 ",
 			"PREVIEW_TABLE_EMPTY_DESC": "여기에 데이터 구성의 미리보기가 표시됩니다.",
 			"PREVIEW_TABLE_EMPTY_TITLE": "데이터를 추가해 주세요.",
 			"REQUIRED_FIELDS_ARE_MISSING": "필수 필드 중 입력 누락 존재",
@@ -1645,6 +1646,7 @@
 			"SERVICE_SUMMARY_SERVER": "서버 ",
 			"SET_CHART_OPTIONS": "차트 옵션 설정",
 			"SET_DATA_SOURCE": "데이터 소스 설정",
+			"TABLE_HEATMAP_COLOR_NONE": "없음",
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "프로젝트 생성",
 				"NO_PROJECT": "프로젝트 없음",
@@ -1681,8 +1683,8 @@
 				"TITLE": "Trusted Advisor"
 			},
 			"UNABLE_TO_LOAD_WIDGET": "위젯 표시 불가",
-			"VIEW_FULL_DATA": "",
-			"WIDGET_TITLE_REQUIRED": ""
+			"VIEW_FULL_DATA": "전체 데이터 보기",
+			"WIDGET_TITLE_REQUIRED": "위젯 제목을 입력해주세요."
 		}
 	},
 	"COST_EXPLORER": {
@@ -1858,7 +1860,7 @@
 			}
 		},
 		"DETAIL": {
-			"1": "",
+			"1": "코드로 공유",
 			"ADD_WIDGET": "위젯 추가",
 			"ALL_PROJECTS": "모든 프로젝트",
 			"ALL_WORKSPACES": "전체 워크스페이스",
@@ -1866,7 +1868,7 @@
 			"ALT_S_UNSHARE_DASHBOARD": "대시보드 공유 해제 완료",
 			"APPLY": "확인",
 			"AUTO": "자동",
-			"BASED_ON": "기준월",
+			"BASED_ON": "기준 월",
 			"CLONE": "복제",
 			"COPIED": "복사됨",
 			"COPY": "복사",
@@ -1985,7 +1987,7 @@
 			"AWS_TRUSTED_ADVISOR": {
 				"DESC": "AWS Trusted Advisor를 통해 검사, 분석된 현황을 프로젝트별로 확인할 수 있는 위젯. "
 			},
-			"BASED_ON": "",
+			"BASED_ON": "기준 월",
 			"BUDGET_STATUS": {
 				"DESC": "조회 기간동안의 상위 200개의 예산 사용률을 보여주는 위젯. "
 			},
@@ -2129,7 +2131,7 @@
 						"PROGRESS_CARD_DESC": "이 차트를 올바르게 표시하려면, 데이터에 최소 2개 이상의 데이터 필드가 있어야 합니다. ",
 						"TITLE": "추가 필드가 필요합니다."
 					},
-					"WIDGET_HEADER": "",
+					"WIDGET_HEADER": "위젯 헤더",
 					"X_AXIS": "X축",
 					"Y_AXIS": "Y축"
 				}
@@ -2175,6 +2177,7 @@
 		"ACCOUNT_SUMMARY_SHOW_MORE": "서비스 어카운트 더 보기",
 		"ACTIVATION_REQUIRED": "기능 활성화 필요",
 		"ACTIVATION_REQUIRED_DESC": "비용 분석, 예산, 비용 리포트를 이용할 수 있습니다.",
+		"AGGREGATING": "집계 중",
 		"ALT_E_DUPLICATED_NAME": "폴더 이름이 중복되었습니다. ",
 		"ALT_E_INVALID_LINK": "북마크를 저장할 수 없습니다. 링크 주소가 유효한지 확인해주세요.",
 		"ALT_E_MAX_LENGTH_INVALID": "{max}자 이하로 입력해 주세요.",
@@ -2217,17 +2220,17 @@
 		"CONFIG_RECENT_TITLE": "최근 방문",
 		"CONFIG_STARRED_ALL": "모두",
 		"CONFIG_STARRED_TITLE": "즐겨찾기",
-		"COST_SUMMARY_AGGREGATING": "집계중",
+		"CONFIRM": "확인",
 		"COST_SUMMARY_BY_PROJECT": "프로젝트별",
-		"COST_SUMMARY_CONFIRM": "확인",
-		"COST_SUMMARY_CURRENT_TOTAL_COST": "이번 달 누적 비용",
-		"COST_SUMMARY_DESC": "위 비용은 비용 리포트의 금액과 다를 수 있습니다.",
+		"COST_SUMMARY_CURRENT_TOTAL_COST": "당월 누적값",
+		"COST_SUMMARY_DESC": "위의 비용은 비용 리포트 발행 시점에 따라 최종 비용에 차이가 있을 수 있습니다.",
 		"COST_SUMMARY_GO_TO_REPORT": "비용 리포트로 이동",
-		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "지난달 총 비용",
+		"COST_SUMMARY_LAST_MONT_TOTAL_COST": "전월 총 비용",
 		"COST_SUMMARY_RECENT": "최근 비용 리포트({date})",
 		"COST_SUMMARY_TITLE": "비용 현황",
 		"COST_SUMMARY_TOTAL_SPEND": "지난달 총 소비:",
 		"EMPTY_LINK": "링크 없음",
+		"ESTIMATED": "예상",
 		"FORM_DESELECT": "선택 해제",
 		"FORM_FOLDER": "폴더",
 		"FORM_LINK": "링크",
@@ -2530,7 +2533,6 @@
 				"EMAIL_INVALID": "잘못된 이메일 형식입니다. ",
 				"GENERATE": "생성",
 				"GENERATE_PLACEHOLDER": "비밀번호 자동 생성 또는 입력",
-				"ID_INVALID": "잘못된 ID 형식입니다.",
 				"MEMBER": "멤버",
 				"NAME": "이름",
 				"NAME_VALID": "사용 가능한 아이디입니다.",
@@ -3651,7 +3653,7 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "추가 설정",
 		"ADMINISTRATION": "관리",
-		"ADMINISTRATION_ADVANCED": "",
+		"ADMINISTRATION_ADVANCED": "고급 관리",
 		"ADMINISTRATION_APP": "앱",
 		"ADMINISTRATION_BOOKMARK": "북마크",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "도메인 설정",
@@ -3903,7 +3905,7 @@
 					"RESPONDER": "수신자",
 					"SHOW_RESPONDERS": "수신자 보기"
 				},
-				"SIGN_IN_BUTTON": "",
+				"SIGN_IN_BUTTON": "로그인 시 상세 관리 가능합니다.",
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "상태 업데이트 실패",
 					"ALT_S_UPDATE_STATUS": "상태 업데이트 완료 ",
@@ -4302,13 +4304,13 @@
 			"DASHBOARD": {
 				"DASHBOARD": "대시보드 ",
 				"DASHBOARD_LIST": "대시보드 리스트",
-				"NO_DASHBOARD": "",
-				"NO_DASHBOARD_DESC": ""
+				"NO_DASHBOARD": "대시보드 없음",
+				"NO_DASHBOARD_DESC": "공유된 대시보드가 이 곳에 추가됩니다."
 			},
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
 			"FAILED": "실패",
-			"GO_TO_DASHBOARD": "",
+			"GO_TO_DASHBOARD": "대시보드로 이동",
 			"HELP": "가이드",
 			"INVITE_ONLY": "초대된 사용자만",
 			"MEMBER": {

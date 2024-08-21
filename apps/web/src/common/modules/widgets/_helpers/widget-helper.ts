@@ -29,7 +29,7 @@ export const getWidgetDataTable = async (dataTableId: string): Promise<PrivateDa
     }
 };
 
-export const sortWidgetTableFields = (fields: string[]) => {
+export const sortWidgetTableFields = (fields: string[]): string[] => {
     const priorityFields = Object.values(DATE_FIELD) as string[];
     const prioritySet = new Set(priorityFields);
 
@@ -52,8 +52,9 @@ export const getFormattedNumber = (val: number, dataField: string, numberFormatV
             return byteFormatter(_originalVal);
         }
         return numberFormatter(val, { notation: 'compact' }) || '--';
-    case NUMBER_FORMAT.SHORT_NUMBER:
-        return numberFormatter(val, { notation: 'compact' }) || '--';
+    // NOTE: temporary remove short number
+    // case NUMBER_FORMAT.SHORT_NUMBER:
+    //     return numberFormatter(val, { notation: 'compact' }) || '--';
     case NUMBER_FORMAT.FULL_NUMBER:
         return val.toString();
     case NUMBER_FORMAT.CUSTOM:

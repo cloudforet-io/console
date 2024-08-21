@@ -14,6 +14,7 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import WidgetFormOverlayStep2WidgetForm
@@ -44,8 +45,13 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(event: 'watch-options-changed', value: boolean): void;}>();
+
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 
 const state = reactive({
     mounted: false,
@@ -82,6 +88,7 @@ const state = reactive({
     //
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
+    isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared && !storeState.isAdminMode),
 });
 
 const {
@@ -199,14 +206,19 @@ onUnmounted(() => {
         <div class="left-part">
             <div class="dashboard-settings-wrapper">
                 <div class="toolbox-wrapper">
-                    <dashboard-toolset-date-dropdown :date-range="state.dashboardOptionsSnapshot.date_range" />
-                    <p-divider vertical
-                               class="divider"
-                    />
-                    <dashboard-variables-v2 disable-save-button
-                                            :is-project-dashboard="!!dashboardDetailState.projectId"
-                    />
-                    <p-button v-if="!dashboardDetailState.projectId && widgetGenerateState.overlayType === 'EXPAND'"
+                    <div class="left-wrapper">
+                        <dashboard-toolset-date-dropdown widget-mode
+                                                         :date-range="state.dashboardOptionsSnapshot.date_range"
+                        />
+                        <p-divider vertical
+                                   class="divider"
+                        />
+                        <dashboard-variables-v2 disable-save-button
+                                                widget-mode
+                                                :is-project-dashboard="!!dashboardDetailState.projectId"
+                        />
+                    </div>
+                    <p-button v-if="!state.isSharedDashboard && !dashboardDetailState.projectId && widgetGenerateState.overlayType === 'EXPAND'"
                               style-type="tertiary"
                               icon-left="ic_edit"
                               class="edit-button"
@@ -294,15 +306,17 @@ onUnmounted(() => {
                 height: 1rem;
             }
             .toolbox-wrapper {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                .dashboard-variables-select-dropdown {
-                    @apply relative flex items-center flex-wrap;
+                @apply flex items-center justify-between w-full;
+                .left-wrapper {
+                    @apply flex items-center;
                     gap: 0.5rem;
+                    .dashboard-variables-select-dropdown {
+                        @apply relative flex items-center flex-wrap;
+                        gap: 0.5rem;
+                    }
                 }
                 .edit-button {
-                    position: absolute;
+                    position: relative;
                     right: 4.5rem;
                 }
             }
@@ -310,6 +324,8 @@ onUnmounted(() => {
                 display: flex;
                 gap: 0.5rem;
                 align-items: center;
+                justify-content: end;
+                min-width: 14rem;
                 .divider {
                     height: 1.5rem;
                 }

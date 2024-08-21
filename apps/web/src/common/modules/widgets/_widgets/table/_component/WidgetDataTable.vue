@@ -86,15 +86,33 @@ const state = reactive({
         if (!props.granularity || !props.dateFormatInfo) return undefined;
         return getRefinedDateFormatByGranularity(props.granularity, props.dateFormatInfo.value);
     }),
-    dataItems: computed(() => {
-        if (!props.totalInfo?.toggleValue && props.items?.length) {
-            return props.items.slice(0, props.items.length - 1);
+    linearInterpolationValueMap: computed<Record<string, { min: number, max: number }>>(() => {
+        if (!props.items || !props.items.length) return {};
+        const dataItems = props.totalInfo?.toggleValue ? props.items.slice(0, -1) : props.items;
+        if (props.fieldType === 'staticField') {
+            return props.fields.reduce((acc, field) => {
+                if (field.fieldInfo?.type === 'dataField') {
+                    const dataField = field.name;
+                    const maxValue = Math.max(...dataItems.map((item) => item[dataField] || 0));
+                    const minValue = Math.min(...dataItems.map((item) => item[dataField] || 0));
+                    return { ...acc, [dataField]: { min: minValue, max: maxValue } };
+                }
+                return acc;
+            }, {});
         }
-        return props.items;
-    }),
-    totalItem: computed(() => {
-        if (!props.items?.length) return undefined;
-        return props.items[props.items.length - 1];
+        if (props.fieldType === 'dynamicField') {
+            return props.fields.reduce((acc, field) => {
+                if (field.fieldInfo?.type === 'dataField') {
+                    const dataField = field.name;
+                    if (field.name === 'Total') return acc;
+                    const maxValue = Math.max(...dataItems.map((item) => item[props.criteria || '']?.find((data) => data[props.dataField as string] === dataField)?.value || 0));
+                    const minValue = Math.min(...dataItems.map((item) => item[props.criteria || '']?.find((data) => data[props.dataField as string] === dataField)?.value || 0));
+                    return { ...acc, [dataField]: { min: minValue, max: maxValue } };
+                }
+                return acc;
+            }, {});
+        }
+        return {};
     }),
 });
 
@@ -229,18 +247,18 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 
     let _dataField = '';
     let _value = 0;
-    let _totalValue = 100;
+    const minValue = state.linearInterpolationValueMap[field.name].min;
+    const maxValue = state.linearInterpolationValueMap[field.name].max;
+    const absGapValue = maxValue - minValue;
     if (props.fieldType === 'staticField') {
         _value = item[field.name] || 0;
-        _totalValue = state.totalItem?.[field.name] || 100;
         _dataField = field.name;
     } else if (props.fieldType === 'dynamicField') {
         _value = item[props.criteria || '']?.find((data) => data[props.dataField as string] === field.name)?.value || 0;
-        _totalValue = state.totalItem?.[props.criteria || '']?.find((data) => data[props.dataField as string] === field.name)?.value || 100;
         _dataField = props.criteria as string;
     }
 
-    const opacity = 0.1 + (0.9 * (_value / _totalValue));
+    const opacity = 0.1 + (0.9 * ((_value - minValue) / absGapValue));
     const _colorInfo = props.dataFieldHeatmapColorInfo?.[_dataField]?.value;
     if (_colorInfo && _colorInfo !== 'NONE') {
         const rgbaString = hexToRgba(HEATMAP_COLOR_HEX_MAP[_colorInfo], opacity);
@@ -257,6 +275,8 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 //     const [key, value] = Object.entries(timediff)[0];
 //     return `( ${value} ${key} )`;
 // };
+
+
 
 </script>
 
@@ -306,7 +326,7 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
                 </tr>
             </thead>
             <tbody ref="tbodyRef">
-                <tr v-for="(item, rowIndex) in state.dataItems"
+                <tr v-for="(item, rowIndex) in props.items"
                     :key="`tr-${props.widgetId}-${rowIndex}`"
                     :data-index="rowIndex"
                 >
@@ -411,8 +431,8 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
     tbody {
         tr {
             &:nth-child(odd) {
-                @apply bg-gray-100;
                 td {
+                    @apply bg-gray-100;
                     &.sub-total {
                         @apply bg-violet-150;
                     }

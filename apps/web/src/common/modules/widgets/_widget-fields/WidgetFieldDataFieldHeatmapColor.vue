@@ -9,6 +9,8 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 
+import { i18n } from '@/translations';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATA_FIELD_HEATMAP_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type {
@@ -26,10 +28,18 @@ const state = reactive({
     isInitiated: false,
     proxyValue: useProxyValue<DataFieldHeatmapColorValue|undefined>('value', props, emit),
     dataFieldList: computed<string[]>(() => Object.keys(props.dataTable?.data_info ?? {}) ?? []),
-    menuItems: computed<SelectDropdownMenuItem[]>(() => Object.entries(DATA_FIELD_HEATMAP_COLOR).map(([key, value]) => ({
-        label: value.label,
-        name: key,
-    }))),
+    menuItems: computed<SelectDropdownMenuItem[]>(() => Object.entries(DATA_FIELD_HEATMAP_COLOR).map(([key, value]) => {
+        if (key === DATA_FIELD_HEATMAP_COLOR.NONE.key) {
+            return {
+                label: i18n.t('COMMON.WIDGETS.TABLE_HEATMAP_COLOR_NONE'),
+                name: key,
+            };
+        }
+        return {
+            label: value.label,
+            name: key,
+        };
+    })),
 });
 
 /* Util */
@@ -84,7 +94,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                         <template #dropdown-button="item">
                             <div class="menu-item">
                                 <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
-                                     :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}-300`]: !!getDataFieldHeatmapColor(item.name)}"
+                                     :class="{'color-circle': true, [getDataFieldHeatmapColor(item.name)]: true}"
                                 />
                                 <span>{{ item.label }}</span>
                             </div>
@@ -92,7 +102,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                         <template #menu-item--format="{item}">
                             <div class="menu-item">
                                 <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
-                                     :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}-300`]: !!getDataFieldHeatmapColor(item.name)}"
+                                     :class="{'color-circle': true, [getDataFieldHeatmapColor(item.name)]: true}"
                                 />
                                 <span>{{ item.label }}</span>
                             </div>
@@ -113,7 +123,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                     <template #dropdown-button="item">
                         <div class="menu-item">
                             <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
-                                 :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}`]: !!getDataFieldHeatmapColor(item.name)}"
+                                 :class="{'color-circle': true, [getDataFieldHeatmapColor(item.name)]: true}"
                             />
                             <span>{{ item.label }}</span>
                         </div>
@@ -121,7 +131,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
                     <template #menu-item--format="{item}">
                         <div class="menu-item">
                             <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
-                                 :class="{'color-circle': true, [`bg-${getDataFieldHeatmapColor(item.name)}`]: !!getDataFieldHeatmapColor(item.name)}"
+                                 :class="{'color-circle': true, [getDataFieldHeatmapColor(item.name)]: true}"
                             />
                             <span>{{ item.label }}</span>
                         </div>
@@ -140,7 +150,25 @@ watch(() => state.dataFieldList, (dataFieldList) => {
             @apply rounded-full;
             width: 1rem;
             height: 1rem;
+
+            &.red {
+                @apply bg-red-300;
+            }
+            &.blue {
+                @apply bg-blue-300;
+            }
+            &.green {
+                @apply bg-green-300;
+            }
+            &.yellow {
+                @apply bg-yellow-300;
+            }
         }
     }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
 }
 </style>

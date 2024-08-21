@@ -23,12 +23,12 @@ import type { NumberFormatValue, NumberFormat } from '@/common/modules/widgets/t
 
 const SAMPLE_NUMBER = 123456789;
 const SAMPLE_FORMAT_LIST = [
-    '#,##0',
-    '#,##0.00',
-    '#,##0%',
-    '#,##0.00%',
-    '#,##0,"천"',
-    '#,##0,,"백만"',
+    { format: '#,##0', sample: 1234 },
+    { format: '#,##0.00', sample: 1234.56 },
+    { format: '#,##0%', sample: 1.23 },
+    { format: '#,##0.00%', sample: 1.2345 },
+    { format: '#,##0,"천"', sample: 1234000 },
+    { format: '#,##0,,"백만"', sample: 1234000000 },
 ];
 const emit = defineEmits<WidgetFieldComponentEmit<NumberFormatValue>>();
 const props = defineProps<WidgetFieldComponentProps<NumberFormatOptions, NumberFormatValue>>();
@@ -41,10 +41,11 @@ const state = reactive({
             name: NUMBER_FORMAT.AUTO,
             label: i18n.t('COMMON.WIDGETS.NUMBER_FORMAT.AUTO'),
         },
-        {
-            name: NUMBER_FORMAT.SHORT_NUMBER,
-            label: i18n.t('COMMON.WIDGETS.NUMBER_FORMAT.SHORT_NUMBER'),
-        },
+        // NOTE: temporary remove short number
+        // {
+        //     name: NUMBER_FORMAT.SHORT_NUMBER,
+        //     label: i18n.t('COMMON.WIDGETS.NUMBER_FORMAT.SHORT_NUMBER'),
+        // },
         {
             name: NUMBER_FORMAT.FULL_NUMBER,
             label: i18n.t('COMMON.WIDGETS.NUMBER_FORMAT.FULL_NUMBER'),
@@ -116,6 +117,9 @@ const handleConfirmCustomModal = () => {
         },
     };
     state.customModalVisible = false;
+};
+const handleClickSampleFormat = (format: string) => {
+    state.customNumberFormat = format;
 };
 
 /* Watcher */
@@ -221,11 +225,12 @@ watch(() => state.customModalVisible, (modalVisible) => {
                 </div>
                 <div class="bottom-part">
                     <div v-for="sampleFormat in SAMPLE_FORMAT_LIST"
-                         :key="`sample-format-${sampleFormat}`"
+                         :key="`sample-format-${sampleFormat.format}`"
                          class="sample-row"
+                         @click="handleClickSampleFormat(sampleFormat.format)"
                     >
-                        <span class="format-text">{{ sampleFormat }}</span>
-                        <span class="formatted-value">{{ customNumberFormatter(sampleFormat, SAMPLE_NUMBER) }}</span>
+                        <span class="format-text">{{ sampleFormat.format }}</span>
+                        <span class="formatted-value">{{ customNumberFormatter(sampleFormat.format, sampleFormat.sample) }}</span>
                     </div>
                 </div>
             </template>
@@ -255,7 +260,9 @@ watch(() => state.customModalVisible, (modalVisible) => {
     .bottom-part {
         @apply border border-gray-150 rounded;
         padding: 0.5rem;
+        margin-top: 0.75rem;
         .sample-row {
+            @apply cursor-pointer;
             display: flex;
             justify-content: space-between;
             padding: 0.5rem;
@@ -267,5 +274,10 @@ watch(() => state.customModalVisible, (modalVisible) => {
             }
         }
     }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
 }
 </style>

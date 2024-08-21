@@ -9,7 +9,7 @@ import { orderBy, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
-import { PTextPagination } from '@cloudforet/mirinae';
+import { PPagination } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
@@ -56,7 +56,9 @@ const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
+    fullPageData: null as Data | null,
     comparisonData: null as Data | null,
+    fullPageComparisonData: null as Data | null,
     dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
     // converted data
     finalConvertedData: computed<Data|null>(() => {
@@ -223,7 +225,55 @@ const getWidgetTableDateFields = (
     return dateFields.slice(-limitCount);
 };
 
-const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|undefined> => {
+const getTotalDataItem = (data: TableDataItem[], type: 'static'|'time_series'|'dynamic'): TableDataItem => {
+    const hasComparisonInfo = state.comparisonInfo?.format;
+
+    const totalDataItem: TableDataItem = {};
+    const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
+    if (_sortedGroupByFields.length) totalDataItem[_sortedGroupByFields[0]] = 'Total';
+    if (type === 'static') {
+        [...state.tableDataField, 'sub_total'].forEach((field) => {
+            totalDataItem[field] = data.reduce((acc, cur) => acc + cur[field], 0);
+            if (field !== 'sub_total' && hasComparisonInfo) {
+                const comparisionFieldName = `comparison_${field}`;
+                totalDataItem[comparisionFieldName] = {
+                    target: totalDataItem[field],
+                    subject: data.reduce((acc, cur) => acc + cur[comparisionFieldName].subject, 0),
+                };
+            }
+        });
+    } else if (type === 'time_series') {
+        totalDataItem[state.tableDataCriteria] = [...state.tableFields, 'sub_total']
+            .filter((field) => field.fieldInfo?.type === 'dataField')
+            .map((field) => {
+                const totalValue = data.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === field.name)?.value || 0), 0);
+                return { [state.tableDataField]: field.name, value: totalValue };
+            });
+    } else if (type === 'dynamic') {
+        const fieldForTotal = data?.[0]?.[state.tableDataCriteria] ?? [];
+        totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
+            const fieldName = `${item[state.tableDataField]}`;
+            if (fieldName.startsWith('comparison_')) {
+                const targetTotalValue = data.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.target || 0), 0);
+                const subjectTotalValue = data.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.subject || 0), 0);
+                return {
+                    [state.tableDataField]: fieldName,
+                    value: {
+                        target: targetTotalValue,
+                        subject: subjectTotalValue,
+                    },
+                };
+            }
+            const totalValue = data.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value || 0), 0);
+            return { [state.tableDataField]: fieldName, value: totalValue };
+        });
+    }
+
+    return totalDataItem;
+};
+
+const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: boolean }): Promise<Data|APIErrorToast|undefined> => {
+    const { isComparison, fullDataFetch } = options;
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
         state.loading = true;
@@ -246,6 +296,13 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
             _groupBy = [..._groupBy, state.tableDataField];
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
         }
+        const sortAndPageQuery = fullDataFetch ? {} : {
+            sort: state.sortBy.length ? state.sortBy : _sort,
+            page: {
+                start: (state.pageSize * (state.thisPage - 1)) + 1,
+                limit: state.pageSize,
+            },
+        };
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
@@ -255,11 +312,7 @@ const fetchWidget = async (isComparison?: boolean): Promise<Data|APIErrorToast|u
                 group_by: _groupBy,
                 field_group: _field_group,
                 fields: _fields,
-                sort: state.sortBy.length ? state.sortBy : _sort,
-                page: {
-                    start: (state.pageSize * (state.thisPage - 1)) + 1,
-                    limit: state.pageSize,
-                },
+                ...sortAndPageQuery,
             },
             vars: props.dashboardVars,
         });
@@ -278,11 +331,18 @@ const loadWidget = async (manualLoad?: boolean): Promise<Data|APIErrorToast> => 
         state.sortBy = [];
         state.thisPage = 1;
     }
-    const res = await fetchWidget();
-    const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget(true) : null;
+    const res = await fetchWidget({});
+    const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget({ isComparison: true }) : null;
     if (typeof res === 'function') return res;
     state.data = res;
     state.comparisonData = comparisonRes;
+
+    if (state.totalInfo?.toggleValue) {
+        const fullDataRes = await fetchWidget({ fullDataFetch: true });
+        const fullDataComparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget({ isComparison: true, fullDataFetch: true }) : null;
+        state.fullPageData = fullDataRes;
+        state.fullPageComparisonData = fullDataComparisonRes;
+    }
     return state.data;
 };
 
@@ -299,12 +359,13 @@ watch([() => props.size], async () => {
 });
 
 // Data Converting
-watch(() => state.data, () => {
-    if (!state.data) return;
+watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
+    if (!data) return;
+    const _fullPageDataResults = fullPageData?.results ?? [];
     if (state.tableDataFieldType === 'staticField') {
         const comparisonData = state.comparisonData?.results;
         const hasComparisonInfo = state.comparisonInfo?.format;
-        const results = state.data.results.map((d, idx) => {
+        const results = data.results.map((d, idx) => {
             const dataItem = { ...d };
             let subTotalValue = 0;
 
@@ -322,27 +383,33 @@ watch(() => state.data, () => {
             return dataItem;
         });
 
-        // if (state.totalInfo?.toggleValue) {
-        // Total Data
-        const totalDataItem: TableDataItem = {};
-        const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
-        if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
-        [...state.tableDataField, 'sub_total'].forEach((field) => {
-            totalDataItem[field] = results.reduce((acc, cur) => acc + cur[field], 0);
-            if (field !== 'sub_total' && hasComparisonInfo) {
-                const comparisionFieldName = `comparison_${field}`;
-                totalDataItem[comparisionFieldName] = {
-                    target: totalDataItem[field],
-                    subject: results.reduce((acc, cur) => acc + cur[comparisionFieldName].subject, 0),
-                };
-            }
-        });
-        results.push(totalDataItem);
-        // }
+        // Full Total Data
+        if (state.totalInfo?.toggleValue) {
+            const fullDataComparison = state.fullPageComparisonData?.results ?? [];
+            const fullDataResults = _fullPageDataResults.map((d, idx) => {
+                const dataItem = { ...d };
+                let subTotalValue = 0;
+
+                state.tableDataField?.forEach((field) => {
+                    const fieldValue = d[field] ?? 0;
+                    subTotalValue += fieldValue;
+
+                    if (hasComparisonInfo) {
+                        const comparisonValue = fullDataComparison?.[idx]?.[field] ?? 0;
+                        dataItem[`comparison_${field}`] = { target: dataItem[field], subject: comparisonValue };
+                    }
+                });
+
+                dataItem.sub_total = subTotalValue;
+                return dataItem;
+            });
+            const fullTotalDataItem = getTotalDataItem(fullDataResults, 'static');
+            results.push(fullTotalDataItem);
+        }
 
         state.staticFieldSlicedData = { results };
     } else if (isDateField(state.tableDataField)) {
-        const results = state.data.results.map((d) => {
+        const results = data.results.map((d) => {
             const subTotal = {
                 [state.tableDataField]: 'sub_total',
                 value: d[state.tableDataCriteria].slice(-state.tableDataMaxCount).reduce((acc, cur) => acc + cur.value, 0),
@@ -353,31 +420,33 @@ watch(() => state.data, () => {
             };
         });
 
-        // if (state.totalInfo?.toggleValue) {
-        // Total Data
-        const totalDataItem: TableDataItem = {};
-        const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
-        if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
-        totalDataItem[state.tableDataCriteria] = [...state.tableFields, 'sub_total']
-            .filter((field) => field.fieldInfo?.type === 'dataField')
-            .map((field) => {
-                const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === field.name)?.value || 0), 0);
-                return { [state.tableDataField]: field.name, value: totalValue };
+        // Full Total Data
+        if (state.totalInfo?.toggleValue) {
+            const fullDataResults = _fullPageDataResults.map((d) => {
+                const subTotal = {
+                    [state.tableDataField]: 'sub_total',
+                    value: d[state.tableDataCriteria].slice(-state.tableDataMaxCount).reduce((acc, cur) => acc + cur.value, 0),
+                };
+                return {
+                    ...d,
+                    [state.tableDataCriteria]: [...d[state.tableDataCriteria].slice(-state.tableDataMaxCount), subTotal],
+                };
             });
-        results.push(totalDataItem);
-        // }
+            const fullTotalDataItem = getTotalDataItem(fullDataResults, 'time_series');
+            results.push(fullTotalDataItem);
+        }
 
         state.timeSeriesDynamicFieldSlicedData = { results };
     } else {
         const availableDataFieldsExceptDateField: string[] = [];
-        const originFirstRowData = state.data?.results?.[0]?.[state.tableDataCriteria] ?? [];
+        const originFirstRowData = data?.results?.[0]?.[state.tableDataCriteria] ?? [];
         const sortedData = orderBy(originFirstRowData, ['value'], ['desc']);
         sortedData.slice(0, state.tableDataMaxCount - 1).forEach((d) => {
             availableDataFieldsExceptDateField.push(d[state.tableDataField]);
         });
 
         const comparisonData = [...state.comparisonData?.results ?? []];
-        const baseData = [...state.data?.results ?? []];
+        const baseData = [...data?.results ?? []];
         const hasComparisonOption = state.comparisonInfo?.format && state.isComparisonEnabled;
         const results = baseData.map((d) => {
             const dynamicFieldData = d[state.tableDataCriteria] ?? [];
@@ -416,30 +485,49 @@ watch(() => state.data, () => {
             };
         });
 
-        // if (state.totalInfo?.toggleValue) {
-        // Total Data
-        const totalDataItem: TableDataItem = {};
-        const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
-        if (_sortedGroupByFields) totalDataItem[_sortedGroupByFields[0]] = 'Total';
-        const fieldForTotal = results?.[0]?.[state.tableDataCriteria] ?? [];
-        totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
-            const fieldName = `${item[state.tableDataField]}`;
-            if (fieldName.startsWith('comparison_')) {
-                const targetTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.target || 0), 0);
-                const subjectTotalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.subject || 0), 0);
+        // Full Total Data
+        if (state.totalInfo?.toggleValue) {
+            const fullDataComparisonData = state.fullPageComparisonData?.results ?? [];
+            const fullDataResults = _fullPageDataResults.map((d) => {
+                const dynamicFieldData = d[state.tableDataCriteria] ?? [];
+                const dynamicFieldDataFilteredByAvailableField = dynamicFieldData.filter((item) => availableDataFieldsExceptDateField.includes(item[state.tableDataField]));
+                const sortedAndFilteredData = sortBy(
+                    dynamicFieldDataFilteredByAvailableField,
+                    (item) => availableDataFieldsExceptDateField.indexOf(item[state.tableDataField]),
+                );
+                const dataWithComparison = [] as TableDataItem[];
+                sortedAndFilteredData.forEach((item) => {
+                    dataWithComparison.push(item);
+                    if (hasComparisonOption) {
+                        const comparisonItem = fullDataComparisonData.find((c) => (state.groupByField ?? []).every((field) => c[field] === d[field]));
+                        const comparisonDynamicFieldData = [...comparisonItem?.[state.tableDataCriteria] || []];
+                        const comparisonValue = comparisonDynamicFieldData.find((c) => c[state.tableDataField] === item[state.tableDataField])?.value ?? 0;
+                        dataWithComparison.push({
+                            [state.tableDataField]: `comparison_${item[state.tableDataField]}`,
+                            value: { target: item.value, subject: comparisonValue },
+                        });
+                    }
+                });
+                const etcValue = d[`_total_${state.tableDataCriteria}`] - sortedAndFilteredData.reduce((acc, cur) => acc + cur.value, 0) ?? 0;
                 return {
-                    [state.tableDataField]: fieldName,
-                    value: {
-                        target: targetTotalValue,
-                        subject: subjectTotalValue,
-                    },
+                    ...d,
+                    [state.tableDataCriteria]: [
+                        ...(hasComparisonOption ? dataWithComparison : sortedAndFilteredData),
+                        {
+                            [state.tableDataField]: 'etc',
+                            value: etcValue,
+                        },
+                        {
+                            [state.tableDataField]: 'sub_total',
+                            value: d[`_total_${state.tableDataCriteria}`],
+                        },
+                    ],
                 };
-            }
-            const totalValue = results.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value || 0), 0);
-            return { [state.tableDataField]: fieldName, value: totalValue };
-        });
-        results.push(totalDataItem);
-        // }
+            });
+
+            const fullTotalDataItem = getTotalDataItem(fullDataResults, 'dynamic');
+            results.push(fullTotalDataItem);
+        }
 
         state.noneTimeSeriesDynamicFieldSlicedData = { results };
     }
@@ -483,9 +571,11 @@ defineExpose<WidgetExpose<Data>>({
                 />
             </div>
             <div class="table-pagination-wrapper">
-                <p-text-pagination :this-page="state.thisPage"
-                                   :all-page="state.allPage"
-                                   @pageChange="handleUpdateThisPage"
+                <p-pagination :this-page="state.thisPage"
+                              :page-size="state.pageSize"
+                              :total-count="state.data?.total_count ?? 0"
+                              size="sm"
+                              @change="handleUpdateThisPage"
                 />
             </div>
         </div>
@@ -495,8 +585,8 @@ defineExpose<WidgetExpose<Data>>({
 <style lang="postcss" scoped>
 .table-wrapper {
     @apply flex justify-center w-full;
-    max-height: calc(100% - 1.5rem);
-    height: calc(100% - 1.5rem);
+    max-height: calc(100% - 2.5rem);
+    height: calc(100% - 2.5rem);
 
     overflow: hidden;
     .data-table {
@@ -505,6 +595,7 @@ defineExpose<WidgetExpose<Data>>({
 }
 .table-pagination-wrapper {
     @apply flex justify-center items-center;
-    height: 1.5rem;
+    height: 2.5rem;
+    padding: 0.5rem 0;
 }
 </style>
