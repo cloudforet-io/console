@@ -132,12 +132,25 @@ export interface DataFieldHeatmapColorOptions {
     default?: DataFieldHeatmapColor;
 }
 
+export interface TextWrapOptions {
+    default?: boolean;
+}
+
+export interface TableColumnWidthOptions {
+    defaultMinimumWidth?: number;
+    defaultFixedWidth?: number;
+}
+
+export interface CustomTableColumnWidthOptions {
+    toggle?: boolean;
+}
+
 export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
-    | NumberFormatOptions | DataFieldHeatmapColorOptions;
+    | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -153,7 +166,8 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'formatRules'
     | 'granularity' | 'colorSchema' | 'pieChartType'
     | 'widgetHeader' | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
-    | 'displayAnnotation' | 'displaySeriesLabel';
+    | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth'
+    | 'customTableColumnWidth';
 
 export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;
