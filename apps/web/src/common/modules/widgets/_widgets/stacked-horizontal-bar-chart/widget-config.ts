@@ -4,7 +4,7 @@ import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-
 const stackedHorizontalBarChart: WidgetConfig = {
     widgetName: 'stackedHorizontalBarChart',
     meta: {
-        title: 'Stacked Horizontal Bar Chart',
+        title: 'Horizontal Bar Chart',
         sizes: ['md', 'full'],
         defaultValidationConfig: {
             defaultMaxCount: 2,
