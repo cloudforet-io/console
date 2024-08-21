@@ -9,9 +9,10 @@ const clusteredColumnChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        dataField: {
+        tableDataField: {
             options: {
-                multiSelectable: true,
+                max: 15,
+                hideCount: true,
             },
         },
         xAxis: {

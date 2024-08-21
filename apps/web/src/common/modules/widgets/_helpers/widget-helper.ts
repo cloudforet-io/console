@@ -56,7 +56,7 @@ export const getFormattedNumber = (val: number, dataField: string, numberFormatV
     // case NUMBER_FORMAT.SHORT_NUMBER:
     //     return numberFormatter(val, { notation: 'compact' }) || '--';
     case NUMBER_FORMAT.FULL_NUMBER:
-        return val.toString();
+        return numberFormatter(val, { minimumFractionDigits: 2 }) || '--';
     case NUMBER_FORMAT.CUSTOM:
         if (!_targetNumberFormat.customNumberFormat) return val.toString();
         return customNumberFormatter(_targetNumberFormat.customNumberFormat, val) || '--';

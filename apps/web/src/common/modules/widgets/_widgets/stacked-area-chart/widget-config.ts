@@ -4,7 +4,7 @@ import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-
 const stackedAreaChart: WidgetConfig = {
     widgetName: 'stackedAreaChart',
     meta: {
-        title: 'Stacked Area Chart',
+        title: 'Area Chart',
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {

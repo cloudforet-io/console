@@ -72,6 +72,12 @@ const state = reactive({
         fieldName: state.fieldName,
         max: state.max,
     })),
+    hideCount: computed<boolean>(() => {
+        if (state.selectedFieldType === 'dynamicField') {
+            return props.widgetFieldSchema?.options?.hideDynamicFieldMaxCount ?? false;
+        }
+        return props.widgetFieldSchema?.options?.hideStaticFieldMaxCount ?? false;
+    }),
 });
 
 
@@ -248,7 +254,8 @@ watch(() => state.menuItems, (menuItems) => {
                                        @update:selected="handleUpdateValue"
                     />
                 </p-field-group>
-                <p-field-group :label="$t('COMMON.WIDGETS.MAX_ITEMS')"
+                <p-field-group v-if="!state.hideCount"
+                               :label="$t('COMMON.WIDGETS.MAX_ITEMS')"
                                style-type="secondary"
                                class="max-items"
                                :invalid="!state.isMaxValid"
