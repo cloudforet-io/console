@@ -1,8 +1,9 @@
 import type { ManipulateType } from 'dayjs';
 import dayjs from 'dayjs';
+import { orderBy, sum } from 'lodash';
 
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange, DynamicFieldData } from '@/common/modules/widgets/types/widget-data-type';
 import type { DateFormat } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -134,4 +135,32 @@ export const getFormattedDate = (date: string, dateFormat: string): string => {
     const dateFormatsWithMMM = Object.values(DATE_FORMAT['MMM DD, YYYY']) as string[];
     if (dateFormatsWithMMM.includes(dateFormat)) return dayjs.utc(date).locale('en').format(dateFormat);
     return dayjs.utc(date).format(dateFormat);
+};
+
+
+export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, criteria: string, dataField: string, maxCount: number): [any[], string[]] => {
+    if (!rawData?.results?.length) return [[], []];
+
+    const _orderedData = orderBy(rawData.results[0]?.[criteria] || [], 'value', 'desc');
+    const _slicedData = _orderedData.slice(0, maxCount);
+    const _seriesFields = _slicedData.map((v) => v[dataField] as string);
+
+    const _refinedResults: any[] = [];
+    let _etcExists = false;
+    rawData.results.forEach((result) => {
+        const _refinedData = (result[criteria] || []).filter((d) => _seriesFields.includes(d[dataField]));
+        const _etcData = (result[criteria] || []).filter((d) => !_seriesFields.includes(d[dataField]));
+        const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
+        if (_etcValueSum > 0) _etcExists = true;
+        _refinedResults.push({
+            ...result,
+            [criteria]: [
+                ..._refinedData,
+                { [dataField]: 'etc', value: _etcValueSum },
+            ],
+        });
+    });
+    if (_etcExists) _seriesFields.push('etc');
+
+    return [_refinedResults, _seriesFields];
 };
