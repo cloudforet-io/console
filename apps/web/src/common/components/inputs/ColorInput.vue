@@ -29,6 +29,7 @@ const handleChangeInput = (event: InputEvent) => {
 .color-input {
     @apply rounded-sm border border-gray-200 bg-white;
     width: 2rem;
+    min-width: 2rem;
     height: 2rem;
     padding: 0 0.125rem;
 }

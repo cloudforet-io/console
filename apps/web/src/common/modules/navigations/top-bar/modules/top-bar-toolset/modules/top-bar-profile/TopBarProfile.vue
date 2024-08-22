@@ -9,7 +9,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import ejs from 'ejs';
 
 import {
-    PI, PDivider, PButton, PCopyButton, PTooltip, PAvatar,
+    PI, PDivider, PButton, PCopyButton, PTooltip, PAvatar, PLazyImg,
 } from '@cloudforet/mirinae';
 
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
@@ -87,6 +87,16 @@ const state = reactive({
     languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
         label: v, name: k,
     }))),
+    visibleAvatar: computed(() => route.matched.some((item) => {
+        switch (item.name) {
+        case MY_PAGE_ROUTE._NAME:
+        case LANDING_ROUTE.WORKSPACE._NAME:
+        case LANDING_ROUTE.DOMAIN._NAME:
+            return true;
+        default:
+            return false;
+        }
+    })),
 });
 
 const profileMenuRef = ref<HTMLElement|null>(null);
@@ -191,8 +201,15 @@ const handleClickSignOut = async () => {
                   @keydown.enter="openProfileMenu"
             >
                 <!-- TODO: Will add user image src -->
-                <p-avatar class="menu-icon"
+                <p-avatar v-if="state.visibleRoleType !== 'Admin' && state.visibleAvatar"
+                          class="menu-icon"
                           size="md"
+                />
+                <p-lazy-img v-else
+                            :src="state.userIcon"
+                            class="menu-icon"
+                            width="1.75rem"
+                            height="1.75rem"
                 />
             </span>
         </p-tooltip>
@@ -200,7 +217,13 @@ const handleClickSignOut = async () => {
              class="profile-menu-wrapper"
         >
             <div class="user-info">
-                <p-avatar size="sm" />
+                <!-- TODO: Will add user image src -->
+                <p-avatar v-if="state.visibleRoleType !== 'Admin' && state.visibleAvatar"
+                          size="sm"
+                />
+                <p-lazy-img v-else
+                            :src="state.userIcon"
+                />
                 <span class="value">{{ state.userId }}</span>
             </div>
             <div class="info-wrapper">

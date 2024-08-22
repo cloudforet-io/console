@@ -193,7 +193,7 @@ onUnmounted(() => {
     @apply relative;
     .fixed-header {
         @apply sticky bg-gray-100;
-        z-index: 1000;
+        z-index: 20;
         top: 0;
         padding-top: 1.75rem;
         margin-top: -1.75rem;

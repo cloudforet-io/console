@@ -9,6 +9,8 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 
+import { i18n } from '@/translations';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATA_FIELD_HEATMAP_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type {
@@ -26,10 +28,18 @@ const state = reactive({
     isInitiated: false,
     proxyValue: useProxyValue<DataFieldHeatmapColorValue|undefined>('value', props, emit),
     dataFieldList: computed<string[]>(() => Object.keys(props.dataTable?.data_info ?? {}) ?? []),
-    menuItems: computed<SelectDropdownMenuItem[]>(() => Object.entries(DATA_FIELD_HEATMAP_COLOR).map(([key, value]) => ({
-        label: value.label,
-        name: key,
-    }))),
+    menuItems: computed<SelectDropdownMenuItem[]>(() => Object.entries(DATA_FIELD_HEATMAP_COLOR).map(([key, value]) => {
+        if (key === DATA_FIELD_HEATMAP_COLOR.NONE.key) {
+            return {
+                label: i18n.t('COMMON.WIDGETS.TABLE_HEATMAP_COLOR_NONE'),
+                name: key,
+            };
+        }
+        return {
+            label: value.label,
+            name: key,
+        };
+    })),
 });
 
 /* Util */
@@ -155,5 +165,10 @@ watch(() => state.dataFieldList, (dataFieldList) => {
             }
         }
     }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
 }
 </style>

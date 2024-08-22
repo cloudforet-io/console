@@ -46,6 +46,15 @@ export default defineConfig(async ({ command, mode }) => {
         build: {
             rollupOptions: {
                 external: ['@cloudforet/mirinae/css/*'],
+                output: {
+                    // eslint-disable-next-line consistent-return
+                    manualChunks(id) {
+                        if (id.includes('node_modules')) {
+                            const chunks = id.split('node_modules/')[1].split('/');
+                            return chunks[0] === '@' ? `${chunks[0]}/${chunks[1]}` : chunks[0];
+                        }
+                    },
+                },
             },
         },
         server: { port: 8080 },

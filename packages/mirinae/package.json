@@ -1,6 +1,6 @@
 {
   "name": "@cloudforet/mirinae",
-  "version": "2.0.0-dev125",
+  "version": "2.0.0-dev172",
   "description": "Mirinae - Design System for Multi Cloud Management Platform, Cloudforet",
   "keywords": [
     "mirinae",
@@ -10,10 +10,10 @@
     "ui library",
     "component"
   ],
-  "homepage": "https://github.com/cloudforet-io/mirinae#readme",
+  "homepage": "https://github.com/cloudforet-io/console/tree/master/packages/mirinae",
   "bugs": {
-    "url": "https://github.com/cloudforet-io/mirinae/issues",
-    "email": "admin@spaceone.dev"
+    "url": "https://github.com/cloudforet-io/console/issues",
+    "email": "admin@cloudforet.io"
   },
   "author": "Cloudforet",
   "license": "Apache-2.0",
@@ -22,14 +22,15 @@
   "typings": "types/index.d.ts",
   "files": [
     "/dist/*",
-    "/src/*",
+    "/src/**/*",
     "/types/*",
     "/css/*",
     "/tailwind.config.cjs"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/cloudforet-io/mirinae.git"
+    "url": "https://github.com/cloudforet-io/console.git",
+    "directory": "packages/mirinae"
   },
   "publishConfig": {
     "access": "public"
@@ -122,7 +123,7 @@
     "tsc-watch": "^6.0.0",
     "tsconfig": "*",
     "typescript": "^4.8.2",
-    "vite": "^4.5.3",
+    "vite": "^5.4.0",
     "vite-plugin-stylelint": "^3.3.3",
     "vitest": "^0.26.3",
     "vue-router": "^3.6.5",

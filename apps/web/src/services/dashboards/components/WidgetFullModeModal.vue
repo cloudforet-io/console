@@ -137,6 +137,7 @@ onBeforeUnmount(() => {
                     </div>
                     <div class="right-part">
                         <dashboard-toolset-date-dropdown v-if="!state.hideDateDropdown"
+                                                         widget-mode
                                                          :date-range="dashboardDetailState.options.date_range"
                         />
                     </div>
