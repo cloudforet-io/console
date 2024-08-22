@@ -36,12 +36,14 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     XAxisValue, DateFormatValue, DisplaySeriesLabelValue, TableDataFieldValue,
+    NumberFormatValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
@@ -147,6 +149,7 @@ const state = reactive({
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -243,6 +246,7 @@ const getStaticFieldData = (rawData: StaticFieldData) => {
     // get chart data
     const _seriesData: any[] = [];
     state.dataField?.forEach((field) => {
+        const _unit = widgetFrameProps.value.unitMap?.[field];
         _seriesData.push({
             name: field,
             type: 'bar',
@@ -255,7 +259,7 @@ const getStaticFieldData = (rawData: StaticFieldData) => {
                 fontSize: 10,
                 formatter: (p) => {
                     if (p.value < _threshold) return '';
-                    return numberFormatter(p.value, { notation: 'compact' });
+                    return getFormattedNumber(p.value, field, state.numberFormat, _unit);
                 },
             },
             data: _xAxisData.map((d) => {
@@ -282,6 +286,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData) => {
     // get chart data
     const _seriesData: any[] = [];
     const _threshold = getThreshold(rawData);
+    const _unit = widgetFrameProps.value.unitMap?.[state.dataField];
     _seriesFields.forEach((field) => {
         const _data: number[] = [];
         _xAxisData.forEach((d) => {
@@ -301,7 +306,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData) => {
                 fontSize: 10,
                 formatter: (p) => {
                     if (p.value < _threshold) return '';
-                    return numberFormatter(p.value, { notation: 'compact' });
+                    return getFormattedNumber(p.value, state.dataCriteria, state.numberFormat, _unit);
                 },
             },
             data: _data,

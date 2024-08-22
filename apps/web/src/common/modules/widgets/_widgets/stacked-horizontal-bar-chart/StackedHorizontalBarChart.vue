@@ -33,10 +33,12 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     StackByValue, YAxisValue, DateFormatValue, DisplaySeriesLabelValue,
+    NumberFormatValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
@@ -135,6 +137,7 @@ const state = reactive({
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -231,7 +234,7 @@ const drawChart = (rawData?: Data|null) => {
                 fontSize: 10,
                 formatter: (p) => {
                     if (p.value < _threshold) return '';
-                    return numberFormatter(p.value, { notation: 'compact' });
+                    return getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit);
                 },
             },
             data: state.yAxisData.map((d) => {

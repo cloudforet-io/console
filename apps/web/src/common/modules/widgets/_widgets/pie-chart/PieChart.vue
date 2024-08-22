@@ -33,11 +33,14 @@ import {
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { GroupByValue, DateFormatValue, DisplaySeriesLabelValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    GroupByValue, DateFormatValue, DisplaySeriesLabelValue, NumberFormatValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -55,7 +58,6 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartData: [],
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
-    threshold: computed<number>(() => (state.data?.total_count || 0) * 0.08),
     chartOptions: computed<PieSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         tooltip: {
@@ -93,6 +95,7 @@ const state = reactive({
                 type: 'pie',
                 ...(state.chartType === 'donut' ? { radius: ['30%', '70%'] } : {}),
                 center: props.size === 'full' ? ['40%', '50%'] : ['30%', '50%'],
+                avoidLabelOverlap: true,
                 label: {
                     show: !!state.displaySeriesLabel?.toggleValue,
                     position: state.displaySeriesLabel?.position,
@@ -100,18 +103,10 @@ const state = reactive({
                     fontSize: 10,
                     formatter: (p) => {
                         if (p.value < state.threshold) return '';
-                        return numberFormatter(p.value, { notation: 'compact' });
+                        return getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit);
                     },
                 },
                 data: state.chartData,
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    },
-                },
-                avoidLabelOverlap: false,
             },
         ],
     })),
@@ -133,6 +128,7 @@ const state = reactive({
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {

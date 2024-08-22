@@ -35,12 +35,14 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     XAxisValue, DateFormatValue, TableDataFieldValue,
+    DisplaySeriesLabelValue, NumberFormatValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
@@ -141,6 +143,8 @@ const state = reactive({
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
     missingValue: computed<string|undefined>(() => props.widgetOptions?.missingValue as string),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -217,6 +221,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
     // get chart data
     const _seriesData: any[] = [];
     const _defaultValue = state.missingValue === 'lineToZero' ? 0 : undefined;
+    const _unit = widgetFrameProps.value.unitMap?.[state.dataField];
     _seriesFields.forEach((field) => {
         const _data: number[] = [];
         _xAxisData.forEach((d) => {
@@ -228,6 +233,13 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
             name: field,
             type: 'line',
             data: _data,
+            label: {
+                show: !!state.displaySeriesLabel?.toggleValue,
+                position: state.displaySeriesLabel?.position,
+                rotate: state.displaySeriesLabel?.rotate,
+                fontSize: 10,
+                formatter: (p) => getFormattedNumber(p.value, state.dataCriteria, state.numberFormat, _unit),
+            },
         });
     });
 
@@ -237,6 +249,7 @@ const getStaticFieldData = (rawData: StaticFieldData): any[] => {
     const _seriesData: any[] = [];
     const _defaultValue = state.missingValue === 'lineToZero' ? 0 : undefined;
     state.dataField.forEach((field) => {
+        const _unit = widgetFrameProps.value.unitMap?.[field];
         _seriesData.push({
             name: field,
             type: 'line',
@@ -244,6 +257,13 @@ const getStaticFieldData = (rawData: StaticFieldData): any[] => {
                 const _data = rawData.results?.find((v) => v[state.xAxisField] === d);
                 return _data ? _data[field] : _defaultValue;
             }),
+            label: {
+                show: !!state.displaySeriesLabel?.toggleValue,
+                position: state.displaySeriesLabel?.position,
+                rotate: state.displaySeriesLabel?.rotate,
+                fontSize: 10,
+                formatter: (p) => getFormattedNumber(p.value, field, state.numberFormat, _unit),
+            },
         });
     });
     return _seriesData;
