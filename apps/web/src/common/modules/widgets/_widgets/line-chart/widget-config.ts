@@ -9,7 +9,11 @@ const lineChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        dataField: {},
+        tableDataField: {
+            options: {
+                max: 15,
+            },
+        },
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
@@ -22,15 +26,6 @@ const lineChart: WidgetConfig = {
         legend: {
             options: {
                 default: true,
-            },
-        },
-        lineBy: {
-            options: {
-                dataTarget: 'labels_info',
-                defaultMaxCount: 5,
-                max: 10,
-                defaultIndex: 0,
-                excludeDateField: true,
             },
         },
         dateFormat: {

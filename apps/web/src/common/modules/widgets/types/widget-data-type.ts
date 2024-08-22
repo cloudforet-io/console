@@ -14,3 +14,16 @@ export type WidgetLoadData = ListResponse<{
 export type DateFieldType = typeof DATE_FIELD[keyof typeof DATE_FIELD];
 
 export type TableDataItem = Record<string, any>;
+
+
+
+export type StaticFieldData = ListResponse<{
+    [key: string]: string|number;
+}>;
+export type DynamicFieldData = {
+    results?: Array<{
+        [key: string]: any;
+    }>;
+    total_count?: number;
+};
+

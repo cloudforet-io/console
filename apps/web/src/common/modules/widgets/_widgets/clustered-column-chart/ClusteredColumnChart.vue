@@ -11,7 +11,7 @@ import type {
     EChartsType,
 } from 'echarts/core';
 import {
-    isEmpty, orderBy, sortBy, sum, throttle,
+    isEmpty, sortBy, throttle,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -31,7 +31,7 @@ import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant'
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getApiQueryDateRange,
-    getReferenceLabel,
+    getReferenceLabel, getRefinedDynamicFieldData,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
@@ -267,40 +267,21 @@ const getStaticFieldData = (rawData: StaticFieldData) => {
     return _seriesData;
 };
 const getDynamicFieldData = (rawData: DynamicFieldData) => {
-    if (!rawData?.results?.length) return [];
-    const _threshold = getThreshold(rawData);
-
-    const _orderedData = orderBy(rawData.results[0]?.[state.dataCriteria] || [], 'value', 'desc');
-    const _slicedData = _orderedData.slice(0, state.dataMaxCount);
-    const _seriesFields = _slicedData.map((v) => v[state.dataField] as string);
-
-    const _refinedResults: any[] = [];
-    let _etcExists = false;
-    rawData.results.forEach((result) => {
-        const _refinedData = (result[state.dataCriteria] || []).filter((d) => _seriesFields.includes(d[state.dataField]));
-        const _etcData = (result[state.dataCriteria] || []).filter((d) => !_seriesFields.includes(d[state.dataField]));
-        const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
-        if (_etcValueSum > 0) _etcExists = true;
-        _refinedResults.push({
-            ...result,
-            [state.dataCriteria]: [
-                ..._refinedData,
-                { [state.dataField]: 'etc', value: _etcValueSum },
-            ],
-        });
-    });
-    if (_etcExists) _seriesFields.push('etc');
+    // get refined data and series fields
+    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataCriteria, state.dataField, state.dataMaxCount);
 
     // get xAxis data
     let _xAxisData: string[] = [];
     if (state.xAxisField === DATE_FIELD.DATE) {
         _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
-        _xAxisData = rawData?.results.map((v) => v[state.xAxisField] as string) || [];
+        _xAxisData = rawData?.results?.map((v) => v[state.xAxisField] as string) || [];
     }
     state.xAxisData = _xAxisData;
+
     // get chart data
     const _seriesData: any[] = [];
+    const _threshold = getThreshold(rawData);
     _seriesFields.forEach((field) => {
         const _data: number[] = [];
         _xAxisData.forEach((d) => {
