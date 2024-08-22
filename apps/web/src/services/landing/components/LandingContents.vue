@@ -85,7 +85,7 @@ onMounted(async () => {
         await userWorkspaceStore.load();
         await recentStore.fetchRecent({
             type: RECENT_TYPE.WORKSPACE,
-            limit: 4,
+            limit: 6,
         });
         await favoriteStore.fetchWorkspaceFavorite();
     } finally {
