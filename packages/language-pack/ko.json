@@ -1556,6 +1556,11 @@
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"MAX_ITEMS": "최대 항목 수",
 			"MAX_ITEMS_DESC": "{fieldName} 값의 최대 개수는 {max}입니다.",
+			"MISSING_VALUE": {
+				"LINE_BREAKS": "",
+				"LINE_TO_ZERO": "",
+				"MISSING_VALUE": ""
+			},
 			"NO_DATA_TO_DISPLAY": "데이터가 없습니다.",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "전일 대비 하락",
