@@ -141,6 +141,7 @@ const state = reactive({
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    missingValue: computed<string|undefined>(() => props.widgetOptions?.missingValue as string),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -215,12 +216,13 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
 
     // get chart data
     const _seriesData: any[] = [];
+    const _defaultValue = state.missingValue === 'lineToZero' ? 0 : undefined;
     _seriesFields.forEach((field) => {
         const _data: number[] = [];
         _xAxisData.forEach((d) => {
             const _result = _refinedResults.find((result) => result[state.xAxisField] === d);
             const _value = _result?.[state.dataCriteria].find((v) => v[state.dataField] === field);
-            _data.push(_value?.value || 0);
+            _data.push(_value?.value || _defaultValue);
         });
         _seriesData.push({
             name: field,
@@ -233,13 +235,14 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
 };
 const getStaticFieldData = (rawData: StaticFieldData): any[] => {
     const _seriesData: any[] = [];
+    const _defaultValue = state.missingValue === 'lineToZero' ? 0 : undefined;
     state.dataField.forEach((field) => {
         _seriesData.push({
             name: field,
             type: 'line',
             data: state.xAxisData.map((d) => {
                 const _data = rawData.results?.find((v) => v[state.xAxisField] === d);
-                return _data ? _data[field] : 0;
+                return _data ? _data[field] : _defaultValue;
             }),
         });
     });
