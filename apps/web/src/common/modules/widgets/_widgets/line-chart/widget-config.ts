@@ -9,16 +9,16 @@ const lineChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        tableDataField: {
-            options: {
-                max: 15,
-            },
-        },
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
                 max: 31,
+            },
+        },
+        tableDataField: {
+            options: {
+                max: 15,
             },
         },
     },
@@ -34,6 +34,7 @@ const lineChart: WidgetConfig = {
             },
         },
         displayAnnotation: {},
+        missingValue: {},
     },
 };
 
