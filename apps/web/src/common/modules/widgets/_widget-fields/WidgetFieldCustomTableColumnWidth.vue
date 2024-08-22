@@ -158,19 +158,19 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="widget-column-width">
+    <div class="widget-field-custom-table-column-width">
         <div class="field-header">
             <p-field-title>{{ $t('Custom Table Column Width') }}</p-field-title>
             <p-toggle-button :value="state.proxyValue?.toggleValue"
                              @update:value="handleUpdateToggle"
             />
         </div>
+        <p class="description">
+            {{ $t('Selects a specific column to override the default width (Fixed widths can be override, but value smaller than the minimum width are ignored)') }}
+        </p>
         <div v-if="state.proxyValue?.toggleValue"
              class="field-contents-wrapper"
         >
-            <p class="description">
-                {{ $t('Selects a specific column to override the default width (Fixed widths can be override, but value smaller than the minimum width are ignored)') }}
-            </p>
             <div class="contents-box">
                 <div v-if="state.customWidthItems.length"
                      class="field-title-wrapper"
@@ -229,17 +229,16 @@ onMounted(() => {
 </template>
 
 <style scoped lang="postcss">
-.widget-column-width {
+.widget-field-custom-table-column-width {
     .field-header {
         @apply flex items-center gap-1 justify-between;
     }
+    .description {
+        @apply text-paragraph-sm text-gray-900;
+        margin: 0.25rem 0 0.75rem;
+    }
     .field-contents-wrapper {
-        margin-top: 0.25rem;
 
-        .description {
-            @apply text-paragraph-sm text-gray-900;
-            margin-bottom: 0.75rem;
-        }
         .contents-box {
             @apply bg-gray-100 rounded-lg;
             padding: 0.5rem;

@@ -64,6 +64,7 @@ const handleChangeWidthType = (value: TableColumnWidthValue['widthType']) => {
     state.proxyValue = {
         ...state.proxyValue,
         widthType: value,
+        fixedWidth: undefined,
     };
 };
 
@@ -106,7 +107,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="widget-column-width">
+    <div class="widget-field-table-column-width">
         <p-field-group :label="$t('Column Width')"
                        required
         >
@@ -161,7 +162,7 @@ onMounted(() => {
 </template>
 
 <style scoped lang="postcss">
-.widget-column-width {
+.widget-field-table-column-width {
     .field-contents-wrapper {
         width: 100%;
         padding-top: 0.25rem;
