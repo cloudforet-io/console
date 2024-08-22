@@ -42,7 +42,7 @@ import type {
 import type {
     GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
     DateFormatValue,
-    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue,
+    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue, TextWrapValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -102,6 +102,7 @@ const state = reactive({
     dateFormatInfo: computed<DateFormatValue|undefined>(() => props.widgetOptions?.dateFormat as DateFormatValue),
     numberFormatInfo: computed<NumberFormatValue|undefined>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
     dataFieldHeatmapColorInfo: computed<DataFieldHeatmapColorValue|undefined>(() => props.widgetOptions?.dataFieldHeatmapColor as DataFieldHeatmapColorValue),
+    textWrapInfo: computed<TextWrapValue>(() => props.widgetOptions?.textWrap as TextWrapValue),
     tableColumnWidthInfo: computed<TableColumnWidthValue|undefined>(() => props.widgetOptions?.tableColumnWidth as TableColumnWidthValue),
     customTableColumnWidthInfo: computed<CustomTableColumnWidthValue|undefined>(() => props.widgetOptions?.customTableColumnWidth as CustomTableColumnWidthValue),
     // table
@@ -470,7 +471,7 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
                     });
                 }
             });
-            const etcValue = d[`_total_${state.tableDataCriteria}`] - sortedAndFilteredData.reduce((acc, cur) => acc + cur.value, 0) ?? 0;
+            const etcValue = d[`_total_${state.tableDataCriteria}`] - (sortedAndFilteredData.reduce((acc, cur) => acc + cur.value, 0) ?? 0);
             return {
                 ...d,
                 [state.tableDataCriteria]: [
@@ -510,7 +511,7 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
                         });
                     }
                 });
-                const etcValue = d[`_total_${state.tableDataCriteria}`] - sortedAndFilteredData.reduce((acc, cur) => acc + cur.value, 0) ?? 0;
+                const etcValue = d[`_total_${state.tableDataCriteria}`] - (sortedAndFilteredData.reduce((acc, cur) => acc + cur.value, 0) ?? 0);
                 return {
                     ...d,
                     [state.tableDataCriteria]: [
@@ -567,6 +568,7 @@ defineExpose<WidgetExpose<Data>>({
                                    :date-format-info="state.dateFormatInfo"
                                    :number-format-info="state.numberFormatInfo"
                                    :data-field-heatmap-color-info="state.dataFieldHeatmapColorInfo"
+                                   :text-wrap-info="state.textWrapInfo"
                                    :table-column-width-info="state.tableColumnWidthInfo"
                                    :custom-table-column-width-info="state.customTableColumnWidthInfo"
                                    :sort-by.sync="state.sortBy"
