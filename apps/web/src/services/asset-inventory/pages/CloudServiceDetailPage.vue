@@ -7,9 +7,10 @@ import { isEmpty, get, cloneDeep } from 'lodash';
 
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { ApiFilterOperator } from '@cloudforet/core-lib/space-connector/type';
 import {
     PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge,
 } from '@cloudforet/mirinae';
@@ -97,7 +98,7 @@ const storeState = reactive({
 /* Main Table */
 const queryTagsHelper = useQueryTags({});
 queryTagsHelper.setURLQueryStringFilters(route.query.filters);
-const { filters: searchFilters, urlQueryStringFilters } = queryTagsHelper;
+const { filters: searchFilters, urlQueryStringFilters, setQueryTags } = queryTagsHelper;
 const fetchOptionState = reactive({
     pageStart: 1,
     pageLimit: assetInventorySettingsStore.getCloudServiceTablePageLimit,
@@ -114,8 +115,16 @@ const typeOptionState = reactive({
 });
 
 const tableHeight = assetInventorySettingsStore.getCloudServiceTableHeight;
+
+interface Condition {
+    key: string;
+    value: ConsoleFilterValue | ConsoleFilterValue[];
+    operator: ApiFilterOperator;
+}
+
 const tableState = reactive({
     schema: null as null|DynamicLayout,
+    defaultFilter: computed<Condition[]|undefined>(() => tableState.schema?.options?.default_filter ?? []),
     items: [],
     selectedItems: computed(() => typeOptionState.selectIndex.map((d) => tableState.items[d])),
     consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
@@ -271,7 +280,7 @@ const handleClickLinkButton = async (type: string, workspaceId: string, id: stri
 };
 
 const apiQuery = new ApiQueryHelper();
-const getQuery = (schema?) => {
+const getQuery = () => {
     apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters(hiddenFilters.value)
@@ -281,17 +290,17 @@ const getQuery = (schema?) => {
         apiQuery.addFilter({ k: 'provider', v: props.provider, o: '=' }, { k: 'cloud_service_type', v: props.name, o: '=' });
     }
 
-    const fields = schema?.options?.fields || tableState.schema?.options?.fields;
+    const fields = tableState.schema?.options?.fields;
     if (fields) {
         apiQuery.setOnly(...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.')), 'reference.resource_id', 'reference.external_link', 'cloud_service_id', 'tags', 'provider');
     }
     return apiQuery.data;
 };
 
-const listCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
+const listCloudServiceTableData = async (): Promise<{items: any[]; totalCount: number}> => {
     typeOptionState.loading = true;
     try {
-        const query = cloneDeep(getQuery(schema));
+        const query = cloneDeep(getQuery());
         query.filter = query.filter ? query.filter.concat(tableState.defaultSearchQuery) : tableState.defaultSearchQuery;
 
         const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
@@ -429,18 +438,36 @@ watch(() => keyItemSets.value, (after) => {
 // @ts-ignore
 debouncedWatch([() => props.group, () => props.name, () => props.provider], async () => {
     if (!props.isServerPage && !props.name) return;
+    setQueryTags([]);
     tableState.schema = await getTableSchema();
     resetSort(tableState.schema.options);
+    if (tableState.defaultFilter?.length) {
+        queryTagsHelper.setFilters(convertToQueryTag(tableState.defaultFilter));
+    }
     await fetchTableData();
 }, { immediate: true, debounce: 200 });
 
+
+const ApiQueryToRawQueryMap = {
+    eq: '=',
+    not: '!=',
+} as const;
+const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((condition) => ({
+    k: condition.key,
+    v: condition.value,
+    o: ApiQueryToRawQueryMap[condition.operator] ?? '=',
+}));
+
 (() => {
     const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : [route.query.default_filters]);
-    tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined)).filter((d) => d);
-    excelQuery.setFiltersAsRawQueryString(route.query.filters);
-    cloudServiceDetailPageStore.$patch((_state) => {
-        _state.searchFilters = excelQuery.filters;
-    });
+    if (defaultSearchQuery.length) {
+        tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined))
+            .filter((d) => d);
+        excelQuery.setFiltersAsRawQueryString(route.query.filters);
+        cloudServiceDetailPageStore.$patch((_state) => {
+            _state.searchFilters = excelQuery.filters;
+        });
+    }
 })();
 </script>
 
