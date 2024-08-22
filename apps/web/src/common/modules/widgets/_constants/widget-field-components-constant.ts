@@ -4,6 +4,7 @@ import basisField from '@/common/modules/widgets/_widget-fields/WidgetFieldBasis
 import categoryBy from '@/common/modules/widgets/_widget-fields/WidgetFieldCategoryBy.vue';
 import colorSchema from '@/common/modules/widgets/_widget-fields/WidgetFieldColorSchema.vue';
 import comparison from '@/common/modules/widgets/_widget-fields/WidgetFieldComparison.vue';
+import customTableColumnWidth from '@/common/modules/widgets/_widget-fields/WidgetFieldCustomTableColumnWidth.vue';
 import dataField from '@/common/modules/widgets/_widget-fields/WidgetFieldDataField.vue';
 import dataFieldHeatmapColor from '@/common/modules/widgets/_widget-fields/WidgetFieldDataFieldHeatmapColor.vue';
 import dateFormat from '@/common/modules/widgets/_widget-fields/WidgetFieldDateFormat.vue';
@@ -60,4 +61,5 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     displayAnnotation,
     displaySeriesLabel,
     tableColumnWidth,
+    customTableColumnWidth,
 };

@@ -82,7 +82,6 @@ const handleChangeFixedWidth = (value: string) => {
 };
 
 watch(() => props.value, (changed) => {
-    console.debug('props.value changed', changed);
     if (changed === undefined) {
         state.proxyValue = {
             minimumWidth: DEFAULT_MINIMUM_WIDTH,
@@ -95,13 +94,13 @@ watch(() => props.value, (changed) => {
 
 
 onMounted(() => {
+    emit('update:is-valid', true);
     state.proxyValue = {
         minimumWidth: (props.value?.minimumWidth && props.value?.minimumWidth > 0 ? props.value.minimumWidth : undefined)
             ?? props.widgetConfig?.optionalFieldsSchema.tableColumnWidth?.options?.defaultMinimumWidth ?? DEFAULT_MINIMUM_WIDTH,
         widthType: props.value?.widthType ?? (props.widgetConfig?.optionalFieldsSchema.tableColumnWidth?.options?.defaultFixedWidth ? 'fixed' : 'auto'),
         fixedWidth: props.value?.fixedWidth ?? props.widgetConfig?.optionalFieldsSchema.tableColumnWidth?.options?.defaultFixedWidth,
     };
-    emit('update:is-valid', true);
 });
 
 
