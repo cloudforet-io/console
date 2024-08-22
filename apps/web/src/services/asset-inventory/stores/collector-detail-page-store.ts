@@ -21,7 +21,7 @@ export const useCollectorDetailPageStore = defineStore('page-collector-detail', 
     });
 
     const getters = reactive({
-        isManagedCollector: computed(() => state.collector?.workspace_id === '*' ?? false),
+        isManagedCollector: computed<boolean>(() => state.collector?.workspace_id === '*'),
         isEditableCollector: computed(() => {
             if (appContextStore.getters.isAdminMode) {
                 return true;
