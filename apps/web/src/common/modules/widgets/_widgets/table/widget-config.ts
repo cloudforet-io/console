@@ -58,10 +58,12 @@ const table: WidgetConfig = {
         },
         dataFieldHeatmapColor: {},
         displayAnnotation: {},
+        tableColumnWidth: {},
+        customTableColumnWidth: {},
     },
     dependencies: {
-        groupBy: ['comparison'],
-        tableDataField: ['comparison'],
+        groupBy: ['comparison', 'customTableColumnWidth'],
+        tableDataField: ['comparison', 'subTotal', 'customTableColumnWidth'],
     },
 };
 
