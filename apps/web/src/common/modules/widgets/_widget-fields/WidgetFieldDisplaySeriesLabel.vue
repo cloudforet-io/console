@@ -13,7 +13,7 @@ import { i18n } from '@/translations';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import {
     PIE_CHART_SERIES_LABEL_POSITION,
-    XY_CHART_SERIES_LABEL_POSITION,
+    COLUMN_CHART_SERIES_LABEL_POSITION, LINE_CHART_SERIES_LABEL_POSITION,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type {
     WidgetFieldComponentProps,
@@ -31,13 +31,21 @@ const props = defineProps<WidgetFieldComponentProps<undefined, DisplaySeriesLabe
 const state = reactive({
     proxyValue: useProxyValue<DisplaySeriesLabelValue|undefined>('value', props, emit),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
-        if (props.widgetConfig?.widgetName === 'pieChart') {
+        const _widgetName = props.widgetConfig?.widgetName;
+        if (!_widgetName) return [];
+        if (_widgetName === 'pieChart') {
             return Object.entries(PIE_CHART_SERIES_LABEL_POSITION).map(([k, v]) => ({
                 name: k,
                 label: v,
             }));
         }
-        return Object.entries(XY_CHART_SERIES_LABEL_POSITION).map(([k, v]) => ({
+        if (['lineChart', 'stackedAreaChart'].includes(_widgetName)) {
+            return Object.entries(LINE_CHART_SERIES_LABEL_POSITION).map(([k, v]) => ({
+                name: k,
+                label: v,
+            }));
+        }
+        return Object.entries(COLUMN_CHART_SERIES_LABEL_POSITION).map(([k, v]) => ({
             name: k,
             label: v,
         }));

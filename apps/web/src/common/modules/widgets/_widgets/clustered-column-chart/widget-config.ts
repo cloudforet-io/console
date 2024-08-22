@@ -34,8 +34,9 @@ const clusteredColumnChart: WidgetConfig = {
                 default: 'MMM DD, YYYY',
             },
         },
-        displayAnnotation: {},
+        numberFormat: {},
         displaySeriesLabel: {},
+        displayAnnotation: {},
     },
 };
 

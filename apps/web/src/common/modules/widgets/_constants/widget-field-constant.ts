@@ -82,7 +82,7 @@ export const DATA_FIELD_HEATMAP_COLOR = {
     },
 } as const;
 
-export const XY_CHART_SERIES_LABEL_POSITION = {
+export const COLUMN_CHART_SERIES_LABEL_POSITION = {
     inside: 'inside',
     left: 'left',
     right: 'right',
@@ -91,7 +91,10 @@ export const XY_CHART_SERIES_LABEL_POSITION = {
     insideTop: 'insideTop',
     insideBottom: 'insideBottom',
 } as const;
-
+export const LINE_CHART_SERIES_LABEL_POSITION = {
+    top: 'top',
+    bottom: 'bottom',
+} as const;
 export const PIE_CHART_SERIES_LABEL_POSITION = {
     inner: 'inner',
     outer: 'outer',

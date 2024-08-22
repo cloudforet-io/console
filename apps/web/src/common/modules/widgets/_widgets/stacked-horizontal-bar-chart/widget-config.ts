@@ -43,8 +43,9 @@ const stackedHorizontalBarChart: WidgetConfig = {
                 default: 'MMM DD, YYYY',
             },
         },
-        displayAnnotation: {},
+        numberFormat: {},
         displaySeriesLabel: {},
+        displayAnnotation: {},
     },
 };
 
