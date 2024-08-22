@@ -83,6 +83,9 @@ export interface LegendOptions { // toggle button
 export interface PieChartTypeOptions {
     default?: string;
 }
+export interface MissingValueOptions {
+    default?: string;
+}
 
 export interface IconOptions {
     default?: string; // e.g. 'ic_coin-filled'
@@ -152,7 +155,8 @@ export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxi
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
-    | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions;
+    | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
+    | MissingValueOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -167,9 +171,9 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'progressBar'
     | 'formatRules'
     | 'granularity' | 'colorSchema' | 'pieChartType'
-    | 'widgetHeader' | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
-    | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth'
-    | 'customTableColumnWidth';
+    | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
+    | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth' | 'customTableColumnWidth'
+    | 'missingValue';
 
 export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;
