@@ -15,7 +15,10 @@ import { hexToRgba } from '@/lib/helper/color-convert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
-import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
+import {
+    DEFAULT_COMPARISON_COLOR,
+    TABLE_DEFAULT_MINIMUM_WIDTH,
+} from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getFormattedDate,
     getRefinedDateFormatByGranularity,
@@ -27,7 +30,7 @@ import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-t
 import type {
     TableDataFieldValue, ComparisonValue, TotalValue,
     DateFormatValue,
-    NumberFormatValue, DataFieldHeatmapColorValue,
+    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -64,6 +67,8 @@ interface Props {
   dateFormatInfo?: DateFormatValue;
   numberFormatInfo?: NumberFormatValue;
   dataFieldHeatmapColorInfo?: DataFieldHeatmapColorValue;
+  tableColumnWidthInfo?: TableColumnWidthValue;
+  customTableColumnWidthInfo?: CustomTableColumnWidthValue;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
@@ -126,7 +131,7 @@ const getField = (field: TableWidgetField): string => {
 const valueFormatter = (value, field: TableWidgetField) => {
     const _value = value || 0;
     let _unit = field.fieldInfo?.unit;
-    let dataField = field.name.replace('comparison_', '');
+    let dataField = field.name?.replace('comparison_', '');
     if (props.fieldType === 'dynamicField') {
         dataField = props.criteria as string;
         _unit = props.dataInfo?.[dataField]?.unit;
@@ -276,6 +281,31 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 //     return `( ${value} ${key} )`;
 // };
 
+const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
+    let customWidth: string|number|undefined = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name)?.width;
+    if (props.fieldType === 'staticField') {
+        if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
+    } else if (props.fieldType === 'dynamicField') {
+        if (field?.fieldInfo?.type === 'dataField') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
+    }
+    const minimumWidth = props.tableColumnWidthInfo?.minimumWidth ?? TABLE_DEFAULT_MINIMUM_WIDTH;
+    const fixedWidth = props.tableColumnWidthInfo?.fixedWidth;
+    const calculatedWidth = (customWidth ?? 0) < minimumWidth
+        ? (fixedWidth || minimumWidth) : (customWidth || fixedWidth || minimumWidth);
+    return calculatedWidth ? `${calculatedWidth}px` : undefined;
+};
+const getFieldWidth = (field: TableWidgetField): string|undefined => {
+    let customWidth: string|number|undefined = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name)?.width;
+    if (props.fieldType === 'staticField') {
+        if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
+    } else if (props.fieldType === 'dynamicField') {
+        if (field?.fieldInfo?.type === 'dataField') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
+    }
+    const fixedWidth = props.tableColumnWidthInfo?.fixedWidth;
+    const calculatedWidth = customWidth || fixedWidth;
+    return calculatedWidth ? `${calculatedWidth}px` : undefined;
+};
+
 
 
 </script>
@@ -288,8 +318,9 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
                     <th v-for="(field, fieldColIndex) in props.fields"
                         :key="`th-${props.widgetId}-${fieldColIndex}`"
                         :style="{
-                            minWidth: field.width || undefined,
-                            width: field.width || undefined,
+                            minWidth: getFieldMinWidth(field),
+                            width: getFieldWidth(field),
+                            maxWidth: getFieldWidth(field),
                         }"
                         :class="{
                             'last-label': fieldColIndex === props.fields.filter((_field) => _field.fieldInfo?.type === 'labelField').length - 1,

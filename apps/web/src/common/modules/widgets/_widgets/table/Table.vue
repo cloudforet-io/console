@@ -42,7 +42,7 @@ import type {
 import type {
     GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
     DateFormatValue,
-    NumberFormatValue, DataFieldHeatmapColorValue,
+    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -102,6 +102,8 @@ const state = reactive({
     dateFormatInfo: computed<DateFormatValue|undefined>(() => props.widgetOptions?.dateFormat as DateFormatValue),
     numberFormatInfo: computed<NumberFormatValue|undefined>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
     dataFieldHeatmapColorInfo: computed<DataFieldHeatmapColorValue|undefined>(() => props.widgetOptions?.dataFieldHeatmapColor as DataFieldHeatmapColorValue),
+    tableColumnWidthInfo: computed<TableColumnWidthValue|undefined>(() => props.widgetOptions?.tableColumnWidth as TableColumnWidthValue),
+    customTableColumnWidthInfo: computed<CustomTableColumnWidthValue|undefined>(() => props.widgetOptions?.customTableColumnWidth as CustomTableColumnWidthValue),
     // table
     tableFields: computed<TableWidgetField[]>(() => {
         const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map(
@@ -565,6 +567,8 @@ defineExpose<WidgetExpose<Data>>({
                                    :date-format-info="state.dateFormatInfo"
                                    :number-format-info="state.numberFormatInfo"
                                    :data-field-heatmap-color-info="state.dataFieldHeatmapColorInfo"
+                                   :table-column-width-info="state.tableColumnWidthInfo"
+                                   :custom-table-column-width-info="state.customTableColumnWidthInfo"
                                    :sort-by.sync="state.sortBy"
                                    :this-page.sync="state.thisPage"
                                    @load="handleManualLoadWidget"
