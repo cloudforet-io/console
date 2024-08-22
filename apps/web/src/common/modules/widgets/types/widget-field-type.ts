@@ -135,7 +135,7 @@ export interface DataFieldHeatmapColorOptions {
 }
 
 export interface TextWrapOptions {
-    default?: boolean;
+    toggle?: boolean;
 }
 
 export interface TableColumnWidthOptions {

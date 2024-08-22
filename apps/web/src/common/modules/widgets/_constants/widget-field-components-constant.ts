@@ -25,6 +25,7 @@ import stackBy from '@/common/modules/widgets/_widget-fields/WidgetFieldStackBy.
 import subTotal from '@/common/modules/widgets/_widget-fields/WidgetFieldSubTotal.vue';
 import tableColumnWidth from '@/common/modules/widgets/_widget-fields/WidgetFieldTableColumnWidth.vue';
 import tableDataField from '@/common/modules/widgets/_widget-fields/WidgetFieldTableDataField.vue';
+import textWrap from '@/common/modules/widgets/_widget-fields/WidgetFieldTextWrap.vue';
 import total from '@/common/modules/widgets/_widget-fields/WidgetFieldTotal.vue';
 import totalField from '@/common/modules/widgets/_widget-fields/WidgetFieldTotalField.vue';
 import xAxis from '@/common/modules/widgets/_widget-fields/WidgetFieldXAxis.vue';
@@ -60,6 +61,7 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     dataFieldHeatmapColor,
     displayAnnotation,
     displaySeriesLabel,
+    textWrap,
     tableColumnWidth,
     customTableColumnWidth,
 };
