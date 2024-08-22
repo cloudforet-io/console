@@ -4,6 +4,8 @@ import {
     onMounted, reactive, watch,
 } from 'vue';
 
+import { sortBy } from 'lodash';
+
 import {
     PFieldTitle, PTextInput, PIconButton, PButton, PSelectDropdown, PToggleButton,
 } from '@cloudforet/mirinae';
@@ -43,11 +45,11 @@ const state = reactive({
     }),
     allFieldList: computed<MenuItem[]>(() => {
         const allField = [...state.labelFieldList, ...state.dataFieldList, 'Sub Total'];
-        return allField.map((item) => ({
-            name: item,
+        return sortBy(allField.map((item) => ({
+            name: item === 'Sub Total' ? 'sub_total' : item,
             label: item,
             disabled: state.customWidthItems.some((customWidthItem) => customWidthItem.fieldKey === item),
-        }));
+        })));
     }),
 });
 

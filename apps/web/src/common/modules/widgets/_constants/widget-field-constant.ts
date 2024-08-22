@@ -96,3 +96,5 @@ export const PIE_CHART_SERIES_LABEL_POSITION = {
     inner: 'inner',
     outer: 'outer',
 } as const;
+
+export const DEFAULT_MINIMUM_WIDTH = 120;

@@ -12,14 +12,13 @@ import { i18n } from '@/translations';
 
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { DEFAULT_MINIMUM_WIDTH } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type {
     WidgetFieldComponentEmit,
     WidgetFieldComponentProps,
     TableColumnWidthOptions,
 } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableColumnWidthValue } from '@/common/modules/widgets/types/widget-field-value-type';
-
-const DEFAULT_MINIMUM_WIDTH = 120;
 
 
 const props = defineProps<WidgetFieldComponentProps<TableColumnWidthOptions, TableColumnWidthValue>>();
