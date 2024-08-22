@@ -141,14 +141,6 @@ const convertToMenuItem = (data?: string[]) => data?.map((d) => ({
 watch(() => labelsMenuItem.value, (value) => {
     if (!(value.find((d) => d.name === state.selectedItem)) && (state.selectedFieldType === 'dynamicField')) {
         state.selectedItem = undefined;
-        return;
-    }
-    if ((labelsMenuItem.value ?? []).length >= 2) {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: props.value?.value ?? state.menuItems[DEFAULT_INDEX]?.name,
-            criteria: state.selectedFieldType === 'dynamicField' ? state.dataInfoMenuItems[0]?.name : undefined,
-        };
     }
 });
 
@@ -174,7 +166,7 @@ const initValue = () => {
         ...state.proxyValue,
         fieldType: state.selectedFieldType,
         value: props.value?.value,
-        criteria: state.proxyValue?.criteria,
+        criteria: props.value?.criteria,
         count: props.value?.count ?? DEFAULT_COUNT,
     };
     if (state.selectedFieldType === 'staticField') {
@@ -199,7 +191,7 @@ watch(() => state.menuItems, (menuItems) => {
         state.selectedItem = convertToMenuItem(_value);
     } else {
         _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, 0);
-        _criteria = getInitialSelectedMenuItem(state.dataInfoMenuItems, state.proxyValue, 0);
+        _criteria = getInitialSelectedMenuItem(state.dataInfoMenuItems, state.proxyValue?.criteria, 0);
         state.selectedItem = _value;
         state.selectedCriteria = _criteria;
     }
