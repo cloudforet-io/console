@@ -131,7 +131,7 @@ export interface TableColumnWidthValue {
 
 export interface CustomTableColumnWidthValue {
     toggleValue: boolean;
-    value: CustomColumnWidthItem[];
+    value?: CustomColumnWidthItem[];
 }
 
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
