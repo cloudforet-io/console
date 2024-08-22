@@ -289,7 +289,7 @@ const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
         if (field?.fieldInfo?.type === 'dataField') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
     }
     const minimumWidth = props.tableColumnWidthInfo?.minimumWidth ?? TABLE_DEFAULT_MINIMUM_WIDTH;
-    const fixedWidth = props.tableColumnWidthInfo?.fixedWidth;
+    const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
     const calculatedWidth = (customWidth ?? 0) < minimumWidth
         ? (fixedWidth || minimumWidth) : (customWidth || fixedWidth || minimumWidth);
     return calculatedWidth ? `${calculatedWidth}px` : undefined;
@@ -301,7 +301,7 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
     } else if (props.fieldType === 'dynamicField') {
         if (field?.fieldInfo?.type === 'dataField') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
     }
-    const fixedWidth = props.tableColumnWidthInfo?.fixedWidth;
+    const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
     const calculatedWidth = customWidth || fixedWidth;
     return calculatedWidth ? `${calculatedWidth}px` : undefined;
 };
