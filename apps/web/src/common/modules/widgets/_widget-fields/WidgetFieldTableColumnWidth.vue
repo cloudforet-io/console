@@ -12,7 +12,7 @@ import { i18n } from '@/translations';
 
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { DEFAULT_MINIMUM_WIDTH } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { TABLE_DEFAULT_MINIMUM_WIDTH } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type {
     WidgetFieldComponentEmit,
     WidgetFieldComponentProps,
@@ -83,7 +83,7 @@ const handleChangeFixedWidth = (value: string) => {
 watch(() => props.value, (changed) => {
     if (changed === undefined) {
         state.proxyValue = {
-            minimumWidth: DEFAULT_MINIMUM_WIDTH,
+            minimumWidth: TABLE_DEFAULT_MINIMUM_WIDTH,
             widthType: 'auto',
             fixedWidth: undefined,
         };
@@ -96,7 +96,7 @@ onMounted(() => {
     emit('update:is-valid', true);
     state.proxyValue = {
         minimumWidth: (props.value?.minimumWidth && props.value?.minimumWidth > 0 ? props.value.minimumWidth : undefined)
-            ?? props.widgetConfig?.optionalFieldsSchema.tableColumnWidth?.options?.defaultMinimumWidth ?? DEFAULT_MINIMUM_WIDTH,
+            ?? props.widgetConfig?.optionalFieldsSchema.tableColumnWidth?.options?.defaultMinimumWidth ?? TABLE_DEFAULT_MINIMUM_WIDTH,
         widthType: props.value?.widthType ?? (props.widgetConfig?.optionalFieldsSchema.tableColumnWidth?.options?.defaultFixedWidth ? 'fixed' : 'auto'),
         fixedWidth: props.value?.fixedWidth ?? props.widgetConfig?.optionalFieldsSchema.tableColumnWidth?.options?.defaultFixedWidth,
     };

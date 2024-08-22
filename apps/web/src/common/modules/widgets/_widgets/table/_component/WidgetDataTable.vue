@@ -17,7 +17,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     DEFAULT_COMPARISON_COLOR,
-    DEFAULT_MINIMUM_WIDTH,
+    TABLE_DEFAULT_MINIMUM_WIDTH,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getFormattedDate,
@@ -288,7 +288,7 @@ const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
     } else if (props.fieldType === 'dynamicField') {
         if (field?.fieldInfo?.type === 'dataField') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
     }
-    const minimumWidth = props.tableColumnWidthInfo?.minimumWidth ?? DEFAULT_MINIMUM_WIDTH;
+    const minimumWidth = props.tableColumnWidthInfo?.minimumWidth ?? TABLE_DEFAULT_MINIMUM_WIDTH;
     const fixedWidth = props.tableColumnWidthInfo?.fixedWidth;
     const calculatedWidth = (customWidth ?? 0) < minimumWidth
         ? (fixedWidth || minimumWidth) : (customWidth || fixedWidth || minimumWidth);
