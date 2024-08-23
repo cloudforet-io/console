@@ -32,6 +32,7 @@ const pieChart: WidgetConfig = {
         legend: {
             options: {
                 default: true,
+                showPositionField: true,
             },
         },
         dateFormat: {

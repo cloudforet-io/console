@@ -40,6 +40,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     GroupByValue, DateFormatValue, DisplaySeriesLabelValue, NumberFormatValue,
+    LegendValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
@@ -58,6 +59,29 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartData: [],
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
+    chartLegendOption: computed(() => {
+        if (!state.showLegends) return { show: false };
+        const _option: any = {
+            show: true,
+            type: 'scroll',
+            itemWidth: 10,
+            itemHeight: 10,
+            icon: 'circle',
+            formatter: (val) => {
+                if (state.groupByField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
+                return getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, val);
+            },
+        };
+        if (state.legendPosition === 'right') {
+            _option.orient = 'vertical';
+            _option.right = 10;
+            _option.top = 20;
+        } else {
+            _option.orient = 'horizontal';
+            _option.bottom = 0;
+        }
+        return _option;
+    }),
     chartOptions: computed<PieSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         tooltip: {
@@ -76,20 +100,7 @@ const state = reactive({
         grid: {
             containLabel: true,
         },
-        legend: {
-            show: state.showLegends,
-            orient: 'vertical',
-            type: 'scroll',
-            right: 10,
-            top: 20,
-            itemWidth: 10,
-            itemHeight: 10,
-            icon: 'circle',
-            formatter: (val) => {
-                if (state.groupByField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
-                return getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, val);
-            },
-        },
+        legend: state.chartLegendOption,
         series: [
             {
                 type: 'pie',
@@ -123,7 +134,8 @@ const state = reactive({
         return { start: _start, end: _end };
     }),
     // optional fields
-    showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
+    legendPosition: computed<string|undefined>(() => (props.widgetOptions?.legend as LegendValue)?.position),
     dateFormat: computed<string|undefined>(() => {
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
