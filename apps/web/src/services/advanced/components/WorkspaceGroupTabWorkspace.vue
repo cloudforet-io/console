@@ -170,6 +170,7 @@ onUnmounted(() => {
                          sort-by="name"
                          search-type="plain"
                          :sort-desc="true"
+                         :this-page.sync="workspaceGroupPageState.workspacePage"
                          :search-text.sync="workspaceGroupPageState.workspaceSearchText"
                          selectable
                          sortable
