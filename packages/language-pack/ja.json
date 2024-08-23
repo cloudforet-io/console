@@ -617,7 +617,7 @@
 				"FILTER_MODAL_HELP_TEXT_1": "選択されたフィルターがありません",
 				"FILTER_MODAL_HELP_TEXT_2": "リストからフィルタを選択します。",
 				"GRANULARITY": "細部基準(Granularity)",
-				"GROUP_BY": "グループ別統計(Group By)",
+				"GROUP_BY": "グループ別統計(Group by)",
 				"HELP_TEXT": {
 					"UP_TO_31_DAYS": "最長31日まで",
 					"UP_TO_LAST_12_MONTHS": "最長12ヶ月(期間内)設定可能"
@@ -822,7 +822,7 @@
 						"IN_RATIO": "比率{ratio}%で",
 						"LABEL_FILTERS": "フィルター",
 						"LABEL_GRANULARITY": "細部基準(Granularity)",
-						"LABEL_GROUP_BY": "グループ別統計(Group By)",
+						"LABEL_GROUP_BY": "グループ別統計(Group by)",
 						"LABEL_QUERY_NAME": "クエリ名",
 						"LABEL_STACK": "累積",
 						"LAST_MONTH_TOTAL_SPEND_DESC": "照会期間の前月に発生した総費用を示すウィジェット。",
@@ -847,7 +847,7 @@
 					"FORM": {
 						"DELETE_CONTENTS": "このウィジェットを復元することはできません",
 						"DELETE_TITLE": "選択したウィジェットを削除しますか？",
-						"LABEL_GROUP_BY": "グループ別統計(Group By)",
+						"LABEL_GROUP_BY": "グループ別統計(Group by)",
 						"LABEL_NAME": "名前",
 						"UPDATE_TITLE": "ウィジェットの更新"
 					},
@@ -1489,7 +1489,7 @@
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day はフィールド名として使用できません。",
 					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "グループ名はフィールド名として使用できません。",
 					"FILTERS": "フィルター",
-					"GROUP_BY": "グループ別統計(Group By)",
+					"GROUP_BY": "グループ別統計(Group by)",
 					"JOIN_DESC": "共通の列に基づいて、異なるテーブルの行を結合します。",
 					"QUERY_DESC": "特定の条件を満たすデータをフィルタリングして抽出します。",
 					"SELECT_DATA_SOURCE_SUCCESS": "データが正常に変更されました。",
@@ -1554,6 +1554,12 @@
 			"HEALTH_DASHBOARD_DESC_3": "先にAWSプランを確認してください",
 			"HEALTH_DASHBOARD_HELP": "AWSのサービスの状態とスケジュール済みタスク通知を見ることができます。",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
+			"LEGEND": {
+				"BOTTOM": "",
+				"LEGEND": "",
+				"POSITION": "位置",
+				"RIGHT": ""
+			},
 			"MAX_ITEMS": "最大アイテム数",
 			"MAX_ITEMS_DESC": "{fieldName} の最大値は {max} です。",
 			"MISSING_VALUE": {
@@ -2111,7 +2117,7 @@
 					"FIELD_NAME": "フィールド名",
 					"FORMAT_RULES": "形式ルール",
 					"GRANULARITY": "細部基準(Granularity)",
-					"GROUP_BY": "グループ別統計(Group By)",
+					"GROUP_BY": "グループ別統計(Group by)",
 					"ICON": "アイコン",
 					"LEGEND": "凡例",
 					"LINE_BY": "ライン別",
@@ -3344,7 +3350,7 @@
 			"EMPTY_TEXT": "結果が見つかりませんでした。\n別の用語で再試行してください。",
 			"FILTERS": "フィルター",
 			"GRANULARITY": "細部基準(Granularity)",
-			"GROUP_BY": "グループ別統計(Group By)",
+			"GROUP_BY": "グループ別統計(Group by)",
 			"HIDE_ALL": "すべて隠す",
 			"MAIN": {
 				"ANALYZE_DATA": "データを分析する",
