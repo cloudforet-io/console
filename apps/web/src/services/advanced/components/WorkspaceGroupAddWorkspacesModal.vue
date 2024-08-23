@@ -1,55 +1,77 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AddWorkspacesParameters } from '@/schema/identity/workspace-group/api-verbs/add-workspaces';
+import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
+
+
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+
+const emit = defineEmits<{(e: 'confirm'): void,
+}>();
 
 const state = reactive({
-    groupName: '',
     loading: false,
-    // TODO: temp data
-    items: [{
-        is_dormant: undefined,
-        label: '🫠',
-        name: 'workspace-6282f1404a07',
-        tags: {
-            description: 'hi',
-            theme: 'green',
-        },
-    },
-    {
-        is_dormant: undefined,
-        label: '🙏🏻',
-        name: 'workspace-440db588c999',
-        tags: {
-            description: '',
-            theme: 'blue',
-        },
-    },
-    {
-        type: 'showMore',
-        label: 'show more',
-    }],
 });
 
-const handleConfirm = () => {
-    workspaceGroupPageStore.closeModal();
-};
-
-const handleModalClose = () => {
-    workspaceGroupPageStore.closeModal();
-};
-
-const dropdownMenuHandler = () => ({
-    results: state.items,
+const {
+    loading, searchText, menuList, selectedItems, handleClickShowMore,
+} = useSelectDropDownList({
+    pageSize: 10,
+    transformer: (_workspace) => ({
+        name: _workspace.workspace_id,
+        label: _workspace.name,
+        tags: _workspace.tags,
+        is_dormant: _workspace.is_dormant,
+    }),
+    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+        query: apiQueryHelper.data,
+    }),
 });
+
+const addWorkspace = async () => {
+    state.loading = true;
+
+    try {
+        await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<AddWorkspacesParameters>({
+            workspace_group_id: workspaceGroupPageGetters.selectedGroup.workspace_group_id,
+            workspaces: selectedItems.value.map((item) => item.name as string),
+        });
+
+        if (!selectedItems.value.length) {
+            return;
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+const handleConfirm = async () => {
+    await addWorkspace();
+    workspaceGroupPageStore.closeModal();
+    emit('confirm');
+};
+
+const handleCloseModal = () => {
+    workspaceGroupPageStore.closeModal();
+};
 </script>
 
 <template>
@@ -57,10 +79,11 @@ const dropdownMenuHandler = () => ({
                     :header-title="workspaceGroupPageState.modal.title"
                     :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES"
                     :loading="state.loading"
+                    :disabled="!selectedItems.length"
                     size="sm"
                     @confirm="handleConfirm"
-                    @cancel="handleModalClose"
-                    @close="handleModalClose"
+                    @cancel="handleCloseModal"
+                    @close="handleCloseModal"
     >
         <template #body>
             <div class="form-wrapper">
@@ -71,17 +94,19 @@ const dropdownMenuHandler = () => ({
                     <template #default>
                         <div class="dropdown-wrapper">
                             <p-select-dropdown
-                                :loading="state.loading"
+                                :loading="loading"
+                                :search-text.sync="searchText"
                                 appearance-type="badge"
                                 is-filterable
                                 multi-selectable
                                 show-delete-all-button
                                 use-fixed-menu-style
-                                page-size="10"
-                                show-select-marker
-                                :handler="dropdownMenuHandler"
+                                disable-handler
+                                :menu="menuList"
+                                :selected.sync="selectedItems"
                                 :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_DROP_DOWN_PLACEHOLDER')"
                                 class="workspace-select-dropdown"
+                                @click-show-more="handleClickShowMore"
                             >
                                 <template #menu-item--format="{ item }">
                                     <div class="menu-item-wrapper"
@@ -104,3 +129,28 @@ const dropdownMenuHandler = () => ({
         </template>
     </p-button-modal>
 </template>
+
+<style lang="postcss" scoped>
+.workspace-select-dropdown {
+    .menu-item-wrapper {
+        @apply flex justify-between;
+        max-width: 100%;
+
+        .label {
+            @apply flex items-center gap-2;
+        }
+        .state {
+            @apply text-label-sm;
+        }
+        .label-text {
+            @apply truncate;
+            max-width: 36.875rem;
+        }
+        &.is-dormant {
+            .label-text {
+                max-width: 31.25rem;
+            }
+        }
+    }
+}
+</style>
