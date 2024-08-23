@@ -30,7 +30,7 @@ import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-t
 import type {
     TableDataFieldValue, ComparisonValue, TotalValue,
     DateFormatValue,
-    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue,
+    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue, TextWrapValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -69,6 +69,7 @@ interface Props {
   dataFieldHeatmapColorInfo?: DataFieldHeatmapColorValue;
   tableColumnWidthInfo?: TableColumnWidthValue;
   customTableColumnWidthInfo?: CustomTableColumnWidthValue;
+  textWrapInfo?: TextWrapValue;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
@@ -118,6 +119,16 @@ const state = reactive({
             }, {});
         }
         return {};
+    }),
+    textWrapStyle: computed(() => {
+        if (!props.textWrapInfo?.toggleValue) return {};
+        return {
+            display: 'inline-block',
+            width: '100%',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+        };
     }),
 });
 
@@ -333,7 +344,9 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
                                   'sub-total': field.fieldInfo?.additionalType === 'subTotal',
                               }"
                         >
-                            <span class="th-text">
+                            <span class="th-text"
+                                  :style="{ ...state.textWrapStyle }"
+                            >
                                 {{ field.fieldInfo?.additionalType === 'comparison' ? 'Δ' : "" }}{{ getField(field) }}
                                 <!--                                <span class="timediff-sub-text">{{ getTimeDiffSubText(field) }}</span>-->
                             </span>
@@ -371,7 +384,12 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
                             'total': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1,
                             'total-freeze': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1 && props.totalInfo?.freeze,
                         }"
-                        :style="rowIndex !== props.items?.length - 1 ? getHeatmapColorStyle(item, field) : {}"
+                        :style="{
+                            minWidth: getFieldMinWidth(field),
+                            width: getFieldWidth(field),
+                            maxWidth: getFieldWidth(field),
+                            ...(rowIndex !== props.items?.length - 1 ? getHeatmapColorStyle(item, field) : {}),
+                        }"
                     >
                         <span ref="labelRef"
                               class="td-contents"
@@ -382,7 +400,9 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
                             <p-tooltip class="value-tooltip"
                                        :contents="getValueTooltipText(item, field)"
                                        position="bottom"
-                            ><span class="common-text-box">{{ getValue(item, field) }}</span></p-tooltip>
+                            ><span class="common-text-box"
+                                   :style="{ ...state.textWrapStyle }"
+                            >{{ getValue(item, field) }}</span></p-tooltip>
                             <p-i v-if="field.fieldInfo?.additionalType === 'comparison' && getComparisonValueIcon(item, field)"
                                  :name="getComparisonValueIcon(item, field)?.icon"
                                  :color="getComparisonValueIcon(item, field)?.color"
@@ -435,6 +455,8 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
 
         .th-contents {
             @apply flex items-center justify-between pl-4 gap-1;
+            text-align: left;
+
             .comparison-info {
                 min-width: 0.875rem;
             }
@@ -447,6 +469,7 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
 
             &.data-field {
                 @apply justify-end;
+                text-align: right;
             }
             &.sub-total {
                 @apply font-bold text-gray-700;
@@ -516,6 +539,11 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
         .td-contents {
             @apply flex items-center pl-4 gap-1;
             width: 100%;
+            text-align: left;
+
+            .value-tooltip {
+                width: 100%;
+            }
 
             .comparison-icon {
                 min-width: 0.75rem;
@@ -523,6 +551,7 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
 
             &.data-field {
                 @apply justify-end;
+                text-align: right;
             }
         }
     }

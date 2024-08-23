@@ -58,6 +58,7 @@ const table: WidgetConfig = {
         },
         dataFieldHeatmapColor: {},
         displayAnnotation: {},
+        textWrap: {},
         tableColumnWidth: {},
         customTableColumnWidth: {},
     },
