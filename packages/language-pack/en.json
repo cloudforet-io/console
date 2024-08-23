@@ -2741,14 +2741,38 @@
 			"WORKSPACES": "Workspaces"
 		},
 		"WORKSPACE_GROUP": {
-			"CREATE": "Create",
 			"ALT_S_UPDATE_ROLE": "Workspace role successfully changed",
-			"TOOLTIP_STATE": "With ‘Auto Dormancy Configuration’ turned on, workspaces with a total cost lower than the user-defined threshold will automatically be set to dormant. The threshold can be changed in [Preferences > Domain Settings > Auto Dormancy Configuration].",
-			"TOOLTIP_COST": "based on Cost Report",
+			"CREATE": "Create",
 			"MAIN": {
 				"DELETE": "Delete",
 				"EDIT": "Edit",
 				"TOOLBOX_PLACEHOLDER": "Action"
+			},
+			"MODAL": {
+				"ADD": "Add",
+				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
+				"ADD_WORKSPACES_TITLE": "Add Workspaces to {name}",
+				"ALT_S_ADD_USRES": "Users successfully added",
+				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
+				"CREATE_DROP_DOWN_PLACEHOLDER": "Select workspaces",
+				"CREATE_GROUP_NAME": "Name",
+				"CREATE_GROUP_NAME_PLACEHOLDER": "Enter Name",
+				"CREATE_TITLE": "Create Workspace Group",
+				"DELETE_BUTTON": "Delete",
+				"DELETE_GROUP_USER_TITLE": "Remove Group User",
+				"DELETE_MODAL_FIRST_MESSAGE": "Are you sure you want to delete “Workspace Group Name”? This workspace group includes the following workspaces and users:",
+				"DELETE_MODAL_LAST_MESSAGE": "Are you sure you want to delete this workspace group?",
+				"DELETE_MODAL_WARNING_MESSAGE": "Once the workspace group deleted, all group users will lose access to the included workspaces, and this action cannot be undone.",
+				"DELETE_TITLE": "Delete Workspace Group",
+				"DELETE_WORKSPACES_TITLE": "Remove Workspaces",
+				"EDIT_GROUP_NAME": "Name",
+				"EDIT_GROUP_NAME_PLACEHOLDER": "Enter Name",
+				"EDIT_TITLE": "Edit Workspace Group",
+				"ROLE_DROP_DOWN_PLACEHOLDER": "Select a role",
+				"ROLE_SELECT_DROP_DOWN_TITLE": "Role",
+				"USER_DROP_DOWN_PLACEHOLDER": "Add Users",
+				"USER_SELECT_DROP_DOWN_TITLE": "User",
+				"WORKSPACE_SELECT_DROP_DOWN_TITLE": "Included Workspaces"
 			},
 			"TAB": {
 				"ADD_USER": "Add User",
@@ -2758,32 +2782,8 @@
 				"WORKSPACE": "Workspace"
 			},
 			"TITLE": "Workspace Group",
-			"MODAL": {
-				"CREATE_DROP_DOWN_PLACEHOLDER": "Select workspaces",
-				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
-				"CREATE_TITLE": "Create Workspace Group",
-				"EDIT_TITLE": "Edit Workspace Group",
-				"DELETE_TITLE": "Delete Workspace Group",
-				"DELETE_WORKSPACES_TITLE": "Remove Workspaces",
-				"DELETE_GROUP_USER_TITLE": "Remove Group User",
-				"DELETE_MODAL_FIRST_MESSAGE": "Are you sure you want to delete “Workspace Group Name”? This workspace group includes the following workspaces and users:",
-				"DELETE_MODAL_LAST_MESSAGE": "Are you sure you want to delete this workspace group?",
-				"DELETE_MODAL_WARNING_MESSAGE": "Once the workspace group deleted, all group users will lose access to the included workspaces, and this action cannot be undone.",
-				"DELETE_BUTTON": "Delete",
-				"ADD_WORKSPACES_TITLE": "Add Workspaces to {name}",
-				"ALT_S_ADD_USRES": "Users successfully added",
-				"WORKSPACE_SELECT_DROP_DOWN_TITLE": "Included Workspaces",
-				"ROLE_DROP_DOWN_PLACEHOLDER": "Select a role",
-				"ROLE_SELECT_DROP_DOWN_TITLE": "Role",
-				"USER_SELECT_DROP_DOWN_TITLE": "User",
-				"USER_DROP_DOWN_PLACEHOLDER": "Add Users",
-				"CREATE_GROUP_NAME_PLACEHOLDER": "Enter Name",
-				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
-				"ADD": "Add",
-				"CREATE_GROUP_NAME": "Name",
-				"EDIT_GROUP_NAME": "Name",
-				"EDIT_GROUP_NAME_PLACEHOLDER": "Enter Name"
-			}
+			"TOOLTIP_COST": "based on Cost Report",
+			"TOOLTIP_STATE": "With ‘Auto Dormancy Configuration’ turned on, workspaces with a total cost lower than the user-defined threshold will automatically be set to dormant. The threshold can be changed in [Preferences > Domain Settings > Auto Dormancy Configuration]."
 		}
 	},
 	"IDENTITY": {
@@ -3619,7 +3619,8 @@
 		"ROLE_TYPE_OWNER": "Owner",
 		"SEARCH_WORKSPACE": "Search Workspaces",
 		"SHOW_ALL": "Show All",
-		"TITLE": "Which Workspace?"
+		"TITLE": "Which Workspace?",
+		"WORKSPACE_GROUP": "Workspace Group"
 	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
