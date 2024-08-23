@@ -7,8 +7,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { WorkspaceGroupAddWorkspaceParameters } from '@/schema/identity/workspace-group/api-verbs/add_workspaces';
-import type { WorkspaceGroupCreateParameters } from '@/schema/identity/workspace-group/api-verbs/create';
+import type { AddWorkspacesParameters } from '@/schema/identity/workspace-group/api-verbs/add-workspaces';
+import type { CreateWorkspaceParameters } from '@/schema/identity/workspace-group/api-verbs/create';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -72,15 +72,11 @@ const {
     }),
 });
 
-const resetState = () => {
-    state.groupName = '';
-};
-
 const createWorkspaceGroup = async () => {
     state.loading = true;
 
     try {
-        const { workspace_group_id } = await SpaceConnector.clientV2.identity.workspaceGroup.create<WorkspaceGroupCreateParameters, WorkspaceGroupModel>({
+        const { workspace_group_id } = await SpaceConnector.clientV2.identity.workspaceGroup.create<CreateWorkspaceParameters, WorkspaceGroupModel>({
             name: state.groupName,
         });
 
@@ -88,7 +84,7 @@ const createWorkspaceGroup = async () => {
             return;
         }
 
-        await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<WorkspaceGroupAddWorkspaceParameters, WorkspaceGroupModel>({
+        await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<AddWorkspacesParameters, WorkspaceGroupModel>({
             workspace_group_id,
             workspaces: selectedItems.value.map((item) => item.name as string),
         });
@@ -103,7 +99,6 @@ const handleConfirm = async () => {
     await createWorkspaceGroup();
     showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_CREATE_WORKSPACE'), '');
     workspaceGroupPageStore.closeModal();
-    resetState();
     emit('confirm');
     workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
@@ -114,7 +109,6 @@ const handleConfirm = async () => {
 
 const handleModalClose = () => {
     workspaceGroupPageStore.closeModal();
-    resetState();
 };
 </script>
 

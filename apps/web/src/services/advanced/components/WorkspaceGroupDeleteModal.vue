@@ -28,12 +28,14 @@ const state = reactive({
 });
 
 const moveWorkspaceGroupTabWorkspace = () => ({
+    // TODO: Plan to change when implementing workspace list page modal
     name: LANDING_ROUTE.WORKSPACE._NAME,
     // TODO: add queryString
     // query: {}
 });
 
 const moveWorkspaceGroupTabGroupUser = () => ({
+    // TODO: Plan to change when implementing workspace list page modal
     name: LANDING_ROUTE.WORKSPACE._NAME,
     // TODO: add queryString
     // query: {}
@@ -69,12 +71,7 @@ const handleConfirm = async () => {
     emit('confirm');
 };
 
-const handleCancel = () => {
-    workspaceGroupPageStore.closeModal();
-    resetSequence();
-};
-
-const handleClose = () => {
+const handleCloseModal = () => {
     workspaceGroupPageStore.closeModal();
     resetSequence();
 };
@@ -88,8 +85,8 @@ const handleClose = () => {
                     :loading="state.loading"
                     size="sm"
                     @confirm="handleConfirm"
-                    @cancel="handleCancel"
-                    @close="handleClose"
+                    @cancel="handleCloseModal"
+                    @close="handleCloseModal"
     >
         <template #body>
             <div v-if="state.sequence === WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST"
