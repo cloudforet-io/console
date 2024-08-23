@@ -95,13 +95,19 @@ export const useSelectDropDownList = ({
         state.list = await fetchList();
     })();
 
-    watch(() => state.searchText, debounce(async () => {
-        state.list = await fetchList() || [];
+    const reset = async () => {
         state.pageStart = 1;
+        state.list = await fetchList() || [];
+    };
+
+    watch(() => state.searchText, debounce(async () => {
+        state.pageStart = 1;
+        state.list = await fetchList() || [];
     }, 300));
 
     return {
         ...toRefs(state),
+        reset,
         handleClickShowMore,
     };
 };
