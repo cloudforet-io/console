@@ -19,11 +19,6 @@ const geoMap: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        legend: {
-            options: {
-                default: true,
-            },
-        },
         displayAnnotation: {},
     },
 };
