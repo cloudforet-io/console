@@ -82,6 +82,27 @@ const state = reactive({
         }
         return _option;
     }),
+    chartSeriesOption: computed(() => {
+        const _option: any = {
+            type: 'pie',
+            avoidLabelOverlap: true,
+        };
+        if (state.chartType === 'donut') {
+            _option.radius = ['30%', '70%'];
+        }
+        if (state.legendPosition === 'right') {
+            if (props.size === 'full') {
+                _option.center = ['40%', '50%'];
+            } else {
+                _option.center = ['30%', '50%'];
+            }
+        } else if (props.size === 'full') {
+            _option.center = ['50%', '50%'];
+        } else {
+            _option.center = ['50%', '40%'];
+        }
+        return _option;
+    }),
     chartOptions: computed<PieSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         tooltip: {
@@ -103,19 +124,13 @@ const state = reactive({
         legend: state.chartLegendOption,
         series: [
             {
-                type: 'pie',
-                ...(state.chartType === 'donut' ? { radius: ['30%', '70%'] } : {}),
-                center: props.size === 'full' ? ['40%', '50%'] : ['30%', '50%'],
-                avoidLabelOverlap: true,
+                ...state.chartSeriesOption,
                 label: {
                     show: !!state.displaySeriesLabel?.toggleValue,
                     position: state.displaySeriesLabel?.position,
                     rotate: state.displaySeriesLabel?.rotate,
                     fontSize: 10,
-                    formatter: (p) => {
-                        if (p.value < state.threshold) return '';
-                        return getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit);
-                    },
+                    formatter: (p) => getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit),
                 },
                 data: state.chartData,
             },
