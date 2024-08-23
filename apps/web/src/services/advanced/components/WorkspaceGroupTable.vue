@@ -45,10 +45,6 @@ const tableState = reactive({
         { name: 'workspace', label: 'Workspace' },
         { name: 'group_user', label: 'Group User' },
         { name: 'created_at', label: 'Created' },
-        // TODO: Will be added when the design is changed
-        // { name: 'all_users', label: 'All User' },
-        // { name: 'service_account', label: 'Service Account' },
-        // { name: 'cost', label: 'Cost' },
     ],
     items: computed(() => workspaceGroupPageState.groups.map(({
         name, workspaces, users, created_at,
@@ -88,9 +84,13 @@ const fetchWorkspaceGroups = async () => {
     }
 };
 
-const handleUpdateSelectIndex = (indices: number[]) => {
+const handleUpdateSelectIndices = (indices: number[]) => {
     workspaceGroupPageStore.$patch((_state) => {
         _state.state.selectedIndices = indices;
+        _state.state.selectedUserIndices = [];
+        _state.state.groupUserSearchText = '';
+        _state.state.selectedWorkspaceIndices = [];
+        _state.state.workspaceSearchText = '';
     });
 };
 
@@ -115,6 +115,10 @@ const handleChange = (options: any = {}) => {
 
     fetchWorkspaceGroups();
 };
+
+const handleChangeSort = (name, desc) => {
+    workspaceGroupListApiQueryHelper.setSort(name, desc);
+};
 </script>
 
 <template>
@@ -135,32 +139,14 @@ const handleChange = (options: any = {}) => {
             :sort-desc="true"
             :query-tags="queryTags"
             :multi-select="false"
-            @select="handleUpdateSelectIndex"
+            @select="handleUpdateSelectIndices"
             @change="handleChange"
-            @refresh="handleChange"
+            @refresh="handleChange()"
+            @changeSort="handleChangeSort"
         >
             <template #toolbox-left>
                 <workspace-group-table-toolbox />
             </template>
-            <!-- TODO: Will be added when the design is changed -->
-            <!-- <template #th-cost-format="{ field }">
-                <div class="th-tooltip">
-                    <span>{{ field.label }}</span>
-                    <p-tooltip
-                        :contents="$t('IAM.WORKSPACE_GROUP.TOOLTIP_COST')"
-                        position="bottom"
-                        class="tooltip-wrapper"
-                        content-class="custom-tooltip-content"
-                    >
-                        <p-i name="ic_info-circle"
-                             class="title-tooltip"
-                             height="1rem"
-                             width="1rem"
-                             :color="gray[500]"
-                        />
-                    </p-tooltip>
-                </div>
-            </template> -->
             <template #col-created_at-format="{ value }">
                 {{ iso8601Formatter(value, 'UTC') }}
             </template>

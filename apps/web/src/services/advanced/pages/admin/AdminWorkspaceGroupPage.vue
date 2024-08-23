@@ -2,6 +2,7 @@
 import { onUnmounted } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -25,14 +26,35 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 
-const fetchWorkspaceGroups = async () => {
+const workspaceGroupListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(workspaceGroupPageState.pageStart).setPageLimit(workspaceGroupPageState.pageLimit)
+    .setSort('name', true);
+const workspaceGroupListApiQuery = workspaceGroupListApiQueryHelper.data;
+
+const fetchWorkspaceGroups = async (tabRefresh = { isGroupUser: false, isWorkspace: false }) => {
     workspaceGroupPageState.loading = true;
 
     try {
-        const { results } = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>();
+        const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>({
+            query: workspaceGroupListApiQuery,
+        });
 
         workspaceGroupPageState.groups = results || [];
-        workspaceGroupPageState.selectedIndices = [];
+        workspaceGroupPageState.total_count = total_count;
+
+        if (!tabRefresh.isGroupUser && !tabRefresh.isWorkspace) {
+            workspaceGroupPageState.selectedIndices = [];
+        }
+
+        if (tabRefresh.isGroupUser) {
+            workspaceGroupPageState.selectedUserIndices = [];
+            workspaceGroupPageState.selectedGroupUsers = {};
+        }
+
+        if (tabRefresh.isWorkspace) {
+            workspaceGroupPageState.selectedWorkspaceIndices = [];
+            workspaceGroupPageState.selectedWorkspace = {};
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
         workspaceGroupPageState.groups = [];
@@ -43,10 +65,10 @@ const fetchWorkspaceGroups = async () => {
 
 const initWorkspaceGroups = async () => {
     await fetchWorkspaceGroups();
+};
 
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedIndices = [0];
-    });
+const refreshTab = async (value) => {
+    await fetchWorkspaceGroups(value);
 };
 
 (() => {
@@ -55,7 +77,7 @@ const initWorkspaceGroups = async () => {
 
 onUnmounted(() => {
     workspaceGroupPageStore.$dispose();
-    workspaceGroupPageStore.$reset();
+    workspaceGroupPageStore.reset();
 });
 </script>
 
@@ -69,14 +91,18 @@ onUnmounted(() => {
                 />
             </template>
         </p-horizontal-layout>
-        <workspace-group-tab />
+        <workspace-group-tab v-if="workspaceGroupPageState.selectedIndices.length"
+                             @refresh="refreshTab"
+        />
         <workspace-group-create-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.CREATE"
                                       @confirm="fetchWorkspaceGroups"
         />
         <workspace-group-edit-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-modal @confirm="fetchWorkspaceGroups" />
-        <workspace-group-delete-status-modal />
-        <workspace-group-add-workspaces-modal />
+        <workspace-group-delete-status-modal @confirm="fetchWorkspaceGroups" />
+        <workspace-group-add-workspaces-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES"
+                                              @confirm="fetchWorkspaceGroups"
+        />
         <workspace-group-add-users-modal />
     </section>
 </template>

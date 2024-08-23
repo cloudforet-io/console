@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch, onUnmounted } from 'vue';
 
 import {
     PHeading, PButton, PToolboxTable, PLink, PStatus, PTooltip, PI,
@@ -19,6 +19,10 @@ import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
+const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+
+const emit = defineEmits<{(e: 'refersh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
 const tableState = reactive({
     // TODO: temp data
@@ -31,16 +35,6 @@ const tableState = reactive({
         { name: 'created_at', label: 'Created' },
         { name: 'remove_button', label: ' ', sortable: false },
     ],
-    // TODO: temp data
-    items: [{
-        name: 'cloudone-mz',
-        state: 'ENABLED',
-        user: 24,
-        service_account: 23,
-        cost: 5160.09,
-        created_at: '2022-03-10 12:02:41',
-        workspace_id: 'workspace-15fb37788416',
-    }],
 });
 
 const getWorkspaceRouteLocationByWorkspaceId = (item) => ({
@@ -82,13 +76,64 @@ const setupModal = (type) => {
     }
 };
 
+const handleSelect = (index) => {
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.state.selectedWorkspaceIndices = index;
+    });
+};
+
+const handleChange = (options: any = {}) => {
+    if (options.pageStart) {
+        workspaceGroupPageStore.$patch((_state) => {
+            _state.state.workspacePageStart = options.pageStart;
+        });
+    }
+
+    if (options.pageLimit) {
+        workspaceGroupPageStore.$patch((_state) => {
+            _state.state.workspacePageStart = 1;
+            _state.state.workspacePageLimit = options.pageLimit;
+            _state.state.workspacePage = 1;
+        });
+    }
+};
+
 const handleAddWorkspaceButtonClick = () => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES);
 };
 
-const handleRemoveButtonClick = () => {
+const handleSelectedWorkspacesRemoveButtonClick = () => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES);
 };
+
+const handleSelectedWorkspaceRemoveButtonClick = (item) => {
+    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES);
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.state.selectedWorkspace = item;
+    });
+};
+
+const handleRefresh = () => {
+    emit('refresh', { isWorkspace: true });
+};
+
+const handleChangeSort = (name, isDesc) => {
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.state.workspaceSortBy = name;
+        _state.state.selectedWorkspaceIndices = [];
+        _state.state.isWorkspaceSortDesc = isDesc;
+    });
+};
+
+watch(() => workspaceGroupPageState.workspaceSearchText, () => {
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.state.selectedWorkspaceIndices = [];
+    });
+});
+
+onUnmounted(() => {
+    workspaceGroupPageStore.resetWorkspace();
+});
 </script>
 
 <template>
@@ -96,13 +141,14 @@ const handleRemoveButtonClick = () => {
         <p-heading class="workspace-group-tab-workspace-header"
                    :title="$t('IAM.WORKSPACE_GROUP.TAB.WORKSPACE')"
                    use-total-count
-                   :total-count="28"
+                   :total-count="workspaceGroupPageGetters.workspaceTotalCount"
                    heading-type="sub"
         >
             <template #extra>
                 <div class="workspace-group-tab-workspace-button-wrapper">
                     <p-button style-type="negative-primary"
-                              @click="handleRemoveButtonClick"
+                              :disabled="!workspaceGroupPageGetters.selectedWorkspacesByIndices.length"
+                              @click="handleSelectedWorkspacesRemoveButtonClick"
                     >
                         {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
                     </p-button>
@@ -116,10 +162,22 @@ const handleRemoveButtonClick = () => {
             </template>
         </p-heading>
         <p-toolbox-table class="workspace-group-tab-workspace-table"
+                         :loading="workspaceGroupPageState.loading"
                          :fields="tableState.fields"
-                         :items="tableState.items"
+                         :items="workspaceGroupPageGetters.selectedWorkspaces"
+                         :select-index="workspaceGroupPageState.selectedWorkspaceIndices"
+                         :total-count="workspaceGroupPageGetters.workspaceTotalCount"
+                         sort-by="name"
+                         search-type="plain"
+                         :sort-desc="true"
+                         :search-text.sync="workspaceGroupPageState.workspaceSearchText"
                          selectable
                          sortable
+                         searchable
+                         @select="handleSelect"
+                         @change="handleChange"
+                         @refresh="handleRefresh()"
+                         @changeSort="handleChangeSort"
         >
             <template #th-state-format="{ field }">
                 <div class="th-tooltip">
@@ -170,7 +228,9 @@ const handleRemoveButtonClick = () => {
                 </div>
             </template>
             <template #col-state-format="{ value }">
-                <p-status v-bind="workspaceStateFormatter(value)" />
+                <p-status v-bind="workspaceStateFormatter(value)"
+                          class="capitalize"
+                />
             </template>
             <template #col-user-format="{ value, item }">
                 <p-link :text="value"
@@ -186,10 +246,10 @@ const handleRemoveButtonClick = () => {
                         :to="getServiceAccountRouteLocationByWorkspaceId(item)"
                 />
             </template>
-            <template #col-remove_button-format>
+            <template #col-remove_button-format="{ item }">
                 <p-button size="sm"
                           style-type="tertiary"
-                          @click.stop="handleRemoveButtonClick"
+                          @click.stop="() => handleSelectedWorkspaceRemoveButtonClick(item)"
                 >
                     {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
                 </p-button>
