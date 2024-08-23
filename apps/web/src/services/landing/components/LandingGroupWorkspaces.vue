@@ -97,7 +97,7 @@ const fetchWorkspaceList = async () => {
 </script>
 
 <template>
-    <div class="landing-all-workspaces">
+    <div class="landing-group-workspaces">
         <div class="workspace-group-filter-container"
              :class="{ 'is-opened': state.isButtonGroupOpened }"
         >
@@ -156,7 +156,7 @@ const fetchWorkspaceList = async () => {
 </template>
 
 <style scoped lang="postcss">
-.landing-all-workspaces {
+.landing-group-workspaces {
     @apply flex flex-col;
     gap: 1rem;
 
@@ -165,6 +165,7 @@ const fetchWorkspaceList = async () => {
 
         /* custom design-system component - p-button-tab */
         :deep(.p-button-tab) {
+            width: calc(100% - 3rem);
             .button-group {
                 margin: 0;
                 overflow-x: auto;
