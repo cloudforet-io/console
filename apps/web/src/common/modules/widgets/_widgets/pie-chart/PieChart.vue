@@ -11,6 +11,7 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
+import type { LegendOption, EChartsOption } from 'echarts/types/dist/shared';
 import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -59,9 +60,9 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartData: [],
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
-    chartLegendOption: computed(() => {
+    chartLegendOption: computed<LegendOption>(() => {
         if (!state.showLegends) return { show: false };
-        const _option: any = {
+        const _option: LegendOption = {
             show: true,
             type: 'scroll',
             itemWidth: 10,
@@ -82,8 +83,8 @@ const state = reactive({
         }
         return _option;
     }),
-    chartSeriesOption: computed(() => {
-        const _option: any = {
+    chartSeriesOption: computed<PieSeriesOption>(() => {
+        const _option: PieSeriesOption = {
             type: 'pie',
             avoidLabelOverlap: true,
         };
@@ -103,7 +104,7 @@ const state = reactive({
         }
         return _option;
     }),
-    chartOptions: computed<PieSeriesOption>(() => ({
+    chartOptions: computed<EChartsOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         tooltip: {
             trigger: 'item',
