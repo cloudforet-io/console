@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { reactive, computed } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTableCheckModal, PLink, PStatus } from '@cloudforet/mirinae';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { workspaceStateFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -14,8 +16,13 @@ import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-con
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+
+const emit = defineEmits<{(e: 'confirm'): void,
+}>();
 
 const state = reactive({
+    loading: false,
     fields: computed(() => {
         const baseFields = [
             { name: 'name', label: 'Name' },
@@ -39,27 +46,23 @@ const state = reactive({
             { name: 'service_account', label: 'Service Account' },
         ];
     }),
-    items: computed(() => {
-        if (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER) {
-            return [{
-                // TODO: temp data
-                user_id: 'Kara_Herzog@yahoo.com',
-                name: ' ',
-                state: 'ENABLED',
-                group_role_type: 'Member',
-            }];
+});
+
+const getDeleteTableItems = () => {
+    if (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER) {
+        if (Object.keys(workspaceGroupPageState.selectedGroupUser).length) {
+            return [workspaceGroupPageState.selectedGroupUser];
         }
 
-        return [{
-            // TODO: temp data
-            name: 'cloudone-mz',
-            state: 'ENABLED',
-            user: 24,
-            service_account: 23,
-            workspace_id: 'workspace-15fb37788416',
-        }];
-    }),
-});
+        return workspaceGroupPageGetters.selectedGroupUsersByIndices;
+    }
+
+    if (Object.keys(workspaceGroupPageState.selectedWorkspace).length) {
+        return [workspaceGroupPageState.selectedWorkspace];
+    }
+
+    return workspaceGroupPageGetters.selectedWorkspacesByIndices;
+};
 
 const getWorkspaceRouteLocationByWorkspaceId = (item) => ({
     name: WORKSPACE_HOME_ROUTE._NAME,
@@ -82,16 +85,54 @@ const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
     },
 });
 
-const handleConfirm = () => {
+
+const deleteGroupUsers = async () => {
+    state.loading = true;
+
+    try {
+        await SpaceConnector.clientV2.identity.workspaceGroup.removeUsers({
+            worksapce_group_id: workspaceGroupPageGetters.selectedGroup.workspace_group_id,
+            workspaces: workspaceGroupPageGetters.selectedGroupUsersByIndices.map((item) => item.name),
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+const deleteWorkspaces = async () => {
+    state.loading = true;
+
+    try {
+        await SpaceConnector.clientV2.identity.workspaceGroup.removeWorkspaces({
+            worksapce_group_id: workspaceGroupPageGetters.selectedGroup.workspace_group_id,
+            workspaces: workspaceGroupPageGetters.selectedWorkspacesByIndices.map((item) => item.name),
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+
+const handleConfirm = async () => {
+    if (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER) {
+        await deleteGroupUsers();
+        workspaceGroupPageStore.resetSelectedGroupUser();
+    } else {
+        await deleteWorkspaces();
+        workspaceGroupPageStore.resetSelectedWorkspace();
+    }
+
+    emit('confirm', { isGroupUser: true });
     workspaceGroupPageStore.closeModal();
 };
 
-const handleCancel = () => {
+const handleCloseModal = () => {
     workspaceGroupPageStore.closeModal();
-};
-
-const handleClose = () => {
-    workspaceGroupPageStore.closeModal();
+    workspaceGroupPageStore.resetSelectedGroupUser();
 };
 </script>
 
@@ -102,11 +143,12 @@ const handleClose = () => {
                          :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER
                              || workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES"
                          :fields="state.fields"
-                         :items="state.items"
+                         :items="getDeleteTableItems()"
                          size="sm"
+                         :loading="state.loading"
                          @confirm="handleConfirm"
-                         @cancel="handleCancel"
-                         @close="handleClose"
+                         @cancel="handleCloseModal"
+                         @close="handleCloseModal"
     >
         <template #col-name-format="{ value, item }">
             <div v-if="workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES"
@@ -122,8 +164,10 @@ const handleClose = () => {
                 />
             </div>
         </template>
-        <template #col-state-format="{ value }">
-            <p-status v-bind="workspaceStateFormatter(value)" />
+        <template #col-state-format="{ value}">
+            <p-status v-bind="workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES ? workspaceStateFormatter(value) : groupUserStateFormatter(value)"
+                      class="capitalize"
+            />
         </template>
         <template #col-user-format="{ value, item }">
             <p-link :text="value"
