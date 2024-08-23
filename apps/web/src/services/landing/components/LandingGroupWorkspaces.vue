@@ -3,15 +3,11 @@ import { computed, reactive } from 'vue';
 
 import { partition, sortBy } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PButton, PButtonTab, PIconButton,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
-import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
@@ -55,33 +51,42 @@ const state = reactive({
     workspaceGroupList: [] as WorkspaceGroupModel[],
     workspaceFilterList: computed(() => [
         { label: i18n.t('LADING.ALL_WORKSPACE'), name: 'all' },
-        { label: i18n.t('LADING.ALL_WORKSPACE2'), name: 'all2' },
+        { label: 'test group 1', name: 'test1' },
+        { label: 'test group 2', name: 'test2' },
+        { label: 'test group 3', name: 'test3' },
+        { label: 'test group 4', name: 'test4' },
+        { label: 'test group 5', name: 'test5' },
         ...state.workspaceGroupList.map((group:WorkspaceGroupModel) => ({ label: group.name, name: group.workspace_group_id })),
     ]),
     activeTab: 'all',
     isAllWorkspaceTab: computed(() => state.activeTab === 'all'),
+    isButtonGroupOpened: false,
 });
 
 const handleClickShowAll = () => {
     state.isShowAll = true;
 };
 
+const handleClickButtonGroupToggle = () => {
+    state.isButtonGroupOpened = !state.isButtonGroupOpened;
+};
+
 const fetchWorkspaceGroupList = async () => {
-    try {
-        const response = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>();
-        state.workspaceGroupList = response;
-    } catch (e) {
-        console.error(e);
-    }
+    // try {
+    //     const response = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>();
+    //     state.workspaceGroupList = response;
+    // } catch (e) {
+    //     console.error(e);
+    // }
 };
 
 const fetchWorkspaceList = async () => {
-    try {
-        const response = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>();
-        state.workspaceList = response;
-    } catch (e) {
-        console.error(e);
-    }
+    // try {
+    //     const response = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>();
+    //     state.workspaceList = response;
+    // } catch (e) {
+    //     console.error(e);
+    // }
 };
 
 (async () => {
@@ -93,52 +98,60 @@ const fetchWorkspaceList = async () => {
 
 <template>
     <div class="landing-all-workspaces">
-        <p-button-tab v-model="state.activeTab"
-                      :tabs="state.workspaceFilterList"
+        <div class="workspace-group-filter-container"
+             :class="{ 'is-opened': state.isButtonGroupOpened }"
         >
-            <template #additional-button>
-                <p-icon-button name="ic_settings"
-                               style-type="tertiary"
-                               size="sm"
-                               class="ml-1"
-                />
-            </template>
-            <div class="title-wrapper">
-                <p-field-title :label="state.isAllWorkspaceTab ? $t('LADING.ALL_WORKSPACE'): $t('LADING.WORKSPACE_GROUP')"
-                               color="dark"
-                               font-weight="bold"
-                               size="md"
-                               class="title"
-                >
-                    <template #right>
-                        <span class="cnt">({{ state.workspaceList.length }})</span>
-                    </template>
-                </p-field-title>
-                <p-button v-if="props.isDomainAdmin"
-                          style-type="primary"
-                          size="md"
-                          icon-left="ic_plus_bold"
-                          @click="emit('create')"
-                >
-                    {{ $t('LADING.CREATE') }}
-                </p-button>
-            </div>
-            <landing-workspace-board :board-sets="state.workspaceBoardSets"
-                                     :board-type="BOARD_TYPE.ALL_WORKSPACE"
-                                     :is-domain-admin="props.isDomainAdmin"
+            <p-button-tab v-model="state.activeTab"
+                          :tabs="state.workspaceFilterList"
+            >
+                <template #additional-button>
+                    <p-icon-button name="ic_settings"
+                                   style-type="tertiary"
+                                   size="sm"
+                                   class="ml-1"
+                    />
+                </template>
+            </p-button-tab>
+            <p-icon-button :name="state.isButtonGroupOpened ? 'ic_chevron-up' : 'ic_chevron-down'"
+                           style-type="tertiary"
+                           @click="handleClickButtonGroupToggle"
             />
-            <div class="show-more-button-wrapper">
-                <p-button v-if="state.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.workspaceList.length"
-                          icon-right="ic_chevron-down"
-                          style-type="transparent"
-                          size="md"
-                          class="show-more-button"
-                          @click="handleClickShowAll"
-                >
-                    {{ $t('LADING.SHOW_ALL') }}
-                </p-button>
-            </div>
-        </p-button-tab>
+        </div>
+        <div class="title-wrapper">
+            <p-field-title :label="state.isAllWorkspaceTab ? $t('LADING.ALL_WORKSPACE'): $t('LADING.WORKSPACE_GROUP')"
+                           color="dark"
+                           font-weight="bold"
+                           size="md"
+                           class="title"
+            >
+                <template #right>
+                    <span class="cnt">({{ state.workspaceList.length }})</span>
+                </template>
+            </p-field-title>
+            <p-button v-if="props.isDomainAdmin"
+                      style-type="primary"
+                      size="md"
+                      icon-left="ic_plus_bold"
+                      @click="emit('create')"
+            >
+                {{ $t('LADING.CREATE') }}
+            </p-button>
+        </div>
+        <landing-workspace-board :board-sets="state.workspaceBoardSets"
+                                 :board-type="BOARD_TYPE.ALL_WORKSPACE"
+                                 :is-domain-admin="props.isDomainAdmin"
+        />
+        <div class="show-more-button-wrapper">
+            <p-button v-if="state.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.workspaceList.length"
+                      icon-right="ic_chevron-down"
+                      style-type="transparent"
+                      size="md"
+                      class="show-more-button"
+                      @click="handleClickShowAll"
+            >
+                {{ $t('LADING.SHOW_ALL') }}
+            </p-button>
+        </div>
     </div>
 </template>
 
@@ -147,17 +160,43 @@ const fetchWorkspaceList = async () => {
     @apply flex flex-col;
     gap: 1rem;
 
-    /* custom design-system component - p-button-tab */
-    :deep(.p-button-tab) {
-        .button-group {
-            margin: 0;
+    .workspace-group-filter-container {
+        @apply flex gap-4;
+
+        /* custom design-system component - p-button-tab */
+        :deep(.p-button-tab) {
+            .button-group {
+                margin: 0;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+
+                .tab-header-button {
+                    flex-shrink: 0;
+                }
+            }
+
+            .button-group::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tab-pane {
+                padding-bottom: 0;
+            }
+        }
+    }
+    .is-opened {
+        /* custom design-system component - p-button-tab */
+        :deep(.p-button-tab) {
+            .button-group {
+                flex-wrap: wrap;
+            }
         }
     }
 
     .title-wrapper {
         @apply flex items-center justify-between;
 
-        margin-top: 2rem;
+        margin-top: 1rem;
         margin-bottom: 1rem;
         .title {
             .cnt {
