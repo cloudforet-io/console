@@ -166,7 +166,7 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
 
 <style scoped lang="postcss">
 .landing-workspace-recent-list::-webkit-scrollbar {
-    display: none;  /* Webkit 기반 브라우저에서 스크롤바를 숨깁니다 */
+    display: none;
 }
 
 .landing-workspace-recent-list {
