@@ -136,8 +136,14 @@ export interface CustomTableColumnWidthValue {
     value?: CustomColumnWidthItem[];
 }
 
+export interface LegendValue {
+    toggleValue: boolean;
+    position?: 'right' | 'bottom';
+}
+
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
     | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
-    | DisplayAnnotationValue | DisplaySeriesLabelValue | TextWrapValue | TableColumnWidthValue | CustomTableColumnWidthValue;
+    | DisplayAnnotationValue | DisplaySeriesLabelValue | TextWrapValue | TableColumnWidthValue | CustomTableColumnWidthValue
+    | LegendValue;

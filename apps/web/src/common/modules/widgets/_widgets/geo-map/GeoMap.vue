@@ -35,6 +35,7 @@ import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
+import type { LegendValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { coral, gray } from '@/styles/colors';
 
@@ -99,7 +100,7 @@ const state = reactive({
         return { start: _start, end: _end };
     }),
     // optional fields
-    showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => ({

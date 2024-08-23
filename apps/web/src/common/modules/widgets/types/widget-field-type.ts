@@ -79,6 +79,7 @@ export interface MaxOptions {
 }
 export interface LegendOptions { // toggle button
     default?: boolean;
+    showPositionField?: boolean;
 }
 export interface PieChartTypeOptions {
     default?: string;

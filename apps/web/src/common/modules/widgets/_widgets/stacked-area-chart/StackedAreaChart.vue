@@ -42,6 +42,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     LineByValue, XAxisValue, DateFormatValue, DisplaySeriesLabelValue, NumberFormatValue,
+    LegendValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
@@ -137,7 +138,7 @@ const state = reactive({
         return { start: _start, end: _end };
     }),
     // optional fields
-    showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
     dateFormat: computed<string|undefined>(() => {
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];

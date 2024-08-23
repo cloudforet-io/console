@@ -35,8 +35,8 @@ const lineChart: WidgetConfig = {
         },
         numberFormat: {},
         displaySeriesLabel: {},
-        displayAnnotation: {},
         missingValue: {},
+        displayAnnotation: {},
     },
 };
 
