@@ -133,6 +133,7 @@ const handleConfirm = async () => {
 const handleCloseModal = () => {
     workspaceGroupPageStore.closeModal();
     workspaceGroupPageStore.resetSelectedGroupUser();
+    workspaceGroupPageStore.resetSelectedWorkspace();
 };
 </script>
 
