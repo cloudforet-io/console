@@ -30,6 +30,7 @@ import { gray } from '@/styles/colors';
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import LandingAllWorkspaces from '@/services/landing/components/LandingAllWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/LandingEmptyContents.vue';
+import LandingGroupWorkspaces from '@/services/landing/components/LandingGroupWorkspaces.vue';
 import LandingRecentVisits from '@/services/landing/components/LandingRecentVisits.vue';
 import LandingSearch from '@/services/landing/components/LandingSearch.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
@@ -60,6 +61,7 @@ const storeState = reactive({
 });
 const state = reactive({
     searchText: '',
+    isSearchMode: computed(() => state.searchText !== ''),
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     searchedWorkspaceList: computed<WorkspaceModel[]>(() => (state.searchText !== ''
         ? storeState.workspaceList.filter((item) => item.name.toLowerCase()?.includes(state.searchText.toLowerCase()))
@@ -119,14 +121,22 @@ onUnmounted(() => {
         >
             <div class="contents-wrapper">
                 <landing-search @search="handleSearch" />
-                <landing-recent-visits v-if="storeState.recentWorkspace.length > 0 && state.searchText === ''"
+                <landing-recent-visits v-if="storeState.recentWorkspace.length > 0 && !state.isSearchMode"
                                        :workspace-list="storeState.workspaceList"
                                        :recent-visits="storeState.recentWorkspace"
                 />
-                <landing-all-workspaces :workspace-list="state.refinedWorkspaceList"
+                <p-divider v-if="!state.isSearchMode" />
+                <landing-all-workspaces v-show="state.isSearchMode"
+                                        :workspace-list="state.refinedWorkspaceList"
                                         :favorite-list="storeState.favoriteList"
                                         :is-domain-admin="storeState.isDomainAdmin"
                                         @create="handleClickButton"
+                />
+                <landing-group-workspaces v-if="!state.isSearchMode"
+                                          :workspace-list="state.refinedWorkspaceList"
+                                          :favorite-list="storeState.favoriteList"
+                                          :is-domain-admin="storeState.isDomainAdmin"
+                                          @create="handleClickButton"
                 />
             </div>
             <template #no-data>

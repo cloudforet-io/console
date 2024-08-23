@@ -2741,11 +2741,38 @@
 			"WORKSPACES": "워크스페이스"
 		},
 		"WORKSPACE_GROUP": {
+			"ALT_S_UPDATE_ROLE": "",
 			"CREATE": "",
 			"MAIN": {
 				"DELETE": "",
 				"EDIT": "",
 				"TOOLBOX_PLACEHOLDER": ""
+			},
+			"MODAL": {
+				"ADD": "",
+				"ADD_USERS_TITLE": "",
+				"ADD_WORKSPACES_TITLE": "",
+				"ALT_S_ADD_USRES": "",
+				"ALT_S_CREATE_WORKSPACE": "",
+				"CREATE_DROP_DOWN_PLACEHOLDER": "",
+				"CREATE_GROUP_NAME": "",
+				"CREATE_GROUP_NAME_PLACEHOLDER": "",
+				"CREATE_TITLE": "",
+				"DELETE_BUTTON": "",
+				"DELETE_GROUP_USER_TITLE": "",
+				"DELETE_MODAL_FIRST_MESSAGE": "",
+				"DELETE_MODAL_LAST_MESSAGE": "",
+				"DELETE_MODAL_WARNING_MESSAGE": "",
+				"DELETE_TITLE": "",
+				"DELETE_WORKSPACES_TITLE": "",
+				"EDIT_GROUP_NAME": "",
+				"EDIT_GROUP_NAME_PLACEHOLDER": "",
+				"EDIT_TITLE": "",
+				"ROLE_DROP_DOWN_PLACEHOLDER": "",
+				"ROLE_SELECT_DROP_DOWN_TITLE": "",
+				"USER_DROP_DOWN_PLACEHOLDER": "",
+				"USER_SELECT_DROP_DOWN_TITLE": "",
+				"WORKSPACE_SELECT_DROP_DOWN_TITLE": ""
 			},
 			"TAB": {
 				"ADD_USER": "",
@@ -2754,7 +2781,9 @@
 				"REMOVE": "",
 				"WORKSPACE": ""
 			},
-			"TITLE": ""
+			"TITLE": "",
+			"TOOLTIP_COST": "",
+			"TOOLTIP_STATE": ""
 		}
 	},
 	"IDENTITY": {
@@ -3590,7 +3619,8 @@
 		"ROLE_TYPE_OWNER": "소유자",
 		"SEARCH_WORKSPACE": "워크스페이스 검색",
 		"SHOW_ALL": "모두 보기",
-		"TITLE": "워크스페이스를 선택하세요."
+		"TITLE": "워크스페이스를 선택하세요.",
+		"WORKSPACE_GROUP": ""
 	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
