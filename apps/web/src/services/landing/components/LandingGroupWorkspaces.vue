@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router/composables';
 import { partition, sortBy } from 'lodash';
 
 import {
-    PFieldTitle, PButton, PButtonTab, PIconButton,
+    PFieldTitle, PButton, PButtonTab, PIconButton, POverlayLayout,
 } from '@cloudforet/mirinae';
 
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
@@ -65,6 +65,7 @@ const state = reactive({
     ]),
     activeTab: 'all',
     isAllWorkspaceTab: computed(() => state.activeTab === 'all'),
+    isOverlayOpen: false,
     isButtonGroupOpened: false,
 });
 
@@ -75,6 +76,11 @@ const handleClickShowAll = () => {
 const handleClickButtonGroupToggle = () => {
     state.isButtonGroupOpened = !state.isButtonGroupOpened;
 };
+const handleOpenOverlay = (workspaceGroupId:string) => {
+    console.log(workspaceGroupId);
+    state.isOverlayOpen = true;
+};
+
 
 const fetchWorkspaceGroupList = async () => {
     // try {
@@ -135,14 +141,24 @@ const fetchWorkspaceList = async () => {
                     <span class="cnt">({{ state.workspaceList.length }})</span>
                 </template>
             </p-field-title>
-            <p-button v-if="props.isDomainAdmin"
-                      style-type="primary"
-                      size="md"
-                      icon-left="ic_plus_bold"
-                      @click="emit('create')"
-            >
-                {{ $t('LADING.CREATE') }}
-            </p-button>
+            <div class="right-part-wrapper">
+                <p-button v-if="state.activeTab !== 'all'"
+                          style-type="tertiary"
+                          size="md"
+                          icon-left="ic_settings"
+                          @click="handleOpenOverlay(state.activeTab)"
+                >
+                    {{ $t('LADING.SETTINGS') }}
+                </p-button>
+                <p-button v-if="props.isDomainAdmin"
+                          style-type="primary"
+                          size="md"
+                          icon-left="ic_plus_bold"
+                          @click="emit('create')"
+                >
+                    {{ $t('LADING.CREATE') }}
+                </p-button>
+            </div>
         </div>
         <landing-workspace-board :board-sets="state.workspaceBoardSets"
                                  :board-type="BOARD_TYPE.ALL_WORKSPACE"
@@ -158,6 +174,11 @@ const fetchWorkspaceList = async () => {
             >
                 {{ $t('LADING.SHOW_ALL') }}
             </p-button>
+            <p-overlay-layout :visible.sync="state.isOverlayOpen"
+                              :title="$t('LADING.WORKSPACE_GROUP_SETTINGS')"
+                              style-type="primary"
+                              size="lg"
+            />
         </div>
     </div>
 </template>
@@ -205,6 +226,11 @@ const fetchWorkspaceList = async () => {
         @apply flex items-center justify-between;
 
         margin-top: 1rem;
+
+        .right-part-wrapper {
+            @apply flex gap-2;
+        }
+
         margin-bottom: 1rem;
         .title {
             .cnt {
