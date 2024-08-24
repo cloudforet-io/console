@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { partition, sortBy } from 'lodash';
 
@@ -11,8 +12,11 @@ import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/mode
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
@@ -30,6 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'create'): void}>();
+const router = useRouter();
 
 const state = reactive({
     isShowAll: false,
@@ -105,10 +110,12 @@ const fetchWorkspaceList = async () => {
                           :tabs="state.workspaceFilterList"
             >
                 <template #additional-button>
-                    <p-icon-button name="ic_settings"
+                    <p-icon-button v-if="props.isDomainAdmin"
+                                   name="ic_settings"
                                    style-type="tertiary"
                                    size="sm"
                                    class="ml-1"
+                                   @click="() => { router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACE_GROUP._NAME)})}"
                     />
                 </template>
             </p-button-tab>
