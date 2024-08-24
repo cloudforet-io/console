@@ -8,7 +8,7 @@ import {
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AddWorkspacesParameters } from '@/schema/identity/workspace-group/api-verbs/add-workspaces';
-import type { CreateWorkspaceParameters } from '@/schema/identity/workspace-group/api-verbs/create';
+import type { WorkspaceGroupCreateParameters } from '@/schema/identity/workspace-group/api-verbs/create';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -76,7 +76,7 @@ const createWorkspaceGroup = async () => {
     state.loading = true;
 
     try {
-        const { workspace_group_id } = await SpaceConnector.clientV2.identity.workspaceGroup.create<CreateWorkspaceParameters, WorkspaceGroupModel>({
+        const { workspace_group_id } = await SpaceConnector.clientV2.identity.workspaceGroup.create<WorkspaceGroupCreateParameters, WorkspaceGroupModel>({
             name: state.groupName,
         });
 

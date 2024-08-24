@@ -1,4 +1,5 @@
 import type { Tags } from '@/schema/_common/model';
+import type { RoleType } from '@/schema/identity/role/type';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 export interface WorkspaceGroupModel {
@@ -16,7 +17,6 @@ export interface WorkspaceGroupModel {
 
 export interface WorkspaceUser {
     user_id: string;
-    name?: string;
-    state: string;
-    role: string;
+    role_id: string;
+    role_type: RoleType;
 }
