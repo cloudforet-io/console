@@ -1,59 +1,54 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch, onUnmounted } from 'vue';
 
+
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PButton, PToolboxTable, PStatus, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
-import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
-import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
+const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+
+const emit = defineEmits<{(e: 'refersh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
 const tableState = reactive({
+    // TODO: temp data
     fields: [
-        // TODO: temp data
         { name: 'user_id', label: 'User ID' },
         { name: 'name', label: 'Name' },
         { name: 'state', label: 'State' },
         { name: 'role', label: 'Role' },
         { name: 'remove_button', label: ' ', sortable: false },
     ],
-    items: [{
-        // TODO: temp data
-        user_id: 'Kara_Herzog@yahoo.com',
-        name: '',
-        state: 'ENABLED',
-        role: 'WORKSPACE_OWNER',
-    }],
 });
 
-const selectDropdownState = reactive({
-    // TODO: temp data
-    items: [{
-        label: 'Workspace Member',
-        name: 'managed-workspace-member',
-        role_type: ROLE_TYPE.WORKSPACE_MEMBER,
-    },
-    {
-        label: 'Workspace Member',
-        name: 'managed-workspace-member',
-        role_type: ROLE_TYPE.WORKSPACE_MEMBER,
-    },
-    {
-        label: 'Workspace Member',
-        name: 'managed-workspace-member',
-        role_type: ROLE_TYPE.WORKSPACE_MEMBER,
-    },
-    {
-        label: 'show more',
-        type: 'showMore',
-    }],
+const {
+    loading, searchText, menuList, selectedItems, handleClickShowMore,
+} = useSelectDropDownList({
+    pageSize: 10,
+    transformer: (_role) => ({
+        label: _role.name,
+        name: _role.role_id,
+        role_type: _role.role_type,
+    }),
+    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+        query: apiQueryHelper.data,
+    }),
 });
 
 const setupModal = (type) => {
@@ -74,17 +69,73 @@ const setupModal = (type) => {
     }
 };
 
-const dropdownMenuHandler = () => ({
-    results: selectDropdownState.items,
-});
+const handleSelect = (index) => {
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.state.selectedUserIndices = index;
+    });
+};
+
+const handleChange = (options: any = {}) => {
+    if (options.pageStart) {
+        workspaceGroupPageStore.$patch((_state) => {
+            _state.state.groupUserPageStart = options.pageStart;
+        });
+    }
+
+    if (options.pageLimit) {
+        workspaceGroupPageStore.$patch((_state) => {
+            _state.state.groupUserPageStart = 1;
+            _state.state.groupUserPageLimit = options.pageLimit;
+            _state.state.groupUserPage = 1;
+        });
+    }
+};
+
+const handleSelectMenu = () => {
+    showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.ALT_S_UPDATE_ROLE'), '');
+};
+
+const handleRefresh = () => {
+    emit('refresh', { isGroupUser: true });
+};
 
 const handleAddUsersButtonClick = () => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS);
 };
 
-const handleRemoveButtonClick = () => {
+const handleSelectedGroupUsersRemoveButtonClick = () => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER);
 };
+
+const handleSelectedGroupUserRemoveButtonClick = (item) => {
+    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER);
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.state.selectedGroupUser = item;
+    });
+};
+
+const handleChangeSort = (name, isDesc) => {
+    workspaceGroupPageStore.$patch((_state) => {
+        if (name === 'role') {
+            _state.state.groupUserSortBy = `${name}_type`;
+        } else {
+            _state.state.groupUserSortBy = name;
+        }
+
+        _state.state.selectedUserIndices = [];
+        _state.state.isUserSortDesc = isDesc;
+    });
+};
+
+watch(() => workspaceGroupPageState.groupUserSearchText, () => {
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.state.selectedUserIndices = [];
+    });
+});
+
+onUnmounted(() => {
+    workspaceGroupPageStore.resetGroupUser();
+});
 </script>
 
 <template>
@@ -92,13 +143,14 @@ const handleRemoveButtonClick = () => {
         <p-heading class="workspace-group-tab-group-user-header"
                    :title="$t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER')"
                    use-total-count
-                   :total-count="28"
+                   :total-count="workspaceGroupPageGetters.groupUserTotalCount"
                    heading-type="sub"
         >
             <template #extra>
                 <div class="workspace-group-tab-group-user-button-wrapper">
                     <p-button style-type="negative-primary"
-                              @click="handleRemoveButtonClick"
+                              :disabled="!workspaceGroupPageGetters.selectedGroupUsersByIndices.length"
+                              @click="handleSelectedGroupUsersRemoveButtonClick"
                     >
                         {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
                     </p-button>
@@ -112,32 +164,54 @@ const handleRemoveButtonClick = () => {
             </template>
         </p-heading>
         <p-toolbox-table class="workspace-group-tab-group-user-table"
+                         :loading="workspaceGroupPageState.loading"
                          :fields="tableState.fields"
-                         :items="tableState.items"
+                         :items="workspaceGroupPageGetters.selectedGroupUsers"
+                         :select-index="workspaceGroupPageState.selectedUserIndices"
+                         :total-count="workspaceGroupPageGetters.groupUserTotalCount"
+                         sort-by="user_id"
+                         search-type="plain"
+                         :sort-desc="true"
+                         :this-page.sync="workspaceGroupPageState.groupUserPage"
+                         :search-text.sync="workspaceGroupPageState.groupUserSearchText"
                          selectable
                          sortable
+                         searchable
+                         @select="handleSelect"
+                         @change="handleChange"
+                         @refresh="handleRefresh()"
+                         @changeSort="handleChangeSort"
         >
             <template #col-state-format="{ value }">
-                <p-status v-bind="workspaceStateFormatter(value)" />
+                <p-status v-bind="groupUserStateFormatter(value)"
+                          class="capitalize"
+                />
             </template>
-            <template #col-role-format="{ value }">
+            <template #col-role-format="{ item }">
                 <span class="role-type">
-                    <img :src="useRoleFormatter(value).image"
+                    <img :src="useRoleFormatter(item.role_type).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
-                    <span>{{ useRoleFormatter(value).name }}</span>
+                    <span>{{ useRoleFormatter(item.role_type).name }}</span>
                     <p-select-dropdown
                         is-filterable
                         use-fixed-menu-style
                         style-type="transparent"
                         class="role-select-dropdown"
-                        page-size="5"
-                        :handler="dropdownMenuHandler"
+                        :menu="menuList"
+                        :selected.sync="selectedItems"
+                        :search-text.sync="searchText"
+                        :loading="loading"
+                        disable-handler
+                        page-size="10"
+                        @click-show-more="handleClickShowMore"
+                        @select="handleSelectMenu"
                     >
                         <template #dropdown-button>
-                            <span>{{ value.name }}</span>
+                            <span />
                         </template>
+                        <!-- eslint-disable vue/no-template-shadow -->
                         <template #menu-item--format="{ item }">
                             <div class="role-menu-item">
                                 <img :src="useRoleFormatter(item.role_type).image"
@@ -156,10 +230,10 @@ const handleRemoveButtonClick = () => {
                     </p-select-dropdown>
                 </span>
             </template>
-            <template #col-remove_button-format="{}">
+            <template #col-remove_button-format="{ item }">
                 <p-button size="sm"
                           style-type="tertiary"
-                          @click.stop="handleRemoveButtonClick"
+                          @click.stop="() => handleSelectedGroupUserRemoveButtonClick(item)"
                 >
                     {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
                 </p-button>
@@ -188,24 +262,31 @@ const handleRemoveButtonClick = () => {
             width: 1.5rem;
             height: 1.5rem;
         }
+    }
 
-        .role-select-dropdown {
-            width: auto;
-            .role-menu-item {
-                @apply flex items-center;
-                gap: 0.25rem;
-                .role-type-icon {
-                    width: 1rem;
-                    height: 1rem;
-                }
-                .role-label {
-                    @apply truncate;
-                    width: 14.375rem;
-                }
-                .role-type {
-                    @apply text-label-sm text-gray-400;
-                }
+    .role-select-dropdown {
+        width: auto;
+        .role-menu-item {
+            @apply flex items-center;
+            gap: 0.25rem;
+            .role-type-icon {
+                width: 1rem;
+                height: 1rem;
             }
+            .role-label {
+                @apply truncate;
+                width: 14.375rem;
+            }
+            .role-type {
+                @apply text-label-sm text-gray-400;
+            }
+        }
+    }
+
+    /* custom design-system component - p-select-dropdown */
+    :deep(.p-select-dropdown) {
+        .no-data {
+            position: initial;
         }
     }
 }

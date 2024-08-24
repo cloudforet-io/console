@@ -35,6 +35,8 @@ import type { ReferenceLoadOptions } from '@/store/reference/type';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
+import type { WorkspaceGroupReferenceMap } from '@/store/reference/workspace-group-reference-store';
+import { useWorkspaceGroupReferenceStore } from '@/store/reference/workspace-group-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
@@ -59,7 +61,8 @@ type PiniaStoreReferenceType =
     |'workspace'
     |'escalation_policy'
     |'metric'
-    |'namespace';
+    |'namespace'
+    |'workspace_group';
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
@@ -82,6 +85,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const escalationPolicyReferenceStore = useEscalationPolicyReferenceStore();
     const namespaceReferenceStore = useNamespaceReferenceStore();
     const metricReferenceStore = useMetricReferenceStore();
+    const workspaceGroupReferenceStore = useWorkspaceGroupReferenceStore();
 
     const getters = reactive({
         // TODO: unify into one case (serviceAccount or service_account)
@@ -100,6 +104,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         cloudServiceQuerySet: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
         cloud_service_query_set: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
         workspace: computed<WorkspaceReferenceMap>(() => workspaceReferenceStore.getters.workspaceItems),
+        workspace_group: computed<WorkspaceGroupReferenceMap>(() => workspaceGroupReferenceStore.getters.workspaceGroupItems),
         publicDashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
         public_dashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
         serviceAccount: computed(() => serviceAccountReferenceStore.getters.serviceAccountItems),
@@ -134,6 +139,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await providerReferenceStore.sync(data); break;
             case 'workspace':
                 await workspaceReferenceStore.sync(data); break;
+            case 'workspace_group':
+                await workspaceGroupReferenceStore.sync(data); break;
             case 'user':
                 await userReferenceStore.sync(data); break;
             case 'public_dashboard':
@@ -177,6 +184,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await protocolReferenceStore.load(options); break;
             case 'workspace':
                 await workspaceReferenceStore.load(options); break;
+            case 'workspace_group':
+                await workspaceGroupReferenceStore.load(options); break;
             case 'user':
                 await userReferenceStore.load(options); break;
             case 'public_dashboard':
@@ -213,6 +222,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             protocolReferenceStore.flush();
             providerReferenceStore.flush();
             workspaceReferenceStore.flush();
+            workspaceGroupReferenceStore.flush();
             userReferenceStore.flush();
             publicDashboardReferenceStore.flush();
             serviceAccountReferenceStore.flush();

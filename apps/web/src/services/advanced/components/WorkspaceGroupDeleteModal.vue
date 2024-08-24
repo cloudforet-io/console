@@ -1,31 +1,79 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PI, PLink, PButton,
 } from '@cloudforet/mirinae';
 
+import type { WorkspaceGroupDeleteParameters } from '@/schema/identity/workspace-group/api-verbs/delete';
+import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { WORKSPACE_GROUP_MODAL_TYPE, WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+
+const emit = defineEmits<{(e: 'confirm'): void,
+}>();
 
 const state = reactive({
-    sequence: WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST,
+    sequence: 'first',
     loading: false,
 });
 
-const handleConfirm = () => {
-    workspaceGroupPageStore.closeModal();
+const moveWorkspaceGroupTabWorkspace = () => ({
+    // TODO: Plan to change when implementing workspace list page modal
+    name: LANDING_ROUTE.WORKSPACE._NAME,
+    // TODO: add queryString
+    // query: {}
+});
+
+const moveWorkspaceGroupTabGroupUser = () => ({
+    // TODO: Plan to change when implementing workspace list page modal
+    name: LANDING_ROUTE.WORKSPACE._NAME,
+    // TODO: add queryString
+    // query: {}
+});
+
+const deleteWorkspaceGroups = async () => {
+    state.loading = true;
+
+    try {
+        await SpaceConnector.clientV2.identity.workspaceGroup.delete<WorkspaceGroupDeleteParameters, WorkspaceGroupModel>({
+            workspace_group_id: workspaceGroupPageGetters.selectedGroup.workspace_group_id,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
 };
 
-const handleCancel = () => {
-    workspaceGroupPageStore.closeModal();
+const resetSequence = () => {
+    state.sequence = WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST;
 };
 
-const handleClose = () => {
+const handleConfirm = async () => {
+    if (state.sequence === WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST) {
+        state.sequence = WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.LAST;
+        return;
+    }
+
+    await deleteWorkspaceGroups();
     workspaceGroupPageStore.closeModal();
+    resetSequence();
+    emit('confirm');
+};
+
+const handleCloseModal = () => {
+    workspaceGroupPageStore.closeModal();
+    resetSequence();
 };
 </script>
 
@@ -37,8 +85,8 @@ const handleClose = () => {
                     :loading="state.loading"
                     size="sm"
                     @confirm="handleConfirm"
-                    @cancel="handleCancel"
-                    @close="handleClose"
+                    @cancel="handleCloseModal"
+                    @close="handleCloseModal"
     >
         <template #body>
             <div v-if="state.sequence === WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST"
@@ -53,7 +101,7 @@ const handleClose = () => {
                             Workspace
                         </h5>
                         <p class="count">
-                            5
+                            {{ workspaceGroupPageGetters.selectedGroup.workspaces.length || 0 }}
                         </p>
                         <p-button style-type="tertiary"
                                   size="sm"
@@ -62,6 +110,7 @@ const handleClose = () => {
                             <p-link new-tab
                                     action-icon="internal-link"
                                     size="lg"
+                                    :to="moveWorkspaceGroupTabWorkspace()"
                             />
                         </p-button>
                     </div>
@@ -70,7 +119,7 @@ const handleClose = () => {
                             Group User
                         </h5>
                         <p class="count">
-                            28
+                            {{ workspaceGroupPageGetters.selectedGroup.users.length || 0 }}
                         </p>
                         <p-button style-type="tertiary"
                                   size="sm"
@@ -79,6 +128,7 @@ const handleClose = () => {
                             <p-link new-tab
                                     action-icon="internal-link"
                                     size="lg"
+                                    :to="moveWorkspaceGroupTabGroupUser()"
                             />
                         </p-button>
                     </div>

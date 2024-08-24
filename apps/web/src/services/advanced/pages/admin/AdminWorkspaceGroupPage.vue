@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
+import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import WorkspaceGroupAddUsersModal from '@/services/advanced/components/WorkspaceGroupAddUsersModal.vue';
 import WorkspaceGroupAddWorkspacesModal from '@/services/advanced/components/WorkspaceGroupAddWorkspacesModal.vue';
@@ -12,13 +20,64 @@ import WorkspaceGroupEditModal from '@/services/advanced/components/WorkspaceGro
 import WorkspaceGroupHeader from '@/services/advanced/components/WorkspaceGroupHeader.vue';
 import WorkspaceGroupTab from '@/services/advanced/components/WorkspaceGroupTab.vue';
 import WorkspaceGroupTable from '@/services/advanced/components/WorkspaceGroupTable.vue';
+import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
+const workspaceGroupPageState = workspaceGroupPageStore.state;
+
+const workspaceGroupListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(workspaceGroupPageState.pageStart).setPageLimit(workspaceGroupPageState.pageLimit)
+    .setSort('name', true);
+const workspaceGroupListApiQuery = workspaceGroupListApiQueryHelper.data;
+
+const fetchWorkspaceGroups = async (tabRefresh = { isGroupUser: false, isWorkspace: false }) => {
+    workspaceGroupPageState.loading = true;
+
+    try {
+        const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>({
+            query: workspaceGroupListApiQuery,
+        });
+
+        workspaceGroupPageState.groups = results || [];
+        workspaceGroupPageState.total_count = total_count;
+
+        if (!tabRefresh.isGroupUser && !tabRefresh.isWorkspace) {
+            workspaceGroupPageState.selectedIndices = [];
+        }
+
+        if (tabRefresh.isGroupUser) {
+            workspaceGroupPageState.selectedUserIndices = [];
+            workspaceGroupPageState.selectedGroupUsers = {};
+        }
+
+        if (tabRefresh.isWorkspace) {
+            workspaceGroupPageState.selectedWorkspaceIndices = [];
+            workspaceGroupPageState.selectedWorkspace = {};
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        workspaceGroupPageState.groups = [];
+    } finally {
+        workspaceGroupPageState.loading = false;
+    }
+};
+
+const initWorkspaceGroups = async () => {
+    await fetchWorkspaceGroups();
+};
+
+const refreshTab = async (value) => {
+    await fetchWorkspaceGroups(value);
+};
+
+(() => {
+    initWorkspaceGroups();
+})();
 
 onUnmounted(() => {
     workspaceGroupPageStore.$dispose();
-    workspaceGroupPageStore.$reset();
+    workspaceGroupPageStore.reset();
 });
 </script>
 
@@ -27,15 +86,23 @@ onUnmounted(() => {
         <workspace-group-header />
         <p-horizontal-layout class="user-group-toolbox-layout">
             <template #container="{ height }">
-                <workspace-group-table :table-height="height" />
+                <workspace-group-table :table-height="height"
+                                       @confirm="fetchWorkspaceGroups"
+                />
             </template>
         </p-horizontal-layout>
-        <workspace-group-tab />
-        <workspace-group-create-modal />
-        <workspace-group-edit-modal />
-        <workspace-group-delete-modal />
-        <workspace-group-delete-status-modal />
-        <workspace-group-add-workspaces-modal />
+        <workspace-group-tab v-if="workspaceGroupPageState.selectedIndices.length"
+                             @refresh="refreshTab"
+        />
+        <workspace-group-create-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.CREATE"
+                                      @confirm="fetchWorkspaceGroups"
+        />
+        <workspace-group-edit-modal @confirm="fetchWorkspaceGroups" />
+        <workspace-group-delete-modal @confirm="fetchWorkspaceGroups" />
+        <workspace-group-delete-status-modal @confirm="fetchWorkspaceGroups" />
+        <workspace-group-add-workspaces-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES"
+                                              @confirm="fetchWorkspaceGroups"
+        />
         <workspace-group-add-users-modal />
     </section>
 </template>

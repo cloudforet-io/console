@@ -1,14 +1,21 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PSelectDropdown, PIconButton,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import type { RoleModel } from '@/schema/identity/role/model';
+import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
+import type { UserModel } from '@/schema/identity/user/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
@@ -18,24 +25,40 @@ import { useRoleFormatter } from '@/services/iam/composables/refined-table-data'
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 
+
 const state = reactive({
     loading: false,
-    roles: [{
-        // TODO: temp data
-        user_id: 'Kara_Herzog@yahoo.com',
-        name: 'asdas',
-        state: 'ENABLED',
-        label: 'Workspace Member',
-        role_type: 'WORKSPACE_OWNER',
-    },
-    {
-        type: 'showMore',
-        label: 'show more',
-    }],
     users: [{
         // TODO: temp data
         user_id: 'Bradford_McDermott@hotmail.com',
     }],
+});
+
+const {
+    loading: roleLoading, searchText: roleSearchText, menuList: roleMenuList, selectedItems: roleSelectedItems, handleClickShowMore: handleClickShowMoreRole,
+} = useSelectDropDownList({
+    pageSize: 10,
+    transformer: (_role) => ({
+        label: _role.name,
+        name: _role.role_id,
+        role_type: _role.role_type,
+    }),
+    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+        query: apiQueryHelper.data,
+    }),
+});
+
+const {
+    loading: userLoading, searchText: userSearchText, menuList: userMenuList, selectedItems: userSelectedItems, handleClickShowMore: handleClickShowMoreUser,
+} = useSelectDropDownList({
+    pageSize: 10,
+    transformer: (_user) => ({
+        name: _user.name,
+        user_id: _user.user_id,
+    }),
+    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>({
+        query: apiQueryHelper.data,
+    }),
 });
 
 const handleConfirm = () => {
@@ -43,17 +66,9 @@ const handleConfirm = () => {
     workspaceGroupPageStore.closeModal();
 };
 
-const handleModalClose = () => {
+const handleCloseModal = () => {
     workspaceGroupPageStore.closeModal();
 };
-
-const roleDropdownMenuHandler = () => ({
-    results: state.roles,
-});
-
-const userDropdownMenuHandler = () => ({
-    results: state.users,
-});
 </script>
 
 <template>
@@ -63,8 +78,8 @@ const userDropdownMenuHandler = () => ({
                     :loading="state.loading"
                     size="sm"
                     @confirm="handleConfirm"
-                    @cancel="handleModalClose"
-                    @close="handleModalClose"
+                    @cancel="handleCloseModal"
+                    @close="handleCloseModal"
     >
         <template #body>
             <div class="form-wrapper">
@@ -77,9 +92,21 @@ const userDropdownMenuHandler = () => ({
                             is-filterable
                             use-fixed-menu-style
                             class="role-select-dropdown"
+                            disable-handler
+                            :menu="roleMenuList"
+                            :selected.sync="roleSelectedItems"
+                            :search-text.sync="roleSearchText"
+                            :loading="roleLoading"
                             :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.ROLE_DROP_DOWN_PLACEHOLDER')"
-                            :handler="roleDropdownMenuHandler"
+                            @click-show-more="handleClickShowMoreRole"
                         >
+                            <template #dropdown-left-area>
+                                <img v-if="roleSelectedItems.length > 0"
+                                     :src="useRoleFormatter(roleSelectedItems[0]?.role_type).image"
+                                     alt="role-type-icon"
+                                     class="role-type-icon"
+                                >
+                            </template>
                             <template #menu-item--format="{ item }">
                                 <div class="role-menu-item">
                                     <img :src="useRoleFormatter(item.role_type).image"
@@ -102,12 +129,19 @@ const userDropdownMenuHandler = () => ({
                             is-filterable
                             use-fixed-menu-style
                             class="user-select-dropdown"
+                            style-type="TERTIARY_ICON_BUTTON"
+                            disable-handler
+                            multi-selectable
+                            :menu="userMenuList"
+                            :selected.sync="userSelectedItems"
+                            :search-text.sync="userSearchText"
+                            :loading="userLoading"
                             :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.USER_DROP_DOWN_PLACEHOLDER')"
-                            :handler="userDropdownMenuHandler"
+                            @click-show-more="handleClickShowMoreUser"
                         >
                             <template #menu-item--format="{ item }">
                                 <div class="user-menu-item">
-                                    <span class="role-user_id">{{ item.user_id }}</span>
+                                    <span class="role-user_id">{{ item.user_id }}({{ item.name }})</span>
                                     <p-icon-button name="ic_close"
                                                    size="md"
                                     />
@@ -116,7 +150,12 @@ const userDropdownMenuHandler = () => ({
                         </p-select-dropdown>
                     </template>
                 </p-field-group>
-                <!-- TODO: selected user -->
+            </div>
+            <!-- TODO: selected user -->
+            <div v-for="item in userSelectedItems"
+                 :key="item.user_id"
+            >
+                {{ item.user_id }}
             </div>
         </template>
         <template #confirm-button>
@@ -128,15 +167,15 @@ const userDropdownMenuHandler = () => ({
 <style lang="postcss" scoped>
 .workspace-group-add-users-modal {
     .role-select-dropdown {
+        .role-type-icon {
+            @apply rounded-full;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
         .role-menu-item {
             @apply flex items-center;
             gap: 0.25rem;
-
-            .role-type-icon {
-                @apply rounded-full;
-                width: 1.5rem;
-                height: 1.5rem;
-            }
 
             .role-label {
                 @apply truncate;
@@ -153,6 +192,14 @@ const userDropdownMenuHandler = () => ({
         .user-menu-item {
             @apply flex items-center justify-between;
             gap: 0.25rem;
+        }
+
+        :deep(.dropdown-button)::before {
+            content: "Add Users";
+        }
+
+        :deep(.selection-display-wrapper) {
+            display: none;
         }
     }
 }

@@ -7,6 +7,7 @@ import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/worksp
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
+const workspaceGroupState = workspaceGroupPageStore.state;
 
 const handleCreateButtonClick = () => {
     workspaceGroupPageStore.updateModalSettings({
@@ -22,7 +23,7 @@ const handleCreateButtonClick = () => {
         <p-heading class="workspace-group-header"
                    :title="$t('IAM.WORKSPACE_GROUP.TITLE')"
                    use-total-count
-                   :total-count="12"
+                   :total-count="workspaceGroupState.totalCount"
         >
             <template #extra>
                 <p-button style-type="primary"
