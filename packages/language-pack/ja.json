@@ -2757,6 +2757,7 @@
 				"CREATE_DROP_DOWN_PLACEHOLDER": "",
 				"CREATE_GROUP_NAME": "",
 				"CREATE_GROUP_NAME_PLACEHOLDER": "",
+				"CREATE_NAME_INVALID_DUPLICATED": "",
 				"CREATE_TITLE": "",
 				"DELETE_BUTTON": "",
 				"DELETE_GROUP_USER_TITLE": "",
@@ -3572,6 +3573,7 @@
 		"BANNER_DESC": "新しいセットアップが必要ですか?",
 		"CREATE": "作成",
 		"CREATE_WORKSPACE": "ワークスペースの作成",
+		"DELETE_WORKSPACE_GROUP": "",
 		"DESC_ACCESSIBLE_WORKSPACE": "{user_id} がアクセス可能なすべてのワークスペース",
 		"DESC_ACCESSIBLE_WORKSPACE_ADMIN": "ドメインに作成されたすべてのワークスペース",
 		"DESC_CLICK": "ワークスペースを選択して移動してください。",
@@ -3611,16 +3613,21 @@
 		"DORMANT_WORKSPACE": "休止ワークスペース",
 		"DORMANT_WORKSPACE_POPOVER": "このワークスペースは{date}に管理者が設定した閾値よりもコストが低いため、休止状態に切り替えられました。",
 		"DORMANT_WORKSPACE_POPOVER_ADMIN": "{name}で発生した費用が閾値を下回ったため、{date}に休止状態に移行されました。",
+		"DUPLICATE_NAME_ERROR": "",
 		"GO_TO_DORMANT_CONFIG": "休止設定ページに移動します",
+		"NAME": "",
 		"NOT_FOUND_ACCESS_WORKSPACE": "アクセス可能なワークスペースがありません。",
 		"NOT_FOUND_DESC": "まだ作成されたワークスペースがありません。",
 		"RECENT": "最近のアクセス",
 		"ROLE_TYPE_MEMBER": "構成員",
 		"ROLE_TYPE_OWNER": "オーナー",
+		"SAVE_CHANGES": "",
 		"SEARCH_WORKSPACE": "ワークスペース検索",
+		"SETTINGS": "設定",
 		"SHOW_ALL": "すべて表示",
 		"TITLE": "ワークスペースを選択してください。",
-		"WORKSPACE_GROUP": ""
+		"WORKSPACE_GROUP": "",
+		"WORKSPACE_GROUP_SETTINGS": ""
 	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {

@@ -2757,6 +2757,7 @@
 				"CREATE_DROP_DOWN_PLACEHOLDER": "",
 				"CREATE_GROUP_NAME": "",
 				"CREATE_GROUP_NAME_PLACEHOLDER": "",
+				"CREATE_NAME_INVALID_DUPLICATED": "",
 				"CREATE_TITLE": "",
 				"DELETE_BUTTON": "",
 				"DELETE_GROUP_USER_TITLE": "",
@@ -3572,6 +3573,7 @@
 		"BANNER_DESC": "새로운 환경 구성이 필요하신가요?",
 		"CREATE": "생성",
 		"CREATE_WORKSPACE": "새 워크스페이스 생성",
+		"DELETE_WORKSPACE_GROUP": "",
 		"DESC_ACCESSIBLE_WORKSPACE": "{user_id}님이 접근 가능한 전체 워크스페이스",
 		"DESC_ACCESSIBLE_WORKSPACE_ADMIN": "도메인에 생성된 전체 워크스페이스",
 		"DESC_CLICK": "워크스페이스를 선택하여 이동하세요.",
@@ -3611,16 +3613,21 @@
 		"DORMANT_WORKSPACE": "휴면 워크스페이스",
 		"DORMANT_WORKSPACE_POPOVER": "이 워크스페이스는 {date}에 관리자가 설정한 임계값보다 비용이 낮아 휴면 상태로 전환되었습니다.",
 		"DORMANT_WORKSPACE_POPOVER_ADMIN": "{name}에서 발생한 비용이 임계값을 넘지 못해 {date}에 휴면 상태로 전환되었습니다.",
+		"DUPLICATE_NAME_ERROR": "",
 		"GO_TO_DORMANT_CONFIG": "휴면 정책 설정 페이지로 이동",
+		"NAME": "",
 		"NOT_FOUND_ACCESS_WORKSPACE": "접근 가능한 워크스페이스가 없습니다.",
 		"NOT_FOUND_DESC": "아직 생성된 워크스페이스가 없습니다.",
 		"RECENT": "최근 방문",
 		"ROLE_TYPE_MEMBER": "멤버",
 		"ROLE_TYPE_OWNER": "소유자",
+		"SAVE_CHANGES": "",
 		"SEARCH_WORKSPACE": "워크스페이스 검색",
+		"SETTINGS": "설정",
 		"SHOW_ALL": "모두 보기",
 		"TITLE": "워크스페이스를 선택하세요.",
-		"WORKSPACE_GROUP": ""
+		"WORKSPACE_GROUP": "",
+		"WORKSPACE_GROUP_SETTINGS": ""
 	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
