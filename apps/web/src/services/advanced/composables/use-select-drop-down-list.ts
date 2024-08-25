@@ -1,4 +1,5 @@
 /* eslint-disable consistent-return */
+import type { ComputedRef, ToRefs } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -24,10 +25,25 @@ interface SelectDownListProps {
     fetcher: (apiQueryHelper: ApiQueryHelper) => Promise<ListResponse<any>>
 }
 
+interface SelectDropDownListState {
+    searchText: string,
+    loading: boolean,
+    totalCount: number,
+    list: any[],
+    menuList: ComputedRef<SelectDropdownMenuItem[]>,
+    selectedItems: MenuItem[],
+    pageStart: number,
+    pageLimit: number,
+    isShowMore: ComputedRef<boolean>,
+}
+
 export const useSelectDropDownList = ({
     isSearch = true, filter, pageSize = 10, transformer, fetcher,
-}: SelectDownListProps) => {
-    const state = reactive({
+}: SelectDownListProps) : ToRefs<SelectDropDownListState> & {
+    reset: () => Promise<void>,
+    handleClickShowMore: () => Promise<void>,
+} => {
+    const state = reactive<SelectDropDownListState>({
         searchText: '',
         loading: false,
         totalCount: 0,
@@ -106,7 +122,7 @@ export const useSelectDropDownList = ({
     }, 300));
 
     return {
-        ...toRefs(state),
+        ...toRefs<SelectDropDownListState>(state),
         reset,
         handleClickShowMore,
     };

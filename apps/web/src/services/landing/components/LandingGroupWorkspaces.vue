@@ -4,20 +4,27 @@ import { useRouter } from 'vue-router/composables';
 
 import { partition, sortBy } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldTitle, PButton, PButtonTab, PIconButton, POverlayLayout,
+    PFieldTitle, PButton, PButtonTab, PIconButton,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type {
+    WorkspaceGroupDetailsGetWorkspaceGroupParameters,
+} from '@/schema/identity/workspace-group-details/api-verbs/get-workspace-groups';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
+import LandingWorkspaceGroupManageOverlay from '@/services/landing/components/LandingWorkspaceGroupManageOverlay.vue';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 
@@ -83,12 +90,12 @@ const handleOpenOverlay = (workspaceGroupId:string) => {
 
 
 const fetchWorkspaceGroupList = async () => {
-    // try {
-    //     const response = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>();
-    //     state.workspaceGroupList = response;
-    // } catch (e) {
-    //     console.error(e);
-    // }
+    try {
+        const response = await SpaceConnector.clientV2.identity.workspaceGroupDetails.getWorkspaceGroups<WorkspaceGroupDetailsGetWorkspaceGroupParameters, ListResponse<WorkspaceGroupModel>>();
+        state.workspaceGroupList = response;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
 const fetchWorkspaceList = async () => {
@@ -174,11 +181,7 @@ const fetchWorkspaceList = async () => {
             >
                 {{ $t('LADING.SHOW_ALL') }}
             </p-button>
-            <p-overlay-layout :visible.sync="state.isOverlayOpen"
-                              :title="$t('LADING.WORKSPACE_GROUP_SETTINGS')"
-                              style-type="primary"
-                              size="lg"
-            />
+            <landing-workspace-group-manage-overlay :is-overlay-open.sync="state.isOverlayOpen" />
         </div>
     </div>
 </template>
