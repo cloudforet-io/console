@@ -6,8 +6,7 @@ import { languages } from '@/store/modules/user/config';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import {
-    getDefaultPageAccessPermissionList, getMinimalPageAccessPermissionList,
-    getPageAccessPermissionMapFromRawData,
+    getDefaultPageAccessPermissionList, getMinimalPageAccessPermissionList, getPageAccessMapFromRawData,
 } from '@/lib/access-control/page-access-helper';
 import type { MenuId } from '@/lib/menu/config';
 
@@ -34,7 +33,7 @@ export const getCurrentGrantInfo: Getter<UserState, any> = (state: UserState): G
 export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
     const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
     const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
-    const pagePermissionMap = getPageAccessPermissionMapFromRawData(roleBasePagePermissions);
+    const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
     const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
     const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
     Object.keys(pagePermissionMap).forEach((menuId) => {

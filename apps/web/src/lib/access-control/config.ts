@@ -13,7 +13,6 @@ export type PageAccessType = {
     access: boolean;
 };
 export type PageAccessMap = Record<string, PageAccessType>;
-export type PageAccessPermissionMap = Record<string, boolean>;
 
 export const DOMAIN_ADMIN_DEFAULT_PERMISSIONS: MenuId[] = [
     ...Object.values(MENU_ID).filter((menuId) => menuId !== MENU_ID.PROJECT),
