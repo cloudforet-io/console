@@ -1,3 +1,4 @@
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
@@ -185,6 +186,8 @@ export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     isValid?: boolean;
     value?: FieldValue;
     widgetConfig?: WidgetConfig;
+    widgetId?: string;
+    dateRange?: DateRange;
 }
 
 export interface WidgetFieldComponentEmit<ValueType> {
