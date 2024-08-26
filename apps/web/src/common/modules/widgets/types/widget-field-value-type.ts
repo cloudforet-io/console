@@ -143,9 +143,9 @@ export interface LegendValue {
     position?: 'right' | 'bottom';
 }
 
-export type WidgetHeightValue = keyof typeof WIDGET_HEIGHT; // for Number Card Widget
-export interface WidgetHeight {
-    value: WidgetHeightValue;
+export type WidgetHeightType = keyof typeof WIDGET_HEIGHT; // for Number Card Widget
+export interface WidgetHeightValue {
+    value: WidgetHeightType;
 }
 
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
@@ -153,4 +153,4 @@ export type WidgetFieldValues = string | string[] | number | boolean | Compariso
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
     | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
     | DisplayAnnotationValue | DisplaySeriesLabelValue | TextWrapValue | TableColumnWidthValue | CustomTableColumnWidthValue
-    | LegendValue | WidgetHeight;
+    | LegendValue | WidgetHeightValue;

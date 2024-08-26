@@ -10,7 +10,7 @@ import type {
     DateFormat,
     NumberFormat,
     DataFieldHeatmapColor,
-    WidgetHeightValue,
+    WidgetHeightType,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
@@ -154,7 +154,7 @@ export interface CustomTableColumnWidthOptions {
 }
 
 export interface WidgetHeightOptions {
-    default?: WidgetHeightValue;
+    default?: WidgetHeightType;
 }
 
 export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
