@@ -4,9 +4,10 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { languages } from '@/store/modules/user/config';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import { PAGE_ACCESS } from '@/lib/access-control/config';
 import {
-    getDefaultPageAccessPermissionList, getMinimalPageAccessPermissionList,
-    getPageAccessPermissionMapFromRawData,
+    getDefaultPageAccessPermissionList, getMinimalPageAccessPermissionList, getPageAccessMapFromRawData,
 } from '@/lib/access-control/page-access-helper';
 import type { MenuId } from '@/lib/menu/config';
 
@@ -32,27 +33,48 @@ export const getCurrentGrantInfo: Getter<UserState, any> = (state: UserState): G
 
 export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
     const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
-    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
-    const pagePermissionMap = getPageAccessPermissionMapFromRawData(roleBasePagePermissions);
     const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
     const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
-    Object.keys(pagePermissionMap).forEach((menuId) => {
-        if (!minimalPagePermissionList.includes(menuId as MenuId)) pagePermissionMap[menuId] = false;
-    });
+    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
+    const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
 
+    Object.keys(pagePermissionMap).forEach((menuId) => {
+        if (minimalPagePermissionList.includes(menuId as MenuId)) pagePermissionMap[menuId] = { read: true, write: true, access: true };
+    });
     let result = [...minimalPagePermissionList];
     Object.keys(pagePermissionMap).forEach((menuId) => {
         const _menuId = menuId as MenuId;
-        if (defaultPagePermissionList.includes(_menuId) && !minimalPagePermissionList.includes(_menuId)) result = [...result, _menuId];
+        if (defaultPagePermissionList.includes(_menuId) && !minimalPagePermissionList.includes(_menuId) && pagePermissionMap[_menuId].access) result = [...result, _menuId];
     });
 
     return result;
 };
 
-export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters): Record<string, boolean> => {
-    const result: Record<string, boolean> = {};
-    getters.pageAccessPermissionList.forEach((MenuId) => {
-        if (!result[MenuId]) result[MenuId] = true;
+export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters): PageAccessMap => {
+    const result: PageAccessMap = {};
+
+    const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
+    const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
+    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
+    const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+
+    const isAllReadOnly = roleBasePagePermissions.every((item) => {
+        const accessType = item.split('.*')[0].split(':')[1];
+        return accessType === PAGE_ACCESS.READ_ONLY;
+    });
+
+    getters.pageAccessPermissionList.forEach((menuId) => {
+        if (!result[menuId]) {
+            if (roleType === ROLE_TYPE.DOMAIN_ADMIN) {
+                result[menuId] = {
+                    write: !isAllReadOnly,
+                };
+            } else {
+                result[menuId] = {
+                    write: minimalPagePermissionList.includes(menuId) ? true : pagePermissionMap[menuId]?.write,
+                };
+            }
+        }
     });
     return result;
 };

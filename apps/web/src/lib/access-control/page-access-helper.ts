@@ -1,12 +1,15 @@
 import type { RoleType } from '@/schema/identity/role/type';
 
 import type {
-    PageAccessPermissionMap,
+    PageAccessMap,
 } from '@/lib/access-control/config';
 import {
     DOMAIN_ADMIN_DEFAULT_PERMISSIONS,
-    NO_ROLE_USER_DEFAULT_PERMISSIONS,
-    SYSTEM_USER_DEFAULT_PERMISSIONS, WORKSPACE_MEMBER_DEFAULT_PERMISSIONS, WORKSPACE_OWNER_DEFAULT_PERMISSIONS, WORKSPACE_USER_MINIMAL_PERMISSIONS,
+    NO_ROLE_USER_DEFAULT_PERMISSIONS, PAGE_ACCESS,
+    SYSTEM_USER_DEFAULT_PERMISSIONS,
+    WORKSPACE_MEMBER_DEFAULT_PERMISSIONS,
+    WORKSPACE_OWNER_DEFAULT_PERMISSIONS,
+    WORKSPACE_USER_MINIMAL_PERMISSIONS,
 } from '@/lib/access-control/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
@@ -34,30 +37,54 @@ export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu)
     ...(menu.subMenuList ? flattenMenu(menu.subMenuList) : []),
 ]);
 
-export const getPageAccessPermissionMapFromRawData = (pageAccessPermissions: string[]): PageAccessPermissionMap => {
-    const result = {} as PageAccessPermissionMap;
-    const flattendPermissionRequiredMenuList = flattenMenu(MENU_LIST);
+export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[]): PageAccessMap => {
+    const result: PageAccessMap = {};
+    const flattenedMenuList = flattenMenu(MENU_LIST);
+    const setPermissions = (id: string, read = true, write = true, access = true) => {
+        result[id] = { read, write, access };
+    };
 
-    pageAccessPermissions.forEach((page) => {
-        // in case of wildcard
+    const handleWildcardPermissions = (menuId: string, accessType: string) => {
+        const menu = MENU_LIST.find(({ id }) => id === menuId);
+        if (!menu) return;
+
+        const read = accessType !== PAGE_ACCESS.NO_ACCESS;
+        const write = accessType === PAGE_ACCESS.READ_WRITE;
+        const access = accessType !== PAGE_ACCESS.READ_ONLY;
+
+        setPermissions(menuId, read, write, access);
+
+        menu.subMenuList?.forEach(({ id: subMenuId }) => {
+            setPermissions(subMenuId, read, write, access);
+        });
+    };
+
+    pageAccessPermissions?.forEach((page) => {
         if (page === '*') {
-            flattendPermissionRequiredMenuList.forEach(({ id }) => {
-                result[id] = true;
-            });
-            // in case of service wildcard
-        } else if (page.endsWith('*')) {
-            const menuId = page.replace('.*', '');
-            const foundServiceMenuById = MENU_LIST.find(({ id }) => id === menuId);
-            if (!foundServiceMenuById) return;
-            flattenMenu([foundServiceMenuById]).forEach(({ id }) => {
-                result[id] = true;
-            });
-            // general case -  asset_inventory.service_account
+            flattenedMenuList.forEach(({ id }) => setPermissions(id));
+        } else if (page.endsWith('.*')) {
+            const [menuId, accessType = PAGE_ACCESS.READ_WRITE] = page.replace('.*', '').split(':');
+            handleWildcardPermissions(menuId, accessType);
         } else {
-            const endMenuIdByPageName = page.split('.').reverse()[0];
-            result[endMenuIdByPageName] = true;
+            const [menuId, accessType = PAGE_ACCESS.READ_WRITE] = page.split('.')[0].split(':');
+            const subMenuId = page.split('.').slice(1).join('.');
+
+            setPermissions(menuId, true, accessType === PAGE_ACCESS.READ_WRITE, true);
+
+            const menu = MENU_LIST.find(({ id }) => id === menuId);
+            const subMenuExists = menu?.subMenuList?.some(({ id }) => id === subMenuId);
+
+            setPermissions(subMenuId, subMenuExists, accessType === PAGE_ACCESS.READ_WRITE, subMenuExists);
         }
     });
+
+    // Set remaining items with no access
+    flattenedMenuList.forEach(({ id }) => {
+        if (!result[id]) {
+            setPermissions(id, false, false, false);
+        }
+    });
+
     return result;
 };
 

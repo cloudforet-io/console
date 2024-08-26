@@ -1,7 +1,6 @@
-import { find } from 'lodash';
-
 import type { RoleType } from '@/schema/identity/role/type';
 
+import { PAGE_ACCESS } from '@/lib/access-control/config';
 import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-helper';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -40,9 +39,8 @@ export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessM
             results.push({
                 id: menu.id,
                 translationIds: [menuInfo.translationId],
-                isAccessible: true,
                 isParent: true,
-                accessType: 'read_write',
+                accessType: PAGE_ACCESS.READ_WRITE,
                 subMenuList: flattenSubMenuList(menu?.subMenuList ?? [], defaultMenuIdsByRoleType),
             });
         }
@@ -51,23 +49,37 @@ export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessM
 };
 
 export const getPageAccessList = (menuItems: PageAccessMenuItem[]): string[] => {
-    // all case
-    const allItem = find(menuItems, { id: 'all' });
-    if (allItem && allItem.isAccessible) return ['*'];
-
     const results: string[] = [];
-    menuItems.forEach((menu) => {
-        // accessible permission for menu group
-        if (menu.isAccessible) {
-            results.push(`${menu.id}.*`);
-            return;
-        }
 
-        // each individual menu case
-        menu.subMenuList?.forEach((subMenu) => {
-            if (!subMenu.isAccessible) return;
-            results.push(`${menu.id}.${subMenu.id}`);
-        });
+    menuItems.forEach((menu) => {
+        if (menu.isParent) {
+            // Access type is no_access
+            if (menu.accessType === PAGE_ACCESS.NO_ACCESS) {
+                results.push(`${menu.id}:${menu.accessType}.*`);
+                return;
+            }
+
+            const subMenuList = menu.subMenuList || [];
+            const allSubMenusAccessible = subMenuList.every((subMenu) => subMenu.isAccessible);
+            const accessibleSubMenus = subMenuList.filter((subMenu) => subMenu.isAccessible && subMenu.id !== menu.id);
+
+            const accessTypePart = `${menu.id}:${menu.accessType}`;
+
+            if (allSubMenusAccessible) {
+                // If all submenus are accessible, push main menu with wildcard
+                results.push(`${accessTypePart}.*`);
+            } else if (accessibleSubMenus.length > 0) {
+                // If some submenus are accessible, push each individually
+                accessibleSubMenus.forEach((subMenu) => {
+                    results.push(`${accessTypePart}.${subMenu.id}`);
+                });
+            } else {
+                // If no submenus are accessible, push only the main menu access type
+                results.push(`${accessTypePart}.*`);
+            }
+        } else if (menu.isAccessible) {
+            results.push(`${menu.id}.*`);
+        }
     });
 
     return results;
