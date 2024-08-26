@@ -40,7 +40,7 @@ const fetchWorkspaceGroups = async (tabRefresh = { isGroupUser: false, isWorkspa
         });
 
         workspaceGroupPageState.workspaceGroups = results || [];
-        workspaceGroupPageState.total_count = total_count;
+        workspaceGroupPageState.totalCount = total_count ?? 0;
 
         if (!tabRefresh.isGroupUser && !tabRefresh.isWorkspace) {
             workspaceGroupPageState.selectedIndices = [];
@@ -48,7 +48,6 @@ const fetchWorkspaceGroups = async (tabRefresh = { isGroupUser: false, isWorkspa
 
         if (tabRefresh.isGroupUser) {
             workspaceGroupPageState.selectedUserIndices = [];
-            workspaceGroupPageState.selectedGroupUsers = {};
         }
 
         if (tabRefresh.isWorkspace) {

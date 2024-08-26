@@ -44,6 +44,7 @@ const tableState = reactive({
         { name: 'name', label: 'Name' },
         { name: 'workspace', label: 'Workspace' },
         { name: 'group_user', label: 'Group User' },
+        { name: 'created_at', label: 'Created At' },
     ],
     items: computed(() => workspaceGroupPageState.workspaceGroups.map(({
         name, workspaces, users, created_at,

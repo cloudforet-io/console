@@ -19,7 +19,7 @@ const colorBindFactory = (colorMapping, textFnc) => (value) => ({
 });
 
 export const workspaceStateFormatter = colorBindFactory(WORKSPACE_STATE_COLOR, (value) => value?.toLowerCase());
-export const groupUserStateFormatter = colorBindFactory(USER_STATE_COLOR, (value) => value.toLowerCase());
+export const groupUserStateFormatter = colorBindFactory(USER_STATE_COLOR, (value) => value?.toLowerCase());
 
 export const useRoleFormatter = (type: RoleType, isWorkspace?: boolean) => {
     const name = type?.toLowerCase().replace(/_/g, ' ').replace(/(?:^|\s)\w/g, (match) => match.toUpperCase());

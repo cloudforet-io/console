@@ -51,7 +51,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
 
             return state.workspaceGroups[index];
         }),
-        selectedGroupUsers: computed(() => {
+        workspaceGroupUsers: computed(() => {
             const filteredUsers = getters.selectedWorkspaceGroup?.users?.filter(actions.filterUser);
 
             const sortedSelectedGroupUsers = filteredUsers?.sort((a, b) => {
@@ -78,7 +78,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             const groupUsers: any[] = [];
 
             state.selectedUserIndices.forEach((d:number) => {
-                groupUsers.push(getters.selectedGroupUsers[d]);
+                groupUsers.push(getters.workspaceGroupUsers[d]);
             });
 
             return groupUsers ?? [];
@@ -144,10 +144,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
 
             return state.workspaceGroups[index]?.workspaces?.length;
         }),
-        groupUserPage: computed(() => {
-            console.log(state.groupUserPageStart / state.groupUserPageLimit);
-            return state.groupUserPageStart / state.groupUserPageLimit;
-        }),
+        groupUserPage: computed(() => state.groupUserPageStart / state.groupUserPageLimit),
     };
 
     const actions = {

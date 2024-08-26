@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { reactive, watch, onUnmounted } from 'vue';
+import {
+    reactive, watch, onUnmounted, computed,
+} from 'vue';
+
+import dayjs from 'dayjs';
 
 import {
     PHeading, PButton, PToolboxTable, PLink, PStatus, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -22,17 +30,24 @@ const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
-const emit = defineEmits<{(e: 'refersh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
+const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
+
+const allReferenceStore = useAllReferenceStore();
 
 const tableState = reactive({
-    // TODO: temp data
+    timezone: computed(() => store.state.user.timezone),
+    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
+    tableItems: computed(() => workspaceGroupPageGetters.selectedWorkspaces?.map((workspace) => ({
+        ...tableState.workspaces[workspace],
+        remove_button: workspace,
+    }))),
     fields: [
         { name: 'name', label: 'Name' },
-        { name: 'state', label: 'State' },
-        { name: 'user', label: 'User' },
-        { name: 'service_account', label: 'Service Account' },
-        { name: 'cost', label: 'Cost' },
-        { name: 'created_at', label: 'Created' },
+        { name: 'data.state', label: 'State' },
+        { name: 'data.user', label: 'User' },
+        { name: 'data.service_account_count', label: 'Service Account' },
+        { name: 'data.cost_info', label: 'Cost' },
+        { name: 'data.created_at', label: 'Created' },
         { name: 'remove_button', label: ' ', sortable: false },
     ],
 });
@@ -164,7 +179,7 @@ onUnmounted(() => {
         <p-toolbox-table class="workspace-group-tab-workspace-table"
                          :loading="workspaceGroupPageState.loading"
                          :fields="tableState.fields"
-                         :items="workspaceGroupPageGetters.selectedWorkspaces"
+                         :items="tableState.tableItems"
                          :select-index="workspaceGroupPageState.selectedWorkspaceIndices"
                          :total-count="workspaceGroupPageGetters.workspaceTotalCount"
                          sort-by="name"
@@ -228,24 +243,30 @@ onUnmounted(() => {
                     />
                 </div>
             </template>
-            <template #col-state-format="{ value }">
+            <template #col-data.state-format="{ value }">
                 <p-status v-bind="workspaceStateFormatter(value)"
                           class="capitalize"
                 />
             </template>
-            <template #col-user-format="{ value, item }">
+            <template #col-data.user-format="{ value, item }">
                 <p-link :text="value"
                         action-icon="internal-link"
                         new-tab
                         :to="getUserRouteLocationByWorkspaceId(item)"
                 />
             </template>
-            <template #col-service_account-format="{ value, item }">
-                <p-link :text="value"
+            <template #col-data.service_account_count-format="{ value, item }">
+                <p-link :text="value || 0"
                         action-icon="internal-link"
                         new-tab
                         :to="getServiceAccountRouteLocationByWorkspaceId(item)"
                 />
+            </template>
+            <template #col-data.cost_info-format="{ value }">
+                {{ value?.month ?? '-' }}
+            </template>
+            <template #col-data.created_at-format="{ value }">
+                {{ dayjs.tz(dayjs.utc(value), tableState.timezone).format('YYYY-MM-DD HH:mm') }}
             </template>
             <template #col-remove_button-format="{ item }">
                 <p-button size="sm"

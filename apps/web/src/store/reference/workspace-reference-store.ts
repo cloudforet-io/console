@@ -19,7 +19,7 @@ import type {
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
-type PickedWorkspaceModel = Pick<WorkspaceModel, 'state' | 'tags'>;
+type PickedWorkspaceModel = Pick<WorkspaceModel, 'state' | 'tags'|'cost_info'|'service_account_count' |'created_at'>;
 export type WorkspaceItem = Required<Pick<ReferenceItem<PickedWorkspaceModel>, 'key'|'label'|'name'|'data'>>;
 export type WorkspaceReferenceMap = ReferenceMap<WorkspaceItem>;
 
@@ -60,7 +60,7 @@ export const useWorkspaceReferenceStore = defineStore('reference-workspace', () 
 
         const params: WorkspaceListParameters = {
             query: {
-                only: ['name', 'workspace_id', 'state', 'tags'],
+                only: ['name', 'workspace_id', 'state', 'tags', 'cost_info', 'service_account_count', 'created_at'],
             },
         };
 
@@ -83,6 +83,9 @@ export const useWorkspaceReferenceStore = defineStore('reference-workspace', () 
                 data: {
                     state: workspace.state,
                     tags: workspace.tags,
+                    cost_info: workspace.cost_info,
+                    service_account_count: workspace.service_account_count,
+                    created_at: workspace.created_at,
                 },
             };
         });
@@ -101,6 +104,9 @@ export const useWorkspaceReferenceStore = defineStore('reference-workspace', () 
                 data: {
                     state: workspace.state,
                     tags: workspace.tags,
+                    cost_info: workspace.cost_info,
+                    service_account_count: workspace.service_account_count,
+                    created_at: workspace.created_at,
                 },
             },
         };
