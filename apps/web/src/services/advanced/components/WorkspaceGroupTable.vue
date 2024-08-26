@@ -44,14 +44,13 @@ const tableState = reactive({
         { name: 'name', label: 'Name' },
         { name: 'workspace', label: 'Workspace' },
         { name: 'group_user', label: 'Group User' },
-        { name: 'created_at', label: 'Created' },
     ],
-    items: computed(() => workspaceGroupPageState.groups.map(({
+    items: computed(() => workspaceGroupPageState.workspaceGroups.map(({
         name, workspaces, users, created_at,
     }) => ({
         name,
-        workspace: workspaces.length,
-        group_user: users.length,
+        workspace: workspaces?.length,
+        group_user: users?.length,
         created_at,
     }))),
     valueHandlerMap: computed(() => {
@@ -74,11 +73,11 @@ const fetchWorkspaceGroups = async () => {
             query: workspaceGroupListApiQuery,
         });
 
-        workspaceGroupPageState.groups = results || [];
+        workspaceGroupPageState.workspaceGroups = results || [];
         workspaceGroupPageState.selectedIndices = [];
     } catch (e) {
         ErrorHandler.handleError(e);
-        workspaceGroupPageState.groups = [];
+        workspaceGroupPageState.workspaceGroups = [];
     } finally {
         workspaceGroupPageState.loading = false;
     }

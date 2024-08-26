@@ -23,6 +23,7 @@ interface SelectDownListProps {
     pageSize?: number;
     transformer: (item: any) => SelectDropdownMenuItem,
     fetcher: (apiQueryHelper: ApiQueryHelper) => Promise<ListResponse<any>>
+    searchKey?: string;
 }
 
 interface SelectDropDownListState {
@@ -38,7 +39,7 @@ interface SelectDropDownListState {
 }
 
 export const useSelectDropDownList = ({
-    isSearch = true, filter, pageSize = 10, transformer, fetcher,
+    isSearch = true, filter, pageSize = 10, transformer, fetcher, searchKey = 'name',
 }: SelectDownListProps) : ToRefs<SelectDropDownListState> & {
     reset: () => Promise<void>,
     handleClickShowMore: () => Promise<void>,
@@ -74,11 +75,11 @@ export const useSelectDropDownList = ({
 
         const apiQueryHelper = new ApiQueryHelper()
             .setPageStart(state.pageStart).setPageLimit(state.pageLimit)
-            .setSort('name', true);
+            .setSort(searchKey, true);
 
         if (isSearch) {
             const filters: ConsoleFilter[] = [
-                { k: 'name', v: state.searchText, o: '' },
+                { k: searchKey, v: state.searchText, o: '' },
             ];
 
             if (filter) {

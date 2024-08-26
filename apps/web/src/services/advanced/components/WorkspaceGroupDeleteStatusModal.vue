@@ -91,7 +91,7 @@ const deleteGroupUsers = async () => {
 
     try {
         await SpaceConnector.clientV2.identity.workspaceGroup.removeUsers({
-            worksapce_group_id: workspaceGroupPageGetters.selectedGroup.workspace_group_id,
+            worksapce_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
             workspaces: workspaceGroupPageGetters.selectedGroupUsersByIndices.map((item) => item.name),
         });
     } catch (e) {
@@ -106,7 +106,7 @@ const deleteWorkspaces = async () => {
 
     try {
         await SpaceConnector.clientV2.identity.workspaceGroup.removeWorkspaces({
-            worksapce_group_id: workspaceGroupPageGetters.selectedGroup.workspace_group_id,
+            worksapce_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
             workspaces: workspaceGroupPageGetters.selectedWorkspacesByIndices.map((item) => item.name),
         });
     } catch (e) {

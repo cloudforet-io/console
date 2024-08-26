@@ -59,10 +59,11 @@ const {
     fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>({
         query: apiQueryHelper.data,
     }),
+    searchKey: 'user_id',
 });
 
 const handleConfirm = () => {
-    showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USRES'), '');
+    showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
     workspaceGroupPageStore.closeModal();
 };
 

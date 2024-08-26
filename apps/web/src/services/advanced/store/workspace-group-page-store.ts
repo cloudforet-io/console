@@ -9,7 +9,7 @@ import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/mode
 export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', () => {
     const state = reactive({
         loading: false,
-        groups: [] as WorkspaceGroupModel[],
+        workspaceGroups: [] as WorkspaceGroupModel[],
         selectedIndices: [] as number[],
         pageStart: 1,
         pageLimit: 15,
@@ -46,13 +46,13 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
     //  "Write operation failed: computed value is readonly" error message when using the store.$dispose method,
     // so we change to a method that doesn't use the reactive API.
     const getters = {
-        selectedGroup: computed(() => {
+        selectedWorkspaceGroup: computed(() => {
             const [index] = state.selectedIndices;
 
-            return state.groups[index];
+            return state.workspaceGroups[index];
         }),
         selectedGroupUsers: computed(() => {
-            const filteredUsers = getters.selectedGroup?.users.filter(actions.filterUser);
+            const filteredUsers = getters.selectedWorkspaceGroup?.users?.filter(actions.filterUser);
 
             const sortedSelectedGroupUsers = filteredUsers?.sort((a, b) => {
                 const aValue = a[state.groupUserSortBy];
@@ -84,7 +84,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             return groupUsers ?? [];
         }),
         selectedWorkspaces: computed(() => {
-            const filteredWorkspaces = getters.selectedGroup?.workspaces?.filter(actions.filterWorkspace);
+            const filteredWorkspaces = getters.selectedWorkspaceGroup?.workspaces?.filter(actions.filterWorkspace);
 
             const sortedSelectedWorkspaces = filteredWorkspaces?.sort((a, b) => {
                 const aValue = a[state.workspaceSortBy];
@@ -126,23 +126,23 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             const [index] = state.selectedIndices;
 
             if (state.groupUserSearchText) {
-                const filteredUsers = state.groups[index].users.filter(actions.filterUser);
+                const filteredUsers = state.workspaceGroups[index].users.filter(actions.filterUser);
 
                 return filteredUsers.length;
             }
 
-            return state.groups[index]?.users?.length;
+            return state.workspaceGroups[index]?.users?.length;
         }),
         workspaceTotalCount: computed(() => {
             const [index] = state.selectedIndices;
 
             if (state.workspaceSearchText) {
-                const filteredWorkspaces = state.groups[index].workspaces.filter(actions.filterWorkspace);
+                const filteredWorkspaces = state.workspaceGroups[index].workspaces.filter(actions.filterWorkspace);
 
                 return filteredWorkspaces.length;
             }
 
-            return state.groups[index]?.workspaces?.length;
+            return state.workspaceGroups[index]?.workspaces?.length;
         }),
         groupUserPage: computed(() => {
             console.log(state.groupUserPageStart / state.groupUserPageLimit);
@@ -177,7 +177,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         },
         reset: () => {
             state.loading = false;
-            state.groups = [] as WorkspaceGroupModel[];
+            state.workspaceGroups = [] as WorkspaceGroupModel[];
             state.selectedIndices = [] as number[];
             state.pageStart = 1;
             state.pageLimit = 15;
