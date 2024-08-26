@@ -37,7 +37,11 @@ const state = reactive({
     roleTypeData: ROLE_TYPE.DOMAIN_ADMIN as RoleType,
     pageAccessFormData: ['*'] as string[],
     permissionsData: undefined as string[]|undefined,
-    isAllValid: computed<boolean>(() => state.isBaseInformationValid),
+    isPageAccessValid: false,
+    isAllValid: computed<boolean>(() => {
+        const isPageAccessCheckRequired = state.roleTypeData !== 'DOMAIN_ADMIN';
+        return state.isBaseInformationValid && (!isPageAccessCheckRequired || state.isPageAccessValid);
+    }),
     formData: computed<RoleCreateParameters|RoleUpdateParameters>(() => {
         const baseData = {
             name: state.baseInfoFormData.trim(),
@@ -62,7 +66,10 @@ const handleBaseInfoValidate = (value: boolean) => {
 };
 const handleUpdateForm = (formData: RoleFormData) => {
     if (formData.name) state.baseInfoFormData = formData.name;
-    if (formData.role_type) state.roleTypeData = formData.role_type;
+    if (formData.role_type) {
+        state.roleTypeData = formData.role_type;
+        state.pageAccessFormData = props.formType === FORM_TYPE.CREATE ? ['*'] : state.pageAccessFormData;
+    }
     if (formData.page_access) state.pageAccessFormData = formData.page_access;
     if (formData.permissions) state.permissionsData = formData.permissions;
 };
@@ -74,6 +81,7 @@ watch(() => state.isAllValid, (after) => {
 watch(() => state.formData, (after) => {
     emit('update-form-data', after);
 });
+// update mode
 watch(() => props.initialRoleData, (initialRoleData) => {
     if (isEmpty(initialRoleData)) return;
     state.baseInfoFormData = initialRoleData?.name;
@@ -95,7 +103,9 @@ watch(() => props.initialRoleData, (initialRoleData) => {
         />
         <role-update-form-permission-form :initial-page-access="state.pageAccessFormData"
                                           :initial-permissions="state.permissionsData"
+                                          :is-page-access-valid.sync="state.isPageAccessValid"
                                           :role-type="state.roleTypeData"
+                                          :form-type="props.formType"
                                           @update-form="handleUpdateForm"
         />
     </div>

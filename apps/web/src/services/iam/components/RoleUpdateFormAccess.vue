@@ -86,6 +86,12 @@ const handleChangeSelectedAccess = (value: string, item: PageAccessMenuItem) => 
 };
 const handleChangeToggle = (value: boolean) => {
     state.isReadOnly = value;
+    state.menuItems.forEach((menu) => {
+        emit('update', {
+            ...menu,
+            accessType: value ? 'read_only' : 'read_write',
+        });
+    });
 };
 
 /* Watcher */

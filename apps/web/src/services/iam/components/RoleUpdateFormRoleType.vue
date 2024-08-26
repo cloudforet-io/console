@@ -109,6 +109,7 @@ watch(() => props.initialData, (initialData) => {
 
 <style scoped lang="postcss">
 .role-update-page-role-type {
+    max-width: 100%;
     .heading {
         margin-bottom: 1.5rem;
     }

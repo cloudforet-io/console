@@ -1,45 +1,49 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, ref, watch, watchEffect,
+    computed, reactive, ref, watch,
 } from 'vue';
 
 import { find, isEqual } from 'lodash';
 
-import { PPaneLayout, PHeading } from '@cloudforet/mirinae';
+import { PHeading, PPaneLayout } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
-import {
-    getPageAccessPermissionMapFromRawData,
-} from '@/lib/access-control/page-access-helper';
+import { getPageAccessMapFromRawData } from '@/lib/access-control/page-access-helper';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import RoleUpdateFormAccess from '@/services/iam/components/RoleUpdateFormAccess.vue';
 import RoleUpdateFormPolicy from '@/services/iam/components/RoleUpdateFormPolicy.vue';
-import {
-    getPageAccessMenuListByRoleType,
-    getPageAccessList,
-} from '@/services/iam/helpers/role-page-access-menu-list';
+import { FORM_TYPE } from '@/services/iam/constants/role-constant';
+import { getPageAccessList, getPageAccessMenuListByRoleType } from '@/services/iam/helpers/role-page-access-menu-list';
 import type { PageAccessMenuItem, RoleFormData } from '@/services/iam/types/role-type';
 
 interface Props {
     initialPageAccess?: string[];
     initialPermissions?: string[];
     roleType?: RoleType;
+    isPageAccessValid?: boolean;
+    formType?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     initialPageAccess: undefined,
     initialPermissions: undefined,
     roleType: ROLE_TYPE.WORKSPACE_OWNER,
+    isPageAccessValid: true,
+    formType: FORM_TYPE.CREATE,
 });
 
 const emit = defineEmits<{(e: 'update-form', formData: RoleFormData): void,
+    (e: 'update:is-page-access-valid', value: boolean): void,
 }>();
 
 const menuItems = ref([] as PageAccessMenuItem[]);
 const state = reactive({
     pageAccessPermissions: computed(() => getPageAccessList(menuItems.value)),
+    proxyAllValid: useProxyValue('isPageAccessValid', props, emit),
 });
 
 /* Components */
@@ -47,9 +51,7 @@ const handleUpdateForm = (value: PageAccessMenuItem, isInit?: boolean) => {
     const { id: menuId, isAccessible, accessType } = value;
     const item = find(menuItems.value, { id: menuId });
     if (item) {
-        if (accessType) {
-            item.accessType = accessType;
-        }
+        if (accessType) item.accessType = accessType;
         if (isInit && item.subMenuList?.length === 0) {
             item.subMenuList?.push({
                 id: item.id,
@@ -60,15 +62,40 @@ const handleUpdateForm = (value: PageAccessMenuItem, isInit?: boolean) => {
     }
     menuItems.value.forEach((menuItem) => {
         if (menuItem?.subMenuList?.length) {
+            menuItem.isValid = !menuItem?.subMenuList.every((d) => !d.isAccessible);
+
             const subItem = find(menuItem.subMenuList, { id: menuId });
             if (subItem) {
-                subItem.isAccessible = isAccessible;
+                subItem.isAccessible = menuItem.accessType !== 'no_access' ? isAccessible : true;
             }
         }
     });
+
+    state.proxyAllValid = menuItems.value.every((i) => i.isValid);
 };
 const handleUpdateEditor = (value: string) => {
     emit('update-form', { permissions: value.split('\n') });
+};
+const setPageAccessPermissionsData = () => {
+    if (!props.initialPageAccess) return;
+    const pageAccessPermissionMap = getPageAccessMapFromRawData(props.initialPageAccess);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
+        if (!itemId) return;
+        let accessType = '';
+        if (accessible.read && accessible.write) {
+            accessType = 'read_write';
+        } else if (accessible.read && !accessible.write) {
+            accessType = 'read_only';
+        } else {
+            accessType = 'no_access';
+        }
+        handleUpdateForm({
+            id: itemId,
+            isAccessible: accessible.access,
+            accessType,
+        }, true);
+    }
 };
 
 /* Watcher */
@@ -76,16 +103,10 @@ watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessP
     if (isEqual(pageAccessPermissions, prevPageAccessPermissions)) return;
     emit('update-form', { page_access: pageAccessPermissions });
 });
-watchEffect(() => {
-    menuItems.value = getPageAccessMenuListByRoleType(props.roleType);
-
-    if (!props.initialPageAccess) return;
-    const pageAccessPermissionMap = getPageAccessPermissionMapFromRawData(props.initialPageAccess);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
-        handleUpdateForm({ id: itemId, isAccessible: accessible }, true);
-    }
-});
+watch([() => props.roleType, () => props.initialPageAccess], ([roleType]) => {
+    menuItems.value = getPageAccessMenuListByRoleType(roleType);
+    setPageAccessPermissionsData();
+}, { immediate: true });
 </script>
 
 <template>
@@ -107,7 +128,7 @@ watchEffect(() => {
 
 <style lang="postcss" scoped>
 .role-create-page-permission-form {
-    @apply mx-0;
+    max-width: 100%;
     .heading {
         margin-bottom: 1.5rem;
     }
