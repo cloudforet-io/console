@@ -10,6 +10,7 @@ import type {
     DateFormat,
     NumberFormat,
     DataFieldHeatmapColor,
+    WidgetHeightType,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
@@ -152,13 +153,17 @@ export interface CustomTableColumnWidthOptions {
     toggle?: boolean;
 }
 
+export interface WidgetHeightOptions {
+    default?: WidgetHeightType;
+}
+
 export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
     | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
-    | MissingValueOptions;
+    | MissingValueOptions | WidgetHeightOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -175,7 +180,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'granularity' | 'colorSchema' | 'pieChartType'
     | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
     | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth' | 'customTableColumnWidth'
-    | 'missingValue';
+    | 'missingValue' | 'widgetHeight';
 
 export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;

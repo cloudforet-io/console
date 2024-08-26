@@ -3,6 +3,7 @@ import type {
     PIE_CHART_SERIES_LABEL_POSITION,
     COLUMN_CHART_SERIES_LABEL_POSITION,
     LINE_CHART_SERIES_LABEL_POSITION,
+    WIDGET_HEIGHT,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 
 
@@ -142,9 +143,14 @@ export interface LegendValue {
     position?: 'right' | 'bottom';
 }
 
+export type WidgetHeightType = keyof typeof WIDGET_HEIGHT; // for Number Card Widget
+export interface WidgetHeightValue {
+    value: WidgetHeightType;
+}
+
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
     | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
     | DisplayAnnotationValue | DisplaySeriesLabelValue | TextWrapValue | TableColumnWidthValue | CustomTableColumnWidthValue
-    | LegendValue;
+    | LegendValue | WidgetHeightValue;

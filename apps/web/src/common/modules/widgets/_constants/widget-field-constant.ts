@@ -101,3 +101,8 @@ export const PIE_CHART_SERIES_LABEL_POSITION = {
 } as const;
 
 export const TABLE_DEFAULT_MINIMUM_WIDTH = 120;
+
+export const WIDGET_HEIGHT = {
+    default: 'default',
+    full: 'full',
+};

@@ -15,6 +15,7 @@ import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
+import { WIDGET_HEIGHT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { WidgetFrameEmit } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
@@ -92,7 +93,11 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
 
 <template>
     <div class="widget-frame"
-         :class="{ full: state.isFull, [props.size]: props.size }"
+         :class="{
+             full: state.isFull,
+             [props.size]: props.size,
+             [`widget-height-${props.widgetOptions?.widgetHeight?.value ?? WIDGET_HEIGHT.default}`]: true,
+         }"
          :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
         <div v-if="props.title !== undefined"
@@ -269,6 +274,12 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
     padding: 1rem;
     &.sm {
         height: 11rem;
+    }
+    &.full {
+        height: 35rem;
+    }
+    &.widget-height-full {
+        height: 22.5rem;
     }
     &:hover {
         .action-button-wrapper {

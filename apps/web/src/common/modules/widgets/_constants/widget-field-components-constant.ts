@@ -29,6 +29,7 @@ import tableDataField from '@/common/modules/widgets/_widget-fields/WidgetFieldT
 import textWrap from '@/common/modules/widgets/_widget-fields/WidgetFieldTextWrap.vue';
 import total from '@/common/modules/widgets/_widget-fields/WidgetFieldTotal.vue';
 import totalField from '@/common/modules/widgets/_widget-fields/WidgetFieldTotalField.vue';
+import widgetHeight from '@/common/modules/widgets/_widget-fields/WidgetFieldWidgetHeight.vue';
 import xAxis from '@/common/modules/widgets/_widget-fields/WidgetFieldXAxis.vue';
 import yAxis from '@/common/modules/widgets/_widget-fields/WidgetFieldYAxis.vue';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
@@ -66,4 +67,5 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     tableColumnWidth,
     customTableColumnWidth,
     missingValue,
+    widgetHeight,
 };

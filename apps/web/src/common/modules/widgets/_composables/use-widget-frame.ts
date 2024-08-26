@@ -196,6 +196,7 @@ export const useWidgetFrame = (
     });
     const widgetFrameProps = computed<WidgetFrameProps>(() => ({
         widgetId: props.widgetId,
+        widgetOptions: props.widgetOptions,
         widgetSizes: _state.widgetConfig.meta.sizes,
         dataTableId: props.dataTableId,
         //
