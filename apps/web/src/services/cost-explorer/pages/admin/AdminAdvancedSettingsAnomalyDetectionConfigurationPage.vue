@@ -3,9 +3,9 @@ import type { ComputedRef } from 'vue';
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
-
-import { cloneDeep } from 'lodash';
+import { clone, cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -17,10 +17,16 @@ import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner
 import type { DomainConfigGetParameters } from '@/schema/config/domain-config/api-verbs/get';
 import type { DomainConfigSetParameters } from '@/schema/config/domain-config/api-verbs/set';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
+import { store } from '@/store';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { NOTIFY_LEVEL_MAP } from '@/services/cost-explorer/constants/anomaly-detection-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type {
     NotificationRule,
     NotificationUnit,
@@ -31,6 +37,11 @@ import type {
 const CONFIG_NAME = 'anomaly_detection_configuration';
 const ALL_VALUE: NotificationVariation[] = ['gte', 'lte'];
 
+const route = useRoute();
+
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
 const state = reactive<{
     statusToggle: boolean;
     notificationRules:Partial<NotificationRule>[];
@@ -38,6 +49,8 @@ const state = reactive<{
     variationMenu: ComputedRef<MenuItem[]>;
     notifyLevelMenu: ComputedRef<MenuItem[]>;
     recipients: boolean;
+    selectedMenuId: ComputedRef<string>;
+    hasReadWriteAccess?: ComputedRef<boolean|undefined>;
         }>({
             statusToggle: false,
             notificationRules: [{ variation: ALL_VALUE }],
@@ -57,7 +70,18 @@ const state = reactive<{
                 iconColor: level.color,
             }))),
             recipients: false,
+            selectedMenuId: computed(() => {
+                const reversedMatched = clone(route.matched).reverse();
+                const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+                const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+                if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+                    return '';
+                }
+                return targetMenuId;
+            }),
+            hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
         });
+
 
 const handleUpdateNotificationRules = (key: keyof NotificationRule, value: NotificationRule[keyof NotificationRule]|'all', index: number) => {
     const clonedNotificationRules = cloneDeep(state.notificationRules);
@@ -160,6 +184,7 @@ onMounted(async () => {
         <div class="content-wrapper">
             <div class="toggle-wrapper">
                 <p-toggle-button :value.sync="state.statusToggle"
+                                 :disabled="!state.hasReadWriteAccess"
                                  class="toggle-button"
                 />
                 <div class="toggle-text">
@@ -193,17 +218,20 @@ onMounted(async () => {
                         >
                             <p-text-input :value="rule.threshold"
                                           :placeholder="$t('COST_EXPLORER.ANOMALY_DETECTION.NOTIFICATION_RULES.AMOUNT')"
+                                          :disabled="!state.hasReadWriteAccess"
                                           block
                                           @update:value="handleUpdateNotificationRules('threshold', $event, index)"
                             />
                             <p-select-dropdown :selected="rule.unit"
                                                :menu="state.unitMenu"
                                                :placeholder="$t('COST_EXPLORER.ANOMALY_DETECTION.NOTIFICATION_RULES.SELECT_UNIT')"
+                                               :disabled="!state.hasReadWriteAccess"
                                                block
                                                use-fixed-menu-style
                                                @select="handleUpdateNotificationRules('unit', $event, index)"
                             />
                             <p-select-dropdown :selected="rule.variation.length === 2 ? 'all': JSON.stringify(rule.variation)"
+                                               :disabled="!state.hasReadWriteAccess"
                                                :menu="state.variationMenu"
                                                block
                                                use-fixed-menu-style
@@ -212,6 +240,7 @@ onMounted(async () => {
                             <p-select-dropdown :selected="rule.notifyLevel"
                                                :menu="state.notifyLevelMenu"
                                                use-fixed-menu-style
+                                               :disabled="!state.hasReadWriteAccess"
                                                block
                                                @select="handleUpdateNotificationRules('notifyLevel', $event, index)"
                             >
@@ -237,12 +266,14 @@ onMounted(async () => {
                             <p-icon-button name="ic_delete"
                                            size="sm"
                                            class="self-center"
+                                           :disabled="!state.hasReadWriteAccess"
                                            @click="handleDeleteRule(index)"
                             />
                         </div>
                         <p-button icon-left="ic_plus"
                                   class="add-btn"
                                   style-type="secondary"
+                                  :disabled="!state.hasReadWriteAccess"
                                   @click="handleAddNotificationRule"
                         >
                             {{ $t('COMMON.BUTTONS.ADD') }}
@@ -266,9 +297,11 @@ onMounted(async () => {
                     </p>
                 </div>
                 <div class="check-role">
-                    <p-checkbox v-model="state.recipients" /><span class="owner-img"><p-lazy-img :src="WorkspaceOwnerImage"
-                                                                                                 width="1.25rem"
-                                                                                                 height="1.25rem"
+                    <p-checkbox v-model="state.recipients"
+                                :disabled="!state.hasReadWriteAccess"
+                    /><span class="owner-img"><p-lazy-img :src="WorkspaceOwnerImage"
+                                                          width="1.25rem"
+                                                          height="1.25rem"
                     /></span><span class="owner-text">Workspace Owner Role</span>
                 </div>
             </div>

@@ -13,6 +13,11 @@ import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/
 import CostReportSettingsModal from '@/services/cost-explorer/components/CostReportSettingsModal.vue';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
@@ -64,7 +69,7 @@ const handleClickSettings = (): void => {
                 {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.UPCOMING_REPORT') }}
             </span>
         </template>
-        <template v-if="storeState.isAdminMode"
+        <template v-if="props.hasReadWriteAccess && storeState.isAdminMode"
                   #right-extra
         >
             <p-button style-type="tertiary"

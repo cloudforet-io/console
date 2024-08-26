@@ -23,6 +23,12 @@ import DataSourceManagementTabLinkedAccountTable
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { CostLinkedAccountModalType, DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
+
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
@@ -154,7 +160,9 @@ onUnmounted(() => {
                    :total-count="storeState.linkedAccountsTotalCount"
                    class="title"
         >
-            <template #extra>
+            <template v-if="props.hasReadWriteAccess"
+                      #extra
+            >
                 <div class="extra-wrapper">
                     <p-button style-type="tertiary"
                               :disabled="storeState.selectedLinkedAccountsIndices.length === 0"
@@ -171,7 +179,8 @@ onUnmounted(() => {
                 </div>
             </template>
         </p-heading>
-        <data-source-management-tab-linked-account-table @confirm="handleChangeLinkedAccountToolbox"
+        <data-source-management-tab-linked-account-table :has-read-write-access="props.hasReadWriteAccess"
+                                                         @confirm="handleChangeLinkedAccountToolbox"
                                                          @select-filter="handleChangedSelectFilter"
         />
         <data-source-management-modal v-if="storeState.modalVisible"
