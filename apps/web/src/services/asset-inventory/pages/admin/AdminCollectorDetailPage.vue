@@ -8,7 +8,7 @@
                         width="20rem"
                         height="1.5rem"
             />
-            <template v-if="state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
+            <template v-if="state.hasReadWriteAccess && state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
                       #title-right-extra
             >
                 <span class="title-right-button-wrapper">
@@ -29,7 +29,9 @@
                 <div v-if="collectorJobStore.AllJobsInfoLoaded"
                      class="collector-button-box"
                 >
-                    <collect-data-button-group @collect="handleCollectData" />
+                    <collect-data-button-group v-if="state.hasReadWriteAccess"
+                                               @collect="handleCollectData"
+                    />
                     <router-link v-if="collectorJobStore.hasJobs"
                                  :to="state.collectorHistoryLink"
                     >
@@ -45,10 +47,14 @@
 
         <collector-base-info-section class="section"
                                      :history-link="state.collectorHistoryLink"
+                                     :has-read-write-access="state.hasReadWriteAccess"
         />
-        <collector-schedule-section class="section" />
+        <collector-schedule-section class="section"
+                                    :has-read-write-access="state.hasReadWriteAccess"
+        />
         <collector-options-section class="section"
                                    data-test-id="collector-options-section"
+                                   :has-read-write-access="state.hasReadWriteAccess"
         />
 
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
@@ -92,7 +98,9 @@ import {
 // eslint-disable-next-line import/no-duplicates
 } from 'vue';
 import type { Location } from 'vue-router';
+import { useRoute } from 'vue-router/composables';
 
+import { clone } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -104,11 +112,15 @@ import { SpaceRouter } from '@/router';
 import type { CollectorDeleteParameters } from '@/schema/inventory/collector/api-verbs/delete';
 import type { CollectorGetParameters } from '@/schema/inventory/collector/api-verbs/get';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
@@ -132,6 +144,10 @@ import {
 import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+
+
+
 
 
 const props = defineProps<{
@@ -140,13 +156,12 @@ const props = defineProps<{
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
-
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
-
 const collectorDataModalStore = useCollectorDataModalStore();
-
 const collectorDetailPageStore = useCollectorDetailPageStore();
+
+const route = useRoute();
 
 watch(() => collectorFormState.originCollector, async (collector) => {
     if (collector) {
@@ -159,7 +174,21 @@ watch(() => collectorFormState.originCollector, async (collector) => {
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const queryHelper = new QueryHelper();
+
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
 const state = reactive({
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),

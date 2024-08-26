@@ -4,6 +4,8 @@ import { computed, reactive, ref } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { clone } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     useContextMenuController, PHeading, PIconButton, PButton, PContextMenu, PI,
@@ -18,11 +20,15 @@ import type { MetricExampleModel } from '@/schema/inventory/metric-example/model
 import type { MetricCreateParameters } from '@/schema/inventory/metric/api-verbs/create';
 import type { MetricDeleteParameters } from '@/schema/inventory/metric/api-verbs/delete';
 import type { MetricModel } from '@/schema/inventory/metric/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -35,13 +41,12 @@ import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/component
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 const rightPartRef = ref<HTMLElement|null>(null);
-const router = useRouter();
-const route = useRoute();
+
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
@@ -49,12 +54,25 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 
+const router = useRouter();
+const route = useRoute();
+
 const storeState = reactive({
     namespaces: computed(() => allReferenceStore.getters.namespace),
     currentMetric: computed(() => metricExplorerPageState.metric),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
-
 const state = reactive({
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     currentMetricId: computed<string>(() => route.params.metricId),
     isDuplicateEnabled: computed<boolean>(() => Object.values(storeState.namespaces).find((d) => d.key === storeState.currentMetric?.namespace_id)?.data.group !== 'common'),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
@@ -64,14 +82,14 @@ const state = reactive({
     metricDeleteModalVisible: false,
     loadingDuplicate: false,
     selectedNameFormModalType: undefined as string|undefined,
-    saveDropdownMenuItems: computed<MenuItem[]>(() => ([
+    saveDropdownMenuItems: computed<MenuItem[]>(() => (state.hasReadWriteAccess ? [
         {
             type: 'item',
             name: 'saveAs',
             icon: 'ic_disk-edit-filled',
             label: `${i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS')}...`,
         },
-    ])),
+    ] : [])),
     pageTitle: computed<string|TranslateResult>(() => {
         if (metricExplorerPageState.metricLoading) return '';
         if (metricExplorerPageState.metric) {
@@ -86,13 +104,13 @@ const state = reactive({
         return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_CUSTOM_METRIC');
     }),
     editQueryTitle: computed<TranslateResult>(() => {
-        if (state.isManagedMetric || state.currentMetricExampleId) {
+        if (!state.hasReadWriteAccess || state.isManagedMetric || state.currentMetricExampleId) {
             return i18n.t('INVENTORY.METRIC_EXPLORER.VIEW_QUERY');
         }
         return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_QUERY');
     }),
     editQueryButtonIcon: computed<string>(() => {
-        if (state.isManagedMetric || state.currentMetricExampleId) {
+        if (!state.hasReadWriteAccess || state.isManagedMetric || state.currentMetricExampleId) {
             return 'ic_editor-code';
         }
         return 'ic_edit';
@@ -249,7 +267,7 @@ const handleClickMoreMenuButton = () => {
     else showContextMenu();
 };
 const handleOpenEditQuery = () => {
-    if (state.isManagedMetric || state.currentMetricExampleId) {
+    if (!state.hasReadWriteAccess || state.isManagedMetric || state.currentMetricExampleId) {
         metricExplorerPageStore.openMetricQueryFormSidebar('VIEW');
     } else {
         metricExplorerPageStore.openMetricQueryFormSidebar('UPDATE');
@@ -281,11 +299,13 @@ const handleOpenEditQuery = () => {
             <div v-if="!state.isManagedMetric"
                  class="title-right-extra icon-wrapper"
             >
-                <p-icon-button name="ic_edit-text"
+                <p-icon-button v-if="state.hasReadWriteAccess"
+                               name="ic_edit-text"
                                size="md"
                                @click.stop="handleClickEditName"
                 />
-                <p-icon-button name="ic_delete"
+                <p-icon-button v-if="state.hasReadWriteAccess"
+                               name="ic_delete"
                                size="md"
                                style-type="negative-transparent"
                                @click.stop="handleClickDeleteMetric"
@@ -311,47 +331,49 @@ const handleOpenEditQuery = () => {
                 >
                     {{ state.editQueryTitle }}
                 </p-button>
-                <template v-if="!state.currentMetricExampleId">
-                    <p-button v-if="state.isDuplicateEnabled"
-                              class="mr-2"
-                              style-type="tertiary"
-                              icon-left="ic_clone"
-                              :loading="state.loadingDuplicate"
-                              @click="handleDuplicate"
-                    >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.DUPLICATE') }}
-                    </p-button>
-                    <p-button style-type="tertiary"
-                              icon-left="ic_plus_bold"
-                              @click="handleOpenAddExampleModal"
-                    >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE') }}
-                    </p-button>
-                </template>
-                <!-- example case -->
-                <template v-else>
-                    <p-button class="save-button"
-                              style-type="tertiary"
-                              icon-left="ic_disk-filled"
-                              @click="handleSaveMetricExample"
-                    >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.SAVE') }}
-                    </p-button>
-                    <p-icon-button ref="targetRef"
-                                   class="more-menu-button"
-                                   :name="visibleContextMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
-                                   style-type="tertiary"
-                                   shape="square"
-                                   size="md"
-                                   color="inherit"
-                                   @click="handleClickMoreMenuButton"
-                    />
-                    <p-context-menu v-show="visibleContextMenu"
-                                    ref="contextMenuRef"
-                                    :menu="state.saveDropdownMenuItems"
-                                    :style="contextMenuStyle"
-                                    @select="handleSelectSaveAsExample"
-                    />
+                <template v-if="state.hasReadWriteAccess">
+                    <template v-if="!state.currentMetricExampleId">
+                        <p-button v-if="state.isDuplicateEnabled"
+                                  class="mr-2"
+                                  style-type="tertiary"
+                                  icon-left="ic_clone"
+                                  :loading="state.loadingDuplicate"
+                                  @click="handleDuplicate"
+                        >
+                            {{ $t('INVENTORY.METRIC_EXPLORER.DUPLICATE') }}
+                        </p-button>
+                        <p-button style-type="tertiary"
+                                  icon-left="ic_plus_bold"
+                                  @click="handleOpenAddExampleModal"
+                        >
+                            {{ $t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE') }}
+                        </p-button>
+                    </template>
+                    <!-- example case -->
+                    <template v-else>
+                        <p-button class="save-button"
+                                  style-type="tertiary"
+                                  icon-left="ic_disk-filled"
+                                  @click="handleSaveMetricExample"
+                        >
+                            {{ $t('INVENTORY.METRIC_EXPLORER.SAVE') }}
+                        </p-button>
+                        <p-icon-button ref="targetRef"
+                                       class="more-menu-button"
+                                       :name="visibleContextMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
+                                       style-type="tertiary"
+                                       shape="square"
+                                       size="md"
+                                       color="inherit"
+                                       @click="handleClickMoreMenuButton"
+                        />
+                        <p-context-menu v-show="visibleContextMenu"
+                                        ref="contextMenuRef"
+                                        :menu="state.saveDropdownMenuItems"
+                                        :style="contextMenuStyle"
+                                        @select="handleSelectSaveAsExample"
+                        />
+                    </template>
                 </template>
             </div>
             <metric-explorer-name-form-modal :visible.sync="state.metricNameFormModalVisible"
