@@ -53,7 +53,6 @@ const state = reactive({
     }),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
-        if (props.disableSaveButton) return [];
         const results: string[] = [];
         Object.entries(state.variableProperties).forEach(([k]) => {
             if (!isEqual(dashboardDetailState.dashboardInfo?.vars?.[k], dashboardDetailState.vars?.[k])) {
