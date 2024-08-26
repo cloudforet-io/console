@@ -59,7 +59,8 @@ const state = reactive({
     showBadge: computed<boolean>(() => {
         if (dashboardDetailState.dashboardInfo?.user_id) return true;
         // HACK: temp code for legacy project dashboard
-        return dashboardDetailState.dashboardInfo?.workspace_id === '*'; // || dashboardDetailState.dashboardInfo?.project_id === '*';
+        if (state.sharedScope === 'PROJECT') return false;
+        return state.sharedScope === 'WORKSPACE';
     }),
     badgeStyleType: computed<string>(() => {
         if (dashboardDetailState.dashboardScope === 'PRIVATE') return 'gray150';
