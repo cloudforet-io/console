@@ -157,12 +157,6 @@ const drawChart = async (rawData: WidgetLoadData|null) => {
                 _targetRegion?.continent.latitude,
                 result[state.dataField],
             ],
-            label: {
-                emphasis: {
-                    position: 'right',
-                    show: true,
-                },
-            },
             itemStyle: {
                 normal: {
                     color: coral[400],
