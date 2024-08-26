@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onBeforeMount, onUnmounted, reactive, ref, watch,
+    computed, nextTick, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import { cloneDeep, isEqual } from 'lodash';
@@ -189,6 +189,10 @@ watch(() => state.mounted, async (mounted) => {
         await loadOverlayWidget();
         state.mounted = false;
     }
+});
+watch(() => dashboardDetailState.vars, async () => {
+    await nextTick();
+    await loadOverlayWidget();
 });
 
 onBeforeMount(() => {
