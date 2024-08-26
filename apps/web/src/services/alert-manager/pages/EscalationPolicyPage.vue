@@ -2,7 +2,9 @@
 import {
     reactive, computed,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler,
@@ -33,7 +35,10 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -44,6 +49,7 @@ import EscalationPolicyDataTable from '@/services/alert-manager/components/Escal
 import EscalationPolicyFormModal from '@/services/alert-manager/components/EscalationPolicyFormModal.vue';
 import { ACTION } from '@/services/alert-manager/constants/alert-constant';
 import type { ActionMode } from '@/services/alert-manager/types/alert-type';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 interface Item extends Omit<EscalationPolicyModel, 'name'> {
     name: {
@@ -54,9 +60,15 @@ interface Item extends Omit<EscalationPolicyModel, 'name'> {
 }
 
 const router = useRouter();
+const route = useRoute();
+
 const { query } = router.currentRoute;
 
 const allReferenceStore = useAllReferenceStore();
+
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
 
 /* Search Tag */
 const queryTagsHelper = useQueryTags({
@@ -125,6 +137,16 @@ const state = reactive({
     deleteModalVisible: false,
     formModalVisible: false,
     formMode: undefined as ActionMode|undefined,
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 /* api */
@@ -229,7 +251,9 @@ const onChange = async (options: ToolboxOptions = {}) => {
                 @change="onChange"
                 @refresh="onChange()"
             >
-                <template #left-area>
+                <template v-if="state.hasReadWriteAccess"
+                          #left-area
+                >
                     <p-button class="create-button"
                               style-type="primary"
                               icon-left="ic_plus_bold"
@@ -251,6 +275,7 @@ const onChange = async (options: ToolboxOptions = {}) => {
             <escalation-policy-data-table
                 :items="state.items"
                 :loading="tableState.loading"
+                :has-read-write-access="state.hasReadWriteAccess"
                 :select-index.sync="state.selectIndex"
                 @change="onChange"
             />
