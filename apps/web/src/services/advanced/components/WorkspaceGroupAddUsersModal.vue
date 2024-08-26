@@ -11,9 +11,13 @@ import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
+import type { WorkspaceGroupAddUsersParameters } from '@/schema/identity/workspace-group/api-verbs/add-users';
+import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
@@ -36,7 +40,7 @@ const state = reactive({
 
 const {
     loading: roleLoading, searchText: roleSearchText, menuList: roleMenuList, selectedItems: roleSelectedItems, handleClickShowMore: handleClickShowMoreRole,
-} = useSelectDropDownList({
+} = useSelectDropDownList<RoleModel>({
     pageSize: 10,
     transformer: (_role) => ({
         label: _role.name,
@@ -50,7 +54,7 @@ const {
 
 const {
     loading: userLoading, searchText: userSearchText, menuList: userMenuList, selectedItems: userSelectedItems, handleClickShowMore: handleClickShowMoreUser,
-} = useSelectDropDownList({
+} = useSelectDropDownList<UserModel>({
     pageSize: 10,
     transformer: (_user) => ({
         name: _user.name,
@@ -62,9 +66,22 @@ const {
     searchKey: 'user_id',
 });
 
-const handleConfirm = () => {
-    showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
-    workspaceGroupPageStore.closeModal();
+const handleConfirm = async () => {
+    try {
+        state.loading = true;
+        await SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>({
+            workspace_group_id: workspaceGroupPageStore.getters.selectedWorkspaceGroup?.workspace_group_id,
+            users: userSelectedItems.value.map((item) => ({
+                user_id: item?.user_id, role_id: roleSelectedItems.value[0]?.name,
+            })),
+        });
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
+    } catch (e) {
+        state.loading = false;
+        ErrorHandler.handleError(e);
+    } finally {
+        workspaceGroupPageStore.closeModal();
+    }
 };
 
 const handleCloseModal = () => {
@@ -103,7 +120,7 @@ const handleCloseModal = () => {
                         >
                             <template #dropdown-left-area>
                                 <img v-if="roleSelectedItems.length > 0"
-                                     :src="useRoleFormatter(roleSelectedItems[0]?.role_type).image"
+                                     :src="useRoleFormatter(roleSelectedItems[0]?.role_type ?? 'USER').image"
                                      alt="role-type-icon"
                                      class="role-type-icon"
                                 >
@@ -143,9 +160,6 @@ const handleCloseModal = () => {
                             <template #menu-item--format="{ item }">
                                 <div class="user-menu-item">
                                     <span class="role-user_id">{{ item.user_id }}({{ item.name }})</span>
-                                    <p-icon-button name="ic_close"
-                                                   size="md"
-                                    />
                                 </div>
                             </template>
                         </p-select-dropdown>
@@ -157,6 +171,9 @@ const handleCloseModal = () => {
                  :key="item.user_id"
             >
                 {{ item.user_id }}
+                <p-icon-button name="ic_close"
+                               size="md"
+                />
             </div>
         </template>
         <template #confirm-button>

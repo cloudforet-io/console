@@ -8,7 +8,6 @@ import { debounce } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -26,25 +25,25 @@ interface SelectDownListProps {
     searchKey?: string;
 }
 
-interface SelectDropDownListState {
+interface SelectDropDownListState<T> {
     searchText: string,
     loading: boolean,
     totalCount: number,
-    list: any[],
+    list: T[],
     menuList: ComputedRef<SelectDropdownMenuItem[]>,
-    selectedItems: MenuItem[],
+    selectedItems: T[],
     pageStart: number,
     pageLimit: number,
     isShowMore: ComputedRef<boolean>,
 }
 
-export const useSelectDropDownList = ({
+export const useSelectDropDownList = <DataModel>({
     isSearch = true, filter, pageSize = 10, transformer, fetcher, searchKey = 'name',
-}: SelectDownListProps) : ToRefs<SelectDropDownListState> & {
+}: SelectDownListProps) : ToRefs<SelectDropDownListState<DataModel>> & {
     reset: () => Promise<void>,
     handleClickShowMore: () => Promise<void>,
 } => {
-    const state = reactive<SelectDropDownListState>({
+    const state = reactive<SelectDropDownListState<DataModel>>({
         searchText: '',
         loading: false,
         totalCount: 0,
@@ -58,7 +57,7 @@ export const useSelectDropDownList = ({
 
             return menuList;
         }),
-        selectedItems: [] as MenuItem[],
+        selectedItems: [] as DataModel[],
         pageStart: 1,
         pageLimit: pageSize,
         isShowMore: computed(() => {
@@ -123,7 +122,7 @@ export const useSelectDropDownList = ({
     }, 300));
 
     return {
-        ...toRefs<SelectDropDownListState>(state),
+        ...toRefs<SelectDropDownListState<DataModel>>(state),
         reset,
         handleClickShowMore,
     };
