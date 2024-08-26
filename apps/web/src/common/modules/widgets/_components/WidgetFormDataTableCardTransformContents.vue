@@ -251,7 +251,9 @@ const handleUpdateDataTable = async () => {
         widgetGenerateStore.setDataTableUpdating(true);
         await widgetGenerateStore.loadDataTable({});
     }
-    state.loading = false;
+    setTimeout(() => {
+        state.loading = false;
+    }, 1000);
 };
 
 /* Utils */
