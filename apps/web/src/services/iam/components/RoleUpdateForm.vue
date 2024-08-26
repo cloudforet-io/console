@@ -36,6 +36,7 @@ const state = reactive({
     baseInfoFormData: '' as string,
     roleTypeData: ROLE_TYPE.DOMAIN_ADMIN as RoleType,
     pageAccessFormData: ['*'] as string[],
+    changedPageAccessFormData: ['*'] as string[],
     permissionsData: undefined as string[]|undefined,
     isPageAccessValid: false,
     isAllValid: computed<boolean>(() => {
@@ -46,7 +47,7 @@ const state = reactive({
         const baseData = {
             name: state.baseInfoFormData.trim(),
             permissions: state.permissionsData,
-            page_access: state.pageAccessFormData,
+            page_access: state.changedPageAccessFormData,
         };
         return props.formType === FORM_TYPE.CREATE
             ? {
@@ -70,7 +71,7 @@ const handleUpdateForm = (formData: RoleFormData) => {
         state.roleTypeData = formData.role_type;
         state.pageAccessFormData = props.formType === FORM_TYPE.CREATE ? ['*'] : state.pageAccessFormData;
     }
-    if (formData.page_access) state.pageAccessFormData = formData.page_access;
+    if (formData.page_access) state.changedPageAccessFormData = formData.page_access;
     if (formData.permissions) state.permissionsData = formData.permissions;
 };
 
