@@ -58,7 +58,6 @@ const handleUpdateAnnotation = (value: string) => {
 
 /* Watcher */
 watch(() => isAllValid.value, (_isAllValid) => {
-    console.log('isAllValid', _isAllValid);
     emit('update:is-valid', _isAllValid);
 });
 
