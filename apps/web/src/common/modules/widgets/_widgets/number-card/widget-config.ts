@@ -24,6 +24,7 @@ const numberCard: WidgetConfig = {
         },
         numberFormat: {},
         displayAnnotation: {},
+        widgetHeight: {},
     },
 };
 
