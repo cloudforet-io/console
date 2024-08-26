@@ -1,5 +1,6 @@
 import type { RoleType } from '@/schema/identity/role/type';
 
+import { PAGE_ACCESS } from '@/lib/access-control/config';
 import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-helper';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -39,7 +40,7 @@ export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessM
                 id: menu.id,
                 translationIds: [menuInfo.translationId],
                 isParent: true,
-                accessType: 'read_write',
+                accessType: PAGE_ACCESS.READ_WRITE,
                 subMenuList: flattenSubMenuList(menu?.subMenuList ?? [], defaultMenuIdsByRoleType),
             });
         }
@@ -53,7 +54,7 @@ export const getPageAccessList = (menuItems: PageAccessMenuItem[]): string[] => 
     menuItems.forEach((menu) => {
         if (menu.isParent) {
             // Access type is no_access
-            if (menu.accessType === 'no_access') {
+            if (menu.accessType === PAGE_ACCESS.NO_ACCESS) {
                 results.push(`${menu.id}:${menu.accessType}.*`);
                 return;
             }

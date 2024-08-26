@@ -5,7 +5,7 @@ import type {
 } from '@/lib/access-control/config';
 import {
     DOMAIN_ADMIN_DEFAULT_PERMISSIONS,
-    NO_ROLE_USER_DEFAULT_PERMISSIONS,
+    NO_ROLE_USER_DEFAULT_PERMISSIONS, PAGE_ACCESS,
     SYSTEM_USER_DEFAULT_PERMISSIONS,
     WORKSPACE_MEMBER_DEFAULT_PERMISSIONS,
     WORKSPACE_OWNER_DEFAULT_PERMISSIONS,
@@ -48,9 +48,9 @@ export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[]): P
         const menu = MENU_LIST.find(({ id }) => id === menuId);
         if (!menu) return;
 
-        const read = accessType !== 'no_access';
-        const write = accessType === 'read_write';
-        const access = accessType !== 'no_access';
+        const read = accessType !== PAGE_ACCESS.NO_ACCESS;
+        const write = accessType === PAGE_ACCESS.READ_WRITE;
+        const access = accessType !== PAGE_ACCESS.READ_ONLY;
 
         setPermissions(menuId, read, write, access);
 
@@ -63,18 +63,18 @@ export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[]): P
         if (page === '*') {
             flattenedMenuList.forEach(({ id }) => setPermissions(id));
         } else if (page.endsWith('.*')) {
-            const [menuId, accessType = 'read_write'] = page.replace('.*', '').split(':');
+            const [menuId, accessType = PAGE_ACCESS.READ_WRITE] = page.replace('.*', '').split(':');
             handleWildcardPermissions(menuId, accessType);
         } else {
-            const [menuId, accessType = 'read_write'] = page.split('.')[0].split(':');
+            const [menuId, accessType = PAGE_ACCESS.READ_WRITE] = page.split('.')[0].split(':');
             const subMenuId = page.split('.').slice(1).join('.');
 
-            setPermissions(menuId, true, accessType === 'read_write', true);
+            setPermissions(menuId, true, accessType === PAGE_ACCESS.READ_WRITE, true);
 
             const menu = MENU_LIST.find(({ id }) => id === menuId);
             const subMenuExists = menu?.subMenuList?.some(({ id }) => id === subMenuId);
 
-            setPermissions(subMenuId, subMenuExists, accessType === 'read_write', subMenuExists);
+            setPermissions(subMenuId, subMenuExists, accessType === PAGE_ACCESS.READ_WRITE, subMenuExists);
         }
     });
 

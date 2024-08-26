@@ -99,3 +99,9 @@ export const WORKSPACE_USER_MINIMAL_PERMISSIONS: MenuId[] = [
     MENU_ID.ACCOUNT_PROFILE,
     MENU_ID.NOTIFICATIONS,
 ];
+
+export const PAGE_ACCESS = {
+    NO_ACCESS: 'no_access',
+    READ_ONLY: 'read_only',
+    READ_WRITE: 'read_write',
+} as const;

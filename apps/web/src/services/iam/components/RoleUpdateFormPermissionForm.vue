@@ -10,6 +10,7 @@ import { PHeading, PPaneLayout } from '@cloudforet/mirinae';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
+import { PAGE_ACCESS } from '@/lib/access-control/config';
 import { getPageAccessMapFromRawData } from '@/lib/access-control/page-access-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -66,7 +67,7 @@ const handleUpdateForm = (value: PageAccessMenuItem, isInit?: boolean) => {
 
             const subItem = find(menuItem.subMenuList, { id: menuId });
             if (subItem) {
-                subItem.isAccessible = menuItem.accessType !== 'no_access' ? isAccessible : true;
+                subItem.isAccessible = menuItem.accessType !== PAGE_ACCESS.NO_ACCESS ? isAccessible : true;
             }
         }
     });
@@ -84,11 +85,11 @@ const setPageAccessPermissionsData = () => {
         if (!itemId) return;
         let accessType = '';
         if (accessible.read && accessible.write) {
-            accessType = 'read_write';
+            accessType = PAGE_ACCESS.READ_WRITE;
         } else if (accessible.read && !accessible.write) {
-            accessType = 'read_only';
+            accessType = PAGE_ACCESS.READ_ONLY;
         } else {
-            accessType = 'no_access';
+            accessType = PAGE_ACCESS.NO_ACCESS;
         }
         handleUpdateForm({
             id: itemId,

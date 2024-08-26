@@ -15,6 +15,7 @@ import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
+import { PAGE_ACCESS } from '@/lib/access-control/config';
 import {
     getPageAccessMapFromRawData,
 } from '@/lib/access-control/page-access-helper';
@@ -59,7 +60,7 @@ const tableState = reactive({
     items: computed<TableItem[] | undefined>(() => state.pageAccessDataList?.map((i) => {
         const pageAccess: AccessType | undefined = (() => {
             if (i.isParent && i.subMenuList.length === 0) {
-                return getAccessType('no_access');
+                return getAccessType(PAGE_ACCESS.NO_ACCESS);
             }
             if (i.accessType) {
                 return getAccessType(i.accessType);
@@ -90,7 +91,7 @@ const handleUpdateForm = (value: PageAccessMenuItem) => {
 
     if (item) {
         if (accessType) item.accessType = accessType;
-        if (item.accessType === 'no_access') {
+        if (item.accessType === PAGE_ACCESS.NO_ACCESS) {
             item.subMenuList = [];
         } else if (item.subMenuList?.length === 0) {
             item.subMenuList?.push({
@@ -139,11 +140,11 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
         if (!itemId) return;
         let accessType = '';
         if (accessible.read && accessible.write) {
-            accessType = 'read_write';
+            accessType = PAGE_ACCESS.READ_WRITE;
         } else if (accessible.read && !accessible.write) {
-            accessType = 'read_only';
+            accessType = PAGE_ACCESS.READ_ONLY;
         } else {
-            accessType = 'no_access';
+            accessType = PAGE_ACCESS.NO_ACCESS;
         }
         handleUpdateForm({ id: itemId, isAccessible: accessible.access, accessType });
     });

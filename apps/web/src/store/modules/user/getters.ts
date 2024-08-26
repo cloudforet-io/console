@@ -5,6 +5,7 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { languages } from '@/store/modules/user/config';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
+import { PAGE_ACCESS } from '@/lib/access-control/config';
 import {
     getDefaultPageAccessPermissionList, getMinimalPageAccessPermissionList, getPageAccessMapFromRawData,
 } from '@/lib/access-control/page-access-helper';
@@ -59,7 +60,7 @@ export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters):
 
     const isAllReadOnly = roleBasePagePermissions.every((item) => {
         const accessType = item.split('.*')[0].split(':')[1];
-        return accessType === 'read_only';
+        return accessType === PAGE_ACCESS.READ_ONLY;
     });
 
     getters.pageAccessPermissionList.forEach((menuId) => {

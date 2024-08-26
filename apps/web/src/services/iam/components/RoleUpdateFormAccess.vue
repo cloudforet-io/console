@@ -11,6 +11,7 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
 
+import { PAGE_ACCESS } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { gray, green } from '@/styles/colors';
@@ -55,14 +56,14 @@ const tableState = reactive({
 const getDropdownItems = (id: string) => {
     if (id === MENU_ID.DASHBOARDS || id === MENU_ID.PROJECT) {
         return [
-            { name: 'read_write', label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
-            { name: 'no_access', label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
+            { name: PAGE_ACCESS.READ_WRITE, label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
+            { name: PAGE_ACCESS.NO_ACCESS, label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
         ];
     }
     return [
-        { name: 'read_write', label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
-        { name: 'read_only', label: i18n.t('IAM.ROLE.FORM.READ_ONLY'), icon: 'ic_no-edit' },
-        { name: 'no_access', label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
+        { name: PAGE_ACCESS.READ_WRITE, label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
+        { name: PAGE_ACCESS.READ_ONLY, label: i18n.t('IAM.ROLE.FORM.READ_ONLY'), icon: 'ic_no-edit' },
+        { name: PAGE_ACCESS.NO_ACCESS, label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
     ];
 };
 const handleChangeSelectedMenu = (values: PageAccessMenuItem[]) => {
@@ -89,7 +90,7 @@ const handleChangeToggle = (value: boolean) => {
     state.menuItems.forEach((menu) => {
         emit('update', {
             ...menu,
-            accessType: value ? 'read_only' : 'read_write',
+            accessType: value ? PAGE_ACCESS.READ_ONLY : PAGE_ACCESS.READ_WRITE,
         });
     });
 };
@@ -179,7 +180,7 @@ watch(() => props.menuItems, (menuItems) => {
                                     :key="menu.name"
                                     :invalid="item.isInValid"
                                     class="accessible-item"
-                                    :disabled="item.page_access === 'no_access'"
+                                    :disabled="item.page_access === PAGE_ACCESS.NO_ACCESS"
                                     :selected="tableState.selectedMenuIds"
                                     :value="menu"
                                     @change="handleChangeSelectedMenu"

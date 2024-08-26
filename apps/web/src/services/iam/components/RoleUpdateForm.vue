@@ -40,7 +40,7 @@ const state = reactive({
     permissionsData: undefined as string[]|undefined,
     isPageAccessValid: false,
     isAllValid: computed<boolean>(() => {
-        const isPageAccessCheckRequired = state.roleTypeData !== 'DOMAIN_ADMIN';
+        const isPageAccessCheckRequired = state.roleTypeData !== ROLE_TYPE.DOMAIN_ADMIN;
         return state.isBaseInformationValid && (!isPageAccessCheckRequired || state.isPageAccessValid);
     }),
     formData: computed<RoleCreateParameters|RoleUpdateParameters>(() => {
