@@ -15,7 +15,9 @@ import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
-import { getPageAccessPermissionMapFromRawData } from '@/lib/access-control/page-access-helper';
+import {
+    getPageAccessMapFromRawData,
+} from '@/lib/access-control/page-access-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -70,7 +72,6 @@ const tableState = reactive({
             service: i.translationIds ? i.translationIds[0] : '',
             page_access: pageAccess,
             accessible_menu_list: i.subMenuList.length > 0 ? i.subMenuList : undefined,
-            isInValid: i.subMenuList.every((j) => !j.isAccessible),
         };
     })),
 });
@@ -89,7 +90,9 @@ const handleUpdateForm = (value: PageAccessMenuItem) => {
 
     if (item) {
         if (accessType) item.accessType = accessType;
-        if (item.subMenuList?.length === 0) {
+        if (item.accessType === 'no_access') {
+            item.subMenuList = [];
+        } else if (item.subMenuList?.length === 0) {
             item.subMenuList?.push({
                 id: item.id,
                 isAccessible: item.isAccessible,
@@ -99,8 +102,14 @@ const handleUpdateForm = (value: PageAccessMenuItem) => {
     }
 
     state.pageAccessDataList.forEach((menuItem) => {
-        const subItem = find(menuItem.subMenuList, { id: menuId });
-        if (subItem) subItem.isAccessible = isAccessible;
+        if (menuItem?.subMenuList?.length) {
+            const subItemIndex = menuItem.subMenuList.findIndex((d) => d.id === menuId);
+
+            if (subItemIndex !== -1 && !isAccessible) {
+                menuItem.subMenuList.splice(subItemIndex, 1);
+            }
+        }
+        return menuItem;
     });
 };
 
@@ -124,10 +133,19 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
     await getRoleDetailData(selectedRoleId);
     state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type);
 
-    const pageAccessPermissionMap = getPageAccessPermissionMapFromRawData(state.pageAccess);
+    const pageAccessPermissionMap = getPageAccessMapFromRawData(state.pageAccess);
 
     Object.entries(pageAccessPermissionMap).forEach(([itemId, accessible]) => {
-        handleUpdateForm({ id: itemId, isAccessible: accessible });
+        if (!itemId) return;
+        let accessType = '';
+        if (accessible.read && accessible.write) {
+            accessType = 'read_write';
+        } else if (accessible.read && !accessible.write) {
+            accessType = 'read_only';
+        } else {
+            accessType = 'no_access';
+        }
+        handleUpdateForm({ id: itemId, isAccessible: accessible.access, accessType });
     });
 }, { immediate: true });
 </script>
