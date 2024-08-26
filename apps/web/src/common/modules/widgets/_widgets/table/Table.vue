@@ -3,8 +3,6 @@ import {
     defineExpose, reactive, computed, watch, onMounted,
 } from 'vue';
 
-import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
-import dayjs from 'dayjs';
 import { orderBy, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -13,7 +11,6 @@ import { PPagination } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
@@ -34,7 +31,7 @@ import { getWidgetDataTable, sortWidgetTableFields } from '@/common/modules/widg
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DateRange, DateFieldType, TableDataItem,
+    DateRange, TableDataItem,
 } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
@@ -133,36 +130,44 @@ const state = reactive({
                     });
                 }
             });
-        } else if (isDateField(state.tableDataField)) dataFields = getWidgetTableDateFields(state.tableDataField, state.granularity, state.dateRange, state.tableDataMaxCount, state.tableDataCriteria);
-        else { // None Time Series Dynamic Field Case
-            (state.finalConvertedData?.results?.[0]?.[state.tableDataCriteria] ?? []).forEach((d) => {
-                if (d[state.tableDataField] === 'sub_total') return;
-                const fieldName = `${d[state.tableDataField]}`;
-                const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
-                if (fieldName && fieldName.startsWith('comparison_')) {
-                    if (state.comparisonInfo?.format && state.isComparisonEnabled && d[state.tableDataField] !== 'etc') {
-                        dataFields.push({
-                            name: fieldName,
-                            label: fieldName.split('_')[1],
-                            fieldInfo: {
-                                type: 'dataField',
-                                additionalType: 'comparison',
-                                reference: isReferenceField ? REFERENCE_FIELD_MAP[state.tableDataField] : undefined,
-                                unit: state.dataInfo?.[state.tableDataCriteria]?.unit,
-                            },
-                        });
-                    }
-                } else {
+        } else if (isDateField(state.tableDataField)) {
+            dataFields = (state.tableDataFieldInfo.dynamicFieldValue ?? []).map((_fieldName) => ({
+                name: _fieldName,
+                label: _fieldName,
+                fieldInfo: { type: 'dataField', additionalType: 'dateFormat', unit: state.dataInfo?.[state.tableDataCriteria]?.unit },
+            }));
+        } else { // None Time Series Dynamic Field Case
+            const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
+            (state.tableDataFieldInfo.dynamicFieldValue ?? []).forEach((_fieldName) => {
+                dataFields.push({
+                    name: _fieldName,
+                    label: _fieldName,
+                    fieldInfo: {
+                        type: 'dataField',
+                        reference: isReferenceField ? REFERENCE_FIELD_MAP[state.tableDataField] : undefined,
+                        unit: state.dataInfo?.[state.tableDataCriteria]?.unit,
+                    },
+                });
+                if (state.comparisonInfo?.format && state.isComparisonEnabled) {
                     dataFields.push({
-                        name: d[state.tableDataField],
-                        label: d[state.tableDataField],
+                        name: `comparison_${_fieldName}`,
+                        label: _fieldName,
                         fieldInfo: {
                             type: 'dataField',
-                            reference: isReferenceField && d[state.tableDataField] !== 'etc' ? REFERENCE_FIELD_MAP[state.tableDataField] : undefined,
+                            additionalType: 'comparison',
+                            reference: isReferenceField ? REFERENCE_FIELD_MAP[state.tableDataField] : undefined,
                             unit: state.dataInfo?.[state.tableDataCriteria]?.unit,
                         },
                     });
                 }
+            });
+            dataFields.push({
+                name: 'etc',
+                label: 'etc',
+                fieldInfo: {
+                    type: 'dataField',
+                    unit: state.dataInfo?.[state.tableDataCriteria]?.unit,
+                },
             });
         }
         const basicFields = [...labelFields, ...dataFields];
@@ -194,40 +199,6 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Helper */
-const getWidgetTableDateFields = (
-    dateField: DateFieldType,
-    granularity: Granularity|undefined,
-    dateRange: DateRange,
-    limitCount: number,
-    criteria: string,
-): TableWidgetField[] => {
-    if (!granularity || !dateRange?.end) return [];
-    const dateFields: TableWidgetField[] = [];
-    const start = dayjs.utc(dateRange.start);
-    const end = dayjs.utc(dateRange.end);
-
-    let timeUnit: TimeUnit = 'day';
-    if (granularity === GRANULARITY.MONTHLY) timeUnit = 'month';
-    else if (granularity === GRANULARITY.YEARLY) timeUnit = 'year';
-
-    const isSeparateDate = dateField !== DATE_FIELD.DATE;
-
-    let labelDateFormat = isSeparateDate ? 'DD' : 'YYYY-MM-DD';
-    if (timeUnit === 'month') labelDateFormat = isSeparateDate ? 'MM' : 'YYYY-MM';
-    else if (timeUnit === 'year') labelDateFormat = 'YYYY';
-
-    let now = start;
-    while (now.isSameOrBefore(end, timeUnit)) {
-        dateFields.push({
-            name: now.format(labelDateFormat),
-            label: now.format(labelDateFormat),
-            fieldInfo: { type: 'dataField', additionalType: 'dateFormat', unit: state.dataInfo?.[criteria]?.unit },
-        });
-        now = now.add(1, timeUnit);
-    }
-    return dateFields.slice(-limitCount);
-};
-
 const getTotalDataItem = (data: TableDataItem[], type: 'static'|'time_series'|'dynamic'): TableDataItem => {
     const hasComparisonInfo = state.comparisonInfo?.format;
 
@@ -288,6 +259,7 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
         let _groupBy: string[] = [...state.groupByField];
         let _field_group: string[] = [];
         let _sort: Query['sort'] = [];
+        let _filter: Query['filter'] = [];
         if (state.tableDataFieldType === 'staticField') {
             state.tableDataField?.forEach((field) => {
                 _fields[field] = { key: field, operator: 'sum' };
@@ -298,6 +270,13 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
             _field_group = [state.tableDataField];
             _groupBy = [..._groupBy, state.tableDataField];
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
+        }
+        if (state.tableDataFieldType === 'dynamicField') {
+            _filter = [{
+                k: state.tableDataField,
+                v: state.tableDataFieldInfo.dynamicFieldValue,
+                o: 'in',
+            }];
         }
         const sortAndPageQuery = fullDataFetch ? {} : {
             sort: state.sortBy.length ? state.sortBy : _sort,
@@ -315,6 +294,7 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
                 group_by: _groupBy,
                 field_group: _field_group,
                 fields: _fields,
+                filter: _filter,
                 ...sortAndPageQuery,
             },
             vars: props.dashboardVars,

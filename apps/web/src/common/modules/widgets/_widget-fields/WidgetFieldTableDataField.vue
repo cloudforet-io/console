@@ -250,7 +250,7 @@ watch(() => state.selectedFieldType, (selectedFieldType) => {
             ...state.proxyValue,
             value: props.value?.value ?? state.menuItems[DEFAULT_INDEX]?.name,
             criteria: state.dataInfoMenuItems[0]?.name,
-            dynamicFieldValue: [],
+            dynamicFieldValue: props.value?.fieldType === 'dynamicField' ? (props.value?.dynamicFieldValue ?? []) : undefined,
         };
     }
 }, { immediate: true });
@@ -264,7 +264,7 @@ const initValue = () => {
         value: props.value?.value,
         criteria: props.value?.criteria,
         count: props.value?.count ?? DEFAULT_COUNT,
-        dynamicFieldValue: state.selectedFieldType === 'dynamicField' ? props.value?.dynamicFieldValue ?? [] : undefined,
+        dynamicFieldValue: state.selectedFieldType === 'dynamicField' ? (props.value?.dynamicFieldValue ?? []) : undefined,
     };
     if (state.selectedFieldType === 'staticField') {
         state.selectedItem = convertToMenuItem(state.proxyValue?.value);
@@ -329,13 +329,6 @@ const fetchAndExtractDynamicField = async () => {
         state.loading = false;
     }
 };
-const resetDynamicField = () => {
-    state.dynamicFields = [];
-    state.proxyValue = {
-        ...state.proxyValue,
-        dynamicFieldValue: [],
-    };
-};
 const generateDateFields = (granularity: string, dateRange: DateRange) => {
     if (!granularity) {
         state.dynamicFields = [];
@@ -379,17 +372,26 @@ watch([ // Fetch Dynamic Field
     () => props.allValueMap?.groupBy,
     () => props.allValueMap?.granularity,
     () => props.dateRange,
-], async ([_fieldType, _value, _criteria, _groupBy, _granularity, _dateRange], prev) => {
+], async (
+    [_fieldType, _value, _criteria, _groupBy, _granularity, _dateRange],
+    [, _prevValue, _prevCriteria, _prevGroupBy, _prevGranularity, _prevDateRange],
+) => {
     if (_fieldType === 'staticField') return;
-    if (_value === prev[1] && _criteria === prev[2] && isEqual(_groupBy, prev[3]) && _granularity === prev[4] && isEqual(_dateRange, prev[5])) return;
-    resetDynamicField();
+    const fetchingSkipCondition = _value === _prevValue && _criteria === _prevCriteria && isEqual(_groupBy, _prevGroupBy) && _granularity === _prevGranularity && isEqual(_dateRange, _prevDateRange);
+    if (fetchingSkipCondition) return;
+    const resetConditionByExternalValue = _prevGroupBy && _prevGranularity && (!isEqual(_groupBy, _prevGroupBy) || _granularity !== _prevGranularity);
+    if (resetConditionByExternalValue) {
+        state.proxyValue = {
+            ...state.proxyValue,
+            dynamicFieldValue: [],
+        };
+    }
     if (_value === 'Date') {
         generateDateFields(_granularity as string, state.dateRange);
     } else {
         await fetchAndExtractDynamicField();
     }
 }, { immediate: true });
-
 
 </script>
 
