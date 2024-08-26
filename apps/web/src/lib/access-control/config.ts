@@ -10,7 +10,7 @@ export interface AccessInfo {
 export type PageAccessType = {
     read?: boolean;
     write?: boolean;
-    access: boolean;
+    access?: boolean;
 };
 export type PageAccessMap = Record<string, PageAccessType>;
 

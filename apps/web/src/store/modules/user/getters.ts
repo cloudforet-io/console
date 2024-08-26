@@ -32,14 +32,14 @@ export const getCurrentGrantInfo: Getter<UserState, any> = (state: UserState): G
 
 export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
     const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
-    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
-    const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
     const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
     const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
+    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
+    const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+
     Object.keys(pagePermissionMap).forEach((menuId) => {
         if (minimalPagePermissionList.includes(menuId as MenuId)) pagePermissionMap[menuId] = { read: true, write: true, access: true };
     });
-
     let result = [...minimalPagePermissionList];
     Object.keys(pagePermissionMap).forEach((menuId) => {
         const _menuId = menuId as MenuId;
@@ -51,8 +51,29 @@ export const pageAccessPermissionList: Getter<UserState, any> = (state, getters)
 
 export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters): PageAccessMap => {
     const result: PageAccessMap = {};
-    getters.pageAccessPermissionList.forEach((MenuId) => {
-        if (!result[MenuId]) result[MenuId] = { access: true };
+
+    const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
+    const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
+    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
+    const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+
+    const isAllReadOnly = roleBasePagePermissions.every((item) => {
+        const accessType = item.split('.*')[0].split(':')[1];
+        return accessType === 'read_only';
+    });
+
+    getters.pageAccessPermissionList.forEach((menuId) => {
+        if (!result[menuId]) {
+            if (roleType === ROLE_TYPE.DOMAIN_ADMIN) {
+                result[menuId] = {
+                    write: !isAllReadOnly,
+                };
+            } else {
+                result[menuId] = {
+                    write: minimalPagePermissionList.includes(menuId) ? true : pagePermissionMap[menuId]?.write,
+                };
+            }
+        }
     });
     return result;
 };
