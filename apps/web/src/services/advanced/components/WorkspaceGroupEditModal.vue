@@ -29,7 +29,7 @@ const updateWorkspaceGroups = async () => {
 
     try {
         await SpaceConnector.clientV2.identity.workspaceGroup.update<WorkspaceGroupUpdateParameters, WorkspaceGroupModel>({
-            workspace_group_id: workspaceGroupPageGetters.selectedGroup.workspace_group_id,
+            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
             name: state.groupName,
         });
     } catch (e) {
@@ -56,7 +56,7 @@ const handleClose = () => {
 
 watch(() => workspaceGroupPageState.modal.visible, () => {
     if (workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.EDIT) {
-        state.groupName = workspaceGroupPageGetters.selectedGroup.name;
+        state.groupName = workspaceGroupPageGetters.selectedWorkspaceGroup.name;
     }
 });
 </script>

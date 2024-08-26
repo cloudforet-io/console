@@ -60,7 +60,7 @@ export const useWorkspaceGroupReferenceStore = defineStore('reference-workspace-
 
         const params: WorkspaceGroupListParameters = {
             query: {
-                only: ['name', 'workspace_id', 'tags'],
+                only: ['name', 'workspace_group_id', 'tags'],
             },
         };
 

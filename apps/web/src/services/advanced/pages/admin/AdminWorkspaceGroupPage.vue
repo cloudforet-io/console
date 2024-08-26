@@ -39,7 +39,7 @@ const fetchWorkspaceGroups = async (tabRefresh = { isGroupUser: false, isWorkspa
             query: workspaceGroupListApiQuery,
         });
 
-        workspaceGroupPageState.groups = results || [];
+        workspaceGroupPageState.workspaceGroups = results || [];
         workspaceGroupPageState.total_count = total_count;
 
         if (!tabRefresh.isGroupUser && !tabRefresh.isWorkspace) {
@@ -57,7 +57,7 @@ const fetchWorkspaceGroups = async (tabRefresh = { isGroupUser: false, isWorkspa
         }
     } catch (e) {
         ErrorHandler.handleError(e);
-        workspaceGroupPageState.groups = [];
+        workspaceGroupPageState.workspaceGroups = [];
     } finally {
         workspaceGroupPageState.loading = false;
     }

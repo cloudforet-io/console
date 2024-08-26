@@ -77,7 +77,7 @@ const createWorkspaceGroup = async () => {
 
     try {
         const { workspace_group_id } = await SpaceConnector.clientV2.identity.workspaceGroup.create<WorkspaceGroupCreateParameters, WorkspaceGroupModel>({
-            name: state.groupName,
+            name: groupName.value,
         });
 
         if (!selectedItems.value.length) {

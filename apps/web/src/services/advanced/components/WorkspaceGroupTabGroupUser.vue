@@ -24,7 +24,7 @@ const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
-const emit = defineEmits<{(e: 'refersh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
+const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
 const tableState = reactive({
     // TODO: temp data

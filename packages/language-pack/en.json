@@ -2752,7 +2752,7 @@
 				"ADD": "Add",
 				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
 				"ADD_WORKSPACES_TITLE": "Add Workspaces to {name}",
-				"ALT_S_ADD_USRES": "Users successfully added",
+				"ALT_S_ADD_USERS": "Users successfully added",
 				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
 				"CREATE_DROP_DOWN_PLACEHOLDER": "Select workspaces",
 				"CREATE_GROUP_NAME": "Name",
@@ -2773,7 +2773,7 @@
 				"ROLE_SELECT_DROP_DOWN_TITLE": "Role",
 				"USER_DROP_DOWN_PLACEHOLDER": "Add Users",
 				"USER_SELECT_DROP_DOWN_TITLE": "User",
-				"WORKSPACE_SELECT_DROP_DOWN_TITLE": ""
+				"WORKSPACE_SELECT_DROP_DOWN_TITLE": "Included Workspaces"
 			},
 			"TAB": {
 				"ADD_USER": "Add User",

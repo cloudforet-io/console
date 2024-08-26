@@ -46,7 +46,7 @@ const deleteWorkspaceGroups = async () => {
 
     try {
         await SpaceConnector.clientV2.identity.workspaceGroup.delete<WorkspaceGroupDeleteParameters, WorkspaceGroupModel>({
-            workspace_group_id: workspaceGroupPageGetters.selectedGroup.workspace_group_id,
+            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -101,7 +101,7 @@ const handleCloseModal = () => {
                             Workspace
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedGroup.workspaces.length || 0 }}
+                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.workspaces.length || 0 }}
                         </p>
                         <p-button style-type="tertiary"
                                   size="sm"
@@ -119,7 +119,7 @@ const handleCloseModal = () => {
                             Group User
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedGroup.users.length || 0 }}
+                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.users.length || 0 }}
                         </p>
                         <p-button style-type="tertiary"
                                   size="sm"

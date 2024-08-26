@@ -49,7 +49,7 @@ const addWorkspace = async () => {
 
     try {
         await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<AddWorkspacesParameters>({
-            workspace_group_id: workspaceGroupPageGetters.selectedGroup.workspace_group_id,
+            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
             workspaces: selectedItems.value.map((item) => item.name as string),
         });
 
