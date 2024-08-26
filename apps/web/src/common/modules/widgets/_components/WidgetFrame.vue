@@ -267,8 +267,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
     position: relative;
     height: 22.5rem;
 
-    @apply rounded-lg bg-white;
-    border-color: theme('colors.gray.200');
+    @apply rounded-lg bg-white border border-gray-200;
     display: inline-flex;
     flex-direction: column;
     padding: 1rem;
