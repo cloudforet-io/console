@@ -10,7 +10,7 @@ import WorkspaceGroupTabGroupUser from '@/services/advanced/components/Workspace
 import WorkspaceGroupTabWorkspace from '@/services/advanced/components/WorkspaceGroupTabWorkspace.vue';
 import { WORKSPACE_GROUP_TABS } from '@/services/advanced/constants/workspace-group-constant';
 
-const emit = defineEmits<{(e: 'refersh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
+const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([

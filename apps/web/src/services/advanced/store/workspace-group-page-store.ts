@@ -52,9 +52,9 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             return state.groups[index];
         }),
         selectedGroupUsers: computed(() => {
-            const filteredUsers = getters.selectedGroup.users.filter(actions.filterUser);
+            const filteredUsers = getters.selectedGroup?.users.filter(actions.filterUser);
 
-            const sortedSelectedGroupUsers = filteredUsers.sort((a, b) => {
+            const sortedSelectedGroupUsers = filteredUsers?.sort((a, b) => {
                 const aValue = a[state.groupUserSortBy];
                 const bValue = b[state.groupUserSortBy];
 
@@ -72,7 +72,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
                 return sortedSelectedGroupUsers.slice(state.groupUserPageStart - 1);
             }
 
-            return sortedSelectedGroupUsers.slice(state.groupUserPageStart - 1, state.groupUserPageStart - 1 + state.groupUserPageLimit);
+            return sortedSelectedGroupUsers?.slice(state.groupUserPageStart - 1, state.groupUserPageStart - 1 + state.groupUserPageLimit);
         }),
         selectedGroupUsersByIndices: computed(() => {
             const groupUsers: any[] = [];
@@ -84,9 +84,9 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             return groupUsers ?? [];
         }),
         selectedWorkspaces: computed(() => {
-            const filteredWokrspaces = getters.selectedGroup.workspaces.filter(actions.filterWorkspace);
+            const filteredWorkspaces = getters.selectedGroup?.workspaces?.filter(actions.filterWorkspace);
 
-            const sortedSelectedWokrspaces = filteredWokrspaces.sort((a, b) => {
+            const sortedSelectedWorkspaces = filteredWorkspaces?.sort((a, b) => {
                 const aValue = a[state.workspaceSortBy];
                 const bValue = b[state.workspaceSortBy];
 
@@ -108,10 +108,10 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             });
 
             if (getters.workspaceTotalCount < state.workspacePageStart - 1 + state.workspacePageLimit) {
-                return sortedSelectedWokrspaces.slice(state.workspacePageStart - 1);
+                return sortedSelectedWorkspaces.slice(state.workspacePageStart - 1);
             }
 
-            return sortedSelectedWokrspaces.slice(state.workspacePageStart - 1, state.workspacePageStart - 1 + state.workspacePageLimit);
+            return sortedSelectedWorkspaces?.slice(state.workspacePageStart - 1, state.workspacePageStart - 1 + state.workspacePageLimit);
         }),
         selectedWorkspacesByIndices: computed(() => {
             const workspaces: any[] = [];
@@ -131,7 +131,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
                 return filteredUsers.length;
             }
 
-            return state.groups[index].users.length;
+            return state.groups[index]?.users?.length;
         }),
         workspaceTotalCount: computed(() => {
             const [index] = state.selectedIndices;
@@ -142,7 +142,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
                 return filteredWorkspaces.length;
             }
 
-            return state.groups[index].workspaces.length;
+            return state.groups[index]?.workspaces?.length;
         }),
         groupUserPage: computed(() => {
             console.log(state.groupUserPageStart / state.groupUserPageLimit);

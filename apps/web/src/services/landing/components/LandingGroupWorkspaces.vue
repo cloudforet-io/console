@@ -1,19 +1,30 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { partition, sortBy } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PButton, PButtonTab, PIconButton,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type {
+    WorkspaceGroupDetailsGetWorkspaceGroupParameters,
+} from '@/schema/identity/workspace-group-details/api-verbs/get-workspace-groups';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
+import LandingWorkspaceGroupManageOverlay from '@/services/landing/components/LandingWorkspaceGroupManageOverlay.vue';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 
@@ -30,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'create'): void}>();
+const router = useRouter();
 
 const state = reactive({
     isShowAll: false,
@@ -60,6 +72,7 @@ const state = reactive({
     ]),
     activeTab: 'all',
     isAllWorkspaceTab: computed(() => state.activeTab === 'all'),
+    isOverlayOpen: false,
     isButtonGroupOpened: false,
 });
 
@@ -70,14 +83,19 @@ const handleClickShowAll = () => {
 const handleClickButtonGroupToggle = () => {
     state.isButtonGroupOpened = !state.isButtonGroupOpened;
 };
+const handleOpenOverlay = (workspaceGroupId:string) => {
+    console.log(workspaceGroupId);
+    state.isOverlayOpen = true;
+};
+
 
 const fetchWorkspaceGroupList = async () => {
-    // try {
-    //     const response = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>();
-    //     state.workspaceGroupList = response;
-    // } catch (e) {
-    //     console.error(e);
-    // }
+    try {
+        const response = await SpaceConnector.clientV2.identity.workspaceGroupDetails.getWorkspaceGroups<WorkspaceGroupDetailsGetWorkspaceGroupParameters, ListResponse<WorkspaceGroupModel>>();
+        state.workspaceGroupList = response;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
 const fetchWorkspaceList = async () => {
@@ -97,7 +115,7 @@ const fetchWorkspaceList = async () => {
 </script>
 
 <template>
-    <div class="landing-all-workspaces">
+    <div class="landing-group-workspaces">
         <div class="workspace-group-filter-container"
              :class="{ 'is-opened': state.isButtonGroupOpened }"
         >
@@ -105,10 +123,12 @@ const fetchWorkspaceList = async () => {
                           :tabs="state.workspaceFilterList"
             >
                 <template #additional-button>
-                    <p-icon-button name="ic_settings"
+                    <p-icon-button v-if="props.isDomainAdmin"
+                                   name="ic_settings"
                                    style-type="tertiary"
                                    size="sm"
                                    class="ml-1"
+                                   @click="() => { router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACE_GROUP._NAME)})}"
                     />
                 </template>
             </p-button-tab>
@@ -128,14 +148,24 @@ const fetchWorkspaceList = async () => {
                     <span class="cnt">({{ state.workspaceList.length }})</span>
                 </template>
             </p-field-title>
-            <p-button v-if="props.isDomainAdmin"
-                      style-type="primary"
-                      size="md"
-                      icon-left="ic_plus_bold"
-                      @click="emit('create')"
-            >
-                {{ $t('LADING.CREATE') }}
-            </p-button>
+            <div class="right-part-wrapper">
+                <p-button v-if="state.activeTab !== 'all'"
+                          style-type="tertiary"
+                          size="md"
+                          icon-left="ic_settings"
+                          @click="handleOpenOverlay(state.activeTab)"
+                >
+                    {{ $t('LADING.SETTINGS') }}
+                </p-button>
+                <p-button v-if="props.isDomainAdmin"
+                          style-type="primary"
+                          size="md"
+                          icon-left="ic_plus_bold"
+                          @click="emit('create')"
+                >
+                    {{ $t('LADING.CREATE') }}
+                </p-button>
+            </div>
         </div>
         <landing-workspace-board :board-sets="state.workspaceBoardSets"
                                  :board-type="BOARD_TYPE.ALL_WORKSPACE"
@@ -151,12 +181,13 @@ const fetchWorkspaceList = async () => {
             >
                 {{ $t('LADING.SHOW_ALL') }}
             </p-button>
+            <landing-workspace-group-manage-overlay :is-overlay-open.sync="state.isOverlayOpen" />
         </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
-.landing-all-workspaces {
+.landing-group-workspaces {
     @apply flex flex-col;
     gap: 1rem;
 
@@ -165,6 +196,7 @@ const fetchWorkspaceList = async () => {
 
         /* custom design-system component - p-button-tab */
         :deep(.p-button-tab) {
+            width: calc(100% - 3rem);
             .button-group {
                 margin: 0;
                 overflow-x: auto;
@@ -197,6 +229,11 @@ const fetchWorkspaceList = async () => {
         @apply flex items-center justify-between;
 
         margin-top: 1rem;
+
+        .right-part-wrapper {
+            @apply flex gap-2;
+        }
+
         margin-bottom: 1rem;
         .title {
             .cnt {

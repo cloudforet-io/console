@@ -2757,6 +2757,7 @@
 				"CREATE_DROP_DOWN_PLACEHOLDER": "Select workspaces",
 				"CREATE_GROUP_NAME": "Name",
 				"CREATE_GROUP_NAME_PLACEHOLDER": "Enter Name",
+				"CREATE_NAME_INVALID_DUPLICATED": "Workspace group name is duplicated.",
 				"CREATE_TITLE": "Create Workspace Group",
 				"DELETE_BUTTON": "Delete",
 				"DELETE_GROUP_USER_TITLE": "Remove Group User",
@@ -2772,13 +2773,7 @@
 				"ROLE_SELECT_DROP_DOWN_TITLE": "Role",
 				"USER_DROP_DOWN_PLACEHOLDER": "Add Users",
 				"USER_SELECT_DROP_DOWN_TITLE": "User",
-				"USER_DROP_DOWN_PLACEHOLDER": "Add Users",
-				"CREATE_GROUP_NAME_PLACEHOLDER": "Enter Name",
-				"ADD": "Add",
-				"CREATE_GROUP_NAME": "Name",
-				"EDIT_GROUP_NAME": "Name",
-				"EDIT_GROUP_NAME_PLACEHOLDER": "Enter Name",
-				"CREATE_NAME_INVALID_DUPLICATED": "Workspace group name is duplicated."
+				"WORKSPACE_SELECT_DROP_DOWN_TITLE": ""
 			},
 			"TAB": {
 				"ADD_USER": "Add User",
@@ -3578,6 +3573,7 @@
 		"BANNER_DESC": " Looking for a new setup?",
 		"CREATE": "Create",
 		"CREATE_WORKSPACE": "Create New Workspace",
+		"DELETE_WORKSPACE_GROUP": "Delete This Workspace Group",
 		"DESC_ACCESSIBLE_WORKSPACE": "All accessible workspaces for {user_id}",
 		"DESC_ACCESSIBLE_WORKSPACE_ADMIN": "All workspaces created in \bthe domain.",
 		"DESC_CLICK": "Click one to enter.",
@@ -3617,16 +3613,21 @@
 		"DORMANT_WORKSPACE": "Dormant Workspace",
 		"DORMANT_WORKSPACE_POPOVER": "Your workspace went dormant on {date} because its cost is lower than the threshold set by your administrators.",
 		"DORMANT_WORKSPACE_POPOVER_ADMIN": "{name} went dormant on {date} because its cost is lower than the threshold.",
+		"DUPLICATE_NAME_ERROR": "Workspace group name is duplicated.",
 		"GO_TO_DORMANT_CONFIG": "Go to Dormancy Config",
+		"NAME": "Name",
 		"NOT_FOUND_ACCESS_WORKSPACE": "There are no accessible workspaces.",
 		"NOT_FOUND_DESC": "Looks like you don’t have any workspace.",
 		"RECENT": "Recent Visits",
 		"ROLE_TYPE_MEMBER": "Member",
 		"ROLE_TYPE_OWNER": "Owner",
+		"SAVE_CHANGES": "Save Changes",
 		"SEARCH_WORKSPACE": "Search Workspaces",
+		"SETTINGS": "Settings",
 		"SHOW_ALL": "Show All",
 		"TITLE": "Which Workspace?",
-		"WORKSPACE_GROUP": "Workspace Group"
+		"WORKSPACE_GROUP": "Workspace Group",
+		"WORKSPACE_GROUP_SETTINGS": "Workspace Group Settings"
 	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
