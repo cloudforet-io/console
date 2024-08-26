@@ -10,6 +10,7 @@ import {
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
@@ -27,10 +28,9 @@ const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
 const tableState = reactive({
-    // TODO: temp data
     fields: [
         { name: 'user_id', label: 'User ID' },
-        { name: 'name', label: 'Name' },
+        { name: 'user_name', label: 'Name' },
         { name: 'state', label: 'State' },
         { name: 'role', label: 'Role' },
         { name: 'remove_button', label: ' ', sortable: false },
@@ -46,6 +46,7 @@ const {
         name: _role.role_id,
         role_type: _role.role_type,
     }),
+    filter: [{ k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '!=' }],
     fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
         query: apiQueryHelper.data,
     }),
@@ -166,7 +167,7 @@ onUnmounted(() => {
         <p-toolbox-table class="workspace-group-tab-group-user-table"
                          :loading="workspaceGroupPageState.loading"
                          :fields="tableState.fields"
-                         :items="workspaceGroupPageGetters.selectedGroupUsers"
+                         :items="workspaceGroupPageGetters.workspaceGroupUsers"
                          :select-index="workspaceGroupPageState.selectedUserIndices"
                          :total-count="workspaceGroupPageGetters.groupUserTotalCount"
                          sort-by="user_id"

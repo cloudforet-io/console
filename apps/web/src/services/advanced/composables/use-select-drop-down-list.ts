@@ -77,12 +77,12 @@ export const useSelectDropDownList = <DataModel>({
             .setSort(searchKey, true);
 
         if (isSearch) {
-            const filters: ConsoleFilter[] = [
+            let filters: ConsoleFilter[] = [
                 { k: searchKey, v: state.searchText, o: '' },
             ];
 
             if (filter) {
-                filters.concat(filter);
+                filters = filters.concat(filter);
             }
 
             apiQueryHelper.setFilters(filters);
