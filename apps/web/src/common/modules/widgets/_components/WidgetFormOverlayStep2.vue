@@ -329,7 +329,7 @@ onUnmounted(() => {
                 gap: 0.5rem;
                 align-items: center;
                 justify-content: end;
-                min-width: 14rem;
+                min-width: 9rem;
                 .divider {
                     height: 1.5rem;
                 }
