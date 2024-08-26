@@ -33,10 +33,10 @@ export const getCurrentGrantInfo: Getter<UserState, any> = (state: UserState): G
 
 export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
     const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
-    const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
-    const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
     const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
     const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+    const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
+    const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
 
     Object.keys(pagePermissionMap).forEach((menuId) => {
         if (minimalPagePermissionList.includes(menuId as MenuId)) pagePermissionMap[menuId] = { read: true, write: true, access: true };
@@ -54,9 +54,9 @@ export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters):
     const result: PageAccessMap = {};
 
     const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
-    const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
     const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
     const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+    const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
 
     const isAllReadOnly = roleBasePagePermissions.every((item) => {
         const accessType = item.split('.*')[0].split(':')[1];
