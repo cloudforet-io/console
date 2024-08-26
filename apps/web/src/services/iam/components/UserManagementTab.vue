@@ -22,6 +22,12 @@ import {
 import { USER_TABS } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
+
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
@@ -91,16 +97,24 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <user-management-tab-detail @refresh="initUserData" />
+                <user-management-tab-detail :has-read-write-access="props.hasReadWriteAccess"
+                                            @refresh="initUserData"
+                />
             </template>
             <template #workspace>
-                <user-management-tab-workspace :active-tab="singleItemTabState.activeTab" />
+                <user-management-tab-workspace :active-tab="singleItemTabState.activeTab"
+                                               :has-read-write-access="props.hasReadWriteAccess"
+                />
             </template>
             <template #projects>
-                <user-management-tab-projects :active-tab="singleItemTabState.activeTab" />
+                <user-management-tab-projects :active-tab="singleItemTabState.activeTab"
+                                              :has-read-write-access="props.hasReadWriteAccess"
+                />
             </template>
             <template #tag>
-                <user-management-tab-tag :active-tab="singleItemTabState.activeTab" />
+                <user-management-tab-tag :active-tab="singleItemTabState.activeTab"
+                                         :has-read-write-access="props.hasReadWriteAccess"
+                />
             </template>
         </p-tab>
         <p-tab v-else-if="userPageState.selectedIndices.length > 1"

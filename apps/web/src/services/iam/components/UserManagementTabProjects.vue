@@ -32,6 +32,7 @@ interface TableItem {
 }
 interface Props {
     activeTab: string;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -142,7 +143,9 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                     </router-link>
                 </span>
             </template>
-            <template #col-remove_button-format="{item}">
+            <template v-if="props.hasReadWriteAccess"
+                      #col-remove_button-format="{item}"
+            >
                 <p-button style-type="tertiary"
                           size="sm"
                           class="remove-button"

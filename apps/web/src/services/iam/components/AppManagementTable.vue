@@ -39,6 +39,7 @@ import { useAppPageStore } from '@/services/iam/store/app-page-store';
 
 interface Props {
     tableHeight?: number;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -240,7 +241,7 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
 <template>
     <section class="app-management-table">
         <p-toolbox-table search-type="query"
-                         selectable
+                         :selectable="props.hasReadWriteAccess"
                          sortable
                          :loading="state.loading"
                          disabled
@@ -259,7 +260,9 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
                          @change="handleChange"
                          @refresh="handleChange()"
         >
-            <template #toolbox-left>
+            <template v-if="props.hasReadWriteAccess"
+                      #toolbox-left
+            >
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :menu="dropdownMenu"
                                    reset-selection-on-menu-close

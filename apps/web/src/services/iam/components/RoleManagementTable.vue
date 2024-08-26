@@ -36,6 +36,7 @@ import { useRolePageStore } from '@/services/iam/store/role-page-store';
 
 interface Props {
     tableHeight?: number;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -158,7 +159,9 @@ const handleExport = async () => {
                          @refresh="handleChange()"
                          @export="handleExport"
         >
-            <template #toolbox-left>
+            <template v-if="props.hasReadWriteAccess"
+                      #toolbox-left
+            >
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :menu="dropdownMenu"
                                    reset-selection-on-menu-close
@@ -186,7 +189,7 @@ const handleExport = async () => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
             <template #col-edit_button-format="{ item }">
-                <p-button v-if="!item?.is_managed && item.role_type !== ROLE_TYPE.SYSTEM_ADMIN"
+                <p-button v-if="props.hasReadWriteAccess && (!item?.is_managed && item.role_type !== ROLE_TYPE.SYSTEM_ADMIN)"
                           size="sm"
                           style-type="tertiary"
                           icon-left="ic_edit"

@@ -26,6 +26,7 @@ interface TableItem {
 }
 interface Props {
     activeTab: string;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -103,7 +104,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                    :total-count="state.items.length"
                    :title="$t('IAM.USER.MAIN.TAG')"
         >
-            <template v-if="userPageState.isAdminMode"
+            <template v-if="props.hasReadWriteAccess && userPageState.isAdminMode"
                       #extra
             >
                 <p-button style-type="tertiary"

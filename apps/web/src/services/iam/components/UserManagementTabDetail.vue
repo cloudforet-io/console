@@ -29,6 +29,12 @@ import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { ModalSettingState } from '@/services/iam/types/user-type';
 
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
+
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
@@ -162,7 +168,9 @@ const handleClickVerifyButton = async () => {
         <p-heading heading-type="sub"
                    :title="$t('IAM.USER.MAIN.BASE_INFORMATION')"
         >
-            <template #extra>
+            <template v-if="props.hasReadWriteAccess"
+                      #extra
+            >
                 <div class="toolbox-wrapper">
                     <div v-if="userPageState.isAdminMode"
                          class="toolbox"

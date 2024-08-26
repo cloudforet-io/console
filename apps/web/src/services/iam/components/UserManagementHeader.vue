@@ -14,6 +14,12 @@ import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { ModalSettingState } from '@/services/iam/types/user-type';
 
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
+
 const userWorkspaceStore = useUserWorkspaceStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
@@ -79,7 +85,9 @@ watch(() => route.query, (query) => {
                    :selected-count="userPageState.selectedIndices.length"
                    class="user-management-header"
         >
-            <template #extra>
+            <template v-if="props.hasReadWriteAccess"
+                      #extra
+            >
                 <div class="toolbox-wrapper">
                     <p-button v-if="userPageState.isAdminMode"
                               style-type="primary"

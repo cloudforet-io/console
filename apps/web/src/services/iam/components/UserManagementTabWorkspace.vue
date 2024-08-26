@@ -58,6 +58,7 @@ interface TableItem {
 }
 interface Props {
     activeTab: string;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -278,6 +279,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                     >
                     <p-select-dropdown is-filterable
                                        use-fixed-menu-style
+                                       :disabled="!props.hasReadWriteAccess"
                                        style-type="transparent"
                                        :visible-menu="dropdownState.visibleMenu"
                                        :loading="dropdownState.loading"
@@ -311,7 +313,9 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
             <template #col-created_at-format="{value}">
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
-            <template #col-remove_button-format="{ item }">
+            <template v-if="props.hasReadWriteAccess"
+                      #col-remove_button-format="{ item }"
+            >
                 <p-button style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
