@@ -271,7 +271,7 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
             _groupBy = [..._groupBy, state.tableDataField];
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
         }
-        if (state.tableDataFieldType === 'dynamicField') {
+        if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField') {
             _filter = [{
                 k: state.tableDataField,
                 v: state.tableDataFieldInfo.dynamicFieldValue,
@@ -451,7 +451,8 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
                     });
                 }
             });
-            const etcValue = d[`_total_${state.tableDataCriteria}`] - (sortedAndFilteredData.reduce((acc, cur) => acc + cur.value, 0) ?? 0);
+            const etcValue = d[`_total_${state.tableDataCriteria}`]
+                - (sortedAndFilteredData.filter((item) => state.tableDataFieldInfo.dynamicFieldValue?.includes(item[state.tableDataField])).reduce((acc, cur) => acc + cur.value, 0) ?? 0);
             return {
                 ...d,
                 [state.tableDataCriteria]: [
