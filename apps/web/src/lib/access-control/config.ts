@@ -7,6 +7,12 @@ export interface AccessInfo {
 
 // refined page permission types. page NEVER includes wildcard.
 // export type PagePermissionMap = Record<string, PagePermissionType>;
+export type PageAccessType = {
+    read?: boolean;
+    write?: boolean;
+    access: boolean;
+};
+export type PageAccessMap = Record<string, PageAccessType>;
 export type PageAccessPermissionMap = Record<string, boolean>;
 
 export const DOMAIN_ADMIN_DEFAULT_PERMISSIONS: MenuId[] = [
@@ -60,6 +66,8 @@ export const WORKSPACE_MEMBER_DEFAULT_PERMISSIONS: MenuId[] = [
     MENU_ID.ALERT_MANAGER,
     MENU_ID.ALERT,
     MENU_ID.ESCALATION_POLICY,
+    MENU_ID.IAM,
+    MENU_ID.APP,
     MENU_ID.MY_PAGE,
     MENU_ID.ACCOUNT_PROFILE,
     MENU_ID.NOTIFICATIONS,

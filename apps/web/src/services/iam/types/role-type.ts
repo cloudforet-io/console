@@ -7,6 +7,7 @@ export interface RoleFormData {
     role_type?: RoleType;
     page_access?: string[];
     permissions?: string[];
+    valid?: boolean;
 }
 
 // Page Access
@@ -19,7 +20,7 @@ export interface TableItem {
 export interface PageAccessMenuItem {
     id: string;
     translationIds?: string[];
-    isAccessible: boolean;
+    isAccessible?: boolean;
     isParent?: boolean;
     subMenuList?: PageAccessMenuItem[];
     accessType?: string;

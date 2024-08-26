@@ -4,6 +4,7 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { languages } from '@/store/modules/user/config';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import {
     getDefaultPageAccessPermissionList, getMinimalPageAccessPermissionList,
     getPageAccessPermissionMapFromRawData,
@@ -37,22 +38,22 @@ export const pageAccessPermissionList: Getter<UserState, any> = (state, getters)
     const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
     const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
     Object.keys(pagePermissionMap).forEach((menuId) => {
-        if (!minimalPagePermissionList.includes(menuId as MenuId)) pagePermissionMap[menuId] = false;
+        if (minimalPagePermissionList.includes(menuId as MenuId)) pagePermissionMap[menuId] = { read: true, write: true, access: true };
     });
 
     let result = [...minimalPagePermissionList];
     Object.keys(pagePermissionMap).forEach((menuId) => {
         const _menuId = menuId as MenuId;
-        if (defaultPagePermissionList.includes(_menuId) && !minimalPagePermissionList.includes(_menuId)) result = [...result, _menuId];
+        if (defaultPagePermissionList.includes(_menuId) && !minimalPagePermissionList.includes(_menuId) && pagePermissionMap[_menuId].access) result = [...result, _menuId];
     });
 
     return result;
 };
 
-export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters): Record<string, boolean> => {
-    const result: Record<string, boolean> = {};
+export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters): PageAccessMap => {
+    const result: PageAccessMap = {};
     getters.pageAccessPermissionList.forEach((MenuId) => {
-        if (!result[MenuId]) result[MenuId] = true;
+        if (!result[MenuId]) result[MenuId] = { access: true };
     });
     return result;
 };
