@@ -374,15 +374,14 @@ watch([ // Fetch Dynamic Field
     () => state.proxyValue.criteria,
     () => props.allValueMap?.groupBy,
     () => props.allValueMap?.granularity,
-    () => state.dateRange,
+    () => props.dateRange,
 ], async ([_fieldType, _value, _criteria, _groupBy, _granularity, _dateRange], prev) => {
     if (_fieldType === 'staticField') return;
     if (_value === prev[1] && _criteria === prev[2] && isEqual(_groupBy, prev[3]) && _granularity === prev[4] && isEqual(_dateRange, prev[5])) return;
+    resetDynamicField();
     if (_value === 'Date') {
-        resetDynamicField();
-        generateDateFields(_granularity as string, _dateRange);
+        generateDateFields(_granularity as string, state.dateRange);
     } else {
-        resetDynamicField();
         await fetchAndExtractDynamicField();
     }
 }, { immediate: true });
