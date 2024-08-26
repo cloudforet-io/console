@@ -31,7 +31,7 @@ const workspaceGroupListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 const workspaceGroupListApiQuery = workspaceGroupListApiQueryHelper.data;
 
-const fetchWorkspaceGroups = async (tabRefresh = { isGroupUser: false, isWorkspace: false }) => {
+const fetchWorkspaceGroups = async (tabRefresh:WorkspaceGroupFetchParameters = { isGroupUser: false, isWorkspace: false }) => {
     workspaceGroupPageState.loading = true;
 
     try {
@@ -66,7 +66,11 @@ const initWorkspaceGroups = async () => {
     await fetchWorkspaceGroups();
 };
 
-const refreshTab = async (value) => {
+interface WorkspaceGroupFetchParameters {
+    isGroupUser?: boolean;
+    isWorkspace?: boolean;
+}
+const refreshTab = async (value:WorkspaceGroupFetchParameters) => {
     await fetchWorkspaceGroups(value);
 };
 
@@ -102,6 +106,6 @@ onUnmounted(() => {
         <workspace-group-add-workspaces-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES"
                                               @confirm="fetchWorkspaceGroups"
         />
-        <workspace-group-add-users-modal />
+        <workspace-group-add-users-modal @confirm="() => {refreshTab({isGroupUser: true})}" />
     </section>
 </template>

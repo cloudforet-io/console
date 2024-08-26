@@ -29,13 +29,12 @@ import { useRoleFormatter } from '@/services/iam/composables/refined-table-data'
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 
+const emit = defineEmits<{(e: 'confirm'): void}>();
+
+
 
 const state = reactive({
     loading: false,
-    users: [{
-        // TODO: temp data
-        user_id: 'Bradford_McDermott@hotmail.com',
-    }],
 });
 
 const {
@@ -66,6 +65,11 @@ const {
     searchKey: 'user_id',
 });
 
+const resetState = () => {
+    roleSelectedItems.value = [];
+    userSelectedItems.value = [];
+};
+
 const handleConfirm = async () => {
     try {
         state.loading = true;
@@ -76,11 +80,13 @@ const handleConfirm = async () => {
             })),
         });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
+        emit('confirm');
     } catch (e) {
-        state.loading = false;
         ErrorHandler.handleError(e);
     } finally {
+        resetState();
         workspaceGroupPageStore.closeModal();
+        state.loading = false;
     }
 };
 
