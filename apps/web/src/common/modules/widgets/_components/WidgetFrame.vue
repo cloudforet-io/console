@@ -275,6 +275,9 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
     &.sm {
         height: 11rem;
     }
+    &.full {
+        height: 35rem;
+    }
     &.widget-height-full {
         height: 22.5rem;
     }
