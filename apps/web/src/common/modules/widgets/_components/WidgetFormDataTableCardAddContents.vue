@@ -64,6 +64,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    loading: false,
     dataTableId: computed(() => props.item.data_table_id),
     sourceType: computed(() => props.item.source_type),
     options: computed(() => props.item.options),
@@ -290,6 +291,7 @@ const handleCancelModal = () => {
     modalState.visible = false;
 };
 const handleUpdateDataTable = async () => {
+    state.loading = true;
     const result = await updateDataTable();
     if (result) {
         showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
@@ -297,6 +299,7 @@ const handleUpdateDataTable = async () => {
         widgetGenerateStore.setDataTableUpdating(true);
         await widgetGenerateStore.loadDataTable({});
     }
+    state.loading = false;
 };
 
 /* Utils */
@@ -401,6 +404,7 @@ defineExpose({
         />
         <widget-form-data-table-card-footer :disabled="validationState.dataTableApplyInvalid"
                                             :changed="state.optionsChanged"
+                                            :loading="state.loading"
                                             @delete="handleClickDeleteDataTable"
                                             @reset="handleClickResetDataTable"
                                             @update="handleUpdateDataTable"
