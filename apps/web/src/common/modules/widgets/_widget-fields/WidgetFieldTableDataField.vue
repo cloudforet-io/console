@@ -21,20 +21,27 @@ import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-wid
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
-import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
-import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import {
+    getReferenceLabel,
+    getWidgetBasedOnDate,
+    getWidgetDateRange,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getInitialSelectedMenuItem, isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { TableDataItem, DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
+
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+import {
+    useAllReferenceTypeInfoStore,
+} from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
 type Data = ListResponse<TableDataItem>;
@@ -49,13 +56,10 @@ const { labelsMenuItem } = useGranularityMenuItem(props, 'tableDataField');
 const MIN_LABELS_INFO_COUNT = 1;
 const DEFAULT_INDEX = 1;
 
-const allReferenceStore = useAllReferenceStore();
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
 const storeState = reactive({
-    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    workspace: computed(() => allReferenceStore.getters.workspace),
-    region: computed(() => allReferenceStore.getters.region),
-    serviceAccount: computed(() => allReferenceStore.getters.serviceAccount),
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
 });
 
 const state = reactive({
@@ -133,7 +137,7 @@ const state = reactive({
         const maxCount = state.proxyValue.count;
         return state.dynamicFields?.map((d) => {
             const fieldName = state.proxyValue.value;
-            const label = Object.keys(REFERENCE_FIELD_MAP).includes(fieldName) ? storeState[REFERENCE_FIELD_MAP[fieldName]][d]?.label || d : d;
+            const label = getReferenceLabel(storeState.allReferenceTypeInfo, fieldName, d);
             return {
                 name: d,
                 label,
