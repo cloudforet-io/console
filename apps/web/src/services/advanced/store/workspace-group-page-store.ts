@@ -3,9 +3,15 @@ import { reactive, computed } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_STATE } from '@/schema/identity/role/constant';
+import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceGroupModel, WorkspaceUser } from '@/schema/identity/workspace-group/model';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 
 export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', () => {
@@ -26,6 +32,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         selectedUserIndices: [] as number[],
         groupUserPageStart: 1,
         groupUserPageLimit: 15,
+        roles: [] as RoleModel[],
 
         // Workspace Tab
         workspacePage: 1,
@@ -227,6 +234,21 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             const workspaceNameMatches = workspace.name && workspace.name.includes(searchText);
 
             return workspaceNameMatches;
+        },
+        listRoles: async () => {
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+                    query: {
+                        filter: [
+                            { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                        ],
+                    },
+                });
+                state.roles = results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.roles = [];
+            }
         },
     };
     const state2 = reactive({

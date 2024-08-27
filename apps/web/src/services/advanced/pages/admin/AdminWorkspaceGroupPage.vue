@@ -72,6 +72,7 @@ const refreshTab = async (value:WorkspaceGroupFetchParameters) => {
 
 (() => {
     initWorkspaceGroups();
+    workspaceGroupPageStore.listRoles();
 })();
 
 onUnmounted(() => {

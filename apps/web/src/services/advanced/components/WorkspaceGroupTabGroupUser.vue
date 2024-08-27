@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { reactive, watch, onUnmounted } from 'vue';
+import {
+    reactive, watch, onUnmounted, computed,
+} from 'vue';
 
 
 
@@ -12,10 +14,14 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleType } from '@/schema/identity/role/type';
+import type { WorkspaceGroupUpdateRoleParameters } from '@/schema/identity/workspace-group/api-verbs/update-role';
 import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
@@ -36,6 +42,13 @@ const tableState = reactive({
         { name: 'role', label: 'Role' },
         { name: 'remove_button', label: ' ', sortable: false },
     ],
+    roleMap: computed(() => {
+        const map: Record<string, RoleModel> = {};
+        workspaceGroupPageState.roles.forEach((role) => {
+            map[role.role_id] = role;
+        });
+        return map;
+    }),
 });
 
 const {
@@ -105,8 +118,25 @@ const handleChange = (options: any = {}) => {
     }
 };
 
-const handleSelectMenu = () => {
-    showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.ALT_S_UPDATE_ROLE'), '');
+const handleSelectMenu = async (value:{label:string, name:string, role_type: RoleType}) => {
+    try {
+        const selectedGroupUser = workspaceGroupPageGetters.selectedGroupUsersByIndices[0];
+
+        const roleId = value.name;
+        const userId = selectedGroupUser.user_id;
+        const workspaceGroupId = workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id;
+
+        await SpaceConnector.clientV2.identity.workspaceGroup.updateRole<WorkspaceGroupUpdateRoleParameters>({
+            workspace_group_id: workspaceGroupId,
+            user_id: userId,
+            role_id: roleId,
+        });
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.ALT_S_UPDATE_ROLE'), '');
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        emit('refresh', { isGroupUser: true });
+    }
 };
 
 const handleRefresh = () => {
@@ -207,7 +237,6 @@ onUnmounted(() => {
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
-                    <span>{{ useRoleFormatter(item.role_type).name }}</span>
                     <p-select-dropdown
                         is-filterable
                         use-fixed-menu-style
@@ -223,7 +252,7 @@ onUnmounted(() => {
                         @select="handleSelectMenu"
                     >
                         <template #dropdown-button>
-                            <span />
+                            <span>{{ tableState.roleMap[item.role_id].name }}</span>
                         </template>
                         <!-- eslint-disable vue/no-template-shadow -->
                         <template #menu-item--format="{ item }">
