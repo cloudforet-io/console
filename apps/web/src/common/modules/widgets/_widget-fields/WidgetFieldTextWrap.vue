@@ -51,13 +51,13 @@ onMounted(() => {
 <template>
     <div class="widget-field-text-wrap">
         <div class="field-header">
-            <p-field-title>{{ $t('Text Wrap') }}</p-field-title>
+            <p-field-title>{{ $t('COMMON.WIDGETS.TEXT_WRAP.TEXT_WRAP') }}</p-field-title>
             <p-toggle-button :value="state.proxyValue?.toggleValue"
                              @update:value="handleUpdateToggle"
             />
         </div>
         <p class="description">
-            {{ $t('Text is wrapped to fit the column width.') }}
+            {{ $t('COMMON.WIDGETS.TEXT_WRAP.DESCRIPTION') }}
         </p>
     </div>
 </template>
