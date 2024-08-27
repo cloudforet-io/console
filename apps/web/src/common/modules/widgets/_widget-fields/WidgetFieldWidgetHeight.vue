@@ -57,7 +57,7 @@ onMounted(() => {
 
 <template>
     <div class="widget-field-widget-height">
-        <p-field-group :label="$t('Widget Height')"
+        <p-field-group :label="$t('COMMON.WIDGETS.WIDGET_HEIGHT.WIDGET_HEIGHT')"
                        required
         >
             <div class="widget-height-select-wrapper">

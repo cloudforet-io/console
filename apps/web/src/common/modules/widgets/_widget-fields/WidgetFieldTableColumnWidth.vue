@@ -108,13 +108,13 @@ onMounted(() => {
 
 <template>
     <div class="widget-field-table-column-width">
-        <p-field-group :label="$t('Column Width')"
+        <p-field-group :label="$t('COMMON.WIDGETS.TABLE_COLUMN_WIDTH.TABLE_COLUMN_WIDTH')"
                        required
         >
             <div class="field-contents-wrapper">
                 <div class="field-wrapper">
                     <p-field-title class="width-sub-title">
-                        {{ $t('Minimum Width') }}
+                        {{ $t('COMMON.WIDGETS.TABLE_COLUMN_WIDTH.MINIMUM_WIDTH') }}
                     </p-field-title>
                     <p-text-input :value="state.proxyValue?.minimumWidth"
                                   type="number"
@@ -125,7 +125,7 @@ onMounted(() => {
                 <div class="field-wrapper width-field">
                     <div class="type-select-wrapper">
                         <p-field-title class="width-sub-title">
-                            {{ $t('Width') }}
+                            {{ $t('COMMON.WIDGETS.TABLE_COLUMN_WIDTH.WIDTH') }}
                         </p-field-title>
                         <p-radio-group>
                             <p-radio v-for="(item) in state.widthTypeItems"

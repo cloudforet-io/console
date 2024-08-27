@@ -160,13 +160,13 @@ onMounted(() => {
 <template>
     <div class="widget-field-custom-table-column-width">
         <div class="field-header">
-            <p-field-title>{{ $t('Custom Table Column Width') }}</p-field-title>
+            <p-field-title>{{ $t('COMMON.WIDGETS.CUSTOM_TABLE_COLUMN_WIDTH.CUSTOM_TABLE_COLUMN_WIDTH') }}</p-field-title>
             <p-toggle-button :value="state.proxyValue?.toggleValue"
                              @update:value="handleUpdateToggle"
             />
         </div>
         <p class="description">
-            {{ $t('Selects a specific column to override the default width (Fixed widths can be override, but value smaller than the minimum width are ignored)') }}
+            {{ $t('COMMON.WIDGETS.CUSTOM_TABLE_COLUMN_WIDTH.DESCRIPTION') }}
         </p>
         <div v-if="state.proxyValue?.toggleValue"
              class="field-contents-wrapper"
@@ -176,13 +176,13 @@ onMounted(() => {
                      class="field-title-wrapper"
                 >
                     <p-field-title class="field-title"
-                                   :label="$t('Field')"
+                                   :label="$t('COMMON.WIDGETS.CUSTOM_TABLE_COLUMN_WIDTH.FIELD')"
                                    size="sm"
                                    color="gray"
                                    inline
                     />
                     <p-field-title class="width-title"
-                                   :label="$t('Width')"
+                                   :label="$t('COMMON.WIDGETS.CUSTOM_TABLE_COLUMN_WIDTH.WIDTH')"
                                    size="sm"
                                    color="gray"
                                    inline
