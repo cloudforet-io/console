@@ -69,7 +69,7 @@ onMounted(() => {
     <div class="widget-field-legend">
         <div class="top-part">
             <p-field-title>{{ $t('COMMON.WIDGETS.LEGEND.LEGEND') }}</p-field-title>
-            <p-toggle-button :value="state.proxyValue.toggleValue"
+            <p-toggle-button :value="state.proxyValue?.toggleValue"
                              @update:value="handleUpdateToggleValue"
             />
         </div>

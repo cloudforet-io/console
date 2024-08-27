@@ -260,6 +260,7 @@ watch(() => state.customModalVisible, (modalVisible) => {
             @apply text-label-md text-gray-600;
             display: flex;
             justify-content: space-between;
+            padding-top: 0.5rem;
         }
     }
     .bottom-part {

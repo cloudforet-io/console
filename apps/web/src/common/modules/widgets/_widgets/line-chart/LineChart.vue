@@ -42,7 +42,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     XAxisValue, DateFormatValue, TableDataFieldValue,
-    DisplaySeriesLabelValue, NumberFormatValue, LegendValue,
+    DisplaySeriesLabelValue, NumberFormatValue, LegendValue, MissingValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
@@ -145,7 +145,7 @@ const state = reactive({
     }),
     numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
-    missingValue: computed<string|undefined>(() => props.widgetOptions?.missingValue as string),
+    missingValue: computed<string|undefined>(() => (props.widgetOptions?.missingValue as MissingValue)?.value),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),

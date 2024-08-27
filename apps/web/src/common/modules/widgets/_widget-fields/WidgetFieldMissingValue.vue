@@ -12,13 +12,14 @@ import type {
     WidgetFieldComponentEmit,
     MissingValueOptions,
 } from '@/common/modules/widgets/types/widget-field-type';
+import type { MissingValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const emit = defineEmits<WidgetFieldComponentEmit<string>>();
-const props = defineProps<WidgetFieldComponentProps<MissingValueOptions, string>>();
+const emit = defineEmits<WidgetFieldComponentEmit<MissingValue>>();
+const props = defineProps<WidgetFieldComponentProps<MissingValueOptions, MissingValue>>();
 
 const state = reactive({
-    proxyValue: useProxyValue<string>('value', props, emit),
+    proxyValue: useProxyValue<MissingValue>('value', props, emit),
     missingValueMenuItems: computed<MenuItem[]>(() => [
         {
             name: 'lineToZero',
@@ -35,12 +36,16 @@ const state = reactive({
 /* Event */
 const handleChangeMissingValue = (value: string) => {
     state.selected = value;
-    state.proxyValue = value;
+    state.proxyValue = {
+        value,
+    };
 };
 
 onMounted(() => {
     emit('update:is-valid', true);
-    state.proxyValue = props.value ?? 'lineToZero';
+    state.proxyValue = {
+        value: props.value?.value ?? props.widgetFieldSchema?.options?.default ?? 'lineToZero',
+    };
 });
 </script>
 
