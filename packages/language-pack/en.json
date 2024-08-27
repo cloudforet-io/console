@@ -1434,7 +1434,7 @@
 				"FORMAT": "Format",
 				"INCREASE": "Increase",
 				"INFO_TOOLTIP": "Compare based on granularity.",
-				"INFO_TOOLTIP_TABLE": "This feature is for comparison based on granularity. Not available if 'Data' or 'Group by' is set to 'date.'",
+				"INFO_TOOLTIP_TABLE": "This feature is for comparison based on granularity. \nNot available if 'Data' or 'Group by' is set to 'date.'",
 				"NAME_INVALID_TEXT": "Please write at least one letter.",
 				"PERCENT": "Percentage",
 				"PREVIOUS_DAY": "Previous Day",
@@ -1445,6 +1445,12 @@
 			"CONFIGURE_WIDGET": "Configure Widget",
 			"CONTINUE": "Continue",
 			"CRITERIA": "Criteria",
+			"CUSTOM_TABLE_COLUMN_WIDTH": {
+				"CUSTOM_TABLE_COLUMN_WIDTH": "Custom Table Column Width",
+				"DESCRIPTION": "Selects a specific column to override the default width (Fixed widths can be override, but value smaller than the minimum width are ignored)",
+				"FIELD": "Field",
+				"WIDTH": "Width"
+			},
 			"DAILY_UPDATE_CREATED": "Created",
 			"DAILY_UPDATE_DELETED": "Deleted",
 			"DAILY_UPDATE_DESC": "00:00 ~ present (Local Time)",
@@ -1657,7 +1663,16 @@
 			"SERVICE_SUMMARY_SERVER": "Server",
 			"SET_CHART_OPTIONS": "Set Chart Options",
 			"SET_DATA_SOURCE": "Set Data Source",
+			"TABLE_COLUMN_WIDTH": {
+				"MINIMUM_WIDTH": "Minimum Width",
+				"TABLE_COLUMN_WIDTH": "Column Width",
+				"WIDTH": "Width"
+			},
 			"TABLE_HEATMAP_COLOR_NONE": "None",
+			"TEXT_WRAP": {
+				"DESCRIPTION": "Text is wrapped to fit the column width.",
+				"TEXT_WRAP": "Text Wrap"
+			},
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "Create Project",
 				"NO_PROJECT": "No Project",
@@ -1695,6 +1710,9 @@
 			},
 			"UNABLE_TO_LOAD_WIDGET": "Unable to load widget",
 			"VIEW_FULL_DATA": "View full data",
+			"WIDGET_HEIGHT": {
+				"WIDGET_HEIGHT": "Widget Height"
+			},
 			"WIDGET_TITLE_REQUIRED": "Please enter widget title."
 		}
 	},

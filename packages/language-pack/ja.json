@@ -1434,7 +1434,7 @@
 				"FORMAT": "フォーマット",
 				"INCREASE": "増加する",
 				"INFO_TOOLTIP": "粒度に基づいて比較する",
-				"INFO_TOOLTIP_TABLE": "この機能は粒度に基づく比較のためのものです。'データ' または 'グループ化' が '日付' に設定されている場合は使用できません。",
+				"INFO_TOOLTIP_TABLE": "この機能は粒度に基づく比較のためのものです。\n'データ' または 'グループ化' が '日付' に設定されている場合は使用できません。",
 				"NAME_INVALID_TEXT": "少なくとも1つの文字を書いてください。",
 				"PERCENT": "比率",
 				"PREVIOUS_DAY": "前日",
@@ -1445,6 +1445,12 @@
 			"CONFIGURE_WIDGET": "ウィジェットの構成",
 			"CONTINUE": "次へ",
 			"CRITERIA": "条件",
+			"CUSTOM_TABLE_COLUMN_WIDTH": {
+				"CUSTOM_TABLE_COLUMN_WIDTH": "",
+				"DESCRIPTION": "",
+				"FIELD": "",
+				"WIDTH": ""
+			},
 			"DAILY_UPDATE_CREATED": "作成",
 			"DAILY_UPDATE_DELETED": "削除",
 			"DAILY_UPDATE_DESC": "00:00〜現在（ローカル時間基準）",
@@ -1657,7 +1663,16 @@
 			"SERVICE_SUMMARY_SERVER": "サーバ",
 			"SET_CHART_OPTIONS": "チャートオプション設定",
 			"SET_DATA_SOURCE": "データソース設定",
+			"TABLE_COLUMN_WIDTH": {
+				"MINIMUM_WIDTH": "",
+				"TABLE_COLUMN_WIDTH": "",
+				"WIDTH": ""
+			},
 			"TABLE_HEATMAP_COLOR_NONE": "ない",
+			"TEXT_WRAP": {
+				"DESCRIPTION": "",
+				"TEXT_WRAP": ""
+			},
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "プロジェクト作成",
 				"NO_PROJECT": "プロジェクトなし",
@@ -1695,6 +1710,9 @@
 			},
 			"UNABLE_TO_LOAD_WIDGET": "ウィジェット表示不可",
 			"VIEW_FULL_DATA": "データ全体を表示",
+			"WIDGET_HEIGHT": {
+				"WIDGET_HEIGHT": ""
+			},
 			"WIDGET_TITLE_REQUIRED": "ウィジェットのタイトルを入力してください。"
 		}
 	},
