@@ -16,11 +16,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 
-interface SelectDownListProps {
+interface SelectDownListProps<T> {
     isSearch?: boolean;
     filter?: ConsoleFilter[];
     pageSize?: number;
-    transformer: (item: any) => SelectDropdownMenuItem,
+    transformer: (item: T) => SelectDropdownMenuItem,
     fetcher: (apiQueryHelper: ApiQueryHelper) => Promise<ListResponse<any>>
     searchKey?: string;
 }
@@ -39,7 +39,7 @@ interface SelectDropDownListState<T> {
 
 export const useSelectDropDownList = <DataModel>({
     isSearch = true, filter, pageSize = 10, transformer, fetcher, searchKey = 'name',
-}: SelectDownListProps) : ToRefs<SelectDropDownListState<DataModel>> & {
+}: SelectDownListProps<DataModel>) : ToRefs<SelectDropDownListState<DataModel>> & {
     reset: () => Promise<void>,
     handleClickShowMore: () => Promise<void>,
 } => {
@@ -49,10 +49,10 @@ export const useSelectDropDownList = <DataModel>({
         totalCount: 0,
         list: [],
         menuList: computed<SelectDropdownMenuItem[]>(() => {
-            const menuList = [...(state.list ?? []).map(transformer)];
-
+            const menuListSource: DataModel[] = state.list ?? [];
+            const menuList: SelectDropdownMenuItem[] = menuListSource.map(transformer);
             if (state.isShowMore) {
-                menuList.push({ type: 'showMore' });
+                menuList.push({ type: 'showMore', name: 'Show More' });
             }
 
             return menuList;
@@ -96,6 +96,7 @@ export const useSelectDropDownList = <DataModel>({
         } catch (e) {
             ErrorHandler.handleError(e);
             state.totalCount = 0;
+            return [];
         } finally {
             state.loading = false;
         }

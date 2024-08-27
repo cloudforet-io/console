@@ -8,6 +8,7 @@ export const WORKSPACE_GROUP_MODAL_TYPE = {
     ADD_USERS: 'add_users',
     REMOVE_GROUP_USER: 'remove_group_user',
     REMOVE_WORKSPACES: 'remove_workspaces',
+    REMOVE_SINGLE_WORKSPACE: 'remove_single_workspace',
 } as const;
 
 export const WORKSPACE_GROUP_TABS = {

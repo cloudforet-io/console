@@ -59,7 +59,7 @@ const {
 });
 const {
     loading, searchText, menuList, selectedItems, handleClickShowMore,
-} = useSelectDropDownList({
+} = useSelectDropDownList<WorkspaceModel>({
     pageSize: 10,
     transformer: (_workspace) => ({
         name: _workspace.workspace_id,
@@ -72,7 +72,7 @@ const {
     }),
 });
 
-const createWorkspaceGroup = async () => {
+const createWorkspaceGroup = async (): Promise<string | undefined> => {
     state.loading = true;
 
     try {
@@ -81,29 +81,33 @@ const createWorkspaceGroup = async () => {
         });
 
         if (!selectedItems.value.length) {
-            return;
+            return undefined;
         }
 
         await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<WorkspaceGroupAddWorkspacesParameters, WorkspaceGroupModel>({
             workspace_group_id,
-            workspaces: selectedItems.value.map((item) => item.name as string),
+            workspaces: selectedItems.value.map((item) => item.name),
         });
+        return workspace_group_id;
     } catch (e) {
         ErrorHandler.handleError(e);
+        return undefined;
     } finally {
         state.loading = false;
     }
 };
 
 const handleConfirm = async () => {
-    await createWorkspaceGroup();
+    const workspaceGroupId = await createWorkspaceGroup();
     showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_CREATE_WORKSPACE'), '');
     workspaceGroupPageStore.closeModal();
     emit('confirm');
+
     workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: state.groupName }),
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: groupName.value }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
+        additionalData: { workspaceGroupId },
     });
 };
 

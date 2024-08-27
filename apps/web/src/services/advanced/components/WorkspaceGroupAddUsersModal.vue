@@ -8,6 +8,7 @@ import {
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
@@ -46,6 +47,7 @@ const {
         name: _role.role_id,
         role_type: _role.role_type,
     }),
+    filter: [{ k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '!=' }],
     fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
         query: apiQueryHelper.data,
     }),
@@ -74,7 +76,7 @@ const handleConfirm = async () => {
     try {
         state.loading = true;
         await SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>({
-            workspace_group_id: workspaceGroupPageStore.getters.selectedWorkspaceGroup?.workspace_group_id,
+            workspace_group_id: workspaceGroupPageState.modalAdditionalData?.workspaceGroupId ?? workspaceGroupPageStore.getters.selectedWorkspaceGroup?.workspace_group_id,
             users: userSelectedItems.value.map((item) => ({
                 user_id: item?.user_id, role_id: roleSelectedItems.value[0]?.name,
             })),

@@ -22,6 +22,7 @@ import WorkspaceGroupTab from '@/services/advanced/components/WorkspaceGroupTab.
 import WorkspaceGroupTable from '@/services/advanced/components/WorkspaceGroupTable.vue';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
+import type { WorkspaceGroupFetchParameters } from '@/services/advanced/types/admin-workspace-group-type';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
@@ -52,7 +53,6 @@ const fetchWorkspaceGroups = async (tabRefresh:WorkspaceGroupFetchParameters = {
 
         if (tabRefresh.isWorkspace) {
             workspaceGroupPageState.selectedWorkspaceIndices = [];
-            workspaceGroupPageState.selectedWorkspace = {};
         }
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -66,10 +66,6 @@ const initWorkspaceGroups = async () => {
     await fetchWorkspaceGroups();
 };
 
-interface WorkspaceGroupFetchParameters {
-    isGroupUser?: boolean;
-    isWorkspace?: boolean;
-}
 const refreshTab = async (value:WorkspaceGroupFetchParameters) => {
     await fetchWorkspaceGroups(value);
 };

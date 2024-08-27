@@ -81,6 +81,12 @@ const setupModal = (type) => {
         visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
         themeColor: 'alert',
     }); break;
+    case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE: workspaceGroupPageStore.updateModalSettings({
+        type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE,
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_WORKSPACES_TITLE'),
+        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
+        themeColor: 'alert',
+    }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
         title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_WORKSPACES_TITLE', { name: 'yubeom kim' }),
@@ -122,10 +128,8 @@ const handleSelectedWorkspacesRemoveButtonClick = () => {
 };
 
 const handleSelectedWorkspaceRemoveButtonClick = (item) => {
-    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES);
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedWorkspace = item;
-    });
+    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE);
+    workspaceGroupPageState.modalAdditionalData.selectedWorkspace = item;
 };
 
 const handleRefresh = () => {

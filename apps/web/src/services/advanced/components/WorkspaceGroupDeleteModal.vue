@@ -2,9 +2,7 @@
 import { reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import {
-    PButtonModal, PI, PLink, PButton,
-} from '@cloudforet/mirinae';
+import { PButtonModal, PI } from '@cloudforet/mirinae';
 
 import type { WorkspaceGroupDeleteParameters } from '@/schema/identity/workspace-group/api-verbs/delete';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
@@ -13,7 +11,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { WORKSPACE_GROUP_MODAL_TYPE, WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
-import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
@@ -25,20 +22,6 @@ const emit = defineEmits<{(e: 'confirm'): void,
 const state = reactive({
     sequence: 'first',
     loading: false,
-});
-
-const moveWorkspaceGroupTabWorkspace = () => ({
-    // TODO: Plan to change when implementing workspace list page modal
-    name: LANDING_ROUTE.WORKSPACE._NAME,
-    // TODO: add queryString
-    // query: {}
-});
-
-const moveWorkspaceGroupTabGroupUser = () => ({
-    // TODO: Plan to change when implementing workspace list page modal
-    name: LANDING_ROUTE.WORKSPACE._NAME,
-    // TODO: add queryString
-    // query: {}
 });
 
 const deleteWorkspaceGroups = async () => {
@@ -101,36 +84,16 @@ const handleCloseModal = () => {
                             Workspace
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.workspaces.length || 0 }}
+                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.workspaces?.length || 0 }}
                         </p>
-                        <p-button style-type="tertiary"
-                                  size="sm"
-                                  class="link-button"
-                        >
-                            <p-link new-tab
-                                    action-icon="internal-link"
-                                    size="lg"
-                                    :to="moveWorkspaceGroupTabWorkspace()"
-                            />
-                        </p-button>
                     </div>
                     <div class="count-wrapper">
                         <h5 class="count-title">
                             Group User
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.users.length || 0 }}
+                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.users?.length || 0 }}
                         </p>
-                        <p-button style-type="tertiary"
-                                  size="sm"
-                                  class="link-button"
-                        >
-                            <p-link new-tab
-                                    action-icon="internal-link"
-                                    size="lg"
-                                    :to="moveWorkspaceGroupTabGroupUser()"
-                            />
-                        </p-button>
                     </div>
                 </div>
                 <div class="warning-message-wrapper">
