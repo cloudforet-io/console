@@ -153,7 +153,7 @@ watch(() => props.dateRange, () => {
         <span v-if="!props.widgetMode"
               class="label-text"
         >
-            {{ $t('DASHBOARDS.DETAIL.BASED_ON') }}:
+            {{ $t('DASHBOARDS.DETAIL.BASED_ON') }}
         </span>
         <p-select-dropdown class="date-dropdown"
                            size="sm"
@@ -184,7 +184,7 @@ watch(() => props.dateRange, () => {
         gap: 0.125rem;
         .label-text {
             @apply text-label-md font-bold text-gray-800;
-            padding-right: 0.25rem;
+            padding-right: 0.5rem;
         }
     }
 }
