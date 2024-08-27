@@ -84,8 +84,9 @@ const state = reactive({
                         _seriesName = dayjs.utc(_seriesName).format(state.dateFormat);
                     }
                     if (state.unit) _seriesName = `${_seriesName} (${state.unit})`;
+                    const _name = getReferenceLabel(props.allReferenceTypeInfo, state.yAxisField, params.name);
                     const _value = numberFormatter(p.value) || '';
-                    return `${_seriesName}<br>${p.marker} ${params.name}: <b>${_value}</b>`;
+                    return `${_seriesName}<br>${p.marker} ${_name}: <b>${_value}</b>`;
                 }).join('<br>');
             },
         },

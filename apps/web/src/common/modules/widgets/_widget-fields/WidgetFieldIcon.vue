@@ -32,7 +32,7 @@ const DEFAULT_COLOR:string = gray[900];
 
 const state = reactive({
     proxyValue: useProxyValue<IconValue|undefined>('value', props, emit),
-    toggleValue: !!props.widgetFieldSchema?.options?.toggle ?? false,
+    toggleValue: !!props.widgetFieldSchema?.options?.toggle,
     visibleMenu: false,
     selectedIcon: DEFAULT_ICON as Icon,
     iconList: [

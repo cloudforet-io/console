@@ -56,7 +56,7 @@ const tabRef = ref<null | Vue>(null);
 
 const getTabHeaderHeight = () => {
     const tabHeaderHeight = tabRef.value?.$el.firstElementChild?.clientHeight;
-    if (tabHeaderHeight) return (tabHeaderHeight + 4) ?? 0;
+    if (tabHeaderHeight) return tabHeaderHeight + 4;
     return 0;
 };
 

@@ -35,7 +35,10 @@ const projectLinkFormatter: LinkFormatter = (name, data, reference, query) => {
         return {
             name,
             query,
-            params: data ? { id: data } : undefined,
+            params: data ? {
+                id: data,
+                ...(reference.workspace_id ? { workspaceId: reference.workspace_id } : {}),
+            } : undefined,
         };
     } return {};
 };
