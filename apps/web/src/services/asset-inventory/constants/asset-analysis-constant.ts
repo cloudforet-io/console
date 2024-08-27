@@ -5,7 +5,7 @@ export const GRANULARITY = {
 
 export const OPERATOR = {
     SUM: 'sum',
-    AVG: 'avg',
+    AVG: 'average',
     MAX: 'max',
     MIN: 'min',
 } as const;
