@@ -101,7 +101,7 @@ export const WORKSPACE_USER_MINIMAL_PERMISSIONS: MenuId[] = [
 ];
 
 export const PAGE_ACCESS = {
-    NO_ACCESS: 'no_access',
-    READ_ONLY: 'read_only',
-    READ_WRITE: 'read_write',
+    RESTRICTED: 'restricted',
+    READONLY: 'readonly',
+    WRITABLE: 'writable',
 } as const;

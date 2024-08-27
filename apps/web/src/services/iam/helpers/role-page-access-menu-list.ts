@@ -40,7 +40,7 @@ export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessM
                 id: menu.id,
                 translationIds: [menuInfo.translationId],
                 isParent: true,
-                accessType: PAGE_ACCESS.READ_WRITE,
+                accessType: PAGE_ACCESS.WRITABLE,
                 subMenuList: flattenSubMenuList(menu?.subMenuList ?? [], defaultMenuIdsByRoleType),
             });
         }
@@ -53,8 +53,8 @@ export const getPageAccessList = (menuItems: PageAccessMenuItem[]): string[] => 
 
     menuItems.forEach((menu) => {
         if (menu.isParent) {
-            // Access type is no_access
-            if (menu.accessType === PAGE_ACCESS.NO_ACCESS) {
+            // Access type is restricted
+            if (menu.accessType === PAGE_ACCESS.RESTRICTED) {
                 results.push(`${menu.id}:${menu.accessType}.*`);
                 return;
             }
