@@ -48,7 +48,7 @@ const HEATMAP_COLOR_HEX_MAP = {
 const SKIP_HEATMAP_FIELD = ['subTotal', 'comparison'];
 
 type TableDataValue = number | undefined | null;
-const TABLE_MISSING_VALUE_SYMBOL = '-';
+// const TABLE_MISSING_VALUE_SYMBOL = '-';
 
 interface Props {
   fields: TableWidgetField[];
@@ -144,9 +144,10 @@ const getField = (field: TableWidgetField): string => {
 };
 
 const valueFormatter = (value: TableDataValue, field: TableWidgetField) => {
-    // handle missing value
-    const isMissingValue = value === null || value === undefined;
-    if (isMissingValue && props.missingValueInfo?.value === 'lineBreaks') return TABLE_MISSING_VALUE_SYMBOL;
+    // TODO: handle missing value after applying table missing value
+    // // handle missing value
+    // const isMissingValue = value === null || value === undefined;
+    // if (isMissingValue && props.missingValueInfo?.value === 'lineBreaks') return TABLE_MISSING_VALUE_SYMBOL;
 
     const _value = value || 0;
     let _unit = field.fieldInfo?.unit;
@@ -184,7 +185,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
             return '-';
         }
-        return valueFormatter(itemValue, field);
+        return itemValue ? valueFormatter(itemValue, field) : '-';
     }
     if (props.fieldType === 'dynamicField') {
         const dynamicData = item[props.criteria || ''] ?? [];
@@ -201,7 +202,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
             return '-';
         }
-        return valueFormatter(dynamicDataItem?.value, field);
+        return dynamicDataItem?.value ? valueFormatter(dynamicDataItem?.value, field) : '-';
     }
     return '-';
 };

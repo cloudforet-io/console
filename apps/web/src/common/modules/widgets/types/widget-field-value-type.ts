@@ -60,7 +60,6 @@ export interface TableDataFieldValue {
     value?: string | string[];
     dynamicFieldValue?: string[];
     criteria?: string;
-    count: number;
 }
 export interface GroupByValue {
     value?: string | string[];

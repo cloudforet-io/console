@@ -9,12 +9,7 @@ const clusteredColumnChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        tableDataField: {
-            options: {
-                max: 15,
-                hideCount: true,
-            },
-        },
+        tableDataField: {},
         xAxis: {
             options: {
                 dataTarget: 'labels_info',

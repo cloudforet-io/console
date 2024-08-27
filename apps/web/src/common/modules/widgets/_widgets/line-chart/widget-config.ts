@@ -16,11 +16,7 @@ const lineChart: WidgetConfig = {
                 max: 31,
             },
         },
-        tableDataField: {
-            options: {
-                max: 15,
-            },
-        },
+        tableDataField: {},
     },
     optionalFieldsSchema: {
         legend: {
