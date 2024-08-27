@@ -31,7 +31,7 @@ const state = reactive({
 
 const {
     loading, searchText, menuList, selectedItems, handleClickShowMore,
-} = useSelectDropDownList({
+} = useSelectDropDownList<WorkspaceModel>({
     pageSize: 10,
     transformer: (_workspace) => ({
         name: _workspace.workspace_id,
@@ -50,7 +50,7 @@ const addWorkspace = async () => {
     try {
         await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<WorkspaceGroupAddWorkspacesParameters>({
             workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
-            workspaces: selectedItems.value.map((item) => item.name as string),
+            workspaces: selectedItems.value.map((item) => item.name),
         });
 
         if (!selectedItems.value.length) {

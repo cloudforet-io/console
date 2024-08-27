@@ -101,7 +101,7 @@ const handleCloseModal = () => {
                             Workspace
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.workspaces.length || 0 }}
+                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.workspaces?.length || 0 }}
                         </p>
                         <p-button style-type="tertiary"
                                   size="sm"
@@ -119,7 +119,7 @@ const handleCloseModal = () => {
                             Group User
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.users.length || 0 }}
+                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.users?.length || 0 }}
                         </p>
                         <p-button style-type="tertiary"
                                   size="sm"

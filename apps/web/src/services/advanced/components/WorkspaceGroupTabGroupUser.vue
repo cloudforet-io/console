@@ -12,6 +12,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
+import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -39,7 +40,7 @@ const tableState = reactive({
 
 const {
     loading, searchText, menuList, selectedItems, handleClickShowMore,
-} = useSelectDropDownList({
+} = useSelectDropDownList<RoleModel>({
     pageSize: 10,
     transformer: (_role) => ({
         label: _role.name,
@@ -62,7 +63,7 @@ const setupModal = (type) => {
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: 'yubeom group' }),
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: workspaceGroupPageGetters.selectedWorkspaceGroup.name }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
     }); break;
     default:
@@ -108,10 +109,10 @@ const handleSelectedGroupUsersRemoveButtonClick = () => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER);
 };
 
-const handleSelectedGroupUserRemoveButtonClick = (item) => {
+const handleSelectedGroupUserRemoveButtonClick = (item:WorkspaceUser) => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER);
     workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedGroupUser = item;
+        _state.state.selectedGroupUser = [item];
     });
 };
 
