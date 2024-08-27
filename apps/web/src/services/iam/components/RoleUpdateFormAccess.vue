@@ -56,14 +56,14 @@ const tableState = reactive({
 const getDropdownItems = (id: string) => {
     if (id === MENU_ID.DASHBOARDS || id === MENU_ID.PROJECT) {
         return [
-            { name: PAGE_ACCESS.READ_WRITE, label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
-            { name: PAGE_ACCESS.NO_ACCESS, label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
+            { name: PAGE_ACCESS.WRITABLE, label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
+            { name: PAGE_ACCESS.RESTRICTED, label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
         ];
     }
     return [
-        { name: PAGE_ACCESS.READ_WRITE, label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
-        { name: PAGE_ACCESS.READ_ONLY, label: i18n.t('IAM.ROLE.FORM.READ_ONLY'), icon: 'ic_no-edit' },
-        { name: PAGE_ACCESS.NO_ACCESS, label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
+        { name: PAGE_ACCESS.WRITABLE, label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
+        { name: PAGE_ACCESS.READONLY, label: i18n.t('IAM.ROLE.FORM.READ_ONLY'), icon: 'ic_no-edit' },
+        { name: PAGE_ACCESS.RESTRICTED, label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
     ];
 };
 const handleChangeSelectedMenu = (values: PageAccessMenuItem[]) => {
@@ -90,7 +90,7 @@ const handleChangeToggle = (value: boolean) => {
     state.menuItems.forEach((menu) => {
         emit('update', {
             ...menu,
-            accessType: value ? PAGE_ACCESS.READ_ONLY : PAGE_ACCESS.READ_WRITE,
+            accessType: value ? PAGE_ACCESS.READONLY : PAGE_ACCESS.WRITABLE,
         });
     });
 };
@@ -180,7 +180,7 @@ watch(() => props.menuItems, (menuItems) => {
                                     :key="menu.name"
                                     :invalid="item.isInValid"
                                     class="accessible-item"
-                                    :disabled="item.page_access === PAGE_ACCESS.NO_ACCESS"
+                                    :disabled="item.page_access === PAGE_ACCESS.RESTRICTED"
                                     :selected="tableState.selectedMenuIds"
                                     :value="menu"
                                     @change="handleChangeSelectedMenu"

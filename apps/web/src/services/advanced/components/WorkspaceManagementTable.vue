@@ -50,6 +50,7 @@ import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-con
 
 interface Props {
     tableHeight?: number;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -261,7 +262,9 @@ onMounted(async () => {
                     </p-select-status>
                 </div>
             </template>
-            <template #toolbox-left>
+            <template v-if="props.hasReadWriteAccess"
+                      #toolbox-left
+            >
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :menu="dropdownMenu"
                                    reset-selection-on-menu-close

@@ -60,7 +60,7 @@ const tableState = reactive({
     items: computed<TableItem[] | undefined>(() => state.pageAccessDataList?.map((i) => {
         const pageAccess: AccessType | undefined = (() => {
             if (i.isParent && i.subMenuList.length === 0) {
-                return getAccessType(PAGE_ACCESS.NO_ACCESS);
+                return getAccessType(PAGE_ACCESS.RESTRICTED);
             }
             if (i.accessType) {
                 return getAccessType(i.accessType);
@@ -79,9 +79,9 @@ const tableState = reactive({
 
 const getAccessType = (id: string): AccessType | undefined => {
     const accessTypes: Record<string, AccessType> = {
-        read_write: { label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
-        read_only: { label: i18n.t('IAM.ROLE.FORM.READ_ONLY'), icon: 'ic_no-edit' },
-        no_access: { label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
+        writable: { label: i18n.t('IAM.ROLE.FORM.READ_AND_WRITE'), icon: 'ic_edit' },
+        readonly: { label: i18n.t('IAM.ROLE.FORM.READ_ONLY'), icon: 'ic_no-edit' },
+        restricted: { label: i18n.t('IAM.ROLE.FORM.NO_ACCESS'), icon: 'ic_limit-filled' },
     };
     return accessTypes[id];
 };
@@ -91,7 +91,7 @@ const handleUpdateForm = (value: PageAccessMenuItem) => {
 
     if (item) {
         if (accessType) item.accessType = accessType;
-        if (item.accessType === PAGE_ACCESS.NO_ACCESS) {
+        if (item.accessType === PAGE_ACCESS.RESTRICTED) {
             item.subMenuList = [];
         } else if (item.subMenuList?.length === 0) {
             item.subMenuList?.push({
@@ -140,11 +140,11 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
         if (!itemId) return;
         let accessType = '';
         if (accessible.read && accessible.write) {
-            accessType = PAGE_ACCESS.READ_WRITE;
+            accessType = PAGE_ACCESS.WRITABLE;
         } else if (accessible.read && !accessible.write) {
-            accessType = PAGE_ACCESS.READ_ONLY;
+            accessType = PAGE_ACCESS.READONLY;
         } else {
-            accessType = PAGE_ACCESS.NO_ACCESS;
+            accessType = PAGE_ACCESS.RESTRICTED;
         }
         handleUpdateForm({ id: itemId, isAccessible: accessible.access, accessType });
     });

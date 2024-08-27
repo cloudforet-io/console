@@ -67,7 +67,7 @@ const handleUpdateForm = (value: PageAccessMenuItem, isInit?: boolean) => {
 
             const subItem = find(menuItem.subMenuList, { id: menuId });
             if (subItem) {
-                subItem.isAccessible = menuItem.accessType !== PAGE_ACCESS.NO_ACCESS ? isAccessible : true;
+                subItem.isAccessible = menuItem.accessType !== PAGE_ACCESS.RESTRICTED ? isAccessible : true;
             }
         }
     });
@@ -85,11 +85,11 @@ const setPageAccessPermissionsData = () => {
         if (!itemId) return;
         let accessType = '';
         if (accessible.read && accessible.write) {
-            accessType = PAGE_ACCESS.READ_WRITE;
+            accessType = PAGE_ACCESS.WRITABLE;
         } else if (accessible.read && !accessible.write) {
-            accessType = PAGE_ACCESS.READ_ONLY;
+            accessType = PAGE_ACCESS.READONLY;
         } else {
-            accessType = PAGE_ACCESS.NO_ACCESS;
+            accessType = PAGE_ACCESS.RESTRICTED;
         }
         handleUpdateForm({
             id: itemId,

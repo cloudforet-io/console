@@ -60,7 +60,7 @@ export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters):
 
     const isAllReadOnly = roleBasePagePermissions.every((item) => {
         const accessType = item.split('.*')[0].split(':')[1];
-        return accessType === PAGE_ACCESS.READ_ONLY;
+        return accessType === PAGE_ACCESS.READONLY;
     });
 
     getters.pageAccessPermissionList.forEach((menuId) => {
