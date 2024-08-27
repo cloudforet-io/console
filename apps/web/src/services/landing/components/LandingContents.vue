@@ -3,9 +3,9 @@ import { useWindowSize } from '@vueuse/core';
 import {
     computed, onMounted, onUnmounted, reactive,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
-import { sortBy } from 'lodash';
+import { clone, sortBy } from 'lodash';
 
 import {
     PButton, PDataLoader, PDivider, screens,
@@ -19,6 +19,10 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
@@ -28,12 +32,14 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 import { gray } from '@/styles/colors';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import LandingAllWorkspaces from '@/services/landing/components/LandingAllWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/LandingEmptyContents.vue';
 import LandingGroupWorkspaces from '@/services/landing/components/LandingGroupWorkspaces.vue';
 import LandingRecentVisits from '@/services/landing/components/LandingRecentVisits.vue';
 import LandingSearch from '@/services/landing/components/LandingSearch.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
+
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
@@ -45,6 +51,7 @@ const landingPageStore = useLandingPageStore();
 const landingPageStoreGetters = landingPageStore.getters;
 
 const router = useRouter();
+const route = useRoute();
 const { width } = useWindowSize();
 
 const storeState = reactive({
@@ -58,6 +65,7 @@ const storeState = reactive({
         workspaceId: i.data.workspace_id,
         itemId: i.data.id,
     }))),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     searchText: '',
@@ -67,6 +75,16 @@ const state = reactive({
         ? storeState.workspaceList.filter((item) => item.name.toLowerCase()?.includes(state.searchText.toLowerCase()))
         : storeState.workspaceList)),
     refinedWorkspaceList: computed<WorkspaceModel[]>(() => (state.searchText ? state.searchedWorkspaceList : storeState.workspaceList)),
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const handleSearch = (value: string) => {
@@ -135,6 +153,7 @@ onUnmounted(() => {
                 <landing-group-workspaces v-if="!state.isSearchMode"
                                           :favorite-list="storeState.favoriteList"
                                           :is-domain-admin="storeState.isDomainAdmin"
+                                          :has-read-write-access="state.hasReadWriteAccess"
                                           @create="handleClickButton"
                 />
             </div>
@@ -142,7 +161,7 @@ onUnmounted(() => {
                 <landing-empty-contents :is-domain-admin="storeState.isDomainAdmin" />
             </template>
         </p-data-loader>
-        <div v-if="storeState.isDomainAdmin && storeState.workspaceList.length > 0"
+        <div v-if="state.hasReadWriteAccess && storeState.isDomainAdmin && storeState.workspaceList.length > 0"
              class="banner-wrapper"
         >
             <p-divider />

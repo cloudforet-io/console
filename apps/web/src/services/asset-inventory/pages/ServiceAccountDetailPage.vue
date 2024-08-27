@@ -234,6 +234,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             <service-account-attached-general-accounts v-if="state.isTrustedAccount && props.serviceAccountId"
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
+                                                       :has-read-write-access="state.hasReadWriteAccess"
             />
             <service-account-cluster v-if="state.isKubernetesAgentMode"
                                      :service-account-id="props.serviceAccountId"

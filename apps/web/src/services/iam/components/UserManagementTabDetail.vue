@@ -289,7 +289,8 @@ const handleClickVerifyButton = async () => {
                 <p-button v-if="label === $t('IAM.USER.MAIN.NOTIFICATION_EMAIL')
                               && !tableState.refinedUserItems.email_verified
                               && tableState.refinedUserItems.email
-                              && tableState.refinedUserItems.email !== ''"
+                              && tableState.refinedUserItems.email !== ''
+                              && props.hasReadWriteAccess"
                           style-type="primary"
                           size="sm"
                           :loading="state.verifyEmailLoading"
