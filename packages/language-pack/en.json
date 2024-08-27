@@ -1663,6 +1663,10 @@
 			"SERVICE_SUMMARY_SERVER": "Server",
 			"SET_CHART_OPTIONS": "Set Chart Options",
 			"SET_DATA_SOURCE": "Set Data Source",
+			"SUB_TOTAL": {
+				"INFO_TEXT": "This feature calculates subtotals based on granularity in group-by statistics. \nIt is not available for 'static fields'.",
+				"SUB_TOTAL": "Sub Total"
+			},
 			"TABLE_COLUMN_WIDTH": {
 				"MINIMUM_WIDTH": "Minimum Width",
 				"TABLE_COLUMN_WIDTH": "Column Width",

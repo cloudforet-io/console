@@ -1663,6 +1663,10 @@
 			"SERVICE_SUMMARY_SERVER": "サーバ",
 			"SET_CHART_OPTIONS": "チャートオプション設定",
 			"SET_DATA_SOURCE": "データソース設定",
+			"SUB_TOTAL": {
+				"INFO_TEXT": "詳細な基準に基づいてグループ別統計で部分合計を計算できます。\nただし、フィールドが'静的フィールド'の場合は使用できません。",
+				"SUB_TOTAL": "小計"
+			},
 			"TABLE_COLUMN_WIDTH": {
 				"MINIMUM_WIDTH": "",
 				"TABLE_COLUMN_WIDTH": "",

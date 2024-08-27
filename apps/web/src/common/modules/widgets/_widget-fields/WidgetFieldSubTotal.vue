@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { onMounted, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
-import { PFieldTitle, PToggleButton, PCheckbox } from '@cloudforet/mirinae';
+import {
+    PFieldTitle, PToggleButton, PCheckbox, PI, PTooltip,
+} from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { TotalOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
-import type { TotalValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { TotalValue, TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const emit = defineEmits<WidgetFieldComponentEmit<TotalValue|undefined>>();
@@ -21,6 +23,12 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<TotalOptions, T
 
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
+    disabled: computed(() => {
+        const tableDataField = props.allValueMap?.tableDataField as TableDataFieldValue;
+        if (!tableDataField) return false;
+        if (tableDataField.fieldType === 'staticField') return true;
+        return false;
+    }),
 });
 
 const handleUpdateValue = (value: boolean) => {
@@ -62,8 +70,17 @@ onMounted(() => {
 <template>
     <div class="widget-field-total">
         <div class="field-header">
-            <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.SUB_TOTAL') }}</p-field-title>
+            <p-field-title>
+                {{ $t('COMMON.WIDGETS.SUB_TOTAL.SUB_TOTAL') }}
+                <p-tooltip :contents="$t('COMMON.WIDGETS.SUB_TOTAL.INFO_TEXT')">
+                    <p-i name="ic_info-circle"
+                         width="0.875rem"
+                         height="0.875rem"
+                    />
+                </p-tooltip>
+            </p-field-title>
             <p-toggle-button :value="state.proxyValue?.toggleValue"
+                             :disabled="state.disabled"
                              @update:value="handleUpdateToggle"
             />
         </div>
