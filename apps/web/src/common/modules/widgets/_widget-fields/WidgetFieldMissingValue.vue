@@ -43,7 +43,9 @@ const handleChangeMissingValue = (value: string) => {
 
 onMounted(() => {
     emit('update:is-valid', true);
-    state.proxyValue = props.value ?? { value: 'lineToZero' };
+    state.proxyValue = {
+        value: props.value?.value ?? props.widgetFieldSchema?.options?.default ?? 'lineToZero',
+    };
 });
 </script>
 
