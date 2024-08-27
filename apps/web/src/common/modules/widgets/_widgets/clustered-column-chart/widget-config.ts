@@ -9,7 +9,6 @@ const clusteredColumnChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        tableDataField: {},
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
@@ -17,6 +16,7 @@ const clusteredColumnChart: WidgetConfig = {
                 max: 31,
             },
         },
+        tableDataField: {},
     },
     optionalFieldsSchema: {
         legend: {
