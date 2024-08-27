@@ -10,7 +10,7 @@ export type LanguageCode = 'ko' | 'en' | string;
 export interface RoleInfo {
     roleType: RoleType;
     roleId: string;
-    pageAccess: PageAccessType[];
+    pageAccess: PageAccessType[]|string[];
 }
 
 export interface GrantInfo {

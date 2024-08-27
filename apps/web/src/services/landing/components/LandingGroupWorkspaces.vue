@@ -27,6 +27,7 @@ const PAGE_SIZE = 16;
 interface Props {
     favoriteList?: FavoriteItem[];
     isDomainAdmin?: boolean;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -117,7 +118,7 @@ const fetchWorkspaceList = async () => {
                           :tabs="state.workspaceFilterList"
             >
                 <template #additional-button>
-                    <p-icon-button v-if="props.isDomainAdmin"
+                    <p-icon-button v-if="props.hasReadWriteAccess && props.isDomainAdmin"
                                    name="ic_settings"
                                    style-type="tertiary"
                                    size="sm"
@@ -151,7 +152,7 @@ const fetchWorkspaceList = async () => {
                 >
                     {{ $t('LADING.SETTINGS') }}
                 </p-button>
-                <p-button v-if="props.isDomainAdmin"
+                <p-button v-if="props.hasReadWriteAccess && props.isDomainAdmin"
                           style-type="primary"
                           size="md"
                           icon-left="ic_plus_bold"
