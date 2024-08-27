@@ -37,9 +37,18 @@ import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
-    GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
+    GroupByValue,
+    TableDataFieldValue,
+    ComparisonValue,
+    TotalValue,
+    ProgressBarValue,
     DateFormatValue,
-    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue, TextWrapValue,
+    NumberFormatValue,
+    DataFieldHeatmapColorValue,
+    TableColumnWidthValue,
+    CustomTableColumnWidthValue,
+    TextWrapValue,
+    MissingValueValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -102,6 +111,7 @@ const state = reactive({
     textWrapInfo: computed<TextWrapValue>(() => props.widgetOptions?.textWrap as TextWrapValue),
     tableColumnWidthInfo: computed<TableColumnWidthValue|undefined>(() => props.widgetOptions?.tableColumnWidth as TableColumnWidthValue),
     customTableColumnWidthInfo: computed<CustomTableColumnWidthValue|undefined>(() => props.widgetOptions?.customTableColumnWidth as CustomTableColumnWidthValue),
+    missingValueInfo: computed<MissingValueValue|undefined>(() => props.widgetOptions?.missingValue as MissingValueValue),
     // table
     tableFields: computed<TableWidgetField[]>(() => {
         const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map(
@@ -552,6 +562,7 @@ defineExpose<WidgetExpose<Data>>({
                                    :text-wrap-info="state.textWrapInfo"
                                    :table-column-width-info="state.tableColumnWidthInfo"
                                    :custom-table-column-width-info="state.customTableColumnWidthInfo"
+                                   :missing-value-info="state.missingValueInfo"
                                    :sort-by.sync="state.sortBy"
                                    :this-page.sync="state.thisPage"
                                    @load="handleManualLoadWidget"
