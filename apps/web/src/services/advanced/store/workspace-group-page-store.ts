@@ -24,7 +24,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         groupUserSortBy: 'user_id',
         isUserSortDesc: false,
         selectedUserIndices: [] as number[],
-        selectedGroupUser: [] as WorkspaceUser[],
         groupUserPageStart: 1,
         groupUserPageLimit: 15,
 
@@ -44,7 +43,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             visible: '',
         },
         // Additional data added for data transfer between modals
-        modalAdditionalData: {} as { workspaceGroupId?: string, selectedWorkspace?: TableDataItem },
+        modalAdditionalData: {} as { workspaceGroupId?: string, selectedWorkspace?: TableDataItem, selectedGroupUser?: WorkspaceUser },
     });
 
     // The getters method using reactive will not work when using the store.$dispose method with the error
@@ -179,7 +178,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             state.groupUserSortBy = 'user_id';
             state.isUserSortDesc = false;
             state.selectedUserIndices = [] as number[];
-            state.selectedGroupUser = [];
             state.groupUserPageStart = 1;
             state.groupUserPageLimit = 15;
         },
@@ -191,9 +189,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             state.selectedWorkspaceIndices = [] as number[];
             state.workspacePageStart = 1;
             state.workspacePageLimit = 15;
-        },
-        resetSelectedGroupUser: () => {
-            state.selectedGroupUser = [];
         },
         resetSelectedWorkspace: () => {
             state.selectedWorkspaceIndices = [];

@@ -84,7 +84,7 @@ const setupModal = (type) => {
     case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE,
         title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_WORKSPACES_TITLE'),
-        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
+        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE,
         themeColor: 'alert',
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES: workspaceGroupPageStore.updateModalSettings({
@@ -129,7 +129,9 @@ const handleSelectedWorkspacesRemoveButtonClick = () => {
 
 const handleSelectedWorkspaceRemoveButtonClick = (item) => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE);
-    workspaceGroupPageState.modalAdditionalData.selectedWorkspace = item;
+    workspaceGroupPageState.modalAdditionalData = {
+        selectedWorkspace: item,
+    };
 };
 
 const handleRefresh = () => {
