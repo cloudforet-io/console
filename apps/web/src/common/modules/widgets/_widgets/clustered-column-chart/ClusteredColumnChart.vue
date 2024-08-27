@@ -36,6 +36,7 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
@@ -135,7 +136,6 @@ const state = reactive({
     dataFieldType: computed<TableDataFieldValue['fieldType']>(() => state.dataFieldInfo?.fieldType),
     dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
     dataCriteria: computed<string|undefined>(() => state.dataFieldInfo?.criteria),
-    dataMaxCount: computed<number>(() => state.dataFieldInfo?.count),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
@@ -168,6 +168,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         let _groupBy: string[] = [state.xAxisField];
         let _field_group: string[] = [];
         let _sort: Query['sort'] = [];
+        let _filter: Query['filter'] = [];
         if (state.dataFieldType === 'staticField') {
             state.dataField?.forEach((field) => {
                 _fields[field] = { key: field, operator: 'sum' };
@@ -179,6 +180,14 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             _groupBy = [..._groupBy, state.dataField];
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.dataCriteria}`, desc: true }];
         }
+        if (isDateField(state.dataField) && state.dataFieldType === 'dynamicField') {
+            _filter = [{
+                k: state.dataField,
+                v: state.dataFieldInfo.dynamicFieldValue,
+                o: 'in',
+            }];
+        }
+
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
@@ -195,6 +204,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
                 field_group: _field_group,
                 sort: _sort,
                 page: { start: 1, limit: state.xAxisCount },
+                filter: _filter,
             },
             vars: props.dashboardVars,
         });
@@ -273,7 +283,7 @@ const getStaticFieldData = (rawData: StaticFieldData) => {
 };
 const getDynamicFieldData = (rawData: DynamicFieldData) => {
     // get refined data and series fields
-    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataCriteria, state.dataField, state.dataMaxCount);
+    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataCriteria, state.dataField, state.dataFieldInfo.dynamicFieldValue);
 
     // get xAxis data
     let _xAxisData: string[] = [];

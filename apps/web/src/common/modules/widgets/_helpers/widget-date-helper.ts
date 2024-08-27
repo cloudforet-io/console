@@ -1,6 +1,6 @@
 import type { ManipulateType } from 'dayjs';
 import dayjs from 'dayjs';
-import { orderBy, sum } from 'lodash';
+import { sum } from 'lodash';
 
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { DateRange, DynamicFieldData } from '@/common/modules/widgets/types/widget-data-type';
@@ -138,18 +138,14 @@ export const getFormattedDate = (date: string, dateFormat: string): string => {
 };
 
 
-export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, criteria: string, dataField: string, maxCount: number): [any[], string[]] => {
+export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, criteria: string, dataField: string, dynamicFieldValue: string[]): [any[], string[]] => {
     if (!rawData?.results?.length) return [[], []];
-
-    const _orderedData = orderBy(rawData.results[0]?.[criteria] || [], 'value', 'desc');
-    const _slicedData = _orderedData.slice(0, maxCount);
-    const _seriesFields = _slicedData.map((v) => v[dataField] as string);
 
     const _refinedResults: any[] = [];
     let _etcExists = false;
     rawData.results.forEach((result) => {
-        const _refinedData = (result[criteria] || []).filter((d) => _seriesFields.includes(d[dataField]));
-        const _etcData = (result[criteria] || []).filter((d) => !_seriesFields.includes(d[dataField]));
+        const _refinedData = (result[criteria] || []).filter((d) => dynamicFieldValue.includes(d[dataField]));
+        const _etcData = (result[criteria] || []).filter((d) => !dynamicFieldValue.includes(d[dataField]));
         const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
         if (_etcValueSum > 0) _etcExists = true;
         _refinedResults.push({
@@ -160,6 +156,8 @@ export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, criteria: 
             ],
         });
     });
+
+    const _seriesFields = [...dynamicFieldValue];
     if (_etcExists) _seriesFields.push('etc');
 
     return [_refinedResults, _seriesFields];

@@ -35,6 +35,7 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
@@ -42,7 +43,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
     XAxisValue, DateFormatValue, TableDataFieldValue,
-    DisplaySeriesLabelValue, NumberFormatValue, LegendValue, MissingValue,
+    DisplaySeriesLabelValue, NumberFormatValue, LegendValue, MissingValueValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
@@ -126,14 +127,11 @@ const state = reactive({
     dataFieldType: computed<TableDataFieldValue['fieldType']>(() => state.dataFieldInfo?.fieldType),
     dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
     dataCriteria: computed<string|undefined>(() => state.dataFieldInfo?.criteria),
-    dataMaxCount: computed<number>(() => state.dataFieldInfo?.count),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
         if (Object.values(DATE_FIELD).includes(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
-        } else if (Object.values(DATE_FIELD).includes(state.dataField)) {
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.dataMaxCount);
         }
         return { start: _start, end: _end };
     }),
@@ -145,7 +143,7 @@ const state = reactive({
     }),
     numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
-    missingValue: computed<string|undefined>(() => (props.widgetOptions?.missingValue as MissingValue)?.value),
+    missingValue: computed<string|undefined>(() => (props.widgetOptions?.missingValue as MissingValueValue)?.value),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -162,6 +160,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         let _groupBy: string[] = [state.xAxisField];
         let _field_group: string[] = [];
         let _sort: Query['sort'] = [];
+        let _filter: Query['filter'] = [];
         if (state.dataFieldType === 'staticField') {
             state.dataField?.forEach((field) => {
                 _fields[field] = { key: field, operator: 'sum' };
@@ -172,6 +171,13 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             _field_group = [state.dataField];
             _groupBy = [..._groupBy, state.dataField];
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.dataCriteria}`, desc: true }];
+        }
+        if (isDateField(state.dataField) && state.dataFieldType === 'dynamicField') {
+            _filter = [{
+                k: state.dataField,
+                v: state.dataFieldInfo.dynamicFieldValue,
+                o: 'in',
+            }];
         }
         //
         const _isPrivate = props.widgetId.startsWith('private');
@@ -188,6 +194,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             field_group: _field_group,
             sort: _sort,
             page: { start: 1, limit: state.xAxisCount },
+            filter: _filter,
         };
         const res = await _fetcher({
             widget_id: props.widgetId,
@@ -207,7 +214,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 /* Util */
 const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
     // get refined data and series fields
-    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataCriteria, state.dataField, state.dataMaxCount);
+    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataCriteria, state.dataField, state.dataFieldInfo.dynamicFieldValue);
 
     // get xAxis data
     let _xAxisData: string[] = [];
