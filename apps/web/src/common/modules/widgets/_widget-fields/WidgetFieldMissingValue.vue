@@ -12,14 +12,14 @@ import type {
     WidgetFieldComponentEmit,
     MissingValueOptions,
 } from '@/common/modules/widgets/types/widget-field-type';
-import type { MissingValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { MissingValueValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const emit = defineEmits<WidgetFieldComponentEmit<MissingValue>>();
-const props = defineProps<WidgetFieldComponentProps<MissingValueOptions, MissingValue>>();
+const emit = defineEmits<WidgetFieldComponentEmit<MissingValueValue>>();
+const props = defineProps<WidgetFieldComponentProps<MissingValueOptions, MissingValueValue>>();
 
 const state = reactive({
-    proxyValue: useProxyValue<MissingValue>('value', props, emit),
+    proxyValue: useProxyValue<MissingValueValue>('value', props, emit),
     missingValueMenuItems: computed<MenuItem[]>(() => [
         {
             name: 'lineToZero',
@@ -46,6 +46,7 @@ onMounted(() => {
     state.proxyValue = {
         value: props.value?.value ?? props.widgetFieldSchema?.options?.default ?? 'lineToZero',
     };
+    state.selected = state.proxyValue.value;
 });
 </script>
 
@@ -67,3 +68,10 @@ onMounted(() => {
         </p-field-group>
     </div>
 </template>
+
+<style scoped lang="scss">
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: 0;
+}
+</style>

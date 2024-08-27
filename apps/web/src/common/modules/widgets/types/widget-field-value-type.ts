@@ -148,7 +148,7 @@ export interface WidgetHeightValue {
     value: WidgetHeightType;
 }
 
-export interface MissingValue {
+export interface MissingValueValue {
     value: string;
 }
 
@@ -157,4 +157,4 @@ export type WidgetFieldValues = string | string[] | number | boolean | Compariso
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
     | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
     | DisplayAnnotationValue | DisplaySeriesLabelValue | TextWrapValue | TableColumnWidthValue | CustomTableColumnWidthValue
-    | LegendValue | WidgetHeightValue | MissingValue;
+    | LegendValue | WidgetHeightValue | MissingValueValue;
