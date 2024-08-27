@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import Vue, {
+    computed,
     onMounted, onUnmounted, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { cloneDeep } from 'lodash';
+import { clone, cloneDeep } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PHeading, PHorizontalLayout,
 } from '@cloudforet/mirinae';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
@@ -22,9 +28,11 @@ import WorkspacesSetEnableModal from '@/services/advanced/components/WorkspacesS
 import WorkspacesUserManagementTab from '@/services/advanced/components/WorkspacesUserManagementTab.vue';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+
 
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
@@ -32,6 +40,21 @@ const userPageStore = useUserPageStore();
 
 const route = useRoute();
 
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
+const state = reactive({
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+});
 const modalState = reactive({
     createType: '' as 'CREATE'|'EDIT',
     createModalVisible: false,
@@ -136,7 +159,9 @@ onUnmounted(() => {
                    :total-count="workspacePageState.totalCount"
                    use-total-count
         >
-            <template #extra>
+            <template v-if="state.hasReadWriteAccess"
+                      #extra
+            >
                 <p-button style-type="primary"
                           icon-left="ic_plus_bold"
                           @click="handleCreateWorkspace"
@@ -148,11 +173,12 @@ onUnmounted(() => {
         <p-horizontal-layout class="workspace-toolbox-layout">
             <template #container="{ height }">
                 <workspace-management-table :table-height="height"
+                                            :has-read-write-access="state.hasReadWriteAccess"
                                             @select-action="handleSelectAction"
                 />
             </template>
         </p-horizontal-layout>
-        <workspaces-user-management-tab />
+        <workspaces-user-management-tab :has-read-write-access="state.hasReadWriteAccess" />
         <workspaces-create-modal
             :visible.sync="modalState.createModalVisible"
             :create-type="modalState.createType"

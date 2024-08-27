@@ -35,6 +35,12 @@ import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
+
 const bookmarkStore = useBookmarkStore();
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
@@ -334,7 +340,7 @@ watch(() => route.params, async () => {
                     <span class="col-link">{{ value ?? '-' }}</span>
                 </template>
                 <template #col-action_button-format="{item}">
-                    <p-select-dropdown v-if="item.isGlobal"
+                    <p-select-dropdown v-if="props.hasReadWriteAccess && item.isGlobal"
                                        :menu="getDropdownMenu(item)"
                                        style-type="icon-button"
                                        button-icon="ic_ellipsis-horizontal"
