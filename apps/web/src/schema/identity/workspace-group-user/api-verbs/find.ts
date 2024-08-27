@@ -1,6 +1,6 @@
 import type { UserState } from '@/schema/identity/user/type';
 
-export interface WorkspaceGroupDetailsFindUsersParameters {
+export interface WorkspaceGroupUserFindParameters {
     workspace_group_id: string;
     keyword?: string;
     state?: UserState;

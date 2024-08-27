@@ -5,7 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { AddWorkspacesParameters } from '@/schema/identity/workspace-group/api-verbs/add-workspaces';
+import type { WorkspaceGroupAddWorkspacesParameters } from '@/schema/identity/workspace-group/api-verbs/add-workspaces';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
@@ -48,7 +48,7 @@ const addWorkspace = async () => {
     state.loading = true;
 
     try {
-        await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<AddWorkspacesParameters>({
+        await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<WorkspaceGroupAddWorkspacesParameters>({
             workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
             workspaces: selectedItems.value.map((item) => item.name as string),
         });
