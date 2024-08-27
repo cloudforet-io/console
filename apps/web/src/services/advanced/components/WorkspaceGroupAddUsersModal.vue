@@ -8,7 +8,7 @@ import {
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
@@ -50,7 +50,13 @@ const {
     }),
     filter: [{ k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '!=' }],
     fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-        query: apiQueryHelper.data,
+        query: {
+            ...apiQueryHelper.data,
+            filter: [
+                ...(apiQueryHelper.data.filter || []),
+                { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+            ],
+        },
     }),
 });
 
