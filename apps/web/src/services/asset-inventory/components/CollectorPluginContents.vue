@@ -101,7 +101,7 @@ const state = reactive({
     name: computed<string>(() => props.plugin?.name ?? ''),
     description: computed<string>(() => props.plugin?.tags?.long_description ?? ''),
     labels: computed<string[]>(() => (props.plugin as PluginModel)?.labels ?? []), // it is empty with collector plugin
-    isBeta: computed<boolean>(() => !!(props.plugin as PluginModel)?.tags?.beta ?? false), // it is empty with collector plugin
+    isBeta: computed<boolean>(() => !!props.plugin?.tags?.beta), // it is empty with collector plugin
     pluginDetailLink: computed(() => {
         const link = props.plugin?.tags?.link ?? '';
         if (!link) return undefined;

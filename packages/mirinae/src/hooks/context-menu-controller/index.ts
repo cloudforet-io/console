@@ -108,7 +108,7 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
                 return true;
             });
         } else {
-            results = [...items] ?? [];
+            results = [...items];
         }
 
         return results;

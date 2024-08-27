@@ -33,10 +33,10 @@ const state = reactive({
     isTrustedAccount: computed(() => serviceAccountPageState.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     baseInformationData: computed(() => {
         const accountType = state.isTrustedAccount ? 'Trusted Account' : 'General Account';
-        return ({
+        return {
             ...serviceAccountPageState.originServiceAccountItem,
             account_type: accountType,
-        } ?? {});
+        };
     }),
 });
 

@@ -279,13 +279,13 @@ onDeactivated(() => {
                     :text="storeState.workspaces[value]?.label"
             />
         </template>
-        <template #col-project_id-format="{ value }">
+        <template #col-project_id-format="{ value, item }">
             <p-link v-if="storeState.projects[value]"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
-                    :to="getProperRouteLocation(referenceRouter(
+                    :to="referenceRouter(
                         value,
-                        { resource_type: 'identity.Project' }))"
+                        { resource_type: 'identity.Project', workspace_id: item.workspace_id })"
             >
                 {{ storeState.projects[value].label }}
             </p-link>
