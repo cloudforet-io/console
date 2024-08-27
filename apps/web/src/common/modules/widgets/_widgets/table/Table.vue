@@ -3,8 +3,6 @@ import {
     defineExpose, reactive, computed, watch, onMounted,
 } from 'vue';
 
-import { orderBy, sortBy } from 'lodash';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { PPagination } from '@cloudforet/mirinae';
@@ -37,9 +35,18 @@ import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
-    GroupByValue, TableDataFieldValue, ComparisonValue, TotalValue, ProgressBarValue,
+    GroupByValue,
+    TableDataFieldValue,
+    ComparisonValue,
+    TotalValue,
+    ProgressBarValue,
     DateFormatValue,
-    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue, TextWrapValue,
+    NumberFormatValue,
+    DataFieldHeatmapColorValue,
+    TableColumnWidthValue,
+    CustomTableColumnWidthValue,
+    TextWrapValue,
+    MissingValueValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -102,13 +109,15 @@ const state = reactive({
     textWrapInfo: computed<TextWrapValue>(() => props.widgetOptions?.textWrap as TextWrapValue),
     tableColumnWidthInfo: computed<TableColumnWidthValue|undefined>(() => props.widgetOptions?.tableColumnWidth as TableColumnWidthValue),
     customTableColumnWidthInfo: computed<CustomTableColumnWidthValue|undefined>(() => props.widgetOptions?.customTableColumnWidth as CustomTableColumnWidthValue),
+    missingValueInfo: computed<MissingValueValue|undefined>(() => props.widgetOptions?.missingValue as MissingValueValue),
     // table
     tableFields: computed<TableWidgetField[]>(() => {
+        // 1. Label Fields
         const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map(
             (field) => ({ name: field, label: field, fieldInfo: { type: 'labelField', additionalType: field === 'Date' ? 'dateFormat' : undefined } }),
         ) ?? [];
         let dataFields: TableWidgetField[] = [];
-        if (state.tableDataFieldType === 'staticField') {
+        if (state.tableDataFieldType === 'staticField') { // 2-1. Static Fields
             state.tableDataField?.forEach((field) => {
                 dataFields.push({
                     name: field,
@@ -130,13 +139,13 @@ const state = reactive({
                     });
                 }
             });
-        } else if (isDateField(state.tableDataField)) {
+        } else if (isDateField(state.tableDataField)) { // 2-2-1. Dynamic Fields - Date Field Case
             dataFields = (state.tableDataFieldInfo.dynamicFieldValue ?? []).map((_fieldName) => ({
                 name: _fieldName,
                 label: _fieldName,
                 fieldInfo: { type: 'dataField', additionalType: 'dateFormat', unit: state.dataInfo?.[state.tableDataCriteria]?.unit },
             }));
-        } else { // None Time Series Dynamic Field Case
+        } else { // 2-2-2. Dynamic Fields - None Date Field Case
             const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
             (state.tableDataFieldInfo.dynamicFieldValue ?? []).forEach((_fieldName) => {
                 dataFields.push({
@@ -255,6 +264,7 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+        // Set Query
         const _fields = {};
         let _groupBy: string[] = [...state.groupByField];
         let _field_group: string[] = [];
@@ -271,6 +281,7 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
             _groupBy = [..._groupBy, state.tableDataField];
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
         }
+        // Filter (Only for Dynamic Field with Date Field)
         if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField') {
             _filter = [{
                 k: state.tableDataField,
@@ -345,11 +356,15 @@ watch([() => props.size], async () => {
 watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
     if (!data) return;
     const _fullPageDataResults = fullPageData?.results ?? [];
+
     if (state.tableDataFieldType === 'staticField') {
         const comparisonData = state.comparisonData?.results;
         const hasComparisonInfo = state.comparisonInfo?.format;
         const results = data.results.map((d, idx) => {
+            // Basic Data
             const dataItem = { ...d };
+
+            // Sub Total & Comparison Data
             let subTotalValue = 0;
 
             state.tableDataField?.forEach((field) => {
@@ -393,6 +408,7 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
         state.staticFieldSlicedData = { results };
     } else if (isDateField(state.tableDataField)) {
         const results = data.results.map((d) => {
+            // Sub Total Data
             const subTotal = {
                 [state.tableDataField]: 'sub_total',
                 value: d[state.tableDataCriteria].slice(-state.tableDataMaxCount).reduce((acc, cur) => acc + cur.value, 0),
@@ -421,25 +437,14 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
 
         state.timeSeriesDynamicFieldSlicedData = { results };
     } else {
-        const availableDataFieldsExceptDateField: string[] = [];
-        const originFirstRowData = data?.results?.[0]?.[state.tableDataCriteria] ?? [];
-        const sortedData = orderBy(originFirstRowData, ['value'], ['desc']);
-        sortedData.slice(0, state.tableDataMaxCount - 1).forEach((d) => {
-            availableDataFieldsExceptDateField.push(d[state.tableDataField]);
-        });
-
         const comparisonData = [...state.comparisonData?.results ?? []];
         const baseData = [...data?.results ?? []];
+
         const hasComparisonOption = state.comparisonInfo?.format && state.isComparisonEnabled;
         const results = baseData.map((d) => {
             const dynamicFieldData = d[state.tableDataCriteria] ?? [];
-            const dynamicFieldDataFilteredByAvailableField = dynamicFieldData.filter((item) => availableDataFieldsExceptDateField.includes(item[state.tableDataField]));
-            const sortedAndFilteredData = sortBy(
-                dynamicFieldDataFilteredByAvailableField,
-                (item) => availableDataFieldsExceptDateField.indexOf(item[state.tableDataField]),
-            );
             const dataWithComparison = [] as TableDataItem[];
-            sortedAndFilteredData.forEach((item) => {
+            dynamicFieldData.forEach((item) => {
                 dataWithComparison.push(item);
                 if (hasComparisonOption) {
                     const comparisonItem = comparisonData.find((c) => (state.groupByField ?? []).every((field) => c[field] === d[field]));
@@ -452,11 +457,11 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
                 }
             });
             const etcValue = d[`_total_${state.tableDataCriteria}`]
-                - (sortedAndFilteredData.filter((item) => state.tableDataFieldInfo.dynamicFieldValue?.includes(item[state.tableDataField])).reduce((acc, cur) => acc + cur.value, 0) ?? 0);
+                - (dynamicFieldData.filter((item) => state.tableDataFieldInfo.dynamicFieldValue?.includes(item[state.tableDataField])).reduce((acc, cur) => acc + cur.value, 0) ?? 0);
             return {
                 ...d,
                 [state.tableDataCriteria]: [
-                    ...(hasComparisonOption ? dataWithComparison : sortedAndFilteredData),
+                    ...(hasComparisonOption ? dataWithComparison : dynamicFieldData),
                     {
                         [state.tableDataField]: 'etc',
                         value: etcValue,
@@ -474,13 +479,8 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
             const fullDataComparisonData = state.fullPageComparisonData?.results ?? [];
             const fullDataResults = _fullPageDataResults.map((d) => {
                 const dynamicFieldData = d[state.tableDataCriteria] ?? [];
-                const dynamicFieldDataFilteredByAvailableField = dynamicFieldData.filter((item) => availableDataFieldsExceptDateField.includes(item[state.tableDataField]));
-                const sortedAndFilteredData = sortBy(
-                    dynamicFieldDataFilteredByAvailableField,
-                    (item) => availableDataFieldsExceptDateField.indexOf(item[state.tableDataField]),
-                );
                 const dataWithComparison = [] as TableDataItem[];
-                sortedAndFilteredData.forEach((item) => {
+                dynamicFieldData.forEach((item) => {
                     dataWithComparison.push(item);
                     if (hasComparisonOption) {
                         const comparisonItem = fullDataComparisonData.find((c) => (state.groupByField ?? []).every((field) => c[field] === d[field]));
@@ -492,11 +492,11 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
                         });
                     }
                 });
-                const etcValue = d[`_total_${state.tableDataCriteria}`] - (sortedAndFilteredData.reduce((acc, cur) => acc + cur.value, 0) ?? 0);
+                const etcValue = d[`_total_${state.tableDataCriteria}`] - (dynamicFieldData.reduce((acc, cur) => acc + cur.value, 0) ?? 0);
                 return {
                     ...d,
                     [state.tableDataCriteria]: [
-                        ...(hasComparisonOption ? dataWithComparison : sortedAndFilteredData),
+                        ...(hasComparisonOption ? dataWithComparison : dynamicFieldData),
                         {
                             [state.tableDataField]: 'etc',
                             value: etcValue,
@@ -552,6 +552,7 @@ defineExpose<WidgetExpose<Data>>({
                                    :text-wrap-info="state.textWrapInfo"
                                    :table-column-width-info="state.tableColumnWidthInfo"
                                    :custom-table-column-width-info="state.customTableColumnWidthInfo"
+                                   :missing-value-info="state.missingValueInfo"
                                    :sort-by.sync="state.sortBy"
                                    :this-page.sync="state.thisPage"
                                    @load="handleManualLoadWidget"

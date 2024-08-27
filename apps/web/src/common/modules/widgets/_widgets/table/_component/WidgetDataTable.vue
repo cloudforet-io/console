@@ -31,6 +31,7 @@ import type {
     TableDataFieldValue, ComparisonValue, TotalValue,
     DateFormatValue,
     NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue, TextWrapValue,
+    MissingValueValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -46,6 +47,8 @@ const HEATMAP_COLOR_HEX_MAP = {
 };
 const SKIP_HEATMAP_FIELD = ['subTotal', 'comparison'];
 
+type TableDataValue = number | undefined | null;
+const TABLE_MISSING_VALUE_SYMBOL = '-';
 
 interface Props {
   fields: TableWidgetField[];
@@ -70,6 +73,7 @@ interface Props {
   tableColumnWidthInfo?: TableColumnWidthValue;
   customTableColumnWidthInfo?: CustomTableColumnWidthValue;
   textWrapInfo?: TextWrapValue;
+  missingValueInfo?: MissingValueValue;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
@@ -139,7 +143,11 @@ const getField = (field: TableWidgetField): string => {
     return field.label || field.name;
 };
 
-const valueFormatter = (value, field: TableWidgetField) => {
+const valueFormatter = (value: TableDataValue, field: TableWidgetField) => {
+    // handle missing value
+    const isMissingValue = value === null || value === undefined;
+    if (isMissingValue && props.missingValueInfo?.value === 'lineBreaks') return TABLE_MISSING_VALUE_SYMBOL;
+
     const _value = value || 0;
     let _unit = field.fieldInfo?.unit;
     let dataField = field.name?.replace('comparison_', '');
@@ -176,7 +184,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
             return '-';
         }
-        return valueFormatter(itemValue, field) || '-';
+        return valueFormatter(itemValue, field);
     }
     if (props.fieldType === 'dynamicField') {
         const dynamicData = item[props.criteria || ''] ?? [];
@@ -193,7 +201,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
             return '-';
         }
-        return valueFormatter(dynamicDataItem?.value, field) || 0;
+        return valueFormatter(dynamicDataItem?.value, field);
     }
     return '-';
 };
