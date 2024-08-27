@@ -65,12 +65,6 @@ export interface CategoryByOptions {
     defaultIndex?: number;
     excludeDateField?: boolean;
 }
-export interface TotalFieldOptions {
-    dataTarget?: string;
-}
-export interface BasisFieldOptions {
-    dataTarget?: string;
-}
 export interface MinOptions {
     default?: number;
 }
@@ -157,7 +151,6 @@ export interface WidgetHeightOptions {
 
 export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
-    | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
     | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
@@ -169,7 +162,6 @@ export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
 
 export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy'
-    | 'totalField' | 'basisField'
     | 'min' | 'max'
     | 'icon' | 'comparison' | 'legend'
     | 'subTotal' | 'total'

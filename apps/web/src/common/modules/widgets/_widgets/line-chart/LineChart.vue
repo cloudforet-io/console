@@ -127,11 +127,19 @@ const state = reactive({
     dataFieldType: computed<TableDataFieldValue['fieldType']>(() => state.dataFieldInfo?.fieldType),
     dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
     dataCriteria: computed<string|undefined>(() => state.dataFieldInfo?.criteria),
+    dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
         if (Object.values(DATE_FIELD).includes(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+        } else if (Object.values(DATE_FIELD).includes(state.dataField)) {
+            if (state.dynamicFieldValue.length) {
+                const _sortedDateValue = [...state.dynamicFieldValue];
+                _sortedDateValue.sort();
+                _start = _sortedDateValue[0];
+                _end = _sortedDateValue[_sortedDateValue.length - 1];
+            }
         }
         return { start: _start, end: _end };
     }),
