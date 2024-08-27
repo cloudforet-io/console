@@ -15,3 +15,10 @@ export interface RoleModel {
     created_at: string;
     updated_at: string;
 }
+
+export interface BasicRoleModel {
+    role_id: string;
+    name: string;
+    state: RoleState;
+    role_type: RoleType;
+}

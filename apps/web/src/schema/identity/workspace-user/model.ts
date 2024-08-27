@@ -14,7 +14,7 @@ export interface WorkspaceUserModel {
     timezone: string;
     api_key_count: number;
     tags: Tags;
-    role_binding_info: RoleBindingModel;
+    role_bindings_info: RoleBindingModel[];
     domain_id: string;
     created_at: string;
     last_accessed_at: string;

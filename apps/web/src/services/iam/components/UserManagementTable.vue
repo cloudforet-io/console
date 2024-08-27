@@ -185,7 +185,7 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
 const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
         const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
-            role_binding_id: state.refinedUserItems[rowIndex].role_binding_info?.role_binding_id || '',
+            role_binding_id: state.refinedUserItems[rowIndex]?.role_bindings_info?.[0]?.role_binding_id || '',
             role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
@@ -356,7 +356,7 @@ const handleRemoveButton = async () => {
                 <p-button style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
-                          @click.stop="handleClickButton(value.item.role_binding_info)"
+                          @click.stop="handleClickButton(value.item.role_bindings_info)"
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
