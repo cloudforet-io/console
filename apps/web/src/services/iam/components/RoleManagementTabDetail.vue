@@ -12,6 +12,7 @@ import {
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
@@ -21,6 +22,8 @@ import {
 } from '@/lib/access-control/page-access-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { gray, green } from '@/styles/colors';
 
 import { MANAGED_PAGE_ACCESS } from '@/services/iam/constants/role-constant';
 import { getPageAccessMenuListByRoleType } from '@/services/iam/helpers/role-page-access-menu-list';
@@ -50,6 +53,10 @@ const state = reactive({
     permissionsCode: computed<string>(() => JSON.stringify(state.permissions, null, 4)),
     pageAccess: computed<string[]>(() => (state.data.is_managed ? MANAGED_PAGE_ACCESS : state.data.page_access ?? [])),
     pageAccessDataList: [] as PageAccessMenuItem[],
+    readOnly: computed<boolean>(() => state.data.page_access.every((item) => {
+        const accessType = item.split('.*')[0].split(':')[1];
+        return accessType === PAGE_ACCESS.READONLY;
+    })),
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -164,6 +171,49 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
                     <p-empty v-if="state.pageAccessDataList.length === 0">
                         {{ $t('IAM.ROLE.DETAIL.NO_DATA') }}
                     </p-empty>
+                    <div v-else-if="state.data.role_type === ROLE_TYPE.DOMAIN_ADMIN">
+                        <div class="page-access-info-wrapper">
+                            <p-i name="ic_settings"
+                                 width="2rem"
+                                 height="2rem"
+                                 class="setting-icon"
+                                 :color="gray[900]"
+                            />
+                            <div class="page-access-info">
+                                <p class="title">
+                                    {{ $t('IAM.ROLE.FORM.FULL_ACCESS') }}
+                                </p>
+                                <div class="page-access-desc">
+                                    <p-i name="ic_check-circle"
+                                         width="1.125rem"
+                                         height="1.125rem"
+                                         class="check-circle-icon"
+                                         :color="green[600]"
+                                    />
+                                    <span class="desc">{{ $t('IAM.ROLE.FORM.ADMIN_CENTER') }}</span>
+                                </div>
+                                <div class="page-access-desc">
+                                    <p-i name="ic_check-circle"
+                                         width="1.125rem"
+                                         height="1.125rem"
+                                         class="check-circle-icon"
+                                         :color="green[600]"
+                                    />
+                                    <span class="desc">{{ $t('IAM.ROLE.FORM.ALL_WORKSPACES') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="state.readOnly"
+                             class="page-access-info-wrapper"
+                        >
+                            <p-i name="ic_no-edit"
+                                 height="2rem"
+                                 width="2rem"
+                                 color="inherit"
+                            />
+                            <span>{{ $t('IAM.ROLE.FORM.READ_ONLY_PERMISSIONS') }}</span>
+                        </div>
+                    </div>
                     <p-data-table v-else
                                   :fields="tableState.fields"
                                   :items="tableState.items"
@@ -240,6 +290,33 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
                 & + .accessible-item {
                     margin-left: 0.5rem;
                 }
+            }
+        }
+        .page-access-info-wrapper {
+            @apply flex items-start border border-gray-200 rounded-md;
+            margin-right: 1rem;
+            margin-left: 1rem;
+            padding: 1.375rem 1rem;
+            gap: 0.5rem;
+            .setting-icon {
+                margin-top: -0.375rem;
+            }
+            .page-access-info {
+                @apply flex flex-col;
+                gap: 0.25rem;
+                .title {
+                    @apply text-gray-900 font-medium;
+                    margin-bottom: 0.375rem;
+                }
+                .desc {
+                    @apply text-label-md text-gray-700;
+                }
+            }
+            & + .page-access-info-wrapper {
+                @apply items-center;
+                margin-top: 0.5rem;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
             }
         }
 
