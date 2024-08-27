@@ -66,6 +66,12 @@ const setupModal = (type) => {
         title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: workspaceGroupPageGetters.selectedWorkspaceGroup.name }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
     }); break;
+    case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER: workspaceGroupPageStore.updateModalSettings({
+        type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER,
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_GROUP_USER_TITLE'),
+        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER,
+        themeColor: 'alert',
+    }); break;
     default:
         break;
     }
@@ -110,10 +116,10 @@ const handleSelectedGroupUsersRemoveButtonClick = () => {
 };
 
 const handleSelectedGroupUserRemoveButtonClick = (item:WorkspaceUser) => {
-    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER);
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedGroupUser = [item];
-    });
+    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER);
+    workspaceGroupPageState.modalAdditionalData = {
+        selectedGroupUser: item,
+    };
 };
 
 const handleChangeSort = (name, isDesc) => {

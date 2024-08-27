@@ -39,6 +39,7 @@ const state = reactive({
     loading: false,
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     isRemoveGroupUserType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER)),
+    isRemoveSingleGroupUserType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER)),
     isRemoveWorkspacesType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES)),
     items: computed<(WorkspaceUser|WorkspaceModel|TableDataItem)[]>(() => {
         switch (workspaceGroupPageState.modal.type) {
@@ -47,6 +48,8 @@ const state = reactive({
                 return workspaceGroupPageGetters.selectedGroupUsersByIndices;
             }
             return [];
+        case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER:
+            return [workspaceGroupPageState.modalAdditionalData.selectedGroupUser];
         case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES:
             return workspaceGroupPageGetters.selectedWorkspacesByIndices?.map((workspace) => ({
                 ...state.workspaces[workspace],
@@ -94,9 +97,12 @@ const deleteGroupUsers = async () => {
     state.loading = true;
 
     try {
+        const users = state.isRemoveSingleGroupUserType
+            ? [workspaceGroupPageState.modalAdditionalData?.selectedGroupUser]
+            : workspaceGroupPageGetters.selectedGroupUsersByIndices;
         await SpaceConnector.clientV2.identity.workspaceGroup.removeUsers<WorkspaceGroupRemoveUsersParameters>({
             workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
-            users: workspaceGroupPageGetters.selectedGroupUsersByIndices.map((item) => ({ user_id: item.user_id })),
+            users: users.map((item) => ({ user_id: item.user_id })),
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -122,9 +128,8 @@ const deleteWorkspaces = async () => {
 
 
 const handleConfirm = async () => {
-    if (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER) {
+    if (state.isRemoveGroupUserType || state.isRemoveSingleGroupUserType) {
         await deleteGroupUsers();
-        workspaceGroupPageStore.resetSelectedGroupUser();
     } else {
         await deleteWorkspaces();
         workspaceGroupPageStore.resetSelectedWorkspace();
@@ -136,7 +141,6 @@ const handleConfirm = async () => {
 
 const handleCloseModal = () => {
     workspaceGroupPageStore.closeModal();
-    workspaceGroupPageStore.resetSelectedGroupUser();
     workspaceGroupPageStore.resetSelectedWorkspace();
 };
 </script>
@@ -148,8 +152,9 @@ const handleCloseModal = () => {
                          :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER
                              || workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES
                              || workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE
+                             || workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER
                          "
-                         :fields="state.isRemoveGroupUserType ? userTableFields : workspaceTableField"
+                         :fields="state.isRemoveGroupUserType || state.isRemoveSingleGroupUserType ? userTableFields : workspaceTableField"
                          :items="state.items"
                          size="sm"
                          :loading="state.loading"

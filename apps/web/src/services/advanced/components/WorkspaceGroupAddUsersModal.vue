@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PSelectDropdown, PIconButton,
+    PButtonModal, PFieldGroup, PSelectDropdown, PIconButton, PAvatar,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -36,6 +36,7 @@ const emit = defineEmits<{(e: 'confirm'): void}>();
 
 const state = reactive({
     loading: false,
+    isAllValid: computed(() => roleSelectedItems.value.length > 0 && userSelectedItems.value.length > 0),
 });
 
 const {
@@ -95,6 +96,10 @@ const handleConfirm = async () => {
 const handleCloseModal = () => {
     workspaceGroupPageStore.closeModal();
 };
+
+const handleRemoveUser = (item: UserModel) => {
+    userSelectedItems.value = userSelectedItems.value.filter((selectedItem) => selectedItem.user_id !== item.user_id);
+};
 </script>
 
 <template>
@@ -103,6 +108,7 @@ const handleCloseModal = () => {
                     :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS"
                     :loading="state.loading"
                     size="sm"
+                    :disabled="!state.isAllValid"
                     @confirm="handleConfirm"
                     @cancel="handleCloseModal"
                     @close="handleCloseModal"
@@ -174,13 +180,19 @@ const handleCloseModal = () => {
                     </template>
                 </p-field-group>
             </div>
-            <!-- TODO: selected user -->
             <div v-for="item in userSelectedItems"
                  :key="item.user_id"
+                 class="selected-user-item"
             >
-                {{ item.user_id }}
+                <div class="flex items-center gap-2">
+                    <p-avatar class="menu-icon"
+                              size="md"
+                    />
+                    {{ item.user_id }}
+                </div>
                 <p-icon-button name="ic_close"
                                size="md"
+                               @click="handleRemoveUser(item)"
                 />
             </div>
         </template>
@@ -226,6 +238,14 @@ const handleCloseModal = () => {
 
         :deep(.selection-display-wrapper) {
             display: none;
+        }
+    }
+
+    .selected-user-item {
+        @apply flex items-center justify-between rounded text-label-md;
+        padding: 0.5rem;
+        &:hover {
+            @apply bg-blue-100;
         }
     }
 }
