@@ -48,14 +48,13 @@ export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[]): P
         const menu = MENU_LIST.find(({ id }) => id === menuId);
         if (!menu) return;
 
-        const read = accessType !== PAGE_ACCESS.NO_ACCESS;
         const write = accessType === PAGE_ACCESS.READ_WRITE;
-        const access = accessType !== PAGE_ACCESS.READ_ONLY;
+        const access = accessType !== PAGE_ACCESS.NO_ACCESS;
 
-        setPermissions(menuId, read, write, access);
+        setPermissions(menuId, access, write, access);
 
         menu.subMenuList?.forEach(({ id: subMenuId }) => {
-            setPermissions(subMenuId, read, write, access);
+            setPermissions(subMenuId, access, write, access);
         });
     };
 

@@ -27,11 +27,17 @@ import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 const costReportPageGetters = costReportPageStore.getters;
 const appContextStore = useAppContextStore();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -108,7 +114,7 @@ watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
                         />
                     </p-tooltip>
                 </div>
-                <p-toggle-button v-if="storeState.isAdminMode"
+                <p-toggle-button v-if="props.hasReadWriteAccess && storeState.isAdminMode"
                                  :value="state.enableWorkspaceOwnerRecipients"
                                  @change-toggle="handleToggleRecipients"
                 />

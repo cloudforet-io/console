@@ -2,6 +2,9 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
@@ -11,8 +14,13 @@ import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
 import UserManagementFormModal from '@/services/iam/components/UserManagementFormModal.vue';
 import UserManagementHeader from '@/services/iam/components/UserManagementHeader.vue';
@@ -25,10 +33,25 @@ const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
+const route = useRoute();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
     grantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
+const state = reactive({
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const userListApiQueryHelper = new ApiQueryHelper()
@@ -73,15 +96,16 @@ onUnmounted(() => {
 
 <template>
     <section class="user-page">
-        <user-management-header />
+        <user-management-header :has-read-write-access="state.hasReadWriteAccess" />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
                 <user-management-table :table-height="height"
+                                       :has-read-write-access="state.hasReadWriteAccess"
                                        @confirm="refreshUserList"
                 />
             </template>
         </p-horizontal-layout>
-        <user-management-tab />
+        <user-management-tab :has-read-write-access="state.hasReadWriteAccess" />
         <user-management-add-modal @confirm="refreshUserList" />
         <user-management-status-modal @confirm="refreshUserList" />
         <user-management-form-modal @confirm="refreshUserList" />

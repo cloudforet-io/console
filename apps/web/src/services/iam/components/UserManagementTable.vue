@@ -39,10 +39,12 @@ import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 interface Props {
     tableHeight: number;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
+    hasReadWriteAccess: true,
 });
 
 const userPageStore = useUserPageStore();
@@ -250,7 +252,7 @@ const handleRemoveButton = async () => {
             @change="handleChange"
             @refresh="handleChange()"
         >
-            <template v-if="userPageState.isAdminMode"
+            <template v-if="props.hasReadWriteAccess && userPageState.isAdminMode"
                       #toolbox-left
             >
                 <user-management-table-toolbox />

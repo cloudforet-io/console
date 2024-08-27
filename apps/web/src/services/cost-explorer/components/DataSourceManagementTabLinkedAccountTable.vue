@@ -40,6 +40,12 @@ import {
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
+
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const dataSourcesPageStore = useDataSourcesPageStore();
@@ -169,7 +175,7 @@ watch(() => tableState.selectedFilter, (selectedFilter) => {
     <p-toolbox-table search-type="query"
                      class="data-source-management-tab-linked-account-table"
                      searchable
-                     selectable
+                     :selectable="props.hasReadWriteAccess"
                      sortable
                      disabled
                      :placeholder="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.SELECT')"
@@ -208,6 +214,7 @@ watch(() => tableState.selectedFilter, (selectedFilter) => {
                                :visible-menu="dropdownState.visible"
                                :loading="dropdownState.loading"
                                :search-text.sync="dropdownState.searchText"
+                               :disabled="!props.hasReadWriteAccess"
                                show-select-marker
                                is-filterable
                                :selected="value ? [{ name: value, label: getWorkspaceInfo(value)?.name}] : undefined"

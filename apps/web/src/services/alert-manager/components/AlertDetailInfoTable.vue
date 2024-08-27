@@ -32,6 +32,7 @@ import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-st
 const props = defineProps<{
     id?: string;
     manageDisabled?: boolean;
+    hasReadWriteAccess?: boolean;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -105,7 +106,7 @@ const getEscalationPolicy = async () => {
                 <alert-detail-info-table-description
                     :id="props.id"
                     :alert-data="state.data"
-                    :manage-disabled="props.manageDisabled"
+                    :manage-disabled="!props.hasReadWriteAccess || props.manageDisabled"
                     @update="$emit('update')"
                 />
             </template>
@@ -135,7 +136,7 @@ const getEscalationPolicy = async () => {
                 <alert-detail-info-table-project
                     :id="props.id"
                     :alert-data="state.data"
-                    :manage-disabled="props.manageDisabled"
+                    :manage-disabled="!props.hasReadWriteAccess || props.manageDisabled"
                     @update="$emit('update')"
                 />
             </template>

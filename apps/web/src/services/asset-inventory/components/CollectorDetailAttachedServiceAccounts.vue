@@ -40,6 +40,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/stores/collect
 
 const props = defineProps<{
     manageDisabled?: boolean;
+    hasReadWriteAccess?: boolean
 }>();
 const emit = defineEmits<{(e: 'update:totalCount', totalCount: number): void;
 }>();
@@ -231,7 +232,8 @@ watch([() => collectorFormStore.collectorProvider, () => state.serviceAccountsFi
                 </p-badge>
             </template>
             <template #col-collect-format="{item}">
-                <p-button size="sm"
+                <p-button v-if="props.hasReadWriteAccess"
+                          size="sm"
                           style-type="tertiary"
                           :disabled="props.manageDisabled"
                           class="service-account-collect-data-button"

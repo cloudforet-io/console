@@ -3,6 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
+import { clone } from 'lodash';
 
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -28,8 +29,11 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -56,6 +60,7 @@ import type {
     AlertUrgencyFilter,
     AlertAssignedFilter,
 } from '@/services/alert-manager/types/alert-type';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const router = useRouter();
 const route = useRoute();
@@ -90,6 +95,7 @@ const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 
 /* Search Tags */
@@ -194,6 +200,16 @@ const state = reactive({
     alertStateLabels: useAlertStateI18n(),
     urgencyLabels: useAlertUrgencyI18n(),
     visibleCustomFieldModal: false,
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 /* formatters & autocomplete handlers */
@@ -384,7 +400,9 @@ initPage();
                                    :total-count="state.totalCount"
                                    :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')"
                         >
-                            <template #extra>
+                            <template v-if="state.hasReadWriteAccess"
+                                      #extra
+                            >
                                 <alert-main-data-table-actions
                                     :selected-items="state.selectedItems"
                                     :manage-disabled="props.manageDisabled"
@@ -394,7 +412,9 @@ initPage();
                         </p-heading>
                     </div>
                 </template>
-                <template #toolbox-left>
+                <template v-if="state.hasReadWriteAccess"
+                          #toolbox-left
+                >
                     <p-button style-type="primary"
                               icon-left="ic_plus_bold"
                               :disabled="props.manageDisabled"
