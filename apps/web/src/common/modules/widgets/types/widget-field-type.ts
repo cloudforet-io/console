@@ -18,9 +18,7 @@ export interface DataFieldOptions {
     multiSelectable?: boolean;
 }
 export interface TableDataFieldOptions {
-    max?: number;
-    hideDynamicFieldMaxCount?: boolean;
-    hideStaticFieldMaxCount?: boolean;
+    max?: number; // This is a value for a possible max limit.
 }
 export interface XAxisOptions {
     dataTarget?: string;

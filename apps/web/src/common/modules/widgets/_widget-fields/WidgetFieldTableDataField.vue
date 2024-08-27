@@ -11,7 +11,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PSelectDropdown, PFieldGroup, PTextInput, PSelectButton, PTooltip, PI,
+    PSelectDropdown, PFieldGroup, PSelectButton,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -36,7 +36,7 @@ import { getInitialSelectedMenuItem, isDateField } from '@/common/modules/widget
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { TableDataItem, DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
-import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { TableDataFieldValue, GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
@@ -46,7 +46,6 @@ import {
 
 type Data = ListResponse<TableDataItem>;
 
-const DEFAULT_COUNT = 5;
 const DEFAULT_FIELD_TYPE = 'staticField';
 const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions, TableDataFieldValue>>(), {
 });
@@ -88,7 +87,6 @@ const state = reactive({
         label: d,
     }))),
     isValid: computed<boolean>(() => {
-        if (state.proxyValue?.count === undefined) return false;
         if (state.menuItems.length === 0) return false;
         if (state.proxyValue.fieldType === 'dynamicField' && !state.proxyValue.dynamicFieldValue?.length) return false;
         if (Array.isArray(state.selectedItem)) {
@@ -103,23 +101,11 @@ const state = reactive({
         }
         return !state.selectedItem;
     }),
-    max: computed(() => props.widgetFieldSchema?.options?.max),
-    isMaxValid: computed<boolean>(() => (state.max ? (state.proxyValue?.count <= state.max) && !!state.proxyValue?.count : true)),
-    tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
-        fieldName: state.fieldName,
-        max: state.max,
-    })),
-    hideCount: computed<boolean>(() => {
-        if (state.selectedFieldType === 'dynamicField') {
-            return props.widgetFieldSchema?.options?.hideDynamicFieldMaxCount ?? false;
-        }
-        return props.widgetFieldSchema?.options?.hideStaticFieldMaxCount ?? false;
-    }),
     // Dynamic Field Fetching
     basedOnDate: computed(() => getWidgetBasedOnDate(props.allValueMap?.granularity as string, props.dateRange?.end)),
     dateRange: computed<DateRange>(() => {
         const _granularity = props.allValueMap?.granularity as string;
-        const _groupBy = props.allValueMap?.groupBy?.value as string[];
+        const _groupBy = (props.allValueMap?.groupBy as GroupByValue)?.value as string[];
         const _basedOnDate = getWidgetBasedOnDate(_granularity, props.dateRange?.end);
         let subtract = 1;
         if (isDateField(state.proxyValue.value) || _groupBy?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))) {
@@ -133,20 +119,16 @@ const state = reactive({
     dynamicFields: undefined as undefined | string[],
     dynamicFieldMenuItems: computed<MenuItem[]>(() => {
         if (state.proxyValue.fieldType === 'staticField') return [];
-        const selected = state.proxyValue.dynamicFieldValue ?? [];
-        const maxCount = state.proxyValue.count;
         return state.dynamicFields?.map((d) => {
             const fieldName = state.proxyValue.value;
             const label = getReferenceLabel(storeState.allReferenceTypeInfo, fieldName, d);
             return {
                 name: d,
                 label,
-                disabled: selected.length === Number(maxCount) && !selected.includes(d),
             };
         }) ?? [];
     }),
     selectedMenuItems: computed(() => state.dynamicFieldMenuItems.filter((d) => state.proxyValue.dynamicFieldValue?.includes(d.name))),
-    visibleMenu: false,
     loading: false,
 });
 
@@ -198,22 +180,12 @@ const handleUpdateValue = (val: string|MenuItem[]) => {
         };
     }
 };
-const handleUpdateCount = (val: number) => {
-    if (val === state.proxyValue?.count) return;
-    state.proxyValue = {
-        ...state.proxyValue,
-        dynamicFieldValue: undefined,
-        count: val,
-    };
-};
+
 const handleSelectDynamicFields = (value: MenuItem[]) => {
     state.proxyValue = {
         ...state.proxyValue,
         dynamicFieldValue: value.map((d) => d.name),
     };
-    if (value.length === Number(state.proxyValue.count)) {
-        state.visibleMenu = false;
-    }
 };
 
 const handleClearDynamicFieldsSelection = () => {
@@ -263,7 +235,6 @@ const initValue = () => {
         fieldType: state.selectedFieldType,
         value: props.value?.value,
         criteria: props.value?.criteria,
-        count: props.value?.count ?? DEFAULT_COUNT,
         dynamicFieldValue: state.selectedFieldType === 'dynamicField' ? (props.value?.dynamicFieldValue ?? []) : undefined,
     };
     if (state.selectedFieldType === 'staticField') {
@@ -311,7 +282,7 @@ const fetchAndExtractDynamicField = async () => {
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
-                group_by: [...(props.allValueMap?.groupBy?.value ?? []), state.proxyValue?.value],
+                group_by: [...((props.allValueMap?.groupBy as GroupByValue)?.value ?? []), state.proxyValue?.value],
                 granularity: props.allValueMap?.granularity,
                 field_group: [state.proxyValue?.value],
                 fields: {
@@ -438,35 +409,6 @@ watch([ // Fetch Dynamic Field
                                        @update:selected="handleUpdateValue"
                     />
                 </p-field-group>
-                <p-field-group v-if="!state.hideCount"
-                               :label="$t('COMMON.WIDGETS.MAX_ITEMS')"
-                               style-type="secondary"
-                               class="max-items"
-                               :invalid="!state.isMaxValid"
-                               :invalid-text="$t('COMMON.WIDGETS.NUMBER_FIELD_VALIDATION', {max: state.max})"
-                               required
-                >
-                    <p-text-input type="number"
-                                  :min="1"
-                                  :max="props.widgetFieldSchema?.options?.max"
-                                  :invalid="!state.isMaxValid"
-                                  :value="state.proxyValue?.count ?? DEFAULT_COUNT"
-                                  @update:value="handleUpdateCount"
-                    />
-                    <template #label-extra>
-                        <p-tooltip v-if="state.max"
-                                   :contents="state.tooltipDesc"
-                                   position="bottom"
-                                   class="tooltip"
-                        >
-                            <p-i width="1rem"
-                                 height="1rem"
-                                 name="ic_info-circle"
-                                 class="icon"
-                            />
-                        </p-tooltip>
-                    </template>
-                </p-field-group>
             </div>
             <p-field-group v-if="state.selectedFieldType === 'dynamicField'"
                            required
@@ -474,7 +416,6 @@ watch([ // Fetch Dynamic Field
                 <p-select-dropdown class="dynamic-field-select-dropdown"
                                    :menu="state.dynamicFieldMenuItems"
                                    :selected="state.selectedMenuItems"
-                                   :visible-menu.sync="state.visibleMenu"
                                    :loading="state.loading"
                                    :invalid="!state.proxyValue?.dynamicFieldValue?.length"
                                    use-fixed-menu-style
@@ -509,18 +450,6 @@ watch([ // Fetch Dynamic Field
         width: 6.5rem;
         .input-container {
             padding-right: 1.5rem;
-        }
-    }
-    .max-items {
-        width: 10rem;
-
-        .tooltip {
-            position: relative;
-            padding-left: 1.25rem;
-            .icon {
-                position: absolute;
-                right: 0;
-            }
         }
     }
 }
