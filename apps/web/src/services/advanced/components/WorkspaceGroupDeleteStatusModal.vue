@@ -9,12 +9,15 @@ import type { WorkspaceGroupRemoveUsersParameters } from '@/schema/identity/work
 import type {
     WorkspaceGroupRemoveWorkspacesParameters,
 } from '@/schema/identity/workspace-group/api-verbs/remove-workspaces';
+import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 
 import { workspaceStateFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
@@ -23,6 +26,7 @@ import type { WorkspaceGroupFetchParameters } from '@/services/advanced/types/ad
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
+
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
@@ -36,7 +40,7 @@ const state = reactive({
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     isRemoveGroupUserType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER)),
     isRemoveWorkspacesType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES)),
-    items: computed(() => {
+    items: computed<(WorkspaceUser|WorkspaceModel|TableDataItem)[]>(() => {
         switch (workspaceGroupPageState.modal.type) {
         case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER:
             if (workspaceGroupPageGetters.selectedGroupUsersByIndices.length) {
