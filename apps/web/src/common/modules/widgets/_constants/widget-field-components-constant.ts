@@ -1,6 +1,5 @@
 import type { Component } from 'vue';
 
-import basisField from '@/common/modules/widgets/_widget-fields/WidgetFieldBasisField.vue';
 import categoryBy from '@/common/modules/widgets/_widget-fields/WidgetFieldCategoryBy.vue';
 import colorSchema from '@/common/modules/widgets/_widget-fields/WidgetFieldColorSchema.vue';
 import comparison from '@/common/modules/widgets/_widget-fields/WidgetFieldComparison.vue';
@@ -28,7 +27,6 @@ import tableColumnWidth from '@/common/modules/widgets/_widget-fields/WidgetFiel
 import tableDataField from '@/common/modules/widgets/_widget-fields/WidgetFieldTableDataField.vue';
 import textWrap from '@/common/modules/widgets/_widget-fields/WidgetFieldTextWrap.vue';
 import total from '@/common/modules/widgets/_widget-fields/WidgetFieldTotal.vue';
-import totalField from '@/common/modules/widgets/_widget-fields/WidgetFieldTotalField.vue';
 import widgetHeight from '@/common/modules/widgets/_widget-fields/WidgetFieldWidgetHeight.vue';
 import xAxis from '@/common/modules/widgets/_widget-fields/WidgetFieldXAxis.vue';
 import yAxis from '@/common/modules/widgets/_widget-fields/WidgetFieldYAxis.vue';
@@ -44,8 +42,6 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     lineBy,
     groupBy,
     categoryBy,
-    totalField,
-    basisField,
     min,
     max,
     formatRules,
