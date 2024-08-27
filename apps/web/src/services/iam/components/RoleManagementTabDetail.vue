@@ -60,8 +60,8 @@ const state = reactive({
 });
 const tableState = reactive({
     fields: computed(() => [
-        { name: 'service', label: i18n.t('IAM.ROLE.FORM.SERVICE') },
-        { name: 'page_access', label: i18n.t('IAM.ROLE.FORM.ACCESS') },
+        { name: 'service', label: i18n.t('IAM.ROLE.FORM.SERVICE'), width: '150px' },
+        { name: 'page_access', label: i18n.t('IAM.ROLE.FORM.ACCESS'), width: '160px' },
         { name: 'accessible_menu_list', label: i18n.t('IAM.ROLE.FORM.ACCESSIBLE_MENU') },
     ]),
     items: computed<TableItem[] | undefined>(() => state.pageAccessDataList?.map((i) => {
