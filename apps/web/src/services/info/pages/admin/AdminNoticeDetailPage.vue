@@ -2,7 +2,9 @@
 import {
     computed, onBeforeMount, reactive,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PHeading } from '@cloudforet/mirinae';
@@ -14,20 +16,25 @@ import type { PostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import {
     hideLoadingMessage,
     showErrorMessage,
     showLoadingMessage,
     showSuccessMessage,
 } from '@/lib/helper/notice-alert-helper';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import NoticeDetail from '@/services/info/components/NoticeDetail.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
+
 
 const props = defineProps<{
     postId: string;
@@ -38,14 +45,26 @@ const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 
 const router = useRouter();
+const route = useRoute();
 
 const storeState = reactive({
     post: computed<undefined|PostModel>(() => noticeDetailState.post),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     hasPermissionToEditOrDelete: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     deleteModalVisible: false,
     sendLoading: false,
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const handleClickEditButton = () => {
@@ -114,7 +133,9 @@ onBeforeMount(async () => {
                    show-back-button
                    @click-back-button="$router.go(-1)"
         >
-            <template #extra>
+            <template v-if="state.hasReadWriteAccess"
+                      #extra
+            >
                 <div v-if="state.hasPermissionToEditOrDelete"
                      class="button-group"
                 >
