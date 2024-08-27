@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { PButton } from '@cloudforet/mirinae';
+import { PButton, PSpinner } from '@cloudforet/mirinae';
 
 interface Props {
    disabled: boolean;
    changed: boolean;
+   loading: boolean;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'delete'): void;
@@ -18,6 +19,7 @@ const handleClickResetDataTable = () => {
     emit('reset');
 };
 const handleUpdateDataTable = () => {
+    if (props.loading) return;
     emit('update');
 };
 </script>
@@ -43,10 +45,15 @@ const handleUpdateDataTable = () => {
                       :disabled="props.disabled"
                       @click="handleUpdateDataTable"
             >
-                {{ $t('COMMON.WIDGETS.APPLY') }}
-                <div v-if="props.changed"
-                     class="update-dot"
-                />
+                <div class="button-contents-wrapper">
+                    <p-spinner v-if="props.loading"
+                               size="sm"
+                    />
+                    {{ $t('COMMON.WIDGETS.APPLY') }}
+                    <div v-if="props.changed"
+                         class="update-dot"
+                    />
+                </div>
             </p-button>
         </div>
     </div>
@@ -59,12 +66,15 @@ const handleUpdateDataTable = () => {
 
     .apply-button {
         @apply relative;
-        .update-dot {
-            @apply absolute rounded-full bg-blue-500 border-2 border-white;
-            width: 0.75rem;
-            height: 0.75rem;
-            right: -0.375rem;
-            top: -0.375rem;
+        .button-contents-wrapper {
+            @apply relative flex items-center gap-1;
+            .update-dot {
+                @apply absolute rounded-full bg-blue-500 border-2 border-white;
+                width: 0.75rem;
+                height: 0.75rem;
+                right: -0.375rem;
+                top: -0.375rem;
+            }
         }
     }
     .form-button-wrapper {

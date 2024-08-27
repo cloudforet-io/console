@@ -8,14 +8,18 @@ import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/
 
 import WidgetFormDataTableCardAddContents
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddContents.vue';
+import WidgetFormDataTableCardLoadingContents
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardLoadingContents.vue';
 import WidgetFormDataTableCardTransformContents
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformContents.vue';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableDataType } from '@/common/modules/widgets/types/widget-model';
 
+const LOADING_STATE = 'LOADING';
 interface Props {
-    item: PublicDataTableModel|PrivateDataTableModel;
+    item?: PublicDataTableModel|PrivateDataTableModel;
+    loadingCard?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -26,8 +30,8 @@ const addContents = ref<WidgetFormDataTableCardAddContents|null>(null);
 const transformContents = ref<WidgetFormDataTableCardTransformContents|null>(null);
 
 const state = reactive({
-    dataTableId: computed<string>(() => props.item.data_table_id),
-    dataType: computed<DataTableDataType>(() => props.item.data_type),
+    dataTableId: computed<string|undefined>(() => props.item?.data_table_id),
+    dataType: computed<DataTableDataType | 'LOADING' | undefined>(() => (props.loadingCard ? LOADING_STATE : props.item?.data_type)),
     selected: computed<boolean>(() => widgetGenerateState.selectedDataTableId === state.dataTableId),
 });
 
@@ -47,6 +51,7 @@ defineExpose({
 
 <template>
     <div class="widget-form-data-table-card">
+        <widget-form-data-table-card-loading-contents v-if="!props.item || props.loadingCard" />
         <widget-form-data-table-card-add-contents v-if="state.dataType === DATA_TABLE_TYPE.ADDED"
                                                   ref="addContents"
                                                   :item="props.item"

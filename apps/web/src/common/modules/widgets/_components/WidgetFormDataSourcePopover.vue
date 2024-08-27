@@ -181,6 +181,7 @@ const handleSelectPopperCondition = (condition: DataTableDataType) => {
 };
 const handleConfirmDataSource = async () => {
     state.loading = true;
+    widgetGenerateStore.setDataTableCreateLoading(true);
     // create widget
     if (widgetGenerateState.overlayType === 'ADD' && !widgetGenerateState.widgetId) {
         const createdWidget = await createWidget();
@@ -235,6 +236,7 @@ const handleConfirmDataSource = async () => {
         }
     }
     state.loading = false;
+    widgetGenerateStore.setDataTableCreateLoading(false);
 };
 
 watch(() => state.showPopover, (val) => {
