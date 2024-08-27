@@ -9,12 +9,16 @@ const lineChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        dataField: {},
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
                 max: 31,
+            },
+        },
+        tableDataField: {
+            options: {
+                max: 15,
             },
         },
     },
@@ -24,20 +28,14 @@ const lineChart: WidgetConfig = {
                 default: true,
             },
         },
-        lineBy: {
-            options: {
-                dataTarget: 'labels_info',
-                defaultMaxCount: 5,
-                max: 10,
-                defaultIndex: 0,
-                excludeDateField: true,
-            },
-        },
         dateFormat: {
             options: {
                 default: 'MMM DD, YYYY',
             },
         },
+        numberFormat: {},
+        displaySeriesLabel: {},
+        missingValue: {},
         displayAnnotation: {},
     },
 };

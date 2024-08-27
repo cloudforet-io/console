@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onBeforeMount, onUnmounted, reactive, ref, watch,
+    computed, nextTick, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import { cloneDeep, isEqual } from 'lodash';
@@ -190,6 +190,10 @@ watch(() => state.mounted, async (mounted) => {
         state.mounted = false;
     }
 });
+watch(() => dashboardDetailState.vars, async () => {
+    await nextTick();
+    await loadOverlayWidget();
+});
 
 onBeforeMount(() => {
     initSnapshot();
@@ -325,7 +329,7 @@ onUnmounted(() => {
                 gap: 0.5rem;
                 align-items: center;
                 justify-content: end;
-                min-width: 14rem;
+                min-width: 9rem;
                 .divider {
                     height: 1.5rem;
                 }

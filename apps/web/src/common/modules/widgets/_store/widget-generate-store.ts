@@ -61,6 +61,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         previewData: { results: [], total_count: 0 } as ListResponse<any>,
         dataTableUpdating: false,
         dataTableLoadLoading: false,
+        dataTableCreateLoading: false,
         joinRestrictedMap: {} as JoinRestrictedMap, // Flag for handling Join type EXCEPTION RESTRICTION cases. (duplicated data field). Example - { '{dataTalbeId}': true, }
         allDataTableInvalidMap: {} as Record<string, boolean>, // Flag for handling all data table invalid cases. Example - { '{dataTalbeId}': true, }
     });
@@ -114,6 +115,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setDataTableUpdating = (status: boolean) => {
         state.dataTableUpdating = status;
     };
+    const setDataTableCreateLoading = (status: boolean) => {
+        state.dataTableCreateLoading = status;
+    };
     const setJoinRestrictedMap = (value: JoinRestrictedMap) => {
         state.joinRestrictedMap = value;
     };
@@ -136,6 +140,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setDataTableUpdating,
         setJoinRestrictedMap,
         setAllDataTableInvalidMap,
+        setDataTableCreateLoading,
     };
     const actions = {
         listDataTable: async () => {

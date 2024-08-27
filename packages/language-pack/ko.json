@@ -617,7 +617,7 @@
 				"FILTER_MODAL_HELP_TEXT_1": "선택한 필터가 없습니다.",
 				"FILTER_MODAL_HELP_TEXT_2": "리스트에 있는 필터를 선택 하세요.",
 				"GRANULARITY": "세부 기준(Granularity)",
-				"GROUP_BY": "그룹별 통계(Group By)",
+				"GROUP_BY": "그룹별 통계(Group by)",
 				"HELP_TEXT": {
 					"UP_TO_31_DAYS": "최대 31일 까지",
 					"UP_TO_LAST_12_MONTHS": "최대 12개월 기간내 설정 가능"
@@ -822,7 +822,7 @@
 						"IN_RATIO": "{ratio}% 비율",
 						"LABEL_FILTERS": "필터",
 						"LABEL_GRANULARITY": "세부 기준(Granularity)",
-						"LABEL_GROUP_BY": "그룹별 통계(Group By)",
+						"LABEL_GROUP_BY": "그룹별 통계(Group by)",
 						"LABEL_QUERY_NAME": "쿼리명",
 						"LABEL_STACK": "누적",
 						"LAST_MONTH_TOTAL_SPEND_DESC": "조회 기간의 전월에 발생한 총 비용을 나타내주는 위젯.",
@@ -847,7 +847,7 @@
 					"FORM": {
 						"DELETE_CONTENTS": "삭제시 복구가 불가합니다.",
 						"DELETE_TITLE": "선택한 위젯을 삭제하시겠습니까?",
-						"LABEL_GROUP_BY": "그룹별 통계(Group By)",
+						"LABEL_GROUP_BY": "그룹별 통계(Group by)",
 						"LABEL_NAME": "이름",
 						"UPDATE_TITLE": "위젯 이름 변경"
 					},
@@ -1489,7 +1489,7 @@
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day는 필드 이름으로 사용할 수 없습니다.",
 					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "Group by로 사용 중인 명칭은 필드 이름으로 사용할 수 없습니다. ",
 					"FILTERS": "필터",
-					"GROUP_BY": "그룹별 통계(Group By)",
+					"GROUP_BY": "그룹별 통계(Group by)",
 					"JOIN_DESC": "공통 열을 기준으로 다른 테이블의 행을 병합합니다.",
 					"QUERY_DESC": "특정 조건을 충족하는 데이터를 필터링하고 추출합니다.",
 					"SELECT_DATA_SOURCE_SUCCESS": "데이터 수정 완료",
@@ -1554,8 +1554,19 @@
 			"HEALTH_DASHBOARD_DESC_3": "AWS 플랜을 먼저 확인하세요. ",
 			"HEALTH_DASHBOARD_HELP": "AWS의 서비스 상태 및 예정된 작업 공지를 볼 수 있습니다.",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
+			"LEGEND": {
+				"BOTTOM": "",
+				"LEGEND": "",
+				"POSITION": "위치",
+				"RIGHT": ""
+			},
 			"MAX_ITEMS": "최대 항목 수",
 			"MAX_ITEMS_DESC": "{fieldName} 값의 최대 개수는 {max}입니다.",
+			"MISSING_VALUE": {
+				"LINE_BREAKS": "",
+				"LINE_TO_ZERO": "",
+				"MISSING_VALUE": ""
+			},
 			"NO_DATA_TO_DISPLAY": "데이터가 없습니다.",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "전일 대비 하락",
@@ -2106,7 +2117,7 @@
 					"FIELD_NAME": "필드명",
 					"FORMAT_RULES": "포멧 규칙",
 					"GRANULARITY": "세부 기준(Granularity)",
-					"GROUP_BY": "그룹별 통계(Group By)",
+					"GROUP_BY": "그룹별 통계(Group by)",
 					"ICON": "아이콘",
 					"LEGEND": "범례(Legend)",
 					"LINE_BY": "라인별",
@@ -3339,7 +3350,7 @@
 			"EMPTY_TEXT": "검색 결과가 없습니다.\n다시 확인 후 검색해 주세요.",
 			"FILTERS": "필터",
 			"GRANULARITY": "세부 기준(Granularity)",
-			"GROUP_BY": "그룹별 통계(Group By)",
+			"GROUP_BY": "그룹별 통계(Group by)",
 			"HIDE_ALL": "전체 숨김",
 			"MAIN": {
 				"ANALYZE_DATA": "데이터 분석 하기",

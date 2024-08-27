@@ -4,7 +4,7 @@ import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-
 const stackedColumnChart: WidgetConfig = {
     widgetName: 'stackedColumnChart',
     meta: {
-        title: 'Stacked Column Chart',
+        title: 'Column Chart',
         sizes: ['md', 'full'],
         defaultValidationConfig: {
             defaultMaxCount: 1,
@@ -41,6 +41,8 @@ const stackedColumnChart: WidgetConfig = {
                 default: 'MMM DD, YYYY',
             },
         },
+        numberFormat: {},
+        displaySeriesLabel: {},
         displayAnnotation: {},
     },
 };

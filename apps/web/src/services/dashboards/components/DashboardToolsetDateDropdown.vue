@@ -153,15 +153,13 @@ watch(() => props.dateRange, () => {
         <span v-if="!props.widgetMode"
               class="label-text"
         >
-            {{ $t('DASHBOARDS.DETAIL.BASED_ON') }}:
+            {{ $t('DASHBOARDS.DETAIL.BASED_ON') }}
         </span>
         <p-select-dropdown class="date-dropdown"
-                           :size="props.widgetMode ? 'md' : 'sm'"
-                           :style-type="props.widgetMode ? 'rounded': 'default'"
-                           :selection-label="props.widgetMode ? $t('DASHBOARDS.DETAIL.BASED_ON') : undefined"
+                           size="sm"
                            :menu="state.monthMenuItems"
                            :selected="state.selectedMonthMenuItem.name"
-                           menu-position="right"
+                           menu-position="left"
                            reset-selection-on-menu-close
                            @select="handleSelectMonthMenuItem"
         >
@@ -186,6 +184,7 @@ watch(() => props.dateRange, () => {
         gap: 0.125rem;
         .label-text {
             @apply text-label-md font-bold text-gray-800;
+            padding-right: 0.5rem;
         }
     }
 }

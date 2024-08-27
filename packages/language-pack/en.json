@@ -617,7 +617,7 @@
 				"FILTER_MODAL_HELP_TEXT_1": "No selected filters",
 				"FILTER_MODAL_HELP_TEXT_2": "Select filters from the list.",
 				"GRANULARITY": "Granularity",
-				"GROUP_BY": "Group By",
+				"GROUP_BY": "Group by",
 				"HELP_TEXT": {
 					"UP_TO_31_DAYS": "Up to 31 days",
 					"UP_TO_LAST_12_MONTHS": "Up to last 12 months"
@@ -822,7 +822,7 @@
 						"IN_RATIO": "In ratio {ratio}%",
 						"LABEL_FILTERS": "Filters",
 						"LABEL_GRANULARITY": "Granularity",
-						"LABEL_GROUP_BY": "Group By",
+						"LABEL_GROUP_BY": "Group by",
 						"LABEL_QUERY_NAME": "Query Name",
 						"LABEL_STACK": "Stack",
 						"LAST_MONTH_TOTAL_SPEND_DESC": "Displays the amount spent during previous month from the most recent date.",
@@ -847,7 +847,7 @@
 					"FORM": {
 						"DELETE_CONTENTS": "You will not be able to recover this widget.",
 						"DELETE_TITLE": "Are you sure you want to remove this widget?",
-						"LABEL_GROUP_BY": "Group By",
+						"LABEL_GROUP_BY": "Group by",
 						"LABEL_NAME": "Name",
 						"UPDATE_TITLE": "Update Widget"
 					},
@@ -1554,8 +1554,19 @@
 			"HEALTH_DASHBOARD_DESC_3": "Check your AWS Support Plans first.",
 			"HEALTH_DASHBOARD_HELP": "Get a notice the status of AWS services.",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
+			"LEGEND": {
+				"BOTTOM": "Bottom",
+				"LEGEND": "Legend",
+				"POSITION": "Position",
+				"RIGHT": "Right"
+			},
 			"MAX_ITEMS": "Max Items",
 			"MAX_ITEMS_DESC": "The maximum number of {fieldName} values is {max}",
+			"MISSING_VALUE": {
+				"LINE_BREAKS": "Line Breaks",
+				"LINE_TO_ZERO": "Line to Zero",
+				"MISSING_VALUE": "Missing Value"
+			},
 			"NO_DATA_TO_DISPLAY": "No Data to Display",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "less than previous day",
@@ -2092,7 +2103,7 @@
 				"STEP_2": {
 					"ADD_RULE": "Add Rule",
 					"BASIS_FIELD": "Basis Field",
-					"CATEGORY_BY": "Category By",
+					"CATEGORY_BY": "Category by",
 					"CHART_TYPE": "Chart Type",
 					"COLOR_SCHEMA": "Color Schema",
 					"DATA_FIELD": "Data Field",
@@ -2106,10 +2117,10 @@
 					"FIELD_NAME": "Field Name",
 					"FORMAT_RULES": "Format Rules",
 					"GRANULARITY": "Granularity",
-					"GROUP_BY": "Group By",
+					"GROUP_BY": "Group by",
 					"ICON": "Icon",
 					"LEGEND": "Legend",
-					"LINE_BY": "Line By",
+					"LINE_BY": "Line by",
 					"MAX": "Max",
 					"MIN": "Min",
 					"OPTIONAL_FIELDS": "Optional Fields",
@@ -2117,7 +2128,7 @@
 					"PROGRESS_BAR_DESCRIPTION_1": "The percentage is calculated as:",
 					"PROGRESS_BAR_DESCRIPTION_2": "[Basis Field ÷ Total Field x 100]",
 					"REQUIRED_FIELDS": "Required Fields",
-					"STACK_BY": "Stack By",
+					"STACK_BY": "Stack by",
 					"STATIC_FIELD": "Static Field",
 					"SUB_TOTAL": "Sub Total",
 					"TITLE": "Title",
@@ -2162,7 +2173,7 @@
 				"MORE_THAN_PREV_YEAR": "more than previous year"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
-				"DESC": "Displays the trend of compliance Pass/Fail findings for the selected period, aggregated by 'Group By' option."
+				"DESC": "Displays the trend of compliance Pass/Fail findings for the selected period, aggregated by 'Group by' option."
 			},
 			"UNIT": "Unit",
 			"UPDATE_TITLE": "Update Widget",
@@ -3339,7 +3350,7 @@
 			"EMPTY_TEXT": "No results found. \nTry again with different term.",
 			"FILTERS": "Filters",
 			"GRANULARITY": "Granularity",
-			"GROUP_BY": "Group By",
+			"GROUP_BY": "Group by",
 			"HIDE_ALL": "Hide all",
 			"MAIN": {
 				"ANALYZE_DATA": "Analyze Data",

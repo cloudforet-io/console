@@ -148,24 +148,26 @@ watch(() => state.customModalVisible, (modalVisible) => {
                        required
         >
             <template v-if="state.dataFieldList.length > 1">
-                <p-field-group v-for="dataField in state.dataFieldList"
-                               :key="`number-format-data-field-${dataField}`"
-                               :label="dataField"
-                               style-type="secondary"
-                               required
-                >
-                    <p-select-dropdown class="w-full"
-                                       use-fixed-menu-style
-                                       reset-selection-on-menu-close
-                                       :menu="state.menuItems"
-                                       :selected="state.proxyValue?.[dataField]?.format"
-                                       @select="handleSelectMenuItem(dataField, $event)"
+                <div class="multi-data-field-wrapper">
+                    <p-field-group v-for="dataField in state.dataFieldList"
+                                   :key="`number-format-data-field-${dataField}`"
+                                   :label="dataField"
+                                   style-type="secondary"
+                                   required
                     >
-                        <template #dropdown-button="item">
-                            <span>{{ getDropdownButtonText(item.label, dataField) }}</span>
-                        </template>
-                    </p-select-dropdown>
-                </p-field-group>
+                        <p-select-dropdown class="w-full"
+                                           use-fixed-menu-style
+                                           reset-selection-on-menu-close
+                                           :menu="state.menuItems"
+                                           :selected="state.proxyValue?.[dataField]?.format"
+                                           @select="handleSelectMenuItem(dataField, $event)"
+                        >
+                            <template #dropdown-button="item">
+                                <span>{{ getDropdownButtonText(item.label, dataField) }}</span>
+                            </template>
+                        </p-select-dropdown>
+                    </p-field-group>
+                </div>
             </template>
             <template v-else>
                 <p-select-dropdown v-for="dataField in state.dataFieldList"
@@ -239,6 +241,9 @@ watch(() => state.customModalVisible, (modalVisible) => {
 </template>
 
 <style lang="postcss" scoped>
+.multi-data-field-wrapper {
+    @apply flex flex-col gap-2;
+}
 .number-format-custom-modal {
     .top-part {
         @apply bg-gray-100 rounded;
@@ -255,6 +260,7 @@ watch(() => state.customModalVisible, (modalVisible) => {
             @apply text-label-md text-gray-600;
             display: flex;
             justify-content: space-between;
+            padding-top: 0.5rem;
         }
     }
     .bottom-part {
