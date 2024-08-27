@@ -38,8 +38,8 @@ const state = reactive({
 });
 const tableState = reactive({
     fields: computed(() => [
-        { name: 'service', label: i18n.t('IAM.ROLE.FORM.SERVICE') },
-        { name: 'page_access', label: i18n.t('IAM.ROLE.FORM.ACCESS') },
+        { name: 'service', label: i18n.t('IAM.ROLE.FORM.SERVICE'), width: '150px' },
+        { name: 'page_access', label: i18n.t('IAM.ROLE.FORM.ACCESS'), width: '190px' },
         { name: 'accessible_menu_list', label: i18n.t('IAM.ROLE.FORM.ACCESSIBLE_MENU') },
     ]),
     items: computed<TableItem[]|undefined>(() => state.menuItems?.map((i) => ({
@@ -79,10 +79,11 @@ const handleChangeSelectedMenu = (values: PageAccessMenuItem[]) => {
         });
     });
 };
-const handleChangeSelectedAccess = (value: string, item: PageAccessMenuItem) => {
+const handleChangeSelectedAccess = (value: string, item: TableItem) => {
     emit('update', {
         ...item,
         accessType: value,
+        isAccessible: true,
     });
 };
 const handleChangeToggle = (value: boolean) => {
@@ -98,6 +99,7 @@ const handleChangeToggle = (value: boolean) => {
 /* Watcher */
 watch(() => props.menuItems, (menuItems) => {
     state.menuItems = menuItems || [];
+    state.isReadOnly = state.menuItems.every((i) => i.accessType === PAGE_ACCESS.READONLY);
     tableState.selectedMenuIds = state.menuItems.flatMap((i) => filter(i.subMenuList, { isAccessible: true }));
 }, { immediate: true });
 </script>

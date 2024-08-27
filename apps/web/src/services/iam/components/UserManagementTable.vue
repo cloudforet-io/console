@@ -169,7 +169,13 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
     }
     try {
         const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-            query: roleListApiQueryHelper.data,
+            query: {
+                ...roleListApiQueryHelper.data,
+                filter: [
+                    ...(roleListApiQueryHelper.data?.filter || []),
+                    { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                ],
+            },
         });
         dropdownState.menuItems = (results ?? []).map((role) => ({
             label: role.name,

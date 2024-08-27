@@ -15,7 +15,8 @@ export interface TableItem {
     id: string;
     service: TranslateResult;
     page_access?: string;
-    accessible_menu?: PageAccessMenuItem[];
+    accessible_menu_list?: PageAccessMenuItem[];
+    isInValid?: boolean
 }
 export interface PageAccessMenuItem {
     id: string;

@@ -7,6 +7,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleBindingListParameters, RoleBindingListResponse } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
@@ -122,7 +123,16 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
         },
         async listRoles(params?: RoleListParameters) {
             try {
-                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
+                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+                    ...params,
+                    query: {
+                        ...params?.query,
+                        filter: [
+                            ...(params?.query?.filter || []),
+                            { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                        ],
+                    },
+                });
                 this.roles = results || [];
                 return results;
             } catch (e) {

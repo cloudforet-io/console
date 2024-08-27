@@ -10,6 +10,7 @@ import {
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
@@ -47,7 +48,13 @@ const {
         role_type: _role.role_type,
     }),
     fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-        query: apiQueryHelper.data,
+        query: {
+            ...apiQueryHelper.data,
+            filter: [
+                ...(apiQueryHelper.data?.filter || []),
+                { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+            ],
+        },
     }),
 });
 

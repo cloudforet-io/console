@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router/composables';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PToolboxTable, PSelectDropdown, PButton, PBadge,
+    PToolboxTable, PSelectDropdown, PButton, PBadge, PStatus,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
@@ -25,7 +25,7 @@ import { useQueryTags } from '@/common/composables/query-tags';
 
 import RoleDeleteModal
     from '@/services/iam/components/RoleDeleteModal.vue';
-import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
+import { appStateFormatter, useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import {
     EXCEL_TABLE_FIELDS,
     ROLE_SEARCH_HANDLERS,
@@ -167,6 +167,11 @@ const handleExport = async () => {
                                    reset-selection-on-menu-close
                                    :placeholder="$t('IAM.ROLE.ACTION')"
                                    @select="handleSelectDropdown"
+                />
+            </template>
+            <template #col-state-format="{value}">
+                <p-status v-bind="appStateFormatter(value)"
+                          class="capitalize"
                 />
             </template>
             <template #col-role_type-format="{value, item}">
