@@ -95,6 +95,10 @@ const handleConfirm = async () => {
 const handleCloseModal = () => {
     workspaceGroupPageStore.closeModal();
 };
+
+const handleRemoveUser = (item: UserModel) => {
+    userSelectedItems.value = userSelectedItems.value.filter((selectedItem) => selectedItem.user_id !== item.user_id);
+};
 </script>
 
 <template>
@@ -181,6 +185,7 @@ const handleCloseModal = () => {
                 {{ item.user_id }}
                 <p-icon-button name="ic_close"
                                size="md"
+                               @click="handleRemoveUser(item)"
                 />
             </div>
         </template>

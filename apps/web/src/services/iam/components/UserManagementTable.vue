@@ -35,6 +35,9 @@ import {
     calculateTime, userStateFormatter, useRoleFormatter, userMfaFormatter,
 } from '@/services/iam/composables/refined-table-data';
 import { USER_SEARCH_HANDLERS, USER_STATE } from '@/services/iam/constants/user-constant';
+import {
+    getWorkspaceRoleBindingIdFromRoleBindingsInfo,
+} from '@/services/iam/helpers/get-role-binding-id-from-role-binding-info';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 interface Props {
@@ -129,7 +132,8 @@ const modalState = reactive({
 const handleSelect = async (index) => {
     userPageStore.$patch({ selectedIndices: index });
 };
-const handleClickButton = async (value: RoleBindingModel) => {
+const handleClickButton = async (value: RoleBindingModel|undefined) => {
+    if (!value) return;
     state.selectedRemoveItem = value.role_binding_id;
     modalState.visible = true;
     modalState.title = i18n.t('IAM.USER.MAIN.MODAL.REMOVE_WORKSPACE_TITLE') as string;
@@ -228,6 +232,9 @@ const handleRemoveButton = async () => {
         modalState.loading = false;
     }
 };
+
+const roleBindingsContents = (roleBindings: RoleBindingModel[])
+    :string => roleBindings.filter((rb) => (rb.workspace_group_id && rb.workspace_id)).map((roleBinding) => userPageState.roles.find((role) => role.role_id === roleBinding.role_id)?.name).join('\n');
 </script>
 
 <template>
@@ -273,7 +280,7 @@ const handleRemoveButton = async () => {
                     <span class="pr-4">{{ userPageStore.roleMap[value]?.name ?? '' }}</span>
                 </div>
             </template>
-            <template #col-role_binding-format="{value, rowIndex}">
+            <template #col-role_binding-format="{value, rowIndex, item: {role_bindings_info}}">
                 <div class="role-type-wrapper">
                     <p-tooltip position="bottom"
                                :contents="useRoleFormatter(value?.type).name"
@@ -315,6 +322,19 @@ const handleRemoveButton = async () => {
                         </template>
                     </p-select-dropdown>
                     <span v-else>{{ value.name }}</span>
+                    <p-tooltip v-if="roleBindingsContents(role_bindings_info).length"
+                               position="bottom"
+                               :contents="roleBindingsContents(role_bindings_info)"
+                               class="tooltip"
+                    >
+                        <p-badge badge-type="subtle"
+                                 shape="round"
+                                 style-type="blue200"
+                                 class="ml-2"
+                        >
+                            +{{ role_bindings_info.length }}
+                        </p-badge>
+                    </p-tooltip>
                 </div>
             </template>
             <template #col-mfa-format="{value}">
@@ -356,7 +376,7 @@ const handleRemoveButton = async () => {
                 <p-button style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
-                          @click.stop="handleClickButton(value.item.role_bindings_info)"
+                          @click.stop="handleClickButton(getWorkspaceRoleBindingIdFromRoleBindingsInfo(value.item.role_bindings_info))"
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
