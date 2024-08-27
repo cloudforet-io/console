@@ -98,6 +98,7 @@ const handleChangeToggle = (value: boolean) => {
 /* Watcher */
 watch(() => props.menuItems, (menuItems) => {
     state.menuItems = menuItems || [];
+    state.isReadOnly = state.menuItems.every((i) => i.accessType === PAGE_ACCESS.READONLY);
     tableState.selectedMenuIds = state.menuItems.flatMap((i) => filter(i.subMenuList, { isAccessible: true }));
 }, { immediate: true });
 </script>
