@@ -50,10 +50,10 @@ const handleUpdateDataTable = () => {
                                size="sm"
                     />
                     {{ $t('COMMON.WIDGETS.APPLY') }}
-                    <div v-if="props.changed"
-                         class="update-dot"
-                    />
                 </div>
+                <div v-if="props.changed"
+                     class="update-dot"
+                />
             </p-button>
         </div>
     </div>
@@ -68,13 +68,13 @@ const handleUpdateDataTable = () => {
         @apply relative;
         .button-contents-wrapper {
             @apply relative flex items-center gap-1;
-            .update-dot {
-                @apply absolute rounded-full bg-blue-500 border-2 border-white;
-                width: 0.75rem;
-                height: 0.75rem;
-                right: -0.375rem;
-                top: -0.375rem;
-            }
+        }
+        .update-dot {
+            @apply absolute rounded-full bg-blue-500 border-2 border-white;
+            width: 0.75rem;
+            height: 0.75rem;
+            right: -0.375rem;
+            top: -0.375rem;
         }
     }
     .form-button-wrapper {
