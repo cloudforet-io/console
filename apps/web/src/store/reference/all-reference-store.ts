@@ -105,6 +105,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         cloud_service_query_set: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
         workspace: computed<WorkspaceReferenceMap>(() => workspaceReferenceStore.getters.workspaceItems),
         workspace_group: computed<WorkspaceGroupReferenceMap>(() => workspaceGroupReferenceStore.getters.workspaceGroupItems),
+        workspaceGroup: computed<WorkspaceGroupReferenceMap>(() => workspaceGroupReferenceStore.getters.workspaceGroupItems),
         publicDashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
         public_dashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
         serviceAccount: computed(() => serviceAccountReferenceStore.getters.serviceAccountItems),

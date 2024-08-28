@@ -18,6 +18,8 @@ import type {
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 type PickedWorkspaceGroupModel = Pick<WorkspaceGroupModel, 'tags'>;
 export type WorkspaceGroupItem = Required<Pick<ReferenceItem<PickedWorkspaceGroupModel>, 'key'|'label'|'name'|'data'>>;
@@ -65,11 +67,17 @@ export const useWorkspaceGroupReferenceStore = defineStore('reference-workspace-
         };
 
         let results: WorkspaceGroupModel[] | undefined;
-        if (_state.isAdminMode) {
-            const res = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>(params);
-            results = res.results;
+        try {
+            if (_state.isAdminMode) {
+                const res = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>(params);
+                results = res.results;
+            } else {
+                const res = await SpaceConnector.clientV2.identity.userProfile.getWorkspaceGroups();
+                results = res.results;
+            }
+        } catch (e) {
+            ErrorHandler.handleError(e);
         }
-
         const workspaceGroupReferenceMap: WorkspaceGroupReferenceMap = {};
 
         results?.forEach((workspaceGroup) => {
