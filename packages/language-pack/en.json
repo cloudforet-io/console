@@ -1562,9 +1562,11 @@
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"LEGEND": {
 				"BOTTOM": "Bottom",
+				"LEFT": "Left",
 				"LEGEND": "Legend",
 				"POSITION": "Position",
-				"RIGHT": "Right"
+				"RIGHT": "Right",
+				"TOP": "Top"
 			},
 			"MAX_ITEMS": "Max Items",
 			"MAX_ITEMS_DESC": "The maximum number of {fieldName} values is {max}",
