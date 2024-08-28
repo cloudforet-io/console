@@ -2400,6 +2400,7 @@
 			"ACTION": "作業",
 			"ALT_E_DELETE_ROLE": "ロール削除に失敗しました",
 			"ALT_S_DELETE_ROLE": "データ削除完了",
+			"ALT_S_UPDATE_ROLE": "",
 			"CREATE": "作成",
 			"DELETE": "削除",
 			"DETAIL": {
@@ -2415,7 +2416,9 @@
 				"ROLE_TYPE": "ロールタイプ",
 				"SELECTED_DATA": "選択したデータ"
 			},
+			"DISABLE": "無効化",
 			"EDIT": "編集",
+			"ENABLE": "有効化",
 			"FORM": {
 				"ACCESS": "",
 				"ACCESSIBLE_MENU": "",
@@ -2510,9 +2513,15 @@
 			},
 			"MANAGED": "管理型",
 			"MODAL": {
+				"COL_CREATED_AT": "作成日",
+				"COL_NAME": "お名前",
+				"COL_ROLE_TYPE": "ロールタイプ",
+				"COL_STATE": "状態",
 				"DELETE_HELP_TEXT": "以下の役割は一部のユーザーに割り当てられています。この役割を削除するには、まず割り当てられたユーザーから削除する必要があります。",
 				"DELETE_TITLE": "選択した項目を削除しますか？",
-				"DELETE_TITLE_CANNOT": "このロールは削除できません。"
+				"DELETE_TITLE_CANNOT": "このロールは削除できません。",
+				"DISABLE_TITLE": "",
+				"ENABLE_TITLE": ""
 			},
 			"ROLE": "ロール"
 		},
