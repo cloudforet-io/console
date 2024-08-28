@@ -338,7 +338,7 @@ const roleBindingsContents = (roleBindings: RoleBindingModel[])
                                  style-type="blue200"
                                  class="ml-2"
                         >
-                            +{{ role_bindings_info.length }}
+                            +{{ role_bindings_info.filter((rb) => rb.workspace_id && rb.workspace_group_id).length }}
                         </p-badge>
                     </p-tooltip>
                 </div>
