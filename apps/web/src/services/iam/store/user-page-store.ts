@@ -19,7 +19,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getWorkspaceRoleBindingIdFromRoleBindingsInfo } from '@/services/iam/helpers/get-role-binding-id-from-role-binding-info';
+import { getWorkspaceRoleBindingIdFromRoleBindingsInfo } from '@/services/iam/helpers/role-binding-helpers';
 import type { UserListItemType } from '@/services/iam/types/user-type';
 
 export const useUserPageStore = defineStore('page-user', {
@@ -51,7 +51,7 @@ export const useUserPageStore = defineStore('page-user', {
     getters: {
         timezone: () => store.state.user.timezone,
         isWorkspaceOwner: () => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER,
-        selectedUsers: (state) => {
+        selectedUsers: (state):UserListItemType[] => {
             if (state.selectedIndices.length === 1 && !isEmpty(state.selectedUser)) return [state.selectedUser];
             const users: UserListItemType[] = [];
             state.selectedIndices.forEach((d:number) => {

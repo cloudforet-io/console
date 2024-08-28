@@ -30,7 +30,7 @@ import {
 } from '@/services/iam/composables/refined-table-data';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { ModalSettingState, UserListItemType } from '@/services/iam/types/user-type';
+import type { ModalSettingState, UserListItemType, ExtendUserListItemType } from '@/services/iam/types/user-type';
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -54,10 +54,6 @@ const state = reactive({
     verifyEmailLoading: false,
     selectedUser: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
 });
-
-interface ExtendUserListItemType extends UserListItemType {
-    last_accessed_count: number
-}
 
 const tableState = reactive({
     refinedUserItems: computed<ExtendUserListItemType>(() => ({
