@@ -301,21 +301,19 @@ onUnmounted(() => {
         flex-direction: column;
         padding: 1rem;
         .dashboard-settings-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            @apply flex items-center justify-between;
             width: 100%;
             padding-bottom: 1rem;
             .divider {
                 height: 1rem;
             }
             .toolbox-wrapper {
-                @apply flex items-center justify-between w-full;
+                @apply flex items-center justify-between flex-1;
                 .left-wrapper {
                     @apply flex items-center;
                     gap: 0.5rem;
                     .dashboard-variables-select-dropdown {
-                        @apply relative flex items-center flex-wrap;
+                        @apply relative flex items-center flex-wrap flex-1;
                         gap: 0.5rem;
                     }
                 }
@@ -325,10 +323,7 @@ onUnmounted(() => {
                 }
             }
             .widget-size-wrapper {
-                display: flex;
-                gap: 0.5rem;
-                align-items: center;
-                justify-content: end;
+                @apply flex justify-end items-center gap-2;
                 min-width: 9rem;
                 .divider {
                     height: 1.5rem;
