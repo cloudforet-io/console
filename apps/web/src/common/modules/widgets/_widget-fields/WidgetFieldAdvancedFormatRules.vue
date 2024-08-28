@@ -109,7 +109,8 @@ onMounted(() => {
             <template #help>
                 <span>{{ $t(props.widgetFieldSchema?.options?.description) }}</span>
             </template>
-            <p-field-group :label="$t('COMMON.WIDGETS.FIELD')"
+            <p-field-group v-if="state.type === 'field'"
+                           :label="$t('COMMON.WIDGETS.FIELD')"
                            style-type="secondary"
                            required
                            class="pb-1"
@@ -140,7 +141,8 @@ onMounted(() => {
                         >
                             <p-field-group required>
                                 <p-text-input :value="rule.text"
-                                              :invalid="rule.text === undefined"
+                                              :invalid="!rule.text?.length"
+                                              placeholder="text"
                                               @update:value="handleFormatRuleInput(idx, 'text', $event)"
                                 />
                             </p-field-group>
@@ -150,7 +152,8 @@ onMounted(() => {
                                 <p-text-input :value="rule.threshold"
                                               type="number"
                                               :min="0"
-                                              :invalid="rule.threshold === undefined"
+                                              placeholder="3000"
+                                              :invalid="!rule.threshold?.length"
                                               @update:value="handleFormatRuleInput(idx, 'threshold', $event)"
                                 />
                             </p-field-group>
