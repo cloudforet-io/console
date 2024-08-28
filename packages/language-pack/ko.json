@@ -1562,9 +1562,11 @@
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"LEGEND": {
 				"BOTTOM": "",
+				"LEFT": "",
 				"LEGEND": "",
 				"POSITION": "위치",
-				"RIGHT": ""
+				"RIGHT": "",
+				"TOP": ""
 			},
 			"MAX_ITEMS": "최대 항목 수",
 			"MAX_ITEMS_DESC": "{fieldName} 값의 최대 개수는 {max}입니다.",

@@ -139,7 +139,7 @@ export interface CustomTableColumnWidthValue {
 
 export interface LegendValue {
     toggleValue: boolean;
-    position?: 'right' | 'bottom';
+    position?: 'right'|'bottom'|'top'|'left';
 }
 
 export type WidgetHeightType = keyof typeof WIDGET_HEIGHT; // for Number Card Widget

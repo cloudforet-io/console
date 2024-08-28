@@ -27,6 +27,8 @@ const state = reactive({
     showPositionField: computed<boolean>(() => !!props.widgetFieldSchema.options?.showPositionField),
     positionMenuItems: computed(() => ([
         { name: 'right', label: i18n.t('COMMON.WIDGETS.LEGEND.RIGHT') },
+        { name: 'left', label: i18n.t('COMMON.WIDGETS.LEGEND.LEFT') },
+        { name: 'top', label: i18n.t('COMMON.WIDGETS.LEGEND.TOP') },
         { name: 'bottom', label: i18n.t('COMMON.WIDGETS.LEGEND.BOTTOM') },
     ])),
 });
@@ -44,7 +46,7 @@ const handleUpdateToggleValue = (val: boolean) => {
         };
     }
 };
-const handleSelectPosition = (val: 'right'|'bottom') => {
+const handleSelectPosition = (val: 'right'|'bottom'|'left'|'top') => {
     state.proxyValue = {
         ...state.proxyValue,
         position: val,
