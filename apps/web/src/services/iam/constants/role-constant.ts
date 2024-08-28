@@ -1,7 +1,6 @@
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
-
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
@@ -15,6 +14,17 @@ export const ROLE_TYPE_BADGE_OPTION = {
 export const FORM_TYPE = {
     UPDATE: 'UPDATE',
     CREATE: 'CREATE',
+} as const;
+
+const ROLE_STATE_MAP = {
+    ENABLED: {
+        label: 'Enabled',
+        name: 'ENABLED',
+    },
+    DISABLED: {
+        label: 'Disabled',
+        name: 'DISABLED',
+    },
 } as const;
 
 const ROLE_TYPE_LABEL = {
@@ -34,6 +44,7 @@ export const ROLE_SEARCH_HANDLERS = {
         items: [
             { name: 'name', label: 'Name' },
             { name: 'tags.description', label: 'Description' },
+            { name: 'state', label: 'State' },
             { name: 'role_type', label: 'Role Type' },
             { name: 'created_at', label: 'Created', dataType: 'datetime' },
         ],
@@ -41,6 +52,7 @@ export const ROLE_SEARCH_HANDLERS = {
     valueHandlerMap: {
         name: makeDistinctValueHandler('identity.Role', 'name'),
         role_type: makeEnumValueHandler(ROLE_TYPE_LABEL),
+        state: makeEnumValueHandler(ROLE_STATE_MAP),
         'tags.description': makeDistinctValueHandler('identity.Role', 'tags.description'),
         created_at: makeDistinctValueHandler('identity.Role', 'created_at', 'datetime'),
     },
@@ -60,8 +72,9 @@ export const EXCEL_TABLE_FIELDS = [
     { key: 'created_at', name: 'Created' },
 ] as ExcelDataField[];
 
-export const ROLE_DELETE_TABLE_FIELDS = [
+export const ROLE_MODAL_TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
+    { name: 'state', label: 'State' },
     { name: 'role_type', label: 'Role Type' },
     { name: 'created_at', label: 'Created' },
 ] as const;

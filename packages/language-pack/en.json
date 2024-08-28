@@ -2400,6 +2400,7 @@
 			"ACTION": "Action",
 			"ALT_E_DELETE_ROLE": "Failed to delete role.",
 			"ALT_S_DELETE_ROLE": "Data successfully deleted ",
+			"ALT_S_UPDATE_ROLE": "Data successfully updated",
 			"CREATE": "Create",
 			"DELETE": "Delete",
 			"DETAIL": {
@@ -2415,7 +2416,9 @@
 				"ROLE_TYPE": "Role Type",
 				"SELECTED_DATA": "Selected Data"
 			},
+			"DISABLE": "Disable",
 			"EDIT": "Edit",
+			"ENABLE": "Enable",
 			"FORM": {
 				"ACCESS": "Page Access",
 				"ACCESSIBLE_MENU": "Accessible Menu",
@@ -2510,9 +2513,15 @@
 			},
 			"MANAGED": "Managed",
 			"MODAL": {
+				"COL_CREATED_AT": "Created",
+				"COL_NAME": "Name",
+				"COL_ROLE_TYPE": "Role Type",
+				"COL_STATE": "State",
 				"DELETE_HELP_TEXT": "The role below is assigned to some users. To delete this role, you must first remove it from the assigned users.",
 				"DELETE_TITLE": "Are you sure you want to delete selected item?",
-				"DELETE_TITLE_CANNOT": "Cannot delete this role"
+				"DELETE_TITLE_CANNOT": "Cannot delete this role",
+				"DISABLE_TITLE": "Disable Role",
+				"ENABLE_TITLE": "Enable Role"
 			},
 			"ROLE": "Role"
 		},

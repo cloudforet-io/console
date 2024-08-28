@@ -2400,6 +2400,7 @@
 			"ACTION": "작업",
 			"ALT_E_DELETE_ROLE": "역할(Role) 삭제에 실패했습니다.",
 			"ALT_S_DELETE_ROLE": "데이터 삭제 완료",
+			"ALT_S_UPDATE_ROLE": "",
 			"CREATE": "생성",
 			"DELETE": "삭제",
 			"DETAIL": {
@@ -2415,7 +2416,9 @@
 				"ROLE_TYPE": "역할(Role) 타입",
 				"SELECTED_DATA": "선택한 데이터"
 			},
+			"DISABLE": "비활성화",
 			"EDIT": "수정",
+			"ENABLE": "활성화",
 			"FORM": {
 				"ACCESS": "",
 				"ACCESSIBLE_MENU": "",
@@ -2510,9 +2513,15 @@
 			},
 			"MANAGED": "Managed",
 			"MODAL": {
+				"COL_CREATED_AT": "생성일",
+				"COL_NAME": "이름 ",
+				"COL_ROLE_TYPE": "역할(Role) 타입",
+				"COL_STATE": "상태",
 				"DELETE_HELP_TEXT": "아래 역할(Role)이 특정 사용자(들)에게 할당되어 있습니다. 이 역할(Role)을 삭제하려면 먼저 해당 사용자들에게서 할당을 해제해야 합니다.",
 				"DELETE_TITLE": "선택한 항목을 삭제하시겠습니까?",
-				"DELETE_TITLE_CANNOT": "해당 역할(Role)은 삭제가 불가합니다"
+				"DELETE_TITLE_CANNOT": "해당 역할(Role)은 삭제가 불가합니다",
+				"DISABLE_TITLE": "",
+				"ENABLE_TITLE": ""
 			},
 			"ROLE": "역할(Role)"
 		},
