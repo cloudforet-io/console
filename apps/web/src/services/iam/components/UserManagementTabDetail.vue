@@ -6,20 +6,23 @@ import {
 import { cloneDeep } from 'lodash';
 
 import {
-    PButton,
-    PDefinitionTable, PHeading, PI, PStatus,
+    PButton, PDefinitionTable, PHeading, PI, PStatus, PLink,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import config from '@/lib/config';
 import { postUserValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import {
     calculateTime,
     useRoleFormatter,
@@ -27,7 +30,7 @@ import {
 } from '@/services/iam/composables/refined-table-data';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { ModalSettingState } from '@/services/iam/types/user-type';
+import type { ModalSettingState, UserListItemType } from '@/services/iam/types/user-type';
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -37,22 +40,29 @@ const props = defineProps<Props>();
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
+const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(e: 'refresh', id: string): void }>();
 
 const storeState = reactive({
     userInfo: computed(() => store.state.user),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+    workspaceGroup: computed(() => allReferenceStore.getters.workspaceGroup),
 });
 const state = reactive({
     loading: false,
     verifyEmailLoading: false,
-    selectedUser: computed(() => userPageStore.selectedUsers[0]),
+    selectedUser: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
 });
+
+interface ExtendUserListItemType extends UserListItemType {
+    last_accessed_count: number
+}
+
 const tableState = reactive({
-    refinedUserItems: computed(() => ({
+    refinedUserItems: computed<ExtendUserListItemType>(() => ({
         ...state.selectedUser,
-        last_accessed_at: calculateTime(state.selectedUser.last_accessed_at, state.selectedUser.timezone),
+        last_accessed_count: calculateTime(state.selectedUser.last_accessed_at, state.selectedUser.timezone),
     })),
     fields: computed<DefinitionField[]>(() => {
         const additionalFields: DefinitionField[] = [];
@@ -75,6 +85,7 @@ const tableState = reactive({
             additionalRoleFields.push({
                 name: 'role_binding',
                 label: i18n.t('IAM.USER.MAIN.ROLE'),
+                disableCopy: true,
             });
         }
 
@@ -83,7 +94,7 @@ const tableState = reactive({
             { name: 'name', label: i18n.t('IAM.USER.MAIN.NAME') },
             { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE'), disableCopy: true },
             ...additionalFields,
-            { name: 'last_accessed_at', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY'), disableCopy: true },
+            { name: 'last_accessed_count', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY'), disableCopy: true },
             { name: 'domain_id', label: i18n.t('IAM.USER.MAIN.DOMAIN_ID') },
             { name: 'role_type', label: i18n.t('IAM.USER.MAIN.ROLE_TYPE') },
             ...additionalRoleFields,
@@ -92,6 +103,8 @@ const tableState = reactive({
             { name: 'created_at', label: i18n.t('IAM.USER.MAIN.CREATED_AT') },
         ];
     }),
+    workspaceGroupRoleBindings: computed(() => (state.selectedUser.role_bindings_info ?? [])
+        .filter((rb) => (rb.workspace_group_id && rb.workspace_id))),
 });
 
 /* Component */
@@ -153,7 +166,7 @@ const handleClickVerifyButton = async () => {
             user_id: tableState.refinedUserItems.user_id || '',
             email: tableState.refinedUserItems.email || '',
         });
-        await emit('refresh', tableState.refinedUserItems.user_id || '');
+        emit('refresh', tableState.refinedUserItems.user_id || '');
         await store.dispatch('user/setUser', { email: tableState.refinedUserItems.email });
     } catch (e: any) {
         ErrorHandler.handleError(e);
@@ -246,9 +259,38 @@ const handleClickVerifyButton = async () => {
                 </span>
             </template>
             <template #data-role_binding="{value}">
-                {{ value.name }}
+                <div class="role-wrapper">
+                    <div class="role-menu-item">
+                        <img :src="useRoleFormatter(value.type).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <span class="role-type">{{ value.name }}</span>
+                    </div>
+                    <div v-for="role in tableState.workspaceGroupRoleBindings"
+                         :key="role.role_id"
+                         class="role-menu-item"
+                    >
+                        <img :src="useRoleFormatter(role.role_type).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <span class="role-type">{{ userPageStore.roleMap[role.role_id].name }}</span>
+                        <span v-if="storeState.workspaceGroup[role.workspace_group_id]"
+                              class="workspace-group-link"
+                        >
+                            <p-link :to="{ name: ADVANCED_ROUTE.WORKSPACES._NAME }"
+                                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                    new-tab
+                                    highlight
+                            >
+                                {{ storeState.workspaceGroup[role.workspace_group_id]?.name }}
+                            </p-link>
+                        </span>
+                    </div>
+                </div>
             </template>
-            <template #data-last_accessed_at="{data}">
+            <template #data-last_accessed_count="{data}">
                 <span v-if="data === -1">
                     -
                 </span>
@@ -318,7 +360,6 @@ const handleClickVerifyButton = async () => {
 
     /* custom design-system component - p-definition */
     :deep(.p-definition) {
-        height: 2.25rem;
         .value-wrapper {
             @apply items-center;
             padding: 0 1rem;
@@ -348,15 +389,33 @@ const handleClickVerifyButton = async () => {
                 border-radius: 6.25rem;
                 right: -7rem;
             }
-            .verified-text {
-                margin-left: 1.5rem;
-            }
             .verified-icon {
                 @apply absolute;
                 bottom: -0.025rem;
                 left: 0;
             }
         }
+
+        .role-type-icon {
+            @apply rounded-full;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .role-wrapper {
+            @apply flex flex-col;
+            gap: 0.375rem;
+            padding: 0.375rem 0;
+
+            .role-menu-item {
+                @apply flex items-center;
+                gap: 0.25rem;
+                .role-type {
+                    @apply text-label-md text-gray-900;
+                }
+            }
+        }
+
         .role-type {
             @apply flex items-center;
             gap: 0.5rem;
