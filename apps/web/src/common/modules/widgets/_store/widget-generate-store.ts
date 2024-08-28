@@ -173,6 +173,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 state.dataTables.push(result);
                 return result;
             } catch (e) {
+                setDataTableCreateLoading(false); // DataTable Loading Failed Case
                 showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
                 return undefined;
