@@ -62,14 +62,18 @@ const addWorkspace = async () => {
         state.loading = false;
     }
 };
-
+const resetForm = () => {
+    selectedItems.value = [];
+};
 const handleConfirm = async () => {
     await addWorkspace();
     workspaceGroupPageStore.closeModal();
+    resetForm();
     emit('confirm', { isGroupUser: true });
 };
 
 const handleCloseModal = () => {
+    resetForm();
     workspaceGroupPageStore.closeModal();
 };
 </script>
