@@ -2,12 +2,19 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
+import { isEmpty } from 'lodash';
+
 import { PLazyImg, PI } from '@cloudforet/mirinae';
 
+import { store } from '@/store';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { MENU_ID } from '@/lib/menu/config';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CloudServiceData } from '@/services/workspace-home/types/workspace-home-type';
+
 
 interface CloudServiceItem {
     cloudServiceGroup: string;
@@ -30,7 +37,11 @@ const props = withDefaults(defineProps<Props>(), {
     item: () => ({} as CloudServiceData),
 });
 
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
 const state = reactive({
+    accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.METRIC_EXPLORER])),
     dailyUpdateItem: computed<CloudServiceItem>(() => ({
         cloudServiceGroup: props.item.cloud_service_group,
         cloudServiceType: props.item.cloud_service_type,
@@ -79,14 +90,16 @@ const state = reactive({
         <div v-if="state.dailyUpdateItem.createdCount"
              class="data-row created"
         >
-            <span class="text-wrapper">
+            <span class="text-wrapper"
+                  :class="{'no-access': !state.accessLink}"
+            >
                 <p-i v-if="state.dailyUpdateItem.isCreateWarning"
                      name="ic_warning-filled"
                      width="0.75rem"
                      height="0.75rem"
                      class="warning-icon"
                 />
-                <router-link :to="state.dailyUpdateItem.createdHref">
+                <router-link :to="state.accessLink ? state.dailyUpdateItem.createdHref : undefined">
                     <span class="label">{{ $t('HOME.ASSET_SUMMARY_CREATED', { count: state.dailyUpdateItem.createdCount }) }}</span>
                 </router-link>
             </span>
@@ -94,14 +107,16 @@ const state = reactive({
         <div v-if="state.dailyUpdateItem.deletedCount"
              class="data-row deleted"
         >
-            <span class="text-wrapper">
+            <span class="text-wrapper"
+                  :class="{'no-access': !state.accessLink}"
+            >
                 <p-i v-if="state.dailyUpdateItem.isDeleteWarning"
                      name="ic_warning-filled"
                      width="0.75rem"
                      height="0.75rem"
                      class="warning-icon"
                 />
-                <router-link :to="state.dailyUpdateItem.deletedHref">
+                <router-link :to="state.accessLink ? state.dailyUpdateItem.deletedHref : undefined">
                     <span class="label">{{ $t('HOME.ASSET_SUMMARY_DELETED', { count: state.dailyUpdateItem.deletedCount }) }}</span>
                 </router-link>
             </span>
@@ -138,6 +153,9 @@ const state = reactive({
             .warning-icon {
                 margin-top: -0.125rem;
                 margin-right: 0.25rem;
+            }
+            &.no-access {
+                @apply cursor-not-allowed;
             }
         }
         &.created {

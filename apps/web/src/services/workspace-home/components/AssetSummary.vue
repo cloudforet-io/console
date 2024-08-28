@@ -1,16 +1,22 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { isEmpty } from 'lodash';
+
 import {
     PDivider, PFieldTitle, PLink, PSpinner,
 } from '@cloudforet/mirinae';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import AssetSummaryDailyUpdates from '@/services/workspace-home/components/AssetSummaryDailyUpdates.vue';
@@ -36,6 +42,7 @@ const storeState = reactive({
     providerMap: computed<ProviderReferenceDataMap>(() => allReferenceGetters.provider),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
     collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     loading: true,
@@ -60,6 +67,7 @@ const state = reactive({
         }
         return result;
     }),
+    accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.METRIC_EXPLORER])),
 });
 
 watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async ([currentWorkspaceId]) => {
@@ -88,8 +96,11 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                     <asset-summary-provider />
                     <asset-summary-daily-updates />
                 </div>
-                <p-divider class="divider" />
-                <p-link highlight
+                <p-divider v-if="state.accessLink"
+                           class="divider"
+                />
+                <p-link v-if="state.accessLink"
+                        highlight
                         :to="{
                             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                             params: { metricId: METRIC_MANAGED_CREATED_COUNT},

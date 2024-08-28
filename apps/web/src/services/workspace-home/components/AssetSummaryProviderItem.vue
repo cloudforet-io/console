@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
+
+import { isEmpty } from 'lodash';
 
 import { PLazyImg, PTextButton } from '@cloudforet/mirinae';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
+import { store } from '@/store';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { MENU_ID } from '@/lib/menu/config';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { ProviderResourceDataItem } from '@/services/workspace-home/types/workspace-home-type';
@@ -25,7 +32,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const router = useRouter();
 
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
+const state = reactive({
+    accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.METRIC_EXPLORER])),
+});
 const handleClickButton = (type: string) => {
+    if (!state.accessLink) return;
     if (!props.item) return;
     let target = '';
     if (type === MANAGED_TARGET_TYPE.STORAGE) target = `metric-managed-${type}-size`;
@@ -52,21 +66,27 @@ const handleClickButton = (type: string) => {
         </div>
         <div class="data-wrapper">
             <p-text-button class="data-row"
+                           :class="{ 'no-access': !state.accessLink }"
                            size="sm"
+                           :readonly="!state.accessLink"
                            @click="handleClickButton(MANAGED_TARGET_TYPE.SERVER)"
             >
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_SERVER') }}</span>
                 <span>{{ numberFormatter(props.item.server) || 0 }}</span>
             </p-text-button>
             <p-text-button class="data-row"
+                           :class="{ 'no-access': !state.accessLink }"
                            size="sm"
+                           :readonly="!state.accessLink"
                            @click="handleClickButton(MANAGED_TARGET_TYPE.DATABASE)"
             >
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_DATABASE') }}</span>
                 <span>{{ numberFormatter(props.item.database) || 0 }}</span>
             </p-text-button>
             <p-text-button class="data-row"
+                           :class="{ 'no-access': !state.accessLink }"
                            size="sm"
+                           :readonly="!state.accessLink"
                            @click="handleClickButton(MANAGED_TARGET_TYPE.STORAGE)"
             >
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_STORAGE') }}</span>
@@ -98,7 +118,7 @@ const handleClickButton = (type: string) => {
             @apply flex justify-between text-label-sm text-gray-700;
             padding: 0.125rem 1rem;
             &:hover {
-                @apply cursor-pointer bg-gray-150;
+                @apply bg-gray-150;
                 text-decoration: none;
             }
             .label {
