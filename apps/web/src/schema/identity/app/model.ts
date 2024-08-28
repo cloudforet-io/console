@@ -18,5 +18,7 @@ export interface AppModel {
     last_accessed_at: string;
     expired_at: string;
     tags?: Tags;
+    project_group_id?: string;
+    project_id?: string;
 }
 
