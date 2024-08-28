@@ -21,7 +21,7 @@ import type {
 import type { NumberFormatValue, NumberFormat } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const SAMPLE_NUMBER = 123456789;
+const SAMPLE_NUMBER = 7564613647;
 const SAMPLE_FORMAT_LIST = [
     { format: '#,##0', sample: 1234 },
     { format: '#,##0.00', sample: 1234.56 },
