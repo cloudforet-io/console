@@ -28,17 +28,18 @@ export const WORKSPACE_GROUP_SEARCH_HANDLERS = {
             title: 'Properties',
             items: [
                 { name: 'name', label: 'Name' },
-                { name: 'workspace', label: 'Workspace' },
-                { name: 'group_user', label: 'Group User' },
+                // { name: 'workspaces', label: 'Workspace' },
+                // { name: 'users', label: 'Group User' },
                 { name: 'create', label: 'Created', dataType: 'datetime' },
             ],
         },
-        {
-            title: 'Advanced',
-            items: [{
-                name: 'tags',
-                label: 'Tags',
-                dataType: 'object',
-            }],
-        }] as KeyItemSet[],
+        // {
+        //     title: 'Advanced',
+        //     items: [{
+        //         name: 'tags',
+        //         label: 'Tags',
+        //         dataType: 'object',
+        //     }],
+        // }
+    ] as KeyItemSet[],
 };
