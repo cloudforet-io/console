@@ -37,8 +37,9 @@ import {
 import { USER_SEARCH_HANDLERS, USER_STATE } from '@/services/iam/constants/user-constant';
 import {
     getWorkspaceRoleBindingIdFromRoleBindingsInfo,
-} from '@/services/iam/helpers/get-role-binding-id-from-role-binding-info';
+} from '@/services/iam/helpers/role-binding-helpers';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+import type { ExtendUserListItemType } from '@/services/iam/types/user-type';
 
 interface Props {
     tableHeight: number;
@@ -66,10 +67,10 @@ const storeState = reactive({
 });
 const state = reactive({
     selectedRemoveItem: '',
-    refinedUserItems: computed(() => userPageState.users.map((user) => ({
+    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => ({
         ...user,
-        mfa: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
-        last_accessed_at: calculateTime(user?.last_accessed_at, userPageStore.timezone),
+        mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
+        last_accessed_count: calculateTime(user?.last_accessed_at, userPageStore.timezone),
     }))),
 });
 const tableState = reactive({
@@ -77,7 +78,7 @@ const tableState = reactive({
         const additionalFields: DefinitionField[] = [];
         if (userPageState.isAdminMode) {
             additionalFields.push(
-                { name: 'mfa', label: 'MFA' },
+                { name: 'mfa_state', label: 'MFA' },
                 {
                     name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
                 },
@@ -94,7 +95,7 @@ const tableState = reactive({
             ...additionalFields,
             { name: 'tags', label: 'Tags', sortable: false },
             { name: 'auth_type', label: 'Auth Type' },
-            { name: 'last_accessed_at', label: 'Last Activity' },
+            { name: 'last_accessed_count', label: 'Last Activity' },
         ];
         return userPageStore.isWorkspaceOwner
             ? [
@@ -111,7 +112,7 @@ const tableState = reactive({
             state: makeEnumValueHandler(USER_STATE),
             email: makeDistinctValueHandler(resourceType, 'email'),
             auth_type: makeDistinctValueHandler(resourceType, 'auth_type'),
-            last_accessed_at: makeDistinctValueHandler(resourceType, 'last_accessed_at', 'datetime'),
+            last_accessed_count: makeDistinctValueHandler(resourceType, 'last_accessed_count', 'datetime'),
             tags: makeDistinctValueHandler(resourceType, 'tags'),
         };
     }),
@@ -240,7 +241,7 @@ const handleRemoveButton = async () => {
 };
 
 const roleBindingsContents = (roleBindings: RoleBindingModel[])
-    :string => roleBindings.filter((rb) => (rb.workspace_group_id && rb.workspace_id)).map((roleBinding) => userPageState.roles.find((role) => role.role_id === roleBinding.role_id)?.name).join('\n');
+    :string => roleBindings.filter((rb) => (rb.workspace_group_id && rb.workspace_id)).map((roleBinding) => userPageStore.roleMap[roleBinding.role_id]?.name).join('\n');
 </script>
 
 <template>
@@ -343,12 +344,12 @@ const roleBindingsContents = (roleBindings: RoleBindingModel[])
                     </p-tooltip>
                 </div>
             </template>
-            <template #col-mfa-format="{value}">
+            <template #col-mfa_state-format="{value}">
                 <p-status v-bind="userMfaFormatter(value)"
                           class="capitalize"
                 />
             </template>
-            <template #col-last_accessed_at-format="{ value }">
+            <template #col-last_accessed_count-format="{ value }">
                 <span v-if="value === -1">
                     -
                 </span>

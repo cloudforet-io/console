@@ -17,6 +17,11 @@ export type UserListItemType = Partial<WorkspaceUserModel> & Partial<UserModel> 
     role_binding?: RoleBindingState
 };
 
+export interface ExtendUserListItemType extends UserListItemType {
+    last_accessed_count: number
+    mfa_state?: 'ON'|'OFF'
+}
+
 export interface ModalSettingState {
     type: string;
     title: string;
