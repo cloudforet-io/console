@@ -111,6 +111,16 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('provider', data);
     },
+    '/identity/role/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('role', data);
+    },
+    '/identity/role/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('role', data);
+    },
     '/inventory/region/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
@@ -205,6 +215,11 @@ const getAfterCallApiMap = () => ({
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('public_dashboard', data);
+    },
+    '/identity/token/grant': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('role', data);
     },
 });
 

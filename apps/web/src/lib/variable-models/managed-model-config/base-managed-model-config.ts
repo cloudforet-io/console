@@ -18,6 +18,7 @@ import ProjectGroupVariableModel from '@/lib/variable-models/managed-model/resou
 import ProjectVariableModel from '@/lib/variable-models/managed-model/resource-model/project-variable-model';
 import ProviderVariableModel from '@/lib/variable-models/managed-model/resource-model/provider-variable-model';
 import RegionVariableModel from '@/lib/variable-models/managed-model/resource-model/region-variable-model';
+import RoleVariableModel from '@/lib/variable-models/managed-model/resource-model/role-variable-model';
 import SecretVariableModel from '@/lib/variable-models/managed-model/resource-model/secret-variable-model';
 import ServiceAccountVariableModel from '@/lib/variable-models/managed-model/resource-model/service-account-variable-model';
 import UserVariableModel from '@/lib/variable-models/managed-model/resource-model/user-variable-model';
@@ -50,6 +51,7 @@ const RESOURCE_VARIABLE_MODELS = {
     workspace_group: WorkspaceGroupVariableModel,
     cost: CostVariableModel,
     metric_data: MetricDataVariableModel,
+    role: RoleVariableModel,
 } as const;
 const CUSTOM_RESOURCE_VARIABLE_MODELS = {
     cost_additional_info_key: CostAdditionalInfoKeyVariableModel,
