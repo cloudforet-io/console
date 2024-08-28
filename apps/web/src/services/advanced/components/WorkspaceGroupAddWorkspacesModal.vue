@@ -15,6 +15,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
+import type { WorkspaceGroupFetchParameters } from '@/services/advanced/types/admin-workspace-group-type';
 
 
 
@@ -22,8 +23,7 @@ const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
-const emit = defineEmits<{(e: 'confirm'): void,
-}>();
+const emit = defineEmits<{(e: 'confirm', option: WorkspaceGroupFetchParameters): void }>();
 
 const state = reactive({
     loading: false,
@@ -66,7 +66,7 @@ const addWorkspace = async () => {
 const handleConfirm = async () => {
     await addWorkspace();
     workspaceGroupPageStore.closeModal();
-    emit('confirm');
+    emit('confirm', { isGroupUser: true });
 };
 
 const handleCloseModal = () => {

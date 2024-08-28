@@ -72,6 +72,7 @@ const refreshTab = async (value:WorkspaceGroupFetchParameters) => {
 
 (() => {
     initWorkspaceGroups();
+    workspaceGroupPageStore.listRoles();
 })();
 
 onUnmounted(() => {
@@ -99,9 +100,7 @@ onUnmounted(() => {
         <workspace-group-edit-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-status-modal @confirm="fetchWorkspaceGroups" />
-        <workspace-group-add-workspaces-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES"
-                                              @confirm="fetchWorkspaceGroups"
-        />
+        <workspace-group-add-workspaces-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-add-users-modal @confirm="() => {refreshTab({isGroupUser: true})}" />
     </section>
 </template>
