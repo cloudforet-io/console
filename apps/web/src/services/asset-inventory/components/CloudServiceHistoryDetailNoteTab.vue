@@ -2,6 +2,9 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -18,8 +21,15 @@ import type { NoteModel } from '@/schema/inventory/note/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+
 
 interface Props {
     recordId: string;
@@ -33,6 +43,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'refresh-note-count'): void}>();
 
+const route = useRoute();
+
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
 const state = reactive({
     id: '',
     noteInput: '',
@@ -47,6 +62,16 @@ const state = reactive({
     ]),
     selectedNoteIdForDelete: '',
     totalCount: 0,
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const handleChangeNoteInput = (e) => {
@@ -170,7 +195,9 @@ watch(() => state.id, () => {
                 </template>
             </p-collapsible-list>
         </article>
-        <article class="add-note-wrapper">
+        <article v-if="state.hasReadWriteAccess"
+                 class="add-note-wrapper"
+        >
             <p-textarea :value="state.noteInput"
                         @input="handleChangeNoteInput"
             />

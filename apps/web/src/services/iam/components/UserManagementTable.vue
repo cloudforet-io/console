@@ -379,7 +379,9 @@ const roleBindingsContents = (roleBindings: RoleBindingModel[])
                     <span />
                 </template>
             </template>
-            <template #col-remove_button-format="value">
+            <template v-if="props.hasReadWriteAccess"
+                      #col-remove_button-format="value"
+            >
                 <p-button style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
