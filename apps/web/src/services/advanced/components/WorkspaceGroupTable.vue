@@ -42,16 +42,16 @@ const props = withDefaults(defineProps<Props>(), {
 const tableState = reactive({
     fields: [
         { name: 'name', label: 'Name' },
-        { name: 'workspace', label: 'Workspace' },
-        { name: 'group_user', label: 'Group User' },
+        { name: 'workspaces', label: 'Workspace' },
+        { name: 'users', label: 'Group User' },
         { name: 'created_at', label: 'Created At' },
     ],
     items: computed(() => workspaceGroupPageState.workspaceGroups.map(({
         name, workspaces, users, created_at,
     }) => ({
         name,
-        workspace: workspaces?.length,
-        group_user: users?.length,
+        workspaces: workspaces?.length,
+        users: users?.length,
         created_at,
     }))),
     valueHandlerMap: computed(() => {
@@ -59,8 +59,8 @@ const tableState = reactive({
 
         return {
             name: makeDistinctValueHandler(resourceType, 'name', 'string', [{ k: 'name', v: '', o: 'not' }]),
-            workspace: makeDistinctValueHandler(resourceType, 'workspace'),
-            group_user: makeDistinctValueHandler(resourceType, 'group_user'),
+            // workspaces: makeReferenceValueHandler(resourceType),
+            // users: makeDistinctValueHandler(resourceType, 'users'),
             created: makeDistinctValueHandler(resourceType, 'created', 'datetime'),
         };
     }),
