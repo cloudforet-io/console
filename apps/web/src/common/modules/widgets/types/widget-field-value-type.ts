@@ -32,8 +32,14 @@ export interface ProgressBarValue {
     baseColor?: string;
 }
 export interface FormatRulesValue {
+    text?: string;
     threshold?: number;
     color: string;
+}
+export interface AdvancedFormatRulesValue {
+    field?: string;
+    rules: FormatRulesValue[];
+    baseColor?: string;
 }
 export interface LineByValue {
     value: string;

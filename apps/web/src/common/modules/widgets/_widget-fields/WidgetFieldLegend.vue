@@ -60,10 +60,9 @@ onMounted(() => {
     if (_toggleValue && state.showPositionField && !_position) {
         _position = 'right';
     }
-    state.proxyValue = {
-        toggleValue: _toggleValue,
-        position: _position,
-    };
+    const _value: LegendValue = { toggleValue: _toggleValue };
+    if (_position) _value.position = _position;
+    state.proxyValue = _value;
 });
 </script>
 

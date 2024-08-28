@@ -1,5 +1,6 @@
 import type { Component } from 'vue';
 
+import advancedFormatRules from '@/common/modules/widgets/_widget-fields/WidgetFieldAdvancedFormatRules.vue';
 import categoryBy from '@/common/modules/widgets/_widget-fields/WidgetFieldCategoryBy.vue';
 import colorSchema from '@/common/modules/widgets/_widget-fields/WidgetFieldColorSchema.vue';
 import comparison from '@/common/modules/widgets/_widget-fields/WidgetFieldComparison.vue';
@@ -45,6 +46,7 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, Component
     min,
     max,
     formatRules,
+    advancedFormatRules,
     legend,
     progressBar,
     icon,

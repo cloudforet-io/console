@@ -73,6 +73,7 @@ export const sanitizeWidgetOptions = (options: Record<string, any>, widgetType: 
     const validOptionKeys = [
         ...Object.keys(widgetConfig?.requiredFieldsSchema ?? {}),
         ...Object.keys(widgetConfig?.optionalFieldsSchema ?? {}),
+        'widgetHeader',
     ];
 
     // Remove keys that are not in the validOptionKeys list
