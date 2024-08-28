@@ -51,7 +51,11 @@ const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 
 const appListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(appPageState.pageStart).setPageLimit(appPageState.pageLimit)
     .setSort('name', true);
+let appListApiQuery = appListApiQueryHelper.data;
+const queryTagHelper = useQueryTags({ keyItemSets: APP_SEARCH_HANDLERS.keyItemSets });
+const { queryTags } = queryTagHelper;
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -209,14 +213,10 @@ const handleClickModalConfirm = async () => {
 };
 
 /* API */
-const queryTagHelper = useQueryTags({ keyItemSets: APP_SEARCH_HANDLERS.keyItemSets });
-const { queryTags } = queryTagHelper;
-let appListApiQuery = appListApiQueryHelper.data;
 const getListApps = async () => {
     state.loading = true;
     try {
         appListApiQueryHelper
-            .setPageStart(appPageState.pageStart).setPageLimit(appPageState.pageLimit)
             .setFilters(queryTagHelper.filters.value);
         await appPageStore.listApps({
             query: appListApiQuery,
