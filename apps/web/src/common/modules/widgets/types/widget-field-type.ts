@@ -2,7 +2,7 @@ import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
-import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { FORMAT_RULE_TYPE, ADVANCED_FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type {
     FormatRulesValue,
@@ -114,9 +114,14 @@ export interface DateFormatOptions {
 export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_TYPE];
 export interface FormatRulesOptions {
     formatRulesType: FormatRulesType;
-    dataTarget?: string;
     description?: string;
     default?: FormatRulesValue[];
+    baseColor?: string;
+}
+export type AdvancedFormatRulesType = typeof ADVANCED_FORMAT_RULE_TYPE[keyof typeof ADVANCED_FORMAT_RULE_TYPE];
+export interface AdvancedFormatRulesOptions {
+    formatRulesType: AdvancedFormatRulesType;
+    description?: string;
     baseColor?: string;
 }
 
@@ -151,7 +156,8 @@ export interface WidgetHeightOptions {
 
 export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
-    | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
+    | FormatRulesOptions | AdvancedFormatRulesOptions
+    | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
     | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
     | MissingValueOptions | WidgetHeightOptions;
@@ -166,7 +172,7 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'icon' | 'comparison' | 'legend'
     | 'subTotal' | 'total'
     | 'progressBar'
-    | 'formatRules'
+    | 'formatRules' | 'advancedFormatRules'
     | 'granularity' | 'colorSchema' | 'pieChartType'
     | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
     | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth' | 'customTableColumnWidth'

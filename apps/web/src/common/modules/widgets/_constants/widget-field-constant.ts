@@ -5,6 +5,11 @@ export const FORMAT_RULE_TYPE = {
     percentThreshold: 'percentThreshold',
 } as const;
 
+export const ADVANCED_FORMAT_RULE_TYPE = {
+    textThreshold: 'textThreshold',
+    field: 'field',
+} as const;
+
 export const COLOR_SCHEMA = {
     Coral: ['#FFD4C8', '#CA4F28'],
     Yellow: ['#F8F6ED', '#D9AE00'],
