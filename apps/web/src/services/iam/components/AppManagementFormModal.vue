@@ -16,6 +16,7 @@ import type { InputItem } from '@cloudforet/mirinae/types/inputs/input/text-inpu
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type { AppModel } from '@/schema/identity/app/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -207,12 +208,18 @@ const handleConfirm = async () => {
         } else {
             const isProject = formState.selectedProjectId?.includes('project');
             const isProjectGroup = formState.selectedProjectId?.includes('pg');
+            let resourceGroup:ResourceGroupType;
+            if (storeState.isAdminMode) {
+                resourceGroup = RESOURCE_GROUP.DOMAIN;
+            } else {
+                resourceGroup = (isProject || isProjectGroup) ? RESOURCE_GROUP.PROJECT : RESOURCE_GROUP.WORKSPACE;
+            }
 
             const res = await appPageStore.createApp({
                 name: formState.name,
                 role_id: formState.role.name,
                 tags: formState.tags,
-                resource_group: storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+                resource_group: resourceGroup,
                 project_id: isProject ? formState.selectedProjectId : undefined,
                 project_group_id: isProjectGroup ? formState.selectedProjectId : undefined,
             });
@@ -263,7 +270,8 @@ watch(() => storeState.isEdit, (isEdit) => {
                                       block
                         />
                     </p-field-group>
-                    <p-field-group class="input-form"
+                    <p-field-group v-if="!storeState.isAdminMode && !storeState.isEdit"
+                                   class="input-form"
                                    required
                     >
                         <template #label>
