@@ -1,3 +1,5 @@
+import type { EvaluateExpressionType } from '@/common/modules/widgets/types/widget-model';
+
 type Handler = (item:any) => string;
 
 export interface TableWidgetField {
@@ -27,9 +29,12 @@ export interface QueryCondition {
     value: string;
 }
 
-export interface EvalFormula {
+export interface EvalExpressions {
     key: string;
-    value: string;
+    isCollapsed: boolean;
+    name: string;
+    fieldType: EvaluateExpressionType;
+    expression: string;
 }
 
 export interface TransformDataTableInfo {
