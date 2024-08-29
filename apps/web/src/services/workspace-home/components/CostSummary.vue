@@ -25,7 +25,9 @@ import type { RoleInfo } from '@/store/modules/user/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -56,9 +58,11 @@ const storeState = reactive({
     dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageState.dataSource),
     getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
     projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     loading: true,
+    accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.COST_REPORT])),
     isDesktopSize: computed(() => width.value > screens.laptop.max),
     currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency || CURRENCY.USD),
     isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
@@ -230,7 +234,7 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                                         :data="state.chartData"
                     />
                 </div>
-                <div v-if="!state.isWorkspaceMember">
+                <div v-if="!state.isWorkspaceMember && state.accessLink">
                     <p-divider class="divider" />
                     <p-link highlight
                             :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"

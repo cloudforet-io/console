@@ -1065,6 +1065,8 @@
 			"NORMAL_TEXT": "Normal text"
 		},
 		"ERROR": {
+			"403_MSG": "No permission to access this page.",
+			"403_MSG_DESC": "To access, please contact the admin.",
 			"404_GO_BACK_1": "Try going",
 			"404_MSG": "Sorry, we can’t seem to find what you’re looking for.",
 			"GO_BACK": "Go back",

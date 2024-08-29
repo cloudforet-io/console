@@ -17,6 +17,7 @@ import { numberFormatter } from '@cloudforet/utils';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -24,7 +25,9 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -46,9 +49,11 @@ const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     serviceAccount: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
     provider: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     loading: true,
+    accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT])),
     emptyData: computed<EmptyData>(() => {
         let result = {} as EmptyData;
         if (isEmpty(storeState.serviceAccount)) {
@@ -257,7 +262,9 @@ watch([() => storeState.currentWorkspaceId, () => storeState.provider], async ([
                         </div>
                     </div>
                 </div>
-                <div class="route-wrapper">
+                <div v-if="state.accessLink"
+                     class="route-wrapper"
+                >
                     <p-divider class="divider" />
                     <p-link highlight
                             :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
