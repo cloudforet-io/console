@@ -2,7 +2,7 @@
 import { reactive, watch } from 'vue';
 
 import {
-    PFieldTitle, PI,
+    PHeading, PI,
 } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -50,8 +50,9 @@ watch(() => props.initialPermissions, (value) => {
 
 <template>
     <div class="role-update-page-policy">
-        <p-field-title class="policy-type"
-                       :label="$t('IAM.ROLE.DETAIL.API_POLICY')"
+        <p-heading heading-type="sub"
+                   :title="$t('IAM.ROLE.DETAIL.API_POLICY')"
+                   class="heading"
         />
         <div class="has-all-permissions">
             <p-i name="ic_plugs"
@@ -86,6 +87,11 @@ watch(() => props.initialPermissions, (value) => {
     @apply flex flex-col;
     margin: 0 1rem 2.5rem 1rem;
     gap: 0.5rem;
+    .heading {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+        margin-left: 0;
+    }
     .has-all-permissions {
         @apply flex items-center border border-gray-200 rounded-md;
         padding: 1rem;

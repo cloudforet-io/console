@@ -385,6 +385,9 @@ const handleClickVerifyButton = async () => {
                 border-radius: 6.25rem;
                 right: -7rem;
             }
+            .verified-text {
+                padding-left: 1.25rem;
+            }
             .verified-icon {
                 @apply absolute;
                 bottom: -0.025rem;

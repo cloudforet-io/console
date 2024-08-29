@@ -54,14 +54,15 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT])),
+    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT].write),
     emptyData: computed<EmptyData>(() => {
-        let result = {} as EmptyData;
+        let result;
         if (isEmpty(storeState.serviceAccount)) {
             result = {
-                to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
+                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : {},
                 title: i18n.t('HOME.NO_ACCOUNT'),
                 desc: i18n.t('HOME.NO_ACCOUNT_DESC'),
-                buttonText: i18n.t('HOME.NO_ACCOUNT_ADD_NEW'),
+                buttonText: state.writableServiceAccount ? i18n.t('HOME.NO_ACCOUNT_ADD_NEW') : undefined,
             };
         }
         return result;

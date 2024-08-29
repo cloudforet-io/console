@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import { filter } from 'lodash';
 
 import {
-    PFieldTitle, PI, PToggleButton, PDataTable, PSelectDropdown, PCheckboxGroup, PCheckbox,
+    PI, PToggleButton, PDataTable, PSelectDropdown, PCheckboxGroup, PCheckbox, PHeading,
 } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -85,6 +85,8 @@ const handleChangeSelectedAccess = (value: string, item: TableItem) => {
         accessType: value,
         isAccessible: true,
     });
+
+    tableState.selectedMenuIds = state.menuItems.flatMap((i) => filter(i.subMenuList, { isAccessible: true }));
 };
 const handleChangeToggle = (value: boolean) => {
     state.isReadOnly = value;
@@ -106,10 +108,9 @@ watch(() => props.menuItems, (menuItems) => {
 
 <template>
     <div class="role-update-page-access">
-        <p-field-title :label="$t('IAM.ROLE.DETAIL.PAGE_ACCESS')"
-                       color="dark"
-                       font-weight="bold"
-                       size="md"
+        <p-heading heading-type="sub"
+                   :title="$t('IAM.ROLE.DETAIL.PAGE_ACCESS')"
+                   class="heading"
         />
         <div v-if="props.roleType === ROLE_TYPE.DOMAIN_ADMIN">
             <div class="page-access-info-wrapper">
@@ -204,8 +205,13 @@ watch(() => props.menuItems, (menuItems) => {
 <style scoped lang="postcss">
 .role-update-page-access {
     @apply flex flex-col;
-    margin: 0 1rem 1.5rem 1rem;
+    margin: 0 1rem 0.5rem 1rem;
     gap: 0.5rem;
+    .heading {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+        margin-left: 0;
+    }
     .page-access-menu {
         @apply border border-gray-200 rounded-md;
         font-size: 0.875rem;

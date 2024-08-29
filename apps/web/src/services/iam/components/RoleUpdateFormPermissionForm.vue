@@ -5,7 +5,7 @@ import {
 
 import { find, isEqual } from 'lodash';
 
-import { PHeading, PPaneLayout } from '@cloudforet/mirinae';
+import { PPaneLayout } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
@@ -112,10 +112,6 @@ watch([() => props.roleType, () => props.initialPageAccess], ([roleType]) => {
 
 <template>
     <p-pane-layout class="role-create-page-permission-form">
-        <p-heading heading-type="sub"
-                   :title="$t('IAM.ROLE.FORM.PERMISSION')"
-                   class="heading"
-        />
         <role-update-form-access :menu-items="menuItems"
                                  :role-type="props.roleType"
                                  @update="handleUpdateForm"
@@ -130,8 +126,5 @@ watch([() => props.roleType, () => props.initialPageAccess], ([roleType]) => {
 <style lang="postcss" scoped>
 .role-create-page-permission-form {
     max-width: 100%;
-    .heading {
-        margin-bottom: 1.5rem;
-    }
 }
 </style>

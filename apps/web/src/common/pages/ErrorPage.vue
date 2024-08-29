@@ -28,6 +28,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 
 interface Props {
@@ -49,20 +50,24 @@ const storeState = reactive({
 
 const handleClickBack = () => {
     const previousPage = route.query.previousPage as string;
-    if (previousPage === '/') {
+
+    if (props.statusCode === '403') {
+        router.push({ name: ROOT_ROUTE._NAME });
+    } else if (previousPage === '/') {
         handleClickHome();
     } else {
         router.go(-1);
     }
 };
 const handleClickHome = () => {
+    const rootRoute = (props.statusCode === '403' || props.statusCode === '404') ? LANDING_ROUTE.WORKSPACE._NAME : ROOT_ROUTE._NAME;
     const isTokenAlive = SpaceConnector.isTokenAlive;
     if (props.statusCode === '403') {
         if (storeState.isAdminMode) {
             appContextStore.exitAdminMode();
         }
     }
-    if (isTokenAlive) router.push({ name: ROOT_ROUTE._NAME });
+    if (isTokenAlive) router.push({ name: rootRoute });
     else router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
 };
 </script>

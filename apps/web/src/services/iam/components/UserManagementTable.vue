@@ -306,6 +306,7 @@ const roleBindingsContents = (roleBindings: RoleBindingModel[])
                                        :loading="dropdownState.loading"
                                        :search-text.sync="dropdownState.searchText"
                                        :handler="dropdownMenuHandler"
+                                       :disabled="!props.hasReadWriteAccess"
                                        class="role-select-dropdown"
                                        @select="handleSelectDropdownItem($event, rowIndex)"
                     >
