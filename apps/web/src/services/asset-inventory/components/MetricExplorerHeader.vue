@@ -23,6 +23,7 @@ import type { MetricModel } from '@/schema/inventory/metric/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
@@ -53,6 +54,7 @@ const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -60,6 +62,7 @@ const route = useRoute();
 const storeState = reactive({
     namespaces: computed(() => allReferenceStore.getters.namespace),
     currentMetric: computed(() => metricExplorerPageState.metric),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
@@ -165,7 +168,7 @@ const duplicateMetric = async () => {
             namespace_id: metricExplorerPageState.metric.namespace_id || '',
             unit: metricExplorerPageState.metric.unit,
             metric_type: metricExplorerPageState.metric.metric_type,
-            resource_group: RESOURCE_GROUP.WORKSPACE,
+            resource_group: storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
             query_options: metricExplorerPageState.metric.query_options,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');

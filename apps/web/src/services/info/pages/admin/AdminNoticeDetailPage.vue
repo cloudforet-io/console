@@ -139,7 +139,8 @@ onBeforeMount(async () => {
                 <div v-if="state.hasPermissionToEditOrDelete"
                      class="button-group"
                 >
-                    <p-button style-type="tertiary"
+                    <p-button v-if="storeState.post?.resource_group !== RESOURCE_GROUP.SYSTEM"
+                              style-type="tertiary"
                               icon-left="ic_edit"
                               @click="handleClickEditButton"
                     >
@@ -153,7 +154,8 @@ onBeforeMount(async () => {
                     >
                         {{ $t('INFO.NOTICE.FORM.SEND_EMAIL_MODAL_TITLE') }}
                     </p-button>
-                    <p-button style-type="negative-secondary"
+                    <p-button v-if="storeState.post?.resource_group !== RESOURCE_GROUP.SYSTEM"
+                              style-type="negative-secondary"
                               @click="handleDeleteModalOpen"
                     >
                         {{ $t('INFO.NOTICE.FORM.DELETE') }}
