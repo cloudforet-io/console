@@ -433,6 +433,7 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
     }
     .role-type {
         @apply flex items-center;
+        padding-right: 1rem;
         gap: 0.5rem;
         .role-type-icon {
             @apply rounded-full;
