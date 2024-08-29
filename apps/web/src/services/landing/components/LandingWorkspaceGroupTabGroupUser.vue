@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { reactive, watch, onUnmounted } from 'vue';
-
-
+import {
+    reactive,
+} from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -11,24 +11,25 @@ import {
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
+import type { BasicRoleModel, RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
+
+import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
-import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
-import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
+import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
-const workspaceGroupPageStore = useWorkspaceGroupPageStore();
-const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
+const userWorkspaceGroupStoreState = userWorkspaceGroupStore.state;
+const landingPageStore = useLandingPageStore();
+const landingPageStoreGetter = landingPageStore.getters;
+const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
 
-const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
 const tableState = reactive({
-    // TODO: temp data
     fields: [
         { name: 'user_id', label: 'User ID' },
         { name: 'name', label: 'Name' },
@@ -40,14 +41,14 @@ const tableState = reactive({
 
 const {
     loading, searchText, menuList, selectedItems, handleClickShowMore,
-} = useSelectDropDownList({
+} = useSelectDropDownList<BasicRoleModel>({
     pageSize: 10,
     transformer: (_role) => ({
         label: _role.name,
         name: _role.role_id,
         role_type: _role.role_type,
     }),
-    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.listBasicRole<RoleListParameters, ListResponse<RoleModel>>({
         query: {
             ...apiQueryHelper.data,
             filter: [
@@ -58,42 +59,23 @@ const {
     }),
 });
 
-const setupModal = (type) => {
-    switch (type) {
-    case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER: workspaceGroupPageStore.updateModalSettings({
-        type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_GROUP_USER_TITLE'),
-        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER,
-        themeColor: 'alert',
-    }); break;
-    case WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS: workspaceGroupPageStore.updateModalSettings({
-        type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: 'yubeom group' }),
-        visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-    }); break;
-    default:
-        break;
-    }
-};
 
 const handleSelect = (index) => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedUserIndices = index;
-    });
+    landingPageStoreGroupUserState.selectedIndices = index;
 };
 
 const handleChange = (options: any = {}) => {
     if (options.pageStart) {
-        workspaceGroupPageStore.$patch((_state) => {
-            _state.state.groupUserPageStart = options.pageStart;
+        landingPageStore.$patch((_state) => {
+            _state.groupUserTableState.pageStart = options.pageStart;
         });
     }
 
     if (options.pageLimit) {
-        workspaceGroupPageStore.$patch((_state) => {
-            _state.state.groupUserPageStart = 1;
-            _state.state.groupUserPageLimit = options.pageLimit;
-            _state.state.groupUserPage = 1;
+        landingPageStore.$patch((_state) => {
+            _state.groupUserTableState.pageStart = 1;
+            _state.groupUserTableState.pageLimit = options.pageLimit;
+            _state.groupUserTableState.thisPage = 1;
         });
     }
 };
@@ -103,46 +85,41 @@ const handleSelectMenu = () => {
 };
 
 const handleRefresh = () => {
-    emit('refresh', { isGroupUser: true });
+    userWorkspaceGroupStore.load();
 };
 
 const handleAddUsersButtonClick = () => {
-    setupModal(WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS);
 };
 
 const handleSelectedGroupUsersRemoveButtonClick = () => {
-    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER);
 };
 
 const handleSelectedGroupUserRemoveButtonClick = (item) => {
-    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER);
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedGroupUser = item;
-    });
+    console.log(item);
 };
 
-const handleChangeSort = (name, isDesc) => {
-    workspaceGroupPageStore.$patch((_state) => {
+const handleChangeSort = (name:string, isDesc:boolean) => {
+    landingPageStore.$patch((_state) => {
         if (name === 'role') {
-            _state.state.groupUserSortBy = `${name}_type`;
+            _state.groupUserTableState.sortBy = `${name}_type`;
         } else {
-            _state.state.groupUserSortBy = name;
+            _state.groupUserTableState.sortBy = name;
         }
 
-        _state.state.selectedUserIndices = [];
-        _state.state.isUserSortDesc = isDesc;
+        _state.groupUserTableState.selectedIndices = [];
+        _state.groupUserTableState.isDesc = isDesc;
     });
 };
 
-watch(() => workspaceGroupPageState.groupUserSearchText, () => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedUserIndices = [];
-    });
-});
-
-onUnmounted(() => {
-    workspaceGroupPageStore.resetGroupUser();
-});
+// watch(() => workspaceGroupPageState.groupUserSearchText, () => {
+//     workspaceGroupPageStore.$patch((_state) => {
+//         _state.state.selectedUserIndices = [];
+//     });
+// });
+//
+// onUnmounted(() => {
+//     workspaceGroupPageStore.resetGroupUser();
+// });
 </script>
 
 <template>
@@ -150,13 +127,13 @@ onUnmounted(() => {
         <p-heading class="workspace-group-tab-group-user-header"
                    :title="$t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER')"
                    use-total-count
-                   :total-count="workspaceGroupPageGetters.groupUserTotalCount"
+                   :total-count="landingPageStoreGetter.workspaceGroupUserTotalCount"
                    heading-type="sub"
         >
             <template #extra>
                 <div class="workspace-group-tab-group-user-button-wrapper">
                     <p-button style-type="negative-primary"
-                              :disabled="!workspaceGroupPageGetters.selectedGroupUsersByIndices.length"
+                              :disabled="!landingPageStoreGroupUserState.selectedIndices.length"
                               @click="handleSelectedGroupUsersRemoveButtonClick"
                     >
                         {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
@@ -171,22 +148,23 @@ onUnmounted(() => {
             </template>
         </p-heading>
         <p-toolbox-table class="workspace-group-tab-group-user-table"
-                         :loading="workspaceGroupPageState.loading"
+                         style="height: calc(100vh - 25rem);"
+                         :loading="userWorkspaceGroupStoreState.loading"
                          :fields="tableState.fields"
-                         :items="workspaceGroupPageGetters.workspaceGroupUsers"
-                         :select-index="workspaceGroupPageState.selectedUserIndices"
-                         :total-count="workspaceGroupPageGetters.groupUserTotalCount"
+                         :items="landingPageStoreGetter.workspaceGroupUserTableItem"
+                         :select-index="landingPageStoreGroupUserState.selectedIndices"
+                         :total-count="landingPageStoreGetter.workspaceGroupUserTotalCount"
                          sort-by="user_id"
                          search-type="plain"
                          :sort-desc="true"
-                         :this-page.sync="workspaceGroupPageState.groupUserPage"
-                         :search-text.sync="workspaceGroupPageState.groupUserSearchText"
+                         :this-page.sync="landingPageStoreGroupUserState.thisPage"
+                         :search-text.sync="landingPageStoreGroupUserState.searchText"
                          selectable
                          sortable
                          searchable
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleRefresh()"
+                         @refresh="handleRefresh"
                          @changeSort="handleChangeSort"
         >
             <template #col-state-format="{ value }">

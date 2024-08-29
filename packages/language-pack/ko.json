@@ -3622,6 +3622,7 @@
 			"TITLE": "멀티 클라우드 자산을 관리 콘솔에 {domain_icon} 모두 모아 보고, \n효율성과 생산성을 {boost_icon}  높이세요.",
 			"WELCOME_TITLE": "클라우드 관리 콘솔에 오신걸 환영합니다! "
 		},
+		"DONE": "",
 		"DORMANT_WORKSPACE": "휴면 워크스페이스",
 		"DORMANT_WORKSPACE_POPOVER": "이 워크스페이스는 {date}에 관리자가 설정한 임계값보다 비용이 낮아 휴면 상태로 전환되었습니다.",
 		"DORMANT_WORKSPACE_POPOVER_ADMIN": "{name}에서 발생한 비용이 임계값을 넘지 못해 {date}에 휴면 상태로 전환되었습니다.",

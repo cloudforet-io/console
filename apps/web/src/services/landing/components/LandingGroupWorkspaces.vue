@@ -14,12 +14,16 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
 import LandingWorkspaceGroupManageOverlay from '@/services/landing/components/LandingWorkspaceGroupManageOverlay.vue';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
+import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 
 const PAGE_SIZE = 16;
@@ -38,11 +42,26 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'create'): void}>();
 const router = useRouter();
 
+// store setting
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceStoreGetters = userWorkspaceStore.getters;
+const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
+const userWorkspaceGroupStoreGetters = userWorkspaceGroupStore.getters;
+const landingPageStore = useLandingPageStore();
+const landingPageStoreState = landingPageStore.state;
+
 const state = reactive({
     isShowAll: false,
-    workspaceList: [] as WorkspaceModel[],
+    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceStoreGetters.workspaceList),
+    selectedGroupWorkspaceList: computed(() => {
+        if (landingPageStoreState.selectedProjectGroup === 'all') {
+            return state.workspaceList;
+        }
+        const selectedGroupsWorkspaceId = state.workspaceGroupList.find((group) => group.workspace_group_id === landingPageStoreState.selectedProjectGroup)?.workspaces || [];
+        return state.workspaceList.filter((workspace) => selectedGroupsWorkspaceId.includes(workspace.workspace_id));
+    }),
     workspaceBoardSets: computed<WorkspaceBoardSet[]>(() => {
-        const favoriteOrderList = sortBy(state.workspaceList, (workspaceItem) => {
+        const favoriteOrderList = sortBy(state.selectedGroupWorkspaceList, (workspaceItem) => {
             const correspondingAItem = props.favoriteList?.find((favoriteItem) => favoriteItem?.itemId === workspaceItem.workspace_id);
             return correspondingAItem ? props.favoriteList?.indexOf(correspondingAItem) : Infinity;
         });
@@ -55,20 +74,20 @@ const state = reactive({
             rounded: true,
         }));
     }),
-    workspaceGroupList: [] as WorkspaceGroupModel[],
+    workspaceGroupList: computed(() => userWorkspaceGroupStoreGetters.workspaceGroupList),
     workspaceFilterList: computed(() => [
         { label: i18n.t('LADING.ALL_WORKSPACE'), name: 'all' },
-        { label: 'test group 1', name: 'test1' },
-        { label: 'test group 2', name: 'test2' },
-        { label: 'test group 3', name: 'test3' },
-        { label: 'test group 4', name: 'test4' },
-        { label: 'test group 5', name: 'test5' },
         ...state.workspaceGroupList.map((group:WorkspaceGroupModel) => ({ label: group.name, name: group.workspace_group_id })),
     ]),
-    activeTab: 'all',
-    isAllWorkspaceTab: computed(() => state.activeTab === 'all'),
+    isAllWorkspaceTab: computed(() => landingPageStoreState.selectedProjectGroup === 'all'),
     isOverlayOpen: false,
     isButtonGroupOpened: false,
+    isShowAllVisible: computed(() => {
+        if (landingPageStoreState.selectedProjectGroup === 'all') {
+            return state.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.workspaceList.length;
+        }
+        return state.selectedGroupWorkspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.selectedGroupWorkspaceList.length;
+    }),
 });
 
 const handleClickShowAll = () => {
@@ -78,33 +97,12 @@ const handleClickShowAll = () => {
 const handleClickButtonGroupToggle = () => {
     state.isButtonGroupOpened = !state.isButtonGroupOpened;
 };
-const handleOpenOverlay = (workspaceGroupId:string) => {
-    console.log(workspaceGroupId);
+const handleOpenOverlay = () => {
     state.isOverlayOpen = true;
 };
 
-
-const fetchWorkspaceGroupList = async () => {
-    // try {
-    //     const response = await SpaceConnector.clientV2.identity
-    //     state.workspaceGroupList = response;
-    // } catch (e) {
-    //     ErrorHandler.handleError(e);
-    // }
-};
-
-const fetchWorkspaceList = async () => {
-    // try {
-    //     const response = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>();
-    //     state.workspaceList = response;
-    // } catch (e) {
-    //     console.error(e);
-    // }
-};
-
 (async () => {
-    await fetchWorkspaceGroupList();
-    await fetchWorkspaceList();
+    await userWorkspaceGroupStore.load();
 })();
 
 </script>
@@ -114,7 +112,7 @@ const fetchWorkspaceList = async () => {
         <div class="workspace-group-filter-container"
              :class="{ 'is-opened': state.isButtonGroupOpened }"
         >
-            <p-button-tab v-model="state.activeTab"
+            <p-button-tab v-model="landingPageStoreState.selectedProjectGroup"
                           :tabs="state.workspaceFilterList"
             >
                 <template #additional-button>
@@ -144,11 +142,11 @@ const fetchWorkspaceList = async () => {
                 </template>
             </p-field-title>
             <div class="right-part-wrapper">
-                <p-button v-if="state.activeTab !== 'all'"
+                <p-button v-if="landingPageStoreState.selectedProjectGroup !== 'all'"
                           style-type="tertiary"
                           size="md"
                           icon-left="ic_settings"
-                          @click="handleOpenOverlay(state.activeTab)"
+                          @click="handleOpenOverlay"
                 >
                     {{ $t('LADING.SETTINGS') }}
                 </p-button>
@@ -167,7 +165,7 @@ const fetchWorkspaceList = async () => {
                                  :is-domain-admin="props.isDomainAdmin"
         />
         <div class="show-more-button-wrapper">
-            <p-button v-if="state.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.workspaceList.length"
+            <p-button v-if="state.isShowAllVisible"
                       icon-right="ic_chevron-down"
                       style-type="transparent"
                       size="md"
