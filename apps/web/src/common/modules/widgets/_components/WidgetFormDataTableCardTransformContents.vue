@@ -20,11 +20,11 @@ import WidgetFormDataTableCardHeaderTitle
 import WidgetFormDataTableCardTransformForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformForm.vue';
 import {
-    DATA_TABLE_TYPE,
+    DATA_TABLE_TYPE, EVAL_EXPRESSION_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
-    DataTableAlertModalMode, QueryCondition, EvalFormula, TransformDataTableInfo,
+    DataTableAlertModalMode, QueryCondition, EvalExpressions, TransformDataTableInfo,
 } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableOperator, JoinType, ConcatOptions, JoinOptions, QueryOptions, EvalOptions,
@@ -61,7 +61,7 @@ const state = reactive({
         const haveRequiredConcatOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined);
         const haveRequiredJoinOptions = haveSavedName && state.dataTableInfo.dataTables.length === 2 && !state.dataTableInfo.dataTables.includes(undefined) && joinState.joinType;
         const haveRequiredQueryOptions = haveSavedName && !!state.dataTableInfo.dataTableId && queryState.conditions.filter((cond) => !!cond.value.trim()).length > 0;
-        const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.functions.filter((func) => !!func.value.trim()).length > 0;
+        const haveRequiredEvalOptions = haveSavedName && !!state.dataTableInfo.dataTableId && evalState.expressions.filter((expression) => !!expression.name && !!expression.expression).length > 0;
         if (state.operator === 'CONCAT') return !haveRequiredConcatOptions;
         if (state.operator === 'JOIN') return !haveRequiredJoinOptions;
         if (state.operator === 'QUERY') return !haveRequiredQueryOptions;
@@ -73,12 +73,12 @@ const state = reactive({
         const dataTableIdChanged = state.dataTableInfo.dataTableId !== originState.dataTableInfo.dataTableId;
         const joinTypeChanged = joinState.joinType !== originState.joinType;
         const conditionsChanged = !isEqual(queryState.conditions.map((cond) => ({ value: cond.value })).filter((cond) => !!cond.value.trim().length), originState.conditions);
-        const functionsChanged = !isEqual(evalState.functions.map((func) => ({ value: func.value }))
-            .filter((func) => !!func.value.trim().length), originState.functions);
+        const expressionsChanged = !isEqual(evalState.expressions.map((expression) => ({ name: expression.name, field_type: expression.fieldType, expression: expression.expression }))
+            .filter((expression) => !!expression.name && !!expression.expression), originState.expressions);
         if (state.operator === 'CONCAT') return dataTablesChanged;
         if (state.operator === 'JOIN') return dataTablesChanged || joinTypeChanged;
         if (state.operator === 'QUERY') return dataTableIdChanged || conditionsChanged;
-        if (state.operator === 'EVAL') return dataTableIdChanged || functionsChanged;
+        if (state.operator === 'EVAL') return dataTableIdChanged || expressionsChanged;
         return false;
     }),
     isUnsaved: computed(() => state.dataTableId.startsWith('UNSAVED-')),
@@ -104,7 +104,9 @@ const queryState = reactive({
 });
 
 const evalState = reactive({
-    functions: [{ key: getRandomId(), value: '' }] as EvalFormula[],
+    expressions: [{
+        key: getRandomId(), fieldType: EVAL_EXPRESSION_TYPE.DATA, name: '', expression: '', isCollapsed: false,
+    }] as EvalExpressions[],
 });
 
 const originState = reactive({
@@ -117,9 +119,7 @@ const originState = reactive({
     conditions: computed(() => ((props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []).map((condition) => ({
         value: condition,
     }))),
-    functions: computed(() => ((props.item.options as DataTableTransformOptions).EVAL?.expressions ?? []).map((func) => ({
-        value: func,
-    }))),
+    expressions: computed(() => ((props.item.options as DataTableTransformOptions).EVAL?.expressions ?? [])),
 });
 
 const setFailStatus = (status: boolean) => {
@@ -168,7 +168,9 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     };
     const evalOptions: EvalOptions = {
         data_table_id: state.dataTableInfo.dataTableId,
-        expressions: evalState.functions.map((functionInfo) => functionInfo.value),
+        expressions: evalState.expressions.map((expressionInfo) => ({
+            name: expressionInfo.name, field_type: expressionInfo.fieldType, expression: expressionInfo.expression,
+        })).filter((expresionInfo) => !!expresionInfo.name && !!expresionInfo.expression),
     };
     const options = () => {
         switch (state.operator) {
@@ -262,7 +264,9 @@ const setInitialDataTableForm = () => {
     state.dataTableInfo = originState.dataTableInfo;
     joinState.joinType = originState.joinType;
     queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
-    evalState.functions = originState.functions.length ? originState.functions.map((func) => ({ ...func, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
+    evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({ ...expression, key: getRandomId() })) : [{
+        key: getRandomId(), name: '', fieldType: EVAL_EXPRESSION_TYPE.DATA, expression: '', isCollapsed: false,
+    }];
 };
 
 onMounted(() => {
@@ -301,7 +305,7 @@ defineExpose({
                                                     :data-table-info.sync="state.dataTableInfo"
                                                     :join-type.sync="joinState.joinType"
                                                     :conditions.sync="queryState.conditions"
-                                                    :functions.sync="evalState.functions"
+                                                    :expressions.sync="evalState.expressions"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
                                             :changed="state.optionsChanged"
