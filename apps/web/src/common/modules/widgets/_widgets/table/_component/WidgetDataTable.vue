@@ -397,7 +397,7 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
                             minWidth: getFieldMinWidth(field),
                             width: getFieldWidth(field),
                             maxWidth: getFieldWidth(field),
-                            ...(rowIndex !== props.items?.length - 1 ? getHeatmapColorStyle(item, field) : {}),
+                            ...(rowIndex !== props.items?.length - 1 || !props.totalInfo?.toggleValue ? getHeatmapColorStyle(item, field) : {}),
                         }"
                     >
                         <span ref="labelRef"
@@ -494,8 +494,8 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
     tbody {
         tr {
             &:nth-child(odd) {
+                @apply bg-gray-100;
                 td {
-                    @apply bg-gray-100;
                     &.sub-total {
                         @apply bg-violet-150;
                     }
