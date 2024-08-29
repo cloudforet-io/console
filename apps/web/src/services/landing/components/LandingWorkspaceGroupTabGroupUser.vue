@@ -3,8 +3,6 @@ import {
     reactive,
 } from 'vue';
 
-
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PButton, PToolboxTable, PStatus, PSelectDropdown, PTooltip,
@@ -150,6 +148,7 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
             </template>
         </p-heading>
         <p-toolbox-table class="workspace-group-tab-group-user-table"
+                         style="height: calc(100vh - 25rem);"
                          :loading="userWorkspaceGroupStoreState.loading"
                          :fields="tableState.fields"
                          :items="landingPageStoreGetter.workspaceGroupUserTableItem"

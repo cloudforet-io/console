@@ -63,14 +63,14 @@ const state = reactive({
         </div>
         <template #footer>
             <p-divider />
-            <p-button style-type="negative-secondary"
-                      size="md"
-                      icon-left="ic_delete"
-                      class="delete-button"
-                      @click="() => { state.isOverlayOpenProxy = false; }"
-            >
-                {{ $t('LADING.DELETE_WORKSPACE_GROUP') }}
-            </p-button>
+            <div class="close-button-wrapper">
+                <p-button style-type="substitutive"
+                          size="md"
+                          @click="() => { state.isOverlayOpenProxy = false; }"
+                >
+                    {{ $t('LADING.DONE') }}
+                </p-button>
+            </div>
         </template>
     </p-overlay-layout>
 </template>
@@ -87,7 +87,8 @@ const state = reactive({
     }
 }
 
-.delete-button {
-    margin: 0.75rem 0 0.75rem 1.5rem;
+.close-button-wrapper {
+    margin: 0.75rem 1.5rem 0.75rem 0;
+    float: right;
 }
 </style>
