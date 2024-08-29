@@ -3,12 +3,13 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea,
+    PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -29,13 +30,18 @@ const state = reactive({
     fieldTypeMenuItems: computed<MenuItem[]>(() => [
         {
             name: EVAL_EXPRESSION_TYPE.LABEL,
-            label: i18n.t('Label Field'),
+            label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TYPE_LABEL_FIELD'),
         },
         {
             name: EVAL_EXPRESSION_TYPE.DATA,
-            label: i18n.t('Data Field'),
+            label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TYPE_DATA_FIELD'),
         },
     ]),
+});
+
+const modalState = reactive({
+    visible: false,
+    currentSelectionKey: undefined as string|undefined,
 });
 
 /* Events */
@@ -51,7 +57,19 @@ const handleToggleExpressionCard = (key: string) => {
     });
 };
 const handleClickDeleteExpression = (key: string) => {
-    state.proxyExpressions = state.proxyExpressions.filter((expression) => expression.key !== key);
+    modalState.visible = true;
+    modalState.currentSelectionKey = key;
+};
+const handleConfirmDeleteExpression = () => {
+    if (!modalState.currentSelectionKey) return;
+    state.proxyExpressions = state.proxyExpressions.filter((expression) => expression.key !== modalState.currentSelectionKey);
+    modalState.visible = false;
+    modalState.currentSelectionKey = undefined;
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'));
+};
+const handleCancelModal = () => {
+    modalState.visible = false;
+    modalState.currentSelectionKey = undefined;
 };
 const handleChangeFieldType = (key: string, selected: EvaluateExpressionType) => {
     state.proxyExpressions = state.proxyExpressions.map((expression) => {
@@ -99,7 +117,7 @@ const handleClickAddLabel = () => {
                     <span v-else
                           class="expression-name placeholder"
                     >
-                        {{ $t('Input Field Name') }}
+                        {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TITLE_PLACEHOLDER') }}
                     </span>
                 </div>
                 <p-icon-button name="ic_delete"
@@ -109,7 +127,7 @@ const handleClickAddLabel = () => {
                 />
             </div>
             <div class="form-body">
-                <p-field-group :label="$t('Field Type')"
+                <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_TYPE')"
                                required
                                style-type="secondary"
                 >
@@ -125,7 +143,7 @@ const handleClickAddLabel = () => {
                         </p-select-button>
                     </div>
                 </p-field-group>
-                <p-field-group :label="$t('Field Name')"
+                <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_NAME')"
                                required
                                style-type="secondary"
                 >
@@ -133,12 +151,12 @@ const handleClickAddLabel = () => {
                                   block
                     />
                 </p-field-group>
-                <p-field-group :label="$t('Field Formula')"
+                <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_FORMULA')"
                                required
                                style-type="secondary"
                 >
                     <p-textarea v-model="expression.expression"
-                                :placeholder="$t('Enter your formula in a pandas format.')"
+                                :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
                     />
                 </p-field-group>
             </div>
@@ -150,6 +168,19 @@ const handleClickAddLabel = () => {
         >
             {{ $t('Add Field') }}
         </p-button>
+        <p-button-modal :header-title="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_MODAL_TITLE')"
+                        :visible.sync="modalState.visible"
+                        size="sm"
+                        theme-color="alert"
+                        @confirm="handleConfirmDeleteExpression"
+                        @cancel="handleCancelModal"
+        >
+            <template #body>
+                <p>
+                    {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_MODAL_DESC') }}
+                </p>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
