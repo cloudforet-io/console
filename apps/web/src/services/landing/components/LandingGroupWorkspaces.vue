@@ -23,6 +23,7 @@ import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
 import LandingWorkspaceGroupManageOverlay from '@/services/landing/components/LandingWorkspaceGroupManageOverlay.vue';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
+import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 
 const PAGE_SIZE = 16;
@@ -40,18 +41,23 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'create'): void}>();
 const router = useRouter();
+
+// store setting
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
 const userWorkspaceGroupStoreGetters = userWorkspaceGroupStore.getters;
+const landingPageStore = useLandingPageStore();
+const landingPageStoreState = landingPageStore.state;
+
 const state = reactive({
     isShowAll: false,
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceStoreGetters.workspaceList),
     selectedGroupWorkspaceList: computed(() => {
-        if (state.activeTab === 'all') {
+        if (landingPageStoreState.selectedProjectGroup === 'all') {
             return state.workspaceList;
         }
-        const selectedGroupsWorkspaceId = state.workspaceGroupList.find((group) => group.workspace_group_id === state.activeTab)?.workspaces || [];
+        const selectedGroupsWorkspaceId = state.workspaceGroupList.find((group) => group.workspace_group_id === landingPageStoreState.selectedProjectGroup)?.workspaces || [];
         return state.workspaceList.filter((workspace) => selectedGroupsWorkspaceId.includes(workspace.workspace_id));
     }),
     workspaceBoardSets: computed<WorkspaceBoardSet[]>(() => {
@@ -73,12 +79,11 @@ const state = reactive({
         { label: i18n.t('LADING.ALL_WORKSPACE'), name: 'all' },
         ...state.workspaceGroupList.map((group:WorkspaceGroupModel) => ({ label: group.name, name: group.workspace_group_id })),
     ]),
-    activeTab: 'all',
-    isAllWorkspaceTab: computed(() => state.activeTab === 'all'),
+    isAllWorkspaceTab: computed(() => landingPageStoreState.selectedProjectGroup === 'all'),
     isOverlayOpen: false,
     isButtonGroupOpened: false,
     isShowAllVisible: computed(() => {
-        if (state.activeTab === 'all') {
+        if (landingPageStoreState.selectedProjectGroup === 'all') {
             return state.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.workspaceList.length;
         }
         return state.selectedGroupWorkspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.selectedGroupWorkspaceList.length;
@@ -107,7 +112,7 @@ const handleOpenOverlay = () => {
         <div class="workspace-group-filter-container"
              :class="{ 'is-opened': state.isButtonGroupOpened }"
         >
-            <p-button-tab v-model="state.activeTab"
+            <p-button-tab v-model="landingPageStoreState.selectedProjectGroup"
                           :tabs="state.workspaceFilterList"
             >
                 <template #additional-button>
@@ -137,7 +142,7 @@ const handleOpenOverlay = () => {
                 </template>
             </p-field-title>
             <div class="right-part-wrapper">
-                <p-button v-if="state.activeTab !== 'all'"
+                <p-button v-if="landingPageStoreState.selectedProjectGroup !== 'all'"
                           style-type="tertiary"
                           size="md"
                           icon-left="ic_settings"
