@@ -16,6 +16,7 @@ export default defineComponent({
 <script setup lang="ts">
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates
+import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -42,6 +43,10 @@ const domainStore = useDomainStore();
 const route = useRoute();
 const router = useRouter();
 
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
+
 const handleClickBack = () => {
     const previousPage = route.query.previousPage as string;
     if (previousPage === '/') {
@@ -52,7 +57,11 @@ const handleClickBack = () => {
 };
 const handleClickHome = () => {
     const isTokenAlive = SpaceConnector.isTokenAlive;
-    if (props.statusCode === '403') appContextStore.exitAdminMode();
+    if (props.statusCode === '403') {
+        if (storeState.isAdminMode) {
+            appContextStore.exitAdminMode();
+        }
+    }
     if (isTokenAlive) router.push({ name: ROOT_ROUTE._NAME });
     else router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
 };
@@ -60,7 +69,9 @@ const handleClickHome = () => {
 
 <template>
     <section class="page-wrapper">
-        <article class="error-contents">
+        <article class="error-contents"
+                 :class="{'no-access': props.statusCode === '403'}"
+        >
             <img class="error-img"
                  alt="error-img"
                  src="/images/error-octos.gif"
@@ -70,12 +81,17 @@ const handleClickHome = () => {
             </h2>
             <h3 class="error-message">
                 <template v-if="props.statusCode === '403'">
-                    {{ $t('COMMON.ERROR.404_MSG') }}
+                    {{ $t('COMMON.ERROR.403_MSG') }}
                 </template>
                 <template v-else>
                     {{ $t('COMMON.ERROR.404_MSG') }}
                 </template>
             </h3>
+            <p v-if="props.statusCode === '403'"
+               class="desc"
+            >
+                {{ $t('COMMON.ERROR.403_MSG_DESC') }}
+            </p>
             <div v-if="domainStore.state.name"
                  class="utils-button"
             >
@@ -106,6 +122,16 @@ const handleClickHome = () => {
     .error-contents {
         text-align: center;
         margin: auto;
+        &.no-access {
+            .error-message {
+                width: 24.125rem;
+                padding-bottom: 0.375rem;
+            }
+            .desc {
+                @apply text-gray-500 text-paragraph-lg;
+                padding-bottom: 2.5rem;
+            }
+        }
         .error-img {
             @apply mx-auto align-middle;
             width: 20rem;
