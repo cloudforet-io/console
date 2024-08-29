@@ -85,6 +85,8 @@ const handleChangeSelectedAccess = (value: string, item: TableItem) => {
         accessType: value,
         isAccessible: true,
     });
+
+    tableState.selectedMenuIds = state.menuItems.flatMap((i) => filter(i.subMenuList, { isAccessible: true }));
 };
 const handleChangeToggle = (value: boolean) => {
     state.isReadOnly = value;
