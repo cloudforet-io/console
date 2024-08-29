@@ -48,21 +48,23 @@ const state = reactive({
     loading: true,
     isNoCollectors: computed<boolean>(() => !Object.keys(storeState.collectors).length),
     isNoServiceAccounts: computed<boolean>(() => !Object.keys(storeState.serviceAccounts).length),
+    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT].write),
+    writableServiceCollector: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.COLLECTOR].write),
     emptyData: computed<EmptyData>(() => {
-        let result = {} as EmptyData;
+        let result;
         if (state.isNoServiceAccounts) {
             result = {
-                to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
+                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : {},
                 title: i18n.t('HOME.NO_ACCOUNT'),
                 desc: i18n.t('HOME.NO_ACCOUNT_DESC'),
-                buttonText: i18n.t('HOME.NO_ACCOUNT_ADD_NEW'),
+                buttonText: state.writableServiceAccount ? i18n.t('HOME.NO_ACCOUNT_ADD_NEW') : undefined,
             };
         } else {
             result = {
-                to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME },
+                to: state.writableServiceCollector ? { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME } : {},
                 title: i18n.t('HOME.NO_COLLECTOR'),
                 desc: i18n.t('HOME.NO_COLLECTOR_DESC'),
-                buttonText: i18n.t('HOME.NO_COLLECTOR_CREATE_NEW'),
+                buttonText: state.writableServiceCollector ? i18n.t('HOME.NO_COLLECTOR_CREATE_NEW') : undefined,
             };
         }
         return result;

@@ -19,6 +19,9 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -59,6 +62,7 @@ const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageState.workspaceUserTotalCount),
     appsTotalCount: computed<number|undefined>(() => workspaceHomePageState.appsTotalCount),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),
@@ -190,14 +194,14 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
             </div>
         </div>
         <div class="extra-wrapper">
-            <p-button v-if="props.accessUserMenu"
+            <p-button v-if="props.accessUserMenu && storeState.pageAccessPermissionMap[MENU_ID.USER].write"
                       style-type="tertiary"
                       icon-left="ic_service_user"
                       @click="handleActionButton('invite')"
             >
                 {{ $t('HOME.INFO_INVITE_USER') }}
             </p-button>
-            <p-button v-if="props.accessAppMenu"
+            <p-button v-if="props.accessAppMenu && storeState.pageAccessPermissionMap[MENU_ID.APP].write"
                       style-type="tertiary"
                       icon-left="ic_service_app"
                       @click="handleActionButton('create')"

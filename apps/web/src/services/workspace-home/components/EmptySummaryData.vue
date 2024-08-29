@@ -89,7 +89,7 @@ const state = reactive({
         </div>
         <span class="title">{{ props.emptyData.title }}</span>
         <span class="desc">{{ props.emptyData.desc }}</span>
-        <p-text-button v-if="!state.isWorkspaceMember"
+        <p-text-button v-if="!state.isWorkspaceMember && props.emptyData?.buttonText"
                        style-type="highlight"
                        @click="router.push(props.emptyData.to)"
         >
