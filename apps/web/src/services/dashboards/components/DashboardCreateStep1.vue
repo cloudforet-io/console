@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
+import { flatMapDeep, uniq } from 'lodash';
+
 import { PEmpty, PFieldTitle, PSearch } from '@cloudforet/mirinae';
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
@@ -48,6 +50,15 @@ const state = reactive({
             labels: d.labels,
         }));
     }),
+    allExistingLabels: computed(() => {
+        const OOTBTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
+        const dashboards: DashboardModel[] = storeState.isWorkspaceMember ? dashboardGetters.privateItems : dashboardGetters.allItems;
+        const existingTemplates = getFilteredTemplates(dashboards, '', [], []);
+        return uniq([
+            ...flatMapDeep(OOTBTemplates.map((d) => d.labels)),
+            ...flatMapDeep(existingTemplates.map((d) => d.labels)),
+        ]);
+    }),
 });
 
 const filterState = reactive({
@@ -90,7 +101,8 @@ onMounted(() => {
     <div class="dashboard-create-step-1">
         <p-search :value.sync="filterState.inputValue" />
         <div class="contents-container">
-            <dashboard-create-step1-search-filter @select-label="handleSelectLabels"
+            <dashboard-create-step1-search-filter :labels="state.allExistingLabels"
+                                                  @select-label="handleSelectLabels"
                                                   @select-provider="handleSelectProvider"
             />
             <div class="template-contents-area">
