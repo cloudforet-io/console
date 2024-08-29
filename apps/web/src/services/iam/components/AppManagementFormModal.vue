@@ -375,6 +375,13 @@ watch(() => storeState.isEdit, (isEdit) => {
             }
         }
     }
+    .project-select-dropdown {
+        .p-select-dropdown {
+            .dropdown-context-menu {
+                min-width: 25.875rem !important;
+            }
+        }
+    }
     .p-field-title .title-wrapper .title {
         width: 100%;
     }
