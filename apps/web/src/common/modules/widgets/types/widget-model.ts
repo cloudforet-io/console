@@ -1,5 +1,6 @@
 import type {
     DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN, DATA_TABLE_OPERATOR, JOIN_TYPE,
+    EVAL_EXPRESSION_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 
 export type WidgetType = string; // TODO: make this widget type enum
@@ -69,5 +70,13 @@ export interface AggregateOptions {
 
 export interface EvalOptions {
     data_table_id: string;
-    expressions: string[];
+    expressions: EvaluateExpression[];
 }
+
+export interface EvaluateExpression {
+    name: string;
+    field_type: EvaluateExpressionType;
+    expression: string;
+}
+
+export type EvaluateExpressionType = keyof typeof EVAL_EXPRESSION_TYPE;
