@@ -2267,6 +2267,8 @@
 		"ALT_E_TAG_FORMAT": "Invalid key:value format",
 		"APP": {
 			"ACTION": "Action",
+			"ALT_S_DISABLED_APP": "App successfully disabled",
+			"ALT_S_ENABLED_APP": "App successfully enabled",
 			"CREATE": "Create",
 			"DELETE": "Delete",
 			"DISABLE": "Disable",
