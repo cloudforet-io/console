@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router/composables';
 
 import { partition, sortBy } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PButton, PButtonTab, PIconButton,
 } from '@cloudforet/mirinae';
@@ -14,6 +15,9 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
@@ -37,12 +41,20 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'create'): void}>();
 const router = useRouter();
-
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 const state = reactive({
     isShowAll: false,
-    workspaceList: [] as WorkspaceModel[],
+    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceStoreGetters.workspaceList),
+    selectedGroupWorkspaceList: computed(() => {
+        if (state.activeTab === 'all') {
+            return state.workspaceList;
+        }
+        const selectedGroupsWorkspaceId = state.workspaceGroupList.find((group) => group.workspace_group_id === state.activeTab)?.workspaces || [];
+        return state.workspaceList.filter((workspace) => selectedGroupsWorkspaceId.includes(workspace.workspace_id));
+    }),
     workspaceBoardSets: computed<WorkspaceBoardSet[]>(() => {
-        const favoriteOrderList = sortBy(state.workspaceList, (workspaceItem) => {
+        const favoriteOrderList = sortBy(state.selectedGroupWorkspaceList, (workspaceItem) => {
             const correspondingAItem = props.favoriteList?.find((favoriteItem) => favoriteItem?.itemId === workspaceItem.workspace_id);
             return correspondingAItem ? props.favoriteList?.indexOf(correspondingAItem) : Infinity;
         });
@@ -58,17 +70,18 @@ const state = reactive({
     workspaceGroupList: [] as WorkspaceGroupModel[],
     workspaceFilterList: computed(() => [
         { label: i18n.t('LADING.ALL_WORKSPACE'), name: 'all' },
-        { label: 'test group 1', name: 'test1' },
-        { label: 'test group 2', name: 'test2' },
-        { label: 'test group 3', name: 'test3' },
-        { label: 'test group 4', name: 'test4' },
-        { label: 'test group 5', name: 'test5' },
         ...state.workspaceGroupList.map((group:WorkspaceGroupModel) => ({ label: group.name, name: group.workspace_group_id })),
     ]),
     activeTab: 'all',
     isAllWorkspaceTab: computed(() => state.activeTab === 'all'),
     isOverlayOpen: false,
     isButtonGroupOpened: false,
+    isShowAllVisible: computed(() => {
+        if (state.activeTab === 'all') {
+            return state.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.workspaceList.length;
+        }
+        return state.selectedGroupWorkspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.selectedGroupWorkspaceList.length;
+    }),
 });
 
 const handleClickShowAll = () => {
@@ -85,26 +98,17 @@ const handleOpenOverlay = (workspaceGroupId:string) => {
 
 
 const fetchWorkspaceGroupList = async () => {
-    // try {
-    //     const response = await SpaceConnector.clientV2.identity
-    //     state.workspaceGroupList = response;
-    // } catch (e) {
-    //     ErrorHandler.handleError(e);
-    // }
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaceGroups();
+        state.workspaceGroupList = results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
-const fetchWorkspaceList = async () => {
-    // try {
-    //     const response = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>();
-    //     state.workspaceList = response;
-    // } catch (e) {
-    //     console.error(e);
-    // }
-};
 
 (async () => {
     await fetchWorkspaceGroupList();
-    await fetchWorkspaceList();
 })();
 
 </script>
@@ -167,7 +171,7 @@ const fetchWorkspaceList = async () => {
                                  :is-domain-admin="props.isDomainAdmin"
         />
         <div class="show-more-button-wrapper">
-            <p-button v-if="state.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.workspaceList.length"
+            <p-button v-if="state.isShowAllVisible"
                       icon-right="ic_chevron-down"
                       style-type="transparent"
                       size="md"
