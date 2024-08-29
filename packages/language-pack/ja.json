@@ -1491,6 +1491,16 @@
 					"DATA_TABLE_NAME_SUCCESS": "データ名が正常に変更されました。",
 					"DATA_TABLE_NAME_WARNING": "この名前のデータはすでに存在します。",
 					"DATA_UNIT": "データ単位",
+					"EVAL": {
+						"DELETE_MODAL_DESC": "",
+						"DELETE_MODAL_TITLE": "",
+						"DELETE_SUCCESS_TOOLTIP": "",
+						"FIELD_FORMULA": "",
+						"FIELD_NAME": "",
+						"FIELD_TYPE": "",
+						"FORMULA_PLACEHOLDER": "",
+						"TITLE_PLACEHOLDER": ""
+					},
 					"EVAL_DESC": "データフィールドに関数や計算を適用します。",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day はフィールド名として使用できません。",
 					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "グループ名はフィールド名として使用できません。",

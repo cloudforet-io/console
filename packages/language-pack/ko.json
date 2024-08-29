@@ -1491,6 +1491,16 @@
 					"DATA_TABLE_NAME_SUCCESS": "데이터 이름 수정 완료",
 					"DATA_TABLE_NAME_WARNING": "동일한 이름의 데이터가 이미 존재합니다.",
 					"DATA_UNIT": "데이터 단위",
+					"EVAL": {
+						"DELETE_MODAL_DESC": "",
+						"DELETE_MODAL_TITLE": "",
+						"DELETE_SUCCESS_TOOLTIP": "",
+						"FIELD_FORMULA": "",
+						"FIELD_NAME": "",
+						"FIELD_TYPE": "",
+						"FORMULA_PLACEHOLDER": "",
+						"TITLE_PLACEHOLDER": ""
+					},
 					"EVAL_DESC": "데이터 필드에 함수나 계산을 적용합니다.",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day는 필드 이름으로 사용할 수 없습니다.",
 					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "Group by로 사용 중인 명칭은 필드 이름으로 사용할 수 없습니다. ",
