@@ -3,13 +3,16 @@ import { computed, reactive, watch } from 'vue';
 
 import { cloneDeep, isEmpty } from 'lodash';
 
+import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
     PToolboxTable, PSelectDropdown, PStatus, PCopyButton, PBadge, PI,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
@@ -38,7 +41,7 @@ import {
 } from '@/services/iam/composables/refined-table-data';
 import {
     APP_DROPDOWN_MODAL_TYPE,
-    APP_SEARCH_HANDLERS,
+    APP_STATE,
 } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 
@@ -58,19 +61,48 @@ const appPageState = appPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
-const appListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(appPageState.pageStart).setPageLimit(appPageState.pageLimit)
-    .setSort('name', true);
-let appListApiQuery = appListApiQueryHelper.data;
-const queryTagHelper = useQueryTags({ keyItemSets: APP_SEARCH_HANDLERS.keyItemSets });
-const { queryTags } = queryTagHelper;
-
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
     userId: computed(() => store.state.user.userId),
     projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceGetters.projectGroup),
+});
+const tableState = reactive({
+    roleTypeFilter: computed<ApiFilter>(() => (storeState.isAdminMode ? { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'eq' } : { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'not' })),
+    appSearchHandlers: computed(() => ({
+        keyItemSets: [
+            {
+                title: 'Properties',
+                items: [
+                    { name: 'name', label: 'Name' },
+                    { name: 'state', label: 'State' },
+                    { name: 'app_id', label: 'App ID' },
+                    { name: 'role_id', label: 'Role ID' },
+                    {
+                        name: 'last_accessed_at',
+                        label: 'Last Activity',
+                        dataType: 'datetime',
+                    },
+                ],
+            },
+            {
+                title: 'Advanced',
+                items: [{
+                    name: 'tags',
+                    label: 'Tags',
+                    dataType: 'object',
+                }],
+            }] as KeyItemSet[],
+        valueHandlerMap: {
+            name: makeDistinctValueHandler('identity.App', 'name', 'string', [tableState.roleTypeFilter]),
+            state: makeEnumValueHandler(APP_STATE),
+            app_id: makeDistinctValueHandler('identity.App', 'app_id', 'string', [tableState.roleTypeFilter]),
+            role_id: makeDistinctValueHandler('identity.App', 'role_id', 'string', [tableState.roleTypeFilter]),
+            last_accessed_at: makeDistinctValueHandler('identity.App', 'last_accessed_at', 'datetime', [tableState.roleTypeFilter]),
+            tags: makeDistinctValueHandler('identity.App', 'tags', 'object', [tableState.roleTypeFilter]),
+        },
+    })),
 });
 const state = reactive({
     loading: false,
@@ -154,6 +186,13 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         ,
     },
 ]));
+
+const appListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(appPageState.pageStart).setPageLimit(appPageState.pageLimit)
+    .setSort('name', true);
+let appListApiQuery = appListApiQueryHelper.data;
+const queryTagHelper = useQueryTags({ keyItemSets: tableState.appSearchHandlers.keyItemSets });
+const { queryTags } = queryTagHelper;
 
 /* Component */
 const handleSelectDropdown = (name) => {
@@ -243,10 +282,12 @@ const getListApps = async () => {
     state.loading = true;
     try {
         appListApiQueryHelper
-            .setFilters(queryTagHelper.filters.value);
+            .setFilters([
+                ...queryTagHelper.filters.value,
+                storeState.isAdminMode ? { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '=' } : { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '!=' },
+            ]);
         await appPageStore.listApps({
-            query: appListApiQuery,
-            role_type: !storeState.isAdminMode && ROLE_TYPE.WORKSPACE_OWNER || ROLE_TYPE.DOMAIN_ADMIN,
+            query: appListApiQueryHelper.data,
         });
     } finally {
         state.loading = false;
@@ -276,8 +317,8 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
                          :fields="state.fields"
                          sort-by="name"
                          :select-index="appPageState.selectedIndex"
-                         :key-item-sets="APP_SEARCH_HANDLERS.keyItemSets"
-                         :value-handler-map="APP_SEARCH_HANDLERS.valueHandlerMap"
+                         :key-item-sets="tableState.appSearchHandlers.keyItemSets"
+                         :value-handler-map="tableState.appSearchHandlers.valueHandlerMap"
                          :sort-desc="true"
                          :total-count="appPageState.totalCount"
                          :query-tags="queryTags"

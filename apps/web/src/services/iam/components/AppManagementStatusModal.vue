@@ -8,6 +8,7 @@ import { cloneDeep } from 'lodash';
 import {
     PButtonModal, PDefinitionTable, PI, PStatus,
 } from '@cloudforet/mirinae';
+import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { AppModel } from '@/schema/identity/app/model';
@@ -77,18 +78,19 @@ const state = reactive({
 });
 
 const definitionFields = computed(() => {
-    const defaultFields = [
+    const projectFields: DefinitionField[] = [];
+    if (appPageStore.selectedApp.project_group_id || appPageStore.selectedApp.project_id) {
+        projectFields.push({ label: i18n.t('IAM.APP.MODAL.COL_PROJECT'), name: 'project' });
+    }
+    return [
         { label: i18n.t('IAM.APP.MODAL.COL_NAME'), name: 'name' },
         { label: i18n.t('IAM.APP.MODAL.COL_STATE'), name: 'state' },
         { label: i18n.t('IAM.APP.MODAL.COL_APP_ID'), name: 'app_id' },
+        ...projectFields,
         { label: i18n.t('IAM.APP.MODAL.COL_ROLE_ID'), name: 'role_id' },
         { label: i18n.t('IAM.APP.MODAL.COL_LASTED_AT'), name: 'last_accessed_at' },
         { label: i18n.t('IAM.APP.MODAL.COL_EXPIRED_AT'), name: 'expired_at' },
     ];
-    if (appPageStore.selectedApp.project_group_id || appPageStore.selectedApp.project_id) {
-        defaultFields.push({ label: i18n.t('IAM.APP.MODAL.COL_PROJECT'), name: 'project' });
-    }
-    return defaultFields;
 });
 
 /* Component */
@@ -139,7 +141,7 @@ const checkModalConfirm = async () => {
     >
         <template #body>
             <p-definition-table :fields="definitionFields"
-                                :data="appPageStore.selectedApp"
+                                :data="state.selectedApp"
                                 :skeleton-rows="6"
                                 block
                                 disable-copy
@@ -149,7 +151,7 @@ const checkModalConfirm = async () => {
                               class="capitalize"
                     />
                 </template>
-                <template #data-project_info="{value}">
+                <template #data-project="{value}">
                     <div v-if="value"
                          class="col-project"
                     >
