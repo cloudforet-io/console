@@ -2408,7 +2408,7 @@
 			"DELETE": "Delete",
 			"DETAIL": {
 				"ALL_PERMISSIONS": "This role has full permission.",
-				"API_POLICY": "API Policy",
+				"API_POLICY": "API Policy Attachement",
 				"BASE_INFORMATION": "Base Information",
 				"CREATED_AT": "Created",
 				"DESCRIPTION": "Description",

@@ -2408,7 +2408,7 @@
 			"DELETE": "削除",
 			"DETAIL": {
 				"ALL_PERMISSIONS": "この役割にはフル権限があります。",
-				"API_POLICY": "APIポリシー",
+				"API_POLICY": "",
 				"BASE_INFORMATION": "基本情報",
 				"CREATED_AT": "作成日",
 				"DESCRIPTION": "説明",

@@ -2408,7 +2408,7 @@
 			"DELETE": "삭제",
 			"DETAIL": {
 				"ALL_PERMISSIONS": "도메인 전체 권한을 가짐. ",
-				"API_POLICY": "API 정책(Policy)",
+				"API_POLICY": "",
 				"BASE_INFORMATION": "기본 정보",
 				"CREATED_AT": "생성일",
 				"DESCRIPTION": "설명",
