@@ -8,4 +8,6 @@ export interface AppCreateParameters {
     expired_at?: string;
     resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     workspace_id?: string;
+    project_group_id?: string;
+    project_id?: string;
 }
