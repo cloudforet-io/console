@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router/composables';
 
 import { partition, sortBy } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PButton, PButtonTab, PIconButton,
 } from '@cloudforet/mirinae';
@@ -15,9 +14,9 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
@@ -43,6 +42,8 @@ const emit = defineEmits<{(e: 'create'): void}>();
 const router = useRouter();
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
+const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
+const userWorkspaceGroupStoreGetters = userWorkspaceGroupStore.getters;
 const state = reactive({
     isShowAll: false,
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceStoreGetters.workspaceList),
@@ -67,7 +68,7 @@ const state = reactive({
             rounded: true,
         }));
     }),
-    workspaceGroupList: [] as WorkspaceGroupModel[],
+    workspaceGroupList: computed(() => userWorkspaceGroupStoreGetters.workspaceGroupList),
     workspaceFilterList: computed(() => [
         { label: i18n.t('LADING.ALL_WORKSPACE'), name: 'all' },
         ...state.workspaceGroupList.map((group:WorkspaceGroupModel) => ({ label: group.name, name: group.workspace_group_id })),
@@ -91,24 +92,12 @@ const handleClickShowAll = () => {
 const handleClickButtonGroupToggle = () => {
     state.isButtonGroupOpened = !state.isButtonGroupOpened;
 };
-const handleOpenOverlay = (workspaceGroupId:string) => {
-    console.log(workspaceGroupId);
+const handleOpenOverlay = () => {
     state.isOverlayOpen = true;
 };
 
-
-const fetchWorkspaceGroupList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaceGroups();
-        state.workspaceGroupList = results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-
 (async () => {
-    await fetchWorkspaceGroupList();
+    await userWorkspaceGroupStore.load();
 })();
 
 </script>
@@ -152,7 +141,7 @@ const fetchWorkspaceGroupList = async () => {
                           style-type="tertiary"
                           size="md"
                           icon-left="ic_settings"
-                          @click="handleOpenOverlay(state.activeTab)"
+                          @click="handleOpenOverlay"
                 >
                     {{ $t('LADING.SETTINGS') }}
                 </p-button>
