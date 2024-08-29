@@ -20,6 +20,8 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo, peacock } from '@/styles/colors';
@@ -110,8 +112,10 @@ const checkModalConfirm = async () => {
             await appPageStore.deleteApp({ app_id: appPageStore.selectedApp.app_id });
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
             await appPageStore.enableApp({ app_id: appPageStore.selectedApp.app_id });
+            showSuccessMessage(i18n.t('IAM.APP.ALT_S_ENABLED_APP'), '');
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
             await appPageStore.disableApp({ app_id: appPageStore.selectedApp.app_id });
+            showSuccessMessage(i18n.t('IAM.APP.ALT_S_DISABLED_APP'), '');
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
             const res = await appPageStore.regenerateApp({ app_id: appPageStore.selectedApp.app_id });
             emit('confirm', res);
