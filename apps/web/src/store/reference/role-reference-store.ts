@@ -7,31 +7,33 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import type { RoleModel } from '@/schema/identity/role/model';
-// eslint-disable-next-line import/no-cycle
-import { store } from '@/store';
+import type { RoleListBasicRoleParameters } from '@/schema/identity/role/api-verbs/list-basic-role';
+import type { BasicRoleModel, RoleModel } from '@/schema/identity/role/model';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
-export type RoleItem = Required<Pick<ReferenceItem<RoleModel>, 'key'|'label'|'name'>>;
+
+export type RoleItem = Required<Pick<ReferenceItem<RoleModel|BasicRoleModel>, 'key'|'label'|'name'|'data'>>;
 export type RoleReferenceMap = ReferenceMap<RoleItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useRoleReferenceStore = defineStore('reference-role', () => {
+    const appContextStore = useAppContextStore();
     const state = reactive({
         items: null as RoleReferenceMap | null,
     });
 
     const getters = reactive({
         roleItems: asyncComputed<RoleReferenceMap>(async () => {
-            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),
@@ -57,19 +59,29 @@ export const useRoleReferenceStore = defineStore('reference-role', () => {
                 only: ['name', 'role_id', 'role_type'],
             },
         };
+        let res: ListResponse<RoleModel|BasicRoleModel> | undefined;
+        try {
+            if (appContextStore.getters.isUserMode) {
+                res = await SpaceConnector.clientV2.identity.role.listBasicRole<RoleListBasicRoleParameters, ListResponse<BasicRoleModel>>(params);
+            } else {
+                res = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
+            }
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        }
 
-        const res = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
 
         const roleReferenceMap: RoleReferenceMap = {};
 
-        res.results?.forEach((role) => {
+        res?.results?.forEach((role) => {
             roleReferenceMap[role.role_id] = {
                 key: role.role_id,
                 label: role.name,
                 name: role.name,
+                data: role,
             };
         });
-
+        console.log(roleReferenceMap);
         state.items = roleReferenceMap;
         lastLoadedTime = currentTime;
     };
@@ -81,6 +93,7 @@ export const useRoleReferenceStore = defineStore('reference-role', () => {
                 key: role.role_id,
                 label: role.name,
                 name: role.name,
+                data: role,
             },
         };
     };
