@@ -7,6 +7,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { i18n } from '@/translations';
 
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { GroupByOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type {
     GroupByValue,
     TableDataFieldValue,
@@ -40,7 +41,13 @@ export const useWidgetOptionValidation = ({
         optionsInvalid: false,
         optionsInvalidText: computed(() => {
             if (_state.widgetConfig.widgetName === 'geoMap') {
-                return i18n.t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_DESC_GEO_MAP');
+                const fixedVal = (_state.widgetConfig.requiredFieldsSchema.groupBy?.options as GroupByOptions)?.fixedValue;
+                const val = (_state.valueMap?.groupBy as GroupByValue)?.value;
+                if (fixedVal) {
+                    if ((Array.isArray(val) && !val.includes(fixedVal)) || val !== fixedVal) {
+                        return i18n.t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_DESC_GEO_MAP');
+                    }
+                }
             }
             return i18n.t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_DESC');
         }),

@@ -55,7 +55,8 @@ const state = reactive({
         if (!state.hideCount && !state.proxyValue?.count) return false;
         if (state.multiselectable && !state.selectedItem?.length) return false;
         if (state.fixedValue) {
-            return state.selectedItem.map((d) => d.name).include(state.fixedValue) || state.selectedItem === state.fixedValue;
+            if (Array.isArray(state.selectedItem)) return state.selectedItem?.map((d) => d.name).include(state.fixedValue);
+            return state.selectedItem === state.fixedValue;
         }
         return !!state.selectedItem;
     }),
