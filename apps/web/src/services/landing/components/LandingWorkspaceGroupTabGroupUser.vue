@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+    computed,
     reactive,
 } from 'vue';
 
@@ -10,8 +11,9 @@ import {
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE } from '@/schema/identity/role/constant';
+import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { BasicRoleModel, RoleModel } from '@/schema/identity/role/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
@@ -28,7 +30,6 @@ const landingPageStore = useLandingPageStore();
 const landingPageStoreGetter = landingPageStore.getters;
 const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
 
-
 const tableState = reactive({
     fields: [
         { name: 'user_id', label: 'User ID' },
@@ -37,6 +38,9 @@ const tableState = reactive({
         { name: 'role', label: 'Role' },
         { name: 'remove_button', label: ' ', sortable: false },
     ],
+    loginUserId: computed(() => store.state.user.userId),
+    loginUserRoleType: computed(() => landingPageStoreGetter.workspaceGroupUsers.find((user) => user.user_id === tableState.loginUserId).role_type),
+    isUserOwnerRole: computed(() => store.state.user.roleType === ROLE_TYPE.DOMAIN_ADMIN || tableState.loginUserRoleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 
 const {
@@ -131,7 +135,9 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
                    heading-type="sub"
         >
             <template #extra>
-                <div class="workspace-group-tab-group-user-button-wrapper">
+                <div v-if="tableState.isUserOwnerRole"
+                     class="workspace-group-tab-group-user-button-wrapper"
+                >
                     <p-button style-type="negative-primary"
                               :disabled="!landingPageStoreGroupUserState.selectedIndices.length"
                               @click="handleSelectedGroupUsersRemoveButtonClick"
@@ -180,6 +186,7 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
                     >
                     <span>{{ useRoleFormatter(item.role_type).name }}</span>
                     <p-select-dropdown
+                        v-if="tableState.isUserOwnerRole"
                         is-filterable
                         use-fixed-menu-style
                         style-type="transparent"
@@ -216,7 +223,8 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
                 </span>
             </template>
             <template #col-remove_button-format="{ item }">
-                <p-button size="sm"
+                <p-button v-if="tableState.isUserOwnerRole"
+                          size="sm"
                           style-type="tertiary"
                           @click.stop="() => handleSelectedGroupUserRemoveButtonClick(item)"
                 >

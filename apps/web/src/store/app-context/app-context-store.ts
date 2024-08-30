@@ -21,6 +21,7 @@ export const useAppContextStore = defineStore('app-context-store', () => {
         isAdminMode: computed<boolean>(() => state.isAdminMode),
         globalGrantLoading: computed<boolean>(() => state.globalGrantLoading),
         workspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+        isUserMode: computed(() => !state.isAdminMode && userWorkspaceStore.getters.currentWorkspaceId !== undefined),
     });
 
     const actions = {
