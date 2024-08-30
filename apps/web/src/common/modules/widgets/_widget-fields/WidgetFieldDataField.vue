@@ -33,8 +33,8 @@ const state = reactive({
     selectedItem: undefined as undefined | MenuItem[] | string,
     isValid: computed<boolean>(() => {
         if (state.menuItems.length === 0) return false;
-        if (Array.isArray(state.selectedItem)) {
-            return !!state.selectedItem.length;
+        if (props.widgetFieldSchema?.options?.multiSelectable) {
+            return Array.isArray(state.selectedItem) && !!state.selectedItem?.length;
         }
         return !!state.selectedItem;
     }),

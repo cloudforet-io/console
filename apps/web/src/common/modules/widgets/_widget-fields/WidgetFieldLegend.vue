@@ -12,8 +12,7 @@ import type { LegendOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit
 import type { LegendValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const emit = defineEmits<WidgetFieldComponentEmit<boolean|undefined>>();
-
+const emit = defineEmits<WidgetFieldComponentEmit<LegendValue>>();
 const props = withDefaults(defineProps<WidgetFieldComponentProps<LegendOptions, LegendValue>>(), {
     widgetFieldSchema: () => ({
         options: {

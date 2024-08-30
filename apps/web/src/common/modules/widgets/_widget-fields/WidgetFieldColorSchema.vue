@@ -38,6 +38,7 @@ const state = reactive({
         name: key,
         label: key,
     }))),
+    isValid: computed<boolean>(() => !!state.proxyValue?.colorValue?.length && !!state.proxyValue?.colorName),
 });
 
 const handleClickColor = (color: ColorSchemaMenuItem) => {
@@ -49,8 +50,10 @@ const handleClickColor = (color: ColorSchemaMenuItem) => {
     };
 };
 
-watch(() => state.proxyValue, (value) => {
-    emit('update:is-valid', value?.colorName !== undefined);
+watch(() => state.proxyValue, () => {
+}, { immediate: true });
+watch(() => state.isValid, (isValid) => {
+    emit('update:is-valid', isValid);
 }, { immediate: true });
 
 const initValue = () => {

@@ -37,7 +37,7 @@ const state = reactive({
     proxyValue: useProxyValue<AdvancedFormatRulesValue>('value', props, emit),
     baseColor: computed<string>(() => state.proxyValue?.baseColor ?? props.widgetFieldSchema?.options?.baseColor ?? DEFAULT_BASE_COLOR),
     type: computed<AdvancedFormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as AdvancedFormatRulesType),
-    isAllValid: computed<boolean>(() => {
+    isValid: computed<boolean>(() => {
         if (!state.proxyValue) return false;
         if (state.type === ADVANCED_FORMAT_RULE_TYPE.textThreshold) {
             return state.proxyValue.value.every((d) => !!d.text && !!d.threshold && !!d.color);
@@ -77,7 +77,7 @@ const handleUpdateField = (val: string) => {
 };
 
 /* Watcher */
-watch(() => state.isAllValid, (isValid) => {
+watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
 }, { immediate: true });
 watch(() => labelsMenuItem.value, (menuItem) => {
