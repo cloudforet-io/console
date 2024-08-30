@@ -88,9 +88,11 @@ const state = reactive({
     }))),
     isValid: computed<boolean>(() => {
         if (state.menuItems.length === 0) return false;
-        if (state.proxyValue.fieldType === 'dynamicField' && !state.proxyValue.dynamicFieldValue?.length) return false;
-        if (Array.isArray(state.selectedItem)) {
-            return !!state.selectedItem.length;
+        if (state.proxyValue.fieldType === 'dynamicField') {
+            return !!state.proxyValue?.criteria && !!state.proxyValue.value;
+        }
+        if (state.proxyValue.fieldType === 'staticField') {
+            return !!state.proxyValue?.value?.length;
         }
         return !!state.selectedItem;
     }),
@@ -198,7 +200,7 @@ const handleClearDynamicFieldsSelection = () => {
 /* Watcher */
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
-});
+}, { immediate: true });
 const convertToMenuItem = (data?: string[]) => data?.map((d) => ({
     name: d,
     label: d,

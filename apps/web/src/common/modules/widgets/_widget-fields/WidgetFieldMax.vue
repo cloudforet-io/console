@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
@@ -8,7 +10,6 @@ import type { MaxOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } 
 
 
 const emit = defineEmits<WidgetFieldComponentEmit<number>>();
-
 const props = withDefaults(defineProps<WidgetFieldComponentProps<MaxOptions, number>>(), {
     widgetFieldSchema: () => ({
         options: {
@@ -19,12 +20,17 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<MaxOptions, num
 
 const state = reactive({
     proxyValue: useProxyValue<number>('value', props, emit),
+    isValid: computed<boolean>(() => typeof state.proxyValue === 'number'),
 });
 
 const handleUpdateValue = (value: string|'') => {
     const parsedValue = value === '' ? 0 : parseInt(value);
     state.proxyValue = (parsedValue < 0) ? 0 : parsedValue;
 };
+
+watch(() => state.isValid, (isValid) => {
+    emit('update:is-valid', isValid);
+}, { immediate: true });
 
 onMounted(() => {
     emit('update:is-valid', true);

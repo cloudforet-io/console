@@ -54,7 +54,9 @@ const state = reactive({
     isValid: computed<boolean>(() => {
         if (!state.hideCount && !state.proxyValue?.count) return false;
         if (state.multiselectable && !state.selectedItem?.length) return false;
-        if (state.fixedValue) return state.selectedItem?.[0]?.label === state.fixedValue || state.selectedItem === state.fixedValue;
+        if (state.fixedValue) {
+            return state.selectedItem.map((d) => d.name).include(state.fixedValue) || state.selectedItem === state.fixedValue;
+        }
         return !!state.selectedItem;
     }),
     max: computed(() => props.widgetFieldSchema?.options?.max),
@@ -88,7 +90,7 @@ const handleUpdateCount = (val: number) => {
 /* Watcher */
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
-});
+}, { immediate: true });
 
 const convertToMenuItem = (data?: string[]) => data?.map((d) => ({
     name: d,
