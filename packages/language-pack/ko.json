@@ -1499,7 +1499,9 @@
 						"FIELD_NAME": "",
 						"FIELD_TYPE": "",
 						"FORMULA_PLACEHOLDER": "",
-						"TITLE_PLACEHOLDER": ""
+						"TITLE_PLACEHOLDER": "",
+						"TYPE_DATA_FIELD": "",
+						"TYPE_LABEL_FIELD": ""
 					},
 					"EVAL_DESC": "데이터 필드에 함수나 계산을 적용합니다.",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day는 필드 이름으로 사용할 수 없습니다.",
