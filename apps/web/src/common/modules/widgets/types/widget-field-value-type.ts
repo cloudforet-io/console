@@ -38,7 +38,7 @@ export interface FormatRulesValue {
 }
 export interface AdvancedFormatRulesValue {
     field?: string;
-    rules: FormatRulesValue[];
+    value: FormatRulesValue[];
     baseColor?: string;
 }
 export interface LineByValue {
@@ -162,4 +162,4 @@ export type WidgetFieldValues = string | string[] | number | boolean | Compariso
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
     | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
     | DisplayAnnotationValue | DisplaySeriesLabelValue | TextWrapValue | TableColumnWidthValue | CustomTableColumnWidthValue
-    | LegendValue | WidgetHeightValue | MissingValueValue;
+    | LegendValue | WidgetHeightValue | MissingValueValue | AdvancedFormatRulesValue;

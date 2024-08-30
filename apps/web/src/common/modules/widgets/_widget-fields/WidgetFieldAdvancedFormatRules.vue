@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { cloneDeep } from 'lodash';
@@ -38,12 +38,13 @@ const state = reactive({
     baseColor: computed<string>(() => state.proxyValue?.baseColor ?? props.widgetFieldSchema?.options?.baseColor ?? DEFAULT_BASE_COLOR),
     type: computed<AdvancedFormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as AdvancedFormatRulesType),
     isAllValid: computed<boolean>(() => {
-        if (!state.proxyValue || !state.proxyValue?.rules) return false;
+        if (!state.proxyValue) return false;
         if (state.type === ADVANCED_FORMAT_RULE_TYPE.textThreshold) {
-            return state.proxyValue.rules.every((d) => !!d.text && !!d.threshold && !!d.color);
+            return state.proxyValue.value.every((d) => !!d.text && !!d.threshold && !!d.color);
         }
         if (!state.proxyValue.field) return false;
-        return state.proxyValue.rules.every((d) => !!d.text && !!d.color);
+        if (state.proxyValue?.value) return state.proxyValue.value.every((d) => !!d.text && !!d.color);
+        return true;
     }),
 });
 
@@ -55,18 +56,18 @@ const handleClickAddRule = () => {
     }
     state.proxyValue = {
         ...state.proxyValue,
-        rules: [...state.proxyValue.rules, _newRule],
+        value: [...state.proxyValue.value, _newRule],
     };
 };
 const handleDelete = (idx: number) => {
-    const _rules = cloneDeep(state.proxyValue.rules);
-    _rules.splice(idx, 1);
-    state.proxyValue = { ...state.proxyValue, rules: _rules };
+    const _value = cloneDeep(state.proxyValue.value);
+    _value.splice(idx, 1);
+    state.proxyValue = { ...state.proxyValue, value: _value };
 };
 const handleFormatRuleInput = (idx: number|string, key: 'text'|'threshold'|'color', val: string) => {
-    const _rules = cloneDeep(state.proxyValue.rules);
-    _rules[idx][key] = val;
-    state.proxyValue = { ...state.proxyValue, rules: _rules };
+    const _value = cloneDeep(state.proxyValue.value);
+    _value[idx][key] = val;
+    state.proxyValue = { ...state.proxyValue, value: _value };
 };
 const handleBaseColor = (val: string) => {
     state.proxyValue = { ...state.proxyValue, baseColor: val };
@@ -81,24 +82,11 @@ watch(() => state.isAllValid, (isValid) => {
 }, { immediate: true });
 watch(() => labelsMenuItem.value, (menuItem) => {
     if (menuItem?.length && state.type === ADVANCED_FORMAT_RULE_TYPE.field && !state.proxyValue?.field) {
-        const _defaultIndex = getDefaultMenuItemIndex(labelsMenuItem.value, state.proxyValue?.field, true);
-        const _selectedValue = getInitialSelectedMenuItem(labelsMenuItem.value, state.proxyValue?.field, _defaultIndex);
+        const _defaultIndex = getDefaultMenuItemIndex(menuItem, state.proxyValue?.field, true);
+        const _selectedValue = getInitialSelectedMenuItem(menuItem, state.proxyValue?.field, _defaultIndex);
         state.proxyValue = { ...state.proxyValue, field: _selectedValue };
     }
-});
-
-/* LifeCycle */
-onMounted(() => {
-    const _value: AdvancedFormatRulesValue = {
-        baseColor: props.value?.baseColor ?? props.widgetFieldSchema?.options?.baseColor ?? DEFAULT_BASE_COLOR,
-        rules: props.value?.rules ?? [],
-    };
-    if (state.type === ADVANCED_FORMAT_RULE_TYPE.field) {
-        _value.field = props.value?.field;
-    }
-    state.proxyValue = _value;
-});
-
+}, { immediate: true });
 </script>
 
 <template>
@@ -132,7 +120,7 @@ onMounted(() => {
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ADD_RULE') }}
                 </p-button>
                 <div class="custom-menu-box">
-                    <div v-for="(rule, idx) in state.proxyValue?.rules"
+                    <div v-for="(rule, idx) in state.proxyValue?.value"
                          :key="`advanced-format-rule-${rule.color}-${idx}`"
                          class="format-rules-input-wrapper"
                     >
