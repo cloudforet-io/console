@@ -7,10 +7,10 @@ import type { TranslateResult } from 'vue-i18n';
 import { i18n } from '@/translations';
 
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type { DataFieldOptions, GroupByOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type {
-    WidgetFieldValues, TableDataFieldValue, GroupByValue, FormatRulesValue,
-    ColorSchemaValue,
+    GroupByValue,
+    TableDataFieldValue,
+    WidgetFieldValues,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
@@ -39,58 +39,11 @@ export const useWidgetOptionValidation = ({
     const state = reactive({
         optionsInvalid: false,
         optionsInvalidText: computed(() => {
-            if (_state.widgetConfig.widgetName === 'geoMap' && getRequiredFieldValidation(_state.valueMap, _state.widgetConfig)) {
+            if (_state.widgetConfig.widgetName === 'geoMap') {
                 return i18n.t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_DESC_GEO_MAP');
             }
             return i18n.t('COMMON.WIDGETS.FORM.WIDGET_VALIDATION_WARNING_DESC');
         }),
-    });
-
-    const getRequiredFieldValidation = (valueMap: OptionsValueMap, config: WidgetConfig) => _state.requiredFields.some((field) => {
-        const fieldValue = valueMap[field];
-        if (field === 'granularity') {
-            return !fieldValue;
-        }
-        if (field === 'dataField') {
-            const isMultiSelectable = (config.requiredFieldsSchema[field]?.options as DataFieldOptions)?.multiSelectable;
-            return isMultiSelectable && Array.isArray(fieldValue) ? !fieldValue.length : !fieldValue;
-        }
-        if (field === 'groupBy') {
-            const fixedValue = (config.requiredFieldsSchema.groupBy?.options as GroupByOptions)?.fixedValue;
-            if (fixedValue) {
-                return !fieldValue?.value || fieldValue?.value !== fixedValue;
-            }
-            return Array.isArray(fieldValue?.value) ? !fieldValue?.value.length : !fieldValue?.value;
-        }
-        if (field === 'tableDataField') {
-            const tableDataFieldValue = fieldValue as TableDataFieldValue;
-            if (tableDataFieldValue?.fieldType === 'dynamicField') {
-                return !tableDataFieldValue.criteria || !tableDataFieldValue.value;
-            }
-            if (tableDataFieldValue?.fieldType === 'staticField') {
-                return !tableDataFieldValue.value?.length;
-            }
-            return false;
-        }
-        if (field === 'min' || field === 'max') {
-            return fieldValue === undefined;
-        }
-        if (field === 'formatRules') {
-            const formatRulesValue = fieldValue as FormatRulesValue[];
-            return formatRulesValue.some((rule) => rule.threshold === undefined);
-        }
-        if (field === 'advancedFormatRules') {
-            return fieldValue === undefined;
-        }
-        if (field === 'colorSchema') {
-            const colorSchemaValue = fieldValue as ColorSchemaValue;
-            return !colorSchemaValue.colorValue.length || !colorSchemaValue.colorName;
-        }
-        if (field === 'pieChartType') {
-            return !fieldValue;
-        }
-
-        return Array.isArray(fieldValue?.value) ? !fieldValue?.value.length : !fieldValue?.value;
     });
 
     const getDuplicatedLabelInfoValidation = (valueMap: OptionsValueMap, config: WidgetConfig) => {
@@ -122,10 +75,7 @@ export const useWidgetOptionValidation = ({
 
     const checkWidgetOptionsFieldsValidation = (valueMap: OptionsValueMap, config: WidgetConfig) => {
         if (!_state.requiredFields.every((field) => Object.keys(valueMap).includes(field))) return;
-        const requiredFieldInvalid = getRequiredFieldValidation(valueMap, config);
-        const duplicatedLabelInfo = getDuplicatedLabelInfoValidation(valueMap, config);
-
-        state.optionsInvalid = requiredFieldInvalid || duplicatedLabelInfo;
+        state.optionsInvalid = getDuplicatedLabelInfoValidation(valueMap, config);
     };
 
     watch([() => _state.valueMap, () => _state.widgetConfig], ([changedValueMap, config]) => {
