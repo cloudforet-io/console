@@ -17,6 +17,11 @@ jobs:
   Deploy-Production:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 0
       - uses: actions/checkout@v2
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
