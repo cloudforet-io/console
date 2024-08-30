@@ -52,7 +52,12 @@ const handleUpdateForm = (value: PageAccessMenuItem, isInit?: boolean) => {
     const { id: menuId, isAccessible, accessType } = value;
     const item = find(menuItems.value, { id: menuId });
     if (item) {
-        if (accessType) item.accessType = accessType;
+        if (accessType) {
+            item.accessType = accessType;
+            item.subMenuList?.forEach((d) => {
+                d.isAccessible = true;
+            });
+        }
         if (isInit && item.subMenuList?.length === 0) {
             item.subMenuList?.push({
                 id: item.id,
