@@ -79,6 +79,9 @@ export const useWidgetOptionValidation = ({
             const formatRulesValue = fieldValue as FormatRulesValue[];
             return formatRulesValue.some((rule) => rule.threshold === undefined);
         }
+        if (field === 'advancedFormatRules') {
+            return fieldValue === undefined;
+        }
         if (field === 'colorSchema') {
             const colorSchemaValue = fieldValue as ColorSchemaValue;
             return !colorSchemaValue.colorValue.length || !colorSchemaValue.colorName;
