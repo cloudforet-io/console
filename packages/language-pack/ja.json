@@ -2267,8 +2267,8 @@
 		"ALT_E_TAG_FORMAT": "無効な「キー：値」形式です",
 		"APP": {
 			"ACTION": "作業",
-			"ALT_S_DISABLED_APP": "",
-			"ALT_S_ENABLED_APP": "",
+			"ALT_S_DISABLED_APP": "アプリが正常に無効化されました",
+			"ALT_S_ENABLED_APP": "アプリが正常に有効化されました",
 			"CREATE": "作成",
 			"DELETE": "削除",
 			"DISABLE": "無効化",

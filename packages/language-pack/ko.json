@@ -2267,8 +2267,8 @@
 		"ALT_E_TAG_FORMAT": "유효하지 않은 ‘키:값’ 형식 입니다.",
 		"APP": {
 			"ACTION": "작업",
-			"ALT_S_DISABLED_APP": "",
-			"ALT_S_ENABLED_APP": "",
+			"ALT_S_DISABLED_APP": "앱 비활성화 완료",
+			"ALT_S_ENABLED_APP": "앱 활성화 완료",
 			"CREATE": "생성",
 			"DELETE": "삭제",
 			"DISABLE": "비활성화",
