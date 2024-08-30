@@ -357,4 +357,11 @@ const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
         @apply col-span-6;
     }
 }
+
+/* custom design-system component - p-heading */
+:deep(.p-heading) {
+    .title {
+        font-size: 1.125rem;
+    }
+}
 </style>
