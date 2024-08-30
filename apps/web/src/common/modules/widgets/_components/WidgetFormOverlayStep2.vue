@@ -19,7 +19,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
-import { useWidgetOptionValidation } from '@/common/modules/widgets/_composables/use-widget-option-validation';
+import { useWidgetOptionsComplexValidation } from '@/common/modules/widgets/_composables/use-widget-options-complex-validation';
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -83,7 +83,7 @@ const state = reactive({
     disableApplyButton: computed<boolean>(() => {
         if (!widgetGenerateGetters.isAllWidgetFormValid) return true;
         const _isWidgetInactive = widgetGenerateState.widget?.state === 'INACTIVE';
-        return (!_isWidgetInactive && !state.isWidgetFieldChanged) || optionsInvalid.value;
+        return (!_isWidgetInactive && !state.isWidgetFieldChanged) || widgetOptionsInvalid.value;
     }),
     //
     varsSnapshot: {} as DashboardVars,
@@ -92,9 +92,9 @@ const state = reactive({
 });
 
 const {
-    optionsInvalid,
-    optionsInvalidText,
-} = useWidgetOptionValidation({
+    invalid: widgetOptionsInvalid,
+    invalidText: widgetOptionsInvalidText,
+} = useWidgetOptionsComplexValidation({
     optionValueMap: computed(() => widgetGenerateState.widgetFormValueMap),
     widgetConfig: computed(() => state.widgetConfig),
 });
@@ -267,8 +267,8 @@ onUnmounted(() => {
             </div>
         </div>
         <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'"
-                                               :widget-validation-invalid="optionsInvalid"
-                                               :widget-validation-invalid-text="optionsInvalidText"
+                                               :widget-validation-invalid="widgetOptionsInvalid"
+                                               :widget-validation-invalid-text="widgetOptionsInvalidText"
         />
         <portal to="apply-button">
             <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"

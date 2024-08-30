@@ -22,11 +22,11 @@ interface WidgetOptionValidationProps {
 }
 
 interface WidgetOptionValidationReturnType {
-    optionsInvalid: Ref<boolean>;
-    optionsInvalidText: Ref<string|TranslateResult>;
+    invalid: Ref<boolean>;
+    invalidText: Ref<string|TranslateResult>;
 }
 
-export const useWidgetOptionValidation = ({
+export const useWidgetOptionsComplexValidation = ({
     optionValueMap,
     widgetConfig,
 }: WidgetOptionValidationProps): WidgetOptionValidationReturnType => {
@@ -38,8 +38,8 @@ export const useWidgetOptionValidation = ({
     });
 
     const state = reactive({
-        optionsInvalid: false,
-        optionsInvalidText: computed(() => {
+        invalid: false,
+        invalidText: computed(() => {
             if (_state.widgetConfig.widgetName === 'geoMap') {
                 const fixedVal = (_state.widgetConfig.requiredFieldsSchema.groupBy?.options as GroupByOptions)?.fixedValue;
                 const val = (_state.valueMap?.groupBy as GroupByValue)?.value;
@@ -53,8 +53,20 @@ export const useWidgetOptionValidation = ({
         }),
     });
 
-    const getDuplicatedLabelInfoValidation = (valueMap: OptionsValueMap, config: WidgetConfig) => {
-        let invalid = false;
+    const getRequiredFieldValidation = (valueMap: OptionsValueMap, config: WidgetConfig): boolean => {
+        if (config.widgetName === 'geoMap') {
+            const fixedVal = (config.requiredFieldsSchema.groupBy?.options as GroupByOptions)?.fixedValue;
+            const val = (valueMap?.groupBy as GroupByValue)?.value;
+            if (fixedVal) {
+                if ((Array.isArray(val) && !val.includes(fixedVal)) || val !== fixedVal) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+    const getDuplicatedLabelInfoValidation = (valueMap: OptionsValueMap, config: WidgetConfig): boolean => {
+        let isValid = true;
         // Label Info Fields Value Duplicate Validation (Table Widget)
         if (config.widgetName === 'table') {
             const groupByField = 'groupBy';
@@ -63,7 +75,7 @@ export const useWidgetOptionValidation = ({
             const tableDataFieldValue = valueMap[tableDataField] as TableDataFieldValue;
             const allValueExist = groupByFieldValue?.value && !!groupByFieldValue.value.length && tableDataFieldValue?.value;
             if (tableDataFieldValue?.fieldType === 'dynamicField' && allValueExist) {
-                invalid = (groupByFieldValue?.value ?? []).includes(tableDataFieldValue.value as string);
+                isValid = !(groupByFieldValue?.value ?? []).includes(tableDataFieldValue.value as string);
             }
         } else {
             // Label Info Fields Value Duplicate Validation (Except Table Widget)
@@ -73,16 +85,19 @@ export const useWidgetOptionValidation = ({
             if (labelInfoFields.length > 1) {
                 const labelInfoFieldValues = labelInfoFields.map((field) => valueMap[field]?.value);
                 const labelInfoFieldValuesSet = new Set(labelInfoFieldValues);
-                invalid = labelInfoFieldValues.length !== labelInfoFieldValuesSet.size;
+                isValid = labelInfoFieldValues.length === labelInfoFieldValuesSet.size;
             }
         }
 
-        return invalid;
+        return isValid;
     };
 
     const checkWidgetOptionsFieldsValidation = (valueMap: OptionsValueMap, config: WidgetConfig) => {
         if (!_state.requiredFields.every((field) => Object.keys(valueMap).includes(field))) return;
-        state.optionsInvalid = getDuplicatedLabelInfoValidation(valueMap, config);
+        const isRequiredFieldsValid = getRequiredFieldValidation(valueMap, config);
+        const isDuplicatedLabelInfoValid = getDuplicatedLabelInfoValidation(valueMap, config);
+        state.invalid = !isRequiredFieldsValid || !isDuplicatedLabelInfoValid;
+        console.log(isRequiredFieldsValid, isDuplicatedLabelInfoValid, state.invalid);
     };
 
     watch([() => _state.valueMap, () => _state.widgetConfig], ([changedValueMap, config]) => {
