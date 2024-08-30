@@ -25,7 +25,7 @@ import {
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
-import { getWidgetDataTable, sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
+import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
@@ -113,7 +113,7 @@ const state = reactive({
     // table
     tableFields: computed<TableWidgetField[]>(() => {
         // 1. Label Fields
-        const labelFields: TableWidgetField[] = sortWidgetTableFields(state.groupByField)?.map(
+        const labelFields: TableWidgetField[] = (state.groupByField ?? []).map(
             (field) => ({ name: field, label: field, fieldInfo: { type: 'labelField', additionalType: field === 'Date' ? 'dateFormat' : undefined } }),
         ) ?? [];
         let dataFields: TableWidgetField[] = [];
@@ -212,8 +212,7 @@ const getTotalDataItem = (data: TableDataItem[], type: 'static'|'time_series'|'d
     const hasComparisonInfo = state.comparisonInfo?.format;
 
     const totalDataItem: TableDataItem = {};
-    const _sortedGroupByFields = sortWidgetTableFields(state.groupByField ?? []);
-    if (_sortedGroupByFields.length) totalDataItem[_sortedGroupByFields[0]] = 'Total';
+    if ((state.groupByField ?? []).length) totalDataItem[(state.groupByField ?? [])[0]] = 'Total';
     if (type === 'static') {
         [...state.tableDataField, 'sub_total'].forEach((field) => {
             totalDataItem[field] = data.reduce((acc, cur) => acc + cur[field], 0);

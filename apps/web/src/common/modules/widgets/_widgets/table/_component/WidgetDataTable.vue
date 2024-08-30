@@ -451,7 +451,7 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
         font-weight: 500;
         height: 1.75rem;
         min-width: 7.5rem;
-        padding: 0.1875rem 0.5rem;
+        padding: 0 0.5rem;
 
         &.last-label {
             @apply border-r;
@@ -485,7 +485,7 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
             }
 
             .sort-icon {
-                @apply text-gray-500 float-right my-px;
+                @apply text-gray-500 float-right;
                 &:hover { cursor: pointer; }
             }
         }
