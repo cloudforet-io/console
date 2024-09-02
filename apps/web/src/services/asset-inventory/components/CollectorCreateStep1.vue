@@ -102,7 +102,7 @@ const emit = defineEmits([
 ]);
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 
 const state = reactive({
@@ -191,7 +191,7 @@ watch([() => collectorFormState.provider, () => state.selectedRepository], async
 
 
 onMounted(() => {
-    collectorFormStore.$reset();
+    collectorFormStore.resetState();
 });
 
 </script>

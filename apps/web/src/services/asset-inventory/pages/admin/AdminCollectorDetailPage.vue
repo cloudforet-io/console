@@ -139,7 +139,7 @@ const props = defineProps<{
 }>();
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
@@ -199,8 +199,8 @@ const getCollector = async (): Promise<CollectorModel|null> => {
     }
 };
 
-const fetchDeleteCollector = async () => (collectorFormStore.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
-    collector_id: collectorFormStore.collectorId,
+const fetchDeleteCollector = async () => (collectorFormState.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
+    collector_id: collectorFormState.collectorId,
 }) : undefined);
 
 const goBackToMainPage = () => {
@@ -225,7 +225,7 @@ const handleDeleteModalConfirm = async () => {
         state.deleteModalVisible = false;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_DELETE_COLLECTOR'), '');
         goBackToMainPage();
-        collectorFormStore.$reset();
+        collectorFormStore.resetState();
     } catch (error) {
         state.deleteModalVisible = false;
         ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_DELETE_COLLECTOR'));
@@ -268,7 +268,7 @@ watch(documentVisibility, (visibility) => {
 
 onMounted(async () => {
     collectorJobStore.$reset();
-    collectorFormStore.$reset();
+    collectorFormStore.resetState();
     collectorDataModalStore.$reset();
     collectorDetailPageStore.reset();
     const collector = await getCollector();
@@ -285,7 +285,7 @@ onMounted(async () => {
 onUnmounted(() => {
     pause();
     collectorJobStore.$reset();
-    collectorFormStore.$reset();
+    collectorFormStore.resetState();
     collectorDataModalStore.$reset();
     collectorDetailPageStore.reset();
 });

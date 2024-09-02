@@ -41,7 +41,7 @@ import { useCollectorPageStore } from '@/services/asset-inventory/stores/collect
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
 
@@ -75,9 +75,9 @@ const handleConfirm = async () => {
 
 /* API */
 const fetchCollectorUpdate = async (): Promise<CollectorModel|undefined> => {
-    if (!collectorFormStore.collectorId) throw new Error('collector_id is not defined');
+    if (!collectorFormState.collectorId) throw new Error('collector_id is not defined');
     const params: CollectorUpdateParameters = {
-        collector_id: collectorFormStore.collectorId,
+        collector_id: collectorFormState.collectorId,
         schedule: {
             hours: collectorFormState.scheduleHours || [],
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',

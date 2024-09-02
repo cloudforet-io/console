@@ -54,7 +54,7 @@ import {
 } from '@/services/asset-inventory/stores/collector-form-store';
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(event: 'update-valid', value: boolean): void; }>();

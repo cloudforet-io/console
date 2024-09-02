@@ -83,7 +83,7 @@ import {
 
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 const appContextStore = useAppContextStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -136,9 +136,9 @@ const handleClickCreateButton = async () => {
             resource_group: state.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
         };
         const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
-            service_accounts: collectorFormStore.serviceAccounts,
+            service_accounts: collectorFormState.serviceAccounts,
         } : {
-            exclude_service_accounts: collectorFormStore.serviceAccounts,
+            exclude_service_accounts: collectorFormState.serviceAccounts,
         };
         Object.assign(params.secret_filter ?? {}, serviceAccountParams);
         const res:CollectorModel = await SpaceConnector.clientV2.inventory.collector.create<CollectorCreateParameters, CollectorModel>(params);
