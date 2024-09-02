@@ -1363,6 +1363,9 @@
 			"ACTUAL": "実際のサイズ",
 			"ADD_WIDGET": "ウィジェットを追加する",
 			"ADD_WIDGET_TO_DASHBOARD": "ダッシュボードにウィジェットを追加する",
+			"ADVANCED_FORMAT_RULES": {
+				"COLOR_CODED_HEATMAP_DESC": ""
+			},
 			"ALL_SUMMARY": {
 				"ADD_SERVICE_ACCOUNTS": "サービスアカウントの追加",
 				"ALL": "合計",
