@@ -21,6 +21,7 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 
 interface Props {
     tableHeight: number;
+    hasReadWriteAccess: boolean
 }
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
@@ -34,9 +35,9 @@ const workspaceGroupListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 let workspaceGroupListApiQuery = workspaceGroupListApiQueryHelper.data;
 
-
 const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
+    hasReadWriteAccess: true,
 });
 
 const tableState = reactive({
@@ -144,7 +145,9 @@ const handleChangeSort = (name, desc) => {
             @refresh="handleChange()"
             @changeSort="handleChangeSort"
         >
-            <template #toolbox-left>
+            <template v-if="props.hasReadWriteAccess"
+                      #toolbox-left
+            >
                 <workspace-group-table-toolbox />
             </template>
             <template #col-created_at-format="{ value }">

@@ -2,13 +2,15 @@
 import {
     reactive, watch, onUnmounted, computed,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
-
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PButton, PToolboxTable, PStatus, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
@@ -17,8 +19,10 @@ import type { RoleModel } from '@/schema/identity/role/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { WorkspaceGroupUpdateRoleParameters } from '@/schema/identity/workspace-group/api-verbs/update-role';
 import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -32,16 +36,34 @@ const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
+const route = useRoute();
+
 const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
+const state = reactive({
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        return closestRoute?.meta?.menuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+});
 const tableState = reactive({
-    fields: [
-        { name: 'user_id', label: 'User ID' },
-        { name: 'user_name', label: 'Name' },
-        { name: 'state', label: 'State' },
-        { name: 'role', label: 'Role' },
-        { name: 'remove_button', label: ' ', sortable: false },
-    ],
+    fields: computed<DataTableFieldType[]>(() => {
+        const defaultFields: DataTableFieldType[] = [
+            { name: 'user_id', label: 'User ID' },
+            { name: 'user_name', label: 'Name' },
+            { name: 'state', label: 'State' },
+            { name: 'role', label: 'Role' },
+        ];
+        if (state.hasReadWriteAccess) {
+            defaultFields.push({ name: 'remove_button', label: ' ', sortable: false });
+        }
+        return defaultFields;
+    }),
     roleMap: computed(() => {
         const map: Record<string, RoleModel> = {};
         workspaceGroupPageState.roles.forEach((role) => {
@@ -190,7 +212,9 @@ onUnmounted(() => {
                    :total-count="workspaceGroupPageGetters.groupUserTotalCount"
                    heading-type="sub"
         >
-            <template #extra>
+            <template v-if="state.hasReadWriteAccess"
+                      #extra
+            >
                 <div class="workspace-group-tab-group-user-button-wrapper">
                     <p-button style-type="negative-primary"
                               :disabled="!workspaceGroupPageGetters.selectedGroupUsersByIndices.length"
@@ -218,7 +242,7 @@ onUnmounted(() => {
                          :sort-desc="true"
                          :this-page.sync="workspaceGroupPageState.groupUserPage"
                          :search-text.sync="workspaceGroupPageState.groupUserSearchText"
-                         selectable
+                         :selectable="state.hasReadWriteAccess"
                          sortable
                          searchable
                          @select="handleSelect"
@@ -242,6 +266,7 @@ onUnmounted(() => {
                         use-fixed-menu-style
                         style-type="transparent"
                         class="role-select-dropdown"
+                        :disabled="!state.hasReadWriteAccess"
                         :menu="menuList"
                         :selected.sync="selectedItems"
                         :search-text.sync="searchText"

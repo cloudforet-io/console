@@ -9,6 +9,7 @@ import {
     PButton,
     PDataTable, PHeading, PLink, PSelectDropdown, PStatus, PTooltip,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
@@ -81,13 +82,18 @@ const state = reactive({
     selectedRemoveItem: '',
 });
 const tableState = reactive({
-    fields: computed(() => [
-        { name: 'workspace', label: i18n.t('IAM.USER.MAIN.WORKSPACE') as string },
-        { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE') as string },
-        { name: 'role_binding', label: i18n.t('IAM.USER.MAIN.ROLE') as string, sortable: false },
-        { name: 'created_at', label: i18n.t('IAM.USER.MAIN.INVITED') as string, sortable: false },
-        { name: 'remove_button', label: ' ', sortable: false },
-    ]),
+    fields: computed<DataTableFieldType[]>(() => {
+        const defaultFields: DataTableFieldType[] = [
+            { name: 'workspace', label: i18n.t('IAM.USER.MAIN.WORKSPACE') as string },
+            { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE') as string },
+            { name: 'role_binding', label: i18n.t('IAM.USER.MAIN.ROLE') as string, sortable: false },
+            { name: 'created_at', label: i18n.t('IAM.USER.MAIN.INVITED') as string, sortable: false },
+        ];
+        if (props.hasReadWriteAccess) {
+            defaultFields.push({ name: 'remove_button', label: ' ', sortable: false });
+        }
+        return defaultFields;
+    }),
 });
 const dropdownState = reactive({
     loading: false,
@@ -319,9 +325,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
             <template #col-created_at-format="{value}">
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
-            <template v-if="props.hasReadWriteAccess"
-                      #col-remove_button-format="{ item }"
-            >
+            <template #col-remove_button-format="{ item }">
                 <p-button style-type="negative-secondary"
                           size="sm"
                           class="remove-button"

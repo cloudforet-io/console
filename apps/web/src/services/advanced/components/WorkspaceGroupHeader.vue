@@ -6,6 +6,14 @@ import { i18n } from '@/translations';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
+interface Props {
+    hasReadWriteAccess: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    hasReadWriteAccess: true,
+});
+
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupState = workspaceGroupPageStore.state;
 
@@ -25,7 +33,9 @@ const handleCreateButtonClick = () => {
                    use-total-count
                    :total-count="workspaceGroupState.totalCount"
         >
-            <template #extra>
+            <template v-if="props.hasReadWriteAccess"
+                      #extra
+            >
                 <p-button style-type="primary"
                           icon-left="ic_plus_bold"
                           @click="handleCreateButtonClick"

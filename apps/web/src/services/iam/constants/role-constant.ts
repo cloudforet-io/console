@@ -58,14 +58,6 @@ export const ROLE_SEARCH_HANDLERS = {
     },
 } as const;
 
-export const ROLE_TABLE_FIELDS = [
-    { name: 'name', label: 'Name' },
-    { name: 'state', label: 'State' },
-    { name: 'role_type', label: 'Role Type' },
-    { name: 'created_at', label: 'Created', sortable: false },
-    { name: 'edit_button', label: ' ', sortable: false },
-] as const;
-
 export const EXCEL_TABLE_FIELDS = [
     { key: 'name', name: 'Name' },
     { key: 'role_type', name: 'Role Type' },

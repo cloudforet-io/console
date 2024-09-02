@@ -7,6 +7,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown, PButton, PBadge, PStatus,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -31,7 +32,6 @@ import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables
 import {
     EXCEL_TABLE_FIELDS,
     ROLE_SEARCH_HANDLERS,
-    ROLE_TABLE_FIELDS,
 } from '@/services/iam/constants/role-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
@@ -60,6 +60,20 @@ let roleListApiQuery = roleListApiQueryHelper.data;
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+});
+const state = reactive({
+    fields: computed<DataTableFieldType[]>(() => {
+        const defaultFields: DataTableFieldType[] = [
+            { name: 'name', label: 'Name' },
+            { name: 'state', label: 'State' },
+            { name: 'role_type', label: 'Role Type' },
+            { name: 'created_at', label: 'Created', sortable: false },
+        ];
+        if (props.hasReadWriteAccess) {
+            defaultFields.push({ name: 'edit_button', label: ' ', sortable: false });
+        }
+        return defaultFields;
+    }),
 });
 const modalState = reactive({
     modalVisible: false,
@@ -180,7 +194,7 @@ const handleExport = async () => {
                          disabled
                          :items="rolePageState.roles"
                          :select-index="rolePageState.selectedIndices"
-                         :fields="ROLE_TABLE_FIELDS"
+                         :fields="state.fields"
                          sort-by="name"
                          :sort-desc="true"
                          :total-count="rolePageState.totalCount"
@@ -229,7 +243,7 @@ const handleExport = async () => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
             <template #col-edit_button-format="{ item }">
-                <p-button v-if="props.hasReadWriteAccess && (!item?.is_managed && item.role_type !== ROLE_TYPE.SYSTEM_ADMIN)"
+                <p-button v-if="!item?.is_managed && item.role_type !== ROLE_TYPE.SYSTEM_ADMIN"
                           size="sm"
                           style-type="tertiary"
                           icon-left="ic_edit"

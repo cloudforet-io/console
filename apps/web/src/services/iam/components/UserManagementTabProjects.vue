@@ -5,7 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PDataTable, PHeading, PI,
 } from '@cloudforet/mirinae';
-
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
@@ -21,7 +21,6 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import UserManagementRemoveModal from '@/services/iam/components/UserManagementRemoveModal.vue';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-
 
 interface TableItem {
     project_id?: string;
@@ -49,11 +48,16 @@ const state = reactive({
     selectedUser: computed(() => userPageStore.selectedUsers[0]),
 });
 const tableState = reactive({
-    fields: computed(() => [
-        { name: 'name', label: i18n.t('IAM.USER.MAIN.PROJECT') as string },
-        { name: 'project_id', label: i18n.t('IAM.USER.MAIN.PROJECT_ID') as string },
-        { name: 'remove_button', label: ' ' },
-    ]),
+    fields: computed<DataTableFieldType[]>(() => {
+        const defaultFields: DataTableFieldType[] = [
+            { name: 'name', label: i18n.t('IAM.USER.MAIN.PROJECT') as string },
+            { name: 'project_id', label: i18n.t('IAM.USER.MAIN.PROJECT_ID') as string },
+        ];
+        if (props.hasReadWriteAccess) {
+            defaultFields.push({ name: 'remove_button', label: ' ' });
+        }
+        return defaultFields;
+    }),
 });
 const modalState = reactive({
     visible: false,
@@ -143,9 +147,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                     </router-link>
                 </span>
             </template>
-            <template v-if="props.hasReadWriteAccess"
-                      #col-remove_button-format="{item}"
-            >
+            <template #col-remove_button-format="{item}">
                 <p-button style-type="tertiary"
                           size="sm"
                           class="remove-button"

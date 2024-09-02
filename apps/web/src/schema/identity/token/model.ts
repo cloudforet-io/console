@@ -12,5 +12,4 @@ export interface TokenGrantModel {
     role_id: string;
     domain_id: string;
     workspace_id: string;
-    page_access: string[];
 }
