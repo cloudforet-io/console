@@ -1363,6 +1363,9 @@
 			"ACTUAL": "Actual",
 			"ADD_WIDGET": "Add Widget",
 			"ADD_WIDGET_TO_DASHBOARD": "Add Widget to Dashboard",
+			"ADVANCED_FORMAT_RULES": {
+				"COLOR_CODED_HEATMAP_DESC": "Heatmap color changes \baccording to the specified text in the legend."
+			},
 			"ALL_SUMMARY": {
 				"ADD_SERVICE_ACCOUNTS": "Add Service Accounts",
 				"ALL": "All",
