@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 
 import { cloneDeep } from 'lodash';
@@ -87,6 +87,13 @@ watch(() => labelsMenuItem.value, (menuItem) => {
         state.proxyValue = { ...state.proxyValue, field: _selectedValue };
     }
 }, { immediate: true });
+onMounted(() => {
+    state.proxyValue = {
+        ...state.proxyValue,
+        value: state.proxyValue?.value ?? [],
+        baseColor: state.proxyValue?.baseColor ?? props.widgetFieldSchema?.options?.baseColor ?? DEFAULT_BASE_COLOR,
+    };
+});
 </script>
 
 <template>
