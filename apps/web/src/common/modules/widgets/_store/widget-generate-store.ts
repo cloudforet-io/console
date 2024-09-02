@@ -27,6 +27,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { JoinRestrictedMap } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { WidgetSize, WidgetOverlayType } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
@@ -61,6 +62,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         previewData: { results: [], total_count: 0 } as ListResponse<any>,
         dataTableUpdating: false,
         dataTableLoadLoading: false,
+        dataTableCreateLoading: false,
         joinRestrictedMap: {} as JoinRestrictedMap, // Flag for handling Join type EXCEPTION RESTRICTION cases. (duplicated data field). Example - { '{dataTalbeId}': true, }
         allDataTableInvalidMap: {} as Record<string, boolean>, // Flag for handling all data table invalid cases. Example - { '{dataTalbeId}': true, }
     });
@@ -69,8 +71,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         selectedDataTable: computed<Partial<DataTableModel>|undefined>(() => state.dataTables.find((dataTable) => dataTable.data_table_id === state.selectedDataTableId)),
         isAllWidgetFormValid: computed<boolean>(() => {
             const widgetValidMapValues = Object.values(state.widgetValidMap);
-            const widgetValueMapKeys = Object.keys(state.widgetFormValueMap);
-            if (widgetValidMapValues.length !== widgetValueMapKeys.length) return false;
             return widgetValidMapValues.every((valid) => valid);
         }),
         widgetState: computed<WidgetState|undefined>(() => state.widget?.state),
@@ -114,6 +114,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setDataTableUpdating = (status: boolean) => {
         state.dataTableUpdating = status;
     };
+    const setDataTableCreateLoading = (status: boolean) => {
+        state.dataTableCreateLoading = status;
+    };
     const setJoinRestrictedMap = (value: JoinRestrictedMap) => {
         state.joinRestrictedMap = value;
     };
@@ -136,6 +139,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setDataTableUpdating,
         setJoinRestrictedMap,
         setAllDataTableInvalidMap,
+        setDataTableCreateLoading,
     };
     const actions = {
         listDataTable: async () => {
@@ -168,6 +172,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 state.dataTables.push(result);
                 return result;
             } catch (e) {
+                setDataTableCreateLoading(false); // DataTable Loading Failed Case
                 showErrorMessage(e.message, e);
                 ErrorHandler.handleError(e);
                 return undefined;
@@ -351,10 +356,12 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             const fetcher = isPrivate
                 ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
                 : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
+            const sanitizedOptions = sanitizeWidgetOptions(updateParams.options ?? {}, updateParams.widget_type ?? 'table');
             try {
                 state.widget = await fetcher({
                     widget_id: state.widgetId,
                     ...updateParams,
+                    options: sanitizedOptions, // Sanitize Wrong Options
                 });
             } catch (e: any) {
                 showErrorMessage(e.message, e);

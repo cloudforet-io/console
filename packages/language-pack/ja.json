@@ -617,7 +617,7 @@
 				"FILTER_MODAL_HELP_TEXT_1": "選択されたフィルターがありません",
 				"FILTER_MODAL_HELP_TEXT_2": "リストからフィルタを選択します。",
 				"GRANULARITY": "細部基準(Granularity)",
-				"GROUP_BY": "グループ別統計(Group By)",
+				"GROUP_BY": "グループ別統計(Group by)",
 				"HELP_TEXT": {
 					"UP_TO_31_DAYS": "最長31日まで",
 					"UP_TO_LAST_12_MONTHS": "最長12ヶ月(期間内)設定可能"
@@ -822,7 +822,7 @@
 						"IN_RATIO": "比率{ratio}%で",
 						"LABEL_FILTERS": "フィルター",
 						"LABEL_GRANULARITY": "細部基準(Granularity)",
-						"LABEL_GROUP_BY": "グループ別統計(Group By)",
+						"LABEL_GROUP_BY": "グループ別統計(Group by)",
 						"LABEL_QUERY_NAME": "クエリ名",
 						"LABEL_STACK": "累積",
 						"LAST_MONTH_TOTAL_SPEND_DESC": "照会期間の前月に発生した総費用を示すウィジェット。",
@@ -847,7 +847,7 @@
 					"FORM": {
 						"DELETE_CONTENTS": "このウィジェットを復元することはできません",
 						"DELETE_TITLE": "選択したウィジェットを削除しますか？",
-						"LABEL_GROUP_BY": "グループ別統計(Group By)",
+						"LABEL_GROUP_BY": "グループ別統計(Group by)",
 						"LABEL_NAME": "名前",
 						"UPDATE_TITLE": "ウィジェットの更新"
 					},
@@ -1434,7 +1434,7 @@
 				"FORMAT": "フォーマット",
 				"INCREASE": "増加する",
 				"INFO_TOOLTIP": "粒度に基づいて比較する",
-				"INFO_TOOLTIP_TABLE": "この機能は粒度に基づく比較のためのものです。'データ' または 'グループ化' が '日付' に設定されている場合は使用できません。",
+				"INFO_TOOLTIP_TABLE": "この機能は粒度に基づく比較のためのものです。\n'データ' または 'グループ化' が '日付' に設定されている場合は使用できません。",
 				"NAME_INVALID_TEXT": "少なくとも1つの文字を書いてください。",
 				"PERCENT": "比率",
 				"PREVIOUS_DAY": "前日",
@@ -1445,6 +1445,12 @@
 			"CONFIGURE_WIDGET": "ウィジェットの構成",
 			"CONTINUE": "次へ",
 			"CRITERIA": "条件",
+			"CUSTOM_TABLE_COLUMN_WIDTH": {
+				"CUSTOM_TABLE_COLUMN_WIDTH": "",
+				"DESCRIPTION": "",
+				"FIELD": "",
+				"WIDTH": ""
+			},
 			"DAILY_UPDATE_CREATED": "作成",
 			"DAILY_UPDATE_DELETED": "削除",
 			"DAILY_UPDATE_DESC": "00:00〜現在（ローカル時間基準）",
@@ -1485,11 +1491,23 @@
 					"DATA_TABLE_NAME_SUCCESS": "データ名が正常に変更されました。",
 					"DATA_TABLE_NAME_WARNING": "この名前のデータはすでに存在します。",
 					"DATA_UNIT": "データ単位",
+					"EVAL": {
+						"DELETE_MODAL_DESC": "",
+						"DELETE_MODAL_TITLE": "",
+						"DELETE_SUCCESS_TOOLTIP": "",
+						"FIELD_FORMULA": "",
+						"FIELD_NAME": "",
+						"FIELD_TYPE": "",
+						"FORMULA_PLACEHOLDER": "",
+						"TITLE_PLACEHOLDER": "",
+						"TYPE_DATA_FIELD": "",
+						"TYPE_LABEL_FIELD": ""
+					},
 					"EVAL_DESC": "データフィールドに関数や計算を適用します。",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day はフィールド名として使用できません。",
 					"FIELD_NAME_GROUP_BY_INVALID_TEXT": "グループ名はフィールド名として使用できません。",
 					"FILTERS": "フィルター",
-					"GROUP_BY": "グループ別統計(Group By)",
+					"GROUP_BY": "グループ別統計(Group by)",
 					"JOIN_DESC": "共通の列に基づいて、異なるテーブルの行を結合します。",
 					"QUERY_DESC": "特定の条件を満たすデータをフィルタリングして抽出します。",
 					"SELECT_DATA_SOURCE_SUCCESS": "データが正常に変更されました。",
@@ -1554,8 +1572,21 @@
 			"HEALTH_DASHBOARD_DESC_3": "先にAWSプランを確認してください",
 			"HEALTH_DASHBOARD_HELP": "AWSのサービスの状態とスケジュール済みタスク通知を見ることができます。",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
+			"LEGEND": {
+				"BOTTOM": "",
+				"LEFT": "",
+				"LEGEND": "",
+				"POSITION": "位置",
+				"RIGHT": "",
+				"TOP": ""
+			},
 			"MAX_ITEMS": "最大アイテム数",
 			"MAX_ITEMS_DESC": "{fieldName} の最大値は {max} です。",
+			"MISSING_VALUE": {
+				"LINE_BREAKS": "",
+				"LINE_TO_ZERO": "",
+				"MISSING_VALUE": ""
+			},
 			"NO_DATA_TO_DISPLAY": "データがありません",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "前日よりも少ない",
@@ -1646,7 +1677,20 @@
 			"SERVICE_SUMMARY_SERVER": "サーバ",
 			"SET_CHART_OPTIONS": "チャートオプション設定",
 			"SET_DATA_SOURCE": "データソース設定",
+			"SUB_TOTAL": {
+				"INFO_TEXT": "詳細な基準に基づいてグループ別統計で部分合計を計算できます。\nただし、フィールドが'静的フィールド'の場合は使用できません。",
+				"SUB_TOTAL": "小計"
+			},
+			"TABLE_COLUMN_WIDTH": {
+				"MINIMUM_WIDTH": "",
+				"TABLE_COLUMN_WIDTH": "",
+				"WIDTH": ""
+			},
 			"TABLE_HEATMAP_COLOR_NONE": "ない",
+			"TEXT_WRAP": {
+				"DESCRIPTION": "",
+				"TEXT_WRAP": ""
+			},
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "プロジェクト作成",
 				"NO_PROJECT": "プロジェクトなし",
@@ -1684,6 +1728,9 @@
 			},
 			"UNABLE_TO_LOAD_WIDGET": "ウィジェット表示不可",
 			"VIEW_FULL_DATA": "データ全体を表示",
+			"WIDGET_HEIGHT": {
+				"WIDGET_HEIGHT": ""
+			},
 			"WIDGET_TITLE_REQUIRED": "ウィジェットのタイトルを入力してください。"
 		}
 	},
@@ -2106,7 +2153,7 @@
 					"FIELD_NAME": "フィールド名",
 					"FORMAT_RULES": "形式ルール",
 					"GRANULARITY": "細部基準(Granularity)",
-					"GROUP_BY": "グループ別統計(Group By)",
+					"GROUP_BY": "グループ別統計(Group by)",
 					"ICON": "アイコン",
 					"LEGEND": "凡例",
 					"LINE_BY": "ライン別",
@@ -3339,7 +3386,7 @@
 			"EMPTY_TEXT": "結果が見つかりませんでした。\n別の用語で再試行してください。",
 			"FILTERS": "フィルター",
 			"GRANULARITY": "細部基準(Granularity)",
-			"GROUP_BY": "グループ別統計(Group By)",
+			"GROUP_BY": "グループ別統計(Group by)",
 			"HIDE_ALL": "すべて隠す",
 			"MAIN": {
 				"ANALYZE_DATA": "データを分析する",

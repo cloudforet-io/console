@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { uniq } from 'lodash';
+
 import {
     PFieldTitle, PCheckboxGroup, PCheckbox, PLazyImg, PSelectDropdown,
 } from '@cloudforet/mirinae';
@@ -17,7 +19,11 @@ export interface FilterLabelItem {
     name: string;
     image?: string;
 }
+interface Props {
+    labels: string[];
+}
 
+const props = defineProps<Props>();
 const emit = defineEmits<{(e:'select-label', labels: FilterLabelItem[]):void;
     (e:'select-provider', plugins: FilterLabelItem[]):void;
     (e:'select-plugin', plugins: PluginItem[]):void;
@@ -34,7 +40,7 @@ const state = reactive({
         image: provider.icon,
     }))),
     labels: computed(() => Object.values(DASHBOARD_LABELS)),
-    labelList: computed(() => state.labels.map((label) => ({
+    labelList: computed(() => uniq([...state.labels, ...props.labels]).map((label) => ({
         label,
         name: label,
         image: null,

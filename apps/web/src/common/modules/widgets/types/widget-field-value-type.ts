@@ -1,5 +1,9 @@
 import type {
     COLOR_SCHEMA, DATE_FORMAT, NUMBER_FORMAT, DATA_FIELD_HEATMAP_COLOR,
+    PIE_CHART_SERIES_LABEL_POSITION,
+    COLUMN_CHART_SERIES_LABEL_POSITION,
+    LINE_CHART_SERIES_LABEL_POSITION,
+    WIDGET_HEIGHT,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 
 
@@ -28,8 +32,14 @@ export interface ProgressBarValue {
     baseColor?: string;
 }
 export interface FormatRulesValue {
+    text?: string;
     threshold?: number;
     color: string;
+}
+export interface AdvancedFormatRulesValue {
+    field?: string;
+    value: FormatRulesValue[];
+    baseColor?: string;
 }
 export interface LineByValue {
     value: string;
@@ -54,8 +64,8 @@ export interface YAxisValue {
 export interface TableDataFieldValue {
     fieldType: 'dynamicField' | 'staticField';
     value?: string | string[];
+    dynamicFieldValue?: string[];
     criteria?: string;
-    count: number;
 }
 export interface GroupByValue {
     value?: string | string[];
@@ -104,14 +114,52 @@ export interface DisplayAnnotationValue {
     annotation?: string;
 }
 
+type ColumnChartSeriesLabelPosition = typeof COLUMN_CHART_SERIES_LABEL_POSITION[keyof typeof COLUMN_CHART_SERIES_LABEL_POSITION];
+type PieChartSeriesLabelPosition = typeof PIE_CHART_SERIES_LABEL_POSITION[keyof typeof PIE_CHART_SERIES_LABEL_POSITION];
+type LineChartSeriesLabelPosition = typeof LINE_CHART_SERIES_LABEL_POSITION[keyof typeof LINE_CHART_SERIES_LABEL_POSITION];
 export interface DisplaySeriesLabelValue {
     toggleValue: boolean;
-    position?: 'left' | 'center' | 'right';
+    position?: ColumnChartSeriesLabelPosition | PieChartSeriesLabelPosition | LineChartSeriesLabelPosition;
     rotate?: number;
+}
+
+export interface TextWrapValue {
+    toggleValue: boolean;
+}
+
+export type CustomColumnWidthItem = {
+    fieldKey: string;
+    width: number;
+};
+
+export interface TableColumnWidthValue {
+    minimumWidth: number;
+    widthType: 'auto' | 'fixed';
+    fixedWidth?: number;
+}
+
+export interface CustomTableColumnWidthValue {
+    toggleValue: boolean;
+    value?: CustomColumnWidthItem[];
+}
+
+export interface LegendValue {
+    toggleValue: boolean;
+    position?: 'right'|'bottom'|'top'|'left';
+}
+
+export type WidgetHeightType = keyof typeof WIDGET_HEIGHT; // for Number Card Widget
+export interface WidgetHeightValue {
+    value: WidgetHeightType;
+}
+
+export interface MissingValueValue {
+    value: string;
 }
 
 export type WidgetFieldValues = string | string[] | number | boolean | ComparisonValue[] | ProgressBarValue | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue | IconValue | TotalValue | ColorSchemaValue
     | WidgetHeaderValue | DateFormatValue | NumberFormatValue | DataFieldHeatmapColorValue
-    | DisplayAnnotationValue | DisplaySeriesLabelValue;
+    | DisplayAnnotationValue | DisplaySeriesLabelValue | TextWrapValue | TableColumnWidthValue | CustomTableColumnWidthValue
+    | LegendValue | WidgetHeightValue | MissingValueValue | AdvancedFormatRulesValue;

@@ -16,7 +16,8 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -25,7 +26,6 @@ import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboa
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { CreateDashboardParameters } from '@/services/dashboards/types/dashboard-api-schema-type';
-
 
 
 interface Props {
@@ -106,7 +106,7 @@ const cloneDashboard = async (): Promise<string|undefined> => {
         const res = await dashboardStore.createDashboard(state.dashboardType, _sharedDashboard);
         return res.dashboard_id;
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CLONE_DASHBOARD'));
+        showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CLONE_DASHBOARD'), e);
     } finally {
         state.loading = false;
     }

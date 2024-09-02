@@ -140,6 +140,9 @@ onMounted(async () => {
                                                      :key="`data-table-${dataTable.data_table_id}`"
                                                      :item="dataTable"
                         />
+                        <widget-form-data-table-card v-if="widgetGenerateState.dataTableCreateLoading"
+                                                     loading-card
+                        />
                         <widget-form-data-source-popover />
                         <div v-if="!storeState.dataTables.length"
                              class="empty-data-table-guide"

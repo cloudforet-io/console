@@ -59,7 +59,8 @@ const state = reactive({
     showBadge: computed<boolean>(() => {
         if (dashboardDetailState.dashboardInfo?.user_id) return true;
         // HACK: temp code for legacy project dashboard
-        return dashboardDetailState.dashboardInfo?.workspace_id === '*'; // || dashboardDetailState.dashboardInfo?.project_id === '*';
+        if (state.sharedScope === 'PROJECT') return false;
+        return state.sharedScope === 'WORKSPACE';
     }),
     badgeStyleType: computed<string>(() => {
         if (dashboardDetailState.dashboardScope === 'PRIVATE') return 'gray150';
@@ -80,14 +81,6 @@ const state = reactive({
         return '';
     }),
     menuItems: computed<MenuItem[]>(() => {
-        if (dashboardDetailGetters.disableManageButtons) {
-            return [{
-                type: 'item',
-                name: 'duplicate',
-                label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
-                icon: 'ic_clone',
-            }];
-        }
         if (dashboardDetailGetters.isDeprecatedDashboard) {
             return [
                 {
@@ -103,6 +96,14 @@ const state = reactive({
                     icon: 'ic_delete',
                 },
             ];
+        }
+        if (dashboardDetailGetters.disableManageButtons) {
+            return [{
+                type: 'item',
+                name: 'duplicate',
+                label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
+                icon: 'ic_clone',
+            }];
         }
         let _shareMenuItems: MenuItem[] = [];
         if (storeState.isAdminMode) {
@@ -338,7 +339,7 @@ const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
 .dashboard-detail-header {
     margin-bottom: 0.75rem;
     .dashboard-setting-dropdown {
-        margin-right: 0.5rem;
+        margin: 0 0.5rem;
     }
     .p-heading {
         align-items: center;
@@ -354,6 +355,13 @@ const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
     gap: 0.5rem;
     .p-select-card {
         @apply col-span-6;
+    }
+}
+
+/* custom design-system component - p-heading */
+:deep(.p-heading) {
+    .title {
+        font-size: 1.125rem;
     }
 }
 </style>

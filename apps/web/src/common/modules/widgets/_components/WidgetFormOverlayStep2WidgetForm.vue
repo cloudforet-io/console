@@ -24,6 +24,8 @@ import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-
 
 import { red } from '@/styles/colors';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 const FORM_TITLE_MAP = {
     WIDGET_HEADER: 'WIDGET_HEADER',
@@ -41,6 +43,8 @@ const props = defineProps<Props>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
+const dashboardDetailInfoStore = useDashboardDetailInfoStore();
+const dashboardDetailInfoState = dashboardDetailInfoStore.state;
 const state = reactive({
     chartTypeMenuItems: computed<MenuItem[]>(() => Object.values(CONSOLE_WIDGET_CONFIG).map((d) => ({
         name: d.widgetName,
@@ -261,6 +265,8 @@ onMounted(() => {
                                :key="`${fieldName}-${widgetGenerateState.selectedWidgetName}`"
                                :widget-field-schema="fieldSchema"
                                :data-table="widgetGenerateGetters.selectedDataTable"
+                               :widget-id="widgetGenerateState.widgetId"
+                               :date-range="dashboardDetailInfoState.options.date_range"
                                :all-value-map="widgetGenerateState.widgetFormValueMap"
                                :value="widgetGenerateState.widgetFormValueMap[fieldName]"
                                :is-valid="widgetGenerateState.widgetValidMap[fieldName]"

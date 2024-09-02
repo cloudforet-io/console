@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
+import { flatMapDeep, uniq } from 'lodash';
+
 import { PEmpty, PFieldTitle, PSearch } from '@cloudforet/mirinae';
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
+import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
@@ -19,6 +23,9 @@ const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
+const storeState = reactive({
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+});
 const state = reactive({
     templates: [] as DashboardTemplateModel[],
     blankTemplate: computed<BoardSet[]>(() => ([{
@@ -34,12 +41,23 @@ const state = reactive({
         }));
     }),
     existingTemplateSets: computed<BoardSet[]>(() => {
-        const _filteredDashboards = getFilteredTemplates(dashboardGetters.allItems, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
+        let dashboardItems: DashboardModel[] = dashboardGetters.allItems;
+        if (storeState.isWorkspaceMember) dashboardItems = dashboardGetters.privateItems;
+        const _filteredDashboards = getFilteredTemplates(dashboardItems, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
         return _filteredDashboards.map((d) => ({
             dashboard_id: d.dashboard_id,
             name: d.name,
             labels: d.labels,
         }));
+    }),
+    allExistingLabels: computed(() => {
+        const OOTBTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
+        const dashboards: DashboardModel[] = storeState.isWorkspaceMember ? dashboardGetters.privateItems : dashboardGetters.allItems;
+        const existingTemplates = getFilteredTemplates(dashboards, '', [], []);
+        return uniq([
+            ...flatMapDeep(OOTBTemplates.map((d) => d.labels)),
+            ...flatMapDeep(existingTemplates.map((d) => d.labels)),
+        ]);
     }),
 });
 
@@ -83,7 +101,8 @@ onMounted(() => {
     <div class="dashboard-create-step-1">
         <p-search :value.sync="filterState.inputValue" />
         <div class="contents-container">
-            <dashboard-create-step1-search-filter @select-label="handleSelectLabels"
+            <dashboard-create-step1-search-filter :labels="state.allExistingLabels"
+                                                  @select-label="handleSelectLabels"
                                                   @select-provider="handleSelectProvider"
             />
             <div class="template-contents-area">

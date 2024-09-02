@@ -1,7 +1,8 @@
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
-import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { FORMAT_RULE_TYPE, ADVANCED_FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type {
     FormatRulesValue,
@@ -9,6 +10,7 @@ import type {
     DateFormat,
     NumberFormat,
     DataFieldHeatmapColor,
+    WidgetHeightType,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
@@ -16,7 +18,7 @@ export interface DataFieldOptions {
     multiSelectable?: boolean;
 }
 export interface TableDataFieldOptions {
-    max?: number;
+    max?: number; // This is a value for a possible max limit.
 }
 export interface XAxisOptions {
     dataTarget?: string;
@@ -63,12 +65,6 @@ export interface CategoryByOptions {
     defaultIndex?: number;
     excludeDateField?: boolean;
 }
-export interface TotalFieldOptions {
-    dataTarget?: string;
-}
-export interface BasisFieldOptions {
-    dataTarget?: string;
-}
 export interface MinOptions {
     default?: number;
 }
@@ -77,8 +73,12 @@ export interface MaxOptions {
 }
 export interface LegendOptions { // toggle button
     default?: boolean;
+    showPositionField?: boolean;
 }
 export interface PieChartTypeOptions {
+    default?: string;
+}
+export interface MissingValueOptions {
     default?: string;
 }
 
@@ -114,9 +114,14 @@ export interface DateFormatOptions {
 export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_TYPE];
 export interface FormatRulesOptions {
     formatRulesType: FormatRulesType;
-    dataTarget?: string;
     description?: string;
     default?: FormatRulesValue[];
+    baseColor?: string;
+}
+export type AdvancedFormatRulesType = typeof ADVANCED_FORMAT_RULE_TYPE[keyof typeof ADVANCED_FORMAT_RULE_TYPE];
+export interface AdvancedFormatRulesOptions {
+    formatRulesType: AdvancedFormatRulesType;
+    description?: string;
     baseColor?: string;
 }
 
@@ -132,12 +137,30 @@ export interface DataFieldHeatmapColorOptions {
     default?: DataFieldHeatmapColor;
 }
 
+export interface TextWrapOptions {
+    toggle?: boolean;
+}
+
+export interface TableColumnWidthOptions {
+    defaultMinimumWidth?: number;
+    defaultFixedWidth?: number;
+}
+
+export interface CustomTableColumnWidthOptions {
+    toggle?: boolean;
+}
+
+export interface WidgetHeightOptions {
+    default?: WidgetHeightType;
+}
+
 export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
-    | TotalFieldOptions | BasisFieldOptions
-    | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
+    | FormatRulesOptions | AdvancedFormatRulesOptions
+    | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions | ProgressBarOptions | ColorSchemaOptions | PieChartTypeOptions | DateFormatOptions
-    | NumberFormatOptions | DataFieldHeatmapColorOptions;
+    | NumberFormatOptions | DataFieldHeatmapColorOptions | TextWrapOptions | TableColumnWidthOptions | CustomTableColumnWidthOptions
+    | MissingValueOptions | WidgetHeightOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
@@ -145,15 +168,15 @@ export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
 
 export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy'
-    | 'totalField' | 'basisField'
     | 'min' | 'max'
     | 'icon' | 'comparison' | 'legend'
     | 'subTotal' | 'total'
     | 'progressBar'
-    | 'formatRules'
+    | 'formatRules' | 'advancedFormatRules'
     | 'granularity' | 'colorSchema' | 'pieChartType'
-    | 'widgetHeader' | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
-    | 'displayAnnotation' | 'displaySeriesLabel';
+    | 'dateFormat' | 'numberFormat' | 'dataFieldHeatmapColor'
+    | 'displayAnnotation' | 'displaySeriesLabel' | 'textWrap' | 'tableColumnWidth' | 'customTableColumnWidth'
+    | 'missingValue' | 'widgetHeight';
 
 export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     dataTable?: PublicDataTableModel|PrivateDataTableModel;
@@ -164,6 +187,8 @@ export interface WidgetFieldComponentProps<FieldOptions, FieldValue = any> {
     isValid?: boolean;
     value?: FieldValue;
     widgetConfig?: WidgetConfig;
+    widgetId?: string;
+    dateRange?: DateRange;
 }
 
 export interface WidgetFieldComponentEmit<ValueType> {
