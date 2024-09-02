@@ -272,7 +272,9 @@ const setInitialDataTableForm = () => {
     state.dataTableInfo = originState.dataTableInfo;
     joinState.joinType = originState.joinType;
     queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
-    evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({ ...expression, key: getRandomId() })) : [{
+    evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({
+        ...expression, isCollapsed: false, fieldType: expression.field_type, key: getRandomId(),
+    })) : [{
         key: getRandomId(), name: '', fieldType: EVAL_EXPRESSION_TYPE.DATA, expression: '', isCollapsed: false,
     }];
 };
