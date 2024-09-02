@@ -3,7 +3,6 @@ import {
     computed, reactive,
 } from 'vue';
 
-
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -11,7 +10,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PBadge, PStatus, PToolboxTable, PButton, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -74,8 +73,8 @@ const state = reactive({
     }))),
 });
 const tableState = reactive({
-    userTableFields: computed(() => {
-        const additionalFields: DefinitionField[] = [];
+    userTableFields: computed<DataTableFieldType[]>(() => {
+        const additionalFields: DataTableFieldType[] = [];
         if (userPageState.isAdminMode) {
             additionalFields.push(
                 { name: 'mfa_state', label: 'MFA' },
@@ -97,7 +96,7 @@ const tableState = reactive({
             { name: 'auth_type', label: 'Auth Type' },
             { name: 'last_accessed_count', label: 'Last Activity' },
         ];
-        return userPageStore.isWorkspaceOwner
+        return userPageStore.isWorkspaceOwner && props.hasReadWriteAccess
             ? [
                 ...baseFields,
                 { name: 'remove_button', label: ' ', sortable: false },
@@ -380,9 +379,7 @@ const roleBindingsContents = (roleBindings: RoleBindingModel[])
                     <span />
                 </template>
             </template>
-            <template v-if="props.hasReadWriteAccess"
-                      #col-remove_button-format="value"
-            >
+            <template #col-remove_button-format="value">
                 <p-button style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
