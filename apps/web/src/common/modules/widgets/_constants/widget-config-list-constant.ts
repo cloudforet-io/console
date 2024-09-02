@@ -1,4 +1,5 @@
 import clusteredColumnChart from '@/common/modules/widgets/_widgets/clustered-column-chart/widget-config';
+import colorCodedHeatmap from '@/common/modules/widgets/_widgets/color-coded-heatmap/widget-config';
 import gauge from '@/common/modules/widgets/_widgets/gauge/widget-config';
 import geoMap from '@/common/modules/widgets/_widgets/geo-map/widget-config';
 import heatmap from '@/common/modules/widgets/_widgets/heatmap/widget-config';
@@ -24,6 +25,7 @@ export const CONSOLE_WIDGET_CONFIG_KEYS = [
     'pieChart',
     'treemap',
     'heatmap',
+    'colorCodedHeatmap',
     'geoMap',
     'table',
     'stackedAreaChart',
@@ -40,6 +42,7 @@ export const CONSOLE_WIDGET_CONFIG: Record<WidgetConfigKey, Partial<WidgetConfig
     pieChart,
     treemap,
     heatmap,
+    colorCodedHeatmap,
     geoMap,
     table,
     stackedAreaChart,

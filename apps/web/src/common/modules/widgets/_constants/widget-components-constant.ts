@@ -40,6 +40,9 @@ export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     gauge: () => ({
         component: import('@/common/modules/widgets/_widgets/gauge/Gauge.vue'),
     }),
+    colorCodedHeatmap: () => ({
+        component: import('@/common/modules/widgets/_widgets/color-coded-heatmap/ColorCodedHeatmap.vue'),
+    }),
     // progressCard: () => ({
     //     component: import('@/common/modules/widgets/_widgets/progress-card/ProgressCard.vue'),
     // }),
@@ -58,5 +61,6 @@ export const WIDGET_COMPONENT_ICON_MAP: Record<WidgetConfigKey, string> = {
     table: 'ic_chart-table',
     stackedAreaChart: 'ic_chart-area',
     gauge: 'ic_chart-gauge',
+    colorCodedHeatmap: 'ic_chart-color-heatmap',
     // progressCard: 'ic_chart-progress-card',
 };
