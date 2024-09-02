@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { onUnmounted } from 'vue';
+import { computed, onUnmounted, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -8,6 +11,9 @@ import { PHorizontalLayout } from '@cloudforet/mirinae';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import { store } from '@/store';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -27,10 +33,24 @@ import type { WorkspaceGroupFetchParameters } from '@/services/advanced/types/ad
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 
+const route = useRoute();
+
 const workspaceGroupListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(workspaceGroupPageState.pageStart).setPageLimit(workspaceGroupPageState.pageLimit)
     .setSort('name', true);
 const workspaceGroupListApiQuery = workspaceGroupListApiQueryHelper.data;
+
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
+const state = reactive({
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        return closestRoute?.meta?.menuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+});
 
 const fetchWorkspaceGroups = async (tabRefresh:WorkspaceGroupFetchParameters = { isGroupUser: false, isWorkspace: false }) => {
     workspaceGroupPageState.loading = true;
@@ -83,10 +103,11 @@ onUnmounted(() => {
 
 <template>
     <section class="workspace-group-page">
-        <workspace-group-header />
+        <workspace-group-header :has-read-write-access="state.hasReadWriteAccess" />
         <p-horizontal-layout class="user-group-toolbox-layout">
             <template #container="{ height }">
                 <workspace-group-table :table-height="height"
+                                       :has-read-write-access="state.hasReadWriteAccess"
                                        @confirm="fetchWorkspaceGroups"
                 />
             </template>

@@ -2,18 +2,23 @@
 import {
     reactive, watch, onUnmounted, computed,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
+import { clone } from 'lodash';
 
 import {
     PHeading, PButton, PToolboxTable, PLink, PStatus, PTooltip, PI,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -34,6 +39,19 @@ const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWor
 
 const allReferenceStore = useAllReferenceStore();
 
+const route = useRoute();
+
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
+const state = reactive({
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        return closestRoute?.meta?.menuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+});
 const tableState = reactive({
     timezone: computed(() => store.state.user.timezone),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
@@ -41,15 +59,20 @@ const tableState = reactive({
         ...tableState.workspaces[workspace],
         remove_button: workspace,
     }))),
-    fields: [
-        { name: 'name', label: 'Name' },
-        { name: 'data.state', label: 'State' },
-        { name: 'data.user', label: 'User' },
-        { name: 'data.service_account_count', label: 'Service Account' },
-        { name: 'data.cost_info', label: 'Cost' },
-        { name: 'data.created_at', label: 'Created' },
-        { name: 'remove_button', label: ' ', sortable: false },
-    ],
+    fields: computed<DataTableFieldType[]>(() => {
+        const defaultFields: DataTableFieldType[] = [
+            { name: 'name', label: 'Name' },
+            { name: 'data.state', label: 'State' },
+            { name: 'data.user', label: 'User' },
+            { name: 'data.service_account_count', label: 'Service Account' },
+            { name: 'data.cost_info', label: 'Cost' },
+            { name: 'data.created_at', label: 'Created' },
+        ];
+        if (state.hasReadWriteAccess) {
+            defaultFields.push({ name: 'remove_button', label: ' ', sortable: false });
+        }
+        return defaultFields;
+    }),
 });
 
 const getWorkspaceRouteLocationByWorkspaceId = (item) => ({
@@ -165,7 +188,9 @@ onUnmounted(() => {
                    :total-count="workspaceGroupPageGetters.workspaceTotalCount"
                    heading-type="sub"
         >
-            <template #extra>
+            <template v-if="state.hasReadWriteAccess"
+                      #extra
+            >
                 <div class="workspace-group-tab-workspace-button-wrapper">
                     <p-button style-type="negative-primary"
                               :disabled="!workspaceGroupPageGetters.selectedWorkspacesByIndices.length"
@@ -193,7 +218,7 @@ onUnmounted(() => {
                          :sort-desc="true"
                          :this-page.sync="workspaceGroupPageState.workspacePage"
                          :search-text.sync="workspaceGroupPageState.workspaceSearchText"
-                         selectable
+                         :selectable="state.hasReadWriteAccess"
                          sortable
                          searchable
                          @select="handleSelect"
