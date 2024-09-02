@@ -129,12 +129,7 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
             };
             commit('setCurrentGrantInfo', grantInfo);
 
-            const grantRoleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
-            const roleInfo = {
-                roleId: grantRoleInfo ? grantRoleInfo?.roleId : response.role_id,
-                roleType: grantRoleInfo ? grantRoleInfo?.roleType : response.role_type,
-                pageAccess: response.page_access || grantRoleInfo?.pageAccess,
-            };
+            const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
             commit('setCurrentRoleInfo', roleInfo);
 
             if (grantRequest.scope === 'DOMAIN') {
