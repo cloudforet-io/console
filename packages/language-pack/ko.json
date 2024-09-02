@@ -1509,6 +1509,8 @@
 					"FILTERS": "필터",
 					"GROUP_BY": "그룹별 통계(Group by)",
 					"JOIN_DESC": "공통 열을 기준으로 다른 테이블의 행을 병합합니다.",
+					"LEGACY_WARNING_DESC": "이 ‘{operator}’ 형식은 더 이상 지원되지 않습니다. 이 형식을 삭제하고 새로운 데이터 변환을 추가해 주세요.",
+					"LEGACY_WARNING_TITLE": "지원되지 않는 ‘{operator}’ 형식",
 					"QUERY_DESC": "특정 조건을 충족하는 데이터를 필터링하고 추출합니다.",
 					"SELECT_DATA_SOURCE_SUCCESS": "데이터 수정 완료",
 					"SELECT_DATA_TABLE_WARNING": "데이터 테이블을 먼저 저장하세요.",

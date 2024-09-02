@@ -29,6 +29,7 @@ import type {
 import type {
     DataTableOperator, JoinType, ConcatOptions, JoinOptions, QueryOptions, EvalOptions,
     DataTableTransformOptions,
+    EvaluateExpression,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -87,6 +88,14 @@ const state = reactive({
         dataTableId: undefined,
     } as TransformDataTableInfo,
     failStatus: false,
+    isLegacyDataTable: computed(() => {
+        if (state.operator === 'EVAL') return false;
+        const evalExpressions = (props.item.options as DataTableTransformOptions).EVAL?.expressions;
+        if (!evalExpressions?.length) return false;
+        const isLegacyEval = typeof evalExpressions[0] === 'string';
+        if (isLegacyEval) return true;
+        return false;
+    }),
 });
 
 const modalState = reactive({
@@ -118,19 +127,7 @@ const originState = reactive({
     conditions: computed(() => ((props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []).map((condition) => ({
         value: condition,
     }))),
-    expressions: computed(() => convertLegacyEvaluateDataTable((props.item.options as DataTableTransformOptions).EVAL?.expressions ?? [])),
-});
-
-const convertLegacyEvaluateDataTable = (expressions: any[]) => expressions.map((expression) => {
-    if (typeof expression === 'string') {
-        const _name = (expression.split('=')[0] ?? '').trim();
-        const _expression = (expression.split('=')[1] ?? '').trim();
-        return {
-            name: _name,
-            fieldType: EVAL_EXPRESSION_TYPE.DATA,
-            expression: _expression,
-        };
-    } return expression;
+    expressions: computed<EvaluateExpression[]|string[]>(() => (props.item.options as DataTableTransformOptions).EVAL?.expressions ?? []),
 });
 
 const setFailStatus = (status: boolean) => {
@@ -275,7 +272,9 @@ const setInitialDataTableForm = () => {
     state.dataTableInfo = originState.dataTableInfo;
     joinState.joinType = originState.joinType;
     queryState.conditions = originState.conditions.length ? originState.conditions.map((cond) => ({ ...cond, key: getRandomId() })) : [{ key: getRandomId(), value: '' }];
-    evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({ ...expression, key: getRandomId() })) : [{
+    evalState.expressions = originState.expressions.length ? originState.expressions.map((expression) => ({
+        ...expression, isCollapsed: false, fieldType: expression.field_type, key: getRandomId(),
+    })) : [{
         key: getRandomId(), name: '', fieldType: EVAL_EXPRESSION_TYPE.DATA, expression: '', isCollapsed: false,
     }];
 };
@@ -309,16 +308,20 @@ defineExpose({
                                                       :data-type="DATA_TABLE_TYPE.TRANSFORMED"
                                                       :selected="props.selected"
                                                       :data-table-name.sync="state.dataTableName"
+                                                      :is-legacy-data-table="state.isLegacyDataTable"
             />
         </div>
+
         <widget-form-data-table-card-transform-form :data-table-id="state.dataTableId"
                                                     :operator="state.operator"
                                                     :data-table-info.sync="state.dataTableInfo"
                                                     :join-type.sync="joinState.joinType"
                                                     :conditions.sync="queryState.conditions"
                                                     :expressions.sync="evalState.expressions"
+                                                    :is-legacy-data-table="state.isLegacyDataTable"
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
+                                            :is-legacy-data-table="state.isLegacyDataTable"
                                             :changed="state.optionsChanged"
                                             :loading="state.loading"
                                             @delete="handleClickDeleteDataTable"

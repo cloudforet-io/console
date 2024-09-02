@@ -19,6 +19,8 @@ import type {
     DataTableOperator, JoinType,
 } from '@/common/modules/widgets/types/widget-model';
 
+import { yellow } from '@/styles/colors';
+
 interface Props {
     dataTableId: string;
     operator: DataTableOperator;
@@ -26,6 +28,7 @@ interface Props {
     joinType: JoinType|undefined;
     conditions: QueryCondition[];
     expressions: EvalExpressions[];
+    isLegacyDataTable?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -117,10 +120,34 @@ const handleClickAddCondition = () => {
                 />
                 <span>{{ state.operatorMap.name }}</span>
             </div>
+            <div v-if="props.isLegacyDataTable"
+                 class="legacy-data-table-warning"
+            >
+                <div class="warning-title">
+                    <p-i name="ic_warning-filled"
+                         width="1.25rem"
+                         height="1.25rem"
+                         :color="yellow[500]"
+                    />
+                    <span>
+                        <i18n path="COMMON.WIDGETS.DATA_TABLE.FORM.LEGACY_WARNING_TITLE">
+                            <template #operator>{{ state.operatorMap.name }}</template>
+                        </i18n>
+                    </span>
+                </div>
+                <p class="warning-description">
+                    <i18n path="COMMON.WIDGETS.DATA_TABLE.FORM.LEGACY_WARNING_DESC">
+                        <template #operator>
+                            {{ state.operatorMap.name }}
+                        </template>
+                    </i18n>
+                </p>
+            </div>
             <div class="data-table-dropdown-wrapper">
                 <widget-form-data-table-card-transform-data-table-dropdown :data-table-id="props.dataTableId"
                                                                            :operator="props.operator"
                                                                            :data-table-info.sync="state.proxyDataTableInfo"
+                                                                           :is-legacy-data-table="props.isLegacyDataTable"
                 />
             </div>
             <p-field-group v-if="props.operator === DATA_TABLE_OPERATOR.JOIN"
@@ -173,6 +200,7 @@ const handleClickAddCondition = () => {
             </p-field-group>
             <widget-form-data-table-card-transform-form-evaluate v-if="props.operator === DATA_TABLE_OPERATOR.EVAL"
                                                                  :expressions.sync="evalState.proxyExpressions"
+                                                                 :is-legacy-data-table="props.isLegacyDataTable"
             />
         </div>
     </div>
@@ -214,6 +242,20 @@ const handleClickAddCondition = () => {
         .functions-wrapper {
             @apply flex gap-1 items-center;
             margin-bottom: 0.5rem;
+        }
+    }
+
+    .legacy-data-table-warning {
+        @apply w-full bg-yellow-100 rounded;
+        padding: 0.5rem 1rem;
+        margin-bottom: 0.5rem;
+        .warning-title {
+            @apply flex items-center gap-1 text-label-lg font-bold text-yellow-700;
+            margin-bottom: 0.25rem;
+        }
+        .warning-description {
+            @apply text-paragraph-md text-gray-900;
+            padding-left: 1.5rem;
         }
     }
 }
