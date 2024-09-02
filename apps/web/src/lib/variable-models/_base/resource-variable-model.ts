@@ -51,7 +51,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
             name: options.name,
             isDataKey: _isDataKey,
             isFilter: _isFilter,
-            values: _isDataKey ? this.stat(options.key as string) : undefined,
+            values: _isDataKey ? this.stat(options.key as string, options.presetValues) : undefined,
         };
 
         // TODO: keys method binding
@@ -112,6 +112,10 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         }
         if (query.filters) {
             apiQueryHelper.addFilter({ k: dataKey, v: query.filters, o: '=' });
+        }
+
+        if (query.start !== undefined && query.limit !== undefined) {
+            apiQueryHelper.setPage(query.start, query.limit);
         }
 
         this.#properties?.forEach((key) => {
@@ -186,7 +190,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         }
     }
 
-    stat(dataKey: string): (query?: ListQuery) => Promise<ListResponse> {
+    stat(dataKey: string, presetValues?: string[]): (query?: ListQuery) => Promise<ListResponse> {
         const _dataKey = dataKey;
         return async (query: ListQuery = {}) => {
             try {
@@ -200,10 +204,17 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                 if (status === 'succeed') {
                     let more = false;
                     if (query.start !== undefined && query.limit !== undefined && response.total_count !== undefined) {
-                        more = (query.start * query.limit) < response.total_count;
+                        more = (query.start - 1 + query.limit) < response.total_count;
                     }
+
+                    const _presetValues = presetValues;
+                    const _resultsWithPreset = [
+                        ...(query.start === 1 ? (_presetValues ?? []).map((d) => ({ name: d, key: d })) : []),
+                        ...(response.results.filter((d) => !_presetValues?.includes(d)).map((d) => ({ key: d, name: d })) ?? []),
+                    ];
+
                     this.#response = {
-                        results: response.results ? response.results.map((d) => ({ key: d, name: d })) : [],
+                        results: _presetValues ? _resultsWithPreset : (response.results ?? []).map((d) => ({ key: d, name: d })),
                         more,
                     };
                 }
