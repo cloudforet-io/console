@@ -81,7 +81,6 @@ export const useRoleReferenceStore = defineStore('reference-role', () => {
                 data: role,
             };
         });
-        console.log(roleReferenceMap);
         state.items = roleReferenceMap;
         lastLoadedTime = currentTime;
     };
