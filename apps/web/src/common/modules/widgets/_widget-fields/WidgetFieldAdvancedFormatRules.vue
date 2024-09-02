@@ -90,8 +90,8 @@ watch(() => labelsMenuItem.value, (menuItem) => {
 onMounted(() => {
     state.proxyValue = {
         ...state.proxyValue,
-        value: state.proxyValue?.value ?? [],
-        baseColor: state.proxyValue?.baseColor ?? props.widgetFieldSchema?.options?.baseColor ?? DEFAULT_BASE_COLOR,
+        value: props.value?.value ?? [],
+        baseColor: props.value?.baseColor ?? props.widgetFieldSchema?.options?.baseColor ?? DEFAULT_BASE_COLOR,
     };
 });
 </script>
