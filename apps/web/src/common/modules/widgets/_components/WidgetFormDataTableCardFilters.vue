@@ -85,12 +85,12 @@ const state = reactive({
     loading: false,
     proxyFilter: useProxyValue('filter', props, emit),
     filterItems: computed(() => props.filterItems),
-    selectedItems: [] as MenuItem[],
+    selectedItems: [] as any[],
     handlerMap: computed(() => {
         const handlerMaps = {};
         if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
-            state.selectedItems.forEach(({ name }) => {
-                handlerMaps[name] = getCostMenuHandler(name, {}, state.primaryCostStatOptions);
+            state.selectedItems.forEach(({ name, presetKeys }) => {
+                handlerMaps[name] = getCostMenuHandler(name, {}, state.primaryCostStatOptions, { presetKeys });
             });
         } else {
             assetFilterState.refinedLabelKeys.forEach((labelInfo) => {
@@ -193,7 +193,12 @@ const resetFilterByKey = (key: string) => {
     state.proxyFilter = { ...state.proxyFilter };
     state.selectedItemsMap = { ...state.selectedItemsMap };
 };
-const getCostMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>, primaryOptions: Record<string, any>): AutocompleteHandler => {
+const getCostMenuHandler = (
+    groupBy: string,
+    listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>,
+    primaryOptions: Record<string, any>,
+    modelOptions?: Record<string, any>,
+): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
         const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
@@ -204,7 +209,7 @@ const getCostMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Ma
             };
         } else {
             const CostVariableModel = new VariableModelFactory({ type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.cost });
-            CostVariableModel[groupBy] = CostVariableModel.generateProperty({ key: groupBy });
+            CostVariableModel[groupBy] = CostVariableModel.generateProperty({ key: groupBy, presetValues: modelOptions?.presetKeys });
             variableModelInfo = {
                 variableModel: CostVariableModel,
                 dataKey: groupBy,
