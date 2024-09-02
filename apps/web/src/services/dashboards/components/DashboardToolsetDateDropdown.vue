@@ -181,10 +181,9 @@ watch(() => props.dateRange, () => {
     min-height: 2rem;
 
     &.detail-page {
-        gap: 0.125rem;
         .label-text {
             @apply text-label-md font-bold text-gray-800;
-            padding-right: 0.5rem;
+            padding-right: 0.25rem;
         }
     }
 }
