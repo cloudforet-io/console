@@ -54,7 +54,6 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     dataTableId: computed(() => props.item.data_table_id),
-    options: computed(() => props.item.options),
     dataTableName: props.item.name ? props.item.name : `${props.item.operator} Data`,
     applyDisabled: computed(() => {
         const haveSavedName = !!originState.name;
@@ -119,7 +118,19 @@ const originState = reactive({
     conditions: computed(() => ((props.item.options as DataTableTransformOptions).QUERY?.conditions ?? []).map((condition) => ({
         value: condition,
     }))),
-    expressions: computed(() => ((props.item.options as DataTableTransformOptions).EVAL?.expressions ?? [])),
+    expressions: computed(() => convertLegacyEvaluateDataTable((props.item.options as DataTableTransformOptions).EVAL?.expressions ?? [])),
+});
+
+const convertLegacyEvaluateDataTable = (expressions: any[]) => expressions.map((expression) => {
+    if (typeof expression === 'string') {
+        const _name = (expression.split('=')[0] ?? '').trim();
+        const _expression = (expression.split('=')[1] ?? '').trim();
+        return {
+            name: _name,
+            fieldType: EVAL_EXPRESSION_TYPE.DATA,
+            expression: _expression,
+        };
+    } return expression;
 });
 
 const setFailStatus = (status: boolean) => {
