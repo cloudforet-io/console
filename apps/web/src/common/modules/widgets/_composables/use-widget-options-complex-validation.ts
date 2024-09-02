@@ -58,9 +58,8 @@ export const useWidgetOptionsComplexValidation = ({
             const fixedVal = (config.requiredFieldsSchema.groupBy?.options as GroupByOptions)?.fixedValue;
             const val = (valueMap?.groupBy as GroupByValue)?.value;
             if (fixedVal) {
-                if ((Array.isArray(val) && !val.includes(fixedVal)) || val !== fixedVal) {
-                    return false;
-                }
+                if (Array.isArray(val)) return val.includes(fixedVal);
+                return val === fixedVal;
             }
         }
         return true;
@@ -97,7 +96,6 @@ export const useWidgetOptionsComplexValidation = ({
         const isRequiredFieldsValid = getRequiredFieldValidation(valueMap, config);
         const isDuplicatedLabelInfoValid = getDuplicatedLabelInfoValidation(valueMap, config);
         state.invalid = !isRequiredFieldsValid || !isDuplicatedLabelInfoValid;
-        console.log(isRequiredFieldsValid, isDuplicatedLabelInfoValid, state.invalid);
     };
 
     watch([() => _state.valueMap, () => _state.widgetConfig], ([changedValueMap, config]) => {
