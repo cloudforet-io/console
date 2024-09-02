@@ -3,7 +3,7 @@ import {
     computed, defineExpose, reactive, ref,
 } from 'vue';
 
-import { max, orderBy } from 'lodash';
+import { orderBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -41,7 +41,6 @@ const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
-    heatmapMaxValue: computed(() => max(state.chartData.map((d) => d?.[2] || 0)) ?? 1),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     boxWidth: computed<number>(() => {
         if (!props.width) return BOX_MIN_WIDTH;
