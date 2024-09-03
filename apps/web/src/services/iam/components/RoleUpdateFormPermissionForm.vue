@@ -87,7 +87,7 @@ const handleUpdateForm = (value: PageAccessMenuItem, isInit?: boolean) => {
 const handleUpdateEditor = (value: string) => {
     state.policy = value;
     if (state.selectedRadioIdx === 0) return;
-    state.proxyPolicyValid = true;
+    state.proxyPolicyValid = state.policy !== '';
 };
 const setPageAccessPermissionsData = () => {
     if (!props.initialPageAccess) return;
@@ -113,10 +113,10 @@ const setPageAccessPermissionsData = () => {
 
 /* Watcher */
 watch(() => state.selectedRadioIdx, (selectedRadioIdx) => {
-    state.proxyPolicyValid = selectedRadioIdx === 0 ? true : state.policy !== '';
     if (selectedRadioIdx === 0) {
         state.policy = undefined;
     }
+    state.proxyPolicyValid = selectedRadioIdx === 0 ? true : state.policy;
 });
 watch(() => state.policy, (policy) => {
     emit('update-form', { permissions: policy ? policy.split('\n') : [] });

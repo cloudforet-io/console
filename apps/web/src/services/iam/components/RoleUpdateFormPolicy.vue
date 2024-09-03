@@ -55,7 +55,6 @@ const state = reactive({
 
 /* Component */
 const handleCodeUpdate = (modifiedCode: string) => {
-    if (!modifiedCode) return;
     state.code = modifiedCode;
     emit('update', modifiedCode);
 };
