@@ -191,7 +191,7 @@ export const sortArrayInObjectArray = <Data extends RawData = RawData>(
  * @description Get contrasting color from hex color
  * @param hexColor
  */
-export const getContrastingColor = (hexColor?: string) => {
+export const getContrastingColor = (hexColor?: string): string => {
     const _white = '#FFFFFF';
     const _black = '#232533';
 
