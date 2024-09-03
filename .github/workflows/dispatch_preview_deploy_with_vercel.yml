@@ -7,10 +7,6 @@ on:
         description: 'Enter Vercel project name'
         required: true
         default: 'feedback'
-      config_url:
-        description: 'Enter the URL of the Edge Config'
-        required: true
-        default: 'https://edge-config.vercel.com/ecfg_rowryyiesolfcdzbajjl4qbuf8ha?token=d0f6ac38-4811-4dfb-9eb4-be39930f0bb1'
 
 env:
   TEAM_NAME: ${{ vars.VERCEL_TEAM_NAME }}
@@ -30,10 +26,6 @@ jobs:
       - name: Set up environment
         run: sudo apt-get install jq
 
-      - name: Fetch Edge Config and Save to JSON
-        run: |
-          curl -s '${{ github.event.inputs.config_url }}' | jq '.' > ./apps/web/public/config/production.json
-
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
@@ -42,6 +34,9 @@ jobs:
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --token=${{ env.VERCEL_TOKEN }}
+
+      - name: Pull Vercel Edge Config
+        run: vercel env pull ./apps/web/.env --yes --token=${{ env.VERCEL_TOKEN }}
 
       - name: Build Project Artifacts
         run: vercel build --prod --yes --token=${{ env.VERCEL_TOKEN }}
