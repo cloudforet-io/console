@@ -437,7 +437,6 @@ watch([ // Fetch Dynamic Field
                                    appearance-type="badge"
                                    show-select-marker
                                    show-clear-selection
-                                   is-filterable
                                    @select="handleSelectDynamicFields"
                                    @clear-selection="handleClearDynamicFieldsSelection"
                 />
