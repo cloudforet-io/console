@@ -72,12 +72,6 @@ const state = reactive({
     }),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     boxWidth: BOX_MIN_WIDTH,
-    boxHeight: computed<number>(() => {
-        const _containerHeight = colorCodedTableRef.value?.clientHeight ?? 0;
-        const yAxisCount = state.data?.results?.length ?? 0;
-        if (!_containerHeight || !yAxisCount) return 0;
-        return _containerHeight / yAxisCount;
-    }),
     xAxisData: computed<string[]>(() => {
         if (state.xAxisField === DATE_FIELD.DATE) {
             return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
