@@ -221,7 +221,7 @@ onMounted(() => {
                           icon-left="ic_plus_bold"
                           @click="handleClickAddCustomFieldWidth"
                 >
-                    {{ $t('Add Custom Field Width') }}
+                    {{ $t('COMMON.WIDGETS.CUSTOM_TABLE_COLUMN_WIDTH.ADD') }}
                 </p-button>
             </div>
         </div>
