@@ -249,7 +249,9 @@ callApiWithGrantGuard();
            :menu-set="state.menuSet"
     >
         <template #slot-dashboards="item">
-            <l-s-b-router-menu-item :item="item">
+            <l-s-b-router-menu-item :current-path="state.currentPath"
+                                    :item="item"
+            >
                 <template #right-extra>
                     <p-icon-button name="ic_plus"
                                    size="sm"
