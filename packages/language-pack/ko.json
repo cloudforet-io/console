@@ -1446,6 +1446,7 @@
 			"CONTINUE": "계속하기",
 			"CRITERIA": "기준",
 			"CUSTOM_TABLE_COLUMN_WIDTH": {
+				"ADD": "사용자 지정 너비 추가",
 				"CUSTOM_TABLE_COLUMN_WIDTH": "열 너비 직접 설정",
 				"DESCRIPTION": "특정 열의 너비를 기본 설정과 다르게 지정할 수 있습니다. 고정된 너비도 변경할 수 있지만, 최소 너비보다 작은 값은 적용되지 않습니다.",
 				"FIELD": "필드",
@@ -1492,6 +1493,7 @@
 					"DATA_TABLE_NAME_WARNING": "동일한 이름의 데이터가 이미 존재합니다.",
 					"DATA_UNIT": "데이터 단위",
 					"EVAL": {
+						"ADD_FIELD": "필드 추가",
 						"DELETE_MODAL_DESC": "이 필드를 삭제하시겠습니까?",
 						"DELETE_MODAL_TITLE": "{field_name} 삭제",
 						"DELETE_SUCCESS_TOOLTIP": "{field_name} 삭제 완료",
@@ -1532,11 +1534,22 @@
 				"PLACEHOLDER": "기준: 만원"
 			},
 			"DISPLAY_SERIES_LABEL": {
+				"BOTTOM": "아래",
 				"DISPLAY_SERIES_LABEL": "시리즈 레이블 표시 ",
+				"INNER": "안쪽",
+				"INSIDE": "내부",
+				"INSIDE_BOTTOM": "내부 아래쪽",
+				"INSIDE_LEFT": "내부 왼쪽",
+				"INSIDE_RIGHT": "내부 오른쪽",
+				"INSIDE_TOP": "내부 위쪽",
+				"LEFT": "왼쪽",
+				"OUTER": "바깥쪽",
 				"POSITION": "위치",
+				"RIGHT": "오른쪽",
 				"ROTATE": "회전",
 				"ROTATE_MAX_INVALID_TEXT": "90 이하로 설정해주세요.",
-				"ROTATE_MIN_INVALID_TEXT": "-90 이상으로 설정해주세요."
+				"ROTATE_MIN_INVALID_TEXT": "-90 이상으로 설정해주세요.",
+				"TOP": "위"
 			},
 			"DONE": "완료",
 			"DONUT": "도넛 차트",
@@ -1684,6 +1697,10 @@
 				"SUB_TOTAL": "소계(Subtotal)"
 			},
 			"TABLE_COLUMN_WIDTH": {
+				"AUTO": "자동",
+				"FIX": "고정",
+				"INVALID_LENGTH": "너비를 입력해 주세요.",
+				"INVALID_MINIMUM_WIDTH": "설정된 최소 열 너비값 보다 커야 합니다.",
 				"MINIMUM_WIDTH": "최소 너비",
 				"TABLE_COLUMN_WIDTH": "열 너비",
 				"WIDTH": "너비"

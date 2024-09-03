@@ -1446,6 +1446,7 @@
 			"CONTINUE": "次へ",
 			"CRITERIA": "条件",
 			"CUSTOM_TABLE_COLUMN_WIDTH": {
+				"ADD": "カスタムフィールド幅を追加",
 				"CUSTOM_TABLE_COLUMN_WIDTH": "カスタムテーブルの列幅",
 				"DESCRIPTION": "特定の列の幅を設定して、デフォルト設定を上書きすることができます。固定された幅も上書きできますが、最小幅より小さい値は無視されます。",
 				"FIELD": "フィールド",
@@ -1492,6 +1493,7 @@
 					"DATA_TABLE_NAME_WARNING": "この名前のデータはすでに存在します。",
 					"DATA_UNIT": "データ単位",
 					"EVAL": {
+						"ADD_FIELD": "フィールド追加",
 						"DELETE_MODAL_DESC": "このフィールドを削除してもよろしいですか？",
 						"DELETE_MODAL_TITLE": "{field_name}を削",
 						"DELETE_SUCCESS_TOOLTIP": "{field_name}は正常に削除されました。",
@@ -1532,11 +1534,22 @@
 				"PLACEHOLDER": "基準: 1万円"
 			},
 			"DISPLAY_SERIES_LABEL": {
+				"BOTTOM": "下",
 				"DISPLAY_SERIES_LABEL": "系列ラベルを表示",
+				"INNER": "内側",
+				"INSIDE": "内側",
+				"INSIDE_BOTTOM": "内側下",
+				"INSIDE_LEFT": "側左",
+				"INSIDE_RIGHT": "内側右",
+				"INSIDE_TOP": "内側上",
+				"LEFT": "左",
+				"OUTER": "側",
 				"POSITION": "位置",
+				"RIGHT": "右",
 				"ROTATE": "回転",
 				"ROTATE_MAX_INVALID_TEXT": "90より小さい必要があります",
-				"ROTATE_MIN_INVALID_TEXT": "-90より大きい必要があります"
+				"ROTATE_MIN_INVALID_TEXT": "-90より大きい必要があります",
+				"TOP": "上"
 			},
 			"DONE": "完了",
 			"DONUT": "Donut",
@@ -1684,6 +1697,10 @@
 				"SUB_TOTAL": "小計"
 			},
 			"TABLE_COLUMN_WIDTH": {
+				"AUTO": "オート",
+				"FIX": "固定",
+				"INVALID_LENGTH": "幅を入力してください。",
+				"INVALID_MINIMUM_WIDTH": "列の幅は最小列幅より大きくする必要があります。",
 				"MINIMUM_WIDTH": "最小幅",
 				"TABLE_COLUMN_WIDTH": "れつはば",
 				"WIDTH": "幅 (はば)"
