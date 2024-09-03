@@ -26,14 +26,12 @@ interface Props {
     roleType?: RoleType
     initialPermissions?: string[];
     selectedRadioIdx?: number;
-    isEdit?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     roleType: ROLE_TYPE.DOMAIN_ADMIN,
     initialPermissions: undefined,
     selectedRadioIdx: 0,
-    isEdit: false,
 });
 
 const emit = defineEmits<{(e: 'update', value: string): void,
@@ -42,7 +40,6 @@ const emit = defineEmits<{(e: 'update', value: string): void,
 
 const state = reactive({
     code: '',
-    isEdit: false,
     radioMenuList: computed<RadioType[]>(() => ([
         {
             label: i18n.t('IAM.ROLE.FORM.POLICY_DEFAULT'),
@@ -64,11 +61,8 @@ const handleCodeUpdate = (modifiedCode: string) => {
 };
 
 /* Watcher */
-watch(() => state.proxySelectedRadioIdx, (proxySelectedRadioIdx) => {
-    if (proxySelectedRadioIdx === 0) handleCodeUpdate('');
-});
 watch(() => props.initialPermissions, (value) => {
-    if (value) {
+    if (value && value.length > 0) {
         state.proxySelectedRadioIdx = 1;
         state.code = value.join('\n');
     }

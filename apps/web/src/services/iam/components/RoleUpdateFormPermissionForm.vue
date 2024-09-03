@@ -47,7 +47,7 @@ const menuItems = ref([] as PageAccessMenuItem[]);
 const state = reactive({
     pageAccessPermissions: computed(() => getPageAccessList(menuItems.value)),
     proxyPageAccessValid: useProxyValue('isPageAccessValid', props, emit),
-    policy: '',
+    policy: '' as string|undefined,
     proxyPolicyValid: useProxyValue('isPolicyValid', props, emit),
     selectedRadioIdx: 0,
 });
@@ -114,9 +114,12 @@ const setPageAccessPermissionsData = () => {
 /* Watcher */
 watch(() => state.selectedRadioIdx, (selectedRadioIdx) => {
     state.proxyPolicyValid = selectedRadioIdx === 0 ? true : state.policy !== '';
+    if (selectedRadioIdx === 0) {
+        state.policy = undefined;
+    }
 });
 watch(() => state.policy, (policy) => {
-    emit('update-form', { permissions: policy.split('\n') });
+    emit('update-form', { permissions: policy ? policy.split('\n') : [] });
 });
 watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessPermissions) => {
     if (isEqual(pageAccessPermissions, prevPageAccessPermissions)) return;
@@ -137,7 +140,6 @@ watch([() => props.roleType, () => props.initialPageAccess], ([roleType]) => {
         <role-update-form-policy :role-type="props.roleType"
                                  :initial-permissions="props.initialPermissions"
                                  :selected-radio-idx.sync="state.selectedRadioIdx"
-                                 :is-edit="props.formType === FORM_TYPE.UPDATE"
                                  @update="handleUpdateEditor"
         />
     </p-pane-layout>
