@@ -200,7 +200,6 @@ const handleClearDynamicFieldsSelection = () => {
 
 /* Watcher */
 watch(() => state.isValid, (isValid) => {
-    console.log(isValid);
     emit('update:is-valid', isValid);
 }, { immediate: true });
 const convertToMenuItem = (data?: string[]) => data?.map((d) => ({
