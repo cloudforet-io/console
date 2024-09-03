@@ -1364,7 +1364,8 @@
 			"ADD_WIDGET": "위젯 추가",
 			"ADD_WIDGET_TO_DASHBOARD": "대시보드에 위젯 추가",
 			"ADVANCED_FORMAT_RULES": {
-				"COLOR_CODED_HEATMAP_DESC": ""
+				"COLOR_CODED_HEATMAP_DESC": "",
+				"COLOR_CODED_TABLE_HEATMAP_DESC": ""
 			},
 			"ALL_SUMMARY": {
 				"ADD_SERVICE_ACCOUNTS": "서비스 어카운트 추가",
