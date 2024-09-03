@@ -11,10 +11,6 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dr
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import {
-    PIE_CHART_SERIES_LABEL_POSITION,
-    COLUMN_CHART_SERIES_LABEL_POSITION, LINE_CHART_SERIES_LABEL_POSITION,
-} from '@/common/modules/widgets/_constants/widget-field-constant';
 import type {
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
@@ -34,21 +30,27 @@ const state = reactive({
         const _widgetName = props.widgetConfig?.widgetName;
         if (!_widgetName) return [];
         if (_widgetName === 'pieChart') {
-            return Object.entries(PIE_CHART_SERIES_LABEL_POSITION).map(([k, v]) => ({
-                name: k,
-                label: v,
-            }));
+            return [
+                { name: 'inner', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INNER') },
+                { name: 'outer', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.OUTER') },
+            ];
         }
         if (['lineChart', 'stackedAreaChart'].includes(_widgetName)) {
-            return Object.entries(LINE_CHART_SERIES_LABEL_POSITION).map(([k, v]) => ({
-                name: k,
-                label: v,
-            }));
+            return [
+                { name: 'top', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.TOP') },
+                { name: 'bottom', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.BOTTOM') },
+            ];
         }
-        return Object.entries(COLUMN_CHART_SERIES_LABEL_POSITION).map(([k, v]) => ({
-            name: k,
-            label: v,
-        }));
+
+        return [
+            { name: 'inside', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE') },
+            { name: 'left', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.LEFT') },
+            { name: 'right', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.RIGHT') },
+            { name: 'insideLeft', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE_LEFT') },
+            { name: 'insideRight', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE_RIGHT') },
+            { name: 'insideTop', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE_TOP') },
+            { name: 'insideBottom', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE_BOTTOM') },
+        ];
     }),
     isRotateValid: computed<boolean>(() => {
         if (!state.proxyValue?.toggleValue) return true;

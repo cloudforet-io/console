@@ -201,7 +201,7 @@ const handleClickAddLabel = () => {
                   icon-left="ic_plus_bold"
                   @click="handleClickAddLabel"
         >
-            {{ $t('Add Field') }}
+            {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.ADD_FIELD') }}
         </p-button>
         <p-button-modal :header-title="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_MODAL_TITLE', { field_name: modalState.currentSelectionName })"
                         :visible.sync="modalState.visible"
