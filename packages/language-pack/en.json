@@ -2448,6 +2448,8 @@
 				"MANAGE": "Manage",
 				"NO_ACCESS": "No Access",
 				"PERMISSION": "Permission",
+				"POLICY_CUSTOM": "Custom Policy",
+				"POLICY_DEFAULT": "Default",
 				"READ_AND_WRITE": "Read & Write",
 				"READ_ONLY": "Read-only",
 				"READ_ONLY_PERMISSIONS": "Read-only Access Permissions",
