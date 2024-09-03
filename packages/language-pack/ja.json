@@ -1512,6 +1512,8 @@
 					"FILTERS": "フィルター",
 					"GROUP_BY": "グループ別統計(Group by)",
 					"JOIN_DESC": "共通の列に基づいて、異なるテーブルの行を結合します。",
+					"LEGACY_WARNING_DESC": "",
+					"LEGACY_WARNING_TITLE": "",
 					"QUERY_DESC": "特定の条件を満たすデータをフィルタリングして抽出します。",
 					"SELECT_DATA_SOURCE_SUCCESS": "データが正常に変更されました。",
 					"SELECT_DATA_TABLE_WARNING": "先にデータテーブルを保存してください。",

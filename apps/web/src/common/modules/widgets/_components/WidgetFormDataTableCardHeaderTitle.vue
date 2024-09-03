@@ -25,6 +25,7 @@ interface Props {
     dataType: DataTableDataType;
     dataTableName: string;
     selected: boolean;
+    isLegacyDataTable?: boolean;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:dataTableName', value: string): void;}>();
@@ -129,6 +130,7 @@ const handleClickNameConfirm = async () => {
             </p-tooltip>
             <p-icon-button class="edit-button"
                            style-type="transparent"
+                           :disabled="props.isLegacyDataTable"
                            name="ic_edit-text"
                            size="sm"
                            @click="handleClickNameEdit"

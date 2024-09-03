@@ -1512,6 +1512,8 @@
 					"FILTERS": "Filters",
 					"GROUP_BY": "Group by",
 					"JOIN_DESC": "Merge rows from different tables based on a common column. ",
+					"LEGACY_WARNING_DESC": "This ‘{operator}’ format is no longer supported. Please remove it and implement the new data transformation.",
+					"LEGACY_WARNING_TITLE": "Unsupported ‘{operator}’ Format",
 					"QUERY_DESC": "Filter and extract data that meet specific conditions. ",
 					"SELECT_DATA_SOURCE_SUCCESS": "Data successfully changed.",
 					"SELECT_DATA_TABLE_WARNING": "Please save the data table first.",

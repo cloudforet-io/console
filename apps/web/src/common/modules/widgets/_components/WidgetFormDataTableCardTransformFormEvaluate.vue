@@ -18,7 +18,8 @@ import type { EvalExpressions } from '@/common/modules/widgets/types/widget-data
 import type { EvaluateExpressionType } from '@/common/modules/widgets/types/widget-model';
 
 interface Props {
-    expressions: EvalExpressions[];
+    expressions: (EvalExpressions[]|string[]);
+    isLegacyDataTable?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -60,7 +61,7 @@ const handleClickDeleteExpression = (key: string) => {
     const targetExpression = state.proxyExpressions.find((d) => d.key === key);
     if (!targetExpression?.name && !targetExpression?.expression) {
         state.proxyExpressions = state.proxyExpressions.filter((expression) => expression.key !== key);
-        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'));
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'), '');
         return;
     }
     modalState.visible = true;
@@ -71,7 +72,7 @@ const handleConfirmDeleteExpression = () => {
     state.proxyExpressions = state.proxyExpressions.filter((expression) => expression.key !== modalState.currentSelectionKey);
     modalState.visible = false;
     modalState.currentSelectionKey = undefined;
-    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'));
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'), '');
 };
 const handleCancelModal = () => {
     modalState.visible = false;
@@ -104,70 +105,95 @@ const handleClickAddLabel = () => {
 
 <template>
     <div class="widget-form-data-table-card-transform-form-evaluate">
-        <div v-for="(expression) in state.proxyExpressions"
-             :key="expression.key"
-             :class="{'expression-form-card': true, collapsed: expression.isCollapsed}"
-        >
-            <div class="form-header"
-                 @click="handleToggleExpressionCard(expression.key)"
+        <template v-if="!props.isLegacyDataTable">
+            <div v-for="(expression) in state.proxyExpressions"
+                 :key="expression.key"
+                 :class="{'expression-form-card': true, collapsed: expression.isCollapsed}"
             >
-                <div class="title">
-                    <p-i name="ic_chevron-down"
-                         width="1.5rem"
-                         height="1.5rem"
-                         class="arrow-button"
-                    />
-                    <span v-if="expression.name"
-                          class="expression-name"
-                    >{{ expression.name }}</span>
-                    <span v-else
-                          class="expression-name placeholder"
-                    >
-                        {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TITLE_PLACEHOLDER') }}
-                    </span>
-                </div>
-                <p-icon-button name="ic_delete"
-                               size="sm"
-                               :disabled="state.proxyExpressions.length === 1"
-                               @click.stop="handleClickDeleteExpression(expression.key)"
-                />
-            </div>
-            <div class="form-body">
-                <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_TYPE')"
-                               required
-                               style-type="secondary"
+                <div class="form-header"
+                     @click="handleToggleExpressionCard(expression.key)"
                 >
-                    <div class="flex gap-2">
-                        <p-select-button v-for="selectItem in state.fieldTypeMenuItems"
-                                         :key="`select-button-${selectItem.name}`"
-                                         :value="selectItem.name"
-                                         style-type="secondary"
-                                         :selected="expression.fieldType"
-                                         @change="handleChangeFieldType(expression.key, $event)"
+                    <div class="title">
+                        <p-i name="ic_chevron-down"
+                             width="1.5rem"
+                             height="1.5rem"
+                             class="arrow-button"
+                        />
+                        <span v-if="expression.name"
+                              class="expression-name"
+                        >{{ expression.name }}</span>
+                        <span v-else
+                              class="expression-name placeholder"
                         >
-                            {{ selectItem.label }}
-                        </p-select-button>
+                            {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.TITLE_PLACEHOLDER') }}
+                        </span>
                     </div>
-                </p-field-group>
-                <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_NAME')"
-                               required
-                               style-type="secondary"
-                >
-                    <p-text-input v-model="expression.name"
-                                  block
+                    <p-icon-button name="ic_delete"
+                                   size="sm"
+                                   :disabled="state.proxyExpressions.length === 1"
+                                   @click.stop="handleClickDeleteExpression(expression.key)"
                     />
-                </p-field-group>
-                <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_FORMULA')"
-                               required
-                               style-type="secondary"
-                >
-                    <p-textarea v-model="expression.expression"
-                                :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
-                    />
-                </p-field-group>
+                </div>
+                <div class="form-body">
+                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_TYPE')"
+                                   required
+                                   style-type="secondary"
+                    >
+                        <div class="flex gap-2">
+                            <p-select-button v-for="selectItem in state.fieldTypeMenuItems"
+                                             :key="`select-button-${selectItem.name}`"
+                                             :value="selectItem.name"
+                                             style-type="secondary"
+                                             :selected="expression.fieldType"
+                                             @change="handleChangeFieldType(expression.key, $event)"
+                            >
+                                {{ selectItem.label }}
+                            </p-select-button>
+                        </div>
+                    </p-field-group>
+                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_NAME')"
+                                   required
+                                   style-type="secondary"
+                    >
+                        <p-text-input v-model="expression.name"
+                                      block
+                        />
+                    </p-field-group>
+                    <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FIELD_FORMULA')"
+                                   required
+                                   style-type="secondary"
+                    >
+                        <p-textarea v-model="expression.expression"
+                                    :placeholder="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.FORMULA_PLACEHOLDER')"
+                        />
+                    </p-field-group>
+                </div>
             </div>
-        </div>
-        <p-button class="add-field-button"
+        </template>
+        <p-field-group v-else
+                       :label="'Expression'"
+                       required
+        >
+            <div class="legacy-expression-wrapper">
+                <div v-for="(expression) in props.expressions"
+                     :key="expression"
+                     class="expressions-wrapper"
+                >
+                    <p-text-input class="label-input"
+                                  block
+                                  :value="expression"
+                                  disabled
+                    />
+                    <p-icon-button name="ic_delete"
+                                   size="sm"
+                                   disabled
+                    />
+                </div>
+            </div>
+        </p-field-group>
+
+        <p-button v-if="!props.isLegacyDataTable"
+                  class="add-field-button"
                   style-type="tertiary"
                   icon-left="ic_plus_bold"
                   @click="handleClickAddLabel"
@@ -227,6 +253,15 @@ const handleClickAddLabel = () => {
     .add-field-button {
         margin-top: 0.5rem;
         width: 6.8125rem;
+    }
+    .legacy-expression-wrapper {
+        @apply bg-gray-100 rounded-lg;
+        padding: 0.5rem;
+        margin-top: 0.25rem;
+        .expressions-wrapper {
+            @apply flex gap-1 items-center;
+            margin-bottom: 0.5rem;
+        }
     }
 }
 
