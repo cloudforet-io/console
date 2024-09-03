@@ -72,6 +72,7 @@ const state = reactive({
     }),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     boxWidth: BOX_MIN_WIDTH,
+    boxHeight: 0,
     xAxisData: computed<string[]>(() => {
         if (state.xAxisField === DATE_FIELD.DATE) {
             return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
@@ -198,13 +199,18 @@ defineExpose<WidgetExpose<Data>>({
 });
 useResizeObserver(colorCodedTableRef, throttle(() => {
     const _containerWidth = colorCodedTableRef.value?.clientWidth;
-    if (!_containerWidth) return;
+    const _containerHeight = colorCodedTableRef.value?.clientHeight;
+    if (!_containerWidth || !_containerHeight) return;
+
+    // width
     const boxWidth = (_containerWidth - Y_AXIS_FIELD_WIDTH) / state.xAxisCount;
-    if (boxWidth < BOX_MIN_WIDTH) {
-        state.boxWidth = BOX_MIN_WIDTH - 2;
-        return;
-    }
-    state.boxWidth = boxWidth - 2;
+    if (boxWidth < BOX_MIN_WIDTH) state.boxWidth = BOX_MIN_WIDTH - 2;
+    else state.boxWidth = boxWidth - 2;
+
+    // height
+    const yAxisCount = state.yAxisData.length;
+    if (!_containerHeight) state.boxHeight = 0;
+    else state.boxHeight = _containerHeight / yAxisCount;
 }, 500));
 </script>
 
@@ -221,6 +227,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                 <div v-for="(yField, yIdx) in state.yAxisData"
                      :key="`color-coded-y-axis-${props.widgetId}-${yField}-${yIdx}`"
                      class="y-col"
+                     :style="{'height': `${state.boxHeight}px`}"
                 >
                     {{ yField }}
                 </div>
@@ -238,6 +245,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                                  'width': `${state.boxWidth}px`,
                                  'background-color': getColor(targetValue(xField, yField)),
                                  'color': getContrastingColor(getColor(targetValue(xField, yField))),
+                                 'height': `${state.boxHeight-1}px`,
                              }"
                         >
                             <p-tooltip :contents="targetValue(xField, yField, 'tooltip')"
@@ -268,17 +276,15 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
     .table-wrapper {
         display: flex;
         width: 100%;
-        height: 100%;
+        height: 80%;
         gap: 0.25rem;
         padding-top: 1rem;
         .y-axis-wrapper {
-            display: flex;
-            flex-direction: column;
-            width: 7.5rem;
             .y-col {
                 @apply text-label-sm text-gray-700 truncate border-b border-gray-200;
-                width: 7.5rem;
-                height: 1.625rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 padding: 0.375rem;
             }
             .y-col:first-child {
@@ -288,6 +294,8 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
         .x-axis-wrapper {
             flex: 1;
             overflow-x: auto;
+            overflow-y: hidden;
+            height: 120%;
             .scroll-view {
                 display: inline-block;
                 white-space: nowrap;
@@ -302,7 +310,6 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    height: 1.55rem;
                     .tooltip-wrapper {
                         width: 100%;
                         text-align: center;
