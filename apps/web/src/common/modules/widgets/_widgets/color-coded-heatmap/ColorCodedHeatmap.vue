@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, reactive, ref,
+    computed, defineExpose, reactive,
 } from 'vue';
 
 import { orderBy } from 'lodash';
@@ -32,7 +32,6 @@ type Data = ListResponse<{
     [key: string]: string|number;
 }>;
 
-const boxWrapperRef = ref<any|null>(null);
 const BOX_MIN_WIDTH = 112;
 const MAX_COUNT = 80;
 const props = defineProps<WidgetProps>();
@@ -48,7 +47,6 @@ const state = reactive({
         if (props.width >= 990) return widgetContentWidth / 10;
         return widgetContentWidth / 8 < BOX_MIN_WIDTH ? BOX_MIN_WIDTH : widgetContentWidth / 8;
     }),
-    boxWrapperHeight: computed(() => (boxWrapperRef.value?.scrollHeight <= (30 * 16) ? 'auto' : '30rem')),
     refinedData: computed(() => {
         if (!state.data) return [];
         const _orderedData = orderBy(state.data.results, [state.dataField], ['desc']);
@@ -99,8 +97,6 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
                         operator: 'sum',
                     },
                 },
-                // field_group: [state.formatRulesField],
-                // sort: [{ key: `_total_${state.dataField}`, desc: true }],
                 page: { start: 1, limit: MAX_COUNT },
             },
             vars: props.dashboardVars,
@@ -143,8 +139,7 @@ defineExpose<WidgetExpose<Data>>({
         <!--Do not delete div element below. It's defense code for redraw-->
         <div class="content-wrapper">
             <div class="box-wrapper"
-                 :style="{'grid-template-columns': `repeat(auto-fill, ${state.boxWidth-4}px)`,
-                 }"
+                 :style="{'grid-template-columns': `repeat(auto-fill, ${state.boxWidth-4}px)`}"
             >
                 <div v-for="(data, idx) in state.refinedData"
                      :key="`box-${idx}`"

@@ -56,9 +56,9 @@ const state = reactive({
     data: null as Data | null,
     refinedData: computed<RefinedData[]>(() => {
         if (!state.data?.results?.length) return [];
-        // if (state.xAxisField === DATE_FIELD.DATE) {
-        //     return state.data.results;
-        // }
+        if (state.xAxisField === DATE_FIELD.DATE) {
+            return state.data.results;
+        }
         const _refinedData: RefinedData[] = [];
         state.data.results.forEach((d) => {
             const _orderedData = orderBy(d[state.dataField], 'value', ['desc']);
@@ -172,7 +172,8 @@ const loadWidget = async (): Promise<Data|APIErrorToast> => {
     state.loading = false;
     return state.data;
 };
-const targetValue = (xField: string, yField: string, format?: 'table'|'tooltip'): number|string => {
+const targetValue = (xField?: string, yField?: string, format?: 'table'|'tooltip'): number|string => {
+    if (!xField || !yField) return '--';
     const _targetData = state.refinedData.find((d) => d[state.yAxisField] === yField);
     const _targetVal = _targetData?.[state.dataField].find((d) => d[state.xAxisField] === xField)?.value;
     if (!_targetVal) return '--';
@@ -223,8 +224,8 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
              class="table-wrapper"
         >
             <div class="y-axis-wrapper">
-                <div v-for="yField in state.yAxisData"
-                     :key="`color-coded-y-axis-${props.widgetId}-${yField}`"
+                <div v-for="(yField, yIdx) in state.yAxisData"
+                     :key="`color-coded-y-axis-${props.widgetId}-${yField}-${yIdx}`"
                      class="y-col"
                 >
                     {{ yField }}
@@ -232,8 +233,8 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
             </div>
             <div class="x-axis-wrapper">
                 <div class="scroll-view">
-                    <div v-for="yField in state.yAxisData"
-                         :key="`color-coded-row-${props.widgetId}-${yField}`"
+                    <div v-for="(yField, yIdx) in state.yAxisData"
+                         :key="`color-coded-row-${props.widgetId}-${yField}-${yIdx}`"
                          class="x-row"
                     >
                         <div v-for="xField in state.xAxisData"
