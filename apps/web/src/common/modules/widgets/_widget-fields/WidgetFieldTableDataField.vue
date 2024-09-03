@@ -88,10 +88,11 @@ const state = reactive({
     }))),
     isValid: computed<boolean>(() => {
         if (state.menuItems.length === 0) return false;
-        if (state.proxyValue.fieldType === 'dynamicField') {
-            return !!state.proxyValue?.criteria && !!state.proxyValue.value;
+        if (state.proxyValue?.fieldType === 'dynamicField' && !state.proxyValue?.dynamicFieldValue?.length) return false;
+        if (Array.isArray(state.selectedItem)) {
+            return !!state.selectedItem.length;
         }
-        if (state.proxyValue.fieldType === 'staticField') {
+        if (state.proxyValue?.fieldType === 'staticField') {
             return !!state.proxyValue?.value?.length;
         }
         return !!state.selectedItem;
@@ -120,7 +121,7 @@ const state = reactive({
     }),
     dynamicFields: undefined as undefined | string[],
     dynamicFieldMenuItems: computed<MenuItem[]>(() => {
-        if (state.proxyValue.fieldType === 'staticField') return [];
+        if (state.proxyValue?.fieldType === 'staticField') return [];
         return state.dynamicFields?.map((d) => {
             const fieldName = state.proxyValue.value;
             const label = getReferenceLabel(storeState.allReferenceTypeInfo, fieldName, d);
@@ -339,9 +340,9 @@ const generateDateFields = (granularity: string, dateRange: DateRange) => {
     state.dynamicFields = dateFields;
 };
 watch([ // Fetch Dynamic Field
-    () => state.proxyValue.fieldType,
-    () => state.proxyValue.value,
-    () => state.proxyValue.criteria,
+    () => state.proxyValue?.fieldType,
+    () => state.proxyValue?.value,
+    () => state.proxyValue?.criteria,
     () => props.allValueMap?.groupBy,
     () => props.allValueMap?.granularity,
     () => props.dateRange,
