@@ -61,7 +61,7 @@ const handleClickDeleteExpression = (key: string) => {
     const targetExpression = state.proxyExpressions.find((d) => d.key === key);
     if (!targetExpression?.name && !targetExpression?.expression) {
         state.proxyExpressions = state.proxyExpressions.filter((expression) => expression.key !== key);
-        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'));
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'), '');
         return;
     }
     modalState.visible = true;
@@ -72,7 +72,7 @@ const handleConfirmDeleteExpression = () => {
     state.proxyExpressions = state.proxyExpressions.filter((expression) => expression.key !== modalState.currentSelectionKey);
     modalState.visible = false;
     modalState.currentSelectionKey = undefined;
-    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'));
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'), '');
 };
 const handleCancelModal = () => {
     modalState.visible = false;
