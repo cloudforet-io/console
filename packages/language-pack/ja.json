@@ -2448,6 +2448,8 @@
 				"MANAGE": "Manage",
 				"NO_ACCESS": "アクセス不可",
 				"PERMISSION": "権限",
+				"POLICY_CUSTOM": "",
+				"POLICY_DEFAULT": "",
 				"READ_AND_WRITE": "読み取りと書き込み",
 				"READ_ONLY": "読み取り専用",
 				"READ_ONLY_PERMISSIONS": "読み取り専用アクセス権限",

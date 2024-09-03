@@ -2448,6 +2448,8 @@
 				"MANAGE": "Manage",
 				"NO_ACCESS": "접근 금지",
 				"PERMISSION": "권한",
+				"POLICY_CUSTOM": "",
+				"POLICY_DEFAULT": "",
 				"READ_AND_WRITE": "읽기 & 쓰기",
 				"READ_ONLY": "읽기 전용",
 				"READ_ONLY_PERMISSIONS": "읽기 전용 접근 권한",
