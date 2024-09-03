@@ -1,50 +1,77 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PHeading, PI,
+    PHeading, PI, PRadioGroup, PRadio, PTextEditor,
 } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
+import { i18n } from '@/translations';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+const POLICY_TYPE = {
+    DEFAULT: 'default',
+    CUSTOM: 'custom',
+} as const;
+type PolicyType = typeof POLICY_TYPE[keyof typeof POLICY_TYPE];
+type RadioType = {
+    label: TranslateResult,
+    name: PolicyType
+};
 
 interface Props {
     roleType?: RoleType
     initialPermissions?: string[];
+    selectedRadioIdx?: number;
+    isEdit?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     roleType: ROLE_TYPE.DOMAIN_ADMIN,
     initialPermissions: undefined,
+    selectedRadioIdx: 0,
+    isEdit: false,
 });
 
-// TODO: will be updated in the next step.
-// const emit = defineEmits<{(e: 'update', value: string): void,
-// }>();
+const emit = defineEmits<{(e: 'update', value: string): void,
+    (e: 'update:selected-radio-idx', value: number): void,
+}>();
 
 const state = reactive({
     code: '',
     isEdit: false,
+    radioMenuList: computed<RadioType[]>(() => ([
+        {
+            label: i18n.t('IAM.ROLE.FORM.POLICY_DEFAULT'),
+            name: POLICY_TYPE.DEFAULT,
+        },
+        {
+            label: i18n.t('IAM.ROLE.FORM.POLICY_CUSTOM'),
+            name: POLICY_TYPE.CUSTOM,
+        },
+    ])),
+    proxySelectedRadioIdx: useProxyValue('selectedRadioIdx', props, emit),
 });
 
 /* Component */
-// TODO: will be updated in the next step.
-// const handleCodeUpdate = (modifiedCode: string) => {
-//     if (!modifiedCode) return;
-//     state.code = modifiedCode;
-//     emit('update', modifiedCode);
-// };
-// const handleClickEdit = () => {
-//     state.isEdit = true;
-// };
+const handleCodeUpdate = (modifiedCode: string) => {
+    if (!modifiedCode) return;
+    state.code = modifiedCode;
+    emit('update', modifiedCode);
+};
 
 /* Watcher */
+watch(() => state.proxySelectedRadioIdx, (proxySelectedRadioIdx) => {
+    if (proxySelectedRadioIdx === 0) handleCodeUpdate('');
+});
 watch(() => props.initialPermissions, (value) => {
     if (value) {
+        state.proxySelectedRadioIdx = 1;
         state.code = value.join('\n');
-        return;
     }
-    state.code = '*';
 }, { immediate: true });
 </script>
 
@@ -54,7 +81,20 @@ watch(() => props.initialPermissions, (value) => {
                    :title="$t('IAM.ROLE.DETAIL.API_POLICY')"
                    class="heading"
         />
-        <div class="has-all-permissions">
+        <p-radio-group>
+            <p-radio v-for="(item, idx) in state.radioMenuList"
+                     :key="`policy-scope-${idx}`"
+                     v-model="state.proxySelectedRadioIdx"
+                     :value="idx"
+            >
+                <span class="radio-item">
+                    {{ item.label }}
+                </span>
+            </p-radio>
+        </p-radio-group>
+        <div v-if="state.proxySelectedRadioIdx === 0"
+             class="has-all-permissions"
+        >
             <p-i name="ic_plugs"
                  width="2rem"
                  height="2rem"
@@ -63,22 +103,12 @@ watch(() => props.initialPermissions, (value) => {
             <span class="text">
                 {{ $t('IAM.ROLE.FORM.DEFAULT_API_POLICY_HELP_TEXT') }}
             </span>
-            <!--            TODO: will be updated in the next step. -->
-            <!--            <p-button class="edit-button"-->
-            <!--                      style-type="tertiary"-->
-            <!--                      size="md"-->
-            <!--                      icon-left="ic_edit"-->
-            <!--                      @click="handleClickEdit"-->
-            <!--            >-->
-            <!--                <span>{{ $t('IAM.ROLE.FORM.EDIT') }}</span>-->
-            <!--            </p-button>-->
         </div>
-        <!--        TODO: will be updated in the next step.-->
-        <!--        <p-text-editor v-else-->
-        <!--                       :code="state.code"-->
-        <!--                       class="content-wrapper"-->
-        <!--                       @update:code="handleCodeUpdate"-->
-        <!--        />-->
+        <p-text-editor v-else
+                       :code="state.code"
+                       class="content-wrapper"
+                       @update:code="handleCodeUpdate"
+        />
     </div>
 </template>
 
