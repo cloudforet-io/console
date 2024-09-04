@@ -31,21 +31,21 @@ const updateWidget = async (widgetId: string, options: WidgetOptions) => {
 };
 
 /**
- * Line Chart
+ * XY Chart (Line Chart, Area Chart, Column Chart)
  * Data Field -> Table Data Field
  * Legend: value type is changed
  */
-const _migrateLineChart = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, WidgetOptions] => {
+const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByField: string): [boolean, WidgetOptions] => {
     let _options = cloneDeep(widget.options);
     let _needMigration = false;
     if (_options.dataField && typeof _options.dataField === 'string') { // legacy case
         _needMigration = true;
-        if (_options.lineBy?.value) {
+        if (_options?.[groupByField]?.value) {
             _options = {
                 ..._options,
                 tableDataField: {
                     fieldType: 'dynamicField',
-                    value: _options.lineBy.value,
+                    value: _options[groupByField].value,
                     dynamicFieldValue: [],
                     criteria: _options.dataField,
                 } as TableDataFieldValue,
@@ -60,7 +60,7 @@ const _migrateLineChart = (widget: PublicWidgetModel|PrivateWidgetModel): [boole
             };
         }
         delete _options.dataField;
-        delete _options.lineBy;
+        delete _options[groupByField];
     }
     if (_options.legend && !_options.legend?.toggleValue) {
         _options = {
@@ -99,7 +99,12 @@ export const migrateLegacyWidgetOptions = async (dashboardWidgets: Array<PublicW
     let isMigrated = false;
     await Promise.all(dashboardWidgets.map(async (widget) => {
         if (widget.widget_type === 'lineChart' || widget.widget_type === 'stackedAreaChart') {
-            const [_needMigration, _migratedOptions] = _migrateLineChart(widget);
+            const [_needMigration, _migratedOptions] = _migrateXYChart(widget, 'lineBy');
+            isMigrated = isMigrated || _needMigration;
+            if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
+        }
+        if (widget.widget_type === 'stackedColumnChart') {
+            const [_needMigration, _migratedOptions] = _migrateXYChart(widget, 'stackBy');
             isMigrated = isMigrated || _needMigration;
             if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
         }
