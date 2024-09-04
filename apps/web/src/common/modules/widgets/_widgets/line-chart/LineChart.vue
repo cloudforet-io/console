@@ -180,7 +180,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             _groupBy = [..._groupBy, state.dataField];
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${_criteria}`, desc: true }];
         }
-        if (isDateField(state.dataField) && state.dataFieldInfo?.fieldType === 'dynamicField') {
+        if (isDateField(state.dataField) && state.dataFieldInfo?.fieldType === 'dynamicField' && state.dataFieldInfo?.dynamicFieldValue?.length) {
             _filter = [{
                 k: state.dataField,
                 v: state.dataFieldInfo.dynamicFieldValue,
