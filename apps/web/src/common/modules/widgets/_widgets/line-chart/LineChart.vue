@@ -125,9 +125,7 @@ const state = reactive({
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
-    dataFieldType: computed<TableDataFieldValue['fieldType']>(() => state.dataFieldInfo?.fieldType),
     dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
-    dataCriteria: computed<string|undefined>(() => state.dataFieldInfo?.criteria),
     dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
@@ -170,18 +168,19 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         let _field_group: string[] = [];
         let _sort: Query['sort'] = [];
         let _filter: Query['filter'] = [];
-        if (state.dataFieldType === 'staticField') {
+        if (state.dataFieldInfo?.fieldType === 'staticField') {
             state.dataField?.forEach((field) => {
                 _fields[field] = { key: field, operator: 'sum' };
             });
             _sort = _groupBy.includes('Date') ? [{ key: 'Date', desc: false }] : state.dataField.map((field) => ({ key: field, desc: true }));
         } else {
-            _fields[state.dataCriteria] = { key: state.dataCriteria, operator: 'sum' };
+            const _criteria = state.dataFieldInfo?.criteria;
+            _fields[_criteria] = { key: _criteria, operator: 'sum' };
             _field_group = [state.dataField];
             _groupBy = [..._groupBy, state.dataField];
-            _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.dataCriteria}`, desc: true }];
+            _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${_criteria}`, desc: true }];
         }
-        if (isDateField(state.dataField) && state.dataFieldType === 'dynamicField') {
+        if (isDateField(state.dataField) && state.dataFieldInfo?.fieldType === 'dynamicField') {
             _filter = [{
                 k: state.dataField,
                 v: state.dataFieldInfo.dynamicFieldValue,
@@ -223,7 +222,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 /* Util */
 const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
     // get refined data and series fields
-    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataCriteria, state.dataField, state.dynamicFieldValue);
+    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataFieldInfo?.criteria, state.dataField, state.dynamicFieldValue);
 
     // get xAxis data
     let _xAxisData: string[] = [];
@@ -242,7 +241,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
         const _data: number[] = [];
         _xAxisData.forEach((d) => {
             const _result = _refinedResults.find((result) => result[state.xAxisField] === d);
-            const _value = _result?.[state.dataCriteria].find((v) => v[state.dataField] === field);
+            const _value = _result?.[state.dataFieldInfo?.criteria].find((v) => v[state.dataField] === field);
             _data.push(_value?.value || _defaultValue);
         });
         _seriesData.push({
@@ -256,7 +255,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
                 position: state.displaySeriesLabel?.position,
                 rotate: state.displaySeriesLabel?.rotate,
                 fontSize: 10,
-                formatter: (p) => getFormattedNumber(p.value, state.dataCriteria, state.numberFormat, _unit),
+                formatter: (p) => getFormattedNumber(p.value, state.dataFieldInfo?.criteria, state.numberFormat, _unit),
             },
         });
     });
@@ -300,7 +299,7 @@ const drawChart = (rawData: Data|null) => {
 
     // get converted chart data
     let _seriesData: any[];
-    if (state.dataFieldType === 'staticField') {
+    if (state.dataFieldInfo?.fieldType === 'staticField') {
         _seriesData = getStaticFieldData(rawData);
     } else {
         _seriesData = getDynamicFieldData(rawData);
