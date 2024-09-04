@@ -5,7 +5,7 @@ import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-
 const colorCodedHeatmap: WidgetConfig = {
     widgetName: 'colorCodedHeatmap',
     meta: {
-        title: 'Color Coded Heatmap',
+        title: 'Color-coded Heatmap',
         sizes: ['full'],
         defaultValidationConfig: {
             defaultMaxCount: 2,
@@ -29,7 +29,9 @@ const colorCodedHeatmap: WidgetConfig = {
             },
         },
     },
-    optionalFieldsSchema: {},
+    optionalFieldsSchema: {
+        displayAnnotation: {},
+    },
 };
 
 

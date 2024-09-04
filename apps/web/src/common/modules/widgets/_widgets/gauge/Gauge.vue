@@ -80,12 +80,12 @@ const state = reactive({
                     distance: -55,
                     color: gray[700],
                     fontSize: 12,
-                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormatter, state.unit),
+                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormat, state.unit),
                 },
                 detail: {
                     offsetCenter: [0, 0],
                     fontSize: 32,
-                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormatter, state.unit),
+                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormat, state.unit),
                     color: gray[700],
                 },
                 data: [
@@ -127,7 +127,7 @@ const state = reactive({
         return { start: _start, end: _end };
     }),
     // optional fields
-    numberFormatter: computed(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    numberFormat: computed(() => props.widgetOptions?.numberFormat as NumberFormatValue),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => ({
