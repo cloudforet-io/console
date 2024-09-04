@@ -39,9 +39,10 @@ const state = reactive({
     changedPageAccessFormData: ['*'] as string[],
     permissionsData: undefined as string[]|undefined,
     isPageAccessValid: false,
+    isPolicyValid: true,
     isAllValid: computed<boolean>(() => {
         const isPageAccessCheckRequired = state.roleTypeData !== ROLE_TYPE.DOMAIN_ADMIN;
-        return state.isBaseInformationValid && (!isPageAccessCheckRequired || state.isPageAccessValid);
+        return state.isBaseInformationValid && (!isPageAccessCheckRequired || state.isPageAccessValid) && state.isPolicyValid;
     }),
     formData: computed<RoleCreateParameters|RoleUpdateParameters>(() => {
         const baseData = {
@@ -105,6 +106,7 @@ watch(() => props.initialRoleData, (initialRoleData) => {
         <role-update-form-permission-form :initial-page-access="state.pageAccessFormData"
                                           :initial-permissions="state.permissionsData"
                                           :is-page-access-valid.sync="state.isPageAccessValid"
+                                          :is-policy-valid.sync="state.isPolicyValid"
                                           :role-type="state.roleTypeData"
                                           :form-type="props.formType"
                                           @update-form="handleUpdateForm"

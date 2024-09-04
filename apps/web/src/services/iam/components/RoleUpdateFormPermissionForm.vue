@@ -34,17 +34,22 @@ const props = withDefaults(defineProps<Props>(), {
     initialPermissions: undefined,
     roleType: ROLE_TYPE.WORKSPACE_OWNER,
     isPageAccessValid: true,
+    isPolicyValid: true,
     formType: FORM_TYPE.CREATE,
 });
 
 const emit = defineEmits<{(e: 'update-form', formData: RoleFormData): void,
     (e: 'update:is-page-access-valid', value: boolean): void,
+    (e: 'update:is-policy-valid', value: boolean): void,
 }>();
 
 const menuItems = ref([] as PageAccessMenuItem[]);
 const state = reactive({
     pageAccessPermissions: computed(() => getPageAccessList(menuItems.value)),
-    proxyAllValid: useProxyValue('isPageAccessValid', props, emit),
+    proxyPageAccessValid: useProxyValue('isPageAccessValid', props, emit),
+    policy: '' as string|undefined,
+    proxyPolicyValid: useProxyValue('isPolicyValid', props, emit),
+    selectedRadioIdx: 0,
 });
 
 /* Components */
@@ -77,10 +82,12 @@ const handleUpdateForm = (value: PageAccessMenuItem, isInit?: boolean) => {
         }
     });
 
-    state.proxyAllValid = menuItems.value.every((i) => i.isValid);
+    state.proxyPageAccessValid = menuItems.value.every((i) => i.isValid);
 };
 const handleUpdateEditor = (value: string) => {
-    emit('update-form', { permissions: value.split('\n') });
+    state.policy = value;
+    if (state.selectedRadioIdx === 0) return;
+    state.proxyPolicyValid = state.policy !== '';
 };
 const setPageAccessPermissionsData = () => {
     if (!props.initialPageAccess) return;
@@ -105,6 +112,15 @@ const setPageAccessPermissionsData = () => {
 };
 
 /* Watcher */
+watch(() => state.selectedRadioIdx, (selectedRadioIdx) => {
+    if (selectedRadioIdx === 0) {
+        state.policy = undefined;
+    }
+    state.proxyPolicyValid = selectedRadioIdx === 0 ? true : state.policy;
+});
+watch(() => state.policy, (policy) => {
+    emit('update-form', { permissions: policy ? policy.split('\n') : [] });
+});
 watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessPermissions) => {
     if (isEqual(pageAccessPermissions, prevPageAccessPermissions)) return;
     emit('update-form', { page_access: pageAccessPermissions });
@@ -123,6 +139,7 @@ watch([() => props.roleType, () => props.initialPageAccess], ([roleType]) => {
         />
         <role-update-form-policy :role-type="props.roleType"
                                  :initial-permissions="props.initialPermissions"
+                                 :selected-radio-idx.sync="state.selectedRadioIdx"
                                  @update="handleUpdateEditor"
         />
     </p-pane-layout>
