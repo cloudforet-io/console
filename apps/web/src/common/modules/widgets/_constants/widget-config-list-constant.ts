@@ -27,6 +27,7 @@ export const CONSOLE_WIDGET_CONFIG_KEYS = [
     'treemap',
     'heatmap',
     'colorCodedHeatmap',
+    'colorCodedTableHeatmap',
     'geoMap',
     'table',
     'stackedAreaChart',
