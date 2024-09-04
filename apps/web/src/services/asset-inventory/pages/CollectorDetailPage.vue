@@ -10,7 +10,6 @@ export default defineComponent({
     beforeRouteEnter(to, from, next) {
         next((vm) => {
             const instance = vm as unknown as IInstance;
-            console.log(from);
             instance.setPathFrom(from);
         });
     },
@@ -49,6 +48,7 @@ import ScopedNotification from '@/common/components/scoped-notification/ScopedNo
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 
+import CollectorAdditionalRule from '@/services/asset-inventory/components/CollectorAdditionalRule.vue';
 import CollectorBaseInfoSection from '@/services/asset-inventory/components/CollectorBaseInfoSection.vue';
 import CollectorDataModal
     from '@/services/asset-inventory/components/CollectorDataModal.vue';
@@ -302,6 +302,7 @@ onUnmounted(() => {
         <collector-options-section class="section"
                                    data-test-id="collector-options-section"
         />
+        <collector-additional-rule class="section" />
         <collector-service-accounts-section class="section" />
 
         <p-double-check-modal :visible.sync="state.deleteModalVisible"

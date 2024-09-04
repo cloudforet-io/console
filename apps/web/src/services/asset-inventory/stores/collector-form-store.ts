@@ -56,6 +56,8 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         options: {} as CollectorOptions,
         versions: [] as string[],
         isScheduleError: false,
+        additionalRules: [{ order: 1 }],
+
         // getters
         collectorId: computed<string|undefined>(() => state.originCollector?.collector_id),
         pluginId: computed<string|undefined>(() => state.originCollector?.plugin_info?.plugin_id ?? state.repositoryPlugin?.plugin_id),
