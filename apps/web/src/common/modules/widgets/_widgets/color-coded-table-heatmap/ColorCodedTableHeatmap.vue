@@ -171,7 +171,7 @@ const targetValue = (xField?: string, yField?: string, format?: 'table'|'tooltip
     if (!xField || !yField) return '--';
     const _targetData = state.refinedData.find((d) => d[state.yAxisField] === yField);
     const _targetVal = _targetData?.[state.dataField].find((d) => d[state.xAxisField] === xField)?.value;
-    if (!_targetVal) return '--';
+    if (!_targetVal) return format === 'table' ? '--' : '';
     if (!format) return _targetVal;
     if (format === 'table') {
         const _formattedVal = getFormattedNumber(_targetVal, state.dataField, state.numberFormat, state.unit);
