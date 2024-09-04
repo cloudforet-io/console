@@ -140,9 +140,9 @@ const state = reactive({
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
-        if (Object.values(DATE_FIELD).includes(state.xAxisField)) {
+        if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
-        } else if (Object.values(DATE_FIELD).includes(state.dataField)) {
+        } else if (isDateField(state.dataField)) {
             if (state.dynamicFieldValue.length) {
                 const _sortedDateValue = [...state.dynamicFieldValue];
                 _sortedDateValue.sort();
@@ -249,22 +249,6 @@ const getStaticFieldData = (rawData: StaticFieldData) => {
         _slicedData.push({ [state.xAxisField]: 'etc', ..._etcData });
     }
 
-    // get xAxis data
-    let _xAxisData: string[] = [];
-    if (state.xAxisField === DATE_FIELD.DATE) {
-        _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
-    } else if (isDateField(state.xAxisField)) {
-        _xAxisData = _slicedData.map((v) => v[state.xAxisField] as string);
-        _xAxisData.sort();
-    } else {
-        _xAxisData = Array.from(new Set(_slicedData.map((v) => v[state.xAxisField] as string)));
-        _xAxisData = _xAxisData.slice(0, state.xAxisCount);
-        if (Object.values(_etcData).some((v) => v > 0)) {
-            _xAxisData.push('etc');
-        }
-    }
-    state.xAxisData = _xAxisData;
-
     // get chart data
     const _seriesData: any[] = [];
     state.dataField?.forEach((field) => {
@@ -284,7 +268,7 @@ const getStaticFieldData = (rawData: StaticFieldData) => {
                     return getFormattedNumber(p.value, field, state.numberFormat, _unit);
                 },
             },
-            data: _xAxisData.map((d) => {
+            data: state.xAxisData.map((d) => {
                 const _data = _slicedData.find((v) => v[state.xAxisField] === d);
                 return _data ? _data[field] : undefined;
             }),
@@ -296,22 +280,13 @@ const getDynamicFieldData = (rawData: DynamicFieldData) => {
     // get refined data and series fields
     const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataCriteria, state.dataField, state.dataFieldInfo.dynamicFieldValue);
 
-    // get xAxis data
-    let _xAxisData: string[] = [];
-    if (state.xAxisField === DATE_FIELD.DATE) {
-        _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
-    } else {
-        _xAxisData = rawData?.results?.map((v) => v[state.xAxisField] as string) || [];
-    }
-    state.xAxisData = _xAxisData;
-
     // get chart data
     const _seriesData: any[] = [];
     const _threshold = getThreshold(rawData);
     const _unit = widgetFrameProps.value.unitMap?.[state.dataField];
     _seriesFields.forEach((field) => {
         const _data: number[] = [];
-        _xAxisData.forEach((d) => {
+        state.xAxisData.forEach((d) => {
             const _result = _refinedResults.find((result) => result[state.xAxisField] === d);
             const _value = _result?.[state.dataCriteria].find((v) => v[state.dataField] === field);
             _data.push(_value?.value || 0);
@@ -339,6 +314,16 @@ const getDynamicFieldData = (rawData: DynamicFieldData) => {
 };
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
+
+    // get xAxis data
+    let _xAxisData: string[] = [];
+    if (state.xAxisField === DATE_FIELD.DATE) {
+        _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+    } else {
+        _xAxisData = rawData?.results?.map((v) => v[state.xAxisField] as string) || [];
+        if (isDateField(state.xAxisField)) _xAxisData.sort();
+    }
+    state.xAxisData = _xAxisData;
 
     let _seriesData: any[] = [];
     if (state.dataFieldType === 'staticField') {
