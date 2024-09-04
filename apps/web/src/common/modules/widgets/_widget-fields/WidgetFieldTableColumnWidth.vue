@@ -127,7 +127,7 @@ onMounted(() => {
                         <p-field-title class="width-sub-title">
                             {{ $t('COMMON.WIDGETS.TABLE_COLUMN_WIDTH.WIDTH') }}
                         </p-field-title>
-                        <p-radio-group>
+                        <p-radio-group direction="horizontal">
                             <p-radio v-for="(item) in state.widthTypeItems"
                                      :key="`width-type-${item.value}`"
                                      :value="item.value"
@@ -173,11 +173,12 @@ onMounted(() => {
                 margin-bottom: 0.25rem;
             }
             .type-select-wrapper {
-                width: 8rem;
+                min-width: 9rem;
+                width: auto;
             }
             .fixed-width-input-wrapper {
                 padding-top: 0.75rem;
-                width: calc(100% - 8rem);
+                width: calc(100% - 9rem);
                 .invalid-text {
                     @apply text-label-sm text-red-500;
                     margin-top: 0.25rem;
