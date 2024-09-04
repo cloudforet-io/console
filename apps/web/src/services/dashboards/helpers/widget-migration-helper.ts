@@ -37,9 +37,9 @@ const updateWidget = async (widgetId: string, options: WidgetOptions) => {
  */
 const _migrateLineChart = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, WidgetOptions] => {
     let _options = cloneDeep(widget.options);
-    let _isMigrated = false;
+    let _needMigration = false;
     if (_options.dataField && typeof _options.dataField === 'string') { // legacy case
-        _isMigrated = true;
+        _needMigration = true;
         if (_options.lineBy?.value) {
             _options = {
                 ..._options,
@@ -70,7 +70,7 @@ const _migrateLineChart = (widget: PublicWidgetModel|PrivateWidgetModel): [boole
             },
         };
     }
-    return [_isMigrated, _options];
+    return [_needMigration, _options];
 };
 
 /**
@@ -79,9 +79,9 @@ const _migrateLineChart = (widget: PublicWidgetModel|PrivateWidgetModel): [boole
  */
 const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, WidgetOptions] => {
     let _options: WidgetOptions = cloneDeep(widget.options);
-    let _isMigrated = false;
+    let _needMigration = false;
     if (_options.dataField && Array.isArray(_options.dataField)) { // legacy case
-        _isMigrated = true;
+        _needMigration = true;
         _options = {
             ..._options,
             tableDataField: {
@@ -91,7 +91,7 @@ const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetMod
         };
         delete _options.dataField;
     }
-    return [_isMigrated, _options];
+    return [_needMigration, _options];
 };
 
 
@@ -99,14 +99,14 @@ export const migrateLegacyWidgetOptions = async (dashboardWidgets: Array<PublicW
     let isMigrated = false;
     await Promise.all(dashboardWidgets.map(async (widget) => {
         if (widget.widget_type === 'lineChart') {
-            const [_isMigrated, _migratedOptions] = _migrateLineChart(widget);
-            isMigrated = isMigrated || _isMigrated;
-            if (_isMigrated) await updateWidget(widget.widget_id, _migratedOptions);
+            const [_needMigration, _migratedOptions] = _migrateLineChart(widget);
+            isMigrated = isMigrated || _needMigration;
+            if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
         }
         if (widget.widget_type === 'clusteredColumnChart') {
-            const [_isMigrated, _migratedOptions] = _migrateClusteredColumnChart(widget);
-            isMigrated = isMigrated || _isMigrated;
-            if (_isMigrated) await updateWidget(widget.widget_id, _migratedOptions);
+            const [_needMigration, _migratedOptions] = _migrateClusteredColumnChart(widget);
+            isMigrated = isMigrated || _needMigration;
+            if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
         }
     }));
     return isMigrated;
