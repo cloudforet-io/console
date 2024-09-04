@@ -11,6 +11,7 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
+import type { LegendOption, EChartsOption } from 'echarts/types/dist/shared';
 import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -33,11 +34,15 @@ import {
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { GroupByValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    GroupByValue, DateFormatValue, DisplaySeriesLabelValue, NumberFormatValue,
+    LegendValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -55,7 +60,56 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartData: [],
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
-    chartOptions: computed<PieSeriesOption>(() => ({
+    chartLegendOption: computed<LegendOption>(() => {
+        if (!state.showLegends) return { show: false };
+        const _option: LegendOption = {
+            show: true,
+            type: 'scroll',
+            itemWidth: 10,
+            itemHeight: 10,
+            icon: 'circle',
+            formatter: (val) => {
+                if (state.groupByField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
+                return getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, val);
+            },
+        };
+        if (['left', 'right'].includes(state.legendPosition)) {
+            _option.orient = 'vertical';
+            _option.top = 20;
+            if (state.legendPosition === 'right') _option.right = 10;
+            else _option.left = 10;
+        } else {
+            _option.orient = 'horizontal';
+            if (state.legendPosition === 'bottom') _option.bottom = 0;
+            else _option.top = 0;
+        }
+        return _option;
+    }),
+    chartSeriesOption: computed<PieSeriesOption>(() => {
+        const _option: PieSeriesOption = {
+            type: 'pie',
+            avoidLabelOverlap: true,
+        };
+        if (state.chartType === 'donut') {
+            _option.radius = ['30%', '70%'];
+        }
+        if (['left', 'right'].includes(state.legendPosition)) {
+            if (props.size === 'full') {
+                if (state.legendPosition === 'right') _option.center = ['40%', '50%'];
+                else _option.center = ['60%', '50%'];
+            } else _option.center = ['30%', '50%'];
+        }
+        if (['top', 'bottom'].includes(state.legendPosition)) {
+            if (state.legendPosition === 'bottom') {
+                if (props.size === 'full') _option.center = ['50%', '60%'];
+                else _option.center = ['50%', '50%'];
+            } else {
+                _option.center = ['50%', '55%'];
+            }
+        }
+        return _option;
+    }),
+    chartOptions: computed<EChartsOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         tooltip: {
             trigger: 'item',
@@ -73,37 +127,18 @@ const state = reactive({
         grid: {
             containLabel: true,
         },
-        legend: {
-            show: state.showLegends,
-            orient: 'vertical',
-            type: 'scroll',
-            right: 10,
-            top: 20,
-            itemWidth: 10,
-            itemHeight: 10,
-            icon: 'circle',
-            formatter: (val) => {
-                if (state.groupByField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
-                return getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, val);
-            },
-        },
+        legend: state.chartLegendOption,
         series: [
             {
-                type: 'pie',
-                ...(state.chartType === 'donut' ? { radius: ['30%', '70%'] } : {}),
-                center: props.size === 'full' ? ['40%', '50%'] : ['30%', '50%'],
-                data: state.chartData,
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    },
-                },
-                avoidLabelOverlap: false,
+                ...state.chartSeriesOption,
                 label: {
-                    show: false,
+                    show: !!state.displaySeriesLabel?.toggleValue,
+                    position: state.displaySeriesLabel?.position,
+                    rotate: state.displaySeriesLabel?.rotate,
+                    fontSize: 10,
+                    formatter: (p) => getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit),
                 },
+                data: state.chartData,
             },
         ],
     })),
@@ -120,11 +155,14 @@ const state = reactive({
         return { start: _start, end: _end };
     }),
     // optional fields
-    showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
+    legendPosition: computed<string|undefined>(() => (props.widgetOptions?.legend as LegendValue)?.position),
     dateFormat: computed<string|undefined>(() => {
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),

@@ -53,7 +53,6 @@ const state = reactive({
     }),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
-        if (props.disableSaveButton) return [];
         const results: string[] = [];
         Object.entries(state.variableProperties).forEach(([k]) => {
             if (!isEqual(dashboardDetailState.dashboardInfo?.vars?.[k], dashboardDetailState.vars?.[k])) {
@@ -123,8 +122,8 @@ const handleResetVariables = () => {
 <style lang="postcss" scoped>
 .dashboard-variables-select-dropdown {
     &.detail-page {
-        @apply w-full rounded-xl border border-gray-200 bg-white;
-        padding: 1rem;
+        @apply w-full rounded-xl bg-white;
+        padding: 0.75rem;
     }
     .variable-selector-box {
         position: relative;

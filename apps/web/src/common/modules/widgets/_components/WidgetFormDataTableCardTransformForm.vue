@@ -11,11 +11,15 @@ import getRandomId from '@/lib/random-id-generator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformDataTableDropdown
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformDataTableDropdown.vue';
+import WidgetFormDataTableCardTransformFormEvaluate
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormEvaluate.vue';
 import { DATA_TABLE_OPERATOR, JOIN_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
-import type { QueryCondition, EvalFormula, TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { QueryCondition, TransformDataTableInfo, EvalExpressions } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableOperator, JoinType,
 } from '@/common/modules/widgets/types/widget-model';
+
+import { yellow } from '@/styles/colors';
 
 interface Props {
     dataTableId: string;
@@ -23,7 +27,8 @@ interface Props {
     dataTableInfo: TransformDataTableInfo;
     joinType: JoinType|undefined;
     conditions: QueryCondition[];
-    functions: EvalFormula[];
+    expressions: EvalExpressions[];
+    isLegacyDataTable?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -31,7 +36,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:data-table-info', value: TransformDataTableInfo): void;
     (e: 'update:join-type', value: JoinType): void;
     (e: 'update:conditions', value: QueryCondition[]): void;
-    (e: 'update:functions', value: EvalFormula[]): void;
+    (e: 'update:expressions', value: EvalExpressions[]): void;
 }>();
 
 const state = reactive({
@@ -60,7 +65,7 @@ const queryState = reactive({
 });
 
 const evalState = reactive({
-    proxyFunctions: useProxyValue('functions', props, emit),
+    proxyExpressions: useProxyValue('expressions', props, emit),
 });
 
 /* Events */
@@ -80,27 +85,27 @@ const handleClickAddCondition = () => {
     queryState.proxyConditions = [...queryState.proxyConditions, { key: getRandomId(), value: '' }];
 };
 
-const handleClickAddFunction = () => {
-    const newFunction = {
-        key: getRandomId(),
-        value: '',
-    };
-    evalState.proxyFunctions = [...evalState.proxyFunctions, newFunction];
-};
-
-const handleChangeFunction = (key: string, value: string) => {
-    const targetIndex = evalState.proxyFunctions.findIndex((functionInfo) => functionInfo.key === key);
-    if (targetIndex !== -1) {
-        evalState.proxyFunctions[targetIndex].value = value;
-    }
-};
-
-const handleRemoveFunction = (key: string) => {
-    const targetIndex = evalState.proxyFunctions.findIndex((functionInfo) => functionInfo.key === key);
-    if (targetIndex !== -1) {
-        evalState.proxyFunctions.splice(targetIndex, 1);
-    }
-};
+// const handleClickAddFunction = () => {
+//     const newFunction = {
+//         key: getRandomId(),
+//         value: '',
+//     };
+//     evalState.proxyFunctions = [...evalState.proxyFunctions, newFunction];
+// };
+//
+// const handleChangeFunction = (key: string, value: string) => {
+//     const targetIndex = evalState.proxyFunctions.findIndex((functionInfo) => functionInfo.key === key);
+//     if (targetIndex !== -1) {
+//         evalState.proxyFunctions[targetIndex].value = value;
+//     }
+// };
+//
+// const handleRemoveFunction = (key: string) => {
+//     const targetIndex = evalState.proxyFunctions.findIndex((functionInfo) => functionInfo.key === key);
+//     if (targetIndex !== -1) {
+//         evalState.proxyFunctions.splice(targetIndex, 1);
+//     }
+// };
 
 
 </script>
@@ -115,10 +120,34 @@ const handleRemoveFunction = (key: string) => {
                 />
                 <span>{{ state.operatorMap.name }}</span>
             </div>
+            <div v-if="props.isLegacyDataTable"
+                 class="legacy-data-table-warning"
+            >
+                <div class="warning-title">
+                    <p-i name="ic_warning-filled"
+                         width="1.25rem"
+                         height="1.25rem"
+                         :color="yellow[500]"
+                    />
+                    <span>
+                        <i18n path="COMMON.WIDGETS.DATA_TABLE.FORM.LEGACY_WARNING_TITLE">
+                            <template #operator>{{ state.operatorMap.name }}</template>
+                        </i18n>
+                    </span>
+                </div>
+                <p class="warning-description">
+                    <i18n path="COMMON.WIDGETS.DATA_TABLE.FORM.LEGACY_WARNING_DESC">
+                        <template #operator>
+                            {{ state.operatorMap.name }}
+                        </template>
+                    </i18n>
+                </p>
+            </div>
             <div class="data-table-dropdown-wrapper">
                 <widget-form-data-table-card-transform-data-table-dropdown :data-table-id="props.dataTableId"
                                                                            :operator="props.operator"
                                                                            :data-table-info.sync="state.proxyDataTableInfo"
+                                                                           :is-legacy-data-table="props.isLegacyDataTable"
                 />
             </div>
             <p-field-group v-if="props.operator === DATA_TABLE_OPERATOR.JOIN"
@@ -169,34 +198,10 @@ const handleRemoveFunction = (key: string) => {
                     </p-button>
                 </div>
             </p-field-group>
-            <p-field-group v-if="props.operator === DATA_TABLE_OPERATOR.EVAL"
-                           label="Expression"
-                           required
-            >
-                <div class="eval-type-functions-wrapper">
-                    <div v-for="(functionInfo, idx) in evalState.proxyFunctions"
-                         :key="functionInfo.key"
-                         class="functions-wrapper"
-                    >
-                        <p-text-input class="formula-input"
-                                      block
-                                      :value="functionInfo.value"
-                                      @update:value="handleChangeFunction(functionInfo.key, $event)"
-                        />
-                        <p-icon-button name="ic_delete"
-                                       size="sm"
-                                       :disabled="idx === 0 && evalState.proxyFunctions.length === 1"
-                                       @click="handleRemoveFunction(functionInfo.key)"
-                        />
-                    </div>
-                    <p-button style-type="tertiary"
-                              icon-left="ic_plus_bold"
-                              @click="handleClickAddFunction"
-                    >
-                        Add Expression
-                    </p-button>
-                </div>
-            </p-field-group>
+            <widget-form-data-table-card-transform-form-evaluate v-if="props.operator === DATA_TABLE_OPERATOR.EVAL"
+                                                                 :expressions.sync="evalState.proxyExpressions"
+                                                                 :is-legacy-data-table="props.isLegacyDataTable"
+            />
         </div>
     </div>
 </template>
@@ -237,6 +242,20 @@ const handleRemoveFunction = (key: string) => {
         .functions-wrapper {
             @apply flex gap-1 items-center;
             margin-bottom: 0.5rem;
+        }
+    }
+
+    .legacy-data-table-warning {
+        @apply w-full bg-yellow-100 rounded;
+        padding: 0.5rem 1rem;
+        margin-bottom: 0.5rem;
+        .warning-title {
+            @apply flex items-center gap-1 text-label-lg font-bold text-yellow-700;
+            margin-bottom: 0.25rem;
+        }
+        .warning-description {
+            @apply text-paragraph-md text-gray-900;
+            padding-left: 1.5rem;
         }
     }
 }

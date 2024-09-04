@@ -274,12 +274,13 @@ export default defineComponent<ButtonModalProps>({
         display: flex;
         flex-direction: column;
         width: 100%;
-        max-height: calc(100vh - 4rem);
+        max-height: calc(100vh - 6rem);
         pointer-events: auto;
         box-shadow: 0 0 0.5rem rgba(theme('colors.gray.900'), 0.32);
         transition: all 0.3s ease;
         justify-content: space-between;
         padding: 2rem 2rem;
+        margin-top: 4rem;
 
         &.no-footer {
             padding-bottom: 2.5rem;

@@ -32,11 +32,14 @@ import {
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { CategoryByValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    CategoryByValue, DateFormatValue, DisplaySeriesLabelValue, NumberFormatValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -79,7 +82,16 @@ const state = reactive({
                     show: false,
                 },
                 label: {
-                    fontSize: 12,
+                    show: true,
+                    position: state.displaySeriesLabel?.position,
+                    rotate: state.displaySeriesLabel?.rotate,
+                    fontSize: 10,
+                    formatter: (p) => {
+                        if (state.displaySeriesLabel?.toggleValue) {
+                            return `${p.name}\n\n${getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit)}`;
+                        }
+                        return p.name;
+                    },
                 },
                 data: state.chartData,
             },
@@ -101,6 +113,8 @@ const state = reactive({
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),

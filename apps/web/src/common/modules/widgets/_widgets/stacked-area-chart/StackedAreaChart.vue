@@ -35,11 +35,15 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { LineByValue, XAxisValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    LineByValue, XAxisValue, DateFormatValue, DisplaySeriesLabelValue, NumberFormatValue,
+    LegendValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -134,11 +138,13 @@ const state = reactive({
         return { start: _start, end: _end };
     }),
     // optional fields
-    showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
     dateFormat: computed<string|undefined>(() => {
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -220,6 +226,13 @@ const getLineByData = (rawData: Data) => {
                 const _data = value.find((v) => v[state.xAxisField] === date);
                 return _data ? _data.value : 0;
             }),
+            label: {
+                show: !!state.displaySeriesLabel?.toggleValue,
+                position: state.displaySeriesLabel?.position,
+                rotate: state.displaySeriesLabel?.rotate,
+                fontSize: 10,
+                formatter: (p) => getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit),
+            },
         });
     });
     return _seriesData;
@@ -233,6 +246,13 @@ const getTotalData = (rawData: Data) => ({
         const _data = rawData.results?.find((v) => v[state.xAxisField] === d);
         return _data ? _data[state.dataField] : 0;
     }),
+    label: {
+        show: !!state.displaySeriesLabel?.toggleValue,
+        position: state.displaySeriesLabel?.position,
+        rotate: state.displaySeriesLabel?.rotate,
+        fontSize: 10,
+        formatter: (p) => getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit),
+    },
 });
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;

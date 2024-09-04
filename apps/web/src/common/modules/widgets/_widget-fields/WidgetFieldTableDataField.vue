@@ -3,21 +3,49 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
+import dayjs from 'dayjs';
 import {
-    PSelectDropdown, PFieldGroup, PTextInput, PSelectButton, PTooltip, PI,
+    flatMap, isEqual, map, uniq,
+} from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PSelectDropdown, PFieldGroup, PSelectButton,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
+import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 import { i18n } from '@/translations';
+
+
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
-import { getInitialSelectedMenuItem } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
+import {
+    getReferenceLabel,
+    getWidgetBasedOnDate,
+    getWidgetDateRange,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getInitialSelectedMenuItem, isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { TableDataItem, DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
-import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { TableDataFieldValue, GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
-const DEFAULT_COUNT = 5;
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+import {
+    useAllReferenceTypeInfoStore,
+} from '@/services/dashboards/stores/all-reference-type-info-store';
+
+
+type Data = ListResponse<TableDataItem>;
+
 const DEFAULT_FIELD_TYPE = 'staticField';
 const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions, TableDataFieldValue>>(), {
 });
@@ -26,6 +54,13 @@ const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
 const { labelsMenuItem } = useGranularityMenuItem(props, 'tableDataField');
 const MIN_LABELS_INFO_COUNT = 1;
 const DEFAULT_INDEX = 1;
+
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+
+const storeState = reactive({
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
+});
+
 const state = reactive({
     isInitiated: false,
     proxyValue: useProxyValue('value', props, emit),
@@ -52,10 +87,13 @@ const state = reactive({
         label: d,
     }))),
     isValid: computed<boolean>(() => {
-        if (state.proxyValue?.count === undefined) return false;
         if (state.menuItems.length === 0) return false;
+        if (state.proxyValue?.fieldType === 'dynamicField' && !state.proxyValue?.dynamicFieldValue?.length) return false;
         if (Array.isArray(state.selectedItem)) {
             return !!state.selectedItem.length;
+        }
+        if (state.proxyValue?.fieldType === 'staticField') {
+            return !!state.proxyValue?.value?.length;
         }
         return !!state.selectedItem;
     }),
@@ -66,12 +104,35 @@ const state = reactive({
         }
         return !state.selectedItem;
     }),
-    max: computed(() => props.widgetFieldSchema?.options?.max),
-    isMaxValid: computed<boolean>(() => (state.max ? (state.proxyValue?.count <= state.max) && !!state.proxyValue?.count : true)),
-    tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
-        fieldName: state.fieldName,
-        max: state.max,
-    })),
+    // Dynamic Field Fetching
+    basedOnDate: computed(() => getWidgetBasedOnDate(props.allValueMap?.granularity as string, props.dateRange?.end)),
+    dateRange: computed<DateRange>(() => {
+        const _granularity = props.allValueMap?.granularity as string;
+        const _groupBy = (props.allValueMap?.groupBy as GroupByValue)?.value as string[];
+        const _basedOnDate = getWidgetBasedOnDate(_granularity, props.dateRange?.end);
+        let subtract = 1;
+        if (isDateField(state.proxyValue.value) || _groupBy?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))) {
+            if (_granularity === GRANULARITY.YEARLY) subtract = 3;
+            if (_granularity === GRANULARITY.MONTHLY) subtract = 12;
+            if (_granularity === GRANULARITY.DAILY) subtract = 30;
+        }
+        const [start, end] = getWidgetDateRange(_granularity, _basedOnDate, subtract);
+        return { start, end };
+    }),
+    dynamicFields: undefined as undefined | string[],
+    dynamicFieldMenuItems: computed<MenuItem[]>(() => {
+        if (state.proxyValue?.fieldType === 'staticField') return [];
+        return state.dynamicFields?.map((d) => {
+            const fieldName = state.proxyValue.value;
+            const label = getReferenceLabel(storeState.allReferenceTypeInfo, fieldName, d);
+            return {
+                name: d,
+                label,
+            };
+        }) ?? [];
+    }),
+    selectedMenuItems: computed(() => state.dynamicFieldMenuItems.filter((d) => state.proxyValue.dynamicFieldValue?.includes(d.name))),
+    loading: false,
 });
 
 
@@ -81,6 +142,7 @@ const handleUpdateCriteria = (val: string|MenuItem[]) => {
     state.proxyValue = {
         ...state.proxyValue,
         criteria: val,
+        dynamicFieldValue: [],
     };
 };
 const handleChangeDataFieldType = (value: string) => {
@@ -90,6 +152,7 @@ const handleChangeDataFieldType = (value: string) => {
             ...state.proxyValue,
             value: [state.menuItems[0]?.name],
             criteria: undefined,
+            dynamicFieldValue: undefined,
         };
         state.selectedItem = convertToMenuItem([state.menuItems[0].name]);
         state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
@@ -98,6 +161,7 @@ const handleChangeDataFieldType = (value: string) => {
             ...state.proxyValue,
             value: state.menuItems[0]?.name,
             criteria: state.dataInfoMenuItems[0]?.name,
+            dynamicFieldValue: [],
         };
         state.selectedItem = state.menuItems[0]?.name;
         state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
@@ -115,18 +179,29 @@ const handleUpdateValue = (val: string|MenuItem[]) => {
         state.proxyValue = {
             ...state.proxyValue,
             value: val,
+            dynamicFieldValue: [],
         };
     }
 };
-const handleUpdateCount = (val: number) => {
-    if (val === state.proxyValue?.count) return;
-    state.proxyValue = { ...state.proxyValue, count: val };
+
+const handleSelectDynamicFields = (value: MenuItem[]) => {
+    state.proxyValue = {
+        ...state.proxyValue,
+        dynamicFieldValue: value.map((d) => d.name),
+    };
+};
+
+const handleClearDynamicFieldsSelection = () => {
+    state.proxyValue = {
+        ...state.proxyValue,
+        dynamicFieldValue: [],
+    };
 };
 
 /* Watcher */
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
-});
+}, { immediate: true });
 const convertToMenuItem = (data?: string[]) => data?.map((d) => ({
     name: d,
     label: d,
@@ -135,14 +210,6 @@ const convertToMenuItem = (data?: string[]) => data?.map((d) => ({
 watch(() => labelsMenuItem.value, (value) => {
     if (!(value.find((d) => d.name === state.selectedItem)) && (state.selectedFieldType === 'dynamicField')) {
         state.selectedItem = undefined;
-        return;
-    }
-    if ((labelsMenuItem.value ?? []).length >= 2) {
-        state.proxyValue = {
-            ...state.proxyValue,
-            value: props.value?.value ?? state.menuItems[DEFAULT_INDEX]?.name,
-            criteria: state.selectedFieldType === 'dynamicField' ? state.dataInfoMenuItems[0]?.name : undefined,
-        };
     }
 });
 
@@ -158,18 +225,20 @@ watch(() => state.selectedFieldType, (selectedFieldType) => {
             ...state.proxyValue,
             value: props.value?.value ?? state.menuItems[DEFAULT_INDEX]?.name,
             criteria: state.dataInfoMenuItems[0]?.name,
+            dynamicFieldValue: props.value?.fieldType === 'dynamicField' ? (props.value?.dynamicFieldValue ?? []) : undefined,
         };
     }
 }, { immediate: true });
 
+// Init Value
 const initValue = () => {
     state.selectedFieldType = props.value?.fieldType ?? DEFAULT_FIELD_TYPE;
     state.proxyValue = {
         ...state.proxyValue,
         fieldType: state.selectedFieldType,
         value: props.value?.value,
-        criteria: state.proxyValue?.criteria,
-        count: props.value?.count ?? DEFAULT_COUNT,
+        criteria: props.value?.criteria,
+        dynamicFieldValue: state.selectedFieldType === 'dynamicField' ? (props.value?.dynamicFieldValue ?? []) : undefined,
     };
     if (state.selectedFieldType === 'staticField') {
         state.selectedItem = convertToMenuItem(state.proxyValue?.value);
@@ -193,7 +262,7 @@ watch(() => state.menuItems, (menuItems) => {
         state.selectedItem = convertToMenuItem(_value);
     } else {
         _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, 0);
-        _criteria = getInitialSelectedMenuItem(state.dataInfoMenuItems, state.proxyValue, 0);
+        _criteria = getInitialSelectedMenuItem(state.dataInfoMenuItems, state.proxyValue?.criteria, 0);
         state.selectedItem = _value;
         state.selectedCriteria = _criteria;
     }
@@ -203,6 +272,101 @@ watch(() => state.menuItems, (menuItems) => {
         criteria: _criteria,
     };
 }, { immediate: true });
+
+/* Dynamic Field Fetching */
+const fetchAndExtractDynamicField = async () => {
+    if (!props.widgetId) return;
+    const _isPrivate = props?.widgetId.startsWith('private');
+    const _fetcher = _isPrivate
+        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
+        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
+    try {
+        state.loading = true;
+        const res = await _fetcher({
+            widget_id: props.widgetId,
+            query: {
+                group_by: [...((props.allValueMap?.groupBy as GroupByValue)?.value ?? []), state.proxyValue?.value],
+                granularity: props.allValueMap?.granularity,
+                field_group: [state.proxyValue?.value],
+                fields: {
+                    [state.proxyValue?.criteria]: { key: state.proxyValue?.criteria, operator: 'sum' },
+                },
+                ...state.dateRange,
+            },
+        });
+        const values = flatMap(res.results ?? [], (item) => map(item[state.proxyValue.criteria], state.proxyValue.value));
+        state.dynamicFields = uniq(values);
+    } catch (e) {
+        showErrorMessage(e, '');
+        state.dynamicFields = [];
+    } finally {
+        state.loading = false;
+    }
+};
+const generateDateFields = (granularity: string, dateRange: DateRange) => {
+    if (!granularity) {
+        state.dynamicFields = [];
+        return;
+    }
+    const dateFields: string[] = [];
+
+    let timeUnit: TimeUnit = 'day';
+    if (granularity === GRANULARITY.MONTHLY) timeUnit = 'month';
+    else if (granularity === GRANULARITY.YEARLY) timeUnit = 'year';
+
+    let labelDateFormat = 'YYYY-MM-DD';
+    if (timeUnit === 'month') labelDateFormat = 'YYYY-MM';
+    else if (timeUnit === 'year') labelDateFormat = 'YYYY';
+
+    let start = dayjs.utc(dateRange.start);
+    let end = dayjs.utc(dateRange.end);
+
+    if (granularity === GRANULARITY.DAILY) {
+        if (!props.dateRange?.start && !props.dateRange?.end) {
+            end = dayjs.utc().startOf('day');
+            start = end.subtract(30, 'day');
+        } else {
+            start = dayjs.utc(props.dateRange.start).startOf('month');
+            end = start.endOf('month');
+        }
+    }
+
+    let now = start;
+    while (now.isSameOrBefore(end, timeUnit)) {
+        dateFields.push(now.format(labelDateFormat));
+        now = now.add(1, timeUnit);
+    }
+
+    state.dynamicFields = dateFields;
+};
+watch([ // Fetch Dynamic Field
+    () => state.proxyValue?.fieldType,
+    () => state.proxyValue?.value,
+    () => state.proxyValue?.criteria,
+    () => props.allValueMap?.groupBy,
+    () => props.allValueMap?.granularity,
+    () => props.dateRange,
+], async (
+    [_fieldType, _value, _criteria, _groupBy, _granularity, _dateRange],
+    [, _prevValue, _prevCriteria, _prevGroupBy, _prevGranularity, _prevDateRange],
+) => {
+    if (_fieldType === 'staticField') return;
+    const fetchingSkipCondition = _value === _prevValue && _criteria === _prevCriteria && isEqual(_groupBy, _prevGroupBy) && _granularity === _prevGranularity && isEqual(_dateRange, _prevDateRange);
+    if (fetchingSkipCondition) return;
+    const resetConditionByExternalValue = _prevGroupBy && _prevGranularity && (!isEqual(_groupBy, _prevGroupBy) || _granularity !== _prevGranularity);
+    if (resetConditionByExternalValue) {
+        state.proxyValue = {
+            ...state.proxyValue,
+            dynamicFieldValue: [],
+        };
+    }
+    if (_value === 'Date') {
+        generateDateFields(_granularity as string, state.dateRange);
+    } else {
+        await fetchAndExtractDynamicField();
+    }
+}, { immediate: true });
+
 </script>
 
 <template>
@@ -248,35 +412,25 @@ watch(() => state.menuItems, (menuItems) => {
                                        @update:selected="handleUpdateValue"
                     />
                 </p-field-group>
-                <p-field-group :label="$t('COMMON.WIDGETS.MAX_ITEMS')"
-                               style-type="secondary"
-                               class="max-items"
-                               :invalid="!state.isMaxValid"
-                               :invalid-text="$t('COMMON.WIDGETS.NUMBER_FIELD_VALIDATION', {max: state.max})"
-                               required
-                >
-                    <p-text-input type="number"
-                                  :min="1"
-                                  :max="props.widgetFieldSchema?.options?.max"
-                                  :invalid="!state.isMaxValid"
-                                  :value="state.proxyValue?.count ?? DEFAULT_COUNT"
-                                  @update:value="handleUpdateCount"
-                    />
-                    <template #label-extra>
-                        <p-tooltip v-if="state.max"
-                                   :contents="state.tooltipDesc"
-                                   position="bottom"
-                                   class="tooltip"
-                        >
-                            <p-i width="1rem"
-                                 height="1rem"
-                                 name="ic_info-circle"
-                                 class="icon"
-                            />
-                        </p-tooltip>
-                    </template>
-                </p-field-group>
             </div>
+            <p-field-group v-if="state.selectedFieldType === 'dynamicField'"
+                           required
+            >
+                <p-select-dropdown class="dynamic-field-select-dropdown"
+                                   :menu="state.dynamicFieldMenuItems"
+                                   :selected="state.selectedMenuItems"
+                                   :loading="state.loading"
+                                   :invalid="!state.proxyValue?.dynamicFieldValue?.length"
+                                   use-fixed-menu-style
+                                   multi-selectable
+                                   appearance-type="badge"
+                                   show-select-marker
+                                   show-clear-selection
+                                   is-filterable
+                                   @update:selected="handleSelectDynamicFields"
+                                   @clear-selection="handleClearDynamicFieldsSelection"
+                />
+            </p-field-group>
         </p-field-group>
     </div>
 </template>
@@ -301,18 +455,9 @@ watch(() => state.menuItems, (menuItems) => {
             padding-right: 1.5rem;
         }
     }
-    .max-items {
-        width: 10rem;
-
-        .tooltip {
-            position: relative;
-            padding-left: 1.25rem;
-            .icon {
-                position: absolute;
-                right: 0;
-            }
-        }
-    }
+}
+.dynamic-field-select-dropdown {
+    margin-top: 0.5rem;
 }
 
 /* custom design-system component - p-field-group */

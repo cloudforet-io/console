@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       project:
-        description: 'enter vercel project name'
+        description: 'Enter Vercel project name'
         required: true
         default: 'feedback'
 
@@ -17,14 +17,29 @@ jobs:
   Deploy-Production:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Set up environment
+        run: sudo apt-get install jq
+
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
+
       - name: Checkout Vercel Target Project
         run: vercel link --yes --scope=${{ env.TEAM_NAME }} --project=${{ env.PROJECT_NAME }} --token=${{ env.VERCEL_TOKEN }}
+
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --token=${{ env.VERCEL_TOKEN }}
+
+      - name: Pull Vercel Edge Config
+        run: vercel env pull ./apps/web/.env --yes --token=${{ env.VERCEL_TOKEN }}
+
       - name: Build Project Artifacts
-        run: vercel build --yes --token=${{ env.VERCEL_TOKEN }}
+        run: vercel build --prod --yes --token=${{ env.VERCEL_TOKEN }}
+
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --prod --token=${{ env.VERCEL_TOKEN }}

@@ -35,9 +35,17 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
-import type { StackByValue, XAxisValue, DateFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type {
+    StackByValue,
+    XAxisValue,
+    DateFormatValue,
+    DisplaySeriesLabelValue,
+    NumberFormatValue,
+    LegendValue,
+} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -131,11 +139,13 @@ const state = reactive({
         return { start: _start, end: _end };
     }),
     // optional fields
-    showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
     dateFormat: computed<string|undefined>(() => {
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
     }),
+    numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -184,6 +194,9 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 const drawChart = (rawData?: Data|null) => {
     if (isEmpty(rawData)) return;
 
+    const _maxTotalCount = rawData?.results?.[0]?.[`_total_${state.dataField}`] ?? 0;
+    const _threshold = _maxTotalCount * 0.08;
+
     // set xAxisData
     if (state.xAxisField === DATE_FIELD.DATE) {
         state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
@@ -219,6 +232,16 @@ const drawChart = (rawData?: Data|null) => {
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
+            label: {
+                show: !!state.displaySeriesLabel?.toggleValue,
+                position: state.displaySeriesLabel?.position,
+                rotate: state.displaySeriesLabel?.rotate,
+                fontSize: 10,
+                formatter: (p) => {
+                    if (p.value < _threshold) return '';
+                    return getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit);
+                },
+            },
             data: state.xAxisData.map((d) => {
                 const _data = value.find((v) => v[state.xAxisField] === d);
                 return _data ? _data?.value : undefined;

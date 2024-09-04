@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { PButton } from '@cloudforet/mirinae';
+import { PButton, PSpinner } from '@cloudforet/mirinae';
 
 interface Props {
    disabled: boolean;
+   isLegacyDataTable?: boolean;
    changed: boolean;
+   loading: boolean;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'delete'): void;
@@ -18,6 +20,7 @@ const handleClickResetDataTable = () => {
     emit('reset');
 };
 const handleUpdateDataTable = () => {
+    if (props.loading) return;
     emit('update');
 };
 </script>
@@ -32,7 +35,8 @@ const handleUpdateDataTable = () => {
             {{ $t('COMMON.WIDGETS.DELETE') }}
         </p-button>
         <div class="form-button-wrapper">
-            <p-button style-type="transparent"
+            <p-button v-if="!props.isLegacyDataTable"
+                      style-type="transparent"
                       icon-left="ic_refresh"
                       @click="handleClickResetDataTable"
             >
@@ -40,10 +44,15 @@ const handleUpdateDataTable = () => {
             </p-button>
             <p-button style-type="secondary"
                       class="apply-button"
-                      :disabled="props.disabled"
+                      :disabled="props.disabled || props.isLegacyDataTable"
                       @click="handleUpdateDataTable"
             >
-                {{ $t('COMMON.WIDGETS.APPLY') }}
+                <div class="button-contents-wrapper">
+                    <p-spinner v-if="props.loading"
+                               size="sm"
+                    />
+                    {{ $t('COMMON.WIDGETS.APPLY') }}
+                </div>
                 <div v-if="props.changed"
                      class="update-dot"
                 />
@@ -59,6 +68,9 @@ const handleUpdateDataTable = () => {
 
     .apply-button {
         @apply relative;
+        .button-contents-wrapper {
+            @apply relative flex items-center gap-1;
+        }
         .update-dot {
             @apply absolute rounded-full bg-blue-500 border-2 border-white;
             width: 0.75rem;

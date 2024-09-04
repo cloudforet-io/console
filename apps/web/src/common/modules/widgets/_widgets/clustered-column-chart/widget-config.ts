@@ -9,11 +9,6 @@ const clusteredColumnChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        dataField: {
-            options: {
-                multiSelectable: true,
-            },
-        },
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
@@ -21,6 +16,7 @@ const clusteredColumnChart: WidgetConfig = {
                 max: 31,
             },
         },
+        tableDataField: {},
     },
     optionalFieldsSchema: {
         legend: {
@@ -33,6 +29,8 @@ const clusteredColumnChart: WidgetConfig = {
                 default: 'MMM DD, YYYY',
             },
         },
+        numberFormat: {},
+        displaySeriesLabel: {},
         displayAnnotation: {},
     },
 };

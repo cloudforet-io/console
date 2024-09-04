@@ -38,6 +38,7 @@ const state = reactive({
         name: key,
         label: key,
     }))),
+    isValid: computed<boolean>(() => !!state.proxyValue?.colorValue?.length && !!state.proxyValue?.colorName),
 });
 
 const handleClickColor = (color: ColorSchemaMenuItem) => {
@@ -49,8 +50,10 @@ const handleClickColor = (color: ColorSchemaMenuItem) => {
     };
 };
 
-watch(() => state.proxyValue, (value) => {
-    emit('update:is-valid', value?.colorName !== undefined);
+watch(() => state.proxyValue, () => {
+}, { immediate: true });
+watch(() => state.isValid, (isValid) => {
+    emit('update:is-valid', isValid);
 }, { immediate: true });
 
 const initValue = () => {
@@ -85,6 +88,12 @@ const gradientGenerator = (color: string) => `linear-gradient(90deg, ${COLOR_SCH
                                    :menu="state.colorSchemaList"
                                    :selected="state.selectedColor"
                 >
+                    <template #dropdown-button>
+                        <span class="color-circle"
+                              :class="state.selectedColor"
+                        />
+                        <span>{{ state.selectedColor }}</span>
+                    </template>
                     <template #menu-menu>
                         <div class="menu-container">
                             <div v-for="colorSchema in state.colorSchemaList"
@@ -139,6 +148,26 @@ const gradientGenerator = (color: string) => `linear-gradient(90deg, ${COLOR_SCH
                     @apply bg-blue-200;
                 }
             }
+        }
+    }
+    .color-circle {
+        @apply rounded-full;
+        width: 1rem;
+        height: 1rem;
+        &.Coral {
+            background: linear-gradient(90deg, #ffd4c8 0%, #ca4f28 100%);
+        }
+        &.Yellow {
+            background: linear-gradient(90deg, #f8f6ed 0%, #d9ae00 100%);
+        }
+        &.Green {
+            background: linear-gradient(90deg, #e8f9b8 0%, #60b731 100%);
+        }
+        &.Violet {
+            background: linear-gradient(90deg, #e1e0fa 0%, #6638b6 100%);
+        }
+        &.Blue {
+            background: linear-gradient(90deg, #e0f2ff 0%, #007ee5 100%);
         }
     }
 }
