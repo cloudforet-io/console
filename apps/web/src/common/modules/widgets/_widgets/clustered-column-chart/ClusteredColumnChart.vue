@@ -140,9 +140,9 @@ const state = reactive({
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
-        if (Object.values(DATE_FIELD).includes(state.xAxisField)) {
+        if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
-        } else if (Object.values(DATE_FIELD).includes(state.dataField)) {
+        } else if (isDateField(state.dataField)) {
             if (state.dynamicFieldValue.length) {
                 const _sortedDateValue = [...state.dynamicFieldValue];
                 _sortedDateValue.sort();
