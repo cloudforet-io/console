@@ -33,6 +33,7 @@ const updateWidget = async (widgetId: string, options: WidgetOptions) => {
 /**
  * Line Chart
  * Data Field -> Table Data Field
+ * Legend: value type is changed
  */
 const _migrateLineChart = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, WidgetOptions] => {
     let _options = cloneDeep(widget.options);
