@@ -43,6 +43,7 @@ const state = reactive({
 const modalState = reactive({
     visible: false,
     currentSelectionKey: undefined as string|undefined,
+    currentSelectionName: undefined as string|undefined,
 });
 
 /* Events */
@@ -61,22 +62,24 @@ const handleClickDeleteExpression = (key: string) => {
     const targetExpression = state.proxyExpressions.find((d) => d.key === key);
     if (!targetExpression?.name && !targetExpression?.expression) {
         state.proxyExpressions = state.proxyExpressions.filter((expression) => expression.key !== key);
-        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'), '');
         return;
     }
     modalState.visible = true;
     modalState.currentSelectionKey = key;
+    modalState.currentSelectionName = targetExpression?.name;
 };
 const handleConfirmDeleteExpression = () => {
     if (!modalState.currentSelectionKey) return;
     state.proxyExpressions = state.proxyExpressions.filter((expression) => expression.key !== modalState.currentSelectionKey);
+    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP', { field_name: modalState.currentSelectionName }), '');
     modalState.visible = false;
     modalState.currentSelectionKey = undefined;
-    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_SUCCESS_TOOLTIP'), '');
+    modalState.currentSelectionName = undefined;
 };
 const handleCancelModal = () => {
     modalState.visible = false;
     modalState.currentSelectionKey = undefined;
+    modalState.currentSelectionName = undefined;
 };
 const handleChangeFieldType = (key: string, selected: EvaluateExpressionType) => {
     state.proxyExpressions = state.proxyExpressions.map((expression) => {
@@ -198,9 +201,9 @@ const handleClickAddLabel = () => {
                   icon-left="ic_plus_bold"
                   @click="handleClickAddLabel"
         >
-            {{ $t('Add Field') }}
+            {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.ADD_FIELD') }}
         </p-button>
-        <p-button-modal :header-title="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_MODAL_TITLE')"
+        <p-button-modal :header-title="$t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL.DELETE_MODAL_TITLE', { field_name: modalState.currentSelectionName })"
                         :visible.sync="modalState.visible"
                         size="sm"
                         theme-color="alert"
