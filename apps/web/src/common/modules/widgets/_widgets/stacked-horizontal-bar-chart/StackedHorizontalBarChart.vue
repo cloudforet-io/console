@@ -196,14 +196,12 @@ const drawChart = (rawData?: Data|null) => {
     const _threshold = _maxTotalCount * 0.08;
 
     // set yAxis Data
-    let _yAxisData: string[];
-    if (state.yAxisField === DATE_FIELD.DATE) {
-        _yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+    if (isDateField(state.yAxisField)) {
+        const _isSeparatedDate = state.yAxisField !== DATE_FIELD.DATE;
+        state.yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
     } else {
-        _yAxisData = reverse([...rawData.results?.map((d) => d[state.yAxisField] as string) ?? []]);
-        if (isDateField(state.yAxisField)) _yAxisData.sort();
+        state.yAxisData = reverse([...rawData.results?.map((d) => d[state.yAxisField] as string) ?? []]);
     }
-    state.yAxisData = _yAxisData;
 
     // slice stackByData by stackByCount
     const _slicedByStackBy: any[] = [];

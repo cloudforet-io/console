@@ -316,14 +316,12 @@ const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
     // get xAxis data
-    let _xAxisData: string[] = [];
-    if (state.xAxisField === DATE_FIELD.DATE) {
-        _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+    if (isDateField(state.xAxisField)) {
+        const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
+        state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
     } else {
-        _xAxisData = rawData?.results?.map((v) => v[state.xAxisField] as string) || [];
-        if (isDateField(state.xAxisField)) _xAxisData.sort();
+        state.xAxisData = rawData?.results?.map((d) => d[state.xAxisField] as string) || [];
     }
-    state.xAxisData = _xAxisData;
 
     let _seriesData: any[] = [];
     if (state.dataFieldType === 'staticField') {
