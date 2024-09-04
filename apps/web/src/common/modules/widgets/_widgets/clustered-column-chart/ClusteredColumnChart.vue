@@ -253,6 +253,9 @@ const getStaticFieldData = (rawData: StaticFieldData) => {
     let _xAxisData: string[] = [];
     if (state.xAxisField === DATE_FIELD.DATE) {
         _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+    } else if (isDateField(state.xAxisField)) {
+        _xAxisData = _slicedData.map((v) => v[state.xAxisField] as string);
+        _xAxisData.sort();
     } else {
         _xAxisData = Array.from(new Set(_slicedData.map((v) => v[state.xAxisField] as string)));
         _xAxisData = _xAxisData.slice(0, state.xAxisCount);
