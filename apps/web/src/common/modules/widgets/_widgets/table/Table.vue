@@ -284,7 +284,7 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
         if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField') {
             _filter = [{
                 k: state.tableDataField,
-                v: state.tableDataFieldInfo?.dynamicFieldValue,
+                v: state.tableDataFieldInfo?.dynamicFieldValue || [],
                 o: 'in',
             }];
         }
