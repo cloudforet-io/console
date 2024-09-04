@@ -73,7 +73,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
 </script>
 
 <template>
-    <div class="widget-field-number-format">
+    <div class="widget-field-data-field-heatmap-color">
         <p-field-group :label="$t('COMMON.WIDGETS.DATA_FIELD_HEATMAP_COLOR.DATA_FIELD_HEATMAP_COLOR')"
                        required
         >
@@ -145,7 +145,7 @@ watch(() => state.dataFieldList, (dataFieldList) => {
 </template>
 
 <style lang="postcss" scoped>
-.widget-field-number-format {
+.widget-field-data-field-heatmap-color {
     .multi-data-field-wrapper {
         @apply flex flex-col gap-2;
     }

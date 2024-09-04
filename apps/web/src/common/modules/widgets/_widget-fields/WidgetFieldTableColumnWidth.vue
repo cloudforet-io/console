@@ -27,8 +27,8 @@ const state = reactive({
     proxyValue: useProxyValue<TableColumnWidthValue>('value', props, emit),
     // Base
     widthTypeItems: computed(() => [
-        { label: i18n.t('auto'), value: 'auto' },
-        { label: i18n.t('fix'), value: 'fixed' },
+        { label: i18n.t('COMMON.WIDGETS.TABLE_COLUMN_WIDTH.AUTO'), value: 'auto' },
+        { label: i18n.t('COMMON.WIDGETS.TABLE_COLUMN_WIDTH.FIX'), value: 'fixed' },
     ]),
     selectedWidthType: computed(() => state.proxyValue?.widthType ?? 'auto'),
     fixedWidthInvalid: computed(() => {
@@ -42,8 +42,8 @@ const state = reactive({
     fixedWidthInvalidText: computed(() => {
         if (state.proxyValue.widthType === 'auto') return '';
         const fixedWidth = state.proxyValue.fixedWidth;
-        if (fixedWidth === undefined || fixedWidth === 0) return i18n.t('Please enter.');
-        if (fixedWidth < state.proxyValue.minimumWidth) return i18n.t('Column width must be greater than the minimum column width.');
+        if (fixedWidth === undefined || fixedWidth === 0) return i18n.t('COMMON.WIDGETS.TABLE_COLUMN_WIDTH.INVALID_LENGTH');
+        if (fixedWidth < state.proxyValue.minimumWidth) return i18n.t('COMMON.WIDGETS.TABLE_COLUMN_WIDTH.INVALID_MINIMUM_WIDTH');
         return '';
     }),
 });
@@ -127,7 +127,7 @@ onMounted(() => {
                         <p-field-title class="width-sub-title">
                             {{ $t('COMMON.WIDGETS.TABLE_COLUMN_WIDTH.WIDTH') }}
                         </p-field-title>
-                        <p-radio-group>
+                        <p-radio-group direction="horizontal">
                             <p-radio v-for="(item) in state.widthTypeItems"
                                      :key="`width-type-${item.value}`"
                                      :value="item.value"
@@ -173,11 +173,12 @@ onMounted(() => {
                 margin-bottom: 0.25rem;
             }
             .type-select-wrapper {
-                width: 8rem;
+                min-width: 9rem;
+                width: auto;
             }
             .fixed-width-input-wrapper {
                 padding-top: 0.75rem;
-                width: calc(100% - 8rem);
+                width: calc(100% - 9rem);
                 .invalid-text {
                     @apply text-label-sm text-red-500;
                     margin-top: 0.25rem;

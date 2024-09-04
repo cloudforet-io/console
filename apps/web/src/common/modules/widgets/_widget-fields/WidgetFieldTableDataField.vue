@@ -80,7 +80,7 @@ const state = reactive({
     multiSelectable: computed(() => state.selectedFieldType === 'staticField'),
     menuItems: computed<MenuItem[]>(() => {
         if (!props.dataTable) return [];
-        return state.selectedFieldType === 'dynamicField' ? labelsMenuItem.value : state.dataInfoMenuItems;
+        return props.value?.fieldType === 'dynamicField' ? labelsMenuItem.value : state.dataInfoMenuItems;
     }),
     dataInfoMenuItems: computed<MenuItem[]>(() => sortWidgetTableFields(Object.keys(props.dataTable?.data_info ?? {})).map((d) => ({
         name: d,
@@ -184,10 +184,21 @@ const handleUpdateValue = (val: string|MenuItem[]) => {
     }
 };
 
-const handleSelectDynamicFields = (value: MenuItem[]) => {
+const handleSelectDynamicFields = (value: MenuItem) => {
+    if (state.proxyValue.dynamicFieldValue.includes(value.name)) {
+        state.proxyValue = {
+            ...state.proxyValue,
+            dynamicFieldValue: [
+                ...state.proxyValue.dynamicFieldValue.filter((d) => d !== value.name),
+            ],
+        };
+        return;
+    }
     state.proxyValue = {
         ...state.proxyValue,
-        dynamicFieldValue: value.map((d) => d.name),
+        dynamicFieldValue: [
+            ...state.proxyValue.dynamicFieldValue, value.name,
+        ],
     };
 };
 
@@ -266,6 +277,7 @@ watch(() => state.menuItems, (menuItems) => {
         state.selectedItem = _value;
         state.selectedCriteria = _criteria;
     }
+
     state.proxyValue = {
         ...state.proxyValue,
         value: _value,
@@ -426,8 +438,7 @@ watch([ // Fetch Dynamic Field
                                    appearance-type="badge"
                                    show-select-marker
                                    show-clear-selection
-                                   is-filterable
-                                   @update:selected="handleSelectDynamicFields"
+                                   @select="handleSelectDynamicFields"
                                    @clear-selection="handleClearDynamicFieldsSelection"
                 />
             </p-field-group>

@@ -1450,10 +1450,11 @@
 			"CONTINUE": "次へ",
 			"CRITERIA": "条件",
 			"CUSTOM_TABLE_COLUMN_WIDTH": {
-				"CUSTOM_TABLE_COLUMN_WIDTH": "",
-				"DESCRIPTION": "",
-				"FIELD": "",
-				"WIDTH": ""
+				"ADD": "カスタムフィールド幅を追加",
+				"CUSTOM_TABLE_COLUMN_WIDTH": "カスタムテーブルの列幅",
+				"DESCRIPTION": "特定の列の幅を設定して、デフォルト設定を上書きすることができます。固定された幅も上書きできますが、最小幅より小さい値は無視されます。",
+				"FIELD": "フィールド",
+				"WIDTH": "幅 (はば)"
 			},
 			"DAILY_UPDATE_CREATED": "作成",
 			"DAILY_UPDATE_DELETED": "削除",
@@ -1496,16 +1497,17 @@
 					"DATA_TABLE_NAME_WARNING": "この名前のデータはすでに存在します。",
 					"DATA_UNIT": "データ単位",
 					"EVAL": {
-						"DELETE_MODAL_DESC": "",
-						"DELETE_MODAL_TITLE": "",
-						"DELETE_SUCCESS_TOOLTIP": "",
-						"FIELD_FORMULA": "",
-						"FIELD_NAME": "",
-						"FIELD_TYPE": "",
-						"FORMULA_PLACEHOLDER": "",
-						"TITLE_PLACEHOLDER": "",
-						"TYPE_DATA_FIELD": "",
-						"TYPE_LABEL_FIELD": ""
+						"ADD_FIELD": "フィールド追加",
+						"DELETE_MODAL_DESC": "このフィールドを削除してもよろしいですか？",
+						"DELETE_MODAL_TITLE": "{field_name}を削",
+						"DELETE_SUCCESS_TOOLTIP": "{field_name}は正常に削除されました。",
+						"FIELD_FORMULA": "フィールド式",
+						"FIELD_NAME": "フィールド名",
+						"FIELD_TYPE": "フィールドタイプ",
+						"FORMULA_PLACEHOLDER": "{pandas}形式で数式を入力してください。",
+						"TITLE_PLACEHOLDER": "フィールド名を入力",
+						"TYPE_DATA_FIELD": "データフィールド",
+						"TYPE_LABEL_FIELD": "ラベルフィールド"
 					},
 					"EVAL_DESC": "データフィールドに関数や計算を適用します。",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day はフィールド名として使用できません。",
@@ -1513,8 +1515,8 @@
 					"FILTERS": "フィルター",
 					"GROUP_BY": "グループ別統計(Group by)",
 					"JOIN_DESC": "共通の列に基づいて、異なるテーブルの行を結合します。",
-					"LEGACY_WARNING_DESC": "",
-					"LEGACY_WARNING_TITLE": "",
+					"LEGACY_WARNING_DESC": "この「{operator}」形式はサポートされなくなりました。削除して、新しいデータ変換を実装してください。",
+					"LEGACY_WARNING_TITLE": "サポートされていない「{operator}」形式",
 					"QUERY_DESC": "特定の条件を満たすデータをフィルタリングして抽出します。",
 					"SELECT_DATA_SOURCE_SUCCESS": "データが正常に変更されました。",
 					"SELECT_DATA_TABLE_WARNING": "先にデータテーブルを保存してください。",
@@ -1536,11 +1538,22 @@
 				"PLACEHOLDER": "基準: 1万円"
 			},
 			"DISPLAY_SERIES_LABEL": {
+				"BOTTOM": "下",
 				"DISPLAY_SERIES_LABEL": "系列ラベルを表示",
+				"INNER": "内側",
+				"INSIDE": "内側",
+				"INSIDE_BOTTOM": "内側下",
+				"INSIDE_LEFT": "側左",
+				"INSIDE_RIGHT": "内側右",
+				"INSIDE_TOP": "内側上",
+				"LEFT": "左",
+				"OUTER": "側",
 				"POSITION": "位置",
+				"RIGHT": "右",
 				"ROTATE": "回転",
 				"ROTATE_MAX_INVALID_TEXT": "90より小さい必要があります",
-				"ROTATE_MIN_INVALID_TEXT": "-90より大きい必要があります"
+				"ROTATE_MIN_INVALID_TEXT": "-90より大きい必要があります",
+				"TOP": "上"
 			},
 			"DONE": "完了",
 			"DONUT": "Donut",
@@ -1579,19 +1592,19 @@
 			"HEALTH_DASHBOARD_HELP": "AWSのサービスの状態とスケジュール済みタスク通知を見ることができます。",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"LEGEND": {
-				"BOTTOM": "",
-				"LEFT": "",
-				"LEGEND": "",
+				"BOTTOM": "下",
+				"LEFT": "左",
+				"LEGEND": "凡例",
 				"POSITION": "位置",
-				"RIGHT": "",
-				"TOP": ""
+				"RIGHT": "右",
+				"TOP": "上"
 			},
 			"MAX_ITEMS": "最大アイテム数",
 			"MAX_ITEMS_DESC": "{fieldName} の最大値は {max} です。",
 			"MISSING_VALUE": {
-				"LINE_BREAKS": "",
-				"LINE_TO_ZERO": "",
-				"MISSING_VALUE": ""
+				"LINE_BREAKS": "ラインを表示しない",
+				"LINE_TO_ZERO": "0として表示",
+				"MISSING_VALUE": "欠損値の処理方式"
 			},
 			"NO_DATA_TO_DISPLAY": "データがありません",
 			"NUMBER_CARD": {
@@ -1688,14 +1701,18 @@
 				"SUB_TOTAL": "小計"
 			},
 			"TABLE_COLUMN_WIDTH": {
-				"MINIMUM_WIDTH": "",
-				"TABLE_COLUMN_WIDTH": "",
-				"WIDTH": ""
+				"AUTO": "オート",
+				"FIX": "固定",
+				"INVALID_LENGTH": "幅を入力してください。",
+				"INVALID_MINIMUM_WIDTH": "列の幅は最小列幅より大きくする必要があります。",
+				"MINIMUM_WIDTH": "最小幅",
+				"TABLE_COLUMN_WIDTH": "れつはば",
+				"WIDTH": "幅 (はば)"
 			},
 			"TABLE_HEATMAP_COLOR_NONE": "ない",
 			"TEXT_WRAP": {
-				"DESCRIPTION": "",
-				"TEXT_WRAP": ""
+				"DESCRIPTION": "テキストは列幅に合わせて折り返されます。",
+				"TEXT_WRAP": "テキストの折り返し"
 			},
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "プロジェクト作成",
@@ -1735,7 +1752,7 @@
 			"UNABLE_TO_LOAD_WIDGET": "ウィジェット表示不可",
 			"VIEW_FULL_DATA": "データ全体を表示",
 			"WIDGET_HEIGHT": {
-				"WIDGET_HEIGHT": ""
+				"WIDGET_HEIGHT": "ウィジェットの高さ"
 			},
 			"WIDGET_TITLE_REQUIRED": "ウィジェットのタイトルを入力してください。"
 		}
@@ -3935,7 +3952,7 @@
 					"RESPONDER": "受信先",
 					"SHOW_RESPONDERS": "受信先を見る"
 				},
-				"SIGN_IN_BUTTON": "",
+				"SIGN_IN_BUTTON": "サインインして詳細を管理",
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "ステータスの更新に失敗しました",
 					"ALT_S_UPDATE_STATUS": "ステータスが正常に更新されました",

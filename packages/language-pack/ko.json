@@ -1450,10 +1450,11 @@
 			"CONTINUE": "계속하기",
 			"CRITERIA": "기준",
 			"CUSTOM_TABLE_COLUMN_WIDTH": {
-				"CUSTOM_TABLE_COLUMN_WIDTH": "",
-				"DESCRIPTION": "",
-				"FIELD": "",
-				"WIDTH": ""
+				"ADD": "사용자 지정 너비 추가",
+				"CUSTOM_TABLE_COLUMN_WIDTH": "열 너비 직접 설정",
+				"DESCRIPTION": "특정 열의 너비를 기본 설정과 다르게 지정할 수 있습니다. 고정된 너비도 변경할 수 있지만, 최소 너비보다 작은 값은 적용되지 않습니다.",
+				"FIELD": "필드",
+				"WIDTH": "너비"
 			},
 			"DAILY_UPDATE_CREATED": "생성 ",
 			"DAILY_UPDATE_DELETED": "삭제",
@@ -1496,16 +1497,17 @@
 					"DATA_TABLE_NAME_WARNING": "동일한 이름의 데이터가 이미 존재합니다.",
 					"DATA_UNIT": "데이터 단위",
 					"EVAL": {
-						"DELETE_MODAL_DESC": "",
-						"DELETE_MODAL_TITLE": "",
-						"DELETE_SUCCESS_TOOLTIP": "",
-						"FIELD_FORMULA": "",
-						"FIELD_NAME": "",
-						"FIELD_TYPE": "",
-						"FORMULA_PLACEHOLDER": "",
-						"TITLE_PLACEHOLDER": "",
-						"TYPE_DATA_FIELD": "",
-						"TYPE_LABEL_FIELD": ""
+						"ADD_FIELD": "필드 추가",
+						"DELETE_MODAL_DESC": "이 필드를 삭제하시겠습니까?",
+						"DELETE_MODAL_TITLE": "{field_name} 삭제",
+						"DELETE_SUCCESS_TOOLTIP": "{field_name} 삭제 완료",
+						"FIELD_FORMULA": "필드 수식",
+						"FIELD_NAME": "필드명",
+						"FIELD_TYPE": "필드 타입",
+						"FORMULA_PLACEHOLDER": "pandas 형식으로 수식을 입력하세요.",
+						"TITLE_PLACEHOLDER": "필드명 입력",
+						"TYPE_DATA_FIELD": "데이터 필드",
+						"TYPE_LABEL_FIELD": "레이블 필드"
 					},
 					"EVAL_DESC": "데이터 필드에 함수나 계산을 적용합니다.",
 					"FIELD_NAME_DATE_INVALID_TEXT": "Date/Year/Month/Day는 필드 이름으로 사용할 수 없습니다.",
@@ -1536,11 +1538,22 @@
 				"PLACEHOLDER": "기준: 만원"
 			},
 			"DISPLAY_SERIES_LABEL": {
+				"BOTTOM": "아래",
 				"DISPLAY_SERIES_LABEL": "시리즈 레이블 표시 ",
+				"INNER": "안쪽",
+				"INSIDE": "내부",
+				"INSIDE_BOTTOM": "내부 아래쪽",
+				"INSIDE_LEFT": "내부 왼쪽",
+				"INSIDE_RIGHT": "내부 오른쪽",
+				"INSIDE_TOP": "내부 위쪽",
+				"LEFT": "왼쪽",
+				"OUTER": "바깥쪽",
 				"POSITION": "위치",
+				"RIGHT": "오른쪽",
 				"ROTATE": "회전",
 				"ROTATE_MAX_INVALID_TEXT": "90 이하로 설정해주세요.",
-				"ROTATE_MIN_INVALID_TEXT": "-90 이상으로 설정해주세요."
+				"ROTATE_MIN_INVALID_TEXT": "-90 이상으로 설정해주세요.",
+				"TOP": "위"
 			},
 			"DONE": "완료",
 			"DONUT": "도넛 차트",
@@ -1579,19 +1592,19 @@
 			"HEALTH_DASHBOARD_HELP": "AWS의 서비스 상태 및 예정된 작업 공지를 볼 수 있습니다.",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"LEGEND": {
-				"BOTTOM": "",
-				"LEFT": "",
-				"LEGEND": "",
+				"BOTTOM": "아래",
+				"LEFT": "왼쪽",
+				"LEGEND": "범례(Legend)",
 				"POSITION": "위치",
-				"RIGHT": "",
-				"TOP": ""
+				"RIGHT": "오른쪽",
+				"TOP": "위"
 			},
 			"MAX_ITEMS": "최대 항목 수",
 			"MAX_ITEMS_DESC": "{fieldName} 값의 최대 개수는 {max}입니다.",
 			"MISSING_VALUE": {
-				"LINE_BREAKS": "",
-				"LINE_TO_ZERO": "",
-				"MISSING_VALUE": ""
+				"LINE_BREAKS": "라인 미표시",
+				"LINE_TO_ZERO": "0으로 표시",
+				"MISSING_VALUE": "없는 값 처리 방식"
 			},
 			"NO_DATA_TO_DISPLAY": "데이터가 없습니다.",
 			"NUMBER_CARD": {
@@ -1684,18 +1697,22 @@
 			"SET_CHART_OPTIONS": "차트 옵션 설정",
 			"SET_DATA_SOURCE": "데이터 소스 설정",
 			"SUB_TOTAL": {
-				"INFO_TEXT": "세부 기준(Granularity) 기반의 그룹별 통계(Group By)에서 각 필드의 부분 합을 구할 수 있습니다. \n단, 데이터 필드를 ‘정적 필드’로 선택한 경우, 본 옵션 사용이 불가합니다.",
+				"INFO_TEXT": "세부 기준(Granularity) 기반의 그룹별 통계(Group By)에서 각 필드의 부분 합을 구할 수 있습니다. \n단, 데이터 필드를 ‘고정 데이터 필드’로 선택한 경우, 본 옵션 사용이 불가합니다.",
 				"SUB_TOTAL": "소계(Subtotal)"
 			},
 			"TABLE_COLUMN_WIDTH": {
-				"MINIMUM_WIDTH": "",
-				"TABLE_COLUMN_WIDTH": "",
-				"WIDTH": ""
+				"AUTO": "자동",
+				"FIX": "고정",
+				"INVALID_LENGTH": "너비를 입력해 주세요.",
+				"INVALID_MINIMUM_WIDTH": "설정된 최소 열 너비값 보다 커야 합니다.",
+				"MINIMUM_WIDTH": "최소 너비",
+				"TABLE_COLUMN_WIDTH": "열 너비",
+				"WIDTH": "너비"
 			},
 			"TABLE_HEATMAP_COLOR_NONE": "없음",
 			"TEXT_WRAP": {
-				"DESCRIPTION": "",
-				"TEXT_WRAP": ""
+				"DESCRIPTION": "텍스트가 열 너비에 맞게 자동으로 줄바꿈됩니다.",
+				"TEXT_WRAP": "텍스트 줄바꿈"
 			},
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "프로젝트 생성",
@@ -1735,7 +1752,7 @@
 			"UNABLE_TO_LOAD_WIDGET": "위젯 표시 불가",
 			"VIEW_FULL_DATA": "전체 데이터 보기",
 			"WIDGET_HEIGHT": {
-				"WIDGET_HEIGHT": ""
+				"WIDGET_HEIGHT": "위젯 높이"
 			},
 			"WIDGET_TITLE_REQUIRED": "위젯 제목을 입력해주세요."
 		}
@@ -2153,7 +2170,7 @@
 					"DATE_FORMAT": "날짜 형식",
 					"DATE_FORMAT_AUTO_DISPLAY": "세부기준(Granuarity)별 자동 표시",
 					"DESCRIPTION": "설명",
-					"DYNAMIC_FIELD": "동적 필드",
+					"DYNAMIC_FIELD": "변동 데이터 필드",
 					"EDIT_DATA": "데이터 수정",
 					"EXPAND_AND_EDIT": "확장 및 편집",
 					"FIELD_NAME": "필드명",
@@ -2171,7 +2188,7 @@
 					"PROGRESS_BAR_DESCRIPTION_2": "[기준 필드 ÷ 총합 필드 x 100]",
 					"REQUIRED_FIELDS": "필수 입력 항목",
 					"STACK_BY": "스택별",
-					"STATIC_FIELD": "정적 필드",
+					"STATIC_FIELD": "고정 데이터 필드",
 					"SUB_TOTAL": "소계(Subtotal)",
 					"TITLE": "이름",
 					"TOTAL": "총합(Total)",

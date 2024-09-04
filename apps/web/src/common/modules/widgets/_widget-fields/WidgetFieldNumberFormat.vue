@@ -241,42 +241,44 @@ watch(() => state.customModalVisible, (modalVisible) => {
 </template>
 
 <style lang="postcss" scoped>
-.multi-data-field-wrapper {
-    @apply flex flex-col gap-2;
-}
-.number-format-custom-modal {
-    .top-part {
-        @apply bg-gray-100 rounded;
-        padding: 0.75rem;
-        .input-wrapper {
-            display: flex;
-            justify-content: space-between;
-            gap: 0.5rem;
-            .p-field-group {
-                width: 100%;
-            }
-        }
-        .helper-wrapper {
-            @apply text-label-md text-gray-600;
-            display: flex;
-            justify-content: space-between;
-            padding-top: 0.5rem;
-        }
+.widget-field-number-format {
+    .multi-data-field-wrapper {
+        @apply flex flex-col gap-2;
     }
-    .bottom-part {
-        @apply border border-gray-150 rounded;
-        padding: 0.5rem;
-        margin-top: 0.75rem;
-        .sample-row {
-            @apply cursor-pointer;
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem;
-            .format-text {
-                @apply text-label-md;
+    .number-format-custom-modal {
+        .top-part {
+            @apply bg-gray-100 rounded;
+            padding: 0.75rem;
+            .input-wrapper {
+                display: flex;
+                justify-content: space-between;
+                gap: 0.5rem;
+                .p-field-group {
+                    width: 100%;
+                }
             }
-            .formatted-value {
-                @apply text-label-sm text-gray-500;
+            .helper-wrapper {
+                @apply text-label-md text-gray-600;
+                display: flex;
+                justify-content: space-between;
+                padding-top: 0.5rem;
+            }
+        }
+        .bottom-part {
+            @apply border border-gray-150 rounded;
+            padding: 0.5rem;
+            margin-top: 0.75rem;
+            .sample-row {
+                @apply cursor-pointer;
+                display: flex;
+                justify-content: space-between;
+                padding: 0.5rem;
+                .format-text {
+                    @apply text-label-md;
+                }
+                .formatted-value {
+                    @apply text-label-sm text-gray-500;
+                }
             }
         }
     }

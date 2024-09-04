@@ -306,7 +306,9 @@ const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
     if (props.fieldType === 'staticField') {
         if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
     } else if (props.fieldType === 'dynamicField') {
-        if (field?.fieldInfo?.type === 'dataField') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
+        if (field?.fieldInfo?.type === 'dataField' && field?.fieldInfo?.additionalType !== 'subTotal') {
+            customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
+        }
     }
     const minimumWidth = props.tableColumnWidthInfo?.minimumWidth ?? TABLE_DEFAULT_MINIMUM_WIDTH;
     const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
@@ -319,10 +321,13 @@ const getFieldWidth = (field: TableWidgetField): string|undefined => {
     if (props.fieldType === 'staticField') {
         if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
     } else if (props.fieldType === 'dynamicField') {
-        if (field?.fieldInfo?.type === 'dataField') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
+        if (field?.fieldInfo?.type === 'dataField' && field?.fieldInfo?.additionalType !== 'subTotal') {
+            customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
+        }
     }
     const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
     const calculatedWidth = customWidth || fixedWidth;
+
     return calculatedWidth ? `${calculatedWidth}px` : undefined;
 };
 
