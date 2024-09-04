@@ -33,6 +33,7 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
@@ -194,12 +195,15 @@ const drawChart = (rawData?: Data|null) => {
     const _maxTotalCount = rawData?.results?.[0]?.[`_total_${state.dataField}`] ?? 0;
     const _threshold = _maxTotalCount * 0.08;
 
-    // set yAxisData
+    // set yAxis Data
+    let _yAxisData: string[];
     if (state.yAxisField === DATE_FIELD.DATE) {
-        state.yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+        _yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
-        state.yAxisData = reverse([...rawData.results?.map((d) => d[state.yAxisField] as string) ?? []]);
+        _yAxisData = reverse([...rawData.results?.map((d) => d[state.yAxisField] as string) ?? []]);
+        if (isDateField(state.yAxisField)) _yAxisData.sort();
     }
+    state.yAxisData = _yAxisData;
 
     // slice stackByData by stackByCount
     const _slicedByStackBy: any[] = [];

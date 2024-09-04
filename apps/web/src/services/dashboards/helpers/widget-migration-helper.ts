@@ -98,7 +98,7 @@ const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetMod
 export const migrateLegacyWidgetOptions = async (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): Promise<boolean> => {
     let isMigrated = false;
     await Promise.all(dashboardWidgets.map(async (widget) => {
-        if (widget.widget_type === 'lineChart') {
+        if (widget.widget_type === 'lineChart' || widget.widget_type === 'stackedAreaChart') {
             const [_needMigration, _migratedOptions] = _migrateLineChart(widget);
             isMigrated = isMigrated || _needMigration;
             if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
