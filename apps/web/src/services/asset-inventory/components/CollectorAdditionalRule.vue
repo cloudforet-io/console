@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PHeading, PCard, PI, PButton, PPaneLayout,
+    PHeading, PCard, PI, PButton, PPaneLayout, PDivider,
 } from '@cloudforet/mirinae';
 
 import {
@@ -19,6 +19,7 @@ const state = reactive({
         const data = collectorFormState.additionalRules;
         return data.sort((a, b) => a.order - b.order);
     }),
+    editModeCardOrder: -1,
 });
 
 const changeOrder = (targetData, clickedData, tempOrder) => {
@@ -63,9 +64,15 @@ const handleClickDeleteButton = (order: number) => {
     });
 };
 
+const handleClickEditButton = (order: number) => {
+    state.editModeCardOrder = order;
+};
+
 const handleClickAddEventRule = async () => {
     collectorFormState.additionalRules = [...collectorFormState.additionalRules, { order: collectorFormState.additionalRules.length + 1 }];
 };
+
+const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
 
 </script>
 
@@ -78,41 +85,74 @@ const handleClickAddEventRule = async () => {
         <div class="card-list-wrapper">
             <p-card v-for="data in state.orderedCardData"
                     :key="data.order"
-                    style-type="gray100"
+                    :style-type="isEditModeByOrder(data.order) ? 'indigo400' :'gray100'"
             >
                 <template #header>
                     <div class="card-header">
                         <div class="left-part">
-                            <span class="order-text">#<strong>{{ data.order }}</strong></span>
-                            <span class="arrow-button"
-                                  :class="{'disabled': data.order === 1}"
-                                  @click="handleClickUpButton(data)"
+                            <div v-if="!isEditModeByOrder(data.order)">
+                                <span class="order-text">#<strong>{{ data.order }}</strong></span>
+                                <span class="arrow-button"
+                                      :class="{'disabled': data.order === 1}"
+                                      @click="handleClickUpButton(data)"
+                                >
+                                    <p-i name="ic_arrow-up"
+                                         width="1.5rem"
+                                         height="1.5rem"
+                                         color="inherit transparent"
+                                    />
+                                </span>
+                                <span class="arrow-button"
+                                      :class="{'disabled': (data.order === state.orderedCardData.length)}"
+                                      @click="handleClickDownButton(data)"
+                                >
+                                    <p-i name="ic_arrow-down"
+                                         width="1.5rem"
+                                         height="1.5rem"
+                                         color="inherit transparent"
+                                    />
+                                </span>
+                            </div>
+                            <div v-else>
+                                {{ $t('INVENTORY.COLLECTOR.EDIT_ADDITIONAL_RULE') }}
+                            </div>
+                        </div>
+                        <div v-if="!isEditModeByOrder(data.order)"
+                             class="right-part"
+                        >
+                            <span class="text-button delete"
+                                  @click="handleClickDeleteButton(data.order)"
                             >
-                                <p-i name="ic_arrow-up"
-                                     width="1.5rem"
-                                     height="1.5rem"
-                                     color="inherit transparent"
-                                />
+                                {{ $t('PROJECT.EVENT_RULE.DELETE') }}
                             </span>
-                            <span class="arrow-button"
-                                  :class="{'disabled': (data.order === state.orderedCardData.length)}"
-                                  @click="handleClickDownButton(data)"
+                            <p-divider vertical
+                                       style="height: 1rem;"
+                            />
+                            <span class="text-button edit"
+                                  @click="handleClickEditButton(data.order)"
                             >
-                                <p-i name="ic_arrow-down"
-                                     width="1.5rem"
-                                     height="1.5rem"
-                                     color="inherit transparent"
+                                <p-i name="ic_edit"
+                                     width="1rem"
+                                     height="1rem"
+                                     color="inherit"
                                 />
+                                {{ $t('PROJECT.EVENT_RULE.EDIT') }}
                             </span>
                         </div>
-                        <span class="text-button"
-                              @click="handleClickDeleteButton(data.order)"
-                        >
-                            {{ $t('PROJECT.EVENT_RULE.DELETE') }}
-                        </span>
                     </div>
                 </template>
-                <div class="additional-rule-form" />
+                <div class="additional-rule-form">
+                    <div v-if="isEditModeByOrder(data.order)"
+                         class="edit-card"
+                    >
+                        edit mode
+                    </div>
+                    <div v-else
+                         class="view-card"
+                    >
+                        view mode
+                    </div>
+                </div>
             </p-card>
         </div>
         <div class="layout-footer">
@@ -164,14 +204,22 @@ const handleClickAddEventRule = async () => {
                 }
             }
 
-            .text-button {
-                @apply text-gray-700;
+            .right-part {
+                display: flex;
+                align-items: center;
                 font-size: 0.875rem;
-                cursor: pointer;
-                margin: 0 0.75rem;
-
-                &:hover {
-                    @apply text-alert underline;
+                .text-button {
+                    @apply text-gray-700;
+                    cursor: pointer;
+                    margin: 0 0.75rem;
+                    &:hover {
+                        &.delete {
+                            @apply text-alert underline;
+                        }
+                        &.edit {
+                            @apply text-secondary underline;
+                        }
+                    }
                 }
             }
         }

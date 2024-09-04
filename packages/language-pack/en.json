@@ -3279,6 +3279,7 @@
 				"TAG": "Tag",
 				"VERSION": "Version"
 			},
+			"EDIT_ADDITIONAL_RULE": "Edit Additional Rule",
 			"HISTORY": {
 				"ALL": "All",
 				"CANCELED": "Canceled",

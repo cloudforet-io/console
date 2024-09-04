@@ -3279,6 +3279,7 @@
 				"TAG": "タグ",
 				"VERSION": "バージョン"
 			},
+			"EDIT_ADDITIONAL_RULE": "",
 			"HISTORY": {
 				"ALL": "すべてを表示",
 				"CANCELED": "キャンセル",
