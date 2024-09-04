@@ -9,29 +9,19 @@ const stackedAreaChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        dataField: {},
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
                 max: 31,
-                defaultIndex: 0,
             },
         },
+        tableDataField: {},
     },
     optionalFieldsSchema: {
         legend: {
             options: {
                 default: true,
-            },
-        },
-        lineBy: {
-            options: {
-                dataTarget: 'labels_info',
-                defaultMaxCount: 5,
-                max: 10,
-                defaultIndex: 0,
-                excludeDateField: true,
             },
         },
         dateFormat: {
@@ -41,6 +31,7 @@ const stackedAreaChart: WidgetConfig = {
         },
         numberFormat: {},
         displaySeriesLabel: {},
+        missingValue: {},
         displayAnnotation: {},
     },
 };
