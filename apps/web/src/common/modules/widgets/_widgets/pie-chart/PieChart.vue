@@ -101,8 +101,7 @@ const state = reactive({
         }
         if (['top', 'bottom'].includes(state.legendPosition)) {
             if (state.legendPosition === 'bottom') {
-                if (props.size === 'full') _option.center = ['50%', '60%'];
-                else _option.center = ['50%', '50%'];
+                _option.center = ['50%', '45%'];
             } else {
                 _option.center = ['50%', '55%'];
             }
