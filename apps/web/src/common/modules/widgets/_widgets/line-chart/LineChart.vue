@@ -224,22 +224,13 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
     // get refined data and series fields
     const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataFieldInfo?.criteria, state.dataField, state.dynamicFieldValue);
 
-    // get xAxis data
-    let _xAxisData: string[] = [];
-    if (state.xAxisField === DATE_FIELD.DATE) {
-        _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
-    } else {
-        _xAxisData = rawData?.results?.map((v) => v[state.xAxisField] as string) || [];
-    }
-    state.xAxisData = _xAxisData;
-
     // get chart data
     const _seriesData: any[] = [];
     const _defaultValue = state.missingValue === 'lineToZero' ? 0 : undefined;
     const _unit = widgetFrameProps.value.unitMap?.[state.dataField];
     _seriesFields.forEach((field) => {
         const _data: number[] = [];
-        _xAxisData.forEach((d) => {
+        state.xAxisData.forEach((d) => {
             const _result = _refinedResults.find((result) => result[state.xAxisField] === d);
             const _value = _result?.[state.dataFieldInfo?.criteria].find((v) => v[state.dataField] === field);
             _data.push(_value?.value || _defaultValue);
@@ -291,11 +282,14 @@ const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
     // set xAxis data
+    let _xAxisData: string[];
     if (state.xAxisField === DATE_FIELD.DATE) {
-        state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+        _xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
     } else {
-        state.xAxisData = rawData.results?.map((d) => d[state.xAxisField] as string) ?? [];
+        _xAxisData = rawData?.results?.map((d) => d[state.xAxisField] as string) || [];
+        if (isDateField(state.xAxisField)) _xAxisData.sort();
     }
+    state.xAxisData = _xAxisData;
 
     // get converted chart data
     let _seriesData: any[];
