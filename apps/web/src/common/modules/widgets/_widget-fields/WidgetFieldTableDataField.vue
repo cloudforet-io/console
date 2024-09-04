@@ -80,7 +80,7 @@ const state = reactive({
     multiSelectable: computed(() => state.selectedFieldType === 'staticField'),
     menuItems: computed<MenuItem[]>(() => {
         if (!props.dataTable) return [];
-        return state.selectedFieldType === 'dynamicField' ? labelsMenuItem.value : state.dataInfoMenuItems;
+        return props.value?.fieldType === 'dynamicField' ? labelsMenuItem.value : state.dataInfoMenuItems;
     }),
     dataInfoMenuItems: computed<MenuItem[]>(() => sortWidgetTableFields(Object.keys(props.dataTable?.data_info ?? {})).map((d) => ({
         name: d,
@@ -277,6 +277,7 @@ watch(() => state.menuItems, (menuItems) => {
         state.selectedItem = _value;
         state.selectedCriteria = _criteria;
     }
+
     state.proxyValue = {
         ...state.proxyValue,
         value: _value,
