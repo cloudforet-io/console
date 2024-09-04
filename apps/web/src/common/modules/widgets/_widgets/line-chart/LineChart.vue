@@ -61,6 +61,7 @@ const state = reactive({
     chart: null as EChartsType | null,
     xAxisData: [],
     chartData: [],
+    isAreaChart: computed<boolean>(() => props.widgetName === 'stackedAreaChart'),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     chartOptions: computed<LineSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
@@ -247,6 +248,8 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
         _seriesData.push({
             name: field,
             type: 'line',
+            stack: state.isAreaChart,
+            areaStyle: state.isAreaChart ? {} : undefined,
             data: _data,
             label: {
                 show: !!state.displaySeriesLabel?.toggleValue,
@@ -268,6 +271,8 @@ const getStaticFieldData = (rawData: StaticFieldData): any[] => {
         _seriesData.push({
             name: field,
             type: 'line',
+            stack: state.isAreaChart,
+            areaStyle: state.isAreaChart ? {} : undefined,
             data: state.xAxisData.map((d) => {
                 const _data = rawData.results?.find((v) => v[state.xAxisField] === d);
                 return _data ? _data[field] : _defaultValue;

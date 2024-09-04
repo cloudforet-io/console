@@ -19,6 +19,9 @@ export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     lineChart: () => ({
         component: import('@/common/modules/widgets/_widgets/line-chart/LineChart.vue'),
     }),
+    stackedAreaChart: () => ({
+        component: import('@/common/modules/widgets/_widgets/line-chart/LineChart.vue'),
+    }),
     pieChart: () => ({
         component: import('@/common/modules/widgets/_widgets/pie-chart/PieChart.vue'),
     }),
@@ -33,9 +36,6 @@ export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     }),
     table: () => ({
         component: import('@/common/modules/widgets/_widgets/table/Table.vue'),
-    }),
-    stackedAreaChart: () => ({
-        component: import('@/common/modules/widgets/_widgets/stacked-area-chart/StackedAreaChart.vue'),
     }),
     gauge: () => ({
         component: import('@/common/modules/widgets/_widgets/gauge/Gauge.vue'),
