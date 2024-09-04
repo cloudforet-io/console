@@ -22,3 +22,4 @@ dev/*.env
 # Playwright
 user.json
 .vercel
+.env*.local

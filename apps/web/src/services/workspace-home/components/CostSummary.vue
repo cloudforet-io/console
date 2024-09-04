@@ -198,7 +198,7 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                                 <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
                                 <span>{{ currencyMoneyFormatter(state.recentMonthValue?.value, { currency: state.currency, style: 'decimal' }) }}</span>
                                 <p-status v-bind="costStateSummaryFormatter(state.recentMonthValue?.is_confirmed ? COST_SUMMARY_STATE_TYPE.CONFIRM : COST_SUMMARY_STATE_TYPE.ESTIMATED)"
-                                          :text="state.recentMonthValue?.is_confirmed ? $t('HOME.CONFIRM') : $t('HOME.ESTIAMTED')"
+                                          :text="state.recentMonthValue?.is_confirmed ? $t('HOME.CONFIRM') : $t('HOME.ESTIMATED')"
                                           class="capitalize state"
                                 />
                             </p>

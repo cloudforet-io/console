@@ -67,7 +67,11 @@ const domainStore = useDomainStore();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => providerReferenceStore.state.items ?? {}),
-    domainName: computed<string>(() => domainStore.state.name),
+    domainName: computed<string>(() => {
+        const domainSettings = domainStore.state.config?.settings;
+        if (domainSettings?.display_name) return domainSettings?.display_name;
+        return domainStore.state.name;
+    }),
 });
 
 const state = reactive({
@@ -438,6 +442,9 @@ const handlePrint = () => {
                         <template #col-index-format="{rowIndex}">
                             {{ rowIndex + 1 }}
                         </template>
+                        <template #col-product-format="{value}">
+                            {{ value === 'Unknown' ? 'ETC' : value }}
+                        </template>
                         <template #col-value-format="{value}">
                             {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
                         </template>
@@ -459,6 +466,9 @@ const handlePrint = () => {
                 >
                     <template #col-index-format="{rowIndex}">
                         {{ rowIndex + 1 }}
+                    </template>
+                    <template #col-project_name-format="{value}">
+                        {{ value === 'Unknown' ? 'ETC' : value }}
                     </template>
                     <template #col-value_sum-format="{value}">
                         {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
@@ -491,6 +501,9 @@ const handlePrint = () => {
                     >
                         <template #col-index-format="{rowIndex}">
                             {{ rowIndex + 1 }}
+                        </template>
+                        <template #col-service_account_name-format="{value}">
+                            {{ value === 'Unknown' ? 'ETC' : value }}
                         </template>
                         <template #col-value-format="{value}">
                             {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
