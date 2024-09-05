@@ -16,7 +16,7 @@ export type CloudServicePageUrlQueryValue = {
     service?: CloudServiceCategory[];
     region?: string[];
     project?: string[];
-    serviceAccount?: string[];
+    service_account?: string[];
     period?: Period;
     filters?: ConsoleFilter[];
 };

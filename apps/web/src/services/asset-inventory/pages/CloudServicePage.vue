@@ -195,7 +195,7 @@ const init = async () => {
     const urlQueryValue: CloudServicePageUrlQueryValue = {
         provider: queryStringToString(currentQuery.provider),
         project: queryStringToArray(currentQuery.project),
-        serviceAccount: queryStringToArray(currentQuery.serviceAccount),
+        service_account: queryStringToArray(currentQuery.service_account),
         region: queryStringToArray(currentQuery.region),
         service: queryStringToArray<CloudServiceCategory>(currentQuery.service),
         period: queryStringToObject<Period>(currentQuery.period),
@@ -203,8 +203,8 @@ const init = async () => {
     };
     cloudServicePageStore.setSelectedProvider(urlQueryValue.provider);
     cloudServicePageStore.setSelectedProjectsToFilters(urlQueryValue.project);
-    cloudServicePageStore.setSelectedServiceAccountsToFilters(urlQueryValue.serviceAccount);
-    cloudServicePageStore.setSelectedServiceAccountsToFilters(urlQueryValue.service);
+    cloudServicePageStore.setSelectedServiceAccountsToFilters(urlQueryValue.service_account);
+    cloudServicePageStore.setSelectedCategoriesToFilters(urlQueryValue.service);
     cloudServicePageStore.setSelectedRegionsToFilters(urlQueryValue.region);
     cloudServicePageStore.setSelectedCategoriesToFilters(urlQueryValue.service);
     cloudServicePageStore.$patch((_state) => {
