@@ -109,9 +109,9 @@ const state = reactive({
     refinedAppItems: computed(() => appPageState.apps.map((app) => {
         let projectLabel = '';
         if (app.project_group_id) {
-            projectLabel = storeState.projectGroups[app.project_group_id].label;
+            projectLabel = storeState.projectGroups[app.project_group_id]?.label;
         } else if (app.project_id) {
-            projectLabel = storeState.projects[app.project_id].label;
+            projectLabel = storeState.projects[app.project_id]?.label;
         }
         return {
             ...app,
@@ -120,7 +120,7 @@ const state = reactive({
                 name: appPageState.roles.filter((r) => r.role_id === app.role_id)[0]?.name || '',
             },
             last_accessed_at: calculateTime(app?.last_accessed_at, storeState.timezone),
-            project: app.project_group_id || app.project_id ? {
+            project: projectLabel && (app.project_group_id || app.project_id) ? {
                 icon: app.project_group_id ? 'ic_folder-filled' : 'ic_document-filled',
                 color: app.project_id ? peacock[600] : indigo[500],
                 label: projectLabel,
