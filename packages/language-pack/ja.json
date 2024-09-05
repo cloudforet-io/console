@@ -601,7 +601,7 @@
 				"COLUMN": "コラム",
 				"COST_ANALYSIS": "コスト分析",
 				"CURRENCY": "通貨",
-				"DAILY": "日別データ (累積データ)",
+				"DAILY": "日別データ",
 				"DATA_SOURCE": "データソース",
 				"DATA_TYPE": "データタイプ",
 				"DEFAULT": "デフォルト",
