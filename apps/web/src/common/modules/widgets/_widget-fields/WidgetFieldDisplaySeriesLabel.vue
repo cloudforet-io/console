@@ -26,11 +26,32 @@ const emit = defineEmits<WidgetFieldComponentEmit<DisplaySeriesLabelValue>>();
 const props = defineProps<WidgetFieldComponentProps<undefined, DisplaySeriesLabelValue>>();
 const state = reactive({
     proxyValue: useProxyValue<DisplaySeriesLabelValue|undefined>('value', props, emit),
-    menuItems: computed<SelectDropdownMenuItem[]>(() => [
-        { name: 'center', label: 'Center' },
-        { name: 'left', label: 'Left' },
-        { name: 'right', label: 'Right' },
-    ]),
+    menuItems: computed<SelectDropdownMenuItem[]>(() => {
+        const _widgetName = props.widgetConfig?.widgetName;
+        if (!_widgetName) return [];
+        if (_widgetName === 'pieChart') {
+            return [
+                { name: 'inner', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INNER') },
+                { name: 'outer', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.OUTER') },
+            ];
+        }
+        if (['lineChart', 'stackedAreaChart'].includes(_widgetName)) {
+            return [
+                { name: 'top', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.TOP') },
+                { name: 'bottom', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.BOTTOM') },
+            ];
+        }
+
+        return [
+            { name: 'inside', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE') },
+            { name: 'left', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.LEFT') },
+            { name: 'right', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.RIGHT') },
+            { name: 'insideLeft', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE_LEFT') },
+            { name: 'insideRight', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE_RIGHT') },
+            { name: 'insideTop', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE_TOP') },
+            { name: 'insideBottom', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE_BOTTOM') },
+        ];
+    }),
     isRotateValid: computed<boolean>(() => {
         if (!state.proxyValue?.toggleValue) return true;
         if (state.proxyValue?.rotate === undefined) return false;
@@ -57,7 +78,7 @@ const handleUpdateToggle = (value: boolean) => {
     }
     state.proxyValue = {
         toggleValue: value,
-        position: 'center',
+        position: state.menuItems[0].name,
         rotate: 0,
     };
 };
@@ -86,7 +107,7 @@ onMounted(() => {
     }
     state.proxyValue = {
         toggleValue: props.value?.toggleValue ?? false,
-        position: props.value?.position ?? 'center',
+        position: props.value?.position ?? state.menuItems[0].name,
         rotate: props.value?.rotate ?? 0,
     };
 });

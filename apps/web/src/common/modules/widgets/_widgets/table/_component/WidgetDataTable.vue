@@ -15,7 +15,10 @@ import { hexToRgba } from '@/lib/helper/color-convert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
-import { DEFAULT_COMPARISON_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
+import {
+    DEFAULT_COMPARISON_COLOR,
+    TABLE_DEFAULT_MINIMUM_WIDTH,
+} from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getFormattedDate,
     getRefinedDateFormatByGranularity,
@@ -27,7 +30,8 @@ import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-t
 import type {
     TableDataFieldValue, ComparisonValue, TotalValue,
     DateFormatValue,
-    NumberFormatValue, DataFieldHeatmapColorValue,
+    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue, TextWrapValue,
+    MissingValueValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
@@ -43,6 +47,8 @@ const HEATMAP_COLOR_HEX_MAP = {
 };
 const SKIP_HEATMAP_FIELD = ['subTotal', 'comparison'];
 
+type TableDataValue = number | undefined | null;
+// const TABLE_MISSING_VALUE_SYMBOL = '-';
 
 interface Props {
   fields: TableWidgetField[];
@@ -64,6 +70,10 @@ interface Props {
   dateFormatInfo?: DateFormatValue;
   numberFormatInfo?: NumberFormatValue;
   dataFieldHeatmapColorInfo?: DataFieldHeatmapColorValue;
+  tableColumnWidthInfo?: TableColumnWidthValue;
+  customTableColumnWidthInfo?: CustomTableColumnWidthValue;
+  textWrapInfo?: TextWrapValue;
+  missingValueInfo?: MissingValueValue;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
@@ -114,6 +124,16 @@ const state = reactive({
         }
         return {};
     }),
+    textWrapStyle: computed(() => {
+        if (!props.textWrapInfo?.toggleValue) return {};
+        return {
+            display: 'inline-block',
+            width: '100%',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+        };
+    }),
 });
 
 const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${props.granularity || 'Previous'}`;
@@ -123,10 +143,15 @@ const getField = (field: TableWidgetField): string => {
     return field.label || field.name;
 };
 
-const valueFormatter = (value, field: TableWidgetField) => {
+const valueFormatter = (value: TableDataValue, field: TableWidgetField) => {
+    // TODO: handle missing value after applying table missing value
+    // // handle missing value
+    // const isMissingValue = value === null || value === undefined;
+    // if (isMissingValue && props.missingValueInfo?.value === 'lineBreaks') return TABLE_MISSING_VALUE_SYMBOL;
+
     const _value = value || 0;
     let _unit = field.fieldInfo?.unit;
-    let dataField = field.name.replace('comparison_', '');
+    let dataField = field.name?.replace('comparison_', '');
     if (props.fieldType === 'dynamicField') {
         dataField = props.criteria as string;
         _unit = props.dataInfo?.[dataField]?.unit;
@@ -160,7 +185,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
             return '-';
         }
-        return valueFormatter(itemValue, field) || '-';
+        return itemValue ? valueFormatter(itemValue, field) : '-';
     }
     if (props.fieldType === 'dynamicField') {
         const dynamicData = item[props.criteria || ''] ?? [];
@@ -177,7 +202,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             if (props.comparisonInfo?.format === 'all') return `${valueFormatter(fixedValue, field)} (${numberFormatter(percentageValue)}%)`;
             return '-';
         }
-        return valueFormatter(dynamicDataItem?.value, field) || 0;
+        return dynamicDataItem?.value ? valueFormatter(dynamicDataItem?.value, field) : '-';
     }
     return '-';
 };
@@ -276,6 +301,36 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 //     return `( ${value} ${key} )`;
 // };
 
+const getFieldMinWidth = (field: TableWidgetField): string|undefined => {
+    let customWidth: string|number|undefined = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name)?.width;
+    if (props.fieldType === 'staticField') {
+        if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
+    } else if (props.fieldType === 'dynamicField') {
+        if (field?.fieldInfo?.type === 'dataField' && field?.fieldInfo?.additionalType !== 'subTotal') {
+            customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
+        }
+    }
+    const minimumWidth = props.tableColumnWidthInfo?.minimumWidth ?? TABLE_DEFAULT_MINIMUM_WIDTH;
+    const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
+    const calculatedWidth = (customWidth ?? 0) < minimumWidth
+        ? (fixedWidth || minimumWidth) : (customWidth || fixedWidth || minimumWidth);
+    return calculatedWidth ? `${calculatedWidth}px` : undefined;
+};
+const getFieldWidth = (field: TableWidgetField): string|undefined => {
+    let customWidth: string|number|undefined = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name)?.width;
+    if (props.fieldType === 'staticField') {
+        if (field?.fieldInfo?.additionalType === 'comparison') customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === field?.name.replace('comparison_', ''))?.width;
+    } else if (props.fieldType === 'dynamicField') {
+        if (field?.fieldInfo?.type === 'dataField' && field?.fieldInfo?.additionalType !== 'subTotal') {
+            customWidth = props.customTableColumnWidthInfo?.value?.find((item) => item.fieldKey === props.dataField as string)?.width;
+        }
+    }
+    const fixedWidth = props.tableColumnWidthInfo?.widthType === 'fixed' ? props.tableColumnWidthInfo?.fixedWidth : undefined;
+    const calculatedWidth = customWidth || fixedWidth;
+
+    return calculatedWidth ? `${calculatedWidth}px` : undefined;
+};
+
 
 
 </script>
@@ -288,8 +343,9 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
                     <th v-for="(field, fieldColIndex) in props.fields"
                         :key="`th-${props.widgetId}-${fieldColIndex}`"
                         :style="{
-                            minWidth: field.width || undefined,
-                            width: field.width || undefined,
+                            minWidth: getFieldMinWidth(field),
+                            width: getFieldWidth(field),
+                            maxWidth: getFieldWidth(field),
                         }"
                         :class="{
                             'last-label': fieldColIndex === props.fields.filter((_field) => _field.fieldInfo?.type === 'labelField').length - 1,
@@ -302,7 +358,9 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
                                   'sub-total': field.fieldInfo?.additionalType === 'subTotal',
                               }"
                         >
-                            <span class="th-text">
+                            <span class="th-text"
+                                  :style="{ ...state.textWrapStyle }"
+                            >
                                 {{ field.fieldInfo?.additionalType === 'comparison' ? 'Δ' : "" }}{{ getField(field) }}
                                 <!--                                <span class="timediff-sub-text">{{ getTimeDiffSubText(field) }}</span>-->
                             </span>
@@ -340,7 +398,12 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
                             'total': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1,
                             'total-freeze': item[props.fields[0].name] === 'Total' && props.items?.length === rowIndex + 1 && props.totalInfo?.freeze,
                         }"
-                        :style="rowIndex !== props.items?.length - 1 ? getHeatmapColorStyle(item, field) : {}"
+                        :style="{
+                            minWidth: getFieldMinWidth(field),
+                            width: getFieldWidth(field),
+                            maxWidth: getFieldWidth(field),
+                            ...(rowIndex !== props.items?.length - 1 || !props.totalInfo?.toggleValue ? getHeatmapColorStyle(item, field) : {}),
+                        }"
                     >
                         <span ref="labelRef"
                               class="td-contents"
@@ -351,7 +414,9 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
                             <p-tooltip class="value-tooltip"
                                        :contents="getValueTooltipText(item, field)"
                                        position="bottom"
-                            ><span class="common-text-box">{{ getValue(item, field) }}</span></p-tooltip>
+                            ><span class="common-text-box"
+                                   :style="{ ...state.textWrapStyle }"
+                            >{{ getValue(item, field) }}</span></p-tooltip>
                             <p-i v-if="field.fieldInfo?.additionalType === 'comparison' && getComparisonValueIcon(item, field)"
                                  :name="getComparisonValueIcon(item, field)?.icon"
                                  :color="getComparisonValueIcon(item, field)?.color"
@@ -391,7 +456,7 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
         font-weight: 500;
         height: 1.75rem;
         min-width: 7.5rem;
-        padding: 0.1875rem 0.5rem;
+        padding: 0 0.5rem;
 
         &.last-label {
             @apply border-r;
@@ -404,6 +469,8 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 
         .th-contents {
             @apply flex items-center justify-between pl-4 gap-1;
+            text-align: left;
+
             .comparison-info {
                 min-width: 0.875rem;
             }
@@ -416,13 +483,14 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 
             &.data-field {
                 @apply justify-end;
+                text-align: right;
             }
             &.sub-total {
                 @apply font-bold text-gray-700;
             }
 
             .sort-icon {
-                @apply text-gray-500 float-right my-px;
+                @apply text-gray-500 float-right;
                 &:hover { cursor: pointer; }
             }
         }
@@ -431,8 +499,8 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
     tbody {
         tr {
             &:nth-child(odd) {
+                @apply bg-gray-100;
                 td {
-                    @apply bg-gray-100;
                     &.sub-total {
                         @apply bg-violet-150;
                     }
@@ -485,6 +553,11 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
         .td-contents {
             @apply flex items-center pl-4 gap-1;
             width: 100%;
+            text-align: left;
+
+            .value-tooltip {
+                width: 100%;
+            }
 
             .comparison-icon {
                 min-width: 0.75rem;
@@ -492,6 +565,7 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
 
             &.data-field {
                 @apply justify-end;
+                text-align: right;
             }
         }
     }

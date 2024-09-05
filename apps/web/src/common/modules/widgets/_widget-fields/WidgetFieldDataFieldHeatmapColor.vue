@@ -73,42 +73,44 @@ watch(() => state.dataFieldList, (dataFieldList) => {
 </script>
 
 <template>
-    <div class="widget-field-number-format">
+    <div class="widget-field-data-field-heatmap-color">
         <p-field-group :label="$t('COMMON.WIDGETS.DATA_FIELD_HEATMAP_COLOR.DATA_FIELD_HEATMAP_COLOR')"
                        required
         >
             <template v-if="state.dataFieldList.length > 1">
-                <p-field-group v-for="dataField in state.dataFieldList"
-                               :key="`number-format-data-field-${dataField}`"
-                               :label="dataField"
-                               style-type="secondary"
-                               required
-                >
-                    <p-select-dropdown class="w-full"
-                                       use-fixed-menu-style
-                                       reset-selection-on-menu-close
-                                       :menu="state.menuItems"
-                                       :selected="state.proxyValue?.[dataField]?.value"
-                                       @select="handleSelectMenuItem(dataField, $event)"
+                <div class="multi-data-field-wrapper">
+                    <p-field-group v-for="dataField in state.dataFieldList"
+                                   :key="`number-format-data-field-${dataField}`"
+                                   :label="dataField"
+                                   style-type="secondary"
+                                   required
                     >
-                        <template #dropdown-button="item">
-                            <div class="menu-item">
-                                <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
-                                     :class="{'color-circle': true, [getDataFieldHeatmapColor(item.name)]: true}"
-                                />
-                                <span>{{ item.label }}</span>
-                            </div>
-                        </template>
-                        <template #menu-item--format="{item}">
-                            <div class="menu-item">
-                                <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
-                                     :class="{'color-circle': true, [getDataFieldHeatmapColor(item.name)]: true}"
-                                />
-                                <span>{{ item.label }}</span>
-                            </div>
-                        </template>
-                    </p-select-dropdown>
-                </p-field-group>
+                        <p-select-dropdown class="w-full"
+                                           use-fixed-menu-style
+                                           reset-selection-on-menu-close
+                                           :menu="state.menuItems"
+                                           :selected="state.proxyValue?.[dataField]?.value"
+                                           @select="handleSelectMenuItem(dataField, $event)"
+                        >
+                            <template #dropdown-button="item">
+                                <div class="menu-item">
+                                    <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
+                                         :class="{'color-circle': true, [getDataFieldHeatmapColor(item.name)]: true}"
+                                    />
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </template>
+                            <template #menu-item--format="{item}">
+                                <div class="menu-item">
+                                    <div v-if="item.name !== DATA_FIELD_HEATMAP_COLOR.NONE.key"
+                                         :class="{'color-circle': true, [getDataFieldHeatmapColor(item.name)]: true}"
+                                    />
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </template>
+                        </p-select-dropdown>
+                    </p-field-group>
+                </div>
             </template>
             <template v-else>
                 <p-select-dropdown v-for="dataField in state.dataFieldList"
@@ -143,7 +145,10 @@ watch(() => state.dataFieldList, (dataFieldList) => {
 </template>
 
 <style lang="postcss" scoped>
-.widget-field-number-format {
+.widget-field-data-field-heatmap-color {
+    .multi-data-field-wrapper {
+        @apply flex flex-col gap-2;
+    }
     .menu-item {
         @apply flex items-center gap-1;
         .color-circle {

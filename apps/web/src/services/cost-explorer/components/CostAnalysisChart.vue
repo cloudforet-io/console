@@ -67,7 +67,7 @@ const getValueSumKey = (dataType:string) => {
 
 /* Api */
 const fetchCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
-const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
+const analyzeApiQueryHelper = new ApiQueryHelper();
 const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         analyzeApiQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
@@ -138,7 +138,7 @@ watch(() => state.groupByMenuItems, (after) => {
         costAnalysisPageStore.setChartGroupBy(after[0].name);
     }
 });
-watch(() => costAnalysisPageState.chartGroupBy, () => {
+watch([() => costAnalysisPageState.chartGroupBy, () => costAnalysisPageState.granularity], () => {
     state.legend = {};
 });
 </script>

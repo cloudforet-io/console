@@ -1,12 +1,12 @@
 {
   "name": "web",
-  "version": "2.0.0-dev177",
+  "version": "2.0.0-dev185",
   "private": true,
   "description": "Cloudforet Console Web Application",
   "author": "Cloudforet",
   "scripts": {
     "dev": "vite --host",
-    "build": "NODE_OPTIONS=--max_old_space_size=8192 vite build --debug",
+    "build": "NODE_OPTIONS=--max_old_space_size=9216 vite build --debug",
     "preview": "vite preview --host",
     "test": "vitest run",
     "test:watch": "vitest watch --ui",

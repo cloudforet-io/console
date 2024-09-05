@@ -4,20 +4,19 @@ import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-
 const stackedAreaChart: WidgetConfig = {
     widgetName: 'stackedAreaChart',
     meta: {
-        title: 'Stacked Area Chart',
+        title: 'Area Chart',
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
         granularity: {},
-        dataField: {},
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
                 defaultMaxCount: 5,
                 max: 31,
-                defaultIndex: 0,
             },
         },
+        tableDataField: {},
     },
     optionalFieldsSchema: {
         legend: {
@@ -25,20 +24,14 @@ const stackedAreaChart: WidgetConfig = {
                 default: true,
             },
         },
-        lineBy: {
-            options: {
-                dataTarget: 'labels_info',
-                defaultMaxCount: 5,
-                max: 10,
-                defaultIndex: 0,
-                excludeDateField: true,
-            },
-        },
         dateFormat: {
             options: {
                 default: 'MMM DD, YYYY',
             },
         },
+        numberFormat: {},
+        displaySeriesLabel: {},
+        missingValue: {},
         displayAnnotation: {},
     },
 };

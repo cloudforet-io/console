@@ -30,8 +30,9 @@ import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-con
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { migrateLegacyWidgetOptions } from '@/services/dashboards/helpers/widget-migration-helper';
 import type {
-    CreateDashboardParameters, DashboardModel, GetDashboardParameters,
+    DashboardModel, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
@@ -380,26 +381,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.widgetValidMap[widgetKey] = isValid;
     };
     //
-    const refineSchemaProperties = (properties: Record<string, DashboardVariableSchemaProperty>): Record<string, DashboardVariableSchemaProperty> => Object.entries(properties)
-        .reduce((acc, [property, propertyInfo]) => {
-            acc[property] = propertyInfo.variable_type === 'MANAGED'
-                ? { variable_type: 'MANAGED', use: propertyInfo.use, fixed: !!propertyInfo.fixed }
-                : propertyInfo;
-            return acc;
-        }, {});
-    const createDashboard = async (params: CreateDashboardParameters, dashboardType?: DashboardType): Promise<DashboardModel> => {
-        const _params = {
-            ...params,
-            variables_schema: {
-                order: params.variables_schema?.order ?? [],
-                properties: refineSchemaProperties(params.variables_schema?.properties ?? {}),
-                fixed_options: params.variables_schema?.fixed_options,
-            },
-        };
-        const _dashboardType = dashboardType ?? state.dashboardType ?? 'WORKSPACE';
-        const res = await dashboardStore.createDashboard(_dashboardType, _params);
-        return res;
-    };
     const deleteDashboard = async (dashboardId: string) => {
         await dashboardStore.deleteDashboard(dashboardId);
     };
@@ -410,10 +391,16 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             const fetcher = isPrivate
                 ? SpaceConnector.clientV2.dashboard.privateWidget.list
                 : SpaceConnector.clientV2.dashboard.publicWidget.list;
-            const { results } = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
+            let res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
                 dashboard_id: state.dashboardId,
             });
-            state.dashboardWidgets = results || [];
+            const _isMigrated = await migrateLegacyWidgetOptions(res.results || []);
+            if (_isMigrated) {
+                res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
+                    dashboard_id: state.dashboardId,
+                });
+            }
+            state.dashboardWidgets = res.results || [];
         } catch (e) {
             ErrorHandler.handleError(e);
         }
@@ -461,7 +448,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         deleteDashboardWidget,
         resetVariables,
         updateWidgetValidation,
-        createDashboard,
         deleteDashboard,
         listDashboardWidgets,
         addWidgetToDashboardLayouts,

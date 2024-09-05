@@ -12,16 +12,12 @@ const table: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        tableDataField: {
-            options: {
-                max: 15,
-            },
-        },
+        tableDataField: {},
         groupBy: {
             options: {
                 dataTarget: 'labels_info',
                 multiSelectable: true,
-                hideCount: false,
+                hideCount: true,
                 defaultIndex: 0,
             },
         },
@@ -57,11 +53,15 @@ const table: WidgetConfig = {
             },
         },
         dataFieldHeatmapColor: {},
+        textWrap: {},
+        tableColumnWidth: {},
+        customTableColumnWidth: {},
         displayAnnotation: {},
+        // missingValue: {},
     },
     dependencies: {
-        groupBy: ['comparison'],
-        tableDataField: ['comparison'],
+        groupBy: ['comparison', 'customTableColumnWidth'],
+        tableDataField: ['comparison', 'subTotal', 'customTableColumnWidth'],
     },
 };
 

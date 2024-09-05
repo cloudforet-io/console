@@ -1,8 +1,9 @@
 import type { ManipulateType } from 'dayjs';
 import dayjs from 'dayjs';
+import { sum } from 'lodash';
 
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
+import type { DateRange, DynamicFieldData } from '@/common/modules/widgets/types/widget-data-type';
 import type { DateFormat } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -13,10 +14,10 @@ export const getTimeUnit = (granularity: string): ManipulateType => {
     if (granularity === 'YEARLY') return 'year';
     return 'month';
 };
-export const getDateFormat = (granularity: string): string => {
-    if (granularity === 'DAILY') return 'YYYY-MM-DD';
+export const getDateFormat = (granularity: string, isSeparatedDate?: boolean): string => {
+    if (granularity === 'DAILY') return isSeparatedDate ? 'DD' : 'YYYY-MM-DD';
     if (granularity === 'YEARLY') return 'YYYY';
-    return 'YYYY-MM';
+    return isSeparatedDate ? 'MM' : 'YYYY-MM';
 };
 export const getDateLabelFormat = (granularity: string): string => {
     if (granularity === 'DAILY') return 'MMM D';
@@ -51,9 +52,9 @@ export const getWidgetBasedOnDate = (granularity: string, end?: string): string 
  * @description Get date fields based on granularity, start, end
  * @example ('MONTHLY', '2024-03', '2024-06') ['2024-03', '2024-04', '2024-05', '2024-06']
  */
-export const getWidgetDateFields = (granularity: string, start?: string, end?: string): string[] => {
+export const getWidgetDateFields = (granularity: string, start?: string, end?: string, isSeparatedDate = false): string[] => {
     const _timeUnit = getTimeUnit(granularity);
-    const _dateFormat = getDateFormat(granularity);
+    const _dateFormat = getDateFormat(granularity, isSeparatedDate);
 
     const results: string[] = [];
     let now = dayjs.utc(start).clone();
@@ -86,7 +87,7 @@ export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, fi
     if (field === 'Project' || field === 'project_id') {
         return allReferenceTypeInfo.project.referenceMap[val]?.label ?? val;
     }
-    if (field === 'Region') {
+    if (field === 'Region' || field === 'region_code') {
         return allReferenceTypeInfo.region.referenceMap[val]?.name || val;
     }
     if (field === 'Provider' || field === 'provider') {
@@ -134,4 +135,30 @@ export const getFormattedDate = (date: string, dateFormat: string): string => {
     const dateFormatsWithMMM = Object.values(DATE_FORMAT['MMM DD, YYYY']) as string[];
     if (dateFormatsWithMMM.includes(dateFormat)) return dayjs.utc(date).locale('en').format(dateFormat);
     return dayjs.utc(date).format(dateFormat);
+};
+
+
+export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, criteria: string, dataField: string, dynamicFieldValue: string[]): [any[], string[]] => {
+    if (!rawData?.results?.length) return [[], []];
+
+    const _refinedResults: any[] = [];
+    let _etcExists = false;
+    rawData.results.forEach((result) => {
+        const _refinedData = (result[criteria] || []).filter((d) => dynamicFieldValue.includes(d[dataField]));
+        const _etcData = (result[criteria] || []).filter((d) => !dynamicFieldValue.includes(d[dataField]));
+        const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
+        if (_etcValueSum > 0) _etcExists = true;
+        _refinedResults.push({
+            ...result,
+            [criteria]: [
+                ..._refinedData,
+                { [dataField]: 'etc', value: _etcValueSum },
+            ],
+        });
+    });
+
+    const _seriesFields = [...dynamicFieldValue];
+    if (_etcExists) _seriesFields.push('etc');
+
+    return [_refinedResults, _seriesFields];
 };

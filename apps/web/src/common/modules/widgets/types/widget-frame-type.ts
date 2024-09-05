@@ -2,6 +2,8 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 
+import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { WidgetState } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -13,6 +15,7 @@ export interface FullDataLink {
 
 export interface WidgetFrameProps {
     widgetId: string;
+    widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>;
     widgetSizes: WidgetSize[];
     dataTableId?: string;
     //

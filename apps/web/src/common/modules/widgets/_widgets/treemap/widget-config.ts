@@ -28,6 +28,8 @@ const treemap: WidgetConfig = {
                 default: 'MMM DD, YYYY',
             },
         },
+        numberFormat: {},
+        displaySeriesLabel: {},
         displayAnnotation: {},
     },
 };

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onBeforeMount, onUnmounted, reactive, ref, watch,
+    computed, nextTick, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import { cloneDeep, isEqual } from 'lodash';
@@ -19,7 +19,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
-import { useWidgetOptionValidation } from '@/common/modules/widgets/_composables/use-widget-option-validation';
+import { useWidgetOptionsComplexValidation } from '@/common/modules/widgets/_composables/use-widget-options-complex-validation';
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -83,7 +83,7 @@ const state = reactive({
     disableApplyButton: computed<boolean>(() => {
         if (!widgetGenerateGetters.isAllWidgetFormValid) return true;
         const _isWidgetInactive = widgetGenerateState.widget?.state === 'INACTIVE';
-        return (!_isWidgetInactive && !state.isWidgetFieldChanged) || optionsInvalid.value;
+        return (!_isWidgetInactive && !state.isWidgetFieldChanged) || widgetOptionsInvalid.value;
     }),
     //
     varsSnapshot: {} as DashboardVars,
@@ -92,9 +92,9 @@ const state = reactive({
 });
 
 const {
-    optionsInvalid,
-    optionsInvalidText,
-} = useWidgetOptionValidation({
+    invalid: widgetOptionsInvalid,
+    invalidText: widgetOptionsInvalidText,
+} = useWidgetOptionsComplexValidation({
     optionValueMap: computed(() => widgetGenerateState.widgetFormValueMap),
     widgetConfig: computed(() => state.widgetConfig),
 });
@@ -190,6 +190,10 @@ watch(() => state.mounted, async (mounted) => {
         state.mounted = false;
     }
 });
+watch(() => dashboardDetailState.vars, async () => {
+    await nextTick();
+    await loadOverlayWidget();
+});
 
 onBeforeMount(() => {
     initSnapshot();
@@ -263,8 +267,8 @@ onUnmounted(() => {
             </div>
         </div>
         <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND'"
-                                               :widget-validation-invalid="optionsInvalid"
-                                               :widget-validation-invalid-text="optionsInvalidText"
+                                               :widget-validation-invalid="widgetOptionsInvalid"
+                                               :widget-validation-invalid-text="widgetOptionsInvalidText"
         />
         <portal to="apply-button">
             <p-button v-if="widgetGenerateState.overlayType !== 'EXPAND'"
@@ -297,21 +301,19 @@ onUnmounted(() => {
         flex-direction: column;
         padding: 1rem;
         .dashboard-settings-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            @apply flex items-center justify-between;
             width: 100%;
             padding-bottom: 1rem;
             .divider {
                 height: 1rem;
             }
             .toolbox-wrapper {
-                @apply flex items-center justify-between w-full;
+                @apply flex items-center justify-between flex-1;
                 .left-wrapper {
                     @apply flex items-center;
                     gap: 0.5rem;
                     .dashboard-variables-select-dropdown {
-                        @apply relative flex items-center flex-wrap;
+                        @apply relative flex items-center flex-wrap flex-1;
                         gap: 0.5rem;
                     }
                 }
@@ -321,11 +323,8 @@ onUnmounted(() => {
                 }
             }
             .widget-size-wrapper {
-                display: flex;
-                gap: 0.5rem;
-                align-items: center;
-                justify-content: end;
-                min-width: 14rem;
+                @apply flex justify-end items-center gap-2;
+                min-width: 9rem;
                 .divider {
                     height: 1.5rem;
                 }

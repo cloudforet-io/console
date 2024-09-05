@@ -35,6 +35,7 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
@@ -42,6 +43,7 @@ import type {
 import type {
     ColorSchemaValue, XAxisValue, YAxisValue, ColorValue,
     DateFormatValue,
+    LegendValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
@@ -153,7 +155,7 @@ const state = reactive({
         return { start: _start, end: _end };
     }),
     // optional fields
-    showLegends: computed<boolean>(() => props.widgetOptions?.legend as boolean),
+    showLegends: computed<boolean>(() => (props.widgetOptions?.legend as LegendValue)?.toggleValue),
     dateFormat: computed<string|undefined>(() => {
         const _dateFormat = (props.widgetOptions?.dateFormat as DateFormatValue)?.value || 'MMM DD, YYYY';
         return DATE_FORMAT?.[_dateFormat]?.[state.granularity];
@@ -206,11 +208,12 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
-    // get xAxis, yAxis data
-    if (state.xAxisField === DATE_FIELD.DATE) {
-        state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+    // set xAxis data
+    if (isDateField(state.xAxisField)) {
+        const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
+        state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
     } else {
-        state.xAxisData = rawData.results?.map((d) => d[state.xAxisField] as string) ?? [];
+        state.xAxisData = rawData?.results?.map((d) => d[state.xAxisField] as string) || [];
     }
 
     // slice yAxisData by yAxisCount

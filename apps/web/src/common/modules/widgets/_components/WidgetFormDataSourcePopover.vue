@@ -223,18 +223,23 @@ const handleConfirmDataSource = async () => {
                 metric_id: state.selectedMetricId,
             },
         };
+
+        // NOTE: For DataTable-Create loading
+        state.showPopover = false;
+        widgetGenerateStore.setDataTableCreateLoading(true);
+
         const result = await widgetGenerateStore.createAddDataTable({
             ...addParameters,
             options: {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
         });
-        state.showPopover = false;
         if (!widgetGenerateState.selectedDataTableId && result) {
             widgetGenerateStore.setSelectedDataTableId(result?.data_table_id);
         }
     }
     state.loading = false;
+    widgetGenerateStore.setDataTableCreateLoading(false);
 };
 
 watch(() => state.showPopover, (val) => {

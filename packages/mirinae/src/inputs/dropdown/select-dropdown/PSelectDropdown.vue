@@ -54,6 +54,7 @@ interface SelectDropdownProps {
     readonly?: boolean;
     showSelectHeader?: boolean;
     showSelectMarker?: boolean;
+    showClearSelection?: boolean;
     menuPosition?: ContextMenuPosition;
     indexMode?: boolean;
     parentId?: string;
@@ -367,7 +368,7 @@ defineExpose({ reloadMenu });
                         :searchable="props.isFilterable"
                         :show-select-header="props.showSelectHeader"
                         :show-select-marker="props.showSelectMarker"
-                        :show-clear-selection="props.isFilterable"
+                        :show-clear-selection="props.isFilterable || props.showClearSelection"
                         :reset-selected-on-unmounted="props.resetSelectedOnUnmounted"
                         @select="handleSelectMenuItem"
                         @click-done="handleClickDone"

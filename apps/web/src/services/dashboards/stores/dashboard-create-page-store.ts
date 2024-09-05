@@ -23,6 +23,8 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
@@ -169,7 +171,7 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
             state.dashboardCreated = true;
             return res.dashboard_id;
         } catch (e) {
-            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
+            showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'), e);
             return undefined;
         } finally {
             state.loading = false;

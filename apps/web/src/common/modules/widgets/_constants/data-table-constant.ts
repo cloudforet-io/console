@@ -30,3 +30,8 @@ export const JOIN_TYPE = {
 
 // NOTE: temporary solution for the global variable
 export const MANAGED_GLOBAL_VARIABLE = [GROUP_BY.WORKSPACE, GROUP_BY.PROJECT, GROUP_BY.SERVICE_ACCOUNT, GROUP_BY.REGION] as string[];
+
+export const EVAL_EXPRESSION_TYPE = {
+    LABEL: 'LABEL',
+    DATA: 'DATA',
+} as const;

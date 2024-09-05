@@ -21,6 +21,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import DashboardDetailHeader from '@/services/dashboards/components/DashboardDetailHeader.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/components/DashboardRefreshDropdown.vue';
@@ -45,6 +46,7 @@ const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
+const widgetGenerateStore = useWidgetGenerateStore();
 const { breadcrumbs } = useBreadcrumbs();
 const router = useRouter();
 const route = useRoute();
@@ -130,6 +132,7 @@ onUnmounted(() => {
     gnbStore.setBreadcrumbs([]);
     // Reset Dashboard Detail Custom breadcrumbs
     dashboardDetailStore.reset();
+    widgetGenerateStore.reset();
 });
 </script>
 
