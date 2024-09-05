@@ -3280,6 +3280,11 @@
 				"VERSION": "Version"
 			},
 			"EDIT_ADDITIONAL_RULE": "Edit Additional Rule",
+			"EMPTY": {
+				"DESC1": "To add additional rules:",
+				"DESC2": "Click the add button below.",
+				"HEADER": "No additional rules on this collector"
+			},
 			"HISTORY": {
 				"ALL": "All",
 				"CANCELED": "Canceled",
