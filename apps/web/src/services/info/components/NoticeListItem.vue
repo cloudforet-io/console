@@ -131,11 +131,11 @@ const dateFormatter = (date?: string): string => {
                     <div v-else
                          class="workspace-wrapper"
                     >
-                        <workspace-logo-icon :text="state.scopedWorkspaceList[0].name || ''"
-                                             :theme="state.scopedWorkspaceList[0].tags?.theme"
+                        <workspace-logo-icon :text="state.scopedWorkspaceList[0]?.name || ''"
+                                             :theme="state.scopedWorkspaceList[0]?.tags?.theme"
                                              size="xxs"
                         />
-                        <span>{{ state.scopedWorkspaceList[0].name }}</span>
+                        <span>{{ state.scopedWorkspaceList[0]?.name }}</span>
                         <p-badge v-if="state.scopedWorkspaceList?.length > 1"
                                  style-type="blue200"
                                  badge-type="subtle"
