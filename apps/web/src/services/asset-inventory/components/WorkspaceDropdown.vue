@@ -73,6 +73,10 @@ const fetchWorkspace = async (searchText?:string) => {
                     start: state.pageStart,
                     limit: state.pageLimit,
                 },
+                filter: [
+                    { k: 'state', v: WORKSPACE_STATE.ENABLE, o: 'eq' },
+                    { k: 'is_dormant', v: false, o: 'eq' },
+                ],
             },
         });
         state.totalCount = total_count;
