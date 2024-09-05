@@ -10,7 +10,3 @@ export interface EmptyData {
     buttonText?: string|TranslateResult;
     desc: string|TranslateResult;
 }
-
-export interface AdditionalRule {
-    order: number;
-}

@@ -3279,6 +3279,7 @@
 				"TAG": "태그",
 				"VERSION": "버전"
 			},
+			"EDIT_ADDITIONAL_RULE": "",
 			"HISTORY": {
 				"ALL": "모두 보기",
 				"CANCELED": "취소됨",
