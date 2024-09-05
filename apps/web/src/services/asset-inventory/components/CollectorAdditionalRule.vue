@@ -5,20 +5,23 @@ import {
     PHeading, PCard, PI, PButton, PPaneLayout, PDivider,
 } from '@cloudforet/mirinae';
 
+import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
+
+import CollectorAdditionalRuleContent from '@/services/asset-inventory/components/CollectorAdditionalRuleContent.vue';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
-import type { AdditionalRule } from '@/services/asset-inventory/types/type';
 
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 
 const state = reactive({
-    orderedCardData: computed<AdditionalRule[]>(() => {
+    orderedCardData: computed<CollectorRuleModel[]>(() => {
         const data = collectorFormState.additionalRules;
         return data.sort((a, b) => a.order - b.order);
     }),
+
     editModeCardOrder: -1,
 });
 
@@ -150,7 +153,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                     <div v-else
                          class="view-card"
                     >
-                        view mode
+                        <collector-additional-rule-content :data="testData" />
                     </div>
                 </div>
             </p-card>
