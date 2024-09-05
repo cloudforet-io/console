@@ -15,6 +15,8 @@ export type CloudServicePageUrlQueryValue = {
     provider?: string;
     service?: CloudServiceCategory[];
     region?: string[];
+    project?: string[];
+    serviceAccount?: string[];
     period?: Period;
     filters?: ConsoleFilter[];
 };
@@ -22,6 +24,8 @@ export type CloudServicePageUrlQueryValue = {
 export type CloudServiceFilterKey = typeof CLOUD_SERVICE_FILTER_KEY[keyof typeof CLOUD_SERVICE_FILTER_KEY];
 
 export type CloudServiceFilterMap = {
+    [CLOUD_SERVICE_FILTER_KEY.PROJECT]?: string[];
+    [CLOUD_SERVICE_FILTER_KEY.SERVICE_ACCOUNT]?: string[];
     [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]?: CloudServiceCategory[];
     [CLOUD_SERVICE_FILTER_KEY.REGION]?: string[];
 };

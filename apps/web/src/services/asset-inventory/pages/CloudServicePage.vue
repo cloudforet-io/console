@@ -112,6 +112,8 @@ const state = reactive({
         provider: cloudServicePageState.selectedProvider === 'all' ? null : primitiveToQueryString(cloudServicePageState.selectedProvider),
         service: arrayToQueryString(cloudServicePageStore.selectedCategories),
         region: arrayToQueryString(cloudServicePageStore.selectedRegions),
+        project: arrayToQueryString(cloudServicePageStore.selectedProjects),
+        service_account: arrayToQueryString(cloudServicePageStore.selectedServiceAccounts),
         period: objectToQueryString(cloudServicePageState.period),
         filters: searchQueryHelper.setFilters(cloudServicePageState.searchFilters).rawQueryStrings,
     })),
@@ -192,12 +194,17 @@ const init = async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
     const urlQueryValue: CloudServicePageUrlQueryValue = {
         provider: queryStringToString(currentQuery.provider),
+        project: queryStringToArray(currentQuery.project),
+        serviceAccount: queryStringToArray(currentQuery.serviceAccount),
         region: queryStringToArray(currentQuery.region),
         service: queryStringToArray<CloudServiceCategory>(currentQuery.service),
         period: queryStringToObject<Period>(currentQuery.period),
         filters: searchQueryHelper.setKeyItemSets(handlerState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
     };
     cloudServicePageStore.setSelectedProvider(urlQueryValue.provider);
+    cloudServicePageStore.setSelectedProjectsToFilters(urlQueryValue.project);
+    cloudServicePageStore.setSelectedServiceAccountsToFilters(urlQueryValue.serviceAccount);
+    cloudServicePageStore.setSelectedServiceAccountsToFilters(urlQueryValue.service);
     cloudServicePageStore.setSelectedRegionsToFilters(urlQueryValue.region);
     cloudServicePageStore.setSelectedCategoriesToFilters(urlQueryValue.service);
     cloudServicePageStore.$patch((_state) => {

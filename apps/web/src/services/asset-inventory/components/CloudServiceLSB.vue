@@ -36,6 +36,8 @@ import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
+const PROJECT_MENU_ID = 'project';
+const SERVICE_ACCOUNT_MENU_ID = 'service-account';
 const PROVIDER_MENU_ID = 'provider';
 const CATEGORY_MENU_ID = 'category';
 const REGION_MENU_ID = 'region';
@@ -138,7 +140,19 @@ const state = reactive({
         });
         return results;
     }),
-    menuSet: computed<LSBMenu[]>(() => (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet)),
+    menuSet: computed<LSBMenu[]>(() => [
+        {
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            label: i18n.t('Project'),
+            id: PROJECT_MENU_ID,
+        },
+        {
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            label: i18n.t('Service Account'),
+            id: SERVICE_ACCOUNT_MENU_ID,
+        },
+        ...state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet,
+    ]),
     favoriteOptions: computed<FavoriteOptions>(() => {
         if (!state.isCloudServiceDetailPage) {
             return {
@@ -207,6 +221,18 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
            class="cloud-service-l-s-b"
            :class="{'is-admin-mode': isAdminMode, 'is-detail-page': state.isCloudServiceDetailPage}"
     >
+        <template #collapsible-contents-project>
+            <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
+                                                    :type="CLOUD_SERVICE_FILTER_KEY.PROJECT"
+                                                    :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
+            />
+        </template>
+        <template #collapsible-contents-service-account>
+            <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
+                                                    :type="CLOUD_SERVICE_FILTER_KEY.SERVICE_ACCOUNT"
+                                                    :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
+            />
+        </template>
         <template #collapsible-contents-provider>
             <p-radio-group direction="vertical"
                            class="provider-radio-group"
