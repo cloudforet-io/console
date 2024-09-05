@@ -9,7 +9,7 @@ import type { BarSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
 import {
-    groupBy, isEmpty, orderBy, reverse, throttle,
+    isEmpty, reverse, throttle,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -27,20 +27,24 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
-    getApiQueryDateRange,
-    getReferenceLabel,
+    getReferenceLabel, getRefinedDynamicFieldData,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
+import {
+    getWidgetLoadApiQuery,
+    getWidgetLoadApiQueryDateRange,
+} from '@/common/modules/widgets/_helpers/widget-load-helper';
+import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type {
-    StackByValue, YAxisValue, DateFormatValue, DisplaySeriesLabelValue,
+    YAxisValue, DateFormatValue, DisplaySeriesLabelValue,
     NumberFormatValue,
     LegendValue,
+    TableDataFieldValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
@@ -72,16 +76,16 @@ const state = reactive({
             itemWidth: 10,
             itemHeight: 10,
             formatter: (val) => {
-                if (state.stackByField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
-                return getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, val);
+                if (state.dataField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
+                return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
             },
         },
         tooltip: {
             formatter: (params) => {
                 const _params = Array.isArray(params) ? params : [params];
                 return _params.map((p) => {
-                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, p.seriesName);
-                    if (state.stackByField === DATE_FIELD.DATE) {
+                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
+                    if (state.dataField === DATE_FIELD.DATE) {
                         _seriesName = dayjs.utc(_seriesName).format(state.dateFormat);
                     }
                     if (state.unit) _seriesName = `${_seriesName} (${state.unit})`;
@@ -121,9 +125,12 @@ const state = reactive({
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     yAxisField: computed<string>(() => (props.widgetOptions?.yAxis as YAxisValue)?.value),
     yAxisCount: computed<number>(() => (props.widgetOptions?.yAxis as YAxisValue)?.count),
-    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
-    stackByField: computed<string|undefined>(() => (props.widgetOptions?.stackBy as StackByValue)?.value as string),
-    stackByCount: computed<number>(() => (props.widgetOptions?.stackBy as StackByValue)?.count as number),
+    // dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
+    // stackByField: computed<string|undefined>(() => (props.widgetOptions?.stackBy as StackByValue)?.value as string),
+    // stackByCount: computed<number>(() => (props.widgetOptions?.stackBy as StackByValue)?.count as number),
+    dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
+    dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
+    dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
@@ -158,23 +165,13 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
-        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _queryDateRange.start,
-                end: _queryDateRange.end,
-                group_by: [state.yAxisField, state.stackByField],
-                fields: {
-                    [state.dataField]: {
-                        key: state.dataField,
-                        operator: 'sum',
-                    },
-                },
-                field_group: [state.stackByField],
-                sort: [{ key: `_total_${state.dataField}`, desc: true }],
                 page: { start: 1, limit: state.yAxisCount },
+                ...getWidgetLoadApiQueryDateRange(state.granularity, state.dateRange),
+                ...getWidgetLoadApiQuery(state.dataFieldInfo, state.yAxisField),
             },
             vars: props.dashboardVars,
         });
@@ -189,6 +186,66 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 };
 
 /* Util */
+const getDynamicFieldData = (rawData: DynamicFieldData, threshold: number): any[] => {
+    // get refined data and series fields
+    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataFieldInfo?.criteria, state.dataField, state.dynamicFieldValue);
+
+    // get chart data
+    const _seriesData: any[] = [];
+    _seriesFields.forEach((field) => {
+        const _data: number[] = [];
+        state.yAxisData.forEach((d) => {
+            const _result = _refinedResults.find((result) => result[state.yAxisField] === d);
+            const _value = _result?.[state.dataFieldInfo?.criteria].find((v) => v[state.dataField] === field);
+            _data.push(_value?.value || 0);
+        });
+        _seriesData.push({
+            name: field,
+            type: 'bar',
+            stack: true,
+            barMaxWidth: 50,
+            label: {
+                show: !!state.displaySeriesLabel?.toggleValue,
+                position: state.displaySeriesLabel?.position,
+                rotate: state.displaySeriesLabel?.rotate,
+                fontSize: 10,
+                formatter: (p) => {
+                    if (p.value < threshold) return '';
+                    return getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit);
+                },
+            },
+            data: _data,
+        });
+    });
+
+    return _seriesData;
+};
+const getStaticFieldData = (rawData: StaticFieldData, threshold: number): any[] => {
+    const _seriesData: any[] = [];
+    state.dataField.forEach((field) => {
+        _seriesData.push({
+            name: field,
+            type: 'bar',
+            stack: true,
+            barMaxWidth: 50,
+            data: state.yAxisData.map((d) => {
+                const _data = rawData.results?.find((v) => v[state.yAxisField] === d);
+                return _data ? _data[field] : 0;
+            }),
+            label: {
+                show: !!state.displaySeriesLabel?.toggleValue,
+                position: state.displaySeriesLabel?.position,
+                rotate: state.displaySeriesLabel?.rotate,
+                fontSize: 10,
+                formatter: (p) => {
+                    if (p.value < threshold) return '';
+                    return getFormattedNumber(p.value, field, state.numberFormat, state.unit);
+                },
+            },
+        });
+    });
+    return _seriesData;
+};
 const drawChart = (rawData?: Data|null) => {
     if (isEmpty(rawData)) return;
 
@@ -203,50 +260,13 @@ const drawChart = (rawData?: Data|null) => {
         state.yAxisData = reverse([...rawData.results?.map((d) => d[state.yAxisField] as string) ?? []]);
     }
 
-    // slice stackByData by stackByCount
-    const _slicedByStackBy: any[] = [];
-    rawData.results?.forEach((d) => {
-        const _orderedData = orderBy(d[state.dataField], 'value', 'desc') ?? [];
-        const _slicedData = _orderedData.slice(0, state.stackByCount);
-        const _etcData = _orderedData.slice(state.stackByCount).reduce((acc, v) => {
-            acc[state.stackByField] = 'etc';
-            acc.value += v.value || 0;
-            return acc;
-        }, { value: 0 });
-        let _values = _etcData.value === 0 ? _slicedData : [..._slicedData, _etcData];
-        _values = orderBy(_values, 'value', 'desc');
-        _values.forEach((v) => {
-            _slicedByStackBy.push({
-                [state.yAxisField]: d[state.yAxisField],
-                ...v,
-            });
-        });
-    });
-
-    // set chartData
-    const _seriesData: any[] = [];
-    Object.entries(groupBy(_slicedByStackBy, state.stackByField)).forEach(([key, value]) => {
-        _seriesData.push({
-            name: key,
-            type: 'bar',
-            stack: true,
-            barMaxWidth: 50,
-            label: {
-                show: !!state.displaySeriesLabel?.toggleValue,
-                position: state.displaySeriesLabel?.position,
-                rotate: state.displaySeriesLabel?.rotate,
-                fontSize: 10,
-                formatter: (p) => {
-                    if (p.value < _threshold) return '';
-                    return getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit);
-                },
-            },
-            data: state.yAxisData.map((d) => {
-                const _data = value.find((v) => v[state.yAxisField] === d);
-                return _data ? _data?.value : undefined;
-            }),
-        });
-    });
+    // get converted chart data
+    let _seriesData: any[];
+    if (state.dataFieldInfo?.fieldType === 'staticField') {
+        _seriesData = getStaticFieldData(rawData, _threshold);
+    } else {
+        _seriesData = getDynamicFieldData(rawData, _threshold);
+    }
     state.chartData = _seriesData;
 };
 const loadWidget = async (): Promise<Data|APIErrorToast> => {
