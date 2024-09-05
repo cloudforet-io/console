@@ -94,6 +94,30 @@ const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetMod
     return [_needMigration, _options];
 };
 
+/**
+ * Heatmap
+ * Data Field & YAxis -> Table Data Field
+ */
+const _migrateHeatmap = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, WidgetOptions] => {
+    let _options: WidgetOptions = cloneDeep(widget.options);
+    let _needMigration = false;
+    if (_options.dataField) { // legacy case
+        _needMigration = true;
+        _options = {
+            ..._options,
+            tableDataField: {
+                fieldType: 'dynamicField',
+                value: _options.yAxis?.value,
+                dynamicFieldValue: [],
+                criteria: _options.dataField,
+            } as TableDataFieldValue,
+        };
+        delete _options.dataField;
+        delete _options.yAxis;
+    }
+    return [_needMigration, _options];
+};
+
 
 export const migrateLegacyWidgetOptions = async (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>): Promise<boolean> => {
     let isMigrated = false;
@@ -110,6 +134,11 @@ export const migrateLegacyWidgetOptions = async (dashboardWidgets: Array<PublicW
         }
         if (widget.widget_type === 'clusteredColumnChart') {
             const [_needMigration, _migratedOptions] = _migrateClusteredColumnChart(widget);
+            isMigrated = isMigrated || _needMigration;
+            if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
+        }
+        if (widget.widget_type === 'heatmap') {
+            const [_needMigration, _migratedOptions] = _migrateHeatmap(widget);
             isMigrated = isMigrated || _needMigration;
             if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
         }

@@ -11,7 +11,7 @@ import type {
     EChartsType,
 } from 'echarts/core';
 import {
-    isEmpty, max, orderBy, throttle,
+    isEmpty, max, throttle,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -29,21 +29,25 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
-    getApiQueryDateRange,
-    getReferenceLabel,
+    getReferenceLabel, getRefinedDynamicFieldData,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
-import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
+import {
+    getWidgetLoadApiQuery,
+    getWidgetLoadApiQueryDateRange,
+} from '@/common/modules/widgets/_helpers/widget-load-helper';
+import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
-    ColorSchemaValue, XAxisValue, YAxisValue, ColorValue,
+    ColorSchemaValue, XAxisValue, ColorValue,
     DateFormatValue,
     LegendValue,
+    TableDataFieldValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
@@ -138,19 +142,24 @@ const state = reactive({
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
-    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
-    yAxisField: computed<string>(() => (props.widgetOptions?.yAxis as YAxisValue)?.value),
-    yAxisCount: computed<number>(() => (props.widgetOptions?.yAxis as YAxisValue)?.count),
+    dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
+    dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
+    dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
     colorValue: computed<ColorValue>(() => (props.widgetOptions?.colorSchema as ColorSchemaValue)?.colorValue),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
-        if (Object.values(DATE_FIELD).includes(state.xAxisField)) {
+        if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
-        } else if (Object.values(DATE_FIELD).includes(state.yAxisField)) {
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.yAxisCount);
+        } else if (isDateField(state.dataField)) {
+            if (state.dynamicFieldValue.length) {
+                const _sortedDateValue = [...state.dynamicFieldValue];
+                _sortedDateValue.sort();
+                _start = _sortedDateValue[0];
+                _end = _sortedDateValue[_sortedDateValue.length - 1];
+            }
         }
         return { start: _start, end: _end };
     }),
@@ -168,7 +177,7 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     noData: computed(() => (state.data ? !state.data.results?.length : false)),
 });
 
-/* Util */
+/* Api */
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
@@ -176,22 +185,12 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
-        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _queryDateRange.start,
-                end: _queryDateRange.end,
-                group_by: [state.xAxisField, state.yAxisField],
-                fields: {
-                    [state.dataField]: {
-                        key: state.dataField,
-                        operator: 'sum',
-                    },
-                },
-                field_group: [state.yAxisField],
-                sort: [{ key: `_total_${state.dataField}`, desc: true }],
+                ...getWidgetLoadApiQueryDateRange(state.granularity, state.dateRange),
+                ...getWidgetLoadApiQuery(state.dataFieldInfo, state.xAxisField),
                 page: { start: 1, limit: state.xAxisCount },
             },
             vars: props.dashboardVars,
@@ -205,6 +204,37 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         return ErrorHandler.makeAPIErrorToast(e);
     }
 };
+
+/* Util */
+const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
+    state.yAxisData = [...state.dynamicFieldValue];
+
+    // get refined data and series fields
+    const [_refinedResults] = getRefinedDynamicFieldData(rawData, state.dataFieldInfo?.criteria, state.dataField, state.dynamicFieldValue);
+
+    const _criteria = state.dataFieldInfo?.criteria;
+    const _seriesData: any[] = [];
+    state.xAxisData.forEach((x, xIdx) => {
+        const _targetData = _refinedResults.find((d) => d[state.xAxisField] === x);
+        state.yAxisData.forEach((y, yIdx) => {
+            const _data = _targetData?.[_criteria].find((v) => v[state.dataField] === y);
+            _seriesData.push([xIdx, yIdx, _data ? _data.value : 0]);
+        });
+    });
+
+    return _seriesData;
+};
+const getStaticFieldData = (rawData: StaticFieldData): any[] => {
+    state.yAxisData = [...state.dataField];
+    const _seriesData: any[] = [];
+    state.xAxisData.forEach((x, xIdx) => {
+        state.yAxisData.forEach((y, yIdx) => {
+            const _data = rawData.results?.find((v) => v[state.xAxisField] === x);
+            _seriesData.push([xIdx, yIdx, _data ? _data[y] : 0]);
+        });
+    });
+    return _seriesData;
+};
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
@@ -216,28 +246,14 @@ const drawChart = (rawData: Data|null) => {
         state.xAxisData = rawData?.results?.map((d) => d[state.xAxisField] as string) || [];
     }
 
-    // slice yAxisData by yAxisCount
-    const _refinedByYAxisCount: any[] = [];
-    rawData.results?.forEach((d) => {
-        const _values = orderBy(d[state.dataField], 'value', 'desc').slice(0, state.yAxisCount);
-        _values.forEach((v) => {
-            _refinedByYAxisCount.push({
-                [state.xAxisField]: d[state.xAxisField],
-                ...v,
-            });
-        });
-    });
-    state.yAxisData = Array.from(new Set(_refinedByYAxisCount.map((d) => d[state.yAxisField])));
-
-    // set chartData
-    const _chartData: any[] = [];
-    state.xAxisData.forEach((x, xIdx) => {
-        state.yAxisData.forEach((y, yIdx) => {
-            const _data = _refinedByYAxisCount.find((d) => d[state.xAxisField] === x && d[state.yAxisField] === y);
-            _chartData.push([xIdx, yIdx, _data ? _data.value : 0]);
-        });
-    });
-    state.chartData = _chartData;
+    // get converted chart data
+    let _seriesData: any[];
+    if (state.dataFieldInfo?.fieldType === 'staticField') {
+        _seriesData = getStaticFieldData(rawData);
+    } else {
+        _seriesData = getDynamicFieldData(rawData);
+    }
+    state.chartData = _seriesData;
 };
 
 const loadWidget = async (): Promise<Data|APIErrorToast> => {
