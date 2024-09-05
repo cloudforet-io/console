@@ -89,6 +89,9 @@ const state = reactive({
             <h4><span>{{ state.conditions[props.data.conditions_policy] }}</span> {{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</h4>
         </section>
         <section class="middle-section">
+            <h5 class="text-paragraph-lg text-gray-900 font-bold">
+                {{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}
+            </h5>
             <table>
                 <tbody>
                     <template v-for="(field, index) in state.conditionFields">
@@ -105,6 +108,9 @@ const state = reactive({
             </table>
         </section>
         <section class="right-section">
+            <h5 class="text-paragraph-lg text-gray-900 font-bold">
+                {{ $t('INVENTORY.COLLECTOR.ACTIONS') }}
+            </h5>
             <table>
                 <tbody>
                     <template v-for="(field, index) in state.actionFields">
