@@ -120,70 +120,44 @@ const getGroupByData = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
     const _etcData = rawData.results?.slice(LIMIT);
 
     const _seriesData: any[] = [];
-    const _today = dayjs.utc();
     _slicedData?.forEach((d) => {
-        let _accumulatedData = 0;
-        const _data = state.xAxisData.map((xAxis) => {
-            if (dayjs.utc(xAxis).isAfter(_today)) return 0;
-            const _targetData = d.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
-            const _value = _targetData?.value ?? 0;
-            if (costAnalysisPageState.granularity === 'DAILY') {
-                _accumulatedData += _value;
-                return _accumulatedData;
-            }
-            return _value;
-        });
         _seriesData.push({
             name: d[state.parsedChartGroupBy] || 'Unknown',
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
-            data: _data,
+            data: state.xAxisData.map((xAxis) => {
+                const _data = d.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
+                return _data ? _data?.value : undefined;
+            }),
         });
     });
     if (_etcData?.length) {
-        let _accumulatedData = 0;
         _seriesData.push({
             name: 'etc',
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
             data: state.xAxisData.map((xAxis) => {
-                if (dayjs.utc(xAxis).isAfter(_today)) return 0;
                 const _data = _etcData.reduce((acc, d) => {
                     const _value = d.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
-                    return acc + (_value?.value ?? 0);
+                    return acc + (_value ? _value.value : 0);
                 }, 0);
-                if (costAnalysisPageState.granularity === 'DAILY') {
-                    _accumulatedData += _data;
-                    return _accumulatedData;
-                }
                 return _data;
             }),
         });
     }
     return _seriesData;
 };
-const getTotalData = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
-    let _accumulatedData = 0;
-    const _today = dayjs.utc();
-    const _data = state.xAxisData.map((d) => {
-        if (dayjs.utc(d).isAfter(_today)) return 0;
-        const _targetData = rawData.results?.[0]?.value_sum?.find((v) => v[DATE_FIELD_NAME] === d);
-        const _value = _targetData?.value ?? 0;
-        if (costAnalysisPageState.granularity === 'DAILY') {
-            _accumulatedData += _value;
-            return _accumulatedData;
-        }
-        return _value;
-    });
-    return [{
-        name: 'Total',
-        type: 'bar',
-        barMaxWidth: 50,
-        data: _data,
-    }];
-};
+const getTotalData = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => [{
+    name: 'Total',
+    type: 'bar',
+    barMaxWidth: 50,
+    data: state.xAxisData.map((d) => {
+        const _data = rawData.results?.[0]?.value_sum?.find((v) => v[DATE_FIELD_NAME] === d);
+        return _data ? _data.value : 0;
+    }),
+}];
 const drawChart = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
     if (isEmpty(rawData)) return;
 
