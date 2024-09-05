@@ -281,10 +281,10 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
         }
         // Filter (Only for Dynamic Field with Date Field)
-        if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField') {
+        if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField' && state.tableDataFieldInfo?.dynamicFieldValue?.length) {
             _filter = [{
                 k: state.tableDataField,
-                v: state.tableDataFieldInfo?.dynamicFieldValue,
+                v: state.tableDataFieldInfo.dynamicFieldValue,
                 o: 'in',
             }];
         }

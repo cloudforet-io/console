@@ -33,6 +33,7 @@ import {
     getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
@@ -194,9 +195,10 @@ const drawChart = (rawData?: Data|null) => {
     const _maxTotalCount = rawData?.results?.[0]?.[`_total_${state.dataField}`] ?? 0;
     const _threshold = _maxTotalCount * 0.08;
 
-    // set yAxisData
-    if (state.yAxisField === DATE_FIELD.DATE) {
-        state.yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+    // set yAxis Data
+    if (isDateField(state.yAxisField)) {
+        const _isSeparatedDate = state.yAxisField !== DATE_FIELD.DATE;
+        state.yAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
     } else {
         state.yAxisData = reverse([...rawData.results?.map((d) => d[state.yAxisField] as string) ?? []]);
     }
