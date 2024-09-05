@@ -67,7 +67,7 @@ const state = reactive({
         return getWidgetDateFields(costAnalysisPageState.granularity, _period?.start, _period?.end);
     }),
     parsedChartGroupBy: computed(() => costAnalysisPageState.chartGroupBy?.replace('additional_info.', '').replace('tags.', '')),
-    chartData: [],
+    chartData: [] as BarSeriesOption[],
     chart: null as EChartsType | null,
     chartOptions: computed<BarSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
@@ -115,7 +115,7 @@ const state = reactive({
 });
 
 /* Util */
-const getGroupByData = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
+const getGroupByData = (rawData: AnalyzeResponse<CostAnalyzeRawData>): BarSeriesOption[] => {
     const _slicedData = rawData.results?.slice(0, LIMIT);
     const _etcData = rawData.results?.slice(LIMIT);
 
@@ -149,7 +149,7 @@ const getGroupByData = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
     }
     return _seriesData;
 };
-const getTotalData = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => [{
+const getTotalData = (rawData: AnalyzeResponse<CostAnalyzeRawData>): BarSeriesOption[] => [{
     name: 'Total',
     type: 'bar',
     barMaxWidth: 50,
