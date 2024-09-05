@@ -3280,6 +3280,11 @@
 				"VERSION": "バージョン"
 			},
 			"EDIT_ADDITIONAL_RULE": "",
+			"EMPTY": {
+				"DESC1": "",
+				"DESC2": "",
+				"HEADER": ""
+			},
 			"HISTORY": {
 				"ALL": "すべてを表示",
 				"CANCELED": "キャンセル",

@@ -56,7 +56,7 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         options: {} as CollectorOptions,
         versions: [] as string[],
         isScheduleError: false,
-        additionalRules: [{ order: 1 }],
+        additionalRules: [],
 
         // getters
         collectorId: computed<string|undefined>(() => state.originCollector?.collector_id),
@@ -159,7 +159,7 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
             state.attachedServiceAccountType = 'all';
             state.selectedServiceAccountFilterOption = 'include';
             state.options = {};
-            state.additionalRules = [{ order: 1, tag: undefined }];
+            state.additionalRules = [];
             state.versions = [];
             state.isScheduleError = false;
         },
