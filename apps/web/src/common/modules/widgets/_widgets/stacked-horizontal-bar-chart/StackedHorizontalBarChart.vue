@@ -260,12 +260,12 @@ const loadWidget = async (): Promise<Data|APIErrorToast> => {
 };
 
 /* Watcher */
-watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+watch([() => state.chartData, () => chartContext.value, () => props.allReferenceTypeInfo], ([, chartCtx]) => {
     if (chartCtx) {
         state.chart = init(chartContext.value);
         state.chart.setOption(state.chartOptions, true);
     }
-});
+}, { deep: true });
 
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 useResizeObserver(chartContext, throttle(() => {

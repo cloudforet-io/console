@@ -234,12 +234,12 @@ const loadWidget = async (): Promise<Data|APIErrorToast> => {
 watch(() => props.size, () => {
     state.chart.setOption(state.chartOptions, true);
 }, { immediate: false });
-watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+watch([() => state.chartData, () => chartContext.value, () => props.allReferenceTypeInfo], ([, chartCtx]) => {
     if (chartCtx) {
         state.chart = init(chartContext.value);
         state.chart.setOption(state.chartOptions, true);
     }
-});
+}, { deep: true });
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
