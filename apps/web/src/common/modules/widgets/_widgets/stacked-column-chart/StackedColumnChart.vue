@@ -81,14 +81,17 @@ const state = reactive({
             icon: 'circle',
             itemWidth: 10,
             itemHeight: 10,
-            formatter: (val) => getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, val),
+            formatter: (val) => {
+                if (state.dataField === DATE_FIELD.DATE) return dayjs.utc(val).format(state.dateFormat);
+                return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
+            },
         },
         tooltip: {
             formatter: (params) => {
                 const _params = Array.isArray(params) ? params : [params];
                 return _params.map((p) => {
-                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.stackByField, p.seriesName);
-                    if (state.stackByField === DATE_FIELD.DATE) {
+                    let _seriesName = getReferenceLabel(props.allReferenceTypeInfo, state.dataField, p.seriesName);
+                    if (state.dataField === DATE_FIELD.DATE) {
                         _seriesName = dayjs.utc(_seriesName).format(state.dateFormat);
                     }
                     if (state.unit) _seriesName = `${_seriesName} (${state.unit})`;
