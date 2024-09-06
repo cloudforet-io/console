@@ -3177,6 +3177,7 @@
 			"ACTIONS": "Actions",
 			"ADDITIONAL_OPTIONS": "Additional Options",
 			"ADDITIONAL_RULE": "Additional Rule",
+			"ADDITIONAL_RULE_CONDITION_INFO": "Check the subkeys of data and tags in \nCloud Service > Details > Raw Data.",
 			"ADD_ADDITIONAL_RULE": "Add Additional Rule",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "Failed to Change Collector Name",
 			"ALT_E_COLLECTOR_SCHEDULE": "You can set a schedule with a maximum of 2 times (a day). ",
@@ -3197,6 +3198,7 @@
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "Attached Service Accounts successfully updated",
 			"CLOUD_SERVICE_TAG": "Cloud Service Tag",
 			"CONDITIONS": "Conditions",
+			"CONDITION_POLICY_DESC": "of the following are met",
 			"CREATE": {
 				"ALL": "All",
 				"ALT_E_COLLECT_EXECUTION": "Data collection failed to start",
@@ -4474,6 +4476,7 @@
 			"ALT_S_DELETE_EVENT_RULE": "Event Rule successfully deleted ",
 			"ALT_S_REORDER_EVENT_RULES": "Event Rules successfully reordered ",
 			"ALT_S_UPDATE_EVENT_RULE": "Event Rule successfully updated ",
+			"ALWAYS": "Always",
 			"ANY": "Any",
 			"ASSIGNEE": "Assignee",
 			"CANCEL": "Cancel",

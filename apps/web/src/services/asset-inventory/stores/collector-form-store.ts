@@ -6,6 +6,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AdditionalRuleCondition, CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
 import type {
     CollectorModel,
 
@@ -56,7 +57,10 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         options: {} as CollectorOptions,
         versions: [] as string[],
         isScheduleError: false,
-        additionalRules: [],
+        additionalRules: [] as CollectorRuleModel[],
+
+        // additional rules form
+        conditionList: [] as AdditionalRuleCondition[],
 
         // getters
         collectorId: computed<string|undefined>(() => state.originCollector?.collector_id),

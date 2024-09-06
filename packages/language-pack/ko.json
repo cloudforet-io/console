@@ -3177,6 +3177,7 @@
 			"ACTIONS": "",
 			"ADDITIONAL_OPTIONS": "추가 옵션",
 			"ADDITIONAL_RULE": "",
+			"ADDITIONAL_RULE_CONDITION_INFO": "Data와 tags 의 subkey를 클라우드 서비스> \n상세정보 > 원본데이터 에서 확인하세요.",
 			"ADD_ADDITIONAL_RULE": "",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "컬렉터 이름 수정 실패",
 			"ALT_E_COLLECTOR_SCHEDULE": "스케줄은 최대 2개까지만 선택이 가능합니다. ",
@@ -3197,6 +3198,7 @@
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "서비스 어카운트 수정 완료",
 			"CLOUD_SERVICE_TAG": "",
 			"CONDITIONS": "",
+			"CONDITION_POLICY_DESC": "",
 			"CREATE": {
 				"ALL": "전체",
 				"ALT_E_COLLECT_EXECUTION": "데이터 수집 시작 실패",
@@ -4474,6 +4476,7 @@
 			"ALT_S_DELETE_EVENT_RULE": "이벤트 규칙 삭제 완료",
 			"ALT_S_REORDER_EVENT_RULES": "이벤트 규칙 순서 변경 완료",
 			"ALT_S_UPDATE_EVENT_RULE": "이벤트 규칙 수정 완료",
+			"ALWAYS": "",
 			"ANY": "다음 중 하나라도",
 			"ASSIGNEE": "담당자",
 			"CANCEL": "취소",
