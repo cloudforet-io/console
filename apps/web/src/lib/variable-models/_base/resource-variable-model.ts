@@ -94,9 +94,9 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         const apiQueryHelper = new ApiQueryHelper();
 
         // Additional Filter (ex. data_source_id)
-        if (query.primaryOptions) {
+        if (query.options) {
             apiQueryHelper.setFilters([]);
-            Object.entries(query.primaryOptions).forEach(([key, value]) => {
+            Object.entries(query.options).forEach(([key, value]) => {
                 apiQueryHelper.addFilter({ k: key, v: value, o: '=' });
             });
             apiQueryHelper.addFilter({ k: dataKey, v: [null, ''], o: '!=' });
