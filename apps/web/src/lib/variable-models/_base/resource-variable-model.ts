@@ -138,6 +138,12 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
             { k: this._meta.idKey, v: [null, ''], o: '!=' },
         ]);
 
+        if (query.options) {
+            Object.entries(query.options).forEach(([key, value]) => {
+                apiQueryHelper.addFilter({ k: key, v: value, o: '=' });
+            });
+        }
+
         if (query.search) {
             const searchFilters = this.#searchTargets.map((key) => ({
                 k: key,
@@ -210,7 +216,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                     const _presetValues = presetValues;
                     const _resultsWithPreset = [
                         ...(query.start === 1 ? (_presetValues ?? []).map((d) => ({ name: d, key: d })) : []),
-                        ...(response.results.filter((d) => !_presetValues?.includes(d)).map((d) => ({ key: d, name: d })) ?? []),
+                        ...(response.results?.filter((d) => !_presetValues?.includes(d)).map((d) => ({ key: d, name: d })) ?? []),
                     ];
 
                     this.#response = {
