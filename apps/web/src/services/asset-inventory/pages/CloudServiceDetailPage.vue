@@ -399,7 +399,10 @@ const initPage = async (initQueryTags = false) => {
     tableState.schema = await getTableSchema();
     resetSort(tableState.schema.options);
     if (tableState.defaultFilter?.length) {
-        queryTagsHelper.setFilters(convertToQueryTag(tableState.defaultFilter));
+        queryTagsHelper.setFilters([
+            ...convertToQueryTag(tableState.defaultFilter),
+            ...searchFilters.value,
+        ]);
     }
     await fetchTableData();
 };
