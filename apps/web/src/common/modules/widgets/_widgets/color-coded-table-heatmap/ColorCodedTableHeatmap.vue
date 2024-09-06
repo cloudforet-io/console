@@ -228,7 +228,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                 </div>
             </div>
             <div class="x-axis-wrapper"
-                 :style="{'height': `${state.scrollHeight}px`}"
+                 :style="{'height': `${props.mode === 'overlay' ? '105%' : `${state.scrollHeight}px`}`}"
             >
                 <div ref="scrollViewRef"
                      class="scroll-view"
