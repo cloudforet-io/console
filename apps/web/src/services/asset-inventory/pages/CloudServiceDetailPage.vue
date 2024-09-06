@@ -393,6 +393,16 @@ const reloadTable = async () => {
 const handleClickSettings = () => {
     tableState.visibleCustomFieldModal = true;
 };
+const initPage = async (initQueryTags = false) => {
+    if (!props.isServerPage && !props.name) return;
+    if (initQueryTags) setQueryTags([]);
+    tableState.schema = await getTableSchema();
+    resetSort(tableState.schema.options);
+    if (tableState.defaultFilter?.length) {
+        queryTagsHelper.setFilters(convertToQueryTag(tableState.defaultFilter));
+    }
+    await fetchTableData();
+};
 
 
 /* Actions */
@@ -408,6 +418,7 @@ const handleDynamicLayoutFetch = (changed: ToolboxOptions = {}) => {
     fetchTableData(changed);
 };
 const handleClickConnectToConsole = () => { window.open(tableState.consoleLink, '_blank'); };
+
 /* Usage Overview */
 const handleDeletePeriodFilter = () => {
     overviewState.period = undefined;
@@ -437,15 +448,8 @@ watch(() => keyItemSets.value, (after) => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 debouncedWatch([() => props.group, () => props.name, () => props.provider], async () => {
-    if (!props.isServerPage && !props.name) return;
-    setQueryTags([]);
-    tableState.schema = await getTableSchema();
-    resetSort(tableState.schema.options);
-    if (tableState.defaultFilter?.length) {
-        queryTagsHelper.setFilters(convertToQueryTag(tableState.defaultFilter));
-    }
-    await fetchTableData();
-}, { immediate: true, debounce: 200 });
+    await initPage(true);
+});
 
 
 const ApiQueryToRawQueryMap = {
@@ -458,7 +462,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
     o: ApiQueryToRawQueryMap[condition.operator] ?? '=',
 }));
 
-(() => {
+(async () => {
     const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : [route.query.default_filters]);
     if (defaultSearchQuery.length) {
         tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined))
@@ -468,6 +472,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
             _state.searchFilters = excelQuery.filters;
         });
     }
+    await initPage();
 })();
 </script>
 
