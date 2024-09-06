@@ -13,7 +13,6 @@ const colorCodedTableHeatmap: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        dataField: {},
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
@@ -21,15 +20,7 @@ const colorCodedTableHeatmap: WidgetConfig = {
                 max: 31,
             },
         },
-        yAxis: {
-            options: {
-                dataTarget: 'labels_info',
-                defaultMaxCount: 8,
-                max: 8,
-                excludeDateField: true,
-                defaultIndex: 0,
-            },
-        },
+        tableDataField: {},
         advancedFormatRules: {
             options: {
                 formatRulesType: ADVANCED_FORMAT_RULE_TYPE.textThreshold,
