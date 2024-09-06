@@ -20,7 +20,7 @@ import type {
     ManagedVariableModelKey,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import {
-    MANAGED_VARIABLE_MODEL_KEY_MAP,
+    MANAGED_VARIABLE_MODEL_KEY_MAP, MANAGED_VARIABLE_MODELS,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import type {
     VariableModelMenuHandlerInfo,
@@ -90,17 +90,21 @@ const state = reactive({
     handlerMap: computed(() => {
         const handlerMaps = {};
         state.enabledFilters.forEach(({ name }) => {
-            handlerMaps[name] = getMenuHandler(name, {}, state.primaryCostStatOptions);
+            handlerMaps[name] = getMenuHandler(name, state.primaryCostStatOptions);
         });
         return handlerMaps;
     }),
 });
 
 /* Util */
-const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>, primaryOptions: Record<string, any>): AutocompleteHandler => {
+const getMenuHandler = (groupBy: string, listQueryOptions: Record<string, any>): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
         const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
+        let _queryOptions: Record<string, any> = {};
+        if (groupBy === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
+            _queryOptions.is_dormant = false;
+        }
         if (_variableOption) {
             variableModelInfo = {
                 variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableOption.key }),
@@ -113,8 +117,9 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
                 variableModel: CostVariableModel,
                 dataKey: groupBy,
             };
+            _queryOptions = { ..._queryOptions, ...listQueryOptions };
         }
-        const handler = getVariableModelMenuHandler([variableModelInfo], listQueryOptions, primaryOptions);
+        const handler = getVariableModelMenuHandler([variableModelInfo], _queryOptions);
 
         return async (...args) => {
             if (!groupBy) return { results: [] };
