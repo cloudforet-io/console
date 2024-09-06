@@ -8,7 +8,7 @@ import {
 } from 'lodash';
 
 import {
-    PSelectDropdown, PStatus,
+    PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type {
@@ -26,8 +26,7 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
+import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {
@@ -167,19 +166,13 @@ watch([() => props.property, () => props.dashboardVariables], async ([property])
             <template v-if="props.propertyName === 'workspace'"
                       #menu-item--format="{item}"
             >
-                <div class="menu-item-wrapper"
-                     :class="{'is-dormant': getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant}"
-                >
+                <div class="menu-item-wrapper">
                     <div class="label">
                         <workspace-logo-icon :text="item?.label || ''"
                                              :theme="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.tags?.theme"
                                              size="xs"
                         />
                         <span class="label-text">{{ item.label }}</span>
-                        <p-status v-if="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant"
-                                  v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
-                                  class="capitalize state"
-                        />
                     </div>
                 </div>
             </template>
@@ -214,11 +207,6 @@ watch([() => props.property, () => props.dashboardVariables], async ([property])
         .label-text {
             @apply truncate;
             max-width: 8.375rem;
-        }
-        &.is-dormant {
-            .label-text {
-                max-width: 4.125rem;
-            }
         }
     }
 }
