@@ -137,7 +137,7 @@ export const migrateLegacyWidgetOptions = async (dashboardWidgets: Array<PublicW
             isMigrated = isMigrated || _needMigration;
             if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
         }
-        if (widget.widget_type === 'heatmap') {
+        if (widget.widget_type === 'heatmap' || widget.widget_type === 'colorCodedTableHeatmap') {
             const [_needMigration, _migratedOptions] = _migrateHeatmap(widget);
             isMigrated = isMigrated || _needMigration;
             if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);

@@ -4,7 +4,7 @@ import {
     computed, defineExpose, reactive, ref,
 } from 'vue';
 
-import { cloneDeep, orderBy, throttle } from 'lodash';
+import { cloneDeep, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTooltip } from '@cloudforet/mirinae';
@@ -21,15 +21,20 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getApiQueryDateRange,
     getWidgetBasedOnDate, getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import {
+    getWidgetLoadApiQuery,
+    getWidgetLoadApiQueryDateRange,
+} from '@/common/modules/widgets/_helpers/widget-load-helper';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type {
-    AdvancedFormatRulesValue, NumberFormatValue, XAxisValue, YAxisValue,
+    AdvancedFormatRulesValue, NumberFormatValue, XAxisValue,
+    TableDataFieldValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
@@ -38,14 +43,9 @@ import { gray } from '@/styles/colors';
 type Data = ListResponse<{
     [key: string]: string|number;
 }>;
-type RefinedData = {
-    [key: string]: Array<{
-        [key: string]: string|any;
-        value: number;
-    }>;
-};
 
 const colorCodedTableRef = ref<null | HTMLElement>(null);
+const scrollViewRef = ref<null | HTMLElement>(null);
 const Y_AXIS_FIELD_WIDTH = 120;
 const BOX_MIN_WIDTH = 64;
 const props = defineProps<WidgetProps>();
@@ -54,60 +54,50 @@ const state = reactive({
     loading: false,
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
-    refinedData: computed<RefinedData[]>(() => {
-        if (!state.data?.results?.length) return [];
-        if (state.xAxisField === DATE_FIELD.DATE) {
-            return state.data.results;
-        }
-        const _refinedData: RefinedData[] = [];
-        state.data.results.forEach((d) => {
-            const _orderedData = orderBy(d[state.dataField], 'value', ['desc']);
-            const _slicedData = _orderedData.slice(0, state.xAxisCount);
-            _refinedData.push({
-                [state.yAxisField]: d[state.yAxisField],
-                [state.dataField]: _slicedData,
-            });
-        });
-        return _refinedData;
-    }),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
     boxWidth: BOX_MIN_WIDTH,
     boxHeight: 0,
+    scrollHeight: 0,
     xAxisData: computed<string[]>(() => {
-        if (state.xAxisField === DATE_FIELD.DATE) {
-            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+        if (isDateField(state.xAxisField)) {
+            const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
+            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
         }
-        const _results = new Set<string>();
-        state.refinedData.forEach((d) => {
-            d[state.dataField].forEach((col) => {
-                _results.add(col[state.xAxisField] as string);
-            });
-        });
-        return Array.from(_results);
+        return state.data?.results?.map((d) => d[state.xAxisField] as string) || [];
     }),
     yAxisData: computed<string[]>(() => {
-        if (state.yAxisField === DATE_FIELD.DATE) {
-            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+        if (isDateField(state.dataField)) { // dynamic field type
+            const _criteria = state.dataFieldInfo?.criteria;
+            const _isSeparatedDate = _criteria !== DATE_FIELD.DATE;
+            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
         }
-        return state.refinedData.map((d) => d[state.yAxisField] as string);
+        if (state.dataFieldInfo.fieldType === 'staticField') {
+            return state.dataField;
+        }
+        return state.dynamicFieldValue;
     }),
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
-    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
-    yAxisField: computed<string>(() => (props.widgetOptions?.yAxis as YAxisValue)?.value),
-    yAxisCount: computed<number>(() => (props.widgetOptions?.yAxis as YAxisValue)?.count),
+    dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
+    dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
+    dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     formatRulesValue: computed<AdvancedFormatRulesValue>(() => props.widgetOptions?.advancedFormatRules as AdvancedFormatRulesValue),
     dateRange: computed<DateRange>(() => {
-        let _dateRangeCount = 1;
-        if (Object.values(DATE_FIELD).includes(state.xAxisField)) {
-            _dateRangeCount = state.xAxisCount;
-        } else if (Object.values(DATE_FIELD).includes(state.yAxisField)) {
-            _dateRangeCount = state.yAxisCount;
+        let _start = state.basedOnDate;
+        let _end = state.basedOnDate;
+        if (isDateField(state.xAxisField)) {
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+        } else if (isDateField(state.dataField)) {
+            if (state.dynamicFieldValue.length) {
+                const _sortedDateValue = [...state.dynamicFieldValue];
+                _sortedDateValue.sort();
+                _start = _sortedDateValue[0];
+                _end = _sortedDateValue[_sortedDateValue.length - 1];
+            }
         }
-        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, _dateRangeCount);
         return { start: _start, end: _end };
     }),
     // optional fields
@@ -128,23 +118,13 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         const _fetcher = _isPrivate
             ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
             : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
-        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _queryDateRange.start,
-                end: _queryDateRange.end,
-                group_by: [state.xAxisField, state.yAxisField],
-                fields: {
-                    [state.dataField]: {
-                        key: state.dataField,
-                        operator: 'sum',
-                    },
-                },
-                field_group: [state.xAxisField],
-                sort: [{ key: `_total_${state.dataField}`, desc: true }],
-                page: { start: 1, limit: state.yAxisCount },
+                page: { start: 1, limit: state.xAxisCount },
+                ...getWidgetLoadApiQueryDateRange(state.granularity, state.dateRange),
+                ...getWidgetLoadApiQuery(state.dataFieldInfo, state.xAxisField),
             },
             vars: props.dashboardVars,
         });
@@ -168,13 +148,25 @@ const loadWidget = async (): Promise<Data|APIErrorToast> => {
     return state.data;
 };
 const targetValue = (xField?: string, yField?: string, format?: 'table'|'tooltip'): number|string => {
-    if (!xField || !yField) return '--';
-    const _targetData = state.refinedData.find((d) => d[state.yAxisField] === yField);
-    const _targetVal = _targetData?.[state.dataField].find((d) => d[state.xAxisField] === xField)?.value;
+    if (!state.data?.results?.length || !xField || !yField) return '--';
+    let _targetVal: number|undefined;
+
+    let _field = yField;
+    if (state.dataFieldInfo.fieldType === 'staticField') {
+        const _targetData = state.data.results.find((d) => d[state.xAxisField] === xField);
+        _targetVal = _targetData?.[yField];
+    } else {
+        const _criteria = state.dataFieldInfo?.criteria;
+        const _targetXData = state.data.results.find((d) => d[state.xAxisField] === xField);
+        const _targetXYData = _targetXData?.[_criteria]?.find((d) => d[state.dataField] === yField);
+        _targetVal = _targetXYData?.value;
+        _field = _criteria;
+    }
+
     if (!_targetVal) return format === 'table' ? '--' : '';
     if (!format) return _targetVal;
     if (format === 'table') {
-        const _formattedVal = getFormattedNumber(_targetVal, state.dataField, state.numberFormat, state.unit);
+        const _formattedVal = getFormattedNumber(_targetVal, _field, state.numberFormat, state.unit);
         if ((_formattedVal.length * 6.5) > state.boxWidth) return '...';
         return _formattedVal;
     }
@@ -209,8 +201,11 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
 
     // height
     const yAxisCount = state.yAxisData.length;
-    if (!_containerHeight) state.boxHeight = 0;
-    else state.boxHeight = _containerHeight / yAxisCount;
+    const boxHeight = _containerHeight / yAxisCount;
+    if (boxHeight < 32) state.boxHeight = 32;
+    else state.boxHeight = boxHeight;
+
+    state.scrollHeight = scrollViewRef.value?.clientHeight || 0;
 }, 500));
 </script>
 
@@ -232,17 +227,21 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                     {{ yField }}
                 </div>
             </div>
-            <div class="x-axis-wrapper">
-                <div class="scroll-view">
-                    <div v-for="(yField, yIdx) in state.yAxisData"
-                         :key="`color-coded-row-${props.widgetId}-${yField}-${yIdx}`"
-                         class="x-row"
+            <div class="x-axis-wrapper"
+                 :style="{'height': `${state.scrollHeight}px`}"
+            >
+                <div ref="scrollViewRef"
+                     class="scroll-view"
+                >
+                    <div v-for="(xField, xIdx) in state.xAxisData"
+                         :key="`color-coded-col-${props.widgetId}-${xField}-${xIdx}`"
+                         class="x-col"
+                         :style="{'width': `${state.boxWidth}px`}"
                     >
-                        <div v-for="xField in state.xAxisData"
+                        <div v-for="yField in state.yAxisData"
                              :key="`color-coded-box-${props.widgetId}-${xField}-${yField}`"
-                             class="col-box"
+                             class="box"
                              :style="{
-                                 'width': `${state.boxWidth}px`,
                                  'background-color': getColor(targetValue(xField, yField)),
                                  'color': getContrastingColor(getColor(targetValue(xField, yField))),
                                  'height': `${state.boxHeight-1}px`,
@@ -255,14 +254,10 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                                 {{ targetValue(xField, yField, 'table') }}
                             </p-tooltip>
                         </div>
-                    </div>
-                    <div class="x-field-wrapper">
-                        <div v-for="xField in state.xAxisData"
-                             :key="`color-coded-x-field-${props.widgetId}-${xField}`"
-                             :style="{'width': `${state.boxWidth}px`}"
-                             class="x-field-col"
-                        >
-                            {{ xField }}
+                        <div class="x-field-text">
+                            <span class="x-field-col"
+                                  :style="{'width': `${state.boxWidth}px`}"
+                            >{{ xField }}</span>
                         </div>
                     </div>
                 </div>
@@ -276,8 +271,9 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
     .table-wrapper {
         display: flex;
         width: 100%;
-        height: 80%;
+        height: 85%;
         gap: 0.25rem;
+        overflow: auto;
         padding-top: 1rem;
         .y-axis-wrapper {
             .y-col {
@@ -293,19 +289,28 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
         }
         .x-axis-wrapper {
             flex: 1;
-            overflow-x: auto;
             overflow-y: hidden;
-            height: 120%;
             .scroll-view {
-                display: inline-block;
+                overflow-x: auto;
+                overflow-y: hidden;
+                display: inline-flex;
                 white-space: nowrap;
+                .x-field-text {
+                    @apply text-label-xs text-gray-600;
+                    display: inline-flex;
+                    padding-top: 0.25rem;
+                    .x-field-col {
+                        @apply truncate;
+                    }
+                }
             }
-            .x-row {
+            .x-col {
                 @apply text-label-sm;
                 display: flex;
+                flex-direction: column;
                 gap: 1px;
-                padding-bottom: 1px;
-                .col-box {
+                padding-right: 1px;
+                .box {
                     @apply truncate;
                     display: flex;
                     justify-content: center;
@@ -314,15 +319,6 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                         width: 100%;
                         text-align: center;
                     }
-                }
-            }
-            .x-field-wrapper {
-                @apply text-label-xs text-gray-600;
-                display: flex;
-                gap: 1px;
-                padding-top: 0.25rem;
-                .x-field-col {
-                    @apply truncate;
                 }
             }
         }
