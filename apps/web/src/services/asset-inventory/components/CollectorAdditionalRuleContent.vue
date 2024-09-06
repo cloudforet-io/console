@@ -6,6 +6,7 @@ import { PLink } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { isNotEmpty } from '@cloudforet/utils';
 
+import { COLLECTOR_RULE_CONDITION_KEY_LABEL } from '@/schema/inventory/collector-rule/constant';
 import type { CollectorRuleModel, AdditionalRuleAction } from '@/schema/inventory/collector-rule/model';
 import { i18n as _i18n } from '@/translations';
 
@@ -30,19 +31,10 @@ interface Field {
     label: TranslateResult;
 }
 
-const ConditionNameMap = {
-    provider: 'Provider',
-    cloud_service_group: 'Cloud Service Group',
-    cloud_service_type: 'Cloud Service Type',
-    region_code: 'Region',
-    account: 'Account',
-    'reference.resource_id': 'Resource ID',
-};
-
 const state = reactive({
     conditionFields: computed<Field[]>(() => (props.data?.conditions ?? []).map((condition) => ({
         name: condition.key,
-        label: ConditionNameMap[condition.key] ?? condition.key,
+        label: COLLECTOR_RULE_CONDITION_KEY_LABEL[condition.key] ?? condition.key,
     }))),
     conditionItems: computed(() => {
         if (!props.data) return {};
