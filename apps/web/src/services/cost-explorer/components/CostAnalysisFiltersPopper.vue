@@ -7,7 +7,7 @@ import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
-    PSelectDropdown, PTextButton, PStatus,
+    PSelectDropdown, PTextButton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -32,8 +32,7 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
+import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import CostAnalysisFiltersAddMoreButton
     from '@/services/cost-explorer/components/CostAnalysisFiltersAddMoreButton.vue';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -215,19 +214,13 @@ watch(() => props.visible, (visible) => {
             <template v-if="groupBy.name === GROUP_BY.WORKSPACE"
                       #menu-item--format="{item}"
             >
-                <div class="menu-item-wrapper"
-                     :class="{'is-dormant': getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant}"
-                >
+                <div class="menu-item-wrapper">
                     <div class="label">
                         <workspace-logo-icon :text="item?.label || ''"
                                              :theme="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.tags?.theme"
                                              size="xs"
                         />
                         <span class="label-text">{{ item.label }}</span>
-                        <p-status v-if="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant"
-                                  v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
-                                  class="capitalize state"
-                        />
                     </div>
                 </div>
             </template>
@@ -273,11 +266,6 @@ watch(() => props.visible, (visible) => {
         .label-text {
             @apply truncate;
             max-width: 8.375rem;
-        }
-        &.is-dormant {
-            .label-text {
-                max-width: 4.125rem;
-            }
         }
     }
 }
