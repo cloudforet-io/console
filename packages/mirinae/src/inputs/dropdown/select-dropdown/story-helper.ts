@@ -653,6 +653,7 @@ const initContextMenuArgTypes = (): ArgTypes => {
         readonly: contextMenuArgTypes.readonly,
         showSelectHeader: contextMenuArgTypes.showSelectHeader,
         showSelectMarker: contextMenuArgTypes.showSelectMarker,
+        showClearSelection: contextMenuArgTypes.showClearSelection,
     };
     Object.keys(contextMenuArgTypes).forEach((k) => {
         const item = contextMenuArgTypes[k];
@@ -676,6 +677,7 @@ const initSelectDropdownArgs = (): Args => {
         readonly: contextMenuArgs.readonly,
         showSelectHeader: contextMenuArgs.showSelectHeader,
         showSelectMarker: contextMenuArgs.showSelectMarker,
+        showClearSelection: contextMenuArgTypes.showClearSelection,
     };
 
     Object.keys(contextMenuArgs).forEach((k) => {

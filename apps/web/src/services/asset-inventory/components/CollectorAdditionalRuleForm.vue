@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PRadio, PSelectDropdown, PI, PTextInput, PTooltip,
+    PButton, PRadio, PSelectDropdown, PI, PTextInput, PTooltip, PFieldGroup, PCheckbox,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -15,6 +15,8 @@ import type { CollectorRuleConditionKey } from '@/schema/inventory/collector-rul
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import CollectorAdditionalRuleFormOperatorDropdown
     from '@/services/asset-inventory/components/CollectorAdditionalRuleFormOperatorDropdown.vue';
@@ -38,7 +40,7 @@ const state = reactive({
         [COLLECTOR_RULE_CONDITION_POLICY.ALL]: _i18n.t('PROJECT.EVENT_RULE.ALL'),
         [COLLECTOR_RULE_CONDITION_POLICY.ALWAYS]: _i18n.t('PROJECT.EVENT_RULE.ALWAYS'),
     })),
-    selectedRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ANY,
+    selectedConditionRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ANY,
     conditionKeyMenu: computed<SelectDropdownMenuItem[]>(() => Object.keys(COLLECTOR_RULE_CONDITION_KEY).filter((key) => (!((key === 'data' || key === 'tags')))).map((key) => ({
         label: COLLECTOR_RULE_CONDITION_KEY_LABEL[key],
         name: key,
@@ -47,6 +49,14 @@ const state = reactive({
         { label: 'Tags', name: 'tags' },
     ])),
     selectedConditionKey: COLLECTOR_RULE_CONDITION_KEY.provider as CollectorRuleConditionKey,
+    // actions
+    actionPolicies: computed(() => ({
+        change_project: 'Project Routing',
+        match_project: 'Match Project',
+        match_service_account: 'Match Service Account',
+    })),
+    selectedActionRadioIdx: 'change_project',
+    isStopProcessingChecked: false,
 });
 
 const handleClickAddRule = () => {
@@ -58,6 +68,14 @@ const handleSelectConditionKey = (value:CollectorRuleConditionKey) => {
 };
 const handle = (value) => {
     console.log(value);
+};
+
+const handleClickCancel = () => {
+    console.log('cancel');
+};
+
+const handleClickDone = () => {
+    console.log('done');
 };
 </script>
 
@@ -87,7 +105,7 @@ const handle = (value) => {
                 <div class="condition-policy-wrapper">
                     <p-radio v-for="([key,value], idx) in Object.entries(state.conditionPolicies)"
                              :key="`bookmark-scope-${idx}`"
-                             v-model="state.selectedRadioIdx"
+                             v-model="state.selectedConditionRadioIdx"
                              :value="key"
                     >
                         <span class="radio-item">
@@ -96,7 +114,7 @@ const handle = (value) => {
                     </p-radio>
                     <span class="text-label-md text-gray-700">{{ $t('INVENTORY.COLLECTOR.CONDITION_POLICY_DESC') }}</span>
                 </div>
-                <div v-if="state.selectedRadioIdx !== COLLECTOR_RULE_CONDITION_POLICY.ALWAYS"
+                <div v-if="state.selectedConditionRadioIdx !== COLLECTOR_RULE_CONDITION_POLICY.ALWAYS"
                      class="condition-list"
                 >
                     <div class="condition-item-row">
@@ -146,8 +164,64 @@ const handle = (value) => {
             <h5 class="text-paragraph-lg text-gray-900 font-bold">
                 {{ $t('INVENTORY.COLLECTOR.ACTIONS') }}
             </h5>
-            <table />
+            <div class="condition-contents-wrapper">
+                <div class="condition-policy-wrapper">
+                    <p-radio v-for="([key,value], idx) in Object.entries(state.actionPolicies)"
+                             :key="`bookmark-scope-${idx}`"
+                             v-model="state.selectedActionRadioIdx"
+                             :value="key"
+                    >
+                        <span class="radio-item">
+                            {{ value }}
+                        </span>
+                    </p-radio>
+                </div>
+                <div class="action-contents-wrapper">
+                    <div v-if="state.selectedActionRadioIdx === 'change_project'">
+                        <project-select-dropdown class="action-project"
+                                                 is-fixed-width
+                        />
+                    </div>
+                    <div v-else
+                         class="match-box"
+                    >
+                        <p-field-group class="action-field-group"
+                                       label="Source"
+                                       required
+                        >
+                            <p-text-input class="action-source"
+                                          block
+                            />
+                        </p-field-group>
+                        <p-field-group class="action-field-group"
+                                       label="Target"
+                                       required
+                        >
+                            <p-text-input class="action-target"
+                                          block
+                            />
+                        </p-field-group>
+                    </div>
+                </div>
+                <div class="stop-processing-wrapper">
+                    <p-checkbox v-model="state.isStopProcessingChecked" />{{ $t('INVENTORY.COLLECTOR.THEN_STOP_PROCESSING') }}
+                </div>
+            </div>
         </section>
+        <div class="form-footer">
+            <p-button style-type="tertiary"
+                      class="cancel-event-rule-button"
+                      @click="handleClickCancel"
+            >
+                {{ $t('COMMON.BUTTONS.CANCEL') }}
+            </p-button>
+            <p-button style-type="primary"
+                      class="done-event-rule-button"
+                      @click="handleClickDone"
+            >
+                {{ $t('COMMON.BUTTONS.DONE') }}
+            </p-button>
+        </div>
     </div>
 </template>
 
@@ -167,14 +241,40 @@ const handle = (value) => {
         > h4 > span {
             font-weight: bold;
         }
-
-        .condition-policy-wrapper {
-            @apply flex gap-4 mb-4 items-end;
-        }
     }
 
     .right-section {
         @apply col-span-6;
+
+        .action-contents-wrapper {
+            @apply border-4 border-gray-100 rounded-lg mt-3;
+            padding: 1rem;
+        }
+
+        .match-box {
+            @apply flex gap-2;
+
+            /* custom design-system component - p-field-group */
+            &:deep(.p-field-group) {
+                margin-bottom: 0;
+            }
+
+            .action-field-group {
+                @apply flex-grow;
+            }
+        }
+    }
+    .stop-processing-wrapper {
+        @apply flex gap-1 mt-3 justify-end items-center text-label-md text-gray-900;
+    }
+
+    .condition-policy-wrapper {
+        @apply flex gap-4 mb-4 items-end;
+    }
+
+    .form-footer {
+        @apply col-span-12 flex justify-end gap-2 mt-3;
+        margin-bottom: 0.625rem;
     }
 }
 

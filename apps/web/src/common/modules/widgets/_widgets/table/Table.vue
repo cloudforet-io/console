@@ -140,14 +140,14 @@ const state = reactive({
                 }
             });
         } else if (isDateField(state.tableDataField)) { // 2-2-1. Dynamic Fields - Date Field Case
-            dataFields = (state.tableDataFieldInfo.dynamicFieldValue ?? []).map((_fieldName) => ({
+            dataFields = (state.tableDataFieldInfo?.dynamicFieldValue ?? []).map((_fieldName) => ({
                 name: _fieldName,
                 label: _fieldName,
                 fieldInfo: { type: 'dataField', additionalType: 'dateFormat', unit: state.dataInfo?.[state.tableDataCriteria]?.unit },
             }));
         } else { // 2-2-2. Dynamic Fields - None Date Field Case
             const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
-            (state.tableDataFieldInfo.dynamicFieldValue ?? []).forEach((_fieldName) => {
+            (state.tableDataFieldInfo?.dynamicFieldValue ?? []).forEach((_fieldName) => {
                 dataFields.push({
                     name: _fieldName,
                     label: _fieldName,
@@ -281,7 +281,7 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
         }
         // Filter (Only for Dynamic Field with Date Field)
-        if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField') {
+        if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField' && state.tableDataFieldInfo?.dynamicFieldValue?.length) {
             _filter = [{
                 k: state.tableDataField,
                 v: state.tableDataFieldInfo.dynamicFieldValue,
@@ -456,7 +456,7 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
                 }
             });
             const etcValue = d[`_total_${state.tableDataCriteria}`]
-                - (dynamicFieldData.filter((item) => state.tableDataFieldInfo.dynamicFieldValue?.includes(item[state.tableDataField])).reduce((acc, cur) => acc + cur.value, 0) ?? 0);
+                - (dynamicFieldData.filter((item) => state.tableDataFieldInfo?.dynamicFieldValue?.includes(item[state.tableDataField])).reduce((acc, cur) => acc + cur.value, 0) ?? 0);
             return {
                 ...d,
                 [state.tableDataCriteria]: [

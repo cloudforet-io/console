@@ -3,6 +3,7 @@ import { PButton, PSpinner } from '@cloudforet/mirinae';
 
 interface Props {
    disabled: boolean;
+   isLegacyDataTable?: boolean;
    changed: boolean;
    loading: boolean;
 }
@@ -34,7 +35,8 @@ const handleUpdateDataTable = () => {
             {{ $t('COMMON.WIDGETS.DELETE') }}
         </p-button>
         <div class="form-button-wrapper">
-            <p-button style-type="transparent"
+            <p-button v-if="!props.isLegacyDataTable"
+                      style-type="transparent"
                       icon-left="ic_refresh"
                       @click="handleClickResetDataTable"
             >
@@ -42,7 +44,7 @@ const handleUpdateDataTable = () => {
             </p-button>
             <p-button style-type="secondary"
                       class="apply-button"
-                      :disabled="props.disabled"
+                      :disabled="props.disabled || props.isLegacyDataTable"
                       @click="handleUpdateDataTable"
             >
                 <div class="button-contents-wrapper">

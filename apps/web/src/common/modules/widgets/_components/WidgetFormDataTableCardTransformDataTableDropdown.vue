@@ -20,6 +20,7 @@ interface Props {
     dataTableId: string;
     operator: DataTableOperator;
     dataTableInfo: TransformDataTableInfo;
+    isLegacyDataTable?: boolean;
 }
 const props = defineProps<Props>();
 
@@ -74,6 +75,7 @@ const secondContainerRef = ref<HTMLElement|null>(null);
 
 /* Events */
 const handleClickSelectButton = (isSecondary?: boolean) => {
+    if (props.isLegacyDataTable) return;
     if (isSecondary) {
         state.secondaryVisibleMenu = !state.secondaryVisibleMenu;
         return;
@@ -152,6 +154,7 @@ watch(() => props.dataTableInfo, (newVal) => {
                 <div ref="targetRef"
                      :class="{'select-button': true,
                               selected: !!state.selected,
+                              disabled: props.isLegacyDataTable,
                               error: state.selected && !storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.selected?.[0]?.name)
                      }"
                      @click="handleClickSelectButton(false)"
@@ -249,6 +252,10 @@ watch(() => props.dataTableInfo, (newVal) => {
                     &.opened {
                         @apply text-secondary;
                     }
+                }
+
+                &.disabled {
+                    @apply cursor-not-allowed;
                 }
 
                 &.selected {
