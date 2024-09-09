@@ -33,7 +33,7 @@ import {
 } from '@/lib/variable-models/variable-model-menu-handler';
 
 import DashboardCostWidgetValueOptionDropdown
-    from '@/services/dashboards/components/DashboardCostWidgetValueOptionDropdown.vue';
+    from '@/services/dashboards/components/legacy/DashboardCostWidgetValueOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
 import {
     COST_VALUE_WIDGET_OPTION_CONFIGS,

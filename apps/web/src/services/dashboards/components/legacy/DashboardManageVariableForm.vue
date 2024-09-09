@@ -15,7 +15,7 @@ import getRandomId from '@/lib/random-id-generator';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import DashboardManageVariableOptionsField
-    from '@/services/dashboards/components/DashboardManageVariableOptionsField.vue';
+    from '@/services/dashboards/components/legacy/DashboardManageVariableOptionsField.vue';
 import type {
     ManageVariableFormOption,
     ManageVariableOverlayStatus,

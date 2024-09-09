@@ -21,12 +21,12 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
-import DashboardControlButtons from '@/services/dashboards/components/DashboardControlButtons.vue';
+import DashboardCloneModal from '@/services/dashboards/components/dashboard-detail/DashboardCloneModal.vue';
+import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
+import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
+import DashboardNameEditModal from '@/services/dashboards/components/dashboard-detail/DashboardNameEditModal.vue';
+import DashboardShareWithCodeModal from '@/services/dashboards/components/dashboard-detail/DashboardShareWithCodeModal.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
-import DashboardLabelsButton from '@/services/dashboards/components/DashboardLabelsButton.vue';
-import DashboardNameEditModal from '@/services/dashboards/components/DashboardNameEditModal.vue';
-import DashboardShareWithCodeModal from '@/services/dashboards/components/DashboardShareWithCodeModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 

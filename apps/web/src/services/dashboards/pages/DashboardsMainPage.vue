@@ -28,7 +28,7 @@ import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
+import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 

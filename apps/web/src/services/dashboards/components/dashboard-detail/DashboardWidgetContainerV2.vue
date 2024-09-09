@@ -42,7 +42,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetHeaderValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
-import DashboardReorderSidebar from '@/services/dashboards/components/DashboardReorderSidebar.vue';
+import DashboardReorderSidebar from '@/services/dashboards/components/dashboard-detail/DashboardReorderSidebar.vue';
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';

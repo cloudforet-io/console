@@ -16,7 +16,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import DashboardToolsetDateCustomModal from '@/services/dashboards/components/DashboardToolsetDateCustomModal.vue';
+import DashboardToolsetDateCustomModal from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateCustomModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 

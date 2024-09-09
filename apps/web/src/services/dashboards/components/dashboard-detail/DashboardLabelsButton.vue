@@ -8,7 +8,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vue';
+import DashboardLabels from '@/services/dashboards/components/dashboard-detail/DashboardLabels.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {

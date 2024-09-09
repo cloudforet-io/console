@@ -25,9 +25,9 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
 
-import DashboardManageVariableForm from '@/services/dashboards/components/DashboardManageVariableForm.vue';
+import DashboardManageVariableForm from '@/services/dashboards/components/legacy/DashboardManageVariableForm.vue';
 import DashboardManageVariableTable
-    from '@/services/dashboards/components/DashboardManageVariableTable.vue';
+    from '@/services/dashboards/components/legacy/DashboardManageVariableTable.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { ManageVariableOverlayStatus } from '@/services/dashboards/types/manage-variable-type';

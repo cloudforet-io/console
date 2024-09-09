@@ -8,7 +8,7 @@ import { debounce } from 'lodash';
 
 import { PDataLoader } from '@cloudforet/mirinae';
 
-import WidgetFullModeModal from '@/services/dashboards/components/WidgetFullModeModal.vue';
+import WidgetFullModeModal from '@/services/dashboards/components/legacy/WidgetFullModeModal.vue';
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';

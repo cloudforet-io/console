@@ -12,9 +12,9 @@ import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
-import type { FilterLabelItem } from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
-import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
-import DashboardCreateTemplateBoard from '@/services/dashboards/components/DashboardCreateTemplateBoard.vue';
+import type { FilterLabelItem } from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
+import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
+import DashboardCreateTemplateBoard from '@/services/dashboards/components/dashboard-create/DashboardCreateTemplateBoard.vue';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
