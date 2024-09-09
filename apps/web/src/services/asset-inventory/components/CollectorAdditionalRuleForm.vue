@@ -18,7 +18,11 @@ import {
     COLLECTOR_RULE_CONDITION_POLICY,
 } from '@/schema/inventory/collector-rule/constant';
 import type { AdditionalRuleCondition, CollectorRuleModel, AdditionalRuleAction } from '@/schema/inventory/collector-rule/model';
-import type { CollectorRuleConditionKey, CollectorRuleConditionOperator } from '@/schema/inventory/collector-rule/type';
+import type {
+    CollectorRuleConditionKey,
+    CollectorRuleConditionOperator,
+    CollectorRuleConditionPolicy,
+} from '@/schema/inventory/collector-rule/type';
 import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
 import type { RegionModel } from '@/schema/inventory/region/model';
 import { i18n as _i18n } from '@/translations';
@@ -106,7 +110,7 @@ const state = reactive({
         [COLLECTOR_RULE_CONDITION_POLICY.ALL]: _i18n.t('PROJECT.EVENT_RULE.ALL'),
         [COLLECTOR_RULE_CONDITION_POLICY.ALWAYS]: _i18n.t('PROJECT.EVENT_RULE.ALWAYS'),
     })),
-    selectedConditionRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ANY,
+    selectedConditionRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ANY as CollectorRuleConditionPolicy,
     conditionKeyMenu: computed<SelectDropdownMenuItem[]>(() => {
         let keys = Object.keys(COLLECTOR_RULE_CONDITION_KEY);
         if (props.provider) keys = keys.filter((key) => key !== COLLECTOR_RULE_CONDITION_KEY.provider);
@@ -137,6 +141,22 @@ const state = reactive({
     isStopProcessingChecked: false,
     sourceInput: '',
     targetInput: '',
+    isAllValid: computed(() => {
+        if (state.selectedConditionRadioIdx !== COLLECTOR_RULE_CONDITION_POLICY.ALWAYS) {
+            const isConditionValid = state.conditionList.every((condition) => condition.key && condition.value);
+            if (!isConditionValid) {
+                return false;
+            }
+        }
+        if (state.selectedActionRadioIdx === 'change_project' && !state.selectedProjectId?.[0]) {
+            return false;
+        }
+        if (state.selectedActionRadioIdx !== 'change_project' && (!state.sourceInput || !state.targetInput)) {
+            return false;
+        }
+
+        return true;
+    }),
 });
 const valueDropdownMenu = (key: CollectorRuleConditionKey, idx:number) => {
     if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_group) {
@@ -527,6 +547,7 @@ const DEFAULT_SEARCH_MAP:Record<CollectorRuleConditionKey, SelectDropdownMenuIte
             </p-button>
             <p-button style-type="primary"
                       class="done-event-rule-button"
+                      :disabled="!state.isAllValid"
                       @click="handleClickDone"
             >
                 {{ $t('COMMON.BUTTONS.DONE') }}
