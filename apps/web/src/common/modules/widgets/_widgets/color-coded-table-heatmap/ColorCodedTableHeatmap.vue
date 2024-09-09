@@ -205,7 +205,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
     if (boxHeight < 32) state.boxHeight = 32;
     else state.boxHeight = boxHeight;
 
-    state.scrollHeight = scrollViewRef.value?.clientHeight || 0;
+    state.scrollHeight = scrollViewRef.value?.scrollHeight || 0;
 }, 500));
 </script>
 
@@ -217,6 +217,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
         <!--Do not delete div element below. It's defense code for redraw-->
         <div ref="colorCodedTableRef"
              class="table-wrapper"
+             :class="[props.mode]"
         >
             <div class="y-axis-wrapper">
                 <div v-for="(yField, yIdx) in state.yAxisData"
@@ -274,7 +275,10 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
         height: 85%;
         gap: 0.25rem;
         overflow: auto;
-        padding-top: 1rem;
+        margin-top: 1rem;
+        &.overlay {
+            height: 90%;
+        }
         .y-axis-wrapper {
             .y-col {
                 @apply text-label-sm text-gray-700 truncate border-b border-gray-200;
