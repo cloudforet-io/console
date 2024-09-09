@@ -62,6 +62,9 @@ const validationState = reactive({
 const hideMenu = () => {
     emit('change-input', { userList: state.selectedItems });
     state.menuVisible = false;
+    validationState.userIdInvalid = false;
+    validationState.userIdInvalidText = '';
+    formState.searchText = '';
 };
 const handleClickTextInput = async () => {
     state.menuVisible = true;
@@ -76,10 +79,11 @@ const handleChangeTextInput = (value: string) => {
         state.menuVisible = true;
     }
 };
-const handleEnterTextInput = debounce(async () => {
+const handleEnterTextInput = debounce(async (value) => {
     if (formState.searchText === '') return;
     if (validateUserId()) {
-        await getUserList();
+        const isFocusOut = value.type === 'focusout';
+        await getUserList(isFocusOut);
     }
 }, 100);
 const handleClickDeleteButton = (idx: number) => {
@@ -91,7 +95,7 @@ const handleSelectDropdownItem = (selected: AuthType|LocalType) => {
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
 };
-const getUserList = async () => {
+const getUserList = async (isFocusOut?: boolean) => {
     let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
     try {
         if (userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
@@ -102,7 +106,9 @@ const getUserList = async () => {
             await fetchGetWorkspaceUsers(formState.searchText);
         }
     } catch (e) {
-        addSelectedItem(isNew);
+        if (!isFocusOut) {
+            addSelectedItem(isNew);
+        }
     } finally {
         await hideMenu();
     }
@@ -156,6 +162,7 @@ const initAuthTypeList = async () => {
     }
 };
 const addSelectedItem = (isNew: boolean) => {
+    if (!formState.searchText) return;
     state.selectedItems.unshift({
         user_id: formState.searchText?.trim(),
         label: formState.searchText?.trim(),

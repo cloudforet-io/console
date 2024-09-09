@@ -7,7 +7,7 @@ import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
-    PSelectDropdown, PTextButton, PStatus,
+    PSelectDropdown, PTextButton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -20,7 +20,7 @@ import type {
     ManagedVariableModelKey,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import {
-    MANAGED_VARIABLE_MODEL_KEY_MAP,
+    MANAGED_VARIABLE_MODEL_KEY_MAP, MANAGED_VARIABLE_MODELS,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import type {
     VariableModelMenuHandlerInfo,
@@ -32,8 +32,7 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
+import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import CostAnalysisFiltersAddMoreButton
     from '@/services/cost-explorer/components/CostAnalysisFiltersAddMoreButton.vue';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -90,17 +89,21 @@ const state = reactive({
     handlerMap: computed(() => {
         const handlerMaps = {};
         state.enabledFilters.forEach(({ name }) => {
-            handlerMaps[name] = getMenuHandler(name, {}, state.primaryCostStatOptions);
+            handlerMaps[name] = getMenuHandler(name, state.primaryCostStatOptions);
         });
         return handlerMaps;
     }),
 });
 
 /* Util */
-const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>, primaryOptions: Record<string, any>): AutocompleteHandler => {
+const getMenuHandler = (groupBy: string, listQueryOptions: Record<string, any>): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
         const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
+        let _queryOptions: Record<string, any> = {};
+        if (groupBy === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
+            _queryOptions.is_dormant = false;
+        }
         if (_variableOption) {
             variableModelInfo = {
                 variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableOption.key }),
@@ -113,8 +116,9 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
                 variableModel: CostVariableModel,
                 dataKey: groupBy,
             };
+            _queryOptions = { ..._queryOptions, ...listQueryOptions };
         }
-        const handler = getVariableModelMenuHandler([variableModelInfo], listQueryOptions, primaryOptions);
+        const handler = getVariableModelMenuHandler([variableModelInfo], _queryOptions);
 
         return async (...args) => {
             if (!groupBy) return { results: [] };
@@ -215,19 +219,13 @@ watch(() => props.visible, (visible) => {
             <template v-if="groupBy.name === GROUP_BY.WORKSPACE"
                       #menu-item--format="{item}"
             >
-                <div class="menu-item-wrapper"
-                     :class="{'is-dormant': getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant}"
-                >
+                <div class="menu-item-wrapper">
                     <div class="label">
                         <workspace-logo-icon :text="item?.label || ''"
                                              :theme="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.tags?.theme"
                                              size="xs"
                         />
                         <span class="label-text">{{ item.label }}</span>
-                        <p-status v-if="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant"
-                                  v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
-                                  class="capitalize state"
-                        />
                     </div>
                 </div>
             </template>
@@ -273,11 +271,6 @@ watch(() => props.visible, (visible) => {
         .label-text {
             @apply truncate;
             max-width: 8.375rem;
-        }
-        &.is-dormant {
-            .label-text {
-                max-width: 4.125rem;
-            }
         }
     }
 }

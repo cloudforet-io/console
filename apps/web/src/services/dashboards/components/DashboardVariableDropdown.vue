@@ -8,7 +8,7 @@ import {
 } from 'lodash';
 
 import {
-    PSelectDropdown, PStatus,
+    PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type {
@@ -22,13 +22,14 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import type { ReferenceMap } from '@/store/reference/type';
 
 import { VariableModelFactory } from '@/lib/variable-models';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
-import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
+import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 interface Props {
     dashboardVariables?: DashboardVariables;
@@ -61,13 +62,15 @@ const state = reactive({
         const options = props.property?.options;
         const fixedOptions = dashboardDetailGetters.refinedVariablesSchema.fixed_options;
         if (!Array.isArray(options)) return undefined;
+        const isWorkspaceDropdown = options.map((d) => d.key).includes(MANAGED_VARIABLE_MODELS.workspace.meta.key);
+        const listQueryOptions = isWorkspaceDropdown ? { is_dormant: false } : {};
         const variableModelInfoList = options.map((config) => ({
             variableModel: new VariableModelFactory({ type: config.type, managedModelKey: config.key }, undefined, {
                 fixedOptions,
             }),
             dataKey: config.dataKey,
         }));
-        return getVariableModelMenuHandler(variableModelInfoList);
+        return getVariableModelMenuHandler(variableModelInfoList, listQueryOptions);
     }),
 });
 
@@ -167,19 +170,13 @@ watch([() => props.property, () => props.dashboardVariables], async ([property])
             <template v-if="props.propertyName === 'workspace'"
                       #menu-item--format="{item}"
             >
-                <div class="menu-item-wrapper"
-                     :class="{'is-dormant': getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant}"
-                >
+                <div class="menu-item-wrapper">
                     <div class="label">
                         <workspace-logo-icon :text="item?.label || ''"
                                              :theme="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.tags?.theme"
                                              size="xs"
                         />
                         <span class="label-text">{{ item.label }}</span>
-                        <p-status v-if="getWorkspaceInfo(item?.name || '', storeState.workspaceList)?.is_dormant"
-                                  v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
-                                  class="capitalize state"
-                        />
                     </div>
                 </div>
             </template>
@@ -214,11 +211,6 @@ watch([() => props.property, () => props.dashboardVariables], async ([property])
         .label-text {
             @apply truncate;
             max-width: 8.375rem;
-        }
-        &.is-dormant {
-            .label-text {
-                max-width: 4.125rem;
-            }
         }
     }
 }
