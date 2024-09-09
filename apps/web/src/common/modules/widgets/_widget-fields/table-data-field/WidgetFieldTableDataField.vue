@@ -338,8 +338,9 @@ const initValue = () => {
             },
             version: LATEST_TABLE_DATA_FIELD_VERSION,
         };
-        state.selectedItem = state.proxyValue?.dynamicFieldInfo.fieldValue;
         state.selectedCriteria = state.proxyValue?.dynamicFieldInfo.criteria;
+        state.selectedItem = state.proxyValue?.dynamicFieldInfo.fieldValue;
+        state.selectedValueType = props.value?.dynamicFieldInfo?.valueType ?? DEFAULT_VALUE_TYPE;
     }
 };
 watch(() => state.menuItems, (menuItems) => {
@@ -456,10 +457,11 @@ watch([ // Fetch Dynamic Field
     () => props.dateRange,
 ], async (
     [_fieldType, _value, _valueType, _criteria, _groupBy, _granularity, _dateRange],
-    [, _prevValue, , _prevCriteria, _prevGroupBy, _prevGranularity, _prevDateRange],
+    [, _prevValue, _prevValueType, _prevCriteria, _prevGroupBy, _prevGranularity, _prevDateRange],
 ) => {
     if (_fieldType === 'staticField' || _valueType === 'auto') return;
-    const fetchingSkipCondition = _value === _prevValue && _criteria === _prevCriteria && isEqual(_groupBy, _prevGroupBy) && _granularity === _prevGranularity && isEqual(_dateRange, _prevDateRange);
+    const fetchingSkipCondition = _value === _prevValue && _valueType === _prevValueType && _criteria === _prevCriteria
+        && isEqual(_groupBy, _prevGroupBy) && _granularity === _prevGranularity && isEqual(_dateRange, _prevDateRange);
     if (fetchingSkipCondition) return;
     const resetConditionByExternalValue = _prevGroupBy && _prevGranularity && (!isEqual(_groupBy, _prevGroupBy) || _granularity !== _prevGranularity);
     if (resetConditionByExternalValue) {
