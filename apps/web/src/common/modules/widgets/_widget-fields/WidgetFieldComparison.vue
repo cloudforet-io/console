@@ -38,10 +38,11 @@ const state = reactive({
     proxyValue: useProxyValue<ComparisonValue[]|undefined>('value', props, emit),
     disabled: computed(() => { // NOTE: EXCEPTION FOR ONLY TABLE WIDGET
         const tableDataField = props.allValueMap.tableDataField as TableDataFieldValue;
+        const _tableDataFieldFieldValue = tableDataField.fieldType === 'staticField' ? tableDataField.staticFieldInfo?.fieldValue : tableDataField.dynamicFieldInfo?.fieldValue;
         if (!tableDataField) return false;
         const groupByField = props.allValueMap.groupBy as GroupByValue;
-        return !Array.isArray(tableDataField?.value) && isDateField(tableDataField?.value)
-            || Array.isArray(tableDataField?.value) && isIncludingDateField(tableDataField?.value)
+        return !Array.isArray(_tableDataFieldFieldValue) && isDateField(_tableDataFieldFieldValue)
+            || Array.isArray(_tableDataFieldFieldValue) && isIncludingDateField(_tableDataFieldFieldValue)
             || Array.isArray(groupByField?.value) && isIncludingDateField(groupByField.value);
     }),
     infoText: computed(() => {
