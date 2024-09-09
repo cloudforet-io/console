@@ -3,6 +3,7 @@ import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-tabl
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
 import type { FORMAT_RULE_TYPE, ADVANCED_FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { TableDataFieldOptions } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type {
     FormatRulesValue,
@@ -16,9 +17,6 @@ import type {
 
 export interface DataFieldOptions {
     multiSelectable?: boolean;
-}
-export interface TableDataFieldOptions {
-    max?: number; // This is a value for a possible max limit.
 }
 export interface XAxisOptions {
     dataTarget?: string;
