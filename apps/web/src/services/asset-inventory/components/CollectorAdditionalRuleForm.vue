@@ -1,21 +1,33 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { debounce } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PRadio, PSelectDropdown, PI, PTextInput, PTooltip, PFieldGroup, PCheckbox,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceTypeListParameters } from '@/schema/inventory/cloud-service-type/api-verbs/list';
+import type { CloudServiceTypeStatParameters } from '@/schema/inventory/cloud-service-type/api-verbs/stat';
+import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
 import {
     COLLECTOR_RULE_CONDITION_KEY, COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_POLICY,
 } from '@/schema/inventory/collector-rule/constant';
 import type { AdditionalRuleCondition, CollectorRuleModel, AdditionalRuleAction } from '@/schema/inventory/collector-rule/model';
 import type { CollectorRuleConditionKey, CollectorRuleConditionOperator } from '@/schema/inventory/collector-rule/type';
+import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
+import type { RegionModel } from '@/schema/inventory/region/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import CollectorAdditionalRuleFormOperatorDropdown
@@ -42,7 +54,9 @@ interface CollectorRuleForm {
     };
 }
 
-const emit = defineEmits<{(e: 'click-done', formData?: CollectorRuleForm): void; }>();
+const emit = defineEmits<{(e: 'click-done', formData?: CollectorRuleForm): void;
+    (e: 'click-cancel'): void;
+}>();
 
 const DEFAULT_CONDITION_KEY = props.provider ? COLLECTOR_RULE_CONDITION_KEY.cloud_service_group : COLLECTOR_RULE_CONDITION_KEY.provider;
 
@@ -76,7 +90,8 @@ const convertToApiCondition = (condition:AdditionalRuleConditionWithSubkey[]):Ad
 });
 
 const state = reactive({
-    projects: computed(() => allReferenceStore.getters.project),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    provider: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     isConditionTooltipVisible: computed(() => {
         let isConditionTooltipVisible = false;
         state.conditionList.forEach((condition) => {
@@ -92,14 +107,25 @@ const state = reactive({
         [COLLECTOR_RULE_CONDITION_POLICY.ALWAYS]: _i18n.t('PROJECT.EVENT_RULE.ALWAYS'),
     })),
     selectedConditionRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ANY,
-    conditionKeyMenu: computed<SelectDropdownMenuItem[]>(() => Object.keys(COLLECTOR_RULE_CONDITION_KEY).filter((key) => (!((key === 'data' || key === 'tags')))).map((key) => ({
-        label: COLLECTOR_RULE_CONDITION_KEY_LABEL[key],
-        name: key,
-    })).concat([
-        { label: 'Data', name: 'data' },
-        { label: 'Tags', name: 'tags' },
-    ])),
+    conditionKeyMenu: computed<SelectDropdownMenuItem[]>(() => {
+        let keys = Object.keys(COLLECTOR_RULE_CONDITION_KEY);
+        if (props.provider) keys = keys.filter((key) => key !== COLLECTOR_RULE_CONDITION_KEY.provider);
+        return keys.filter((key) => (!((key === 'data' || key === 'tags')))).map((key) => ({
+            label: COLLECTOR_RULE_CONDITION_KEY_LABEL[key],
+            name: key,
+        })).concat([
+            { label: 'Data', name: 'data' },
+            { label: 'Tags', name: 'tags' },
+        ]);
+    }),
     conditionList: convertToUiCondition(props.data?.conditions),
+    valueMenuSearchKeyword: '',
+    searchLoading: true,
+    // select dropdown menu
+    conditionListKey: 0,
+    cloudServiceGroupMenu: [] as (SelectDropdownMenuItem[])[],
+    cloudServiceTypeMenu: [] as (SelectDropdownMenuItem[])[],
+    regionMenu: [] as (SelectDropdownMenuItem[])[],
     // actions
     actionPolicies: computed(() => ({
         change_project: 'Project Routing',
@@ -112,7 +138,21 @@ const state = reactive({
     sourceInput: '',
     targetInput: '',
 });
-
+const valueDropdownMenu = (key: CollectorRuleConditionKey, idx:number) => {
+    if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_group) {
+        return state.cloudServiceGroupMenu[idx] ?? DEFAULT_SEARCH_MAP.cloud_service_group ?? [];
+    } if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_type) {
+        return state.cloudServiceTypeMenu[idx] ?? DEFAULT_SEARCH_MAP.cloud_service_type ?? [];
+    } if (key === COLLECTOR_RULE_CONDITION_KEY.region_code) {
+        return state.regionMenu[idx] ?? DEFAULT_SEARCH_MAP.region_code ?? [];
+    } if (key === COLLECTOR_RULE_CONDITION_KEY.provider) {
+        return state.provider ? Object.keys(state.provider).map((provider) => ({
+            label: state.provider[provider].name,
+            name: provider,
+        })) : [];
+    }
+    return [];
+};
 const handleClickAddRule = () => {
     state.conditionList.push({
         key: DEFAULT_CONDITION_KEY,
@@ -124,6 +164,17 @@ const handleClickDeleteCondition = (idx:number) => {
     state.conditionList = state.conditionList.filter((condition, index) => index !== idx);
 };
 
+const handleSelectConditionValue = (value:string, idx:number) => {
+    state.conditionList = state.conditionList.map((condition, index) => {
+        if (index === idx) {
+            return {
+                ...condition,
+                value,
+            };
+        }
+        return condition;
+    });
+};
 const handleSelectConditionKey = (value:CollectorRuleConditionKey, idx:number) => {
     state.conditionList = state.conditionList.map((condition, index) => {
         if (index === idx) {
@@ -134,6 +185,19 @@ const handleSelectConditionKey = (value:CollectorRuleConditionKey, idx:number) =
         }
         return condition;
     });
+    switch (value) {
+    case COLLECTOR_RULE_CONDITION_KEY.cloud_service_group:
+        state.cloudServiceGroupMenu[idx] = DEFAULT_SEARCH_MAP.cloud_service_group;
+        break;
+    case COLLECTOR_RULE_CONDITION_KEY.cloud_service_type:
+        state.cloudServiceTypeMenu[idx] = DEFAULT_SEARCH_MAP.cloud_service_type;
+        break;
+    case COLLECTOR_RULE_CONDITION_KEY.region_code:
+        state.regionMenu[idx] = DEFAULT_SEARCH_MAP.region_code;
+        break;
+    default:
+        break;
+    }
 };
 const handleUpdateSubkeyInput = (value:string) => {
     state.conditionList = state.conditionList.map((condition, index) => {
@@ -172,7 +236,7 @@ const handleUpdateOperator = (value:CollectorRuleConditionOperator, idx:number) 
 };
 
 const handleClickCancel = () => {
-    console.log('cancel');
+    emit('click-cancel');
 };
 
 const handleSelectProjectId = (value) => {
@@ -205,6 +269,98 @@ const handleClickDone = () => {
         },
     });
 };
+// search fetchers
+const fetchCloudServiceGroup = async (keyword = '', idx:number):Promise<SelectDropdownMenuItem[]> => {
+    try {
+        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.stat<CloudServiceTypeStatParameters, ListResponse<string[]>>(
+            {
+                query: {
+                    distinct: 'group',
+                    keyword,
+                    filter: [{ k: 'group', v: keyword, o: 'contain' }, { k: 'provider', v: props.provider, o: 'eq' }],
+                },
+            },
+        );
+        const menu = results?.map((i) => ({
+            label: i,
+            name: i,
+        })) ?? [];
+        state.cloudServiceGroupMenu[idx] = menu;
+        return menu;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.cloudServiceGroupMenu = [];
+        return [];
+    }
+};
+const fetchCloudServiceType = async (keyword = '', idx:number):Promise<SelectDropdownMenuItem[]> => {
+    try {
+        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.list<CloudServiceTypeListParameters, ListResponse<CloudServiceTypeModel>>(
+            {
+                query: {
+                    keyword,
+                    filter: [{ k: 'provider', v: props.provider, o: 'eq' }],
+                },
+            },
+        );
+        const menu = results?.map((i) => ({
+            label: i.name,
+            name: i.cloud_service_type_id,
+        })) ?? [];
+        state.cloudServiceTypeMenu[idx] = menu;
+        return menu;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.cloudServiceTypeMenu = [];
+        return [];
+    }
+};
+const fetchRegion = async (keyword = '', idx:number):Promise<SelectDropdownMenuItem[]> => {
+    try {
+        const { results } = await SpaceConnector.clientV2.inventory.region.list<RegionListParameters, ListResponse<RegionModel>>(
+            {
+                query: {
+                    keyword,
+                    filter: [{ k: 'provider', v: props.provider, o: 'eq' }],
+                },
+            },
+        );
+        const menu = results?.map((i) => ({
+            label: i.name,
+            name: i.region_id,
+        })) ?? [];
+        state.regionMenu[idx] = menu;
+        return menu;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.regionMenu = [];
+        return [];
+    }
+};
+const handleSearchValue = debounce(async (keyword:string, key:CollectorRuleConditionKey, idx:number) => {
+    state.searchLoading = true;
+    state.valueMenuSearchKeyword = keyword;
+    if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_group) {
+        await fetchCloudServiceGroup(keyword, idx);
+    } else if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_type) {
+        await fetchCloudServiceType(keyword, idx);
+    }
+    state.searchLoading = false;
+}, 300);
+const DEFAULT_SEARCH_MAP:Record<CollectorRuleConditionKey, SelectDropdownMenuItem[]> = {
+    [COLLECTOR_RULE_CONDITION_KEY.cloud_service_group]: [],
+    [COLLECTOR_RULE_CONDITION_KEY.cloud_service_type]: [],
+    [COLLECTOR_RULE_CONDITION_KEY.region_code]: [],
+};
+
+(async () => {
+    // init search menu list
+    DEFAULT_SEARCH_MAP.cloud_service_group = await fetchCloudServiceGroup('', 0);
+    DEFAULT_SEARCH_MAP.cloud_service_type = await fetchCloudServiceType('', 0);
+    DEFAULT_SEARCH_MAP.region_code = await fetchRegion('', 0);
+    state.conditionListKey = 1;
+    state.searchLoading = false;
+})();
 </script>
 
 <template>
@@ -242,6 +398,7 @@ const handleClickDone = () => {
                     <span class="text-label-md text-gray-700">{{ $t('INVENTORY.COLLECTOR.CONDITION_POLICY_DESC') }}</span>
                 </div>
                 <div v-if="state.selectedConditionRadioIdx !== COLLECTOR_RULE_CONDITION_POLICY.ALWAYS"
+                     :key="state.conditionListKey"
                      class="condition-list"
                 >
                     <div v-for="(condition, idx) in state.conditionList"
@@ -282,8 +439,16 @@ const handleClickDone = () => {
                                                && condition.key !== COLLECTOR_RULE_CONDITION_KEY['reference.resource_id']
                                                && !condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data)
                                                && !condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)"
+                                           :menu="valueDropdownMenu(condition.key, idx)"
+                                           :search-text="state.valueMenuSearchKeyword"
+                                           :selected="condition.value"
+                                           :loading="state.searchLoading"
                                            class="condition-value"
                                            is-fixed-width
+                                           is-filterable
+                                           use-fixed-menu-style
+                                           @update:search-text="handleSearchValue($event, condition.key, idx)"
+                                           @select="handleSelectConditionValue($event, idx)"
                         />
                         <p-text-input v-else
                                       v-model="condition.value"

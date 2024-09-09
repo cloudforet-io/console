@@ -75,6 +75,13 @@ const handleClickEditButton = (order: number) => {
     state.editModeCardOrder = order;
 };
 
+const handleCancelSetRule = () => {
+    if (collectorFormState.originCollectorRules?.length === 0) {
+        collectorFormState.additionalRules = [];
+    }
+    state.editModeCardOrder = -1;
+};
+
 const handleClickAddEventRule = async () => {
     collectorFormState.additionalRules = [...collectorFormState.additionalRules, { order: collectorFormState.additionalRules.length + 1 }];
     state.editModeCardOrder = collectorFormState.additionalRules.length;
@@ -95,6 +102,10 @@ const handleSetRule = (data) => {
 };
 
 const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
+
+(async () => {
+    await collectorFormStore.setOriginCollectorRules();
+})();
 </script>
 
 <template>
@@ -173,6 +184,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                             <collector-additional-rule-form :data="data"
                                                             :provider="state.collectorProvider"
                                                             @click-done="handleSetRule"
+                                                            @click-cancel="handleCancelSetRule"
                             />
                         </div>
                         <div v-else
