@@ -970,6 +970,8 @@
 	"COMMON": {
 		"BUTTONS": {
 			"ADD": "추가",
+			"CANCEL": "취소",
+			"DONE": "완료",
 			"DOWNLOAD": "다운로드",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "데스크탑",

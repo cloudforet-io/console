@@ -970,6 +970,8 @@
 	"COMMON": {
 		"BUTTONS": {
 			"ADD": "追加",
+			"CANCEL": "キャンセル",
+			"DONE": "完了",
 			"DOWNLOAD": "ダウンロード",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "デスクトップ",

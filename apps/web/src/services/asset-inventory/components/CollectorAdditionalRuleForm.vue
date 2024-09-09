@@ -69,6 +69,14 @@ const handleSelectConditionKey = (value:CollectorRuleConditionKey) => {
 const handle = (value) => {
     console.log(value);
 };
+
+const handleClickCancel = () => {
+    console.log('cancel');
+};
+
+const handleClickDone = () => {
+    console.log('done');
+};
 </script>
 
 <template>
@@ -200,6 +208,20 @@ const handle = (value) => {
                 </div>
             </div>
         </section>
+        <div class="form-footer">
+            <p-button style-type="tertiary"
+                      class="cancel-event-rule-button"
+                      @click="handleClickCancel"
+            >
+                {{ $t('COMMON.BUTTONS.CANCEL') }}
+            </p-button>
+            <p-button style-type="primary"
+                      class="done-event-rule-button"
+                      @click="handleClickDone"
+            >
+                {{ $t('COMMON.BUTTONS.DONE') }}
+            </p-button>
+        </div>
     </div>
 </template>
 
@@ -248,6 +270,11 @@ const handle = (value) => {
 
     .condition-policy-wrapper {
         @apply flex gap-4 mb-4 items-end;
+    }
+
+    .form-footer {
+        @apply col-span-12 flex justify-end gap-2 mt-3;
+        margin-bottom: 0.625rem;
     }
 }
 
