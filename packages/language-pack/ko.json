@@ -2161,6 +2161,7 @@
 				},
 				"STEP_2": {
 					"ADD_RULE": "규칙 추가",
+					"AUTO": "자동",
 					"BASIS_FIELD": "기준 필드",
 					"CATEGORY_BY": "카테고리별",
 					"CHART_TYPE": "차트 유형",
@@ -2174,6 +2175,7 @@
 					"EDIT_DATA": "데이터 수정",
 					"EXPAND_AND_EDIT": "확장 및 편집",
 					"FIELD_NAME": "필드명",
+					"FIXED": "고정",
 					"FORMAT_RULES": "포멧 규칙",
 					"GRANULARITY": "세부 기준(Granularity)",
 					"GROUP_BY": "그룹별 통계(Group by)",
