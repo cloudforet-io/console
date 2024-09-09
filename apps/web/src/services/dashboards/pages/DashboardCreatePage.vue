@@ -37,8 +37,8 @@ import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import { useGoBack } from '@/common/composables/go-back';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import DashboardCreateStep1 from '@/services/dashboards/components/DashboardCreateStep1.vue';
-import DashboardCreateStep2 from '@/services/dashboards/components/DashboardCreateStep2.vue';
+import DashboardCreateStep1 from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1.vue';
+import DashboardCreateStep2 from '@/services/dashboards/components/dashboard-create/DashboardCreateStep2.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 

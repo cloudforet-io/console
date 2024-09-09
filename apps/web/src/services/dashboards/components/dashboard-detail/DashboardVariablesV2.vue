@@ -9,7 +9,7 @@ import type { DashboardVariableSchemaProperty, DashboardVars } from '@/schema/da
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import DashboardVariableDropdown from '@/services/dashboards/components/DashboardVariableDropdown.vue';
+import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
 import {
     MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP,
     MANAGED_DASHBOARD_VARIABLES_SCHEMA,

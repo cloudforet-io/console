@@ -12,7 +12,7 @@ import getRandomId from '@/lib/random-id-generator';
 import { red } from '@/styles/colors';
 
 import DashboardWidgetOptionDropdown
-    from '@/services/dashboards/components/DashboardWidgetOptionDropdown.vue';
+    from '@/services/dashboards/components/legacy/DashboardWidgetOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
 
 const props = defineProps<{

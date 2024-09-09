@@ -20,8 +20,8 @@ import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
 import { gray } from '@/styles/colors';
 
-import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
-import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
+import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
+import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';

@@ -8,9 +8,9 @@ import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 
+import DashboardVariableDropdown from '@/services/dashboards/components/dashboard-detail/DashboardVariableDropdown.vue';
 import DashboardManageVariableOverlay
-    from '@/services/dashboards/components/DashboardManageVariableOverlay.vue';
-import DashboardVariableDropdown from '@/services/dashboards/components/DashboardVariableDropdown.vue';
+    from '@/services/dashboards/components/legacy/DashboardManageVariableOverlay.vue';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';

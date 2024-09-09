@@ -16,7 +16,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import DashboardCreateScopeForm from '@/services/dashboards/components/DashboardCreateScopeForm.vue';
+import DashboardCreateScopeForm from '@/services/dashboards/components/dashboard-create/DashboardCreateScopeForm.vue';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 
 
