@@ -268,9 +268,9 @@ const getVariableModelMenuHandlerInfoList = (schema?: WidgetOptionsSchemaPropert
     });
     return _results;
 };
-const getListQueryOptions = (globalOptionValue?: any) => {
+const getListQueryOptions = (globalOptionValue?: any): Record<string, any> => {
     const globalOptionInfo = widgetFormGetters.globalOptionInfo;
-    if (!globalOptionInfo?.initiatedAndHasValue) return undefined;
+    if (!globalOptionInfo?.initiatedAndHasValue) return {};
     return {
         [globalOptionInfo.variableKey]: globalOptionValue,
     }; // e.g. { cost_data_source: 'ds-1' }

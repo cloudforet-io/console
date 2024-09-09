@@ -22,12 +22,14 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import type { ReferenceMap } from '@/store/reference/type';
 
 import { VariableModelFactory } from '@/lib/variable-models';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 interface Props {
     dashboardVariables?: DashboardVariables;
@@ -60,13 +62,15 @@ const state = reactive({
         const options = props.property?.options;
         const fixedOptions = dashboardDetailGetters.refinedVariablesSchema.fixed_options;
         if (!Array.isArray(options)) return undefined;
+        const isWorkspaceDropdown = options.map((d) => d.key).includes(MANAGED_VARIABLE_MODELS.workspace.meta.key);
+        const listQueryOptions = isWorkspaceDropdown ? { is_dormant: false } : {};
         const variableModelInfoList = options.map((config) => ({
             variableModel: new VariableModelFactory({ type: config.type, managedModelKey: config.key }, undefined, {
                 fixedOptions,
             }),
             dataKey: config.dataKey,
         }));
-        return getVariableModelMenuHandler(variableModelInfoList);
+        return getVariableModelMenuHandler(variableModelInfoList, listQueryOptions);
     }),
 });
 
