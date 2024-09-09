@@ -97,7 +97,7 @@ const state = reactive({
         if (state.menuItems.length === 0) return false;
         if (state.proxyValue?.fieldType === 'dynamicField') {
             if (state.proxyValue.dynamicFieldInfo?.valueType === 'fixed' && !state.proxyValue?.dynamicFieldInfo?.fixedValue?.length) return false;
-            if (state.proxyValue.dynamicFieldInfo?.valueType === 'auto' && !state.proxyValue?.count) return false;
+            if (state.proxyValue.dynamicFieldInfo?.valueType === 'auto' && !state.proxyValue?.dynamicFieldInfo?.count) return false;
         }
         if (Array.isArray(state.selectedItem)) {
             return !!state.selectedItem.length;
@@ -249,7 +249,7 @@ const handleSelectDynamicFields = (value: MenuItem) => {
             ...state.proxyValue,
             dynamicFieldInfo: {
                 ...state.proxyValue.dynamicFieldInfo,
-                fieldValue: [...(state.proxyValue.dynamicFieldInfo?.fixedValue ?? []).filter((d) => d !== value.name)],
+                fixedValue: [...(state.proxyValue.dynamicFieldInfo?.fixedValue ?? []).filter((d) => d !== value.name)],
             },
         };
         return;
@@ -258,7 +258,7 @@ const handleSelectDynamicFields = (value: MenuItem) => {
         ...state.proxyValue,
         dynamicFieldInfo: {
             ...state.proxyValue.dynamicFieldInfo,
-            fieldValue: [
+            fixedValue: [
                 ...(state.proxyValue.dynamicFieldInfo?.fixedValue ?? []), value.name,
             ],
         },
@@ -546,7 +546,7 @@ watch([ // Fetch Dynamic Field
                                        :menu="state.dynamicFieldMenuItems"
                                        :selected="state.selectedDynamicFieldMenuItems"
                                        :loading="state.loading"
-                                       :invalid="!state.proxyValue?.dynamicFieldInfo?.fieldValue?.length"
+                                       :invalid="!state.proxyValue?.dynamicFieldInfo?.fixedValue?.length"
                                        use-fixed-menu-style
                                        multi-selectable
                                        appearance-type="badge"
