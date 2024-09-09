@@ -26,6 +26,7 @@ const state = reactive({
     }),
     isEmptyCase: computed<boolean>(() => collectorFormState.additionalRules.length === 0),
     editModeCardOrder: -1,
+    collectorProvider: computed(() => collectorFormState.originCollector?.provider),
 });
 
 const changeOrder = (targetData, clickedData, tempOrder) => {
@@ -77,6 +78,20 @@ const handleClickEditButton = (order: number) => {
 const handleClickAddEventRule = async () => {
     collectorFormState.additionalRules = [...collectorFormState.additionalRules, { order: collectorFormState.additionalRules.length + 1 }];
     state.editModeCardOrder = collectorFormState.additionalRules.length;
+};
+
+const handleSetRule = (data) => {
+    console.log(data);
+    // collectorFormStore.$patch((_state) => {
+    //     const tempRules = collectorFormState.additionalRules.map((rule) => {
+    //         if (rule.order === data.order) {
+    //             return data;
+    //         }
+    //         return rule;
+    //     });
+    //     _state.state.additionalRules = tempRules;
+    // });
+    // state.editModeCardOrder = -1;
 };
 
 const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
@@ -155,7 +170,10 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                         <div v-if="isEditModeByOrder(data.order)"
                              class="edit-card"
                         >
-                            <collector-additional-rule-form :data="data" />
+                            <collector-additional-rule-form :data="data"
+                                                            :provider="state.collectorProvider"
+                                                            @click-done="handleSetRule"
+                            />
                         </div>
                         <div v-else
                              class="view-card"

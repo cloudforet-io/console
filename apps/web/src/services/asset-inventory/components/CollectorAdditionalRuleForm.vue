@@ -11,7 +11,7 @@ import {
     COLLECTOR_RULE_CONDITION_POLICY,
 } from '@/schema/inventory/collector-rule/constant';
 import type { AdditionalRuleCondition, CollectorRuleModel, AdditionalRuleAction } from '@/schema/inventory/collector-rule/model';
-import type { CollectorRuleConditionKey } from '@/schema/inventory/collector-rule/type';
+import type { CollectorRuleConditionKey, CollectorRuleConditionOperator } from '@/schema/inventory/collector-rule/type';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -24,9 +24,11 @@ import CollectorAdditionalRuleFormOperatorDropdown
 
 interface Props {
     data?: CollectorRuleModel;
+    provider?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     data: undefined,
+    provider: undefined,
 });
 
 const allReferenceStore = useAllReferenceStore();
@@ -42,7 +44,36 @@ interface CollectorRuleForm {
 
 const emit = defineEmits<{(e: 'click-done', formData?: CollectorRuleForm): void; }>();
 
-const DEFAULT_CONDITION_KEY = COLLECTOR_RULE_CONDITION_KEY.provider;
+const DEFAULT_CONDITION_KEY = props.provider ? COLLECTOR_RULE_CONDITION_KEY.cloud_service_group : COLLECTOR_RULE_CONDITION_KEY.provider;
+
+interface AdditionalRuleConditionWithSubkey extends AdditionalRuleCondition {
+    subkey?: string;
+}
+const convertToUiCondition = (condition?:AdditionalRuleCondition[]):AdditionalRuleConditionWithSubkey[] => (condition ?? [{
+    key: DEFAULT_CONDITION_KEY,
+    subkey: '',
+    operator: 'eq',
+    value: '',
+}]).map((c) => {
+    if (c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)) {
+        return {
+            ...c,
+            subkey: c.key.slice(4),
+        };
+    }
+    return c;
+});
+
+const convertToApiCondition = (condition:AdditionalRuleConditionWithSubkey[]):AdditionalRuleCondition[] => condition.map((c) => {
+    if (c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)) {
+        return {
+            key: `${c.key}.${c.subkey}`,
+            operator: c.operator,
+            value: c.value,
+        };
+    }
+    return c;
+});
 
 const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
@@ -68,11 +99,7 @@ const state = reactive({
         { label: 'Data', name: 'data' },
         { label: 'Tags', name: 'tags' },
     ])),
-    conditionList: props.data?.conditions ?? [{
-        key: DEFAULT_CONDITION_KEY,
-        operator: 'eq',
-        value: '',
-    }] as AdditionalRuleCondition[],
+    conditionList: convertToUiCondition(props.data?.conditions),
     // actions
     actionPolicies: computed(() => ({
         change_project: 'Project Routing',
@@ -82,6 +109,8 @@ const state = reactive({
     selectedActionRadioIdx: 'change_project',
     selectedProjectId: props.data?.actions?.change_project ? [props.data?.actions?.change_project ?? ''] : undefined,
     isStopProcessingChecked: false,
+    sourceInput: '',
+    targetInput: '',
 });
 
 const handleClickAddRule = () => {
@@ -106,8 +135,40 @@ const handleSelectConditionKey = (value:CollectorRuleConditionKey, idx:number) =
         return condition;
     });
 };
-const handle = (value) => {
-    console.log(value);
+const handleUpdateSubkeyInput = (value:string) => {
+    state.conditionList = state.conditionList.map((condition, index) => {
+        if (index === state.conditionList.length - 1) {
+            return {
+                ...condition,
+                subkey: value,
+            };
+        }
+        return condition;
+    });
+};
+
+const handleUpdateValueInput = (value:string, idx:number) => {
+    state.conditionList = state.conditionList.map((condition, index) => {
+        if (index === idx) {
+            return {
+                ...condition,
+                value,
+            };
+        }
+        return condition;
+    });
+};
+
+const handleUpdateOperator = (value:CollectorRuleConditionOperator, idx:number) => {
+    state.conditionList = state.conditionList.map((condition, index) => {
+        if (index === idx) {
+            return {
+                ...condition,
+                operator: value,
+            };
+        }
+        return condition;
+    });
 };
 
 const handleClickCancel = () => {
@@ -119,10 +180,26 @@ const handleSelectProjectId = (value) => {
 };
 
 const handleClickDone = () => {
+    const actions:AdditionalRuleAction = {};
+
+    if (state.selectedActionRadioIdx === 'change_project') {
+        actions.change_project = state.selectedProjectId?.[0];
+    } else if (state.selectedActionRadioIdx === 'match_project') {
+        actions.match_project = {
+            source: state.sourceInput,
+            target: state.targetInput,
+        };
+    } else if (state.selectedActionRadioIdx === 'match_service_account') {
+        actions.match_service_account = {
+            source: state.sourceInput,
+            target: state.targetInput,
+        };
+    }
+
     emit('click-done', {
         conditions_policy: state.selectedConditionRadioIdx,
-        conditions: state.conditionList,
-        actions: {},
+        conditions: convertToApiCondition(state.conditionList),
+        actions,
         options: {
             stop_processing: state.isStopProcessingChecked,
         },
@@ -177,38 +254,45 @@ const handleClickDone = () => {
                                            is-fixed-width
                                            @select="handleSelectConditionKey($event, idx)"
                         />
-                        <template v-if="condition.key === COLLECTOR_RULE_CONDITION_KEY.data">
-                            <p-text-input class="condition-sub-key"
+                        <template v-if="condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data)">
+                            <p-text-input :value="state.conditionList[idx].subkey"
+                                          class="condition-sub-key"
                                           block
                                           is-fixed-width
                                           placeholder="ex) os.os_type"
+                                          @update:value="handleUpdateSubkeyInput($event)"
                             />
                         </template>
-                        <template v-if="condition.key === COLLECTOR_RULE_CONDITION_KEY.tags">
-                            <p-text-input class="condition-sub-key"
+                        <template v-if="condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)">
+                            <p-text-input :value="state.conditionList[idx].subkey"
+                                          class="condition-sub-key"
+                                          block
                                           is-fixed-width
                                           placeholder="ex) a.b.c"
+                                          @update:value="handleUpdateSubkeyInput($event)"
                             />
                         </template>
-                        <template v-else>
-                            <collector-additional-rule-form-operator-dropdown class="condition-operator"
-                                                                              @update:value="handle($event)"
-                            />
-                            <template v-if="condition.key === COLLECTOR_RULE_CONDITION_KEY.data || condition.key === COLLECTOR_RULE_CONDITION_KEY.tags">
-                                <span>:</span>
-                            </template>
-                            <p-select-dropdown v-if="condition.key !== COLLECTOR_RULE_CONDITION_KEY.account
-                                                   && condition.key !== COLLECTOR_RULE_CONDITION_KEY['reference.resource_id']"
-                                               class="condition-value"
-                                               is-fixed-width
-                            />
-                            <p-text-input v-else
-                                          class="condition-value"
-                                          block
-                            />
+                        <collector-additional-rule-form-operator-dropdown class="condition-operator"
+                                                                          @update:value="handleUpdateOperator($event, idx)"
+                        />
+                        <template v-if="condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)">
+                            <span>:</span>
                         </template>
+                        <p-select-dropdown v-if="condition.key !== COLLECTOR_RULE_CONDITION_KEY.account
+                                               && condition.key !== COLLECTOR_RULE_CONDITION_KEY['reference.resource_id']
+                                               && !condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data)
+                                               && !condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)"
+                                           class="condition-value"
+                                           is-fixed-width
+                        />
+                        <p-text-input v-else
+                                      v-model="condition.value"
+                                      class="condition-value"
+                                      block
+                                      @update:value="handleUpdateValueInput($event, idx)"
+                        />
                         <p-i v-if="state.conditionList.length > 1"
-                             class="flex-shrink-0"
+                             class="flex-shrink-0 cursor-pointer"
                              name="ic_delete"
                              @click="handleClickDeleteCondition(idx)"
                         />
@@ -248,7 +332,8 @@ const handleClickDone = () => {
                                        label="Source"
                                        required
                         >
-                            <p-text-input class="action-source"
+                            <p-text-input v-model="state.sourceInput"
+                                          class="action-source"
                                           block
                             />
                         </p-field-group>
@@ -256,7 +341,8 @@ const handleClickDone = () => {
                                        label="Target"
                                        required
                         >
-                            <p-text-input class="action-target"
+                            <p-text-input v-model="state.targetInput"
+                                          class="action-target"
                                           block
                             />
                         </p-field-group>
