@@ -95,7 +95,10 @@ const state = reactive({
     }))),
     isValid: computed<boolean>(() => {
         if (state.menuItems.length === 0) return false;
-        if (state.proxyValue?.fieldType === 'dynamicField' && !state.proxyValue?.dynamicFieldValue?.length) return false;
+        if (state.proxyValue?.fieldType === 'dynamicField') {
+            if (state.proxyValue.dynamicFieldInfo?.valueType === 'fixed' && !state.proxyValue?.dynamicFieldInfo?.fixedValue?.length) return false;
+            if (state.proxyValue.dynamicFieldInfo?.valueType === 'auto' && !state.proxyValue?.count) return false;
+        }
         if (Array.isArray(state.selectedItem)) {
             return !!state.selectedItem.length;
         }
@@ -149,7 +152,7 @@ const state = reactive({
             };
         }) ?? [];
     }),
-    selectedMenuItems: computed(() => state.dynamicFieldMenuItems.filter((d) => state.proxyValue.dynamicFieldValue?.includes(d.name))),
+    selectedDynamicFieldMenuItems: computed(() => state.dynamicFieldMenuItems.filter((d) => state.proxyValue.dynamicFieldInfo?.fixedValue?.includes(d.name))),
     loading: false,
 });
 
@@ -241,12 +244,12 @@ const handleUpdateCount = (value: number) => {
     };
 };
 const handleSelectDynamicFields = (value: MenuItem) => {
-    if (state.proxyValue.dynamicFieldValue.includes(value.name)) {
+    if (state.proxyValue.dynamicFieldInfo?.fixedValue.includes(value.name)) {
         state.proxyValue = {
             ...state.proxyValue,
             dynamicFieldInfo: {
                 ...state.proxyValue.dynamicFieldInfo,
-                fieldValue: [...state.proxyValue.dynamicFieldValue.filter((d) => d !== value.name)],
+                fieldValue: [...(state.proxyValue.dynamicFieldInfo?.fixedValue ?? []).filter((d) => d !== value.name)],
             },
         };
         return;
@@ -256,7 +259,7 @@ const handleSelectDynamicFields = (value: MenuItem) => {
         dynamicFieldInfo: {
             ...state.proxyValue.dynamicFieldInfo,
             fieldValue: [
-                ...state.proxyValue.dynamicFieldValue, value.name,
+                ...(state.proxyValue.dynamicFieldInfo?.fixedValue ?? []), value.name,
             ],
         },
     };
@@ -366,7 +369,7 @@ watch(() => state.menuItems, (menuItems) => {
 
         state.proxyValue = {
             ...state.proxyValue,
-            dynamicFieldValue: {
+            dynamicFieldInfo: {
                 ...state.proxyValue.dynamicFieldInfo,
                 criteria: _criteria,
                 fieldValue: _value,
@@ -541,7 +544,7 @@ watch([ // Fetch Dynamic Field
                     <p-select-dropdown v-if="state.selectedValueType === 'fixed'"
                                        class="dynamic-field-select-dropdown"
                                        :menu="state.dynamicFieldMenuItems"
-                                       :selected="state.selectedMenuItems"
+                                       :selected="state.selectedDynamicFieldMenuItems"
                                        :loading="state.loading"
                                        :invalid="!state.proxyValue?.dynamicFieldInfo?.fieldValue?.length"
                                        use-fixed-menu-style

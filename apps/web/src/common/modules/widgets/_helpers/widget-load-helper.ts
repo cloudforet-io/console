@@ -39,10 +39,10 @@ export const getWidgetLoadApiQueryDateRange = (granularity: string, dateRange: D
 };
 
 export const getWidgetLoadApiQuery = (dataFieldInfo: TableDataFieldValue, xAxisField: string): Record<string, any> => {
-    const _dataField = dataFieldInfo.value;
     const _dataFieldType = dataFieldInfo.fieldType;
-    const _criteria = dataFieldInfo?.criteria;
-    const _dynamicFieldValue = dataFieldInfo?.dynamicFieldValue;
+    const _dataField = _dataFieldType === 'staticField' ? dataFieldInfo.staticFieldInfo?.fieldValue : dataFieldInfo.dynamicFieldInfo?.fieldValue;
+    const _criteria = dataFieldInfo?.dynamicFieldInfo?.criteria;
+    const _dynamicFixedFieldValue = dataFieldInfo?.dynamicFieldInfo?.fixedValue;
 
     const _fields = {};
     let _groupBy: string[] = [xAxisField];
@@ -60,10 +60,10 @@ export const getWidgetLoadApiQuery = (dataFieldInfo: TableDataFieldValue, xAxisF
         _groupBy = [..._groupBy, _dataField];
         _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${_criteria}`, desc: true }];
     }
-    if (isDateField(_dataField) && _dataFieldType === 'dynamicField' && _dynamicFieldValue?.length) {
+    if (isDateField(_dataField) && _dataFieldType === 'dynamicField' && _dynamicFixedFieldValue?.length) {
         _filter = [{
             k: _dataField,
-            v: _dynamicFieldValue,
+            v: _dynamicFixedFieldValue,
             o: 'in',
         }];
     }
