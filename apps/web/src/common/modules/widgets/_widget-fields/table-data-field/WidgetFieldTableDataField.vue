@@ -525,17 +525,19 @@ watch([ // Fetch Dynamic Field
                                            appearance-type="badge"
                                            @update:selected="handleUpdateValue"
                         />
-                        <p-divider vertical />
-                        <p-select-button v-for="selectItem in state.valueTypeItems"
-                                         :key="`select-button-${selectItem.name}`"
-                                         class="value-type-button"
-                                         :value="selectItem.name"
-                                         style-type="secondary"
-                                         :selected="state.selectedValueType"
-                                         @change="handleChangeValueType"
-                        >
-                            {{ selectItem.label }}
-                        </p-select-button>
+                        <template v-if="state.selectedFieldType === 'dynamicField'">
+                            <p-divider vertical />
+                            <p-select-button v-for="selectItem in state.valueTypeItems"
+                                             :key="`select-button-${selectItem.name}`"
+                                             class="value-type-button"
+                                             :value="selectItem.name"
+                                             style-type="secondary"
+                                             :selected="state.selectedValueType"
+                                             @change="handleChangeValueType"
+                            >
+                                {{ selectItem.label }}
+                            </p-select-button>
+                        </template>
                     </div>
                 </p-field-group>
             </div>
