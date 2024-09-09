@@ -3177,6 +3177,7 @@
 			"ACTIONS": "",
 			"ADDITIONAL_OPTIONS": "追加オプション",
 			"ADDITIONAL_RULE": "",
+			"ADDITIONAL_RULE_CONDITION_INFO": "",
 			"ADD_ADDITIONAL_RULE": "",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
 			"ALT_E_COLLECTOR_SCHEDULE": "1日に最大2回までスケジュールを設定できます。",
@@ -3197,6 +3198,7 @@
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "サービスアカウントの更新に成功しました",
 			"CLOUD_SERVICE_TAG": "",
 			"CONDITIONS": "",
+			"CONDITION_POLICY_DESC": "",
 			"CREATE": {
 				"ALL": "全体",
 				"ALT_E_COLLECT_EXECUTION": "データ収集は開始に失敗しました",
@@ -4474,6 +4476,7 @@
 			"ALT_S_DELETE_EVENT_RULE": "イベントルール削除に成功",
 			"ALT_S_REORDER_EVENT_RULES": "イベントルールの並べ替えに成功",
 			"ALT_S_UPDATE_EVENT_RULE": "イベントルール変更に成功",
+			"ALWAYS": "",
 			"ANY": "どれか(Any)",
 			"ASSIGNEE": "担当者",
 			"CANCEL": "キャンセル",

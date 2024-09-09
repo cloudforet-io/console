@@ -10,6 +10,7 @@ import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model
 import CollectorAdditionalRuleContent from '@/services/asset-inventory/components/CollectorAdditionalRuleContent.vue';
 import CollectorAdditionalRuleEmptyCase
     from '@/services/asset-inventory/components/CollectorAdditionalRuleEmptyCase.vue';
+import CollectorAdditionalRuleForm from '@/services/asset-inventory/components/CollectorAdditionalRuleForm.vue';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
@@ -79,7 +80,6 @@ const handleClickAddEventRule = async () => {
 };
 
 const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
-
 </script>
 
 <template>
@@ -155,7 +155,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                         <div v-if="isEditModeByOrder(data.order)"
                              class="edit-card"
                         >
-                            edit mode
+                            <collector-additional-rule-form :data="data" />
                         </div>
                         <div v-else
                              class="view-card"
@@ -237,7 +237,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
         }
 
         .additional-rule-form {
-            padding: 2rem 1.5rem;
+            padding: 0.625rem;
         }
     }
 

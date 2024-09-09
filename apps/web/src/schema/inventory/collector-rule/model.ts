@@ -1,10 +1,13 @@
 import type { Tags } from '@/schema/_common/model';
-import type { CollectorRuleConditionPolicy, CollectorRuleType, CollectorResourceGroup } from '@/schema/inventory/collector-rule/type';
+import type {
+    CollectorRuleConditionPolicy, CollectorRuleType, CollectorResourceGroup, CollectorRuleConditionOperator,
+    CollectorRuleConditionKey,
+} from '@/schema/inventory/collector-rule/type';
 
 export interface AdditionalRuleCondition {
-    key: string;
+    key: CollectorRuleConditionKey;
     value: string;
-    operator: 'eq' | 'contain' | 'not' | 'not_contain';
+    operator: CollectorRuleConditionOperator;
 }
 
 export interface AdditionalRuleAction {
