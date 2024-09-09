@@ -160,6 +160,7 @@ const costFilterState = reactive({
             return sortBy(Object.entries(additionalInfo).map(([k]) => ({
                 name: `additional_info.${k}`,
                 label: k,
+                presetKeys: additionalInfo[k].enums,
             })), 'label');
         }
         return dataSource ? sortBy((dataSource.data?.cost_additional_info_keys ?? [])

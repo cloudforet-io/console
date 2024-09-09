@@ -14,10 +14,10 @@ export const getTimeUnit = (granularity: string): ManipulateType => {
     if (granularity === 'YEARLY') return 'year';
     return 'month';
 };
-export const getDateFormat = (granularity: string): string => {
-    if (granularity === 'DAILY') return 'YYYY-MM-DD';
+export const getDateFormat = (granularity: string, isSeparatedDate?: boolean): string => {
+    if (granularity === 'DAILY') return isSeparatedDate ? 'DD' : 'YYYY-MM-DD';
     if (granularity === 'YEARLY') return 'YYYY';
-    return 'YYYY-MM';
+    return isSeparatedDate ? 'MM' : 'YYYY-MM';
 };
 export const getDateLabelFormat = (granularity: string): string => {
     if (granularity === 'DAILY') return 'MMM D';
@@ -52,9 +52,9 @@ export const getWidgetBasedOnDate = (granularity: string, end?: string): string 
  * @description Get date fields based on granularity, start, end
  * @example ('MONTHLY', '2024-03', '2024-06') ['2024-03', '2024-04', '2024-05', '2024-06']
  */
-export const getWidgetDateFields = (granularity: string, start?: string, end?: string): string[] => {
+export const getWidgetDateFields = (granularity: string, start?: string, end?: string, isSeparatedDate = false): string[] => {
     const _timeUnit = getTimeUnit(granularity);
-    const _dateFormat = getDateFormat(granularity);
+    const _dateFormat = getDateFormat(granularity, isSeparatedDate);
 
     const results: string[] = [];
     let now = dayjs.utc(start).clone();

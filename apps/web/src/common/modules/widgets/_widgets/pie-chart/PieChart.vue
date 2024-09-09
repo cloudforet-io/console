@@ -73,13 +73,15 @@ const state = reactive({
                 return getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, val);
             },
         };
-        if (state.legendPosition === 'right') {
+        if (['left', 'right'].includes(state.legendPosition)) {
             _option.orient = 'vertical';
-            _option.right = 10;
             _option.top = 20;
+            if (state.legendPosition === 'right') _option.right = 10;
+            else _option.left = 10;
         } else {
             _option.orient = 'horizontal';
-            _option.bottom = 0;
+            if (state.legendPosition === 'bottom') _option.bottom = 0;
+            else _option.top = 0;
         }
         return _option;
     }),
@@ -91,16 +93,18 @@ const state = reactive({
         if (state.chartType === 'donut') {
             _option.radius = ['30%', '70%'];
         }
-        if (state.legendPosition === 'right') {
+        if (['left', 'right'].includes(state.legendPosition)) {
             if (props.size === 'full') {
-                _option.center = ['40%', '50%'];
+                if (state.legendPosition === 'right') _option.center = ['40%', '50%'];
+                else _option.center = ['60%', '50%'];
+            } else _option.center = ['30%', '50%'];
+        }
+        if (['top', 'bottom'].includes(state.legendPosition)) {
+            if (state.legendPosition === 'bottom') {
+                _option.center = ['50%', '45%'];
             } else {
-                _option.center = ['30%', '50%'];
+                _option.center = ['50%', '55%'];
             }
-        } else if (props.size === 'full') {
-            _option.center = ['50%', '50%'];
-        } else {
-            _option.center = ['50%', '40%'];
         }
         return _option;
     }),

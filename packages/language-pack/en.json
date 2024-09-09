@@ -601,7 +601,7 @@
 				"COLUMN": "Column",
 				"COST_ANALYSIS": "Cost Analysis",
 				"CURRENCY": "Currency",
-				"DAILY": "Daily (Accumulated)",
+				"DAILY": "Daily",
 				"DATA_SOURCE": "Data Source",
 				"DATA_TYPE": "Data Type",
 				"DEFAULT": "Default",
@@ -1446,8 +1446,9 @@
 			"CONTINUE": "Continue",
 			"CRITERIA": "Criteria",
 			"CUSTOM_TABLE_COLUMN_WIDTH": {
+				"ADD": "Add Custom Field Width",
 				"CUSTOM_TABLE_COLUMN_WIDTH": "Custom Table Column Width",
-				"DESCRIPTION": "Selects a specific column to override the default width (Fixed widths can be override, but value smaller than the minimum width are ignored)",
+				"DESCRIPTION": "Allows you to set a specific column's width, overriding the default. Fixed widths can be overridden, but any value smaller than the minimum width will be ignored.",
 				"FIELD": "Field",
 				"WIDTH": "Width"
 			},
@@ -1492,14 +1493,15 @@
 					"DATA_TABLE_NAME_WARNING": "A data with this name already exists.",
 					"DATA_UNIT": "Data Unit",
 					"EVAL": {
+						"ADD_FIELD": "Add Field",
 						"DELETE_MODAL_DESC": "Are you sure you want to delete this Field?",
-						"DELETE_MODAL_TITLE": "Delete Cost Field",
-						"DELETE_SUCCESS_TOOLTIP": "Cost Field successfully deleted.",
+						"DELETE_MODAL_TITLE": "Delete {field_name}",
+						"DELETE_SUCCESS_TOOLTIP": "{field_name} successfully deleted.",
 						"FIELD_FORMULA": "Field Formula",
 						"FIELD_NAME": "Field Name",
 						"FIELD_TYPE": "Field Type",
 						"FORMULA_PLACEHOLDER": "Enter your formula in a pandas format.",
-						"TITLE_PLACEHOLDER": "Input Field Name",
+						"TITLE_PLACEHOLDER": "Enter Field Name",
 						"TYPE_DATA_FIELD": "Date Field",
 						"TYPE_LABEL_FIELD": "Label Field"
 					},
@@ -1509,6 +1511,8 @@
 					"FILTERS": "Filters",
 					"GROUP_BY": "Group by",
 					"JOIN_DESC": "Merge rows from different tables based on a common column. ",
+					"LEGACY_WARNING_DESC": "This ‘{operator}’ format is no longer supported. Please remove it and implement the new data transformation.",
+					"LEGACY_WARNING_TITLE": "Unsupported ‘{operator}’ Format",
 					"QUERY_DESC": "Filter and extract data that meet specific conditions. ",
 					"SELECT_DATA_SOURCE_SUCCESS": "Data successfully changed.",
 					"SELECT_DATA_TABLE_WARNING": "Please save the data table first.",
@@ -1530,11 +1534,22 @@
 				"PLACEHOLDER": "Values shown in thousands of USD"
 			},
 			"DISPLAY_SERIES_LABEL": {
+				"BOTTOM": "bottom",
 				"DISPLAY_SERIES_LABEL": "Display Series Label",
+				"INNER": "inner",
+				"INSIDE": "inside",
+				"INSIDE_BOTTOM": "inside bottom",
+				"INSIDE_LEFT": "inside left",
+				"INSIDE_RIGHT": "inside right",
+				"INSIDE_TOP": "inside top",
+				"LEFT": "left",
+				"OUTER": "outer",
 				"POSITION": "Position",
+				"RIGHT": "Right",
 				"ROTATE": "Rotate",
 				"ROTATE_MAX_INVALID_TEXT": "Must be smaller than 90",
-				"ROTATE_MIN_INVALID_TEXT": "Must be bigger than -90"
+				"ROTATE_MIN_INVALID_TEXT": "Must be bigger than -90",
+				"TOP": "top"
 			},
 			"DONE": "Done",
 			"DONUT": "Donut",
@@ -1682,6 +1697,10 @@
 				"SUB_TOTAL": "Sub Total"
 			},
 			"TABLE_COLUMN_WIDTH": {
+				"AUTO": "Auto",
+				"FIX": "Fix",
+				"INVALID_LENGTH": "Please enter width.",
+				"INVALID_MINIMUM_WIDTH": "Column width must be greater than the minimum column width.",
 				"MINIMUM_WIDTH": "Minimum Width",
 				"TABLE_COLUMN_WIDTH": "Column Width",
 				"WIDTH": "Width"

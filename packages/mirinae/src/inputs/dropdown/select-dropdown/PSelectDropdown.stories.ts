@@ -71,6 +71,7 @@ const Template: Story = {
                 :readonly="readonly"
                 :show-select-header="showSelectHeader"
                 :show-select-marker="showSelectMarker"
+                :show-clear-selection="showClearSelection"
                 :menu-position="menuPosition"
                 :index-mode="indexMode"
                 :parent-id="parentId"
@@ -714,6 +715,28 @@ export const ShowSelectMarker: Story = {
                 <p-select-dropdown :menu="menu" multi-selectable />
                 <br/>
                 <p class="text-label-lg font-bold my-3">Multi select with marker</p>
+                <p-select-dropdown :menu="menu" multi-selectable show-select-marker />
+                <br/>
+            </div>
+        `,
+    }),
+    args: {
+        menu: getSelectDropdownMenuWithMultiTypes(),
+    },
+    decorators: [() => ({
+        template: '<story style="height: 400px" />',
+    })],
+};
+export const ShowClearSelection: Story = {
+    render: () => ({
+        props: Object.keys(getSelectDropdownArgTypes()),
+        components: { PSelectDropdown },
+        template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Without Clear Selection</p>
+                <p-select-dropdown :menu="menu" multi-selectable />
+                <br/>
+                <p class="text-label-lg font-bold my-3">With Clear Selection</p>
                 <p-select-dropdown :menu="menu" multi-selectable show-select-marker />
                 <br/>
             </div>

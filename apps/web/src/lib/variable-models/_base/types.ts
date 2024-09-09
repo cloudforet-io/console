@@ -44,6 +44,7 @@ export interface PropertyOptions<T> {
     name?: string;
     isDataKey?: boolean;
     isFilter?: boolean;
+    presetValues?: string[];
 }
 export interface PropertyObject<T> {
     key: keyof T;
