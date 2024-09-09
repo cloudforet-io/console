@@ -81,7 +81,14 @@ const state = reactive({
 });
 
 const handleClickAddRule = () => {
-    console.log('add rule');
+    state.conditionList.push({
+        key: DEFAULT_CONDITION_KEY,
+        operator: 'eq',
+        value: '',
+    });
+};
+const handleClickDeleteCondition = (idx:number) => {
+    state.conditionList = state.conditionList.filter((condition, index) => index !== idx);
 };
 
 const handleSelectConditionKey = (value:CollectorRuleConditionKey, idx:number) => {
@@ -188,10 +195,12 @@ const handleClickDone = () => {
                                           class="condition-value"
                                           block
                             />
-                            <p-i class="flex-shrink-0"
-                                 name="ic_delete"
-                            />
                         </template>
+                        <p-i v-if="state.conditionList.length > 1"
+                             class="flex-shrink-0"
+                             name="ic_delete"
+                             @click="handleClickDeleteCondition(idx)"
+                        />
                     </div>
                 </div>
             </div>
@@ -319,6 +328,8 @@ const handleClickDone = () => {
     padding: 1rem;
 
     .condition-list {
+        @apply flex flex-col gap-3;
+
         .condition-item-row {
             @apply flex gap-2 items-center justify-between;
 
