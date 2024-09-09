@@ -10,7 +10,7 @@ import {
     COLLECTOR_RULE_CONDITION_KEY, COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_POLICY,
 } from '@/schema/inventory/collector-rule/constant';
-import type { AdditionalRuleCondition, CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
+import type { AdditionalRuleCondition, CollectorRuleModel, AdditionalRuleAction } from '@/schema/inventory/collector-rule/model';
 import type { CollectorRuleConditionKey } from '@/schema/inventory/collector-rule/type';
 import { i18n as _i18n } from '@/translations';
 
@@ -32,9 +32,12 @@ const props = withDefaults(defineProps<Props>(), {
 const allReferenceStore = useAllReferenceStore();
 
 interface CollectorRuleForm {
-    conditionsPolicy: string;
-    conditions: any[]; // TODO: set type
-    actions: any; // TODO: set type
+    conditions_policy: string;
+    conditions: AdditionalRuleCondition[];
+    actions: AdditionalRuleAction;
+    options?: {
+        stop_processing: boolean;
+    };
 }
 
 const emit = defineEmits<{(e: 'click-done', formData?: CollectorRuleForm): void; }>();
@@ -77,6 +80,7 @@ const state = reactive({
         match_service_account: 'Match Service Account',
     })),
     selectedActionRadioIdx: 'change_project',
+    selectedProjectId: props.data?.actions?.change_project ? [props.data?.actions?.change_project ?? ''] : undefined,
     isStopProcessingChecked: false,
 });
 
@@ -110,11 +114,18 @@ const handleClickCancel = () => {
     console.log('cancel');
 };
 
+const handleSelectProjectId = (value) => {
+    state.selectedProjectId = value;
+};
+
 const handleClickDone = () => {
     emit('click-done', {
-        conditionsPolicy: state.selectedConditionRadioIdx,
-        conditions: [],
+        conditions_policy: state.selectedConditionRadioIdx,
+        conditions: state.conditionList,
         actions: {},
+        options: {
+            stop_processing: state.isStopProcessingChecked,
+        },
     });
 };
 </script>
@@ -225,6 +236,9 @@ const handleClickDone = () => {
                     <div v-if="state.selectedActionRadioIdx === 'change_project'">
                         <project-select-dropdown class="action-project"
                                                  is-fixed-width
+                                                 :selected-project-ids="state.selectedProjectId"
+                                                 :project-group-selectable="false"
+                                                 @update:selected-project-ids="handleSelectProjectId"
                         />
                     </div>
                     <div v-else
