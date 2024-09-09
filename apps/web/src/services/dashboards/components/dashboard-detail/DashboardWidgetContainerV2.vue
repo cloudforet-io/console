@@ -10,11 +10,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataLoader, PEmpty, PButton } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
 import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
 import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
+import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-widget/api-verbs/create';
@@ -51,8 +53,9 @@ import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardModel, UpdateDashboardParameters } from '@/services/dashboards/types/dashboard-api-schema-type';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { SharedDataTableInfo } from '@/services/dashboards/types/shared-dashboard-type';
+
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
@@ -270,8 +273,8 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
         ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
         : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
     const dashboardUpdateFetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateDashboard.update<UpdateDashboardParameters, DashboardModel>
-        : SpaceConnector.clientV2.dashboard.publicDashboard.update<UpdateDashboardParameters, DashboardModel>;
+        ? SpaceConnector.clientV2.dashboard.privateDashboard.update<PrivateDashboardUpdateParameters, DashboardModel>
+        : SpaceConnector.clientV2.dashboard.publicDashboard.update<PublicDashboardUpdateParameters, DashboardModel>;
 
     const dataTableList = await listWidgetDataTables(widget.widget_id);
     const dataTableIndex = dataTableList.findIndex((d) => d.data_table_id === widget.data_table_id);
