@@ -16,8 +16,10 @@ import type {
     TemplateType,
     DashboardLayout, DashboardVars,
 } from '@/schema/dashboard/_types/dashboard-type';
+import type { PrivateDashboardGetParameters } from '@/schema/dashboard/private-dashboard/api-verbs/get';
 import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
 import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
+import type { PublicDashboardGetParameters } from '@/schema/dashboard/public-dashboard/api-verbs/get';
 import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
@@ -32,7 +34,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { migrateLegacyWidgetOptions } from '@/services/dashboards/helpers/widget-migration-helper';
 import type {
-    DashboardModel, GetDashboardParameters,
+    DashboardModel,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
@@ -41,7 +43,7 @@ interface WidgetValidMap {
     [widgetKey: string]: boolean;
 }
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
-
+type GetDashboardParameters = PublicDashboardGetParameters | PrivateDashboardGetParameters;
 const DEFAULT_REFRESH_INTERVAL = '5m';
 export const DASHBOARD_DEFAULT = Object.freeze<{ options: DashboardOptions }>({
     options: {

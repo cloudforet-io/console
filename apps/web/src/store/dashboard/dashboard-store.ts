@@ -10,7 +10,15 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type { DashboardType } from '@/schema/dashboard/_types/dashboard-type';
+import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
+import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/private-dashboard/api-verbs/delete';
+import type { PrivateDashboardListParameters } from '@/schema/dashboard/private-dashboard/api-verbs/list';
+import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
+import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
+import type { PublicDashboardDeleteParameters } from '@/schema/dashboard/public-dashboard/api-verbs/delete';
+import type { PublicDashboardListParameters } from '@/schema/dashboard/public-dashboard/api-verbs/list';
+import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -21,12 +29,15 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import type {
-    CreateDashboardParameters, DashboardModel, ListDashboardParameters, UpdateDashboardParameters,
-    DeleteDashboardParameters,
+    DashboardModel,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 
+type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
+type DashboardListParameters = PublicDashboardListParameters|PrivateDashboardListParameters;
+type DashboardUpdateParameters = PublicDashboardUpdateParameters | PrivateDashboardUpdateParameters;
+type DashboardDeleteParameters = PublicDashboardDeleteParameters | PrivateDashboardDeleteParameters;
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
@@ -41,9 +52,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const state = reactive({
         publicDashboardItems: [] as PublicDashboardModel[],
         privateDashboardItems: [] as PrivateDashboardModel[],
-        totalCount: 0,
-        publicDashboardCount: 0,
-        privateDashboardCount: 0,
         searchFilters: [] as ConsoleFilter[],
         scope: undefined as DashboardScope | undefined,
         loading: true,
@@ -68,7 +76,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const reset = () => {
         state.publicDashboardItems = [];
         state.privateDashboardItems = [];
-        state.totalCount = 0;
         state.searchFilters = [];
         state.scope = undefined;
         state.loading = true;
@@ -76,7 +83,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     /* Actions */
     const fetchApiQueryHelper = new ApiQueryHelper();
-    const fetchDashboard = async (dashboardType: DashboardType, params?: ListDashboardParameters) => {
+    const _fetchDashboard = async (dashboardType: DashboardType, params?: DashboardListParameters) => {
         const fetcher = dashboardType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateDashboard.list
             : SpaceConnector.clientV2.dashboard.publicDashboard.list;
@@ -90,22 +97,17 @@ export const useDashboardStore = defineStore('dashboard', () => {
                 },
             });
             const results = res.results || [];
-            const totalCount = res.total_count || 0;
             if (dashboardType === 'PRIVATE') {
                 state.privateDashboardItems = results as PrivateDashboardModel[];
-                state.privateDashboardCount = totalCount;
             } else {
                 state.publicDashboardItems = results as PublicDashboardModel[];
-                state.publicDashboardCount = totalCount;
             }
         } catch (e) {
             ErrorHandler.handleError(e);
             if (dashboardType === 'PRIVATE') {
                 state.privateDashboardItems = [];
-                state.privateDashboardCount = 0;
             } else {
                 state.publicDashboardItems = [];
-                state.publicDashboardCount = 0;
             }
         }
     };
@@ -141,24 +143,28 @@ export const useDashboardStore = defineStore('dashboard', () => {
         };
         state.loading = true;
         if (_state.isAdminMode) {
-            await fetchDashboard('PUBLIC', _publicDashboardParams);
+            await Promise.all([
+                _fetchDashboard('PUBLIC', _publicDashboardParams),
+            ]);
         } else if (isProject) {
-            await fetchDashboard('PUBLIC', _publicDashboardParams);
+            await Promise.all([
+                _fetchDashboard('PUBLIC', _publicDashboardParams),
+            ]);
         } else {
             await Promise.allSettled([
-                fetchDashboard('PRIVATE'),
-                fetchDashboard('PUBLIC', _publicDashboardParams),
+                _fetchDashboard('PRIVATE'),
+                _fetchDashboard('PUBLIC', _publicDashboardParams),
             ]);
         }
         state.loading = false;
     };
 
-    const createDashboard = async (dashboardType: DashboardType, params: CreateDashboardParameters): Promise<DashboardModel> => {
+    const createDashboard = async (dashboardType: DashboardType, params: DashboardCreateParameters): Promise<DashboardModel> => {
         const fetcher = dashboardType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateDashboard.create
             : SpaceConnector.clientV2.dashboard.publicDashboard.create;
         try {
-            const result = await fetcher<CreateDashboardParameters, DashboardModel>(params);
+            const result = await fetcher<DashboardCreateParameters, DashboardModel>(params);
             if (dashboardType === 'PRIVATE') {
                 state.privateDashboardItems.push(result as PrivateDashboardModel);
             } else {
@@ -170,13 +176,13 @@ export const useDashboardStore = defineStore('dashboard', () => {
             throw e;
         }
     };
-    const updateDashboard = async (dashboardId: string, params: UpdateDashboardParameters): Promise<DashboardModel> => {
+    const updateDashboard = async (dashboardId: string, params: DashboardUpdateParameters): Promise<DashboardModel> => {
         const isPrivate = dashboardId?.startsWith('private');
         const fetcher = isPrivate
             ? SpaceConnector.clientV2.dashboard.privateDashboard.update
             : SpaceConnector.clientV2.dashboard.publicDashboard.update;
         try {
-            const result = await fetcher<UpdateDashboardParameters, DashboardModel>({
+            const result = await fetcher<DashboardUpdateParameters, DashboardModel>({
                 dashboard_id: dashboardId,
                 ...params,
             });
@@ -200,9 +206,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
         const fetcher = isPrivate
             ? SpaceConnector.clientV2.dashboard.privateDashboard.delete
             : SpaceConnector.clientV2.dashboard.publicDashboard.delete;
-        const params: DeleteDashboardParameters = { dashboard_id: dashboardId };
+        const params: DashboardDeleteParameters = { dashboard_id: dashboardId };
         try {
-            await fetcher<DeleteDashboardParameters>(params);
+            await fetcher<DashboardDeleteParameters>(params);
             if (isPrivate) {
                 const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1);

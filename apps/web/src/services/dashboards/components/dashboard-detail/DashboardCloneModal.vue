@@ -8,6 +8,8 @@ import {
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { DashboardType } from '@/schema/dashboard/_types/dashboard-type';
+import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
+import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -25,9 +27,9 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { CreateDashboardParameters } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
+type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
 interface Props {
     visible: boolean;
 }
@@ -90,7 +92,7 @@ const cloneDashboard = async (): Promise<string|undefined> => {
     try {
         state.loading = true;
         const _sharedLayouts = await getSharedDashboardLayouts(dashboardDetailState.dashboardLayouts, dashboardDetailState.dashboardWidgets, storeState.costDataSource);
-        const _sharedDashboard: CreateDashboardParameters = {
+        const _sharedDashboard: DashboardCreateParameters = {
             name: name.value,
             layouts: _sharedLayouts,
             options: dashboardDetailState.options || {},
@@ -99,9 +101,9 @@ const cloneDashboard = async (): Promise<string|undefined> => {
         };
         if (storeState.isAdminMode) {
             state.isPrivate = false;
-            _sharedDashboard.resource_group = RESOURCE_GROUP.DOMAIN;
+            (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
         } else if (state.dashboardType !== 'PRIVATE') {
-            _sharedDashboard.resource_group = state.targetDashboard.resource_group || RESOURCE_GROUP.WORKSPACE;
+            (_sharedDashboard as PublicDashboardCreateParameters).resource_group = state.targetDashboard.resource_group || RESOURCE_GROUP.WORKSPACE;
         }
         const res = await dashboardStore.createDashboard(state.dashboardType, _sharedDashboard);
         return res.dashboard_id;
