@@ -4,7 +4,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import {
     WIDGET_CONTAINER_MAX_WIDTH,
     WIDGET_CONTAINER_MIN_WIDTH, WIDGET_WIDTH_CRITERIA,
-} from '@/services/dashboards/shared/dashboard-widget-container/widget-container-config';
+} from '@/services/dashboards/constants/widget-container-config';
 
 interface UseContainerResizerOptions {
     observeResize: boolean;
