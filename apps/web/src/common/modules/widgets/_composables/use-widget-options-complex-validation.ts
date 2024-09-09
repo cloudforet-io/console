@@ -72,9 +72,10 @@ export const useWidgetOptionsComplexValidation = ({
             const tableDataField = 'tableDataField';
             const groupByFieldValue = valueMap[groupByField] as GroupByValue;
             const tableDataFieldValue = valueMap[tableDataField] as TableDataFieldValue;
-            const allValueExist = groupByFieldValue?.value && !!groupByFieldValue.value.length && tableDataFieldValue?.value;
+            const allValueExist = groupByFieldValue?.value && !!groupByFieldValue.value.length
+                && (tableDataFieldValue?.staticFieldInfo?.fieldValue || tableDataFieldValue?.dynamicFieldInfo?.fieldValue);
             if (tableDataFieldValue?.fieldType === 'dynamicField' && allValueExist) {
-                isValid = !(groupByFieldValue?.value ?? []).includes(tableDataFieldValue.value as string);
+                isValid = !(groupByFieldValue?.value ?? []).includes(tableDataFieldValue.dynamicFieldInfo?.fieldValue as string);
             }
         } else {
             // Label Info Fields Value Duplicate Validation (Except Table Widget)

@@ -95,7 +95,10 @@ const state = reactive({
     }))),
     isValid: computed<boolean>(() => {
         if (state.menuItems.length === 0) return false;
-        if (state.proxyValue?.fieldType === 'dynamicField' && !state.proxyValue?.dynamicFieldValue?.length) return false;
+        if (state.proxyValue?.fieldType === 'dynamicField') {
+            if (state.proxyValue.dynamicFieldInfo?.valueType === 'fixed' && !state.proxyValue?.dynamicFieldInfo?.fixedValue?.length) return false;
+            if (state.proxyValue.dynamicFieldInfo?.valueType === 'auto' && !state.proxyValue?.dynamicFieldInfo?.count) return false;
+        }
         if (Array.isArray(state.selectedItem)) {
             return !!state.selectedItem.length;
         }
@@ -149,7 +152,7 @@ const state = reactive({
             };
         }) ?? [];
     }),
-    selectedMenuItems: computed(() => state.dynamicFieldMenuItems.filter((d) => state.proxyValue.dynamicFieldValue?.includes(d.name))),
+    selectedDynamicFieldMenuItems: computed(() => state.dynamicFieldMenuItems.filter((d) => state.proxyValue.dynamicFieldInfo?.fixedValue?.includes(d.name))),
     loading: false,
 });
 
@@ -241,12 +244,12 @@ const handleUpdateCount = (value: number) => {
     };
 };
 const handleSelectDynamicFields = (value: MenuItem) => {
-    if (state.proxyValue.dynamicFieldValue.includes(value.name)) {
+    if (state.proxyValue.dynamicFieldInfo?.fixedValue.includes(value.name)) {
         state.proxyValue = {
             ...state.proxyValue,
             dynamicFieldInfo: {
                 ...state.proxyValue.dynamicFieldInfo,
-                fieldValue: [...state.proxyValue.dynamicFieldValue.filter((d) => d !== value.name)],
+                fixedValue: [...(state.proxyValue.dynamicFieldInfo?.fixedValue ?? []).filter((d) => d !== value.name)],
             },
         };
         return;
@@ -255,8 +258,8 @@ const handleSelectDynamicFields = (value: MenuItem) => {
         ...state.proxyValue,
         dynamicFieldInfo: {
             ...state.proxyValue.dynamicFieldInfo,
-            fieldValue: [
-                ...state.proxyValue.dynamicFieldValue, value.name,
+            fixedValue: [
+                ...(state.proxyValue.dynamicFieldInfo?.fixedValue ?? []), value.name,
             ],
         },
     };
@@ -335,8 +338,9 @@ const initValue = () => {
             },
             version: LATEST_TABLE_DATA_FIELD_VERSION,
         };
-        state.selectedItem = state.proxyValue?.dynamicFieldInfo.fieldValue;
         state.selectedCriteria = state.proxyValue?.dynamicFieldInfo.criteria;
+        state.selectedItem = state.proxyValue?.dynamicFieldInfo.fieldValue;
+        state.selectedValueType = props.value?.dynamicFieldInfo?.valueType ?? DEFAULT_VALUE_TYPE;
     }
 };
 watch(() => state.menuItems, (menuItems) => {
@@ -366,7 +370,7 @@ watch(() => state.menuItems, (menuItems) => {
 
         state.proxyValue = {
             ...state.proxyValue,
-            dynamicFieldValue: {
+            dynamicFieldInfo: {
                 ...state.proxyValue.dynamicFieldInfo,
                 criteria: _criteria,
                 fieldValue: _value,
@@ -453,10 +457,11 @@ watch([ // Fetch Dynamic Field
     () => props.dateRange,
 ], async (
     [_fieldType, _value, _valueType, _criteria, _groupBy, _granularity, _dateRange],
-    [, _prevValue, , _prevCriteria, _prevGroupBy, _prevGranularity, _prevDateRange],
+    [, _prevValue, _prevValueType, _prevCriteria, _prevGroupBy, _prevGranularity, _prevDateRange],
 ) => {
     if (_fieldType === 'staticField' || _valueType === 'auto') return;
-    const fetchingSkipCondition = _value === _prevValue && _criteria === _prevCriteria && isEqual(_groupBy, _prevGroupBy) && _granularity === _prevGranularity && isEqual(_dateRange, _prevDateRange);
+    const fetchingSkipCondition = _value === _prevValue && _valueType === _prevValueType && _criteria === _prevCriteria
+        && isEqual(_groupBy, _prevGroupBy) && _granularity === _prevGranularity && isEqual(_dateRange, _prevDateRange);
     if (fetchingSkipCondition) return;
     const resetConditionByExternalValue = _prevGroupBy && _prevGranularity && (!isEqual(_groupBy, _prevGroupBy) || _granularity !== _prevGranularity);
     if (resetConditionByExternalValue) {
@@ -520,17 +525,19 @@ watch([ // Fetch Dynamic Field
                                            appearance-type="badge"
                                            @update:selected="handleUpdateValue"
                         />
-                        <p-divider vertical />
-                        <p-select-button v-for="selectItem in state.valueTypeItems"
-                                         :key="`select-button-${selectItem.name}`"
-                                         class="value-type-button"
-                                         :value="selectItem.name"
-                                         style-type="secondary"
-                                         :selected="state.selectedValueType"
-                                         @change="handleChangeValueType"
-                        >
-                            {{ selectItem.label }}
-                        </p-select-button>
+                        <template v-if="state.selectedFieldType === 'dynamicField'">
+                            <p-divider vertical />
+                            <p-select-button v-for="selectItem in state.valueTypeItems"
+                                             :key="`select-button-${selectItem.name}`"
+                                             class="value-type-button"
+                                             :value="selectItem.name"
+                                             style-type="secondary"
+                                             :selected="state.selectedValueType"
+                                             @change="handleChangeValueType"
+                            >
+                                {{ selectItem.label }}
+                            </p-select-button>
+                        </template>
                     </div>
                 </p-field-group>
             </div>
@@ -541,9 +548,9 @@ watch([ // Fetch Dynamic Field
                     <p-select-dropdown v-if="state.selectedValueType === 'fixed'"
                                        class="dynamic-field-select-dropdown"
                                        :menu="state.dynamicFieldMenuItems"
-                                       :selected="state.selectedMenuItems"
+                                       :selected="state.selectedDynamicFieldMenuItems"
                                        :loading="state.loading"
-                                       :invalid="!state.proxyValue?.dynamicFieldInfo?.fieldValue?.length"
+                                       :invalid="!state.proxyValue?.dynamicFieldInfo?.fixedValue?.length"
                                        use-fixed-menu-style
                                        multi-selectable
                                        appearance-type="badge"
