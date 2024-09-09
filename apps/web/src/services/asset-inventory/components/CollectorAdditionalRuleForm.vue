@@ -10,7 +10,7 @@ import {
     COLLECTOR_RULE_CONDITION_KEY, COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_POLICY,
 } from '@/schema/inventory/collector-rule/constant';
-// import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
+import type { AdditionalRuleCondition, CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
 import type { CollectorRuleConditionKey } from '@/schema/inventory/collector-rule/type';
 import { i18n as _i18n } from '@/translations';
 
@@ -22,19 +22,36 @@ import CollectorAdditionalRuleFormOperatorDropdown
     from '@/services/asset-inventory/components/CollectorAdditionalRuleFormOperatorDropdown.vue';
 
 
-// interface Props {
-//     data?: CollectorRuleModel;
-// }
-// const props = withDefaults(defineProps<Props>(), {
-//     data: undefined,
-// });
+interface Props {
+    data?: CollectorRuleModel;
+}
+const props = withDefaults(defineProps<Props>(), {
+    data: undefined,
+});
 
 const allReferenceStore = useAllReferenceStore();
 
+interface CollectorRuleForm {
+    conditionsPolicy: string;
+    conditions: any[]; // TODO: set type
+    actions: any; // TODO: set type
+}
 
+const emit = defineEmits<{(e: 'click-done', formData?: CollectorRuleForm): void; }>();
+
+const DEFAULT_CONDITION_KEY = COLLECTOR_RULE_CONDITION_KEY.provider;
 
 const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
+    isConditionTooltipVisible: computed(() => {
+        let isConditionTooltipVisible = false;
+        state.conditionList.forEach((condition) => {
+            if (condition.key === COLLECTOR_RULE_CONDITION_KEY.data || condition.key === COLLECTOR_RULE_CONDITION_KEY.tags) {
+                isConditionTooltipVisible = true;
+            }
+        });
+        return isConditionTooltipVisible;
+    }),
     conditionPolicies: computed(() => ({
         [COLLECTOR_RULE_CONDITION_POLICY.ANY]: _i18n.t('PROJECT.EVENT_RULE.ANY'),
         [COLLECTOR_RULE_CONDITION_POLICY.ALL]: _i18n.t('PROJECT.EVENT_RULE.ALL'),
@@ -48,7 +65,11 @@ const state = reactive({
         { label: 'Data', name: 'data' },
         { label: 'Tags', name: 'tags' },
     ])),
-    selectedConditionKey: COLLECTOR_RULE_CONDITION_KEY.provider as CollectorRuleConditionKey,
+    conditionList: props.data?.conditions ?? [{
+        key: DEFAULT_CONDITION_KEY,
+        operator: 'eq',
+        value: '',
+    }] as AdditionalRuleCondition[],
     // actions
     actionPolicies: computed(() => ({
         change_project: 'Project Routing',
@@ -63,8 +84,16 @@ const handleClickAddRule = () => {
     console.log('add rule');
 };
 
-const handleSelectConditionKey = (value:CollectorRuleConditionKey) => {
-    state.selectedConditionKey = value;
+const handleSelectConditionKey = (value:CollectorRuleConditionKey, idx:number) => {
+    state.conditionList = state.conditionList.map((condition, index) => {
+        if (index === idx) {
+            return {
+                ...condition,
+                key: value,
+            };
+        }
+        return condition;
+    });
 };
 const handle = (value) => {
     console.log(value);
@@ -75,7 +104,11 @@ const handleClickCancel = () => {
 };
 
 const handleClickDone = () => {
-    console.log('done');
+    emit('click-done', {
+        conditionsPolicy: state.selectedConditionRadioIdx,
+        conditions: [],
+        actions: {},
+    });
 };
 </script>
 
@@ -83,8 +116,7 @@ const handleClickDone = () => {
     <div class="collector-additional-rule-form">
         <section class="left-section">
             <h5 class="text-paragraph-lg text-gray-900 font-bold flex justify-between">
-                <span>{{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}<p-tooltip v-if="state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.data
-                                                                               || state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.tags"
+                <span>{{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}<p-tooltip v-if="state.isConditionTooltipVisible"
                                                                            class="ml-2"
                                                                            position="bottom"
                                                                            :contents="$t('INVENTORY.COLLECTOR.ADDITIONAL_RULE_CONDITION_INFO')"
@@ -117,20 +149,24 @@ const handleClickDone = () => {
                 <div v-if="state.selectedConditionRadioIdx !== COLLECTOR_RULE_CONDITION_POLICY.ALWAYS"
                      class="condition-list"
                 >
-                    <div class="condition-item-row">
+                    <div v-for="(condition, idx) in state.conditionList"
+                         :key="`condition-${idx}`"
+                         class="condition-item-row"
+                    >
                         <p-select-dropdown class="condition-key"
                                            :menu="state.conditionKeyMenu"
+                                           :selected="condition.key"
                                            is-fixed-width
-                                           @select="handleSelectConditionKey"
+                                           @select="handleSelectConditionKey($event, idx)"
                         />
-                        <template v-if="state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.data">
+                        <template v-if="condition.key === COLLECTOR_RULE_CONDITION_KEY.data">
                             <p-text-input class="condition-sub-key"
                                           block
                                           is-fixed-width
                                           placeholder="ex) os.os_type"
                             />
                         </template>
-                        <template v-if="state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.tags">
+                        <template v-if="condition.key === COLLECTOR_RULE_CONDITION_KEY.tags">
                             <p-text-input class="condition-sub-key"
                                           is-fixed-width
                                           placeholder="ex) a.b.c"
@@ -140,11 +176,11 @@ const handleClickDone = () => {
                             <collector-additional-rule-form-operator-dropdown class="condition-operator"
                                                                               @update:value="handle($event)"
                             />
-                            <template v-if="state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.data || state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.tags">
+                            <template v-if="condition.key === COLLECTOR_RULE_CONDITION_KEY.data || condition.key === COLLECTOR_RULE_CONDITION_KEY.tags">
                                 <span>:</span>
                             </template>
-                            <p-select-dropdown v-if="state.selectedConditionKey !== COLLECTOR_RULE_CONDITION_KEY.account
-                                                   && state.selectedConditionKey !== COLLECTOR_RULE_CONDITION_KEY['reference.resource_id']"
+                            <p-select-dropdown v-if="condition.key !== COLLECTOR_RULE_CONDITION_KEY.account
+                                                   && condition.key !== COLLECTOR_RULE_CONDITION_KEY['reference.resource_id']"
                                                class="condition-value"
                                                is-fixed-width
                             />
