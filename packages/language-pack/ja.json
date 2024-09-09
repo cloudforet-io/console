@@ -2161,6 +2161,7 @@
 				},
 				"STEP_2": {
 					"ADD_RULE": "ルールを追加",
+					"AUTO": "オート",
 					"BASIS_FIELD": "基準フィールド",
 					"CATEGORY_BY": "カテゴリー別",
 					"CHART_TYPE": "チャートタイプ",
@@ -2174,6 +2175,7 @@
 					"EDIT_DATA": "データを編集",
 					"EXPAND_AND_EDIT": "拡張と編集",
 					"FIELD_NAME": "フィールド名",
+					"FIXED": "固定",
 					"FORMAT_RULES": "形式ルール",
 					"GRANULARITY": "細部基準(Granularity)",
 					"GROUP_BY": "グループ別統計(Group by)",

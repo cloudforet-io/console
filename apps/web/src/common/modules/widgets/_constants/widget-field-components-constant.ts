@@ -1,5 +1,6 @@
 import type { Component } from 'vue';
 
+import tableDataField from '@/common/modules/widgets/_widget-fields/table-data-field/WidgetFieldTableDataField.vue';
 import advancedFormatRules from '@/common/modules/widgets/_widget-fields/WidgetFieldAdvancedFormatRules.vue';
 import categoryBy from '@/common/modules/widgets/_widget-fields/WidgetFieldCategoryBy.vue';
 import colorSchema from '@/common/modules/widgets/_widget-fields/WidgetFieldColorSchema.vue';
@@ -25,7 +26,6 @@ import progressBar from '@/common/modules/widgets/_widget-fields/WidgetFieldProg
 import stackBy from '@/common/modules/widgets/_widget-fields/WidgetFieldStackBy.vue';
 import subTotal from '@/common/modules/widgets/_widget-fields/WidgetFieldSubTotal.vue';
 import tableColumnWidth from '@/common/modules/widgets/_widget-fields/WidgetFieldTableColumnWidth.vue';
-import tableDataField from '@/common/modules/widgets/_widget-fields/WidgetFieldTableDataField.vue';
 import textWrap from '@/common/modules/widgets/_widget-fields/WidgetFieldTextWrap.vue';
 import total from '@/common/modules/widgets/_widget-fields/WidgetFieldTotal.vue';
 import widgetHeight from '@/common/modules/widgets/_widget-fields/WidgetFieldWidgetHeight.vue';

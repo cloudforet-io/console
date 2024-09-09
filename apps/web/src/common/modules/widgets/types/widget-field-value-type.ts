@@ -5,6 +5,7 @@ import type {
     LINE_CHART_SERIES_LABEL_POSITION,
     WIDGET_HEIGHT,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { TableDataFieldValueV1 } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 
 
 export interface Icon {
@@ -61,12 +62,9 @@ export interface YAxisValue {
     value: string;
     count: number;
 }
-export interface TableDataFieldValue {
-    fieldType: 'dynamicField' | 'staticField';
-    value?: string | string[];
-    dynamicFieldValue?: string[];
-    criteria?: string;
-}
+
+export type TableDataFieldValue = TableDataFieldValueV1;
+
 export interface GroupByValue {
     value?: string | string[];
     count?: number;

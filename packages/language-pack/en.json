@@ -2161,6 +2161,7 @@
 				},
 				"STEP_2": {
 					"ADD_RULE": "Add Rule",
+					"AUTO": "Auto",
 					"BASIS_FIELD": "Basis Field",
 					"CATEGORY_BY": "Category by",
 					"CHART_TYPE": "Chart Type",
@@ -2174,6 +2175,7 @@
 					"EDIT_DATA": "Edit Data",
 					"EXPAND_AND_EDIT": "Expand & Edit",
 					"FIELD_NAME": "Field Name",
+					"FIXED": "Fixed",
 					"FORMAT_RULES": "Format Rules",
 					"GRANULARITY": "Granularity",
 					"GROUP_BY": "Group by",
