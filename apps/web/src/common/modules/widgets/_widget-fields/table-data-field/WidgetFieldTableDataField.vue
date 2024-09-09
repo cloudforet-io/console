@@ -11,7 +11,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PSelectDropdown, PFieldGroup, PSelectButton,
+    PSelectDropdown, PFieldGroup, PSelectButton, PDivider, PTextInput,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -34,8 +34,14 @@ import {
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getInitialSelectedMenuItem, isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
+import type {
+    TableDataFieldOptions,
+} from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import {
+    LATEST_TABLE_DATA_FIELD_VERSION,
+} from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { TableDataItem, DateRange } from '@/common/modules/widgets/types/widget-data-type';
-import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableDataFieldValue, GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -47,6 +53,7 @@ import {
 type Data = ListResponse<TableDataItem>;
 
 const DEFAULT_FIELD_TYPE = 'staticField';
+const DEFAULT_VALUE_TYPE = 'fixed';
 const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions, TableDataFieldValue>>(), {
 });
 const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
@@ -63,7 +70,7 @@ const storeState = reactive({
 
 const state = reactive({
     isInitiated: false,
-    proxyValue: useProxyValue('value', props, emit),
+    proxyValue: useProxyValue<TableDataFieldValue>('value', props, emit),
     fieldTypeMenuItems: computed<MenuItem[]>(() => [
         {
             name: 'dynamicField',
@@ -119,6 +126,17 @@ const state = reactive({
         const [start, end] = getWidgetDateRange(_granularity, _basedOnDate, subtract);
         return { start, end };
     }),
+    valueTypeItems: computed<MenuItem[]>(() => [
+        {
+            name: 'auto',
+            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.AUTO'),
+        },
+        {
+            name: 'fixed',
+            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.FIXED'),
+        },
+    ]),
+    selectedValueType: DEFAULT_VALUE_TYPE,
     dynamicFields: undefined as undefined | string[],
     dynamicFieldMenuItems: computed<MenuItem[]>(() => {
         if (state.proxyValue?.fieldType === 'staticField') return [];
@@ -137,75 +155,120 @@ const state = reactive({
 
 
 /* Event */
-const handleUpdateCriteria = (val: string|MenuItem[]) => {
-    state.selectedCriteria = val;
-    state.proxyValue = {
-        ...state.proxyValue,
-        criteria: val,
-        dynamicFieldValue: [],
-    };
-};
+
 const handleChangeDataFieldType = (value: string) => {
     state.selectedFieldType = value;
     if (state.selectedFieldType === 'staticField') {
         state.proxyValue = {
             ...state.proxyValue,
-            value: [state.menuItems[0]?.name],
-            criteria: undefined,
-            dynamicFieldValue: undefined,
+            fieldType: 'staticField',
+            staticFieldInfo: {
+                fieldValue: [state.menuItems[0]?.name],
+            },
+            dynamicFieldInfo: undefined,
         };
         state.selectedItem = convertToMenuItem([state.menuItems[0].name]);
-        state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
     } else {
         state.proxyValue = {
             ...state.proxyValue,
-            value: state.menuItems[0]?.name,
-            criteria: state.dataInfoMenuItems[0]?.name,
-            dynamicFieldValue: [],
+            fieldType: 'dynamicField',
+            dynamicFieldInfo: {
+                criteria: state.dataInfoMenuItems[0]?.name,
+                fieldValue: state.menuItems[0]?.name,
+                valueType: DEFAULT_VALUE_TYPE,
+                fixedValue: [],
+                count: undefined,
+            },
+            staticFieldInfo: undefined,
         };
         state.selectedItem = state.menuItems[0]?.name;
         state.selectedCriteria = state.dataInfoMenuItems[0]?.name;
     }
-    state.proxyValue = { ...state.proxyValue, fieldType: value };
 };
 const handleUpdateValue = (val: string|MenuItem[]) => {
     state.selectedItem = val;
-    if (Array.isArray(val)) {
+    if (state.selectedFieldType === 'staticFeild' && Array.isArray(val)) {
         state.proxyValue = {
             ...state.proxyValue,
-            value: val.map((item) => item?.name),
+            staticFieldInfo: {
+                fieldValue: val.map((item) => item?.name),
+            },
         };
     } else {
         state.proxyValue = {
             ...state.proxyValue,
-            value: val,
-            dynamicFieldValue: [],
+            dynamicFieldInfo: {
+                ...state.proxyValue.dynamicFieldInfo,
+                fieldValue: val,
+                fixedValue: state.selectedValueType === 'fixed' ? [] : undefined,
+                count: undefined,
+            },
         };
     }
 };
+const handleUpdateCriteria = (val: string|MenuItem[]) => {
+    state.selectedCriteria = val;
+    state.proxyValue = {
+        ...state.proxyValue,
+        dynamicFieldInfo: {
+            ...state.proxyValue.dynamicFieldInfo,
+            criteria: val,
+            fixedValue: state.selectedValueType === 'fixed' ? [] : undefined,
+            count: undefined,
+        },
+    };
+};
+const handleChangeValueType = (value: string) => {
+    state.selectedValueType = value;
+    state.proxyValue = {
+        ...state.proxyValue,
+        dynamicFieldInfo: {
+            ...state.proxyValue.dynamicFieldInfo,
+            valueType: value,
+            fixedValue: value === 'fixed' ? [] : undefined,
+            count: undefined,
+        },
+    };
+};
 
+const handleUpdateCount = (value: number) => {
+    state.proxyValue = {
+        ...state.proxyValue,
+        dynamicFieldInfo: {
+            ...state.proxyValue.dynamicFieldInfo,
+            count: value,
+        },
+    };
+};
 const handleSelectDynamicFields = (value: MenuItem) => {
     if (state.proxyValue.dynamicFieldValue.includes(value.name)) {
         state.proxyValue = {
             ...state.proxyValue,
-            dynamicFieldValue: [
-                ...state.proxyValue.dynamicFieldValue.filter((d) => d !== value.name),
-            ],
+            dynamicFieldInfo: {
+                ...state.proxyValue.dynamicFieldInfo,
+                fieldValue: [...state.proxyValue.dynamicFieldValue.filter((d) => d !== value.name)],
+            },
         };
         return;
     }
     state.proxyValue = {
         ...state.proxyValue,
-        dynamicFieldValue: [
-            ...state.proxyValue.dynamicFieldValue, value.name,
-        ],
+        dynamicFieldInfo: {
+            ...state.proxyValue.dynamicFieldInfo,
+            fieldValue: [
+                ...state.proxyValue.dynamicFieldValue, value.name,
+            ],
+        },
     };
 };
 
 const handleClearDynamicFieldsSelection = () => {
     state.proxyValue = {
         ...state.proxyValue,
-        dynamicFieldValue: [],
+        dynamicFieldInfo: {
+            ...state.proxyValue.dynamicFieldInfo,
+            fixedValue: [],
+        },
     };
 };
 
@@ -234,9 +297,14 @@ watch(() => state.selectedFieldType, (selectedFieldType) => {
         }
         state.proxyValue = {
             ...state.proxyValue,
-            value: props.value?.value ?? state.menuItems[DEFAULT_INDEX]?.name,
-            criteria: state.dataInfoMenuItems[0]?.name,
-            dynamicFieldValue: props.value?.fieldType === 'dynamicField' ? (props.value?.dynamicFieldValue ?? []) : undefined,
+            dynamicFieldInfo: {
+                ...state.proxyValue.dynamicFieldInfo,
+                criteria: state.dataInfoMenuItems[0]?.name,
+                fieldValue: props.value?.dynamicFieldInfo?.fieldValue ?? state.menuItems[DEFAULT_INDEX]?.name,
+                valueType: props.value?.fieldType === 'dynamicField' ? props.value.dynamicFieldInfo?.valueType : undefined,
+                fixedValue: props.value?.fieldType === 'dynamicField' && props.value.dynamicFieldInfo?.valueType === 'fixed' ? (props.value?.dynamicFieldInfo?.fixedValue ?? []) : undefined,
+                count: props.value?.fieldType === 'dynamicField' && props.value.dynamicFieldInfo?.valueType === 'auto' ? props.value?.dynamicFieldInfo?.count : undefined,
+            },
         };
     }
 }, { immediate: true });
@@ -244,18 +312,31 @@ watch(() => state.selectedFieldType, (selectedFieldType) => {
 // Init Value
 const initValue = () => {
     state.selectedFieldType = props.value?.fieldType ?? DEFAULT_FIELD_TYPE;
-    state.proxyValue = {
-        ...state.proxyValue,
-        fieldType: state.selectedFieldType,
-        value: props.value?.value,
-        criteria: props.value?.criteria,
-        dynamicFieldValue: state.selectedFieldType === 'dynamicField' ? (props.value?.dynamicFieldValue ?? []) : undefined,
-    };
     if (state.selectedFieldType === 'staticField') {
-        state.selectedItem = convertToMenuItem(state.proxyValue?.value);
+        state.proxyValue = {
+            ...state.proxyValue,
+            fieldType: 'staticField',
+            staticFieldInfo: {
+                fieldValue: props.value?.staticFieldInfo?.fieldValue,
+            },
+            version: LATEST_TABLE_DATA_FIELD_VERSION,
+        };
+        state.selectedItem = convertToMenuItem(state.proxyValue?.staticFieldInfo.fieldValue);
     } else {
-        state.selectedItem = state.proxyValue?.value;
-        state.selectedCriteria = state.proxyValue?.criteria;
+        state.proxyValue = {
+            ...state.proxyValue,
+            fieldType: 'dynamicField',
+            dynamicFieldInfo: {
+                criteria: props.value?.dynamicFieldInfo?.criteria,
+                fieldValue: props.value?.dynamicFieldInfo?.fieldValue,
+                valueType: props.value?.dynamicFieldInfo?.valueType ?? DEFAULT_VALUE_TYPE,
+                fixedValue: props.value?.dynamicFieldInfo?.valueType === 'auto' ? undefined : props.value?.dynamicFieldInfo?.fixedValue,
+                count: props.value?.dynamicFieldInfo?.valueType === 'auto' ? props.value?.dynamicFieldInfo?.count : undefined,
+            },
+            version: LATEST_TABLE_DATA_FIELD_VERSION,
+        };
+        state.selectedItem = state.proxyValue?.dynamicFieldInfo.fieldValue;
+        state.selectedCriteria = state.proxyValue?.dynamicFieldInfo.criteria;
     }
 };
 watch(() => state.menuItems, (menuItems) => {
@@ -269,20 +350,29 @@ watch(() => state.menuItems, (menuItems) => {
     let _value: string | string[] | undefined;
     let _criteria: string | undefined;
     if (state.selectedFieldType === 'staticField') {
-        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value ?? [], 0);
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.staticFieldInfo.fieldValue ?? [], 0);
         state.selectedItem = convertToMenuItem(_value);
+        state.proxyValue = {
+            ...state.proxyValue,
+            staticFieldInfo: {
+                fieldValue: _value,
+            },
+        };
     } else {
-        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.value, 0);
-        _criteria = getInitialSelectedMenuItem(state.dataInfoMenuItems, state.proxyValue?.criteria, 0);
+        _value = getInitialSelectedMenuItem(menuItems, state.proxyValue?.dynamicFieldInfo.fieldValue, 0);
+        _criteria = getInitialSelectedMenuItem(state.dataInfoMenuItems, state.proxyValue?.dynamicFieldInfo.criteria, 0);
         state.selectedItem = _value;
         state.selectedCriteria = _criteria;
-    }
 
-    state.proxyValue = {
-        ...state.proxyValue,
-        value: _value,
-        criteria: _criteria,
-    };
+        state.proxyValue = {
+            ...state.proxyValue,
+            dynamicFieldValue: {
+                ...state.proxyValue.dynamicFieldInfo,
+                criteria: _criteria,
+                fieldValue: _value,
+            },
+        };
+    }
 }, { immediate: true });
 
 /* Dynamic Field Fetching */
@@ -294,19 +384,21 @@ const fetchAndExtractDynamicField = async () => {
         : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
     try {
         state.loading = true;
+        const _field = state.proxyValue?.dynamicFieldInfo?.fieldValue;
+        const _criteria = state.proxyValue?.dynamicFieldInfo?.criteria;
         const res = await _fetcher({
             widget_id: props.widgetId,
             query: {
-                group_by: [...((props.allValueMap?.groupBy as GroupByValue)?.value ?? []), state.proxyValue?.value],
+                group_by: [...((props.allValueMap?.groupBy as GroupByValue)?.value ?? []), _field],
                 granularity: props.allValueMap?.granularity,
-                field_group: [state.proxyValue?.value],
+                field_group: [_field],
                 fields: {
-                    [state.proxyValue?.criteria]: { key: state.proxyValue?.criteria, operator: 'sum' },
+                    [_criteria]: { key: _criteria, operator: 'sum' },
                 },
                 ...state.dateRange,
             },
         });
-        const values = flatMap(res.results ?? [], (item) => map(item[state.proxyValue.criteria], state.proxyValue.value));
+        const values = flatMap(res.results ?? [], (item) => map(item[_criteria], _field));
         state.dynamicFields = uniq(values);
     } catch (e) {
         showErrorMessage(e, '');
@@ -353,23 +445,27 @@ const generateDateFields = (granularity: string, dateRange: DateRange) => {
 };
 watch([ // Fetch Dynamic Field
     () => state.proxyValue?.fieldType,
-    () => state.proxyValue?.value,
-    () => state.proxyValue?.criteria,
+    () => state.proxyValue?.dynamicFieldInfo?.fieldValue,
+    () => state.proxyValue?.dynamicFieldInfo?.valueType,
+    () => state.proxyValue?.dynamicFieldInfo?.criteria,
     () => props.allValueMap?.groupBy,
     () => props.allValueMap?.granularity,
     () => props.dateRange,
 ], async (
-    [_fieldType, _value, _criteria, _groupBy, _granularity, _dateRange],
-    [, _prevValue, _prevCriteria, _prevGroupBy, _prevGranularity, _prevDateRange],
+    [_fieldType, _value, _valueType, _criteria, _groupBy, _granularity, _dateRange],
+    [, _prevValue, , _prevCriteria, _prevGroupBy, _prevGranularity, _prevDateRange],
 ) => {
-    if (_fieldType === 'staticField') return;
+    if (_fieldType === 'staticField' || _valueType === 'auto') return;
     const fetchingSkipCondition = _value === _prevValue && _criteria === _prevCriteria && isEqual(_groupBy, _prevGroupBy) && _granularity === _prevGranularity && isEqual(_dateRange, _prevDateRange);
     if (fetchingSkipCondition) return;
     const resetConditionByExternalValue = _prevGroupBy && _prevGranularity && (!isEqual(_groupBy, _prevGroupBy) || _granularity !== _prevGranularity);
     if (resetConditionByExternalValue) {
         state.proxyValue = {
             ...state.proxyValue,
-            dynamicFieldValue: [],
+            dynamicFieldInfo: {
+                ...state.proxyValue.dynamicFieldInfo,
+                fixedValue: [],
+            },
         };
     }
     if (_value === 'Date') {
@@ -415,32 +511,58 @@ watch([ // Fetch Dynamic Field
                                required
                                class="w-full"
                 >
-                    <p-select-dropdown :menu="state.menuItems"
-                                       :selected="state.selectedItem"
-                                       :multi-selectable="state.multiSelectable"
-                                       :show-select-marker="state.multiSelectable"
-                                       :invalid="state.dataFieldInvalid"
-                                       appearance-type="badge"
-                                       @update:selected="handleUpdateValue"
-                    />
+                    <div class="field-contents-wrapper">
+                        <p-select-dropdown :menu="state.menuItems"
+                                           :selected="state.selectedItem"
+                                           :multi-selectable="state.multiSelectable"
+                                           :show-select-marker="state.multiSelectable"
+                                           :invalid="state.dataFieldInvalid"
+                                           appearance-type="badge"
+                                           @update:selected="handleUpdateValue"
+                        />
+                        <p-divider vertical />
+                        <p-select-button v-for="selectItem in state.valueTypeItems"
+                                         :key="`select-button-${selectItem.name}`"
+                                         class="value-type-button"
+                                         :value="selectItem.name"
+                                         style-type="secondary"
+                                         :selected="state.selectedValueType"
+                                         @change="handleChangeValueType"
+                        >
+                            {{ selectItem.label }}
+                        </p-select-button>
+                    </div>
                 </p-field-group>
             </div>
             <p-field-group v-if="state.selectedFieldType === 'dynamicField'"
                            required
             >
-                <p-select-dropdown class="dynamic-field-select-dropdown"
-                                   :menu="state.dynamicFieldMenuItems"
-                                   :selected="state.selectedMenuItems"
-                                   :loading="state.loading"
-                                   :invalid="!state.proxyValue?.dynamicFieldValue?.length"
-                                   use-fixed-menu-style
-                                   multi-selectable
-                                   appearance-type="badge"
-                                   show-select-marker
-                                   show-clear-selection
-                                   @select="handleSelectDynamicFields"
-                                   @clear-selection="handleClearDynamicFieldsSelection"
-                />
+                <div class="dynamic-field-value-contents-wrapper">
+                    <p-select-dropdown v-if="state.selectedValueType === 'fixed'"
+                                       class="dynamic-field-select-dropdown"
+                                       :menu="state.dynamicFieldMenuItems"
+                                       :selected="state.selectedMenuItems"
+                                       :loading="state.loading"
+                                       :invalid="!state.proxyValue?.dynamicFieldInfo?.fieldValue?.length"
+                                       use-fixed-menu-style
+                                       multi-selectable
+                                       appearance-type="badge"
+                                       show-select-marker
+                                       show-clear-selection
+                                       @select="handleSelectDynamicFields"
+                                       @clear-selection="handleClearDynamicFieldsSelection"
+                    />
+                    <p-text-input v-else
+                                  type="number"
+                                  class="dynamic-field-auto-count"
+                                  :min="1"
+                                  :max="15"
+                                  :placeholder="$t('COMMON.WIDGETS.MAX_ITEMS')"
+                                  :invalid="!state.proxyValue?.dynamicFieldInfo?.count"
+                                  :value="state.proxyValue?.dynamicFieldInfo?.count"
+                                  @update:value="handleUpdateCount"
+                    />
+                </div>
             </p-field-group>
         </p-field-group>
     </div>
@@ -455,20 +577,23 @@ watch([ // Fetch Dynamic Field
 .field-form-wrapper {
     display: flex;
     gap: 0.5rem;
-    .p-select-dropdown {
-        width: 100%;
-    }
 
-    /* custom design-system component - p-text-input */
-    :deep(.p-text-input) {
-        width: 6.5rem;
-        .input-container {
-            padding-right: 1.5rem;
+    .field-contents-wrapper {
+        @apply flex gap-2;
+
+        .value-type-button {
+            height: 2rem;
+            padding: 0 1rem;
         }
     }
 }
-.dynamic-field-select-dropdown {
+.dynamic-field-value-contents-wrapper {
     margin-top: 0.5rem;
+
+    /* custom design-system component - p-text-input */
+    :deep(.p-text-input) {
+        max-width: 7.5rem;
+    }
 }
 
 /* custom design-system component - p-field-group */
