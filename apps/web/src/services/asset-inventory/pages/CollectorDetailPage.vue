@@ -302,7 +302,9 @@ onUnmounted(() => {
         <collector-options-section class="section"
                                    data-test-id="collector-options-section"
         />
-        <collector-additional-rule class="section" />
+        <collector-additional-rule class="section"
+                                   :collector-id="props.collectorId"
+        />
         <collector-service-accounts-section class="section" />
 
         <p-double-check-modal :visible.sync="state.deleteModalVisible"

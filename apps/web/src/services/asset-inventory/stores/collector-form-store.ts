@@ -7,7 +7,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dr
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CollectorRuleListParameters } from '@/schema/inventory/collector-rule/api-verbs/list';
-import type { AdditionalRuleCondition, CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
+import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
 import type {
     CollectorModel,
 
@@ -61,7 +61,6 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
 
         // additional rules form
         originCollectorRules: [] as CollectorRuleModel[]|null,
-        conditionList: [] as AdditionalRuleCondition[],
         additionalRules: [] as CollectorRuleModel[],
 
         // getters
@@ -79,10 +78,10 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         setRepositoryPlugin(pluginInfo: PluginModel|null) {
             state.repositoryPlugin = pluginInfo;
         },
-        async setOriginCollectorRules() {
+        async setOriginCollectorRules(id?: string) {
             try {
                 const res = await SpaceConnector.clientV2.inventory.collectorRule.list<CollectorRuleListParameters, ListResponse<CollectorRuleModel>>({
-                    collector_id: state.originCollector?.collector_id,
+                    collector_id: state.originCollector?.collector_id ?? id,
                 });
                 state.originCollectorRules = res?.results ?? [];
                 state.additionalRules = state.originCollectorRules;

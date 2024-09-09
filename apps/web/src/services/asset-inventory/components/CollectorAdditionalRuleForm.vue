@@ -36,6 +36,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import CollectorAdditionalRuleFormOperatorDropdown
     from '@/services/asset-inventory/components/CollectorAdditionalRuleFormOperatorDropdown.vue';
+import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
 
 
 interface Props {
@@ -49,14 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 
-interface CollectorRuleForm {
-    conditions_policy: string;
-    conditions: AdditionalRuleCondition[];
-    actions: AdditionalRuleAction;
-    options?: {
-        stop_processing: boolean;
-    };
-}
+
 
 const emit = defineEmits<{(e: 'click-done', formData?: CollectorRuleForm): void;
     (e: 'click-cancel'): void;
@@ -90,6 +84,7 @@ const convertToApiCondition = (condition:AdditionalRuleConditionWithSubkey[]):Ad
             value: c.value,
         };
     }
+    delete c.subkey;
     return c;
 });
 
