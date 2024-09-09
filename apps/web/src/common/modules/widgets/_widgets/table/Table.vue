@@ -79,9 +79,12 @@ const state = reactive({
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     tableDataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
     tableDataFieldType: computed<TableDataFieldValue['fieldType']>(() => state.tableDataFieldInfo?.fieldType),
-    tableDataField: computed<string|string[]|undefined>(() => state.tableDataFieldInfo?.value),
-    tableDataCriteria: computed<string|undefined>(() => state.tableDataFieldInfo?.criteria),
-    tableDataMaxCount: computed<number>(() => state.tableDataFieldInfo?.count),
+    tableDataField: computed<string|string[]|undefined>(() => {
+        if (state.tableDataFieldType === 'staticField') return state.tableDataFieldInfo?.staticFieldInfo?.fieldValue;
+        return state.tableDataFieldInfo?.dynamicFieldInfo?.fieldValue;
+    }),
+    tableDataCriteria: computed<string|undefined>(() => state.tableDataFieldInfo?.dynamicFieldInfo?.criteria),
+    tableDataMaxCount: computed<number>(() => state.tableDataFieldInfo?.dynamicFieldInfo?.count),
     groupByField: computed<string[]|undefined>(() => ((props.widgetOptions?.groupBy as GroupByValue)?.value as string[]) ?? []),
     dateRange: computed<DateRange>(() => {
         let subtract = 1;
@@ -140,14 +143,14 @@ const state = reactive({
                 }
             });
         } else if (isDateField(state.tableDataField)) { // 2-2-1. Dynamic Fields - Date Field Case
-            dataFields = (state.tableDataFieldInfo?.dynamicFieldValue ?? []).map((_fieldName) => ({
+            dataFields = (state.tableDataFieldInfo?.dynamicFieldInfo?.fixedValue ?? []).map((_fieldName) => ({
                 name: _fieldName,
                 label: _fieldName,
                 fieldInfo: { type: 'dataField', additionalType: 'dateFormat', unit: state.dataInfo?.[state.tableDataCriteria]?.unit },
             }));
         } else { // 2-2-2. Dynamic Fields - None Date Field Case
             const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
-            (state.tableDataFieldInfo?.dynamicFieldValue ?? []).forEach((_fieldName) => {
+            (state.tableDataFieldInfo?.dynamicFieldInfo?.fixedValue ?? []).forEach((_fieldName) => {
                 dataFields.push({
                     name: _fieldName,
                     label: _fieldName,
@@ -281,10 +284,10 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
         }
         // Filter (Only for Dynamic Field with Date Field)
-        if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField' && state.tableDataFieldInfo?.dynamicFieldValue?.length) {
+        if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField' && state.tableDataFieldInfo?.dynamicFieldInfo?.fixedValue?.length) {
             _filter = [{
                 k: state.tableDataField,
-                v: state.tableDataFieldInfo.dynamicFieldValue,
+                v: state.tableDataFieldInfo.dynamicFieldInfo.fixedValue,
                 o: 'in',
             }];
         }
@@ -456,7 +459,7 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
                 }
             });
             const etcValue = d[`_total_${state.tableDataCriteria}`]
-                - (dynamicFieldData.filter((item) => state.tableDataFieldInfo?.dynamicFieldValue?.includes(item[state.tableDataField])).reduce((acc, cur) => acc + cur.value, 0) ?? 0);
+                - (dynamicFieldData.filter((item) => state.tableDataFieldInfo?.dynamicFieldInfo?.fixedValue?.includes(item[state.tableDataField])).reduce((acc, cur) => acc + cur.value, 0) ?? 0);
             return {
                 ...d,
                 [state.tableDataCriteria]: [
