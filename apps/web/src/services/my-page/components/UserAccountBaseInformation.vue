@@ -9,6 +9,8 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleType } from '@/schema/identity/role/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -22,16 +24,19 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserAccountModuleContainer
     from '@/services/my-page/components/UserAccountModuleContainer.vue';
 
-
 const state = reactive({
     userId: computed(() => store.state.user.userId),
-    userRole: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType || 'USER'),
+    userRole: computed<RoleType>(() => store.state.user.roleType),
     languages: map(languages, (d, k) => ({
         type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
     })) as MenuItem[],
     timezones: map(timezoneList, (d) => ({
         type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
     })) as SelectDropdownMenuItem[],
+    roleType: computed<string>(() => {
+        if (state.userRole === ROLE_TYPE.DOMAIN_ADMIN) return 'Admin';
+        return 'User';
+    }),
 });
 const formState = reactive({
     userName: '' as string | undefined,
@@ -113,12 +118,12 @@ watch(() => store.state.user.language, (language) => {
         </p-field-group>
         <p-field-group v-if="state.userRole === 'DOMAIN_ADMIN'"
                        required
-                       :label="$t('COMMON.PROFILE.ROLE')"
+                       :label="$t('MY_PAGE.ACCOUNT.ADMIN_ROLE')"
                        class="input-form"
         >
-            <p-text-input v-model="state.userRole"
-                          disabled
+            <p-text-input :value="state.roleType"
                           class="text-input"
+                          disabled
             />
         </p-field-group>
         <p-field-group required
