@@ -11,6 +11,7 @@ import { PTooltip } from '@cloudforet/mirinae';
 import { getContrastingColor, numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
@@ -78,7 +79,7 @@ const state = reactive({
         const _criteria = state.dynamicFieldInfo?.criteria;
         const _valueCount = state.dynamicFieldInfo?.count || 0;
         state.data.results.forEach((result) => {
-            result[_criteria]?.forEach((d) => {
+            result?.[_criteria]?.forEach((d) => {
                 if (d[state.dataField] in _subTotalResults) {
                     _subTotalResults[d[state.dataField]] += d.value;
                 } else {
@@ -108,14 +109,13 @@ const state = reactive({
         if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
+            let subtract = state.dynamicFieldInfo.count;
             if (state.dynamicFieldInfo?.valueType === 'fixed') {
-                const _sortedDateValue = [...state.dynamicFieldValue];
-                _sortedDateValue.sort();
-                _start = _sortedDateValue[0];
-                _end = _sortedDateValue[_sortedDateValue.length - 1];
-            } else {
-                [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.dynamicFieldInfo.count);
+                if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
+                if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
+                if (state.granularity === GRANULARITY.DAILY) subtract = 30;
             }
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
         }
         return { start: _start, end: _end };
     }),

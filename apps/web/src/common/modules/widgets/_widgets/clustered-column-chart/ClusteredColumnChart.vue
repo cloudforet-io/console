@@ -18,6 +18,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
@@ -73,7 +74,14 @@ const state = reactive({
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     chart: null as EChartsType | null,
-    xAxisData: [],
+    xAxisData: computed<string[]>(() => {
+        if (!state.data?.results?.length) return [];
+        if (isDateField(state.xAxisField)) {
+            const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
+            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
+        }
+        return state.data.results.map((d) => d[state.xAxisField] as string) || [];
+    }),
     chartData: [],
     chartOptions: computed<BarSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
@@ -149,14 +157,13 @@ const state = reactive({
         if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
+            let subtract = state.dynamicFieldInfo.count || 0;
             if (state.dynamicFieldInfo?.valueType === 'fixed') {
-                const _sortedDateValue = [...state.dynamicFieldValue];
-                _sortedDateValue.sort();
-                _start = _sortedDateValue[0];
-                _end = _sortedDateValue[_sortedDateValue.length - 1];
-            } else {
-                [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.dynamicFieldInfo.count);
+                if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
+                if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
+                if (state.granularity === GRANULARITY.DAILY) subtract = 30;
             }
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
         }
         return { start: _start, end: _end };
     }),
@@ -292,14 +299,6 @@ const getDynamicFieldData = (rawData: DynamicFieldData) => {
 };
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
-
-    // get xAxis data
-    if (isDateField(state.xAxisField)) {
-        const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
-        state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
-    } else {
-        state.xAxisData = rawData?.results?.map((d) => d[state.xAxisField] as string) || [];
-    }
 
     let _seriesData: any[] = [];
     if (state.dataFieldInfo.fieldType === 'staticField') {

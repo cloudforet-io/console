@@ -14,6 +14,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
@@ -58,8 +59,21 @@ const state = reactive({
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     chart: null as EChartsType | null,
-    xAxisData: [],
-    yAxisData: [],
+    xAxisData: computed<string[]>(() => {
+        if (!state.data?.results?.length) return [];
+        if (isDateField(state.xAxisField)) {
+            const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
+            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
+        }
+        return state.data.results.map((d) => d[state.xAxisField] as string) || [];
+    }),
+    yAxisData: computed<string[]>(() => {
+        if (!state.data?.results?.length) return [];
+        if (state.dataFieldInfo?.fieldType === 'staticField') {
+            return state.dataField;
+        }
+        return getRefinedHeatmapDynamicFieldData(state.data, state.dynamicFieldInfo);
+    }),
     chartData: [],
     heatmapMaxValue: computed(() => max(state.chartData.map((d) => d?.[2] || 0)) ?? 1),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
@@ -92,7 +106,7 @@ const state = reactive({
                     if (state.dataFieldInfo.fieldType === 'staticField') {
                         return val;
                     }
-                    if (isDateField(state.dynamicFieldInfo?.fieldValue)) {
+                    if (state.dynamicFieldInfo?.fieldValue === DATE_FIELD.DATE) {
                         return dayjs.utc(val).format(state.dateFormat);
                     }
                     return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
@@ -156,14 +170,13 @@ const state = reactive({
         if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
+            let subtract = state.dynamicFieldInfo.count;
             if (state.dynamicFieldInfo?.valueType === 'fixed') {
-                const _sortedDateValue = [...state.dynamicFieldValue];
-                _sortedDateValue.sort();
-                _start = _sortedDateValue[0];
-                _end = _sortedDateValue[_sortedDateValue.length - 1];
-            } else {
-                [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.dynamicFieldInfo.count);
+                if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
+                if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
+                if (state.granularity === GRANULARITY.DAILY) subtract = 30;
             }
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
         }
         return { start: _start, end: _end };
     }),
@@ -211,13 +224,10 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 
 /* Util */
 const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
-    // get refined data and series fields
-    state.yAxisData = getRefinedHeatmapDynamicFieldData(rawData, state.dynamicFieldInfo);
-
     const _criteria = state.dynamicFieldInfo?.criteria;
     const _seriesData: any[] = [];
     state.xAxisData.forEach((x, xIdx) => {
-        const _targetData = state.data?.results?.find((d) => d[state.xAxisField] === x);
+        const _targetData = rawData.results?.find((d) => d[state.xAxisField] === x);
         state.yAxisData.forEach((y, yIdx) => {
             const _data = _targetData?.[_criteria].find((v) => v[state.dataField] === y);
             _seriesData.push([xIdx, yIdx, _data ? _data.value : 0]);
@@ -227,7 +237,6 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
     return _seriesData;
 };
 const getStaticFieldData = (rawData: StaticFieldData): any[] => {
-    state.yAxisData = [...state.dataField];
     const _seriesData: any[] = [];
     state.xAxisData.forEach((x, xIdx) => {
         state.yAxisData.forEach((y, yIdx) => {
@@ -239,14 +248,6 @@ const getStaticFieldData = (rawData: StaticFieldData): any[] => {
 };
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
-
-    // set xAxis data
-    if (isDateField(state.xAxisField)) {
-        const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
-        state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
-    } else {
-        state.xAxisData = rawData?.results?.map((d) => d[state.xAxisField] as string) || [];
-    }
 
     // get converted chart data
     let _seriesData: any[];
