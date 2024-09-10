@@ -1,6 +1,7 @@
 import type { TranslateResult } from 'vue-i18n';
 
 import type { AdditionalRuleAction, AdditionalRuleCondition } from '@/schema/inventory/collector-rule/model';
+import type { CollectorRuleConditionPolicy } from '@/schema/inventory/collector-rule/type';
 
 export interface Period {
     start?: string;
@@ -14,7 +15,8 @@ export interface EmptyData {
 }
 
 export interface CollectorRuleForm {
-    conditions_policy: string;
+    collector_rule_id?: string;
+    conditions_policy: CollectorRuleConditionPolicy;
     conditions: AdditionalRuleCondition[];
     actions: AdditionalRuleAction;
     options?: {

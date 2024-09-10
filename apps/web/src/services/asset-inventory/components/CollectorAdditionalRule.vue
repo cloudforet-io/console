@@ -9,6 +9,7 @@ import {
 import type { CollectorRuleChangeOrderParameters } from '@/schema/inventory/collector-rule/api-verbs/change-order';
 import type { CollectorRuleCreateParameters } from '@/schema/inventory/collector-rule/api-verbs/create';
 import type { CollectorRuleDeleteParameters } from '@/schema/inventory/collector-rule/api-verbs/delete';
+import type { CollectorRuleUpdateParameters } from '@/schema/inventory/collector-rule/api-verbs/update';
 import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
 import { i18n } from '@/translations';
 
@@ -70,7 +71,7 @@ const handleClickUpButton = async (data:CollectorRuleModel) => {
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_REORDER_COLLECTOR_RULES'), '');
     } catch (e) {
         changeOrder(tempCardData[data.order], tempCardData[data.order - 1], tempOrder);
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_REORDER_COLLECTOR_RULES'), '');
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_REORDER_COLLECTOR_RULES'));
     } finally {
         collectorFormState.additionalRules = tempCardData;
     }
@@ -87,7 +88,7 @@ const handleClickDownButton = async (data:CollectorRuleModel) => {
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_REORDER_COLLECTOR_RULES'), '');
     } catch (e) {
         changeOrder(tempCardData[data.order - 2], tempCardData[data.order - 1], tempOrder);
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_REORDER_COLLECTOR_RULES'), '');
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_REORDER_COLLECTOR_RULES'));
     } finally {
         collectorFormState.additionalRules = tempCardData;
     }
@@ -129,14 +130,33 @@ const createCollectorRule = async (data:CollectorRuleForm) => {
             actions: data.actions,
             options: data.options,
         });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_CREATE_COLLECTOR_RULE'), '');
         await collectorFormStore.setOriginCollectorRules(props.collectorId);
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_CREATE_COLLECTOR_RULE'));
+    }
+};
+
+const updateCollectorRule = async (data:CollectorRuleForm) => {
+    try {
+        await SpaceConnector.clientV2.inventory.collectorRule.update<CollectorRuleUpdateParameters>({
+            collector_rule_id: data.collector_rule_id,
+            conditions: data.conditions,
+            conditions_policy: data.conditions_policy,
+            actions: data.actions,
+            options: data.options,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_UPDATE_COLLECTOR_RULE'), '');
+        await collectorFormStore.setOriginCollectorRules(props.collectorId);
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_UPDATE_COLLECTOR_RULE'));
     }
 };
 const handleSetRule = async (data:CollectorRuleForm) => {
     if (state.isAddCase) {
         await createCollectorRule(data);
+    } else {
+        await updateCollectorRule(data);
     }
     state.editModeCardOrder = 0;
 };

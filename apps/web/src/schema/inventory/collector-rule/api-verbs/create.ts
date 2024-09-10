@@ -7,7 +7,7 @@ export interface CollectorRuleCreateParameters {
     name?: string;
     conditions?: AdditionalRuleCondition[];
     conditions_policy?: CollectorRuleConditionPolicy;
-    actions: AdditionalRuleAction[];
+    actions: AdditionalRuleAction;
     options?: {
         stop_processing: boolean;
     };
