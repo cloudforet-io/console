@@ -8,6 +8,10 @@ import {
 
 import type { CollectorRuleCreateParameters } from '@/schema/inventory/collector-rule/api-verbs/create';
 import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
+import type { EventRuleDeleteParameters } from '@/schema/monitoring/event-rule/api-verbs/delete';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -19,6 +23,7 @@ import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
 import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
+
 
 
 const collectorFormStore = useCollectorFormStore();
@@ -37,9 +42,10 @@ const state = reactive({
         return data.sort((a, b) => a.order - b.order);
     }),
     isEmptyCase: computed<boolean>(() => collectorFormState.additionalRules.length === 0),
-    editModeCardOrder: -1,
+    editModeCardOrder: 0,
     collectorProvider: computed(() => collectorFormState.originCollector?.provider),
-    isAddCase: computed<boolean>(() => collectorFormState.originCollectorRules?.length === 0),
+    isAddCase: computed<boolean>(() => collectorFormState.originCollectorRules?.length === 0
+        || collectorFormState.originCollectorRules.length < collectorFormState.additionalRules.length),
 });
 
 const changeOrder = (targetData, clickedData, tempOrder) => {
@@ -74,14 +80,16 @@ const handleClickDownButton = async (data) => {
     }
 };
 
-const handleClickDeleteButton = (order: number) => {
-    collectorFormStore.$patch((_state) => {
-        const tempRules = collectorFormState.additionalRules.filter((data) => data.order !== order);
-        _state.state.additionalRules = tempRules.map((data, index) => {
-            data.order = index + 1;
-            return data;
+const handleClickDeleteButton = async (order:number) => {
+    try {
+        await SpaceConnector.clientV2.inventory.collectorRule.delete<EventRuleDeleteParameters>({
+            collector_rule_id: state.orderedCardData[order - 1].collector_rule_id,
         });
-    });
+        showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_DELETE_EVENT_RULE'), '');
+        await collectorFormStore.setOriginCollectorRules();
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.EVENT_RULE.ALT_E_DELETE_EVENT_RULE'));
+    }
 };
 
 const handleClickEditButton = (order: number) => {
@@ -92,7 +100,7 @@ const handleCancelSetRule = () => {
     if (state.isAddCase) {
         collectorFormState.additionalRules = [];
     }
-    state.editModeCardOrder = -1;
+    state.editModeCardOrder = 0;
 };
 
 const handleClickAddEventRule = async () => {
@@ -101,34 +109,23 @@ const handleClickAddEventRule = async () => {
 };
 const createCollectorRule = async (data:CollectorRuleForm) => {
     try {
-        const collectorRule = await SpaceConnector.clientV2.inventory.collectorRule.create<CollectorRuleCreateParameters>({
+        await SpaceConnector.clientV2.inventory.collectorRule.create<CollectorRuleCreateParameters>({
             collector_id: collectorFormState.originCollector.collector_id,
             conditions: data.conditions,
             conditions_policy: data.conditions_policy,
             actions: data.actions,
             options: data.options,
         });
-        collectorFormStore.$patch((_state) => {
-            _state.state.additionalRules = [collectorRule];
-        });
+        await collectorFormStore.setOriginCollectorRules(props.collectorId);
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
-const handleSetRule = (data:CollectorRuleForm) => {
+const handleSetRule = async (data:CollectorRuleForm) => {
     if (state.isAddCase) {
-        createCollectorRule(data);
+        await createCollectorRule(data);
     }
-    // collectorFormStore.$patch((_state) => {
-    //     const tempRules = collectorFormState.additionalRules.map((rule) => {
-    //         if (rule.order === data.order) {
-    //             return data;
-    //         }
-    //         return rule;
-    //     });
-    //     _state.state.additionalRules = tempRules;
-    // });
-    state.editModeCardOrder = -1;
+    state.editModeCardOrder = 0;
 };
 
 const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
