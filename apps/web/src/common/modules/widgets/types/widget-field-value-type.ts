@@ -1,10 +1,14 @@
 import type {
-    COLOR_SCHEMA, DATE_FORMAT, NUMBER_FORMAT, DATA_FIELD_HEATMAP_COLOR,
+    DATE_FORMAT, NUMBER_FORMAT, DATA_FIELD_HEATMAP_COLOR,
     PIE_CHART_SERIES_LABEL_POSITION,
     COLUMN_CHART_SERIES_LABEL_POSITION,
     LINE_CHART_SERIES_LABEL_POSITION,
     WIDGET_HEIGHT,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { AdvancedFormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
+import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
+import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type { TableDataFieldValueV1 } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 
 
@@ -32,25 +36,12 @@ export interface ProgressBarValue {
     formatRules?: FormatRulesValue[];
     baseColor?: string;
 }
-export interface FormatRulesValue {
-    text?: string;
-    threshold?: number;
-    color: string;
-}
-export interface AdvancedFormatRulesValue {
-    field?: string;
-    value: FormatRulesValue[];
-    baseColor?: string;
-}
+
 export interface LineByValue {
     value: string;
     count: number;
 }
 export interface StackByValue {
-    value: string;
-    count: number;
-}
-export interface CategoryByValue {
     value: string;
     count: number;
 }
@@ -79,12 +70,6 @@ export interface WidgetHeaderValue {
     toggleValue: boolean;
     title?: string;
     description?: string;
-}
-
-export type ColorValue = typeof COLOR_SCHEMA[keyof typeof COLOR_SCHEMA];
-export interface ColorSchemaValue {
-    colorName: keyof typeof COLOR_SCHEMA;
-    colorValue: ColorValue;
 }
 
 export type DateFormat = keyof typeof DATE_FORMAT;

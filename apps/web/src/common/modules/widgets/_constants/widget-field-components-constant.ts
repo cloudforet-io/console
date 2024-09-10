@@ -1,9 +1,10 @@
 import type { Component } from 'vue';
 
+import advancedFormatRules from '@/common/modules/widgets/_widget-fields/advanced-format-rules/WidgetFieldAdvancedFormatRules.vue';
+import categoryBy from '@/common/modules/widgets/_widget-fields/category-by/WidgetFieldCategoryBy.vue';
+import colorSchema from '@/common/modules/widgets/_widget-fields/color-schema/WidgetFieldColorSchema.vue';
+import formatRules from '@/common/modules/widgets/_widget-fields/format-rules/WidgetFieldFormatRules.vue';
 import tableDataField from '@/common/modules/widgets/_widget-fields/table-data-field/WidgetFieldTableDataField.vue';
-import advancedFormatRules from '@/common/modules/widgets/_widget-fields/WidgetFieldAdvancedFormatRules.vue';
-import categoryBy from '@/common/modules/widgets/_widget-fields/WidgetFieldCategoryBy.vue';
-import colorSchema from '@/common/modules/widgets/_widget-fields/WidgetFieldColorSchema.vue';
 import comparison from '@/common/modules/widgets/_widget-fields/WidgetFieldComparison.vue';
 import customTableColumnWidth from '@/common/modules/widgets/_widget-fields/WidgetFieldCustomTableColumnWidth.vue';
 import dataField from '@/common/modules/widgets/_widget-fields/WidgetFieldDataField.vue';
@@ -11,7 +12,6 @@ import dataFieldHeatmapColor from '@/common/modules/widgets/_widget-fields/Widge
 import dateFormat from '@/common/modules/widgets/_widget-fields/WidgetFieldDateFormat.vue';
 import displayAnnotation from '@/common/modules/widgets/_widget-fields/WidgetFieldDisplayAnnotation.vue';
 import displaySeriesLabel from '@/common/modules/widgets/_widget-fields/WidgetFieldDisplaySeriesLabel.vue';
-import formatRules from '@/common/modules/widgets/_widget-fields/WidgetFieldFormatRules.vue';
 import granularity from '@/common/modules/widgets/_widget-fields/WidgetFieldGranularity.vue';
 import groupBy from '@/common/modules/widgets/_widget-fields/WidgetFieldGroupBy.vue';
 import icon from '@/common/modules/widgets/_widget-fields/WidgetFieldIcon.vue';

@@ -18,11 +18,15 @@ import {
     getInitialSelectedMenuItem,
 } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type {
-    AdvancedFormatRulesOptions, AdvancedFormatRulesType,
+    AdvancedFormatRulesValue,
+    AdvancedFormatRulesOptions,
+    AdvancedFormatRulesType,
+} from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import type {
     WidgetFieldComponentEmit,
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
-import type { FormatRulesValue, AdvancedFormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
 

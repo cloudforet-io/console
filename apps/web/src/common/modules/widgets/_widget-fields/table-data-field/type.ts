@@ -1,14 +1,14 @@
 /** Value Type
  * Latest Version: v1
  * */
-export interface TableDataFieldValueNoVersion {
+export interface TableDataFieldValueNoVersion { // Legacy
     fieldType: 'dynamicField' | 'staticField';
     value?: string | string[];
     dynamicFieldValue?: string[];
     criteria?: string;
 }
 
-export interface TableDataFieldValueV1 {
+export interface TableDataFieldValueV1 { // Latest
     fieldType: 'dynamicField' | 'staticField';
     dynamicFieldInfo?: {
         criteria?: string;

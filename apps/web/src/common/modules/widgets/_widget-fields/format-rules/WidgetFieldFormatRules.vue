@@ -11,13 +11,11 @@ import {
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { FormatRulesValue, FormatRulesType, FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type {
-    FormatRulesOptions,
-    FormatRulesType,
     WidgetFieldComponentEmit,
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
-import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { violet } from '@/styles/colors';
 

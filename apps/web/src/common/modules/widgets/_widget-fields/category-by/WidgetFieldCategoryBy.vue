@@ -9,12 +9,11 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 import WidgetFieldDropdownAndMax from '@/common/modules/widgets/_components/WidgetFieldDropdownAndMax.vue';
 import { useGranularityMenuItem } from '@/common/modules/widgets/_composables/use-granularity-menu-items';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { CategoryByValue, CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type {
-    CategoryByOptions,
     WidgetFieldComponentEmit,
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
-import type { CategoryByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const props = defineProps<WidgetFieldComponentProps<CategoryByOptions, CategoryByValue>>();

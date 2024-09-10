@@ -2,11 +2,13 @@ import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 
-import type { FORMAT_RULE_TYPE, ADVANCED_FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { AdvancedFormatRulesOptions } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
+import type { ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
+import type { FormatRulesValue, FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type { TableDataFieldOptions } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type {
-    FormatRulesValue,
     WidgetFieldValues,
     DateFormat,
     NumberFormat,
@@ -56,13 +58,7 @@ export interface GroupByOptions {
     excludeDateField?: boolean;
     fixedValue?: string;
 }
-export interface CategoryByOptions {
-    dataTarget?: string;
-    max?: number;
-    defaultMaxCount: number;
-    defaultIndex?: number;
-    excludeDateField?: boolean;
-}
+
 export interface MinOptions {
     default?: number;
 }
@@ -109,23 +105,7 @@ export interface DateFormatOptions {
     default: DateFormat;
 }
 
-export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_TYPE];
-export interface FormatRulesOptions {
-    formatRulesType: FormatRulesType;
-    description?: string;
-    default?: FormatRulesValue[];
-    baseColor?: string;
-}
-export type AdvancedFormatRulesType = typeof ADVANCED_FORMAT_RULE_TYPE[keyof typeof ADVANCED_FORMAT_RULE_TYPE];
-export interface AdvancedFormatRulesOptions {
-    formatRulesType: AdvancedFormatRulesType;
-    description?: string;
-    baseColor?: string;
-}
 
-export interface ColorSchemaOptions {
-    default?: string;
-}
 
 export interface NumberFormatOptions {
     default?: NumberFormat;

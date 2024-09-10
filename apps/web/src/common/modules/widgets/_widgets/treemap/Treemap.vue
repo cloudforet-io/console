@@ -33,12 +33,13 @@ import {
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
-    CategoryByValue, DateFormatValue, DisplaySeriesLabelValue, NumberFormatValue,
+    DateFormatValue, DisplaySeriesLabelValue, NumberFormatValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
