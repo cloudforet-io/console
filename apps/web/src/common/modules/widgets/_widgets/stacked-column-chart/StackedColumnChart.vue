@@ -128,19 +128,26 @@ const state = reactive({
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
-    dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
-    dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
+    dynamicFieldInfo: computed<TableDataFieldValue['dynamicFieldInfo']>(() => state.dataFieldInfo?.dynamicFieldInfo),
+    staticFieldInfo: computed<TableDataFieldValue['staticFieldInfo']>(() => state.dataFieldInfo?.staticFieldInfo),
+    dataField: computed<string|string[]|undefined>(() => {
+        if (state.dataFieldInfo?.fieldType === 'staticField') return state.staticFieldInfo?.fieldValue;
+        return state.dynamicFieldInfo?.fieldValue;
+    }),
+    dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
         if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
-            if (state.dynamicFieldValue.length) {
+            if (state.dynamicFieldInfo?.valueType === 'fixed') {
                 const _sortedDateValue = [...state.dynamicFieldValue];
                 _sortedDateValue.sort();
                 _start = _sortedDateValue[0];
                 _end = _sortedDateValue[_sortedDateValue.length - 1];
+            } else {
+                [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.dynamicFieldInfo.count);
             }
         }
         return { start: _start, end: _end };
@@ -192,7 +199,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 /* Util */
 const getDynamicFieldData = (rawData: DynamicFieldData, threshold: number): any[] => {
     // get refined data and series fields
-    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataFieldInfo?.criteria, state.dataField, state.dynamicFieldValue);
+    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dynamicFieldInfo, state.xAxisField);
 
     // get chart data
     const _seriesData: any[] = [];
@@ -201,7 +208,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData, threshold: number): any[
         const _data: number[] = [];
         state.xAxisData.forEach((d) => {
             const _result = _refinedResults.find((result) => result[state.xAxisField] === d);
-            const _value = _result?.[state.dataFieldInfo?.criteria].find((v) => v[state.dataField] === field);
+            const _value = _result?.[state.dynamicFieldInfo?.criteria].find((v) => v[state.dataField] === field);
             _data.push(_value?.value || 0);
         });
         _seriesData.push({
@@ -217,7 +224,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData, threshold: number): any[
                 fontSize: 10,
                 formatter: (p) => {
                     if (p.value < threshold) return '';
-                    return getFormattedNumber(p.value, state.dataFieldInfo?.criteria, state.numberFormat, _unit);
+                    return getFormattedNumber(p.value, state.dynamicFieldInfo?.criteria, state.numberFormat, _unit);
                 },
             },
         });

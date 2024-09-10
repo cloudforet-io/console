@@ -4,7 +4,7 @@ import {
     computed, defineExpose, reactive, ref,
 } from 'vue';
 
-import { cloneDeep, throttle } from 'lodash';
+import { cloneDeep, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTooltip } from '@cloudforet/mirinae';
@@ -66,23 +66,40 @@ const state = reactive({
         return state.data?.results?.map((d) => d[state.xAxisField] as string) || [];
     }),
     yAxisData: computed<string[]>(() => {
-        if (isDateField(state.dataField)) { // dynamic field type
-            const _criteria = state.dataFieldInfo?.criteria;
-            const _isSeparatedDate = _criteria !== DATE_FIELD.DATE;
+        if (!state.data?.results?.length) return [];
+        if (state.dataFieldInfo.fieldType === 'staticField') return state.dataField;
+        if (state.dynamicFieldInfo?.valueType === 'fixed') return state.dynamicFieldValue;
+        // auto
+        if (isDateField(state.dataField)) {
+            const _isSeparatedDate = state.dataField !== DATE_FIELD.DATE;
             return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
         }
-        if (state.dataFieldInfo.fieldType === 'staticField') {
-            return state.dataField;
-        }
-        return state.dynamicFieldValue;
+        const _subTotalResults: Record<string, number> = {};
+        const _criteria = state.dynamicFieldInfo?.criteria;
+        const _valueCount = state.dynamicFieldInfo?.count || 0;
+        state.data.results.forEach((result) => {
+            result[_criteria]?.forEach((d) => {
+                if (d[state.dataField] in _subTotalResults) {
+                    _subTotalResults[d[state.dataField]] += d.value;
+                } else {
+                    _subTotalResults[d[state.dataField]] = d.value;
+                }
+            });
+        });
+        return orderBy(Object.entries(_subTotalResults), 1, 'desc').slice(0, _valueCount).map(([k]) => k);
     }),
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
-    dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
-    dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
+    dynamicFieldInfo: computed<TableDataFieldValue['dynamicFieldInfo']>(() => state.dataFieldInfo?.dynamicFieldInfo),
+    staticFieldInfo: computed<TableDataFieldValue['staticFieldInfo']>(() => state.dataFieldInfo?.staticFieldInfo),
+    dataField: computed<string|string[]|undefined>(() => {
+        if (state.dataFieldInfo?.fieldType === 'staticField') return state.staticFieldInfo?.fieldValue;
+        return state.dynamicFieldInfo?.fieldValue;
+    }),
+    dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     formatRulesValue: computed<AdvancedFormatRulesValue>(() => props.widgetOptions?.advancedFormatRules as AdvancedFormatRulesValue),
     dateRange: computed<DateRange>(() => {
@@ -91,11 +108,13 @@ const state = reactive({
         if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
-            if (state.dynamicFieldValue.length) {
+            if (state.dynamicFieldInfo?.valueType === 'fixed') {
                 const _sortedDateValue = [...state.dynamicFieldValue];
                 _sortedDateValue.sort();
                 _start = _sortedDateValue[0];
                 _end = _sortedDateValue[_sortedDateValue.length - 1];
+            } else {
+                [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.dynamicFieldInfo.count);
             }
         }
         return { start: _start, end: _end };
@@ -156,7 +175,7 @@ const targetValue = (xField?: string, yField?: string, format?: 'table'|'tooltip
         const _targetData = state.data.results.find((d) => d[state.xAxisField] === xField);
         _targetVal = _targetData?.[yField];
     } else {
-        const _criteria = state.dataFieldInfo?.criteria;
+        const _criteria = state.dynamicFieldInfo?.criteria;
         const _targetXData = state.data.results.find((d) => d[state.xAxisField] === xField);
         const _targetXYData = _targetXData?.[_criteria]?.find((d) => d[state.dataField] === yField);
         _targetVal = _targetXYData?.value;
@@ -202,10 +221,17 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
     // height
     const yAxisCount = state.yAxisData.length;
     const boxHeight = _containerHeight / yAxisCount;
-    if (boxHeight < 32) state.boxHeight = 32;
-    else state.boxHeight = boxHeight;
+    const padding = 20 / yAxisCount;
+    if (boxHeight < 32) state.boxHeight = 32 - padding;
+    else state.boxHeight = boxHeight - padding;
 
-    state.scrollHeight = scrollViewRef.value?.scrollHeight || 0;
+    if (props.mode === 'overlay') {
+        state.scrollHeight = '100%';
+    } else {
+        const _scrollHeight = scrollViewRef.value?.scrollHeight || 0;
+        if (_containerHeight < _scrollHeight) state.scrollHeight = `${_scrollHeight}px`;
+        else state.scrollHeight = '100%';
+    }
 }, 500));
 </script>
 
@@ -229,7 +255,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                 </div>
             </div>
             <div class="x-axis-wrapper"
-                 :style="{'height': `${props.mode === 'overlay' ? '105%' : `${state.scrollHeight}px`}`}"
+                 :style="{'height': `calc(${state.scrollHeight})`}"
             >
                 <div ref="scrollViewRef"
                      class="scroll-view"

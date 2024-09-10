@@ -125,19 +125,28 @@ const state = reactive({
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     yAxisField: computed<string>(() => (props.widgetOptions?.yAxis as YAxisValue)?.value),
     yAxisCount: computed<number>(() => (props.widgetOptions?.yAxis as YAxisValue)?.count),
-    // dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
-    // stackByField: computed<string|undefined>(() => (props.widgetOptions?.stackBy as StackByValue)?.value as string),
-    // stackByCount: computed<number>(() => (props.widgetOptions?.stackBy as StackByValue)?.count as number),
     dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
-    dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
-    dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
+    dynamicFieldInfo: computed<TableDataFieldValue['dynamicFieldInfo']>(() => state.dataFieldInfo?.dynamicFieldInfo),
+    staticFieldInfo: computed<TableDataFieldValue['staticFieldInfo']>(() => state.dataFieldInfo?.staticFieldInfo),
+    dataField: computed<string|string[]|undefined>(() => {
+        if (state.dataFieldInfo?.fieldType === 'staticField') return state.staticFieldInfo?.fieldValue;
+        return state.dynamicFieldInfo?.fieldValue;
+    }),
+    dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
-        if (Object.values(DATE_FIELD).includes(state.yAxisField)) {
+        if (isDateField(state.yAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.yAxisCount);
-        } else if (Object.values(DATE_FIELD).includes(state.stackByField)) {
-            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.stackByCount);
+        } else if (isDateField(state.dataField)) {
+            if (state.dynamicFieldInfo?.valueType === 'fixed') {
+                const _sortedDateValue = [...state.dynamicFieldValue];
+                _sortedDateValue.sort();
+                _start = _sortedDateValue[0];
+                _end = _sortedDateValue[_sortedDateValue.length - 1];
+            } else {
+                [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.dynamicFieldInfo.count);
+            }
         }
         return { start: _start, end: _end };
     }),
@@ -188,7 +197,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 /* Util */
 const getDynamicFieldData = (rawData: DynamicFieldData, threshold: number): any[] => {
     // get refined data and series fields
-    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataFieldInfo?.criteria, state.dataField, state.dynamicFieldValue);
+    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dynamicFieldInfo, state.yAxisField);
 
     // get chart data
     const _seriesData: any[] = [];
@@ -196,7 +205,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData, threshold: number): any[
         const _data: number[] = [];
         state.yAxisData.forEach((d) => {
             const _result = _refinedResults.find((result) => result[state.yAxisField] === d);
-            const _value = _result?.[state.dataFieldInfo?.criteria].find((v) => v[state.dataField] === field);
+            const _value = _result?.[state.dynamicFieldInfo?.criteria].find((v) => v[state.dataField] === field);
             _data.push(_value?.value || 0);
         });
         _seriesData.push({
