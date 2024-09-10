@@ -24,15 +24,19 @@ import {
     getRefinedDateFormatByGranularity,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
+import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
-import type {
-    TableDataFieldValue, ComparisonValue, TotalValue,
-    DateFormatValue,
-    NumberFormatValue, DataFieldHeatmapColorValue, TableColumnWidthValue, CustomTableColumnWidthValue, TextWrapValue,
-    MissingValueValue,
-} from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 import {

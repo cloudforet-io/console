@@ -23,6 +23,10 @@ export interface TableDataFieldValueV1 { // Latest
     version: 'v1'; // required
 }
 
+// Type for the field value
+export type TableDataFieldValue = TableDataFieldValueV1;
+
+
 
 /** Options Type */
 export interface TableDataFieldOptions {

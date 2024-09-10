@@ -5,132 +5,35 @@ import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/
 import type { AdvancedFormatRulesOptions } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
-import type { FormatRulesValue, FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import type { ComparisonOptions } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type { CustomTableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type { DataFieldHeatmapColorOptions } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import type { DataFieldOptions } from '@/common/modules/widgets/_widget-fields/data-field/type';
+import type { DateFormatOptions } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { FormatRulesOptions } from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import type { GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { IconOptions } from '@/common/modules/widgets/_widget-fields/icon/type';
+import type { LegendOptions } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { LineByOptions } from '@/common/modules/widgets/_widget-fields/line-by/type';
+import type { MaxOptions } from '@/common/modules/widgets/_widget-fields/max/type';
+import type { MinOptions } from '@/common/modules/widgets/_widget-fields/min/type';
+import type { MissingValueOptions } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { NumberFormatOptions } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { PieChartTypeOptions } from '@/common/modules/widgets/_widget-fields/pie-chart-type/type';
+import type { ProgressBarOptions } from '@/common/modules/widgets/_widget-fields/progress-bar/type';
+import type { StackByOptions } from '@/common/modules/widgets/_widget-fields/stack-by/type';
+import type { SubTotalOptions } from '@/common/modules/widgets/_widget-fields/sub-total/type';
+import type { TableColumnWidthOptions } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
 import type { TableDataFieldOptions } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { TextWrapOptions } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
+import type { TotalOptions } from '@/common/modules/widgets/_widget-fields/total/type';
+import type { WidgetHeightOptions } from '@/common/modules/widgets/_widget-fields/widget-height/type';
+import type { XAxisOptions } from '@/common/modules/widgets/_widget-fields/x-axis/type';
+import type { YAxisOptions } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 import type {
     WidgetFieldValues,
-    DateFormat,
-    NumberFormat,
-    DataFieldHeatmapColor,
-    WidgetHeightType,
 } from '@/common/modules/widgets/types/widget-field-value-type';
-
-
-export interface DataFieldOptions {
-    multiSelectable?: boolean;
-}
-export interface XAxisOptions {
-    dataTarget?: string;
-    max?: number;
-    defaultMaxCount: number;
-    defaultIndex?: number;
-    excludeDateField?: boolean;
-}
-export interface YAxisOptions {
-    dataTarget?: string;
-    max?: number;
-    defaultMaxCount: number;
-    defaultIndex?: number;
-    excludeDateField?: boolean;
-}
-export interface LineByOptions {
-    dataTarget?: string;
-    max?: number;
-    defaultMaxCount: number;
-    defaultIndex?: number;
-    excludeDateField?: boolean;
-}
-export interface StackByOptions {
-    dataTarget?: string;
-    max?: number;
-    defaultMaxCount: number;
-    defaultIndex?: number;
-    excludeDateField?: boolean;
-}
-export interface GroupByOptions {
-    dataTarget?: string;
-    multiSelectable?: boolean;
-    hideCount?: boolean;
-    max?: number;
-    defaultMaxCount: number;
-    defaultIndex?: number;
-    excludeDateField?: boolean;
-    fixedValue?: string;
-}
-
-export interface MinOptions {
-    default?: number;
-}
-export interface MaxOptions {
-    default?: number;
-}
-export interface LegendOptions { // toggle button
-    default?: boolean;
-    showPositionField?: boolean;
-}
-export interface PieChartTypeOptions {
-    default?: string;
-}
-export interface MissingValueOptions {
-    default?: string;
-}
-
-export interface IconOptions {
-    default?: string; // e.g. 'ic_coin-filled'
-    toggle?: boolean;
-}
-
-export interface SubTotalOptions {
-    default?: boolean;
-    toggle?: boolean;
-}
-
-export interface TotalOptions {
-    default?: boolean;
-    toggle?: boolean;
-}
-
-export interface ComparisonOptions {
-    toggle?: boolean;
-    // forTable?: boolean;
-}
-
-export interface ProgressBarOptions {
-    defaultFormatRules?: FormatRulesValue[];
-    baseColor?: string;
-}
-
-export interface DateFormatOptions {
-    default: DateFormat;
-}
-
-
-
-export interface NumberFormatOptions {
-    default?: NumberFormat;
-}
-
-export interface DataFieldHeatmapColorOptions {
-    default?: DataFieldHeatmapColor;
-}
-
-export interface TextWrapOptions {
-    toggle?: boolean;
-}
-
-export interface TableColumnWidthOptions {
-    defaultMinimumWidth?: number;
-    defaultFixedWidth?: number;
-}
-
-export interface CustomTableColumnWidthOptions {
-    toggle?: boolean;
-}
-
-export interface WidgetHeightOptions {
-    default?: WidgetHeightType;
-}
 
 export type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions

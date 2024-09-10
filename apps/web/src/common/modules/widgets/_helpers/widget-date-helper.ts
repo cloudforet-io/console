@@ -4,8 +4,9 @@ import { orderBy, sum } from 'lodash';
 
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import type { DateFormat } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { DateRange, DynamicFieldData } from '@/common/modules/widgets/types/widget-data-type';
-import type { DateFormat, TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 

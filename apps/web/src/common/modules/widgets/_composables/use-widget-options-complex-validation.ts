@@ -6,11 +6,10 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
+import type { GroupByValue, GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type { GroupByOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type {
-    GroupByValue,
-    TableDataFieldValue,
     WidgetFieldValues,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
