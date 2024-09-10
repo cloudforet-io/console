@@ -456,17 +456,23 @@ watch([ // Fetch Dynamic Field
     () => state.proxyValue?.dynamicFieldInfo?.criteria,
     () => props.allValueMap?.groupBy,
     () => props.allValueMap?.granularity,
+    () => props.allValueMap?.xAxis,
+    () => props.allValueMap?.yAxis,
     () => props.dateRange,
 ], async (
-    [_fieldType, _value, _valueType, _criteria, _groupBy, _granularity, _dateRange],
-    [, _prevValue, _prevValueType, _prevCriteria, _prevGroupBy, _prevGranularity, _prevDateRange],
+    [_fieldType, _value, _valueType, _criteria, _groupBy, _granularity, _xAxis, _yAxis, _dateRange],
+    [, _prevValue, _prevValueType, _prevCriteria, _prevGroupBy, _prevGranularity, _prevXAxis, _prevYAxis, _prevDateRange],
 ) => {
     if (_fieldType === 'staticField' || _valueType === 'auto') return;
     const fetchingSkipCondition = _value === _prevValue && _valueType === _prevValueType && _criteria === _prevCriteria
-        && isEqual(_groupBy, _prevGroupBy) && _granularity === _prevGranularity && isEqual(_dateRange, _prevDateRange);
+        && isEqual(_groupBy, _prevGroupBy) && _granularity === _prevGranularity
+        && isEqual(_xAxis, _prevXAxis) && isEqual(_yAxis, _prevYAxis) && isEqual(_dateRange, _prevDateRange);
     if (fetchingSkipCondition) return;
-    const resetConditionByExternalValue = _prevGroupBy && _prevGranularity && (!isEqual(_groupBy, _prevGroupBy) || _granularity !== _prevGranularity);
-    if (resetConditionByExternalValue) {
+    const resetConditionByExternalValue = _prevGroupBy && _prevGranularity
+        && (!isEqual(_groupBy, _prevGroupBy) || _granularity !== _prevGranularity);
+    const _resetByXAxis = _xAxis && _prevXAxis && !isEqual(_xAxis, _prevXAxis);
+    const _resetByYAxis = _yAxis && _prevYAxis && !isEqual(_yAxis, _prevYAxis);
+    if (resetConditionByExternalValue || _resetByXAxis || _resetByYAxis) {
         state.proxyValue = {
             ...state.proxyValue,
             dynamicFieldInfo: {
