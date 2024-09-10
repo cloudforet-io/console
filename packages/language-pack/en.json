@@ -3219,14 +3219,14 @@
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "Attached Service Accounts successfully updated",
 			"CLOUD_SERVICE_TAG": "Cloud Service Tag",
 			"COLLECTOR_RULE": {
-				"ALT_E_CREATE_EVENT_RULE": "Failed to Create Collector Rule",
-				"ALT_E_DELETE_EVENT_RULE": "Failed to Delete Collector Rule",
-				"ALT_E_REORDER_EVENT_RULES": "Failed to Reorder Collector Rules",
-				"ALT_E_UPDATE_EVENT_RULE": "Failed to Update Collector Rule",
-				"ALT_S_CREATE_EVENT_RULE": "Collector Rule successfully created ",
-				"ALT_S_DELETE_EVENT_RULE": "Collector Rule successfully deleted ",
-				"ALT_S_REORDER_EVENT_RULES": "Collector Rules successfully reordered ",
-				"ALT_S_UPDATE_EVENT_RULE": "Collector Rule successfully updated "
+				"ALT_E_CREATE_COLLECTOR_RULE": "Failed to Create Collector Rule",
+				"ALT_E_DELETE_COLLECTOR_RULE": "Failed to Delete Collector Rule",
+				"ALT_E_REORDER_COLLECTOR_RULES": "Failed to Reorder Collector Rules",
+				"ALT_E_UPDATE_COLLECTOR_RULE": "Failed to Update Collector Rule",
+				"ALT_S_CREATE_COLLECTOR_RULE": "Collector Rule successfully created ",
+				"ALT_S_DELETE_COLLECTOR_RULE": "Collector Rule successfully deleted ",
+				"ALT_S_REORDER_COLLECTOR_RULES": "Collector Rules successfully reordered ",
+				"ALT_S_UPDATE_COLLECTOR_RULE": "Collector Rule successfully updated "
 			},
 			"CONDITIONS": "Conditions",
 			"CONDITION_POLICY_DESC": "of the following are met",

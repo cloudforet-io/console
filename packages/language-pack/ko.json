@@ -3219,14 +3219,14 @@
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "서비스 어카운트 수정 완료",
 			"CLOUD_SERVICE_TAG": "",
 			"COLLECTOR_RULE": {
-				"ALT_E_CREATE_EVENT_RULE": "컬렉터 규칙 생성 실패",
-				"ALT_E_DELETE_EVENT_RULE": "컬렉터 규칙 삭제 실패",
-				"ALT_E_REORDER_EVENT_RULES": "컬렉터 규칙 순서 변경 실패",
-				"ALT_E_UPDATE_EVENT_RULE": "이벤트 규칙 변경 실패",
-				"ALT_S_CREATE_EVENT_RULE": "컬렉터 규칙 생성 완료",
-				"ALT_S_DELETE_EVENT_RULE": "컬렉터 규칙 삭제 완료",
-				"ALT_S_REORDER_EVENT_RULES": "컬렉터 규칙 순서 변경 완료",
-				"ALT_S_UPDATE_EVENT_RULE": "컬렉터 규칙 수정 완료"
+				"ALT_E_CREATE_COLLECTOR_RULE": "컬렉터 규칙 생성 실패",
+				"ALT_E_DELETE_COLLECTOR_RULE": "컬렉터 규칙 삭제 실패",
+				"ALT_E_REORDER_COLLECTOR_RULES": "컬렉터 규칙 순서 변경 실패",
+				"ALT_E_UPDATE_COLLECTOR_RULE": "이벤트 규칙 변경 실패",
+				"ALT_S_CREATE_COLLECTOR_RULE": "컬렉터 규칙 생성 완료",
+				"ALT_S_DELETE_COLLECTOR_RULE": "컬렉터 규칙 삭제 완료",
+				"ALT_S_REORDER_COLLECTOR_RULES": "컬렉터 규칙 순서 변경 완료",
+				"ALT_S_UPDATE_COLLECTOR_RULE": "컬렉터 규칙 수정 완료"
 			},
 			"CONDITIONS": "",
 			"CONDITION_POLICY_DESC": "",

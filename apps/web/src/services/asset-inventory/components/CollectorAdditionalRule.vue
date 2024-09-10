@@ -6,6 +6,7 @@ import {
     PHeading, PCard, PI, PButton, PPaneLayout, PDivider,
 } from '@cloudforet/mirinae';
 
+import type { CollectorRuleChangeOrderParameters } from '@/schema/inventory/collector-rule/api-verbs/change-order';
 import type { CollectorRuleCreateParameters } from '@/schema/inventory/collector-rule/api-verbs/create';
 import type { CollectorRuleDeleteParameters } from '@/schema/inventory/collector-rule/api-verbs/delete';
 import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
@@ -57,24 +58,36 @@ const changeOrder = (targetData, clickedData, tempOrder) => {
         clickedData.order = tempOrder + 1;
     }
 };
-const handleClickUpButton = async (data) => {
+const handleClickUpButton = async (data:CollectorRuleModel) => {
     const tempCardData = [...collectorFormState.additionalRules];
     const tempOrder = data.order;
     try {
         changeOrder(tempCardData[data.order - 2], tempCardData[data.order - 1], tempOrder);
+        await SpaceConnector.clientV2.inventory.collectorRule.changeOrder<CollectorRuleChangeOrderParameters>({
+            collector_rule_id: data.collector_rule_id,
+            order: tempOrder - 1,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_REORDER_COLLECTOR_RULES'), '');
     } catch (e) {
         changeOrder(tempCardData[data.order], tempCardData[data.order - 1], tempOrder);
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_REORDER_COLLECTOR_RULES'), '');
     } finally {
         collectorFormState.additionalRules = tempCardData;
     }
 };
-const handleClickDownButton = async (data) => {
+const handleClickDownButton = async (data:CollectorRuleModel) => {
     const tempCardData = [...collectorFormState.additionalRules];
     const tempOrder = data.order;
     try {
         changeOrder(tempCardData[data.order], tempCardData[data.order - 1], tempOrder);
+        await SpaceConnector.clientV2.inventory.collectorRule.changeOrder<CollectorRuleChangeOrderParameters>({
+            collector_rule_id: data.collector_rule_id,
+            order: tempOrder + 1,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_REORDER_COLLECTOR_RULES'), '');
     } catch (e) {
         changeOrder(tempCardData[data.order - 2], tempCardData[data.order - 1], tempOrder);
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_REORDER_COLLECTOR_RULES'), '');
     } finally {
         collectorFormState.additionalRules = tempCardData;
     }
@@ -85,10 +98,10 @@ const handleClickDeleteButton = async (order:number) => {
         await SpaceConnector.clientV2.inventory.collectorRule.delete<CollectorRuleDeleteParameters>({
             collector_rule_id: state.orderedCardData[order - 1].collector_rule_id,
         });
-        showSuccessMessage(i18n.t('PROJECT.COLLECTOR_RULE.ALT_S_DELETE_COLLECTOR_RULE'), '');
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_DELETE_COLLECTOR_RULE'), '');
         await collectorFormStore.setOriginCollectorRules();
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.COLLECTOR_RULE.ALT_E_DELETE_COLLECTOR_RULE'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_DELETE_COLLECTOR_RULE'));
     }
 };
 
