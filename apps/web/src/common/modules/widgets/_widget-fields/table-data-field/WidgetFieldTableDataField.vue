@@ -103,7 +103,7 @@ const state = reactive({
             return !!state.selectedItem.length;
         }
         if (state.proxyValue?.fieldType === 'staticField') {
-            return !!state.proxyValue?.value?.length;
+            return !!state.proxyValue?.staticFieldInfo?.fieldValue?.length;
         }
         return !!state.selectedItem;
     }),
@@ -121,7 +121,8 @@ const state = reactive({
         const _groupBy = (props.allValueMap?.groupBy as GroupByValue)?.value as string[];
         const _basedOnDate = getWidgetBasedOnDate(_granularity, props.dateRange?.end);
         let subtract = 1;
-        if (isDateField(state.proxyValue.value) || _groupBy?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))) {
+        const _field = state.selectedFieldType === 'staticField' ? state.proxyValue?.staticFieldInfo?.fieldValue : state.proxyValue?.dynamicFieldInfo?.fieldValue;
+        if (isDateField(_field) || _groupBy?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))) {
             if (_granularity === GRANULARITY.YEARLY) subtract = 3;
             if (_granularity === GRANULARITY.MONTHLY) subtract = 12;
             if (_granularity === GRANULARITY.DAILY) subtract = 30;
@@ -144,7 +145,7 @@ const state = reactive({
     dynamicFieldMenuItems: computed<MenuItem[]>(() => {
         if (state.proxyValue?.fieldType === 'staticField') return [];
         return state.dynamicFields?.map((d) => {
-            const fieldName = state.proxyValue.value;
+            const fieldName = state.proxyValue.dynamicFieldInfo?.fieldValue;
             const label = getReferenceLabel(storeState.allReferenceTypeInfo, fieldName, d);
             return {
                 name: d,
