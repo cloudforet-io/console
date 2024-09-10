@@ -3218,6 +3218,16 @@
 			"ALT_S_UPDATE_SCHEDULE": "スケジュールの変更完了",
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "サービスアカウントの更新に成功しました",
 			"CLOUD_SERVICE_TAG": "",
+			"COLLECTOR_RULE": {
+				"ALT_E_CREATE_EVENT_RULE": "",
+				"ALT_E_DELETE_EVENT_RULE": "",
+				"ALT_E_REORDER_EVENT_RULES": "",
+				"ALT_E_UPDATE_EVENT_RULE": "",
+				"ALT_S_CREATE_EVENT_RULE": "",
+				"ALT_S_DELETE_EVENT_RULE": "",
+				"ALT_S_REORDER_EVENT_RULES": "",
+				"ALT_S_UPDATE_EVENT_RULE": ""
+			},
 			"CONDITIONS": "",
 			"CONDITION_POLICY_DESC": "",
 			"CREATE": {

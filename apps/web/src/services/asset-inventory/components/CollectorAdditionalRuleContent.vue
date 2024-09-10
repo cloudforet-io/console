@@ -37,14 +37,11 @@ const state = reactive({
         label: COLLECTOR_RULE_CONDITION_KEY_LABEL[condition.key] ?? condition.key,
     }))),
     conditionItems: computed(() => {
-        if (!props.data) return {};
-        return props.data.conditions.reduce((acc, condition) => {
-            acc[condition.key] = {
-                operator: condition.operator,
-                value: condition.value,
-            };
-            return acc;
-        }, {});
+        if (!props.data) return [];
+        return props.data.conditions.map((condition) => ({
+            operator: condition.operator,
+            value: condition.value,
+        }));
     }),
     actionFields: computed<Field[]>(() => {
         if (!props.data) return [];
@@ -87,12 +84,12 @@ const state = reactive({
             <table>
                 <tbody>
                     <template v-for="(field, index) in state.conditionFields">
-                        <tr v-if="isNotEmpty(state.conditionItems[field.name])"
+                        <tr v-if="isNotEmpty(state.conditionItems[index])"
                             :key="`${field}-${index}`"
                         >
                             <td>{{ field.label }}</td>
                             <td>
-                                {{ state.conditionItems[field.name]?.operator }} {{ state.conditionItems[field.name]?.value }}
+                                {{ state.conditionItems[index]?.operator }} {{ state.conditionItems[index]?.value }}
                             </td>
                         </tr>
                     </template>

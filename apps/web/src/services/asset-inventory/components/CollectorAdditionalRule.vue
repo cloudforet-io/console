@@ -7,8 +7,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { CollectorRuleCreateParameters } from '@/schema/inventory/collector-rule/api-verbs/create';
+import type { CollectorRuleDeleteParameters } from '@/schema/inventory/collector-rule/api-verbs/delete';
 import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
-import type { EventRuleDeleteParameters } from '@/schema/monitoring/event-rule/api-verbs/delete';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -82,13 +82,13 @@ const handleClickDownButton = async (data) => {
 
 const handleClickDeleteButton = async (order:number) => {
     try {
-        await SpaceConnector.clientV2.inventory.collectorRule.delete<EventRuleDeleteParameters>({
+        await SpaceConnector.clientV2.inventory.collectorRule.delete<CollectorRuleDeleteParameters>({
             collector_rule_id: state.orderedCardData[order - 1].collector_rule_id,
         });
-        showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_DELETE_EVENT_RULE'), '');
+        showSuccessMessage(i18n.t('PROJECT.COLLECTOR_RULE.ALT_S_DELETE_COLLECTOR_RULE'), '');
         await collectorFormStore.setOriginCollectorRules();
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.EVENT_RULE.ALT_E_DELETE_EVENT_RULE'));
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.COLLECTOR_RULE.ALT_E_DELETE_COLLECTOR_RULE'));
     }
 };
 
@@ -166,7 +166,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                                         />
                                     </span>
                                     <span class="arrow-button"
-                                          :class="{'disabled': (data.order === state.orderedCardData.length)}"
+                                          :class="{'disabled': (data.order === collectorFormState.originCollectorRules?.length)}"
                                           @click="handleClickDownButton(data)"
                                     >
                                         <p-i name="ic_arrow-down"
