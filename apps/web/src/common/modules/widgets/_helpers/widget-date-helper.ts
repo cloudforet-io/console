@@ -179,15 +179,15 @@ export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, dynamicFie
             let _refinedData: any[] = [];
             if (isDateField(dataField)) {
                 _refinedData = orderBy(result[criteria], dataField, 'desc') ?? [];
-                _seriesFields = _refinedData.map((v) => v[dataField]);
             } else {
                 const _orderedData = orderBy(result[criteria], 'value', 'desc') ?? [];
                 _refinedData = _orderedData.slice(0, valueCount);
-                _refinedData.forEach((v) => {
-                    _seriesFieldsSet.add(v[dataField]);
-                });
-                _seriesFields = Array.from(_seriesFieldsSet);
             }
+            _refinedData.forEach((v) => {
+                _seriesFieldsSet.add(v[dataField]);
+            });
+            _seriesFields = Array.from(_seriesFieldsSet);
+            if (isDateField(dataField)) _seriesFields.sort();
 
             // etc data
             const _etcData = (result[criteria] || []).filter((d) => !_seriesFields.includes(d[dataField]));
