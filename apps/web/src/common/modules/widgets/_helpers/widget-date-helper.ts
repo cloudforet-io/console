@@ -1,10 +1,11 @@
 import type { ManipulateType } from 'dayjs';
 import dayjs from 'dayjs';
-import { sum } from 'lodash';
+import { orderBy, sum } from 'lodash';
 
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type { DateRange, DynamicFieldData } from '@/common/modules/widgets/types/widget-data-type';
-import type { DateFormat } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { DateFormat, TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
@@ -138,27 +139,72 @@ export const getFormattedDate = (date: string, dateFormat: string): string => {
 };
 
 
-export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, criteria: string, dataField: string, dynamicFieldValue: string[]): [any[], string[]] => {
+export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, dynamicFieldInfo: TableDataFieldValue['dynamicFieldInfo'], xAxisField: string): [any[], string[]] => {
     if (!rawData?.results?.length) return [[], []];
 
-    const _refinedResults: any[] = [];
-    let _etcExists = false;
-    rawData.results.forEach((result) => {
-        const _refinedData = (result[criteria] || []).filter((d) => dynamicFieldValue.includes(d[dataField]));
-        const _etcData = (result[criteria] || []).filter((d) => !dynamicFieldValue.includes(d[dataField]));
-        const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
-        if (_etcValueSum > 0) _etcExists = true;
-        _refinedResults.push({
-            ...result,
-            [criteria]: [
-                ..._refinedData,
-                { [dataField]: 'etc', value: _etcValueSum },
-            ],
-        });
-    });
+    const valueType = dynamicFieldInfo?.valueType;
+    const valueCount = dynamicFieldInfo?.count || 0;
+    const criteria = dynamicFieldInfo?.criteria as string;
+    const dataField = dynamicFieldInfo?.fieldValue as string;
+    const dynamicFieldValue = dynamicFieldInfo?.fixedValue || [];
 
-    const _seriesFields = [...dynamicFieldValue];
-    if (_etcExists) _seriesFields.push('etc');
+    const _refinedResults: any[] = [];
+    let _seriesFields: string[] = [];
+    if (valueType === 'fixed') {
+        let _etcExists = false;
+        rawData.results.forEach((result) => {
+            const _filteredData = (result[criteria] || []).filter((d) => dynamicFieldValue.includes(d[dataField]));
+
+            // etc data
+            const _etcData = (result[criteria] || []).filter((d) => !dynamicFieldValue.includes(d[dataField]));
+            const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
+            if (_etcValueSum > 0) _etcExists = true;
+
+            _refinedResults.push({
+                ...result,
+                [criteria]: [
+                    ..._filteredData,
+                    { [dataField]: 'etc', value: _etcValueSum },
+                ],
+            });
+        });
+        _seriesFields = [...dynamicFieldValue];
+        if (_etcExists) _seriesFields.push('etc');
+    } else {
+        let _etcExists = false;
+        const _seriesFieldsSet = new Set<string>();
+
+        rawData.results?.forEach((result) => {
+            let _refinedData: any[] = [];
+            if (isDateField(dataField)) {
+                _refinedData = orderBy(result[criteria], dataField, 'desc') ?? [];
+                _seriesFields = _refinedData.map((v) => v[dataField]);
+            } else {
+                const _orderedData = orderBy(result[criteria], 'value', 'desc') ?? [];
+                _refinedData = _orderedData.slice(0, valueCount);
+                _refinedData.forEach((v) => {
+                    _seriesFieldsSet.add(v[dataField]);
+                });
+                _seriesFields = Array.from(_seriesFieldsSet);
+            }
+
+            // etc data
+            const _etcData = (result[criteria] || []).filter((d) => !_seriesFields.includes(d[dataField]));
+            const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
+            if (_etcValueSum > 0) _etcExists = true;
+
+            _refinedResults.push({
+                [criteria]: [
+                    ..._refinedData,
+                    { [dataField]: 'etc', value: _etcValueSum },
+                ],
+                [xAxisField]: result[xAxisField],
+            });
+        });
+
+
+        if (_etcExists) _seriesFields.push('etc');
+    }
 
     return [_refinedResults, _seriesFields];
 };
