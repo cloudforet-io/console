@@ -4027,6 +4027,7 @@
 	"MY_PAGE": {
 		"ACCOUNT": {
 			"ACCOUNT_N_PROFILE": "Account & Profile",
+			"ADMIN_ROLE": "Admin Role",
 			"BASE_INFORMATION": "Base Information",
 			"SAVE_CHANGES": "Save Changes",
 			"TIMEZONE_INVALID": "The time zone is set incorrectly."
@@ -4035,9 +4036,14 @@
 		"MFA": {
 			"BTN_CHANGE": "Change",
 			"BTN_SEND_MAIL": "Send Verification Code",
+			"EMAIL": "Email",
+			"EMAIL_DESC": "Receive a code by Email",
 			"ENABLE_MFA": "Enable MFA",
+			"MS_DESC": "Receive a code with the Microsoft Authenticator app",
+			"MS_TITLE": "Microsoft Authenticator App",
 			"STATE_NOT_VERIFIED": "Not Verified",
 			"STATE_VERIFIED": "Verified",
+			"SYNC": "In-Sync",
 			"TITLE": "Multi-factor Authentication",
 			"TYPE": "MFA Type"
 		},

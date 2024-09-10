@@ -4027,6 +4027,7 @@
 	"MY_PAGE": {
 		"ACCOUNT": {
 			"ACCOUNT_N_PROFILE": "アカウント＆情報",
+			"ADMIN_ROLE": "Admin役割",
 			"BASE_INFORMATION": "基本情報",
 			"SAVE_CHANGES": "変更事項を保存",
 			"TIMEZONE_INVALID": "タイムゾーンが正しく設定されました。"
@@ -4035,9 +4036,14 @@
 		"MFA": {
 			"BTN_CHANGE": "変更",
 			"BTN_SEND_MAIL": "認証コード送信",
+			"EMAIL": "",
+			"EMAIL_DESC": "",
 			"ENABLE_MFA": "MFA有効化",
+			"MS_DESC": "",
+			"MS_TITLE": "",
 			"STATE_NOT_VERIFIED": "認証されていません",
 			"STATE_VERIFIED": "認証済みです",
+			"SYNC": "",
 			"TITLE": "マルチファクタ認証",
 			"TYPE": "MFAタイプ"
 		},
