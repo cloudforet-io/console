@@ -6,13 +6,9 @@ import {
 
 import dayjs from 'dayjs';
 import type { HeatmapSeriesOption } from 'echarts/charts';
+import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import type {
-    EChartsType,
-} from 'echarts/core';
-import {
-    isEmpty, max, throttle,
-} from 'lodash';
+import { isEmpty, max, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -29,7 +25,8 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
-    getReferenceLabel, getRefinedDynamicFieldData,
+    getReferenceLabel,
+    getRefinedHeatmapDynamicFieldData,
     getWidgetBasedOnDate,
     getWidgetDateFields,
     getWidgetDateRange,
@@ -39,15 +36,13 @@ import {
     getWidgetLoadApiQuery,
     getWidgetLoadApiQueryDateRange,
 } from '@/common/modules/widgets/_helpers/widget-load-helper';
-import type { ColorValue, ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
+import type { ColorSchemaValue, ColorValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
 import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
-import type {
-    WidgetProps, WidgetEmit, WidgetExpose,
-} from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 
 
 type Data = ListResponse<{
@@ -94,10 +89,13 @@ const state = reactive({
             },
             axisLabel: {
                 formatter: (val) => {
-                    if (state.yAxisField === DATE_FIELD.DATE) {
+                    if (state.dataFieldInfo.fieldType === 'staticField') {
+                        return val;
+                    }
+                    if (isDateField(state.dynamicFieldInfo?.fieldValue)) {
                         return dayjs.utc(val).format(state.dateFormat);
                     }
-                    return getReferenceLabel(props.allReferenceTypeInfo, state.yAxisField, val);
+                    return getReferenceLabel(props.allReferenceTypeInfo, state.dataField, val);
                 },
             },
         },
@@ -144,8 +142,13 @@ const state = reactive({
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
-    dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
-    dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
+    dynamicFieldInfo: computed<TableDataFieldValue['dynamicFieldInfo']>(() => state.dataFieldInfo?.dynamicFieldInfo),
+    staticFieldInfo: computed<TableDataFieldValue['staticFieldInfo']>(() => state.dataFieldInfo?.staticFieldInfo),
+    dataField: computed<string|string[]|undefined>(() => {
+        if (state.dataFieldInfo?.fieldType === 'staticField') return state.staticFieldInfo?.fieldValue;
+        return state.dynamicFieldInfo?.fieldValue;
+    }),
+    dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
     colorValue: computed<ColorValue>(() => (props.widgetOptions?.colorSchema as ColorSchemaValue)?.colorValue),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
@@ -153,11 +156,13 @@ const state = reactive({
         if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         } else if (isDateField(state.dataField)) {
-            if (state.dynamicFieldValue.length) {
+            if (state.dynamicFieldInfo?.valueType === 'fixed') {
                 const _sortedDateValue = [...state.dynamicFieldValue];
                 _sortedDateValue.sort();
                 _start = _sortedDateValue[0];
                 _end = _sortedDateValue[_sortedDateValue.length - 1];
+            } else {
+                [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.dynamicFieldInfo.count);
             }
         }
         return { start: _start, end: _end };
@@ -206,15 +211,13 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 
 /* Util */
 const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
-    state.yAxisData = [...state.dynamicFieldValue];
-
     // get refined data and series fields
-    const [_refinedResults] = getRefinedDynamicFieldData(rawData, state.dataFieldInfo?.criteria, state.dataField, state.dynamicFieldValue);
+    state.yAxisData = getRefinedHeatmapDynamicFieldData(rawData, state.dynamicFieldInfo);
 
-    const _criteria = state.dataFieldInfo?.criteria;
+    const _criteria = state.dynamicFieldInfo?.criteria;
     const _seriesData: any[] = [];
     state.xAxisData.forEach((x, xIdx) => {
-        const _targetData = _refinedResults.find((d) => d[state.xAxisField] === x);
+        const _targetData = state.data?.results?.find((d) => d[state.xAxisField] === x);
         state.yAxisData.forEach((y, yIdx) => {
             const _data = _targetData?.[_criteria].find((v) => v[state.dataField] === y);
             _seriesData.push([xIdx, yIdx, _data ? _data.value : 0]);

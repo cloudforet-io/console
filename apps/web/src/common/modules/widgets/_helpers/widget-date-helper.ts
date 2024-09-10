@@ -209,3 +209,30 @@ export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, dynamicFie
 
     return [_refinedResults, _seriesFields];
 };
+export const getRefinedHeatmapDynamicFieldData = (rawData: DynamicFieldData, dynamicFieldInfo: TableDataFieldValue['dynamicFieldInfo']): string[] => {
+    if (!rawData?.results?.length) return [];
+
+    const valueType = dynamicFieldInfo?.valueType;
+    const valueCount = dynamicFieldInfo?.count || 0;
+    const criteria = dynamicFieldInfo?.criteria as string;
+    const dataField = dynamicFieldInfo?.fieldValue as string;
+    const dynamicFieldValue = dynamicFieldInfo?.fixedValue || [];
+
+    let _seriesFields: string[] = [];
+    if (valueType === 'fixed') {
+        _seriesFields = [...dynamicFieldValue];
+    } else {
+        const _subTotalResults: Record<string, number> = {};
+        rawData.results.forEach((result) => {
+            result[criteria]?.forEach((d) => {
+                if (d[dataField] in _subTotalResults) {
+                    _subTotalResults[d[dataField]] += d.value;
+                } else {
+                    _subTotalResults[d[dataField]] = d.value;
+                }
+            });
+        });
+        _seriesFields = orderBy(Object.entries(_subTotalResults), 1, 'desc').slice(0, valueCount).map(([k]) => k);
+    }
+    return _seriesFields;
+};
