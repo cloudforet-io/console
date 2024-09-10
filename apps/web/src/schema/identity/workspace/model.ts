@@ -24,4 +24,6 @@ export interface WorkspaceModel {
         day: number;
     };
     dormant_updated_at?: string;
+    workspace_group_id?: string;
+    user_count?: number;
 }

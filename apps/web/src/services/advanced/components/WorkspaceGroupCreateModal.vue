@@ -7,9 +7,9 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { WorkspaceGroupAddWorkspacesParameters } from '@/schema/identity/workspace-group/api-verbs/add-workspaces';
 import type { WorkspaceGroupCreateParameters } from '@/schema/identity/workspace-group/api-verbs/create';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceChangeWorkspaceGroupParameters } from '@/schema/identity/workspace/api-verbs/change-workspace-group';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
@@ -84,10 +84,12 @@ const createWorkspaceGroup = async (): Promise<string | undefined> => {
             return undefined;
         }
 
-        await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<WorkspaceGroupAddWorkspacesParameters, WorkspaceGroupModel>({
+
+        await Promise.allSettled(selectedItems.value.map((item) => SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
             workspace_group_id,
-            workspaces: selectedItems.value.map((item) => item.name),
-        });
+            workspace_id: item.name,
+        })));
+
         return workspace_group_id;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -153,7 +155,8 @@ const handleModalClose = () => {
                                 :search-text.sync="searchText"
                                 appearance-type="stack"
                                 is-filterable
-                                multi-selectable
+                                multi-selec
+                                le
                                 show-delete-all-button
                                 use-fixed-menu-style
                                 show-select-marker
