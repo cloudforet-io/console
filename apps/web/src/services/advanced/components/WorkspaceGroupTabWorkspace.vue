@@ -55,7 +55,7 @@ const state = reactive({
 const tableState = reactive({
     timezone: computed(() => store.state.user.timezone),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
-    tableItems: computed(() => workspaceGroupPageGetters.selectedWorkspaces?.map((workspace) => ({
+    tableItems: computed(() => workspaceGroupPageGetters.workspacesInSelectedGroup?.map((workspace) => ({
         ...tableState.workspaces[workspace],
         remove_button: workspace,
     }))),
