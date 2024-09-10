@@ -36,37 +36,59 @@ const updateWidget = async (widgetId: string, options: WidgetOptions) => {
 
 /**
  * XY Chart (Line Chart, Area Chart, Column Chart)
- * Data Field -> Table Data Field
+ * Data Field & Group by -> Table Data Field V1
+ * Table Data Field No Version -> Table Data Field V1
  * Legend: value type is changed
  */
 const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByField: string): [boolean, WidgetOptions] => {
     let _options = cloneDeep(widget.options);
     let _needMigration = false;
-    // Data Field (no version) -> Table Data Field (no version)
-    if (_options.dataField && typeof _options.dataField === 'string') { // legacy case
+
+    const _dataFieldToTableDataFieldV1 = () => {
         _needMigration = true;
         if (_options?.[groupByField]?.value) {
             _options = {
                 ..._options,
                 tableDataField: {
                     fieldType: 'dynamicField',
-                    value: _options[groupByField].value,
-                    dynamicFieldValue: [],
-                    criteria: _options.dataField,
-                } as TableDataFieldValueNoVersion,
+                    dynamicFieldInfo: {
+                        criteria: _options.dataField,
+                        fieldValue: _options[groupByField].value,
+                        valueType: 'auto',
+                        count: 15,
+                    },
+                    version: 'v1',
+                } as TableDataFieldValueV1,
             };
         } else {
             _options = {
                 ..._options,
                 tableDataField: {
                     fieldType: 'staticField',
-                    value: [_options.dataField],
-                } as TableDataFieldValueNoVersion,
+                    staticFieldInfo: {
+                        fieldValue: [_options.dataField],
+                    },
+                    version: 'v1',
+                } as TableDataFieldValueV1,
             };
         }
-        delete _options.dataField;
-        delete _options[groupByField];
+        delete _options?.dataField;
+        delete _options?.[groupByField];
+    };
+    const _tableDataFieldNoVersionToTableDataFieldV1 = () => {
+        _needMigration = true;
+        _options = {
+            ..._options,
+            tableDataField: migrateTableDataField(_options.tableDataField),
+        };
+    };
+    if ('dataField' in _options) {
+        _dataFieldToTableDataFieldV1();
+    } else if (_options.tableDataField
+        && (!('version' in _options.tableDataField) || _options.tableDataField.version !== LATEST_TABLE_DATA_FIELD_VERSION)) {
+        _tableDataFieldNoVersionToTableDataFieldV1();
     }
+
     // Legend version migration
     // no version
     if (_options.legend && !_options.legend?.toggleValue) {
@@ -77,68 +99,77 @@ const _migrateXYChart = (widget: PublicWidgetModel|PrivateWidgetModel, groupByFi
             },
         };
     }
-    // Table Data Field version migration
-    if (_options.tableDataField
-        && (!('version' in _options.tableDataField) || _options.tableDataField.version !== LATEST_TABLE_DATA_FIELD_VERSION)) {
-        _needMigration = true;
-        _options = {
-            ..._options,
-            tableDataField: migrateTableDataField(_options.tableDataField),
-        };
-    }
     return [_needMigration, _options];
 };
 
 /**
  * Clustered Column Chart
- * Data Field -> Table Data Field
+ * Data Field -> Table Data Field V1
+ * Table Data Field No Version -> Table Data Field V1
  */
 const _migrateClusteredColumnChart = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, WidgetOptions] => {
     let _options: WidgetOptions = cloneDeep(widget.options);
     let _needMigration = false;
-    if (_options.dataField && Array.isArray(_options.dataField)) { // legacy case
+
+    const _dataFieldToTableDataFieldV1 = () => {
         _needMigration = true;
         _options = {
             ..._options,
             tableDataField: {
                 fieldType: 'staticField',
-                value: _options.dataField,
-            } as TableDataFieldValueNoVersion,
+                staticFieldInfo: {
+                    fieldValue: _options.dataField,
+                },
+                version: 'v1',
+            },
         };
-        delete _options.dataField;
-    }
-    // Table Data Field version migration
-    if (_options.tableDataField
-        && (!('version' in _options.tableDataField) || _options.tableDataField.version !== LATEST_TABLE_DATA_FIELD_VERSION)) {
+        delete _options?.dataField;
+    };
+    const _tableDataFieldNoVersionToTableDataFieldV1 = () => {
         _needMigration = true;
         _options = {
             ..._options,
             tableDataField: migrateTableDataField(_options.tableDataField),
         };
+    };
+    if ('dataField' in _options) {
+        _dataFieldToTableDataFieldV1();
+    } else if ('tableDataField' in _options
+        && (!('version' in _options.tableDataField) || _options.tableDataField.version !== LATEST_TABLE_DATA_FIELD_VERSION)) {
+        _tableDataFieldNoVersionToTableDataFieldV1();
     }
     return [_needMigration, _options];
 };
 
 /**
  * Heatmap
- * Data Field & YAxis -> Table Data Field
+ * Data Field & YAxis -> Table Data Field V1
  */
 const _migrateHeatmap = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, WidgetOptions] => {
     let _options: WidgetOptions = cloneDeep(widget.options);
     let _needMigration = false;
-    if (_options.dataField) { // legacy case
+
+    const _dataFieldToTableDataFieldV1 = () => {
         _needMigration = true;
         _options = {
             ..._options,
             tableDataField: {
                 fieldType: 'dynamicField',
-                value: _options.yAxis?.value,
-                dynamicFieldValue: [],
-                criteria: _options.dataField,
-            } as TableDataFieldValueNoVersion,
+                dynamicFieldInfo: {
+                    criteria: _options.dataField,
+                    fieldValue: _options.yAxis?.value,
+                    valueType: 'auto',
+                    count: 7,
+                },
+                version: 'v1',
+            } as TableDataFieldValueV1,
         };
-        delete _options.dataField;
-        delete _options.yAxis;
+        delete _options?.dataField;
+        delete _options?.yAxis;
+    };
+
+    if ('dataField' in _options) {
+        _dataFieldToTableDataFieldV1();
     }
     return [_needMigration, _options];
 };
@@ -147,7 +178,7 @@ const _migrateHeatmap = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean
  * Table
  * Table Data Field No Version -> Table Data Field V1
  */
-const _migarteTable = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, WidgetOptions] => {
+const migrateTable = (widget: PublicWidgetModel|PrivateWidgetModel): [boolean, WidgetOptions] => {
     let _options: WidgetOptions = cloneDeep(widget.options);
     let _needMigration = false;
     // Table Data Field version migration
@@ -181,13 +212,13 @@ export const migrateLegacyWidgetOptions = async (dashboardWidgets: Array<PublicW
             isMigrated = isMigrated || _needMigration;
             if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
         }
-        if (widget.widget_type === 'heatmap' || widget.widget_type === 'colorCodedTableHeatmap') {
+        if (widget.widget_type === 'heatmap') {
             const [_needMigration, _migratedOptions] = _migrateHeatmap(widget);
             isMigrated = isMigrated || _needMigration;
             if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
         }
         if (widget.widget_type === 'table') {
-            const [_needMigration, _migratedOptions] = _migarteTable(widget);
+            const [_needMigration, _migratedOptions] = migrateTable(widget);
             isMigrated = isMigrated || _needMigration;
             if (_needMigration) await updateWidget(widget.widget_id, _migratedOptions);
         }
