@@ -6,8 +6,14 @@ import {
     PHeading, PCard, PI, PButton, PPaneLayout, PDivider,
 } from '@cloudforet/mirinae';
 
+import type { CollectorRuleChangeOrderParameters } from '@/schema/inventory/collector-rule/api-verbs/change-order';
 import type { CollectorRuleCreateParameters } from '@/schema/inventory/collector-rule/api-verbs/create';
+import type { CollectorRuleDeleteParameters } from '@/schema/inventory/collector-rule/api-verbs/delete';
+import type { CollectorRuleUpdateParameters } from '@/schema/inventory/collector-rule/api-verbs/update';
 import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -19,6 +25,7 @@ import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
 import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
+
 
 
 const collectorFormStore = useCollectorFormStore();
@@ -37,9 +44,10 @@ const state = reactive({
         return data.sort((a, b) => a.order - b.order);
     }),
     isEmptyCase: computed<boolean>(() => collectorFormState.additionalRules.length === 0),
-    editModeCardOrder: -1,
+    editModeCardOrder: 0,
     collectorProvider: computed(() => collectorFormState.originCollector?.provider),
-    isAddCase: computed<boolean>(() => collectorFormState.originCollectorRules?.length === 0),
+    isAddCase: computed<boolean>(() => collectorFormState.originCollectorRules?.length === 0
+        || collectorFormState.originCollectorRules.length < collectorFormState.additionalRules.length),
 });
 
 const changeOrder = (targetData, clickedData, tempOrder) => {
@@ -51,37 +59,51 @@ const changeOrder = (targetData, clickedData, tempOrder) => {
         clickedData.order = tempOrder + 1;
     }
 };
-const handleClickUpButton = async (data) => {
+const handleClickUpButton = async (data:CollectorRuleModel) => {
     const tempCardData = [...collectorFormState.additionalRules];
     const tempOrder = data.order;
     try {
         changeOrder(tempCardData[data.order - 2], tempCardData[data.order - 1], tempOrder);
+        await SpaceConnector.clientV2.inventory.collectorRule.changeOrder<CollectorRuleChangeOrderParameters>({
+            collector_rule_id: data.collector_rule_id,
+            order: tempOrder - 1,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_REORDER_COLLECTOR_RULES'), '');
     } catch (e) {
         changeOrder(tempCardData[data.order], tempCardData[data.order - 1], tempOrder);
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_REORDER_COLLECTOR_RULES'));
     } finally {
         collectorFormState.additionalRules = tempCardData;
     }
 };
-const handleClickDownButton = async (data) => {
+const handleClickDownButton = async (data:CollectorRuleModel) => {
     const tempCardData = [...collectorFormState.additionalRules];
     const tempOrder = data.order;
     try {
         changeOrder(tempCardData[data.order], tempCardData[data.order - 1], tempOrder);
+        await SpaceConnector.clientV2.inventory.collectorRule.changeOrder<CollectorRuleChangeOrderParameters>({
+            collector_rule_id: data.collector_rule_id,
+            order: tempOrder + 1,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_REORDER_COLLECTOR_RULES'), '');
     } catch (e) {
         changeOrder(tempCardData[data.order - 2], tempCardData[data.order - 1], tempOrder);
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_REORDER_COLLECTOR_RULES'));
     } finally {
         collectorFormState.additionalRules = tempCardData;
     }
 };
 
-const handleClickDeleteButton = (order: number) => {
-    collectorFormStore.$patch((_state) => {
-        const tempRules = collectorFormState.additionalRules.filter((data) => data.order !== order);
-        _state.state.additionalRules = tempRules.map((data, index) => {
-            data.order = index + 1;
-            return data;
+const handleClickDeleteButton = async (order:number) => {
+    try {
+        await SpaceConnector.clientV2.inventory.collectorRule.delete<CollectorRuleDeleteParameters>({
+            collector_rule_id: state.orderedCardData[order - 1].collector_rule_id,
         });
-    });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_DELETE_COLLECTOR_RULE'), '');
+        await collectorFormStore.setOriginCollectorRules();
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_DELETE_COLLECTOR_RULE'));
+    }
 };
 
 const handleClickEditButton = (order: number) => {
@@ -92,7 +114,7 @@ const handleCancelSetRule = () => {
     if (state.isAddCase) {
         collectorFormState.additionalRules = [];
     }
-    state.editModeCardOrder = -1;
+    state.editModeCardOrder = 0;
 };
 
 const handleClickAddEventRule = async () => {
@@ -101,34 +123,42 @@ const handleClickAddEventRule = async () => {
 };
 const createCollectorRule = async (data:CollectorRuleForm) => {
     try {
-        const collectorRule = await SpaceConnector.clientV2.inventory.collectorRule.create<CollectorRuleCreateParameters>({
+        await SpaceConnector.clientV2.inventory.collectorRule.create<CollectorRuleCreateParameters>({
             collector_id: collectorFormState.originCollector.collector_id,
             conditions: data.conditions,
             conditions_policy: data.conditions_policy,
             actions: data.actions,
             options: data.options,
         });
-        collectorFormStore.$patch((_state) => {
-            _state.state.additionalRules = [collectorRule];
-        });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_CREATE_COLLECTOR_RULE'), '');
+        await collectorFormStore.setOriginCollectorRules(props.collectorId);
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_CREATE_COLLECTOR_RULE'));
     }
 };
-const handleSetRule = (data:CollectorRuleForm) => {
-    if (state.isAddCase) {
-        createCollectorRule(data);
+
+const updateCollectorRule = async (data:CollectorRuleForm) => {
+    try {
+        await SpaceConnector.clientV2.inventory.collectorRule.update<CollectorRuleUpdateParameters>({
+            collector_rule_id: data.collector_rule_id,
+            conditions: data.conditions,
+            conditions_policy: data.conditions_policy,
+            actions: data.actions,
+            options: data.options,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_UPDATE_COLLECTOR_RULE'), '');
+        await collectorFormStore.setOriginCollectorRules(props.collectorId);
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_UPDATE_COLLECTOR_RULE'));
     }
-    // collectorFormStore.$patch((_state) => {
-    //     const tempRules = collectorFormState.additionalRules.map((rule) => {
-    //         if (rule.order === data.order) {
-    //             return data;
-    //         }
-    //         return rule;
-    //     });
-    //     _state.state.additionalRules = tempRules;
-    // });
-    state.editModeCardOrder = -1;
+};
+const handleSetRule = async (data:CollectorRuleForm) => {
+    if (state.isAddCase) {
+        await createCollectorRule(data);
+    } else {
+        await updateCollectorRule(data);
+    }
+    state.editModeCardOrder = 0;
 };
 
 const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
@@ -169,7 +199,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                                         />
                                     </span>
                                     <span class="arrow-button"
-                                          :class="{'disabled': (data.order === state.orderedCardData.length)}"
+                                          :class="{'disabled': (data.order === collectorFormState.originCollectorRules?.length)}"
                                           @click="handleClickDownButton(data)"
                                     >
                                         <p-i name="ic_arrow-down"

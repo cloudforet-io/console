@@ -276,6 +276,7 @@ const handleClickDone = () => {
     }
 
     emit('click-done', {
+        collector_rule_id: props.data?.collector_rule_id,
         conditions_policy: state.selectedConditionRadioIdx,
         conditions: convertToApiCondition(state.conditionList),
         actions,

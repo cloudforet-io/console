@@ -3,12 +3,12 @@ import type { AdditionalRuleAction, AdditionalRuleCondition } from '@/schema/inv
 import type { CollectorRuleConditionPolicy } from '@/schema/inventory/collector-rule/type';
 
 // collector api parameters
-export interface CollectorUpdateParameters {
-    collector_id: string;
+export interface CollectorRuleUpdateParameters {
+    collector_rule_id: string;
     name?: string;
     conditions?: AdditionalRuleCondition[];
     conditions_policy?: CollectorRuleConditionPolicy;
-    actions: AdditionalRuleAction[];
+    actions: AdditionalRuleAction;
     options?: {
         stop_processing: boolean;
     };
