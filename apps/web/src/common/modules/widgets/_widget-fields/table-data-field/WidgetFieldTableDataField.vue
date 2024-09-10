@@ -34,15 +34,16 @@ import {
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getInitialSelectedMenuItem, isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type {
     TableDataFieldOptions,
+    TableDataFieldValue,
 } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import {
     LATEST_TABLE_DATA_FIELD_VERSION,
 } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { TableDataItem, DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
-import type { TableDataFieldValue, GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {

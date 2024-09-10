@@ -36,14 +36,17 @@ import {
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import { getWidgetLoadApiQueryDateRange, getWidgetLoadApiQuery } from '@/common/modules/widgets/_helpers/widget-load-helper';
+import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
+import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type {
-    XAxisValue, DateFormatValue, TableDataFieldValue,
-    DisplaySeriesLabelValue, NumberFormatValue, LegendValue, MissingValueValue,
-} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 

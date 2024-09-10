@@ -21,12 +21,12 @@ import {
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { DateRange, WidgetLoadData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const props = defineProps<WidgetProps>();

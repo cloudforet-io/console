@@ -39,10 +39,10 @@ import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-com
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { widgetWidthAssigner } from '@/common/modules/widgets/_helpers/widget-width-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/header/type';
 import type {
     WidgetExpose, WidgetProps, WidgetSize, WidgetOverlayType,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { WidgetHeaderValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import DashboardReorderSidebar from '@/services/dashboards/components/dashboard-detail/DashboardReorderSidebar.vue';
 import {

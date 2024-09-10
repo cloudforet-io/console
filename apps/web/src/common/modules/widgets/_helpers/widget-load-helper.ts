@@ -4,8 +4,8 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import { getDateFormat, getTimeUnit } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
-import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 export const getWidgetLoadApiQueryDateRange = (granularity: string, dateRange: DateRange): DateRange => {

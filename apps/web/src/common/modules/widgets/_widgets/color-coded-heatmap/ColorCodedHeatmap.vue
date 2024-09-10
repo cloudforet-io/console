@@ -24,9 +24,9 @@ import {
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type { AdvancedFormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
+import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
-import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 type Data = ListResponse<{
