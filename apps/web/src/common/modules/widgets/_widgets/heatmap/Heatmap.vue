@@ -39,12 +39,13 @@ import {
     getWidgetLoadApiQuery,
     getWidgetLoadApiQueryDateRange,
 } from '@/common/modules/widgets/_helpers/widget-load-helper';
+import type { ColorValue, ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type {
-    ColorSchemaValue, XAxisValue, ColorValue,
+    XAxisValue,
     DateFormatValue,
     LegendValue,
     TableDataFieldValue,

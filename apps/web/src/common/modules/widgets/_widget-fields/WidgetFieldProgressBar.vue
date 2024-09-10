@@ -12,12 +12,13 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type {
     ProgressBarOptions,
     WidgetFieldComponentEmit,
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
-import type { ProgressBarValue, FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { ProgressBarValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { indigo } from '@/styles/colors';
 

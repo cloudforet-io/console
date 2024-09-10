@@ -30,10 +30,11 @@ import {
     getWidgetLoadApiQuery,
     getWidgetLoadApiQueryDateRange,
 } from '@/common/modules/widgets/_helpers/widget-load-helper';
+import type { AdvancedFormatRulesValue } from '@/common/modules/widgets/_widget-fields/advanced-format-rules/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type {
-    AdvancedFormatRulesValue, NumberFormatValue, XAxisValue,
+    NumberFormatValue, XAxisValue,
     TableDataFieldValue,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 

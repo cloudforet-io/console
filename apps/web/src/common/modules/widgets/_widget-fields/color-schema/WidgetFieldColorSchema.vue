@@ -9,12 +9,11 @@ import {
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { COLOR_SCHEMA } from '@/common/modules/widgets/_constants/widget-field-constant';
+import type { ColorSchemaValue, ColorSchemaOptions } from '@/common/modules/widgets/_widget-fields/color-schema/type';
 import type {
-    ColorSchemaOptions,
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
 } from '@/common/modules/widgets/types/widget-field-type';
-import type { ColorSchemaValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 const DEFAULT_COLOR = 'Coral';
 const emit = defineEmits<WidgetFieldComponentEmit<ColorSchemaValue>>();
