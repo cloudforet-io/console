@@ -15,6 +15,7 @@ interface Page {
     limit: number;
 }
 interface Query {
+    distinct?: string;
     group_by: string[];
     fields: any;
     field_group?: string[];

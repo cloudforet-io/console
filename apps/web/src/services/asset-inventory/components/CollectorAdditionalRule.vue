@@ -1,11 +1,15 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PCard, PI, PButton, PPaneLayout, PDivider,
 } from '@cloudforet/mirinae';
 
+import type { CollectorRuleCreateParameters } from '@/schema/inventory/collector-rule/api-verbs/create';
 import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorAdditionalRuleContent from '@/services/asset-inventory/components/CollectorAdditionalRuleContent.vue';
 import CollectorAdditionalRuleEmptyCase
@@ -14,10 +18,18 @@ import CollectorAdditionalRuleForm from '@/services/asset-inventory/components/C
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
+import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
 
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
+
+interface Props {
+    collectorId?: string;
+}
+const props = withDefaults(defineProps<Props>(), {
+    collectorId: undefined,
+});
 
 const state = reactive({
     orderedCardData: computed<CollectorRuleModel[]>(() => {
@@ -26,6 +38,8 @@ const state = reactive({
     }),
     isEmptyCase: computed<boolean>(() => collectorFormState.additionalRules.length === 0),
     editModeCardOrder: -1,
+    collectorProvider: computed(() => collectorFormState.originCollector?.provider),
+    isAddCase: computed<boolean>(() => collectorFormState.originCollectorRules?.length === 0),
 });
 
 const changeOrder = (targetData, clickedData, tempOrder) => {
@@ -74,12 +88,54 @@ const handleClickEditButton = (order: number) => {
     state.editModeCardOrder = order;
 };
 
+const handleCancelSetRule = () => {
+    if (state.isAddCase) {
+        collectorFormState.additionalRules = [];
+    }
+    state.editModeCardOrder = -1;
+};
+
 const handleClickAddEventRule = async () => {
     collectorFormState.additionalRules = [...collectorFormState.additionalRules, { order: collectorFormState.additionalRules.length + 1 }];
     state.editModeCardOrder = collectorFormState.additionalRules.length;
 };
+const createCollectorRule = async (data:CollectorRuleForm) => {
+    try {
+        const collectorRule = await SpaceConnector.clientV2.inventory.collectorRule.create<CollectorRuleCreateParameters>({
+            collector_id: collectorFormState.originCollector.collector_id,
+            conditions: data.conditions,
+            conditions_policy: data.conditions_policy,
+            actions: data.actions,
+            options: data.options,
+        });
+        collectorFormStore.$patch((_state) => {
+            _state.state.additionalRules = [collectorRule];
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+const handleSetRule = (data:CollectorRuleForm) => {
+    if (state.isAddCase) {
+        createCollectorRule(data);
+    }
+    // collectorFormStore.$patch((_state) => {
+    //     const tempRules = collectorFormState.additionalRules.map((rule) => {
+    //         if (rule.order === data.order) {
+    //             return data;
+    //         }
+    //         return rule;
+    //     });
+    //     _state.state.additionalRules = tempRules;
+    // });
+    state.editModeCardOrder = -1;
+};
 
 const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
+
+(async () => {
+    await collectorFormStore.setOriginCollectorRules(props.collectorId);
+})();
 </script>
 
 <template>
@@ -155,7 +211,11 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                         <div v-if="isEditModeByOrder(data.order)"
                              class="edit-card"
                         >
-                            <collector-additional-rule-form :data="data" />
+                            <collector-additional-rule-form :data="data"
+                                                            :provider="state.collectorProvider"
+                                                            @click-done="handleSetRule"
+                                                            @click-cancel="handleCancelSetRule"
+                            />
                         </div>
                         <div v-else
                              class="view-card"

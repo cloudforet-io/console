@@ -6,7 +6,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { AdditionalRuleCondition, CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
+import type { CollectorRuleListParameters } from '@/schema/inventory/collector-rule/api-verbs/list';
+import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
 import type {
     CollectorModel,
 
@@ -57,10 +58,10 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         options: {} as CollectorOptions,
         versions: [] as string[],
         isScheduleError: false,
-        additionalRules: [] as CollectorRuleModel[],
 
         // additional rules form
-        conditionList: [] as AdditionalRuleCondition[],
+        originCollectorRules: [] as CollectorRuleModel[]|null,
+        additionalRules: [] as CollectorRuleModel[],
 
         // getters
         collectorId: computed<string|undefined>(() => state.originCollector?.collector_id),
@@ -76,6 +77,19 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         },
         setRepositoryPlugin(pluginInfo: PluginModel|null) {
             state.repositoryPlugin = pluginInfo;
+        },
+        async setOriginCollectorRules(id?: string) {
+            try {
+                const res = await SpaceConnector.clientV2.inventory.collectorRule.list<CollectorRuleListParameters, ListResponse<CollectorRuleModel>>({
+                    collector_id: state.originCollector?.collector_id ?? id,
+                });
+                state.originCollectorRules = res?.results ?? [];
+                state.additionalRules = state.originCollectorRules;
+            } catch (e) {
+                state.originCollectorRules = [];
+                state.additionalRules = [];
+                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_RULE_TITLE'));
+            }
         },
         async resetForm() {
             actions.resetName();

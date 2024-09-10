@@ -1,54 +1,130 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { debounce } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PRadio, PSelectDropdown, PI, PTextInput, PTooltip, PFieldGroup, PCheckbox,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceTypeListParameters } from '@/schema/inventory/cloud-service-type/api-verbs/list';
+import type { CloudServiceTypeStatParameters } from '@/schema/inventory/cloud-service-type/api-verbs/stat';
+import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
 import {
     COLLECTOR_RULE_CONDITION_KEY, COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_POLICY,
 } from '@/schema/inventory/collector-rule/constant';
-// import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
-import type { CollectorRuleConditionKey } from '@/schema/inventory/collector-rule/type';
+import type { AdditionalRuleCondition, CollectorRuleModel, AdditionalRuleAction } from '@/schema/inventory/collector-rule/model';
+import type {
+    CollectorRuleConditionKey,
+    CollectorRuleConditionOperator,
+    CollectorRuleConditionPolicy,
+} from '@/schema/inventory/collector-rule/type';
+import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
+import type { RegionModel } from '@/schema/inventory/region/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import CollectorAdditionalRuleFormOperatorDropdown
     from '@/services/asset-inventory/components/CollectorAdditionalRuleFormOperatorDropdown.vue';
+import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
 
 
-// interface Props {
-//     data?: CollectorRuleModel;
-// }
-// const props = withDefaults(defineProps<Props>(), {
-//     data: undefined,
-// });
+interface Props {
+    data?: CollectorRuleModel;
+    provider?: string;
+}
+const props = withDefaults(defineProps<Props>(), {
+    data: undefined,
+    provider: undefined,
+});
 
 const allReferenceStore = useAllReferenceStore();
 
 
 
+const emit = defineEmits<{(e: 'click-done', formData?: CollectorRuleForm): void;
+    (e: 'click-cancel'): void;
+}>();
+
+const DEFAULT_CONDITION_KEY = props.provider ? COLLECTOR_RULE_CONDITION_KEY.cloud_service_group : COLLECTOR_RULE_CONDITION_KEY.provider;
+
+interface AdditionalRuleConditionWithSubkey extends AdditionalRuleCondition {
+    subkey?: string;
+}
+const convertToUiCondition = (condition?:AdditionalRuleCondition[]):AdditionalRuleConditionWithSubkey[] => (condition ?? [{
+    key: DEFAULT_CONDITION_KEY,
+    subkey: '',
+    operator: 'eq',
+    value: '',
+}]).map((c) => {
+    if (c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)) {
+        return {
+            ...c,
+            subkey: c.key.slice(4),
+        };
+    }
+    return c;
+});
+
+const convertToApiCondition = (condition:AdditionalRuleConditionWithSubkey[]):AdditionalRuleCondition[] => condition.map((c) => {
+    if (c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)) {
+        return {
+            key: `${c.key}.${c.subkey}`,
+            operator: c.operator,
+            value: c.value,
+        };
+    }
+    delete c.subkey;
+    return c;
+});
+
 const state = reactive({
-    projects: computed(() => allReferenceStore.getters.project),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    provider: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    isConditionTooltipVisible: computed(() => {
+        let isConditionTooltipVisible = false;
+        state.conditionList.forEach((condition) => {
+            if (condition.key === COLLECTOR_RULE_CONDITION_KEY.data || condition.key === COLLECTOR_RULE_CONDITION_KEY.tags) {
+                isConditionTooltipVisible = true;
+            }
+        });
+        return isConditionTooltipVisible;
+    }),
     conditionPolicies: computed(() => ({
         [COLLECTOR_RULE_CONDITION_POLICY.ANY]: _i18n.t('PROJECT.EVENT_RULE.ANY'),
         [COLLECTOR_RULE_CONDITION_POLICY.ALL]: _i18n.t('PROJECT.EVENT_RULE.ALL'),
         [COLLECTOR_RULE_CONDITION_POLICY.ALWAYS]: _i18n.t('PROJECT.EVENT_RULE.ALWAYS'),
     })),
-    selectedConditionRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ANY,
-    conditionKeyMenu: computed<SelectDropdownMenuItem[]>(() => Object.keys(COLLECTOR_RULE_CONDITION_KEY).filter((key) => (!((key === 'data' || key === 'tags')))).map((key) => ({
-        label: COLLECTOR_RULE_CONDITION_KEY_LABEL[key],
-        name: key,
-    })).concat([
-        { label: 'Data', name: 'data' },
-        { label: 'Tags', name: 'tags' },
-    ])),
-    selectedConditionKey: COLLECTOR_RULE_CONDITION_KEY.provider as CollectorRuleConditionKey,
+    selectedConditionRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ANY as CollectorRuleConditionPolicy,
+    conditionKeyMenu: computed<SelectDropdownMenuItem[]>(() => {
+        let keys = Object.keys(COLLECTOR_RULE_CONDITION_KEY);
+        if (props.provider) keys = keys.filter((key) => key !== COLLECTOR_RULE_CONDITION_KEY.provider);
+        return keys.filter((key) => (!((key === 'data' || key === 'tags')))).map((key) => ({
+            label: COLLECTOR_RULE_CONDITION_KEY_LABEL[key],
+            name: key,
+        })).concat([
+            { label: 'Data', name: 'data' },
+            { label: 'Tags', name: 'tags' },
+        ]);
+    }),
+    conditionList: convertToUiCondition(props.data?.conditions),
+    valueMenuSearchKeyword: '',
+    searchLoading: true,
+    // select dropdown menu
+    conditionListKey: 0,
+    cloudServiceGroupMenu: [] as (SelectDropdownMenuItem[])[],
+    cloudServiceTypeMenu: [] as (SelectDropdownMenuItem[])[],
+    regionMenu: [] as (SelectDropdownMenuItem[])[],
     // actions
     actionPolicies: computed(() => ({
         change_project: 'Project Routing',
@@ -56,35 +132,257 @@ const state = reactive({
         match_service_account: 'Match Service Account',
     })),
     selectedActionRadioIdx: 'change_project',
+    selectedProjectId: props.data?.actions?.change_project ? [props.data?.actions?.change_project ?? ''] : undefined,
     isStopProcessingChecked: false,
+    sourceInput: '',
+    targetInput: '',
+    isAllValid: computed(() => {
+        if (state.selectedConditionRadioIdx !== COLLECTOR_RULE_CONDITION_POLICY.ALWAYS) {
+            const isConditionValid = state.conditionList.every((condition) => condition.key && condition.value);
+            if (!isConditionValid) {
+                return false;
+            }
+        }
+        if (state.selectedActionRadioIdx === 'change_project' && !state.selectedProjectId?.[0]) {
+            return false;
+        }
+        if (state.selectedActionRadioIdx !== 'change_project' && (!state.sourceInput || !state.targetInput)) {
+            return false;
+        }
+
+        return true;
+    }),
 });
-
+const valueDropdownMenu = (key: CollectorRuleConditionKey, idx:number) => {
+    if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_group) {
+        return state.cloudServiceGroupMenu[idx] ?? DEFAULT_SEARCH_MAP.cloud_service_group ?? [];
+    } if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_type) {
+        return state.cloudServiceTypeMenu[idx] ?? DEFAULT_SEARCH_MAP.cloud_service_type ?? [];
+    } if (key === COLLECTOR_RULE_CONDITION_KEY.region_code) {
+        return state.regionMenu[idx] ?? DEFAULT_SEARCH_MAP.region_code ?? [];
+    } if (key === COLLECTOR_RULE_CONDITION_KEY.provider) {
+        return state.provider ? Object.keys(state.provider).map((provider) => ({
+            label: state.provider[provider].name,
+            name: provider,
+        })) : [];
+    }
+    return [];
+};
 const handleClickAddRule = () => {
-    console.log('add rule');
+    state.conditionList.push({
+        key: DEFAULT_CONDITION_KEY,
+        operator: 'eq',
+        value: '',
+    });
+};
+const handleClickDeleteCondition = (idx:number) => {
+    state.conditionList = state.conditionList.filter((condition, index) => index !== idx);
 };
 
-const handleSelectConditionKey = (value:CollectorRuleConditionKey) => {
-    state.selectedConditionKey = value;
+const handleSelectConditionValue = (value:string, idx:number) => {
+    state.conditionList = state.conditionList.map((condition, index) => {
+        if (index === idx) {
+            return {
+                ...condition,
+                value,
+            };
+        }
+        return condition;
+    });
 };
-const handle = (value) => {
-    console.log(value);
+const handleSelectConditionKey = (value:CollectorRuleConditionKey, idx:number) => {
+    state.conditionList = state.conditionList.map((condition, index) => {
+        if (index === idx) {
+            return {
+                ...condition,
+                key: value,
+            };
+        }
+        return condition;
+    });
+    switch (value) {
+    case COLLECTOR_RULE_CONDITION_KEY.cloud_service_group:
+        state.cloudServiceGroupMenu[idx] = DEFAULT_SEARCH_MAP.cloud_service_group;
+        break;
+    case COLLECTOR_RULE_CONDITION_KEY.cloud_service_type:
+        state.cloudServiceTypeMenu[idx] = DEFAULT_SEARCH_MAP.cloud_service_type;
+        break;
+    case COLLECTOR_RULE_CONDITION_KEY.region_code:
+        state.regionMenu[idx] = DEFAULT_SEARCH_MAP.region_code;
+        break;
+    default:
+        break;
+    }
+};
+const handleUpdateSubkeyInput = (value:string) => {
+    state.conditionList = state.conditionList.map((condition, index) => {
+        if (index === state.conditionList.length - 1) {
+            return {
+                ...condition,
+                subkey: value,
+            };
+        }
+        return condition;
+    });
+};
+
+const handleUpdateValueInput = (value:string, idx:number) => {
+    state.conditionList = state.conditionList.map((condition, index) => {
+        if (index === idx) {
+            return {
+                ...condition,
+                value,
+            };
+        }
+        return condition;
+    });
+};
+
+const handleUpdateOperator = (value:CollectorRuleConditionOperator, idx:number) => {
+    state.conditionList = state.conditionList.map((condition, index) => {
+        if (index === idx) {
+            return {
+                ...condition,
+                operator: value,
+            };
+        }
+        return condition;
+    });
 };
 
 const handleClickCancel = () => {
-    console.log('cancel');
+    emit('click-cancel');
+};
+
+const handleSelectProjectId = (value) => {
+    state.selectedProjectId = value;
 };
 
 const handleClickDone = () => {
-    console.log('done');
+    const actions:AdditionalRuleAction = {};
+
+    if (state.selectedActionRadioIdx === 'change_project') {
+        actions.change_project = state.selectedProjectId?.[0];
+    } else if (state.selectedActionRadioIdx === 'match_project') {
+        actions.match_project = {
+            source: state.sourceInput,
+            target: state.targetInput,
+        };
+    } else if (state.selectedActionRadioIdx === 'match_service_account') {
+        actions.match_service_account = {
+            source: state.sourceInput,
+            target: state.targetInput,
+        };
+    }
+
+    emit('click-done', {
+        conditions_policy: state.selectedConditionRadioIdx,
+        conditions: convertToApiCondition(state.conditionList),
+        actions,
+        options: {
+            stop_processing: state.isStopProcessingChecked,
+        },
+    });
 };
+// search fetchers
+const fetchCloudServiceGroup = async (keyword = '', idx:number):Promise<SelectDropdownMenuItem[]> => {
+    try {
+        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.stat<CloudServiceTypeStatParameters, ListResponse<string[]>>(
+            {
+                query: {
+                    distinct: 'group',
+                    keyword,
+                    filter: [{ k: 'group', v: keyword, o: 'contain' }, { k: 'provider', v: props.provider, o: 'eq' }],
+                },
+            },
+        );
+        const menu = results?.map((i) => ({
+            label: i,
+            name: i,
+        })) ?? [];
+        state.cloudServiceGroupMenu[idx] = menu;
+        return menu;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.cloudServiceGroupMenu = [];
+        return [];
+    }
+};
+const fetchCloudServiceType = async (keyword = '', idx:number):Promise<SelectDropdownMenuItem[]> => {
+    try {
+        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.list<CloudServiceTypeListParameters, ListResponse<CloudServiceTypeModel>>(
+            {
+                query: {
+                    keyword,
+                    filter: [{ k: 'provider', v: props.provider, o: 'eq' }],
+                },
+            },
+        );
+        const menu = results?.map((i) => ({
+            label: i.name,
+            name: i.cloud_service_type_id,
+        })) ?? [];
+        state.cloudServiceTypeMenu[idx] = menu;
+        return menu;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.cloudServiceTypeMenu = [];
+        return [];
+    }
+};
+const fetchRegion = async (keyword = '', idx:number):Promise<SelectDropdownMenuItem[]> => {
+    try {
+        const { results } = await SpaceConnector.clientV2.inventory.region.list<RegionListParameters, ListResponse<RegionModel>>(
+            {
+                query: {
+                    keyword,
+                    filter: [{ k: 'provider', v: props.provider, o: 'eq' }],
+                },
+            },
+        );
+        const menu = results?.map((i) => ({
+            label: i.name,
+            name: i.region_id,
+        })) ?? [];
+        state.regionMenu[idx] = menu;
+        return menu;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.regionMenu = [];
+        return [];
+    }
+};
+const handleSearchValue = debounce(async (keyword:string, key:CollectorRuleConditionKey, idx:number) => {
+    state.searchLoading = true;
+    state.valueMenuSearchKeyword = keyword;
+    if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_group) {
+        await fetchCloudServiceGroup(keyword, idx);
+    } else if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_type) {
+        await fetchCloudServiceType(keyword, idx);
+    }
+    state.searchLoading = false;
+}, 300);
+const DEFAULT_SEARCH_MAP:Record<CollectorRuleConditionKey, SelectDropdownMenuItem[]> = {
+    [COLLECTOR_RULE_CONDITION_KEY.cloud_service_group]: [],
+    [COLLECTOR_RULE_CONDITION_KEY.cloud_service_type]: [],
+    [COLLECTOR_RULE_CONDITION_KEY.region_code]: [],
+};
+
+(async () => {
+    // init search menu list
+    DEFAULT_SEARCH_MAP.cloud_service_group = await fetchCloudServiceGroup('', 0);
+    DEFAULT_SEARCH_MAP.cloud_service_type = await fetchCloudServiceType('', 0);
+    DEFAULT_SEARCH_MAP.region_code = await fetchRegion('', 0);
+    state.conditionListKey = 1;
+    state.searchLoading = false;
+})();
 </script>
 
 <template>
     <div class="collector-additional-rule-form">
         <section class="left-section">
             <h5 class="text-paragraph-lg text-gray-900 font-bold flex justify-between">
-                <span>{{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}<p-tooltip v-if="state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.data
-                                                                               || state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.tags"
+                <span>{{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}<p-tooltip v-if="state.isConditionTooltipVisible"
                                                                            class="ml-2"
                                                                            position="bottom"
                                                                            :contents="$t('INVENTORY.COLLECTOR.ADDITIONAL_RULE_CONDITION_INFO')"
@@ -115,47 +413,69 @@ const handleClickDone = () => {
                     <span class="text-label-md text-gray-700">{{ $t('INVENTORY.COLLECTOR.CONDITION_POLICY_DESC') }}</span>
                 </div>
                 <div v-if="state.selectedConditionRadioIdx !== COLLECTOR_RULE_CONDITION_POLICY.ALWAYS"
+                     :key="state.conditionListKey"
                      class="condition-list"
                 >
-                    <div class="condition-item-row">
+                    <div v-for="(condition, idx) in state.conditionList"
+                         :key="`condition-${idx}`"
+                         class="condition-item-row"
+                    >
                         <p-select-dropdown class="condition-key"
                                            :menu="state.conditionKeyMenu"
+                                           :selected="condition.key"
                                            is-fixed-width
-                                           @select="handleSelectConditionKey"
+                                           @select="handleSelectConditionKey($event, idx)"
                         />
-                        <template v-if="state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.data">
-                            <p-text-input class="condition-sub-key"
+                        <template v-if="condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data)">
+                            <p-text-input :value="state.conditionList[idx].subkey"
+                                          class="condition-sub-key"
                                           block
                                           is-fixed-width
                                           placeholder="ex) os.os_type"
+                                          @update:value="handleUpdateSubkeyInput($event)"
                             />
                         </template>
-                        <template v-if="state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.tags">
-                            <p-text-input class="condition-sub-key"
+                        <template v-if="condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)">
+                            <p-text-input :value="state.conditionList[idx].subkey"
+                                          class="condition-sub-key"
+                                          block
                                           is-fixed-width
                                           placeholder="ex) a.b.c"
+                                          @update:value="handleUpdateSubkeyInput($event)"
                             />
                         </template>
-                        <template v-else>
-                            <collector-additional-rule-form-operator-dropdown class="condition-operator"
-                                                                              @update:value="handle($event)"
-                            />
-                            <template v-if="state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.data || state.selectedConditionKey === COLLECTOR_RULE_CONDITION_KEY.tags">
-                                <span>:</span>
-                            </template>
-                            <p-select-dropdown v-if="state.selectedConditionKey !== COLLECTOR_RULE_CONDITION_KEY.account
-                                                   && state.selectedConditionKey !== COLLECTOR_RULE_CONDITION_KEY['reference.resource_id']"
-                                               class="condition-value"
-                                               is-fixed-width
-                            />
-                            <p-text-input v-else
-                                          class="condition-value"
-                                          block
-                            />
-                            <p-i class="flex-shrink-0"
-                                 name="ic_delete"
-                            />
+                        <collector-additional-rule-form-operator-dropdown class="condition-operator"
+                                                                          @update:value="handleUpdateOperator($event, idx)"
+                        />
+                        <template v-if="condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)">
+                            <span>:</span>
                         </template>
+                        <p-select-dropdown v-if="condition.key !== COLLECTOR_RULE_CONDITION_KEY.account
+                                               && condition.key !== COLLECTOR_RULE_CONDITION_KEY['reference.resource_id']
+                                               && !condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data)
+                                               && !condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)"
+                                           :menu="valueDropdownMenu(condition.key, idx)"
+                                           :search-text="state.valueMenuSearchKeyword"
+                                           :selected="condition.value"
+                                           :loading="state.searchLoading"
+                                           class="condition-value"
+                                           is-fixed-width
+                                           is-filterable
+                                           use-fixed-menu-style
+                                           @update:search-text="handleSearchValue($event, condition.key, idx)"
+                                           @select="handleSelectConditionValue($event, idx)"
+                        />
+                        <p-text-input v-else
+                                      v-model="condition.value"
+                                      class="condition-value"
+                                      block
+                                      @update:value="handleUpdateValueInput($event, idx)"
+                        />
+                        <p-i v-if="state.conditionList.length > 1"
+                             class="flex-shrink-0 cursor-pointer"
+                             name="ic_delete"
+                             @click="handleClickDeleteCondition(idx)"
+                        />
                     </div>
                 </div>
             </div>
@@ -180,6 +500,9 @@ const handleClickDone = () => {
                     <div v-if="state.selectedActionRadioIdx === 'change_project'">
                         <project-select-dropdown class="action-project"
                                                  is-fixed-width
+                                                 :selected-project-ids="state.selectedProjectId"
+                                                 :project-group-selectable="false"
+                                                 @update:selected-project-ids="handleSelectProjectId"
                         />
                     </div>
                     <div v-else
@@ -189,7 +512,8 @@ const handleClickDone = () => {
                                        label="Source"
                                        required
                         >
-                            <p-text-input class="action-source"
+                            <p-text-input v-model="state.sourceInput"
+                                          class="action-source"
                                           block
                             />
                         </p-field-group>
@@ -197,7 +521,8 @@ const handleClickDone = () => {
                                        label="Target"
                                        required
                         >
-                            <p-text-input class="action-target"
+                            <p-text-input v-model="state.targetInput"
+                                          class="action-target"
                                           block
                             />
                         </p-field-group>
@@ -217,6 +542,7 @@ const handleClickDone = () => {
             </p-button>
             <p-button style-type="primary"
                       class="done-event-rule-button"
+                      :disabled="!state.isAllValid"
                       @click="handleClickDone"
             >
                 {{ $t('COMMON.BUTTONS.DONE') }}
@@ -283,6 +609,8 @@ const handleClickDone = () => {
     padding: 1rem;
 
     .condition-list {
+        @apply flex flex-col gap-3;
+
         .condition-item-row {
             @apply flex gap-2 items-center justify-between;
 
