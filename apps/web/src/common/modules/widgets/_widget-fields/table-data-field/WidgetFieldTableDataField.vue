@@ -336,7 +336,7 @@ const initValue = () => {
                 fieldValue: props.value?.dynamicFieldInfo?.fieldValue,
                 valueType: props.value?.dynamicFieldInfo?.valueType ?? DEFAULT_VALUE_TYPE,
                 fixedValue: props.value?.dynamicFieldInfo?.valueType === 'auto' ? undefined : props.value?.dynamicFieldInfo?.fixedValue,
-                count: props.value?.dynamicFieldInfo?.valueType === 'auto' ? props.value?.dynamicFieldInfo?.count : undefined,
+                ...(props.value?.dynamicFieldInfo?.valueType === 'auto' && { count: props.value?.dynamicFieldInfo?.count }),
             },
             version: LATEST_TABLE_DATA_FIELD_VERSION,
         };
@@ -456,8 +456,8 @@ watch([ // Fetch Dynamic Field
     () => state.proxyValue?.dynamicFieldInfo?.criteria,
     () => props.allValueMap?.groupBy,
     () => props.allValueMap?.granularity,
-    () => props.allValueMap?.xAxis,
-    () => props.allValueMap?.yAxis,
+    () => props.allValueMap?.xAxis?.value,
+    () => props.allValueMap?.yAxis?.value,
     () => props.dateRange,
 ], async (
     [_fieldType, _value, _valueType, _criteria, _groupBy, _granularity, _xAxis, _yAxis, _dateRange],
