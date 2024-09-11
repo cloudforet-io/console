@@ -61,6 +61,7 @@ export const getWidgetLoadApiQuery = (dataFieldInfo: TableDataFieldValue, xAxisF
         _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${_criteria}`, desc: true }];
     }
     if (isDateField(_dataField) && _dataFieldType === 'dynamicField' && _dynamicFixedFieldValue?.length) {
+        _dynamicFixedFieldValue.sort();
         _filter = [{
             k: _dataField,
             v: _dynamicFixedFieldValue,
