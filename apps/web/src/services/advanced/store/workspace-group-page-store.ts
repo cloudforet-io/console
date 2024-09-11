@@ -94,10 +94,10 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
 
             return groupUsers ?? [];
         }),
-        selectedWorkspaces: computed(() => {
+        workspacesInSelectedGroup: computed(() => {
             const filteredWorkspaces = getters.selectedWorkspaceGroup?.workspaces?.filter(actions.filterWorkspace);
 
-            const sortedSelectedWorkspaces = filteredWorkspaces?.sort((a, b) => {
+            const sortedWorkspacesInSelectedGroup = filteredWorkspaces?.sort((a, b) => {
                 const aValue = a[state.workspaceSortBy];
                 const bValue = b[state.workspaceSortBy];
 
@@ -119,16 +119,16 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             });
 
             if (getters.workspaceTotalCount < state.workspacePageStart - 1 + state.workspacePageLimit) {
-                return sortedSelectedWorkspaces.slice(state.workspacePageStart - 1);
+                return sortedWorkspacesInSelectedGroup.slice(state.workspacePageStart - 1);
             }
 
-            return sortedSelectedWorkspaces?.slice(state.workspacePageStart - 1, state.workspacePageStart - 1 + state.workspacePageLimit);
+            return sortedWorkspacesInSelectedGroup?.slice(state.workspacePageStart - 1, state.workspacePageStart - 1 + state.workspacePageLimit);
         }),
         selectedWorkspacesByIndices: computed<string[]>(() => {
             const workspaces: any[] = [];
 
             state.selectedWorkspaceIndices.forEach((d:number) => {
-                workspaces.push(getters.selectedWorkspaces[d]);
+                workspaces.push(getters.workspacesInSelectedGroup[d]);
             });
 
             return workspaces ?? [];

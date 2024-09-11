@@ -5,4 +5,5 @@ export interface WorkspaceListParameters {
     workspace_id?: string;
     name?: string;
     created_by?: string;
+    workspace_group_id?: string;
 }

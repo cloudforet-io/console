@@ -48,11 +48,11 @@ const tableState = reactive({
         { name: 'created_at', label: 'Created At' },
     ],
     items: computed(() => workspaceGroupPageState.workspaceGroups.map(({
-        name, workspaces, users, created_at,
+        name, workspace_count, users, created_at,
     }) => ({
         name,
-        workspaces: workspaces?.length,
-        users: users?.length,
+        workspaces: workspace_count ?? 0,
+        users: users?.length ?? 0,
         created_at,
     }))),
     valueHandlerMap: computed(() => {
