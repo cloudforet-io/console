@@ -101,9 +101,7 @@ const state = reactive({
             },
         };
     })),
-    queryMenuSet: computed<LSBMenu>(() => [
-        ...filterMenuItems(state.currentQueryMenuList),
-    ]),
+    queryMenuSet: computed<LSBMenu>(() => state.currentQueryMenuList),
     adminMenuSet: computed<LSBMenu>(() => (!storeState.isAdminMode ? [
         {
             type: MENU_ITEM_TYPE.COLLAPSIBLE,
@@ -148,8 +146,6 @@ const dataSourceState = reactive({
     selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(storeState.dataSourceMap)[0]),
 });
 
-const filterMenuItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.filter((menu) => !(menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id])
-    || menu.type !== MENU_ITEM_TYPE.ITEM);
 const filterStarredItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id])
     && menu.type === MENU_ITEM_TYPE.ITEM);
 

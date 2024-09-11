@@ -132,6 +132,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
     workspaceListApiQueryHelper.setFilters([
         { k: 'name', v: inputText, o: '' },
         { k: 'state', v: 'ENABLED', o: '=' },
+        { k: 'is_dormant', v: false, o: '' },
     ]);
     try {
         const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({

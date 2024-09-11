@@ -601,7 +601,7 @@
 				"COLUMN": "Column",
 				"COST_ANALYSIS": "Cost Analysis",
 				"CURRENCY": "Currency",
-				"DAILY": "Daily (Accumulated)",
+				"DAILY": "Daily",
 				"DATA_SOURCE": "Data Source",
 				"DATA_TYPE": "Data Type",
 				"DEFAULT": "Default",

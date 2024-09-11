@@ -96,10 +96,10 @@ export const useUserPageStore = defineStore('page-user', {
                 const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
                 this.users = (results ?? [])?.map((item) => ({
                     ...item,
-                    role_type: item.role_binding_info.role_type,
+                    role_type: item.role_binding_info?.role_type,
                     role_binding: {
                         type: item.role_binding_info?.role_type as RoleType,
-                        name: this.roles.find((role) => role.role_id === item.role_binding_info.role_id)?.name ?? '',
+                        name: this.roles.find((role) => role.role_id === item.role_binding_info?.role_id)?.name ?? '',
                     },
                 }));
                 this.totalCount = total_count ?? 0;
@@ -116,10 +116,10 @@ export const useUserPageStore = defineStore('page-user', {
                 const res = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>(params);
                 return {
                     ...res,
-                    role_type: res.role_binding_info.role_type,
+                    role_type: res.role_binding_info?.role_type,
                     role_binding: {
-                        type: res.role_binding_info.role_type as RoleType,
-                        name: this.roles.find((role) => role.role_id === res.role_binding_info.role_id)?.name ?? '',
+                        type: res.role_binding_info?.role_type as RoleType,
+                        name: this.roles.find((role) => role.role_id === res.role_binding_info?.role_id)?.name ?? '',
                     },
                 };
             } catch (e: any) {
