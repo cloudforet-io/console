@@ -8,7 +8,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import FNB from '@/common/modules/navigations/FNB.vue';
 
-import LandingHeader from '@/services/landing/components/LandingHeader.vue';
+import LandingHeader from '@/services/landing/components/workspace-landing/LandingHeader.vue';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const userWorkspaceStore = useUserWorkspaceStore();

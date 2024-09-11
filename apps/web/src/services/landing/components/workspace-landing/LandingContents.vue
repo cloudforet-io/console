@@ -33,11 +33,11 @@ import { gray } from '@/styles/colors';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import LandingAllWorkspaces from '@/services/landing/components/LandingAllWorkspaces.vue';
-import LandingEmptyContents from '@/services/landing/components/LandingEmptyContents.vue';
-import LandingGroupWorkspaces from '@/services/landing/components/LandingGroupWorkspaces.vue';
-import LandingRecentVisits from '@/services/landing/components/LandingRecentVisits.vue';
-import LandingSearch from '@/services/landing/components/LandingSearch.vue';
+import LandingGroupWorkspaces from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingGroupWorkspaces.vue';
+import LandingAllWorkspaces from '@/services/landing/components/workspace-landing/LandingAllWorkspaces.vue';
+import LandingEmptyContents from '@/services/landing/components/workspace-landing/LandingEmptyContents.vue';
+import LandingRecentVisits from '@/services/landing/components/workspace-landing/LandingRecentVisits.vue';
+import LandingSearch from '@/services/landing/components/workspace-landing/LandingSearch.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
 
@@ -167,9 +167,9 @@ onUnmounted(() => {
             <p-divider />
             <div class="banner">
                 <img alt="empty-cloud-service-img"
-                     src="@/assets/images/landing/img_landing_create_workspace.png"
+                     src="../../../../assets/images/landing/img_landing_create_workspace.png"
                      class="create-workspace-img"
-                     srcset="@/assets/images/landing/img_landing_create_workspace@2x.png 2x,
+                     srcset="../../../../assets/images/landing/img_landing_create_workspace@2x.png 2x,
                         @/assets/images/landing/img_landing_create_workspace@3x.png 3x"
                 >
                 <span v-if="!state.isMobileSize"
