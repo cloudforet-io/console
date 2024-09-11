@@ -230,7 +230,7 @@ const getValueTooltipText = (item: TableDataItem, field: TableWidgetField) => {
         let _unit;
         if (field.name === 'sub_total') {
             const filteredFieldWithUnit = (props.dataField as string[])?.filter((_field) => props.dataInfo?.[_field]?.unit);
-            _unit = filteredFieldWithUnit.map((_field) => (props.dataInfo ?? {})[_field]?.unit).join(', ');
+            _unit = filteredFieldWithUnit?.map((_field) => (props.dataInfo ?? {})[_field]?.unit).join(', ');
         } else _unit = props.dataInfo?.[field.name || '']?.unit;
         return `• Unit: ${_unit ?? '-'} \n• ${field.name}: ${numberFormatter(item[field.name])}`;
     }

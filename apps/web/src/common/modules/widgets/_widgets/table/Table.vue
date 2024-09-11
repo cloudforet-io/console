@@ -229,7 +229,8 @@ const getTotalDataItem = (data: TableDataItem[], type: 'static'|'time_series'|'d
     const totalDataItem: TableDataItem = {};
     if ((state.groupByField ?? []).length) totalDataItem[(state.groupByField ?? [])[0]] = 'Total';
     if (type === 'static') {
-        [...state.tableDataField, 'sub_total'].forEach((field) => {
+        const _tableDataField = state.tableDataField ?? [];
+        [..._tableDataField, 'sub_total'].forEach((field) => {
             totalDataItem[field] = data.reduce((acc, cur) => acc + cur[field], 0);
             if (field !== 'sub_total' && hasComparisonInfo) {
                 const comparisionFieldName = `comparison_${field}`;
