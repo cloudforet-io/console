@@ -215,7 +215,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
     const _unit = widgetFrameProps.value.unitMap?.[state.dataField];
     _seriesFields.forEach((field) => {
         const _data: number[] = [];
-        state.xAxisData.forEach((d) => {
+        state.xAxisData?.forEach((d) => {
             const _result = _refinedResults.find((result) => result[state.xAxisField] === d);
             const _value = _result?.[state.dynamicFieldInfo?.criteria].find((v) => v[state.dataField] === field);
             _data.push(_value?.value || _defaultValue);
@@ -241,7 +241,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
 const getStaticFieldData = (rawData: StaticFieldData): any[] => {
     const _seriesData: any[] = [];
     const _defaultValue = state.missingValue === 'lineToZero' ? 0 : undefined;
-    state.dataField.forEach((field) => {
+    state.dataField?.forEach((field) => {
         const _unit = widgetFrameProps.value.unitMap?.[field];
         _seriesData.push({
             name: field,
