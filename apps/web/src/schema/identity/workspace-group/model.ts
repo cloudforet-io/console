@@ -6,6 +6,7 @@ export interface WorkspaceGroupModel {
     workspace_group_id: string;
     name: string;
     users: WorkspaceUser[];
+    workspace_count: number;
     tags: Tags;
     domain_id: string;
     created_by: string;
