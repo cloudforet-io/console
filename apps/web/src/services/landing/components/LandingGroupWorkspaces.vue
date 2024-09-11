@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { partition, sortBy } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PButton, PButtonTab, PIconButton,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { UserProfileGetWorkspacesParameters } from '@/schema/identity/user-profile/api-verbs/get-workspaces';
+import type { MyWorkspaceModel } from '@/schema/identity/user-profile/model';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
@@ -17,6 +21,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
@@ -57,9 +62,10 @@ const state = reactive({
         if (landingPageStoreState.selectedProjectGroup === 'all') {
             return state.workspaceList;
         }
-        const selectedGroupsWorkspaceId = state.workspaceGroupList.find((group) => group.workspace_group_id === landingPageStoreState.selectedProjectGroup)?.workspaces || [];
-        return state.workspaceList.filter((workspace) => selectedGroupsWorkspaceId.includes(workspace.workspace_id));
+        return state.workspacesInSelectedGroup;
     }),
+    workspacesInSelectedGroup: [] as MyWorkspaceModel[],
+    workspacesInSelectedGroupTotalCount: 0,
     workspaceBoardSets: computed<WorkspaceBoardSet[]>(() => {
         const favoriteOrderList = sortBy(state.selectedGroupWorkspaceList, (workspaceItem) => {
             const correspondingAItem = props.favoriteList?.find((favoriteItem) => favoriteItem?.itemId === workspaceItem.workspace_id);
@@ -101,6 +107,25 @@ const handleOpenOverlay = () => {
     state.isOverlayOpen = true;
 };
 
+const fetchWorkspaces = async (groupId:string) => {
+    if (groupId === 'all') {
+        return;
+    }
+    try {
+        const { results, total_count } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<UserProfileGetWorkspacesParameters, ListResponse<MyWorkspaceModel>>({
+            workspace_group_id: groupId,
+        });
+        state.workspacesInSelectedGroup = results ?? [];
+        state.workspacesInSelectedGroupTotalCount = total_count ?? 0;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+watch(() => landingPageStoreState.selectedProjectGroup, (groupId) => {
+    fetchWorkspaces(groupId);
+});
+
 (async () => {
     await userWorkspaceGroupStore.load();
 })();
@@ -131,14 +156,14 @@ const handleOpenOverlay = () => {
             />
         </div>
         <div class="title-wrapper">
-            <p-field-title :label="state.isAllWorkspaceTab ? $t('LADING.ALL_WORKSPACE'): $t('LADING.WORKSPACE_GROUP')"
+            <p-field-title :label="$t('LADING.WORKSPACES')"
                            color="dark"
                            font-weight="bold"
                            size="md"
                            class="title"
             >
                 <template #right>
-                    <span class="cnt">({{ state.workspaceList.length }})</span>
+                    <span class="cnt">({{ state.isAllWorkspaceTab ? state.workspaceList.length : state.workspacesInSelectedGroupTotalCount }})</span>
                 </template>
             </p-field-title>
             <div class="right-part-wrapper">
