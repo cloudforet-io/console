@@ -155,8 +155,7 @@ const handleModalClose = () => {
                                 :search-text.sync="searchText"
                                 appearance-type="stack"
                                 is-filterable
-                                multi-selec
-                                le
+                                multi-selectable
                                 show-delete-all-button
                                 use-fixed-menu-style
                                 show-select-marker

@@ -190,12 +190,12 @@ const handleOpenOverlay = () => {
         /* custom design-system component - p-button-tab */
         :deep(.p-button-tab) {
             width: calc(100% - 3rem);
+            overflow-x: auto;
             .button-group {
                 margin: 0;
-                overflow-x: auto;
                 flex-wrap: nowrap;
 
-                .tab-header-button {
+                > button {
                     flex-shrink: 0;
                 }
             }
