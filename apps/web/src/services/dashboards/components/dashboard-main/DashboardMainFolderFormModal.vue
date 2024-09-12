@@ -3,14 +3,21 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
 } from '@cloudforet/mirinae';
 
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { PrivateFolderCreateParameters } from '@/schema/dashboard/private-folder/api-verbs/create';
+import type { PrivateFolderUpdateParameters } from '@/schema/dashboard/private-folder/api-verbs/update';
 import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
+import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
+import type { PublicFolderUpdateParameters } from '@/schema/dashboard/public-folder/api-verbs/update';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,6 +28,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 
 type FolderModel = PublicFolderModel | PrivateFolderModel;
+type FolderCreateParams = PublicFolderCreateParameters | PrivateFolderCreateParameters;
+type FolderUpdateParams = PublicFolderUpdateParameters | PrivateFolderUpdateParameters;
 interface Props {
     visible: boolean;
     type?: 'EDIT' | 'CREATE';
@@ -34,8 +43,12 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     isPrivate: false,
@@ -73,7 +86,14 @@ const {
 /* Api */
 const createFolder = async () => {
     try {
-        // fetch api
+        const fetcher = state.isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
+        const params: FolderCreateParams = {
+            name: name.value as string,
+        };
+        if (!state.isPrivate) {
+            (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;
+        }
+        await fetcher(params);
         showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_CREATE_FOLDER'), '');
         state.proxyVisible = false;
     } catch (e) {
@@ -82,7 +102,13 @@ const createFolder = async () => {
 };
 const updateFolderName = async () => {
     try {
-        // update api
+        const _isPrivate = props.folder?.user_id?.length > 0;
+        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.update : SpaceConnector.clientV2.dashboard.publicFolder.update;
+        const params: FolderUpdateParams = {
+            folder_id: props.folder?.folder_id as string,
+            name: name.value as string,
+        };
+        await fetcher(params);
         state.proxyVisible = false;
         showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_UPDATE_FOLDER'), '');
     } catch (e) {
@@ -98,6 +124,7 @@ const handleFormConfirm = async () => {
     } else {
         await createFolder();
     }
+    await dashboardStore.load();
 };
 const handleUpdatePrivate = (value: boolean) => {
     state.isPrivate = value;
