@@ -7,7 +7,7 @@ export interface TreeNode<T extends TreeData = any> {
     children?: TreeNode<T>[];
 }
 
-interface TreeData {
+export interface TreeData {
     to?: Location;
 }
 export interface TreeDisplayMap {
