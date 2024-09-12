@@ -7,7 +7,7 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
-import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
+import LandingWorkspaceBoard from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceBoard.vue';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 

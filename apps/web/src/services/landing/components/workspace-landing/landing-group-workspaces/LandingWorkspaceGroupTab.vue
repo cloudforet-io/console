@@ -7,8 +7,8 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { i18n } from '@/translations';
 
 import { WORKSPACE_GROUP_TABS } from '@/services/advanced/constants/workspace-group-constant';
-import LandingWorkspaceGroupTabGroupUser from '@/services/landing/components/LandingWorkspaceGroupTabGroupUser.vue';
-import LandingWorkspaceGroupTabWorkspace from '@/services/landing/components/LandingWorkspaceGroupTabWorkspace.vue';
+import LandingWorkspaceGroupTabGroupUser from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupTabGroupUser.vue';
+import LandingWorkspaceGroupTabWorkspace from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupTabWorkspace.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
 const landingPageStore = useLandingPageStore();

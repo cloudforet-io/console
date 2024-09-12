@@ -4,7 +4,7 @@ import { ROUTE_SCOPE } from '@/router/constant';
 
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
-const LandingContainer = () => import('@/services/landing/components/LandingContainer.vue');
+const LandingContainer = () => import('@/services/landing/components/workspace-landing/LandingContainer.vue');
 const WorkspaceLandingPage = () => import('@/services/landing/pages/WorkspaceLandingPage.vue');
 const DomainLandingPage = () => import('@/services/landing/pages/DomainLandingPage.vue');
 

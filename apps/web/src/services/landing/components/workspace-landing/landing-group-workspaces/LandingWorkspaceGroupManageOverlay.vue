@@ -12,7 +12,7 @@ import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-w
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import LandingWorkspaceGroupTab from '@/services/landing/components/LandingWorkspaceGroupTab.vue';
+import LandingWorkspaceGroupTab from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupTab.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
 interface Props {
