@@ -5,7 +5,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { WorkspaceGroupAddWorkspacesParameters } from '@/schema/identity/workspace-group/api-verbs/add-workspaces';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
@@ -16,6 +15,8 @@ import { useSelectDropDownList } from '@/services/advanced/composables/use-selec
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 import type { WorkspaceGroupFetchParameters } from '@/services/advanced/types/admin-workspace-group-type';
+
+import type { WorkspaceGroupAddWorkspacesParameters } from '@/schema/identity/workspace-group/api-verbs/add-workspaces';
 
 
 

@@ -13,6 +13,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { BasicRoleModel, RoleModel } from '@/schema/identity/role/model';
+import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -22,13 +23,22 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
+import LandingWorkspaceGroupAddUsersModal
+    from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupAddUsersModal.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
 const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
 const userWorkspaceGroupStoreState = userWorkspaceGroupStore.state;
+const userWorkspaceGroupStoreGetters = userWorkspaceGroupStore.getters;
 const landingPageStore = useLandingPageStore();
+const landingPageStoreState = landingPageStore.state;
 const landingPageStoreGetter = landingPageStore.getters;
 const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
+
+const state = reactive({
+    addUserModalVisible: false,
+    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageStoreState.selectedProjectGroup]),
+});
 
 const tableState = reactive({
     fields: [
@@ -93,6 +103,7 @@ const handleRefresh = () => {
 };
 
 const handleAddUsersButtonClick = () => {
+    state.addUserModalVisible = true;
 };
 
 const handleSelectedGroupUsersRemoveButtonClick = () => {
@@ -232,6 +243,10 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
                 </p-button>
             </template>
         </p-toolbox-table>
+        <landing-workspace-group-add-users-modal :visible.sync="state.addUserModalVisible"
+                                                 :workspace-group="state.workspaceGroup"
+                                                 @confirm="handleRefresh"
+        />
     </section>
 </template>
 
