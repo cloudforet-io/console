@@ -1778,6 +1778,7 @@
 			"CREAT_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"DASHBOARD": "ダッシュボード",
 			"DASHBOARDS_TITLE": "ダッシュボード",
+			"DELETE_DASHBOARD": "",
 			"DEPRECATED": "サポート終了",
 			"DEPRECATED_DESCRIPTION": "このダッシュボードはサポートが終了し、新しいダッシュボードが適用されるとすぐに削除される予定です。",
 			"FILTER_ALL": "すべて",
