@@ -5,22 +5,25 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ResourceGroupType } from '@/schema/_common/type';
-import type { DashboardType } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardType, DashboardFolderType } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
 import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/private-dashboard/api-verbs/delete';
 import type { PrivateDashboardListParameters } from '@/schema/dashboard/private-dashboard/api-verbs/list';
 import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
+import type { PrivateFolderListParameters } from '@/schema/dashboard/private-folder/api-verbs/list';
 import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import type { PublicDashboardDeleteParameters } from '@/schema/dashboard/public-dashboard/api-verbs/delete';
 import type { PublicDashboardListParameters } from '@/schema/dashboard/public-dashboard/api-verbs/list';
 import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
+import type { PublicFolderListParameters } from '@/schema/dashboard/public-folder/api-verbs/list';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -40,6 +43,8 @@ type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashbo
 type DashboardListParameters = PublicDashboardListParameters|PrivateDashboardListParameters;
 type DashboardUpdateParameters = PublicDashboardUpdateParameters | PrivateDashboardUpdateParameters;
 type DashboardDeleteParameters = PublicDashboardDeleteParameters | PrivateDashboardDeleteParameters;
+type FolderListParameters = PublicFolderListParameters|PrivateFolderListParameters;
+type FolderModel = PublicFolderModel|PrivateFolderModel;
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
@@ -68,6 +73,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
             .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
             .filter((item) => !(item.resource_group === 'DOMAIN' && item.scope === 'PROJECT'))),
         privateItems: computed<PrivateDashboardModel[]>(() => state.privateDashboardItems),
+        sharedFolderItems: computed<PublicFolderModel[]>(() => state.publicFolderItems
+            .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
+            .filter((item) => !(item.resource_group === 'DOMAIN' && item.project_id.length > 0))),
     });
 
     /* Mutations */
@@ -89,13 +97,43 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     /* Actions */
     const fetchApiQueryHelper = new ApiQueryHelper();
+    const privateDashboardListFetcher = getCancellableFetcher<DashboardListParameters, ListResponse<DashboardModel>>(SpaceConnector.clientV2.dashboard.privateDashboard.list);
+    const publicDashboardListFetcher = getCancellableFetcher<DashboardListParameters, ListResponse<DashboardModel>>(SpaceConnector.clientV2.dashboard.publicDashboard.list);
     const _fetchDashboard = async (dashboardType: DashboardType, params?: DashboardListParameters) => {
-        const fetcher = dashboardType === 'PRIVATE'
-            ? SpaceConnector.clientV2.dashboard.privateDashboard.list
-            : SpaceConnector.clientV2.dashboard.publicDashboard.list;
+        const fetcher = dashboardType === 'PRIVATE' ? privateDashboardListFetcher : publicDashboardListFetcher;
         try {
             fetchApiQueryHelper.setFilters(state.searchFilters);
-            const res: ListResponse<DashboardModel> = await fetcher({
+            const { status, response } = await fetcher({
+                ...params,
+                query: {
+                    ...(params?.query || {}),
+                    ...fetchApiQueryHelper.data,
+                },
+            });
+            if (status === 'succeed') {
+                const results = response.results || [];
+                if (dashboardType === 'PRIVATE') {
+                    state.privateDashboardItems = results as PrivateDashboardModel[];
+                } else {
+                    state.publicDashboardItems = results as PublicDashboardModel[];
+                }
+            }
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            if (dashboardType === 'PRIVATE') {
+                state.privateDashboardItems = [];
+            } else {
+                state.publicDashboardItems = [];
+            }
+        }
+    };
+    const _fetchFolder = async (folderType: DashboardFolderType, params?: FolderListParameters) => {
+        const fetcher = folderType === 'PRIVATE'
+            ? SpaceConnector.clientV2.dashboard.privateFolder.list
+            : SpaceConnector.clientV2.dashboard.publicFolder.list;
+        try {
+            fetchApiQueryHelper.setFilters(state.searchFilters);
+            const res: ListResponse<FolderModel> = await fetcher({
                 ...params,
                 query: {
                     ...(params?.query || {}),
@@ -103,14 +141,14 @@ export const useDashboardStore = defineStore('dashboard', () => {
                 },
             });
             const results = res.results || [];
-            if (dashboardType === 'PRIVATE') {
-                state.privateDashboardItems = results as PrivateDashboardModel[];
+            if (folderType === 'PRIVATE') {
+                state.privateFolderItems = results as PrivateFolderModel[];
             } else {
-                state.publicDashboardItems = results as PublicDashboardModel[];
+                state.publicFolderItems = results as PublicFolderModel[];
             }
         } catch (e) {
             ErrorHandler.handleError(e);
-            if (dashboardType === 'PRIVATE') {
+            if (folderType === 'PRIVATE') {
                 state.privateDashboardItems = [];
             } else {
                 state.publicDashboardItems = [];
@@ -151,15 +189,19 @@ export const useDashboardStore = defineStore('dashboard', () => {
         if (_state.isAdminMode) {
             await Promise.all([
                 _fetchDashboard('PUBLIC', _publicDashboardParams),
+                _fetchFolder('PUBLIC', _publicDashboardParams),
             ]);
         } else if (isProject) {
             await Promise.all([
                 _fetchDashboard('PUBLIC', _publicDashboardParams),
+                _fetchFolder('PUBLIC', _publicDashboardParams),
             ]);
         } else {
             await Promise.allSettled([
                 _fetchDashboard('PRIVATE'),
                 _fetchDashboard('PUBLIC', _publicDashboardParams),
+                _fetchFolder('PRIVATE'),
+                _fetchFolder('PUBLIC', _publicDashboardParams),
             ]);
         }
         state.loading = false;
@@ -189,8 +231,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
             : SpaceConnector.clientV2.dashboard.publicDashboard.update;
         try {
             const result = await fetcher<DashboardUpdateParameters, DashboardModel>({
-                dashboard_id: dashboardId,
                 ...params,
+                dashboard_id: dashboardId,
             });
             if (isPrivate) {
                 const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
