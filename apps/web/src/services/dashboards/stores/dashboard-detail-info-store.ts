@@ -6,6 +6,7 @@ import {
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type {
@@ -313,23 +314,25 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         })) ?? [];
         setDashboardWidgetInfoList(_dashboardWidgetInfoList);
     };
+    const privateDashboardGetFetcher = getCancellableFetcher(SpaceConnector.clientV2.dashboard.privateDashboard.get);
+    const publicDashboardGetFetcher = getCancellableFetcher(SpaceConnector.clientV2.dashboard.publicDashboard.get);
     const getDashboardInfo = async (dashboardId: undefined|string) => {
         if (dashboardId === state.dashboardId || dashboardId === undefined) return;
 
         const isPrivate = dashboardId?.startsWith('private');
-        const fetcher = isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateDashboard.get
-            : SpaceConnector.clientV2.dashboard.publicDashboard.get;
+        const fetcher = isPrivate ? privateDashboardGetFetcher : publicDashboardGetFetcher;
         // WARN:: from under this line, beware using originState. originState could reference irrelevant dashboard data
         state.dashboardId = dashboardId;
         state.loadingDashboard = true;
         try {
             const params: GetDashboardParameters = { dashboard_id: dashboardId as string };
-            const result = await fetcher<GetDashboardParameters, DashboardModel>(params);
-            if (result.version === '1.0') {
-                _setDashboardInfoStoreState(result);
-            } else {
-                _setDashboardInfoStoreStateV2(result);
+            const { status, response } = await fetcher<GetDashboardParameters, DashboardModel>(params);
+            if (status === 'succeed') {
+                if (response.version === '1.0') {
+                    _setDashboardInfoStoreState(response);
+                } else {
+                    _setDashboardInfoStoreStateV2(response);
+                }
             }
         } catch (e) {
             reset();
