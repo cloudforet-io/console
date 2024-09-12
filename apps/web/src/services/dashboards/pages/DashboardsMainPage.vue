@@ -14,7 +14,6 @@ import type {
 } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
-
 import { SpaceRouter } from '@/router';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
@@ -29,6 +28,8 @@ import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
+import DashboardMainFolderFormModal
+    from '@/services/dashboards/components/dashboard-main/DashboardMainFolderFormModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
@@ -45,6 +46,7 @@ const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: computed(() => dashboardState.loading),
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    folderFormModalVisible: false,
     sharedDashboardList: computed<PublicDashboardModel[]>(() => {
         if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE' && !state.isWorkspaceOwner) return [];
         if (!storeState.isWorkspaceOwner) return [];
@@ -91,6 +93,9 @@ const queryState = reactive({
 });
 
 const handleCreateDashboard = () => { router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME })); };
+const handleCreateFolder = () => {
+    state.folderFormModalVisible = true;
+};
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsQueryTag(options.queryTags);
@@ -165,9 +170,16 @@ onUnmounted(() => {
         >
             <template #extra>
                 <p-button icon-left="ic_plus_bold"
+                          style-type="tertiary"
+                          class="mr-4"
+                          @click="handleCreateFolder"
+                >
+                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.NEW_FOLDER') }}
+                </p-button>
+                <p-button icon-left="ic_plus_bold"
                           @click="handleCreateDashboard"
                 >
-                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREATE') }}
+                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.NEW_DASHBOARD') }}
                 </p-button>
             </template>
         </p-heading>
@@ -229,6 +241,9 @@ onUnmounted(() => {
                                            is-collapsed
                 />
             </template>
+            <dashboard-main-folder-form-modal :visible.sync="state.folderFormModalVisible"
+                                              type="CREATE"
+            />
         </p-data-loader>
     </div>
 </template>

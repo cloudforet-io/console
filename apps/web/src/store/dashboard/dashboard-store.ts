@@ -15,11 +15,13 @@ import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/privat
 import type { PrivateDashboardListParameters } from '@/schema/dashboard/private-dashboard/api-verbs/list';
 import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
+import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import type { PublicDashboardDeleteParameters } from '@/schema/dashboard/public-dashboard/api-verbs/delete';
 import type { PublicDashboardListParameters } from '@/schema/dashboard/public-dashboard/api-verbs/list';
 import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
+import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -52,6 +54,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const state = reactive({
         publicDashboardItems: [] as PublicDashboardModel[],
         privateDashboardItems: [] as PrivateDashboardModel[],
+        publicFolderItems: [] as PublicFolderModel[],
+        privateFolderItems: [] as PrivateFolderModel[],
         searchFilters: [] as ConsoleFilter[],
         scope: undefined as DashboardScope | undefined,
         loading: true,
@@ -76,6 +80,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const reset = () => {
         state.publicDashboardItems = [];
         state.privateDashboardItems = [];
+        state.publicFolderItems = [];
+        state.privateFolderItems = [];
         state.searchFilters = [];
         state.scope = undefined;
         state.loading = true;
