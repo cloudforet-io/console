@@ -8,5 +8,6 @@ export interface DashboardTreeDataType extends TreeData {
     folderId?: string;
     shared?: boolean;
     scope?: string;
+    userId?: string;
     createdBy?: string;
 }

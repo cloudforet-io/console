@@ -27,9 +27,10 @@ import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
+import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import DashboardMainFolderFormModal
-    from '@/services/dashboards/components/dashboard-main/DashboardMainFolderFormModal.vue';
+    from '@/services/dashboards/components/dashboard-folder/DashboardMainFolderFormModal.vue';
+import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
@@ -224,15 +225,9 @@ onUnmounted(() => {
                                        :dashboard-list="dashboardGetters.domainItems"
             />
             <template v-else>
-                <dashboard-main-board-list v-if="state.sharedDashboardList.length"
-                                           class="dashboard-list"
-                                           :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SHARED')"
-                                           :dashboard-list="state.sharedDashboardList"
-                />
-                <dashboard-main-board-list v-if="state.privateDashboardList.length"
-                                           class="dashboard-list"
-                                           :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
-                                           :dashboard-list="state.privateDashboardList"
+                <dashboard-folder-tree v-if="state.isWorkspaceOwner"
+                                       :dashboard-list="state.sharedDashboardList"
+                                       :folder-list="dashboardGetters.sharedFolderItems"
                 />
                 <dashboard-main-board-list v-if="state.deprecatedDashboardList.length"
                                            class="dashboard-list"
