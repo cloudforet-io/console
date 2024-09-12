@@ -11,6 +11,7 @@ import type { Value } from '@/lib/variable-models/_base/types';
 
 
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
+export type DashboardFolderType = 'PUBLIC'|'PRIVATE';
 
 // dashboard variable schema types
 type VariableSelectionType = 'SINGLE' | 'MULTI';

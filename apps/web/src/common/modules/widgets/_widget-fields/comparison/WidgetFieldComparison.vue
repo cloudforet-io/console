@@ -34,10 +34,10 @@ const state = reactive({
     toggleValue: !!props.widgetFieldSchema.options?.toggle || !!props.value || false,
     proxyValue: useProxyValue<ComparisonValue[]|undefined>('value', props, emit),
     disabled: computed(() => { // NOTE: EXCEPTION FOR ONLY TABLE WIDGET
-        const tableDataField = props.allValueMap.tableDataField as TableDataFieldValue;
-        const _tableDataFieldFieldValue = tableDataField.fieldType === 'staticField' ? tableDataField.staticFieldInfo?.fieldValue : tableDataField.dynamicFieldInfo?.fieldValue;
+        const tableDataField = props.allValueMap?.tableDataField as TableDataFieldValue;
         if (!tableDataField) return false;
-        const groupByField = props.allValueMap.groupBy as GroupByValue;
+        const _tableDataFieldFieldValue = tableDataField.fieldType === 'staticField' ? tableDataField.staticFieldInfo?.fieldValue : tableDataField.dynamicFieldInfo?.fieldValue;
+        const groupByField = props.allValueMap?.groupBy as GroupByValue;
         return !Array.isArray(_tableDataFieldFieldValue) && isDateField(_tableDataFieldFieldValue)
             || Array.isArray(_tableDataFieldFieldValue) && isIncludingDateField(_tableDataFieldFieldValue)
             || Array.isArray(groupByField?.value) && isIncludingDateField(groupByField.value);

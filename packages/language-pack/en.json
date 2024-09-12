@@ -1789,6 +1789,7 @@
 				"ALT_E_UPDATE_FOLDER": "Failed to update folder",
 				"ALT_S_CREATE_FOLDER": "Folder successfully created",
 				"ALT_S_UPDATE_FOLDER": "Folder successfully updated",
+				"CREATED_BY": "created by {user}",
 				"CREATE_FOLDER": "Create Folder",
 				"EDIT_FOLDER_NAME": "Edit Folder Name",
 				"MAKE_PRIVATE": "Make Private (Only me)",
