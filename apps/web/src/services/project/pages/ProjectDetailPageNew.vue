@@ -8,8 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PI, PIconButton, PSelectDropdown, PButtonModal, PButton, PEmpty, PLazyImg,
 } from '@cloudforet/mirinae';
-
-
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
 import UserImage from '@/assets/images/role/img_avatar_no-role.png';
@@ -18,6 +17,7 @@ import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-memb
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
@@ -35,9 +35,12 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, peacock } from '@/styles/colors';
 
+import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
+import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import ProjectMemberInviteModal from '@/services/project/components/ProjectMemberInviteModal.vue';
 import ProjectTagsModal from '@/services/project/components/ProjectTagsModal.vue';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 const ROLE_INFO_MAP = {
     [ROLE_TYPE.SYSTEM_ADMIN]: { icon: SystemAdminImage, label: 'System Admin' },
@@ -56,12 +59,16 @@ const props = defineProps<Props>();
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
+const projectPageStore = useProjectPageStore();
+const projectPageState = projectPageStore.state;
+
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const gnbStore = useGnbStore();
 
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
+    projects: computed(() => allReferenceStore.getters.project),
 });
 const state = reactive({
     menuItems: [
@@ -85,6 +92,11 @@ const state = reactive({
             icon: 'ic_delete',
         },
     ],
+    currentProject: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
+    parentGroupId: computed(() => storeState.projects[props.id]?.data.groupInfo.id),
+    projectGroupMoveModalVisible: false,
+    projectDeleteModalVisible: false,
+    projectEditModalVisible: false,
 });
 
 const memberState = reactive({
@@ -105,23 +117,14 @@ const memberState = reactive({
 const tagsState = reactive({
     loading: false,
     tagsModalVisible: false,
-    tags: computed(() => projectDetailPageState.currentProject.tags ?? {}),
+    tags: computed(() => state.currentProject?.tags ?? {}),
 });
 
 /* Event */
-const handleSelectItem = () => {
-    // if (selected.name === 'update') updatestate.nameEditModalVisible = true;
-    // if (selected.name === 'move') state.cloneModalVisible = true;
-    // if (selected.name === 'shareWithCode') state.shareWithCodeModalVisible = true;
-    // if (selected.name === 'delete') state.deleteModalVisible = true;
-    // if (selected.name === 'share') {
-    //     state.selectedSharedScope = 'WORKSPACE';
-    //     state.shareModalVisible = true;
-    // }
-    // if (selected.name === 'unshare') state.unshareModalVisible = true;
-    // if (selected.name === 'shareProject') {
-    //     state.shareToProjectModalVisible = true;
-    // }
+const handleSelectItem = (selected: MenuItem) => {
+    if (selected.name === 'update') projectPageStore.openProjectFormModal();
+    if (selected.name === 'move') state.projectGroupMoveModalVisible = true;
+    if (selected.name === 'delete') state.projectDeleteModalVisible = true;
 };
 
 const handleOpenMemberModal = () => {
@@ -143,10 +146,11 @@ const handleOpenTagsModal = () => {
 const handleTagUpdate = async (newTags) => {
     try {
         tagsState.loading = true;
-        await SpaceConnector.client.identity.project.update({
+        const result = await SpaceConnector.client.identity.project.update<ProjectUpdateParameters, ProjectModel>({
             project_id: props.id,
             tags: newTags,
         });
+        projectDetailPageStore.setProject(result);
         showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
@@ -154,6 +158,13 @@ const handleTagUpdate = async (newTags) => {
         tagsState.loading = false;
         tagsState.tagsModalVisible = false;
     }
+};
+const handleConfirmProjectForm = (data: ProjectModel) => {
+    projectDetailPageStore.setProject(data);
+};
+
+const handleConfirmProjectGroupMoveModal = () => {
+    projectDetailPageStore.getProject();
 };
 
 /* API */
@@ -248,7 +259,7 @@ onUnmounted(() => {
             <div class="header-contents">
                 <div class="title-wrapper">
                     <span class="title">
-                        {{ projectDetailPageState.currentProject.name ?? '' }}
+                        {{ state.currentProject?.name ?? '' }}
                     </span>
                     <p-select-dropdown style-type="tertiary-icon-button"
                                        button-icon="ic_ellipsis-horizontal"
@@ -314,7 +325,7 @@ onUnmounted(() => {
                                  height="0.625rem"
                                  color="inherit"
                             />
-                            <span>{{ 3 }} Tags</span>
+                            <span>{{ Object.keys(tagsState.tags).length }} Tags</span>
                         </div>
                     </div>
                 </div>
@@ -384,10 +395,24 @@ onUnmounted(() => {
                                          :project-id="props.id"
                                          @confirm="handleConfirmInvite"
             />
-            <project-tags-modal :visible.sync="tagsState.tagsModalVisible"
+            <project-tags-modal v-if="tagsState.tagsModalVisible"
+                                :visible.sync="tagsState.tagsModalVisible"
                                 :tags="tagsState.tags"
                                 :project-id="props.id"
                                 @update="handleTagUpdate"
+            />
+            <project-form-modal v-if="projectPageState.projectFormModalVisible"
+                                :visible="projectPageState.projectFormModalVisible"
+                                :project-group-id="state.parentGroupId"
+                                :project="state.currentProject"
+                                @confirm="handleConfirmProjectForm"
+                                @update:visible="projectPageStore.setProjectFormModalVisible"
+            />
+            <project-main-project-group-move-modal v-if="state.projectGroupMoveModalVisible"
+                                                   :visible.sync="state.projectGroupMoveModalVisible"
+                                                   is-project
+                                                   :target-id="projectDetailPageState.projectId"
+                                                   @confirm="handleConfirmProjectGroupMoveModal"
             />
         </div>
     </div>
