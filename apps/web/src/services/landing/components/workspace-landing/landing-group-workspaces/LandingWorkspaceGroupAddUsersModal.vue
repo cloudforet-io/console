@@ -5,8 +5,9 @@ import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PSelectDropdown, PIconButton, PAvatar,
+    PButtonModal, PFieldGroup, PSelectDropdown, PIconButton, PAvatar, PTextInput,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListBasicRoleParameters } from '@/schema/identity/role/api-verbs/list-basic-role';
@@ -81,7 +82,7 @@ const handleConfirm = async () => {
         await SpaceConnector.clientV2.identity.workspaceGroupUser.add<WorkspaceGroupUserAddParameters, WorkspaceGroupUserModel>({
             workspace_group_id: props.workspaceGroup?.workspace_group_id,
             users: userDropdownState.selectedItems.map((item) => ({
-                user_id: item?.user_id, role_id: roleSelectedItems.value[0]?.name,
+                user_id: item, role_id: roleSelectedItems.value[0]?.name,
             })),
         });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
@@ -99,17 +100,21 @@ const handleCloseModal = () => {
     state.proxyVisible = false;
 };
 
-const handleRemoveUser = (item: WorkspaceGroupUserSummaryModel) => {
-    userDropdownState.menuList = userDropdownState.menuList.filter((selectedItem) => selectedItem.user_id !== item.user_id);
+const handleRemoveUser = (item: string) => {
+    userDropdownState.selectedItems = userDropdownState.selectedItems.filter((selectedItem) => selectedItem !== item);
 };
 // userFind logic
 const userDropdownState = reactive({
-    menuList: [] as WorkspaceGroupUserSummaryModel[],
-    selectedItems: [] as WorkspaceGroupUserSummaryModel[],
+    userList: [] as WorkspaceGroupUserSummaryModel[],
+    menuList: computed(() => userDropdownState.userList.map((user) => ({
+        label: user.user_id,
+        name: user.user_id,
+        disabled: userDropdownState.selectedItems.includes(user.user_id),
+    }))),
+    inputSelectedItem: [] as MenuItem[],
+    selectedItems: [] as string[],
     searchText: '',
-    totalCount: 0,
     loading: false,
-    pageStart: 1,
     pageLimit: 10,
 });
 const fetchUserFindList = async ():Promise<WorkspaceGroupUserSummaryModel[]> => {
@@ -117,41 +122,37 @@ const fetchUserFindList = async ():Promise<WorkspaceGroupUserSummaryModel[]> => 
 
     try {
         if (!props.workspaceGroup?.workspace_group_id) throw Error('Invalid Workspace Group Id.');
-        const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceGroupUser.find<WorkspaceGroupUserFindParameters, ListResponse<WorkspaceGroupUserSummaryModel>>({
+        const { results } = await SpaceConnector.clientV2.identity.workspaceGroupUser.find<WorkspaceGroupUserFindParameters, ListResponse<WorkspaceGroupUserSummaryModel>>({
             workspace_group_id: props.workspaceGroup?.workspace_group_id,
             keyword: userDropdownState.searchText,
             state: USER_STATE.ENABLE,
             page: {
-                start: userDropdownState.pageStart,
+                start: 0,
                 limit: userDropdownState.pageLimit,
             },
         });
-
-        userDropdownState.totalCount = total_count ?? 0;
         return results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
-        userDropdownState.totalCount = 0;
         return [];
     } finally {
         userDropdownState.loading = false;
     }
 };
-
-const handleClickShowMoreUser = async () => {
-    userDropdownState.pageStart += userDropdownState.pageLimit;
-    const results = await fetchUserFindList();
-    userDropdownState.menuList = userDropdownState.menuList.concat(results);
+const handleEnter = (user: [MenuItem]) => {
+    const selectedUser = user[0]?.name;
+    const isExistUser = userDropdownState.selectedItems.find((selectedItem:string) => selectedItem === selectedUser);
+    if (!selectedUser || isExistUser) return;
+    userDropdownState.selectedItems.push(selectedUser);
+    userDropdownState.inputSelectedItem = [];
 };
 
-
 (async () => {
-    userDropdownState.menuList = await fetchUserFindList();
+    userDropdownState.userList = await fetchUserFindList();
 })();
 
 watch(() => userDropdownState.searchText, debounce(async () => {
-    userDropdownState.pageStart = 1;
-    userDropdownState.menuList = await fetchUserFindList() || [];
+    userDropdownState.userList = await fetchUserFindList() || [];
 }, 300));
 </script>
 
@@ -210,38 +211,27 @@ watch(() => userDropdownState.searchText, debounce(async () => {
                                style-type="secondary"
                 >
                     <template #default>
-                        <p-select-dropdown
-                            is-filterable
-                            use-fixed-menu-style
-                            class="user-select-dropdown"
-                            style-type="TERTIARY_ICON_BUTTON"
-                            disable-handler
-                            multi-selectable
-                            :menu="userDropdownState.menuList"
-                            :selected.sync="userDropdownState.selectedItems"
-                            :search-text.sync="userDropdownState.searchText"
-                            :loading="userDropdownState.loading"
-                            :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.USER_DROP_DOWN_PLACEHOLDER')"
-                            @click-show-more="handleClickShowMoreUser"
-                        >
-                            <template #menu-item--format="{ item }">
-                                <div class="user-menu-item">
-                                    <span class="role-user_id">{{ item.user_id }}({{ item.name }})</span>
-                                </div>
-                            </template>
-                        </p-select-dropdown>
+                        <p-text-input :value.sync="userDropdownState.searchText"
+                                      class="user-search-input"
+                                      :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.USER_DROP_DOWN_PLACEHOLDER')"
+                                      :selected="userDropdownState.inputSelectedItem"
+                                      use-auto-complete
+                                      use-fixed-menu-style
+                                      :menu="userDropdownState.menuList"
+                                      @update:selected="handleEnter"
+                        />
                     </template>
                 </p-field-group>
             </div>
             <div v-for="item in userDropdownState.selectedItems"
-                 :key="item.user_id"
+                 :key="item"
                  class="selected-user-item"
             >
                 <div class="flex items-center gap-2">
                     <p-avatar class="menu-icon"
                               size="md"
                     />
-                    {{ item?.user_id }}
+                    {{ item }}
                 </div>
                 <p-icon-button name="ic_close"
                                size="md"
@@ -279,19 +269,8 @@ watch(() => userDropdownState.searchText, debounce(async () => {
         }
     }
 
-    .user-select-dropdown {
-        .user-menu-item {
-            @apply flex items-center justify-between;
-            gap: 0.25rem;
-        }
-
-        :deep(.dropdown-button)::before {
-            content: "Add Users";
-        }
-
-        :deep(.selection-display-wrapper) {
-            display: none;
-        }
+    .user-search-input {
+        width: 100%;
     }
 
     .selected-user-item {
