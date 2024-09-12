@@ -165,16 +165,27 @@ const updateTreeDisplayMap = (selectedTreeId: string) => {
 
 onMounted(() => {
     const selectedProjectGroupId = route.params.projectGroupId as string|undefined;
+    const selectedProjectId = route.params.id as string|undefined;
     if (selectedProjectGroupId) {
         state.selectedTreeId = selectedProjectGroupId as string;
         updateTreeDisplayMap(selectedProjectGroupId);
     }
+    if (selectedProjectId) {
+        state.selectedTreeId = selectedProjectId as string;
+        const parentGroupId = storeState.project[selectedProjectId]?.data.groupInfo?.id;
+        if (parentGroupId) updateTreeDisplayMap(parentGroupId);
+    }
 });
 
-watch(() => route.params.projectGroupId, (groupId) => {
-    if (groupId) {
-        state.selectedTreeId = groupId as string;
-        updateTreeDisplayMap(groupId);
+watch(() => route.params, ({ id, projectGroupId }) => {
+    if (projectGroupId) {
+        state.selectedTreeId = projectGroupId as string;
+        updateTreeDisplayMap(projectGroupId);
+    }
+    if (id) {
+        state.selectedTreeId = id as string;
+        const parentGroupId = storeState.project[id]?.data.groupInfo?.id;
+        if (parentGroupId) updateTreeDisplayMap(parentGroupId);
     }
 });
 watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
