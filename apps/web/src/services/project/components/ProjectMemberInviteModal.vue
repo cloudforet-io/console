@@ -5,18 +5,27 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PSelectDropdown,
+    PButtonModal, PFieldGroup, PSelectDropdown, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 
+import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
+import UserImage from '@/assets/images/role/img_avatar_no-role.png';
+import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
+import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
+import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectAddUsersParameters } from '@/schema/identity/project/api-verbs/add-users';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -24,6 +33,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+const ROLE_INFO_MAP = {
+    [ROLE_TYPE.SYSTEM_ADMIN]: { icon: SystemAdminImage, label: 'System Admin' },
+    [ROLE_TYPE.DOMAIN_ADMIN]: { icon: DomainAdminImage, label: 'Domain Admin' },
+    [ROLE_TYPE.WORKSPACE_OWNER]: { icon: WorkspaceOwnerImage, label: 'Workspace Owner' },
+    [ROLE_TYPE.WORKSPACE_MEMBER]: { icon: WorkspaceMemberImage, label: 'Workspace Member' },
+    [ROLE_TYPE.USER]: { icon: UserImage, label: 'User' },
+} as const;
 
 interface Props {
     visible?: boolean;
@@ -36,6 +52,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'confirm'): void;
 }>();
+const allReferenceStore = useAllReferenceStore();
+
+
+const storeState = reactive({
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
+});
 
 const state = reactive({
     loading: false,
@@ -161,7 +183,18 @@ const handleConfirm = async () => {
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="setForm('selectedUserItems', $event)"
-                        />
+                        >
+                            <template #menu-item--format="{item}">
+                                <p-lazy-img :src="ROLE_INFO_MAP[storeState.users[item.name]?.data.roleInfo.role_type]?.icon"
+                                            class="menu-icon"
+                                            width="1rem"
+                                            height="1rem"
+                                />
+                                <span>
+                                    {{ storeState.users[item.name]?.label }}
+                                </span>
+                            </template>
+                        </p-select-dropdown>
                     </template>
                 </p-field-group>
             </div>
@@ -190,6 +223,9 @@ const handleConfirm = async () => {
             line-height: 1.25;
             padding-bottom: 1rem;
         }
+    }
+    .menu-icon {
+        @apply rounded-full overflow-hidden;
     }
 }
 </style>

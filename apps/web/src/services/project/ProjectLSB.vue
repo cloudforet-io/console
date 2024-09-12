@@ -10,7 +10,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -97,43 +96,43 @@ const state = reactive({
             id: 'project',
         },
     ]),
-    projectDetailMenuSet: computed(() => [
-        {
-            type: MENU_ITEM_TYPE.ITEM,
-            label: i18n.t('PROJECT.DETAIL.DASHBOARD.DASHBOARD'),
-            id: 'project-dashboard',
-            to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME }),
-            hideFavorite: true,
-        },
-        {
-            type: MENU_ITEM_TYPE.ITEM,
-            label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
-            id: 'project-member',
-            to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME }),
-            hideFavorite: true,
-        },
-        {
-            type: MENU_ITEM_TYPE.ITEM,
-            label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
-            id: 'project-alert',
-            to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME }),
-            hideFavorite: true,
-        },
-        {
-            type: MENU_ITEM_TYPE.ITEM,
-            label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
-            id: 'project-notification',
-            to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME }),
-            hideFavorite: true,
-        },
-        {
-            type: MENU_ITEM_TYPE.ITEM,
-            label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
-            id: 'project-tag',
-            to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME }),
-            hideFavorite: true,
-        },
-    ]),
+    // projectDetailMenuSet: computed(() => [
+    //     {
+    //         type: MENU_ITEM_TYPE.ITEM,
+    //         label: i18n.t('PROJECT.DETAIL.DASHBOARD.DASHBOARD'),
+    //         id: 'project-dashboard',
+    //         to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME }),
+    //         hideFavorite: true,
+    //     },
+    //     {
+    //         type: MENU_ITEM_TYPE.ITEM,
+    //         label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
+    //         id: 'project-member',
+    //         to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME }),
+    //         hideFavorite: true,
+    //     },
+    //     {
+    //         type: MENU_ITEM_TYPE.ITEM,
+    //         label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
+    //         id: 'project-alert',
+    //         to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME }),
+    //         hideFavorite: true,
+    //     },
+    //     {
+    //         type: MENU_ITEM_TYPE.ITEM,
+    //         label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
+    //         id: 'project-notification',
+    //         to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME }),
+    //         hideFavorite: true,
+    //     },
+    //     {
+    //         type: MENU_ITEM_TYPE.ITEM,
+    //         label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
+    //         id: 'project-tag',
+    //         to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME }),
+    //         hideFavorite: true,
+    //     },
+    // ]),
     menuSet: computed<LSBMenu[]>(() => {
         const baseMenuSet = [
             {
@@ -143,13 +142,10 @@ const state = reactive({
             },
             { type: MENU_ITEM_TYPE.DIVIDER },
         ];
-        return (state.isProjectLandingPage ? [
+        return [
             ...baseMenuSet,
             ...state.projectLandingMenuSet,
-        ] : [
-            ...baseMenuSet,
-            ...state.projectDetailMenuSet,
-        ]);
+        ];
     }),
     projectFilteredByKeyword: computed<LSBItem[]>(() => storeState.projectItems.filter((project) => project.name.includes(state.projectKeyword))
         .map((project) => ({
