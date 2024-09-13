@@ -2843,7 +2843,7 @@
 				"CREATE_TITLE": "ワークスペースグループを作成",
 				"DELETE_BUTTON": "削除",
 				"DELETE_GROUP_USER_TITLE": "グループユーザーを削除する",
-				"DELETE_MODAL_FIRST_MESSAGE": "“{Workspace Group Name}”を削除してもよろしいですか？このワークスペースグループには以下のワークスペースとユーザーが含まれています:",
+				"DELETE_MODAL_FIRST_MESSAGE": "“{WorkspaceGroupName}”を削除してもよろしいですか？このワークスペースグループには以下のワークスペースとユーザーが含まれています:",
 				"DELETE_MODAL_LAST_MESSAGE": "このワークスペースグループを削除してもよろしいですか？",
 				"DELETE_MODAL_WARNING_MESSAGE": "ワークスペースグループが削除されると、すべてのグループユーザーは含まれているワークスペースへのアクセスを失い、この操作は元に戻せません。",
 				"DELETE_TITLE": "ワークスペースグループを削除する",

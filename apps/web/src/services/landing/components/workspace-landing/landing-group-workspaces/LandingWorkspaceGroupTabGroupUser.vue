@@ -13,7 +13,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { BasicRoleModel, RoleModel } from '@/schema/identity/role/model';
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceGroupModel, WorkspaceUser } from '@/schema/identity/workspace-group/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -25,6 +25,8 @@ import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/c
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import LandingWorkspaceGroupAddUsersModal
     from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupAddUsersModal.vue';
+import LandingWorkspaceGroupRemoveUserModal
+    from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupRemoveUserModal.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
 const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
@@ -37,7 +39,9 @@ const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
 
 const state = reactive({
     addUserModalVisible: false,
+    removeUserModalVisible: false,
     workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageStoreState.selectedProjectGroup]),
+    removeUserList: [] as WorkspaceUser[],
 });
 
 const tableState = reactive({
@@ -107,10 +111,15 @@ const handleAddUsersButtonClick = () => {
 };
 
 const handleSelectedGroupUsersRemoveButtonClick = () => {
+    state.removeUserList = landingPageStoreGetter.workspaceGroupUserTableItem
+        .map((item, index) => (landingPageStoreGroupUserState.selectedIndices.includes(index) ? item : null))
+        .filter((item) => item);
+    state.removeUserModalVisible = true;
 };
 
-const handleSelectedGroupUserRemoveButtonClick = (item) => {
-    console.log(item);
+const handleSelectedGroupUserRemoveButtonClick = async (item:WorkspaceUser) => {
+    state.removeUserList = [item];
+    state.removeUserModalVisible = true;
 };
 
 const handleChangeSort = (name:string, isDesc:boolean) => {
@@ -246,6 +255,11 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
         <landing-workspace-group-add-users-modal :visible.sync="state.addUserModalVisible"
                                                  :workspace-group="state.workspaceGroup"
                                                  @confirm="handleRefresh"
+        />
+        <landing-workspace-group-remove-user-modal :visible.sync="state.removeUserModalVisible"
+                                                   :workspace-group="state.workspaceGroup"
+                                                   :remove-user-list="state.removeUserList"
+                                                   @confirm="handleRefresh"
         />
     </section>
 </template>

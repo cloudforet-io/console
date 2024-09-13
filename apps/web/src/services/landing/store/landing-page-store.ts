@@ -35,7 +35,7 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
         // workspaceGroupUser
         workspaceGroupUsers: computed<WorkspaceUser[]>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[state.selectedProjectGroup]?.users || []),
         workspaceGroupUserTotalCount: computed<number>(() => getters.workspaceGroupUsers.length || 0),
-        workspaceGroupUserTableItem: computed(() => {
+        workspaceGroupUserTableItem: computed<WorkspaceUser[]>(() => {
             const filteredUsers = getters.workspaceGroupUsers?.filter(actions.filterUser);
 
             const sortedSelectedGroupUsers = filteredUsers?.sort((a, b) => {
