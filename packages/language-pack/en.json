@@ -2823,6 +2823,7 @@
 			"WORKSPACES": "Workspaces"
 		},
 		"WORKSPACE_GROUP": {
+			"ALT_E_UPDATE_ROLE": "Failed to change workspace role",
 			"ALT_S_UPDATE_ROLE": "Workspace role successfully changed",
 			"CREATE": "Create",
 			"MAIN": {

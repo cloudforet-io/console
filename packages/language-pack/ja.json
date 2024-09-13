@@ -2823,6 +2823,7 @@
 			"WORKSPACES": "ワークスペース"
 		},
 		"WORKSPACE_GROUP": {
+			"ALT_E_UPDATE_ROLE": "",
 			"ALT_S_UPDATE_ROLE": "ワークスペースの役割が正常に変更されました",
 			"CREATE": "作成",
 			"MAIN": {

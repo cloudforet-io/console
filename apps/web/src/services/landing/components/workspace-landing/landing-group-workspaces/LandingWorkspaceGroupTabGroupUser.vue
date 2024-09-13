@@ -13,6 +13,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { BasicRoleModel, RoleModel } from '@/schema/identity/role/model';
+import type { WorkspaceGroupUserUpdateRoleParameters } from '@/schema/identity/workspace-group-user/api-verbs/update-role';
 import type { WorkspaceGroupModel, WorkspaceUser } from '@/schema/identity/workspace-group/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -20,6 +21,8 @@ import { i18n } from '@/translations';
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
@@ -55,6 +58,7 @@ const tableState = reactive({
     loginUserId: computed(() => store.state.user.userId),
     loginUserRoleType: computed(() => landingPageStoreGetter.workspaceGroupUsers.find((user) => user.user_id === tableState.loginUserId).role_type),
     isUserOwnerRole: computed(() => store.state.user.roleType === ROLE_TYPE.DOMAIN_ADMIN || tableState.loginUserRoleType === ROLE_TYPE.WORKSPACE_OWNER),
+    items: [] as WorkspaceUser[],
 });
 
 const {
@@ -98,8 +102,19 @@ const handleChange = (options: any = {}) => {
     }
 };
 
-const handleSelectMenu = () => {
-    showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.ALT_S_UPDATE_ROLE'), '');
+const handleSelectMenu = async (role: BasicRoleModel, user_id: string) => {
+    try {
+        if (!role.name || !user_id) throw new Error('role_id or user_id is not exist');
+        await SpaceConnector.clientV2.identity.workspaceGroupUser.updateRole<WorkspaceGroupUserUpdateRoleParameters>({
+            workspace_group_id: state.workspaceGroup?.workspace_group_id,
+            target_user_id: user_id,
+            role_id: role.name,
+        });
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.ALT_S_UPDATE_ROLE'), '');
+        await userWorkspaceGroupStore.load();
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.ALT_E_UPDATE_ROLE'));
+    }
 };
 
 const handleRefresh = () => {
@@ -134,16 +149,6 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
         _state.groupUserTableState.isDesc = isDesc;
     });
 };
-
-// watch(() => workspaceGroupPageState.groupUserSearchText, () => {
-//     workspaceGroupPageStore.$patch((_state) => {
-//         _state.state.selectedUserIndices = [];
-//     });
-// });
-//
-// onUnmounted(() => {
-//     workspaceGroupPageStore.resetGroupUser();
-// });
 </script>
 
 <template>
@@ -218,7 +223,7 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
                         disable-handler
                         page-size="10"
                         @click-show-more="handleClickShowMore"
-                        @select="handleSelectMenu"
+                        @select="handleSelectMenu($event, item.user_id)"
                     >
                         <template #dropdown-button>
                             <span />

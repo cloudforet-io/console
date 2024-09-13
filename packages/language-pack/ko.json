@@ -2823,6 +2823,7 @@
 			"WORKSPACES": "워크스페이스"
 		},
 		"WORKSPACE_GROUP": {
+			"ALT_E_UPDATE_ROLE": "워크스페이스 역할(Role) 수정 실패",
 			"ALT_S_UPDATE_ROLE": "워크스페이스 역할(Role) 수정 완료",
 			"CREATE": "생성",
 			"MAIN": {
