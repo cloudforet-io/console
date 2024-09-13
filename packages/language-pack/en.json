@@ -2843,7 +2843,7 @@
 				"CREATE_TITLE": "Create Workspace Group",
 				"DELETE_BUTTON": "Delete",
 				"DELETE_GROUP_USER_TITLE": "Remove Group User",
-				"DELETE_MODAL_FIRST_MESSAGE": "Are you sure you want to delete “{Workspace Group Name}”? This workspace group includes the following workspaces and users:",
+				"DELETE_MODAL_FIRST_MESSAGE": "Are you sure you want to delete “{WorkspaceGroupName}”? This workspace group includes the following workspaces and users:",
 				"DELETE_MODAL_LAST_MESSAGE": "Are you sure you want to delete this workspace group?",
 				"DELETE_MODAL_WARNING_MESSAGE": "Once the workspace group deleted, all group users will lose access to the included workspaces, and this action cannot be undone.",
 				"DELETE_TITLE": "Delete Workspace Group",

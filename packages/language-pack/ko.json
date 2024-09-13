@@ -2843,7 +2843,7 @@
 				"CREATE_TITLE": "워크스페이스 그룹 생성 ",
 				"DELETE_BUTTON": "삭제 ",
 				"DELETE_GROUP_USER_TITLE": "그룹 사용자 삭제",
-				"DELETE_MODAL_FIRST_MESSAGE": "“{Workspace Group Name}”을 삭제하시겠습니까? 이 워크스페이스 그룹에는 다음과 같은 워크스페이스와 사용자가 포함되어 있습니다:",
+				"DELETE_MODAL_FIRST_MESSAGE": "“{WorkspaceGroupName}”을 삭제하시겠습니까? 이 워크스페이스 그룹에는 다음과 같은 워크스페이스와 사용자가 포함되어 있습니다:",
 				"DELETE_MODAL_LAST_MESSAGE": "이 워크스페이스 그룹을 삭제하시겠습니까?",
 				"DELETE_MODAL_WARNING_MESSAGE": "워크스페이스 그룹이 삭제되면, 모든 그룹 사용자는 포함된 워크스페이스에 대한 접근 권한을 잃게 되며, 이 작업은 취소할 수 없습니다.",
 				"DELETE_TITLE": "워크스페이스 그룹 삭제",
