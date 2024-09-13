@@ -3195,11 +3195,11 @@
 		},
 		"COLLECTOR": {
 			"ACCOUNT": "어카운트",
-			"ACTIONS": "",
+			"ACTIONS": "라우팅",
 			"ADDITIONAL_OPTIONS": "추가 옵션",
-			"ADDITIONAL_RULE": "",
-			"ADDITIONAL_RULE_CONDITION_INFO": "Data와 tags 의 subkey를 클라우드 서비스> \n상세정보 > 원본데이터 에서 확인하세요.",
-			"ADD_ADDITIONAL_RULE": "",
+			"ADDITIONAL_RULE": "추가 규칙",
+			"ADDITIONAL_RULE_CONDITION_INFO": "Data와 Tags의 subkey를 클라우드 서비스> \n상세정보 > 원본데이터에서 확인하세요.",
+			"ADD_ADDITIONAL_RULE": "규칙 추가",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "컬렉터 이름 수정 실패",
 			"ALT_E_COLLECTOR_SCHEDULE": "스케줄은 최대 2개까지만 선택이 가능합니다. ",
 			"ALT_E_COLLECT_DATA": "데이터 수집 실패",
@@ -3217,19 +3217,19 @@
 			"ALT_S_UPDATE_COLLECTOR_OPTIONS": "컬렉터 옵션 수정 완료",
 			"ALT_S_UPDATE_SCHEDULE": "스케줄 수정 완료",
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "서비스 어카운트 수정 완료",
-			"CLOUD_SERVICE_TAG": "",
+			"CLOUD_SERVICE_TAG": "클라우드 서비스 태그",
 			"COLLECTOR_RULE": {
 				"ALT_E_CREATE_COLLECTOR_RULE": "컬렉터 규칙 생성 실패",
 				"ALT_E_DELETE_COLLECTOR_RULE": "컬렉터 규칙 삭제 실패",
 				"ALT_E_REORDER_COLLECTOR_RULES": "컬렉터 규칙 순서 변경 실패",
-				"ALT_E_UPDATE_COLLECTOR_RULE": "이벤트 규칙 변경 실패",
+				"ALT_E_UPDATE_COLLECTOR_RULE": "컬렉터 규칙 변경 실패",
 				"ALT_S_CREATE_COLLECTOR_RULE": "컬렉터 규칙 생성 완료",
 				"ALT_S_DELETE_COLLECTOR_RULE": "컬렉터 규칙 삭제 완료",
 				"ALT_S_REORDER_COLLECTOR_RULES": "컬렉터 규칙 순서 변경 완료",
 				"ALT_S_UPDATE_COLLECTOR_RULE": "컬렉터 규칙 수정 완료"
 			},
-			"CONDITIONS": "",
-			"CONDITION_POLICY_DESC": "",
+			"CONDITIONS": "조건",
+			"CONDITION_POLICY_DESC": "만족시키는 경우",
 			"CREATE": {
 				"ALL": "전체",
 				"ALT_E_COLLECT_EXECUTION": "데이터 수집 시작 실패",
@@ -3312,11 +3312,11 @@
 				"TAG": "태그",
 				"VERSION": "버전"
 			},
-			"EDIT_ADDITIONAL_RULE": "",
+			"EDIT_ADDITIONAL_RULE": "추가 규칙 수",
 			"EMPTY": {
-				"DESC1": "",
-				"DESC2": "",
-				"HEADER": ""
+				"DESC1": "규칙을 추가하려면",
+				"DESC2": "아래 버튼을 눌러 추가해주세요.",
+				"HEADER": "추가 규칙이 없습니다."
 			},
 			"HISTORY": {
 				"ALL": "모두 보기",
@@ -3373,8 +3373,8 @@
 			"NO_DATA": "데이터가 없습니다.",
 			"NO_JOB": "최근 작업내역 없음",
 			"NO_OPTIONS": "추가 옵션이 없습니다.",
-			"PROJECT_ROUTING": "",
-			"THEN_STOP_PROCESSING": ""
+			"PROJECT_ROUTING": "프로젝트 라우팅",
+			"THEN_STOP_PROCESSING": "이후 작업 실행하지 않기"
 		},
 		"CREATE_COLLECTOR": "컬렉터 생성",
 		"EMPTY_CLOUD_SERVICE": "클라우드 서비스를 이용하려면 서비스 어카운트를 추가해주세요. ",
@@ -4507,7 +4507,7 @@
 			"ALT_S_DELETE_EVENT_RULE": "이벤트 규칙 삭제 완료",
 			"ALT_S_REORDER_EVENT_RULES": "이벤트 규칙 순서 변경 완료",
 			"ALT_S_UPDATE_EVENT_RULE": "이벤트 규칙 수정 완료",
-			"ALWAYS": "",
+			"ALWAYS": "항상",
 			"ANY": "다음 중 하나라도",
 			"ASSIGNEE": "담당자",
 			"CANCEL": "취소",

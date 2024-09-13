@@ -3195,11 +3195,11 @@
 		},
 		"COLLECTOR": {
 			"ACCOUNT": "アカウント",
-			"ACTIONS": "",
+			"ACTIONS": "ルーティング",
 			"ADDITIONAL_OPTIONS": "追加オプション",
-			"ADDITIONAL_RULE": "",
-			"ADDITIONAL_RULE_CONDITION_INFO": "",
-			"ADD_ADDITIONAL_RULE": "",
+			"ADDITIONAL_RULE": "追加ルール",
+			"ADDITIONAL_RULE_CONDITION_INFO": "データとタグのサブキーを\nクラウドサービス > 詳細 > 生データで確認してください",
+			"ADD_ADDITIONAL_RULE": "ルールを追加",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
 			"ALT_E_COLLECTOR_SCHEDULE": "1日に最大2回までスケジュールを設定できます。",
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
@@ -3217,19 +3217,19 @@
 			"ALT_S_UPDATE_COLLECTOR_OPTIONS": "コレクターオプションの更新に成功しました",
 			"ALT_S_UPDATE_SCHEDULE": "スケジュールの変更完了",
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "サービスアカウントの更新に成功しました",
-			"CLOUD_SERVICE_TAG": "",
+			"CLOUD_SERVICE_TAG": "クラウドサービスのタグ",
 			"COLLECTOR_RULE": {
-				"ALT_E_CREATE_COLLECTOR_RULE": "",
-				"ALT_E_DELETE_COLLECTOR_RULE": "",
-				"ALT_E_REORDER_COLLECTOR_RULES": "",
-				"ALT_E_UPDATE_COLLECTOR_RULE": "",
-				"ALT_S_CREATE_COLLECTOR_RULE": "",
-				"ALT_S_DELETE_COLLECTOR_RULE": "",
-				"ALT_S_REORDER_COLLECTOR_RULES": "",
-				"ALT_S_UPDATE_COLLECTOR_RULE": ""
+				"ALT_E_CREATE_COLLECTOR_RULE": "コレクタールールの作成に失敗しました",
+				"ALT_E_DELETE_COLLECTOR_RULE": "コレクタールールの削除に失敗しました",
+				"ALT_E_REORDER_COLLECTOR_RULES": "コレクタールールの順序変更に失敗しました",
+				"ALT_E_UPDATE_COLLECTOR_RULE": "コレクタールールの更新に失敗しました",
+				"ALT_S_CREATE_COLLECTOR_RULE": "コレクタールールが正常に作成されました",
+				"ALT_S_DELETE_COLLECTOR_RULE": "コレクタールールが正常に削除されました",
+				"ALT_S_REORDER_COLLECTOR_RULES": "コレクタールールの順序が正常に変更されました",
+				"ALT_S_UPDATE_COLLECTOR_RULE": "コレクタールールの更新が完了しました"
 			},
-			"CONDITIONS": "",
-			"CONDITION_POLICY_DESC": "",
+			"CONDITIONS": "条件",
+			"CONDITION_POLICY_DESC": "が満足させる場合",
 			"CREATE": {
 				"ALL": "全体",
 				"ALT_E_COLLECT_EXECUTION": "データ収集は開始に失敗しました",
@@ -3312,11 +3312,11 @@
 				"TAG": "タグ",
 				"VERSION": "バージョン"
 			},
-			"EDIT_ADDITIONAL_RULE": "",
+			"EDIT_ADDITIONAL_RULE": "追加ルールを編集",
 			"EMPTY": {
-				"DESC1": "",
-				"DESC2": "",
-				"HEADER": ""
+				"DESC1": "追加ルールを追加するには",
+				"DESC2": "以下の追加ボタンをクリックしてください",
+				"HEADER": "このコレクターには追加ルールがありません"
 			},
 			"HISTORY": {
 				"ALL": "すべてを表示",
@@ -3373,8 +3373,8 @@
 			"NO_DATA": "データがありません",
 			"NO_JOB": "近のジョブはありません",
 			"NO_OPTIONS": "選択可能なオプションはありません。",
-			"PROJECT_ROUTING": "",
-			"THEN_STOP_PROCESSING": ""
+			"PROJECT_ROUTING": "プロジェクトルーティング",
+			"THEN_STOP_PROCESSING": "その後、作業は停止する"
 		},
 		"CREATE_COLLECTOR": "コレクタ生成",
 		"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
@@ -4507,7 +4507,7 @@
 			"ALT_S_DELETE_EVENT_RULE": "イベントルール削除に成功",
 			"ALT_S_REORDER_EVENT_RULES": "イベントルールの並べ替えに成功",
 			"ALT_S_UPDATE_EVENT_RULE": "イベントルール変更に成功",
-			"ALWAYS": "",
+			"ALWAYS": "常に",
 			"ANY": "どれか(Any)",
 			"ASSIGNEE": "担当者",
 			"CANCEL": "キャンセル",

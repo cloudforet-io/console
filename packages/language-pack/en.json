@@ -3195,7 +3195,7 @@
 		},
 		"COLLECTOR": {
 			"ACCOUNT": "Account",
-			"ACTIONS": "Actions",
+			"ACTIONS": "Routing",
 			"ADDITIONAL_OPTIONS": "Additional Options",
 			"ADDITIONAL_RULE": "Additional Rule",
 			"ADDITIONAL_RULE_CONDITION_INFO": "Check the subkeys of data and tags in \nCloud Service > Details > Raw Data.",
@@ -3223,10 +3223,10 @@
 				"ALT_E_DELETE_COLLECTOR_RULE": "Failed to Delete Collector Rule",
 				"ALT_E_REORDER_COLLECTOR_RULES": "Failed to Reorder Collector Rules",
 				"ALT_E_UPDATE_COLLECTOR_RULE": "Failed to Update Collector Rule",
-				"ALT_S_CREATE_COLLECTOR_RULE": "Collector Rule successfully created ",
-				"ALT_S_DELETE_COLLECTOR_RULE": "Collector Rule successfully deleted ",
-				"ALT_S_REORDER_COLLECTOR_RULES": "Collector Rules successfully reordered ",
-				"ALT_S_UPDATE_COLLECTOR_RULE": "Collector Rule successfully updated "
+				"ALT_S_CREATE_COLLECTOR_RULE": "Collector Rule successfully created",
+				"ALT_S_DELETE_COLLECTOR_RULE": "Collector Rule successfully deleted",
+				"ALT_S_REORDER_COLLECTOR_RULES": "Collector Rules successfully reordered",
+				"ALT_S_UPDATE_COLLECTOR_RULE": "Collector Rule successfully updated"
 			},
 			"CONDITIONS": "Conditions",
 			"CONDITION_POLICY_DESC": "of the following are met",
