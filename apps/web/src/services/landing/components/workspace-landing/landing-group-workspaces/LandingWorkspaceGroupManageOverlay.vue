@@ -31,7 +31,7 @@ const landingPageStoreState = landingPageStore.state;
 
 const state = reactive({
     isOverlayOpenProxy: useProxyValue('isOverlayOpen', props, emit),
-    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageStoreState.selectedProjectGroup]),
+    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageStoreState.selectedWorkspaceGroup]),
 });
 </script>
 

@@ -43,7 +43,7 @@ const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
 const state = reactive({
     addUserModalVisible: false,
     removeUserModalVisible: false,
-    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageStoreState.selectedProjectGroup]),
+    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageStoreState.selectedWorkspaceGroup]),
     removeUserList: [] as WorkspaceUser[],
 });
 
@@ -106,7 +106,7 @@ const handleSelectMenu = async (role: BasicRoleModel, user_id: string) => {
     try {
         if (!role.name || !user_id) throw new Error('role_id or user_id is not exist');
         await SpaceConnector.clientV2.identity.workspaceGroupUser.updateRole<WorkspaceGroupUserUpdateRoleParameters>({
-            workspace_group_id: state.workspaceGroup?.workspace_group_id,
+            workspace_group_id: state.workspaceGroup?.workspace_group_id ?? '',
             target_user_id: user_id,
             role_id: role.name,
         });

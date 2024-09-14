@@ -1,51 +1,87 @@
 <script setup lang="ts">
-import { reactive, watch, onUnmounted } from 'vue';
-
 import {
-    PHeading, PButton, PToolboxTable, PLink, PStatus, PTooltip, PI,
+    computed, onMounted, reactive, watch,
+} from 'vue';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PHeading, PToolboxTable, PLink, PStatus, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
-import { i18n } from '@/translations';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { UserProfileGetWorkspacesParameters } from '@/schema/identity/user-profile/api-verbs/get-workspaces';
+import type { MyWorkspaceModel } from '@/schema/identity/user-profile/model';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
-import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
-import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
-const workspaceGroupPageStore = useWorkspaceGroupPageStore();
-const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
-
-const emit = defineEmits<{(e: 'refersh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
+const fields = [
+    { name: 'name', label: 'Name' },
+    { name: 'state', label: 'State' },
+    { name: 'created_at', label: 'Created' },
+];
+const landingPageStore = useLandingPageStore();
+const landingPageStoreState = landingPageStore.state;
 
 const tableState = reactive({
-    // TODO: temp data
-    fields: [
-        { name: 'name', label: 'Name' },
-        { name: 'state', label: 'State' },
-        { name: 'user', label: 'User' },
-        { name: 'service_account', label: 'Service Account' },
-        { name: 'cost', label: 'Cost' },
-        { name: 'created_at', label: 'Created' },
-        { name: 'remove_button', label: ' ', sortable: false },
-    ],
+    loading: false,
+    items: [] as MyWorkspaceModel[],
+    convertedItems: computed<MyWorkspaceModel[]>(() => {
+        const filteredWorkspaces = tableState.items.filter((workspace: MyWorkspaceModel) => {
+            const searchText = tableState.searchText.trim();
+
+            if (searchText === '') {
+                return true;
+            }
+
+            const workspaceNameMatches = workspace.name && workspace.name.includes(searchText);
+
+            return workspaceNameMatches;
+        });
+        const sortedWorkspacesInSelectedGroup = filteredWorkspaces?.sort((a, b) => {
+            const aValue = a[tableState.sortBy];
+            const bValue = b[tableState.sortBy];
+
+            if (aValue === undefined) return 1;
+            if (bValue === undefined) return -1;
+
+            if (typeof aValue === 'number' && tableState.sortDesc) {
+                return bValue - aValue;
+            }
+            if (typeof aValue === 'number' && !tableState.sortDesc) {
+                return aValue - bValue;
+            }
+
+            if (tableState.sortDesc) {
+                return bValue.localeCompare(aValue);
+            }
+
+            return aValue.localeCompare(bValue);
+        });
+
+        if (tableState.totalCount < tableState.pageStart - 1 + tableState.pageLimit) {
+            return sortedWorkspacesInSelectedGroup.slice(tableState.pageStart - 1);
+        }
+
+        return sortedWorkspacesInSelectedGroup?.slice(tableState.pageStart - 1, tableState.pageStart - 1 + tableState.pageLimit);
+    }),
+    totalCount: computed(() => tableState.items.length),
+    pageStart: 1,
+    thisPage: 1,
+    pageLimit: 15,
+    searchText: '',
+    sortBy: 'name',
+    sortDesc: true,
 });
 
 const getWorkspaceRouteLocationByWorkspaceId = (item) => ({
     name: WORKSPACE_HOME_ROUTE._NAME,
-    params: {
-        workspaceId: item?.workspace_id,
-    },
-});
-
-const getUserRouteLocationByWorkspaceId = (item) => ({
-    name: IAM_ROUTE.USER._NAME,
     params: {
         workspaceId: item?.workspace_id,
     },
@@ -58,81 +94,49 @@ const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
     },
 });
 
-const setupModal = (type) => {
-    switch (type) {
-    case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES: workspaceGroupPageStore.updateModalSettings({
-        type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.DELETE_WORKSPACES_TITLE'),
-        visible: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES,
-        themeColor: 'alert',
-    }); break;
-    case WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES: workspaceGroupPageStore.updateModalSettings({
-        type: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_WORKSPACES_TITLE', { name: 'yubeom kim' }),
-        visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
-    }); break;
-    default:
-        break;
+const fetchWorkspaces = async () => {
+    tableState.loading = true;
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<UserProfileGetWorkspacesParameters, ListResponse<MyWorkspaceModel>>({
+            workspace_group_id: landingPageStoreState.selectedWorkspaceGroup,
+        });
+        tableState.items = results ?? [];
+    } catch (e) {
+        // ErrorHandler.handleError(e);
+    } finally {
+        tableState.loading = false;
     }
 };
 
-const handleSelect = (index) => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedWorkspaceIndices = index;
-    });
-};
-
-const handleChange = (options: any = {}) => {
+const handleChange = async (options: any = {}) => {
     if (options.pageStart) {
-        workspaceGroupPageStore.$patch((_state) => {
-            _state.state.workspacePageStart = options.pageStart;
-        });
+        tableState.pageStart = options.pageStart;
     }
 
     if (options.pageLimit) {
-        workspaceGroupPageStore.$patch((_state) => {
-            _state.state.workspacePageStart = 1;
-            _state.state.workspacePageLimit = options.pageLimit;
-            _state.state.workspacePage = 1;
-        });
+        tableState.pageStart = 1;
+        tableState.pageLimit = options.pageLimit;
+        tableState.thisPage = 1;
     }
 };
 
-const handleAddWorkspaceButtonClick = () => {
-    setupModal(WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES);
-};
-
-const handleSelectedWorkspacesRemoveButtonClick = () => {
-    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES);
-};
-
-const handleSelectedWorkspaceRemoveButtonClick = (item) => {
-    setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES);
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedWorkspace = item;
-    });
+const handleChangeSort = (name:string, isDesc:boolean) => {
+    tableState.sortBy = name;
+    tableState.sortDesc = isDesc;
 };
 
 const handleRefresh = () => {
-    emit('refresh', { isWorkspace: true });
+    tableState.thisPage = 1;
+    tableState.searchText = '';
+    fetchWorkspaces();
 };
 
-const handleChangeSort = (name, isDesc) => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.workspaceSortBy = name;
-        _state.state.selectedWorkspaceIndices = [];
-        _state.state.isWorkspaceSortDesc = isDesc;
-    });
-};
-
-watch(() => workspaceGroupPageState.workspaceSearchText, () => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedWorkspaceIndices = [];
-    });
+watch(() => tableState.searchText, () => {
+    tableState.thisPage = 1;
 });
 
-onUnmounted(() => {
-    workspaceGroupPageStore.resetWorkspace();
+onMounted(() => {
+    fetchWorkspaces();
 });
 </script>
 
@@ -141,43 +145,23 @@ onUnmounted(() => {
         <p-heading class="workspace-group-tab-workspace-header"
                    :title="$t('IAM.WORKSPACE_GROUP.TAB.WORKSPACE')"
                    use-total-count
-                   :total-count="workspaceGroupPageGetters.workspaceTotalCount"
+                   :total-count="tableState.totalCount"
                    heading-type="sub"
-        >
-            <template #extra>
-                <div class="workspace-group-tab-workspace-button-wrapper">
-                    <p-button style-type="negative-primary"
-                              :disabled="!workspaceGroupPageGetters.selectedWorkspacesByIndices.length"
-                              @click="handleSelectedWorkspacesRemoveButtonClick"
-                    >
-                        {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
-                    </p-button>
-                    <p-button style-type="secondary"
-                              icon-left="ic_plus_bold"
-                              @click="handleAddWorkspaceButtonClick"
-                    >
-                        {{ $t('IAM.WORKSPACE_GROUP.TAB.ADD_WORKSPACE') }}
-                    </p-button>
-                </div>
-            </template>
-        </p-heading>
+        />
         <p-toolbox-table class="workspace-group-tab-workspace-table"
-                         :loading="workspaceGroupPageState.loading"
-                         :fields="tableState.fields"
-                         :items="workspaceGroupPageGetters.workspacesInSelectedGroup"
-                         :select-index="workspaceGroupPageState.selectedWorkspaceIndices"
-                         :total-count="workspaceGroupPageGetters.workspaceTotalCount"
+                         :loading="tableState.loading"
+                         :fields="fields"
+                         :items="tableState.convertedItems"
+                         :total-count="tableState.totalCount"
                          sort-by="name"
                          search-type="plain"
                          :sort-desc="true"
-                         :this-page.sync="workspaceGroupPageState.workspacePage"
-                         :search-text.sync="workspaceGroupPageState.workspaceSearchText"
-                         selectable
+                         :this-page.sync="tableState.thisPage"
+                         :search-text.sync="tableState.searchText"
                          sortable
                          searchable
-                         @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleRefresh()"
+                         @refresh="handleRefresh"
                          @changeSort="handleChangeSort"
         >
             <template #th-state-format="{ field }">
@@ -198,27 +182,10 @@ onUnmounted(() => {
                     </p-tooltip>
                 </div>
             </template>
-            <template #th-cost-format="{ field }">
-                <div class="th-tooltip">
-                    <span>{{ field.label }}</span>
-                    <p-tooltip
-                        :contents="$t('IAM.WORKSPACE_GROUP.TOOLTIP_COST')"
-                        position="bottom"
-                        class="tooltip-wrapper"
-                        content-class="custom-tooltip-content"
-                    >
-                        <p-i name="ic_info-circle"
-                             class="title-tooltip"
-                             height="1rem"
-                             width="1rem"
-                             :color="gray[500]"
-                        />
-                    </p-tooltip>
-                </div>
-            </template>
             <template #col-name-format="{ value, item }">
                 <div class="name-wrapper">
                     <workspace-logo-icon :text="value"
+                                         :theme="item.tags?.theme"
                                          size="xs"
                     />
                     <p-link :text="value"
@@ -233,13 +200,6 @@ onUnmounted(() => {
                           class="capitalize"
                 />
             </template>
-            <template #col-user-format="{ value, item }">
-                <p-link :text="value"
-                        action-icon="internal-link"
-                        new-tab
-                        :to="getUserRouteLocationByWorkspaceId(item)"
-                />
-            </template>
             <template #col-service_account-format="{ value, item }">
                 <p-link :text="value"
                         action-icon="internal-link"
@@ -247,25 +207,12 @@ onUnmounted(() => {
                         :to="getServiceAccountRouteLocationByWorkspaceId(item)"
                 />
             </template>
-            <template #col-remove_button-format="{ item }">
-                <p-button size="sm"
-                          style-type="tertiary"
-                          @click.stop="() => handleSelectedWorkspaceRemoveButtonClick(item)"
-                >
-                    {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
-                </p-button>
-            </template>
         </p-toolbox-table>
     </section>
 </template>
 
 <style lang="postcss" scoped>
 .workspace-group-tab-workspace {
-    .workspace-group-tab-workspace-button-wrapper {
-        display: flex;
-        gap: 1rem;
-    }
-
     .workspace-group-tab-workspace-table {
         border: none;
 
@@ -282,16 +229,6 @@ onUnmounted(() => {
                 margin-top: -0.125rem;
             }
         }
-    }
-}
-</style>
-
-<style lang="postcss">
-/* custom design-system component - p-tooltip */
-.p-tooltip {
-    .tooltip-inner {
-        white-space: pre-line;
-        max-width: 16rem;
     }
 }
 </style>

@@ -69,7 +69,7 @@ const deleteGroupUsers = async () => {
     state.loading = true;
     try {
         await SpaceConnector.clientV2.identity.workspaceGroupUser.remove<WorkspaceGroupUserRemoveParameters>({
-            workspace_group_id: landingPageStoreState.selectedProjectGroup,
+            workspace_group_id: landingPageStoreState.selectedWorkspaceGroup,
             users: (props.removeUserList ?? []).map((item) => ({ user_id: item.user_id })),
         });
         await userWorkspaceGroupStore.load();
