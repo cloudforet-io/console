@@ -8,7 +8,7 @@ import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-w
 
 interface LandingPageStoreState {
     loading: boolean;
-    selectedProjectGroup: string;
+    selectedWorkspaceGroup: string;
 }
 
 export const useLandingPageStore = defineStore('landing-page-store', () => {
@@ -17,7 +17,7 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
 
     const state = reactive<LandingPageStoreState>({
         loading: false,
-        selectedProjectGroup: 'all',
+        selectedWorkspaceGroup: 'all',
     });
 
     const groupUserTableState = reactive({
@@ -33,7 +33,7 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
     const getters = reactive({
         loading: computed<boolean>(() => state.loading),
         // workspaceGroupUser
-        workspaceGroupUsers: computed<WorkspaceUser[]>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[state.selectedProjectGroup]?.users || []),
+        workspaceGroupUsers: computed<WorkspaceUser[]>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[state.selectedWorkspaceGroup]?.users || []),
         workspaceGroupUserTotalCount: computed<number>(() => getters.workspaceGroupUsers.length || 0),
         workspaceGroupUserTableItem: computed<WorkspaceUser[]>(() => {
             const filteredUsers = getters.workspaceGroupUsers?.filter(actions.filterUser);

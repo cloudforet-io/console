@@ -59,7 +59,7 @@ const state = reactive({
     isShowAll: false,
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceStoreGetters.workspaceList),
     selectedGroupWorkspaceList: computed(() => {
-        if (landingPageStoreState.selectedProjectGroup === 'all') {
+        if (landingPageStoreState.selectedWorkspaceGroup === 'all') {
             return state.workspaceList;
         }
         return state.workspacesInSelectedGroup;
@@ -85,11 +85,11 @@ const state = reactive({
         { label: i18n.t('LADING.ALL_WORKSPACE'), name: 'all' },
         ...state.workspaceGroupList.map((group:WorkspaceGroupModel) => ({ label: group.name, name: group.workspace_group_id })),
     ]),
-    isAllWorkspaceTab: computed(() => landingPageStoreState.selectedProjectGroup === 'all'),
+    isAllWorkspaceTab: computed(() => landingPageStoreState.selectedWorkspaceGroup === 'all'),
     isOverlayOpen: false,
     isButtonGroupOpened: false,
     isShowAllVisible: computed(() => {
-        if (landingPageStoreState.selectedProjectGroup === 'all') {
+        if (landingPageStoreState.selectedWorkspaceGroup === 'all') {
             return state.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.workspaceList.length;
         }
         return state.selectedGroupWorkspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.selectedGroupWorkspaceList.length;
@@ -122,7 +122,7 @@ const fetchWorkspaces = async (groupId:string) => {
     }
 };
 
-watch(() => landingPageStoreState.selectedProjectGroup, (groupId) => {
+watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
     fetchWorkspaces(groupId);
 });
 
@@ -137,7 +137,7 @@ watch(() => landingPageStoreState.selectedProjectGroup, (groupId) => {
         <div class="workspace-group-filter-container"
              :class="{ 'is-opened': state.isButtonGroupOpened }"
         >
-            <p-button-tab v-model="landingPageStoreState.selectedProjectGroup"
+            <p-button-tab v-model="landingPageStoreState.selectedWorkspaceGroup"
                           :tabs="state.workspaceFilterList"
             >
                 <template #additional-button>
@@ -167,7 +167,7 @@ watch(() => landingPageStoreState.selectedProjectGroup, (groupId) => {
                 </template>
             </p-field-title>
             <div class="right-part-wrapper">
-                <p-button v-if="landingPageStoreState.selectedProjectGroup !== 'all'"
+                <p-button v-if="landingPageStoreState.selectedWorkspaceGroup !== 'all'"
                           style-type="tertiary"
                           size="md"
                           icon-left="ic_settings"
