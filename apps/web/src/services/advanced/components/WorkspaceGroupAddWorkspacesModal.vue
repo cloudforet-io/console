@@ -5,6 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WorkspaceChangeWorkspaceGroupParameters } from '@/schema/identity/workspace/api-verbs/change-workspace-group';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
@@ -14,17 +15,10 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
-import type { WorkspaceGroupFetchParameters } from '@/services/advanced/types/admin-workspace-group-type';
-
-import type { WorkspaceGroupAddWorkspacesParameters } from '@/schema/identity/workspace-group/api-verbs/add-workspaces';
-
-
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
-
-const emit = defineEmits<{(e: 'confirm', option: WorkspaceGroupFetchParameters): void }>();
 
 const state = reactive({
     loading: false,
@@ -49,14 +43,16 @@ const addWorkspace = async () => {
     state.loading = true;
 
     try {
-        await SpaceConnector.clientV2.identity.workspaceGroup.addWorkspaces<WorkspaceGroupAddWorkspacesParameters>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
-            workspaces: selectedItems.value.map((item) => item.name),
-        });
-
         if (!selectedItems.value.length) {
             return;
         }
+        // eslint-disable-next-line max-len
+        await Promise.allSettled(selectedItems.value.map((item) => SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
+            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
+            workspace_id: item.name,
+        })));
+
+        await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -70,7 +66,6 @@ const handleConfirm = async () => {
     await addWorkspace();
     workspaceGroupPageStore.closeModal();
     resetForm();
-    emit('confirm', { isGroupUser: true });
 };
 
 const handleCloseModal = () => {
