@@ -11,6 +11,8 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
+import type { WorkspaceGroupUserListParameters } from '@/schema/identity/workspace-group-user/api-verbs/list';
+import type { WorkspaceGroupUserModel } from '@/schema/identity/workspace-group-user/model';
 import type { WorkspaceGroupModel, WorkspaceUser } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -29,14 +31,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         totalCount: 0,
         searchFilters: [] as ConsoleFilter[],
 
-        // Group User Tab
-        groupUserPage: 1,
-        groupUserSearchText: '',
-        groupUserSortBy: 'user_id',
-        isUserSortDesc: false,
-        selectedUserIndices: [] as number[],
-        groupUserPageStart: 1,
-        groupUserPageLimit: 15,
+        // Group User Tab,
         roles: [] as RoleModel[],
 
         modal: {
@@ -47,6 +42,19 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         },
         // Additional data added for data transfer between modals
         modalAdditionalData: {} as { workspaceGroupId?: string, selectedWorkspace?: TableDataItem, selectedGroupUser?: WorkspaceUser },
+    });
+
+    const userTabState = reactive({
+        selectedUserIndices: [] as number[],
+        userInSelectedGroup: [] as WorkspaceGroupUserModel['users'],
+        userInSelectedGroupTotalCount: 0,
+        searchText: '',
+        thisPage: 1,
+        sortBy: 'name',
+        sortDesc: true,
+        pageStart: 1,
+        pageLimit: 15,
+        loading: false,
     });
 
     const workspaceTabState = reactive({
@@ -65,65 +73,33 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
     // The getters method using reactive will not work when using the store.$dispose method with the error
     //  "Write operation failed: computed value is readonly" error message when using the store.$dispose method,
     // so we change to a method that doesn't use the reactive API.
-    const getters = {
+    const getters = reactive({
         selectedWorkspaceGroupId: computed(() => state.workspaceGroups[state.selectedIndices[0]]?.workspace_group_id),
-        workspaceGroupUsers: computed(() => {
-            const filteredUsers = getters.selectedWorkspaceGroup?.users?.filter(actions.filterUser);
-
-            const sortedSelectedGroupUsers = filteredUsers?.sort((a, b) => {
-                const aValue = a[state.groupUserSortBy];
-                const bValue = b[state.groupUserSortBy];
-
-                if (aValue === undefined) return 1;
-                if (bValue === undefined) return -1;
-
-                if (state.isUserSortDesc) {
-                    return bValue.localeCompare(aValue);
-                }
-
-                return aValue.localeCompare(bValue);
-            });
-
-            if (getters.groupUserTotalCount < state.groupUserPageStart - 1 + state.groupUserPageLimit) {
-                return sortedSelectedGroupUsers.slice(state.groupUserPageStart - 1);
-            }
-
-            return sortedSelectedGroupUsers?.slice(state.groupUserPageStart - 1, state.groupUserPageStart - 1 + state.groupUserPageLimit);
-        }),
-        selectedGroupUsersByIndices: computed<WorkspaceUser[]>(() => {
-            const groupUsers: any[] = [];
-
-            state.selectedUserIndices.forEach((d:number) => {
-                groupUsers.push(getters.workspaceGroupUsers[d]);
-            });
-
-            return groupUsers ?? [];
-        }),
-        groupUserTotalCount: computed(() => {
-            const [index] = state.selectedIndices;
-
-            if (state.groupUserSearchText) {
-                const filteredUsers = state.workspaceGroups[index].users.filter(actions.filterUser);
-
-                return filteredUsers.length;
-            }
-
-            return state.workspaceGroups[index]?.users?.length;
-        }),
-        groupUserPage: computed(() => state.groupUserPageStart / state.groupUserPageLimit),
+        groupUserPage: computed(() => userTabState.pageStart / userTabState.pageLimit),
         selectedWorkspaceIds: computed<string[]>(() => workspaceTabState.selectedWorkspaceIndices.map((index: number) => workspaceTabState.workspacesInSelectedGroup[index].workspace_id)),
-    };
+        selectedGroupUsersByIndices: computed(() => userTabState.selectedUserIndices.map((index: number) => userTabState.userInSelectedGroup[index])),
+    });
 
 
-    const apiQuery = new ApiQueryHelper();
+    const workspacesInSelectedGroupApiQuery = new ApiQueryHelper();
     const getWorkspacesInSelectedGroupApiQuery = ():Query => {
-        apiQuery.setSort(workspaceTabState.sortBy, workspaceTabState.sortDesc)
+        workspacesInSelectedGroupApiQuery.setSort(workspaceTabState.sortBy, workspaceTabState.sortDesc)
             .setPage(workspaceTabState.pageStart, workspaceTabState.pageLimit)
             .setFilters([
                 { k: 'workspace_group_id', v: getters.selectedWorkspaceGroupId, o: '=' },
                 { k: 'name', v: workspaceTabState.searchText, o: '' },
             ]);
-        return apiQuery.data;
+        return workspacesInSelectedGroupApiQuery.data;
+    };
+
+    const workspacesGroupUserApiQuery = new ApiQueryHelper();
+    const getWorkspacesGroupUserApiQuery = ():Query => {
+        workspacesGroupUserApiQuery.setSort(workspaceTabState.sortBy, workspaceTabState.sortDesc)
+            .setPage(workspaceTabState.pageStart, workspaceTabState.pageLimit)
+            .setFilters([
+                { k: 'name', v: workspaceTabState.searchText, o: '' },
+            ]);
+        return workspacesGroupUserApiQuery.data;
     };
     const actions = {
         updateModalSettings: ({
@@ -147,13 +123,13 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             state.modalAdditionalData = {};
         },
         resetGroupUser: () => {
-            state.groupUserPage = 1;
-            state.groupUserSearchText = '';
-            state.groupUserSortBy = 'user_id';
-            state.isUserSortDesc = false;
-            state.selectedUserIndices = [] as number[];
-            state.groupUserPageStart = 1;
-            state.groupUserPageLimit = 15;
+            userTabState.thisPage = 1;
+            userTabState.searchText = '';
+            userTabState.sortBy = 'user_id';
+            userTabState.sortDesc = false;
+            userTabState.selectedUserIndices = [] as number[];
+            userTabState.pageStart = 1;
+            userTabState.pageLimit = 15;
         },
         resetWorkspaceTab: () => {
             workspaceTabState.searchText = '';
@@ -178,18 +154,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         },
         resetSelectedWorkspace: () => {
             workspaceTabState.selectedWorkspaceIndices = [] as number[];
-        },
-        filterUser: (user) => {
-            const searchText = state.groupUserSearchText.trim();
-
-            if (searchText === '') {
-                return true;
-            }
-
-            const userIdMatches = user.user_id && user.user_id.includes(searchText);
-            const userNameMatches = user.name && user.name.includes(searchText);
-
-            return userIdMatches || userNameMatches;
         },
         listRoles: async () => {
             try {
@@ -222,12 +186,27 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
                 workspaceTabState.loading = false;
             }
         },
-        // removeSelectedWorkspace: async () => {
-        //
-        // }
+        listWorkspaceGroupUsers: async () => {
+            userTabState.loading = true;
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.workspaceGroupUser.list<WorkspaceGroupUserListParameters, ListResponse<WorkspaceGroupUserModel>>({
+                    query: getWorkspacesGroupUserApiQuery(),
+                    workspace_group_id: getters.selectedWorkspaceGroupId,
+                });
+                userTabState.userInSelectedGroup = results?.[0].users || [];
+                userTabState.userInSelectedGroupTotalCount = results?.[0].users.length || 0;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                userTabState.userInSelectedGroup = [];
+                userTabState.userInSelectedGroupTotalCount = 0;
+            } finally {
+                userTabState.loading = false;
+            }
+        },
     };
     return {
         state,
+        userTabState,
         workspaceTabState,
         getters,
         ...actions,

@@ -28,6 +28,7 @@ import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-con
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
+const userTabState = workspaceGroupPageStore.userTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
 const allReferenceStore = useAllReferenceStore();
@@ -100,6 +101,9 @@ const deleteGroupUsers = async () => {
             workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
             users: users.map((item) => ({ user_id: item.user_id })),
         });
+
+        await workspaceGroupPageStore.listWorkspaceGroupUsers();
+        userTabState.selectedUserIndices = [];
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

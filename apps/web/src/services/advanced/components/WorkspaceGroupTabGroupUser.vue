@@ -34,6 +34,7 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const userTabState = workspaceGroupPageStore.userTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
 const route = useRoute();
@@ -104,7 +105,7 @@ const setupModal = (type) => {
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: workspaceGroupPageGetters.selectedWorkspaceGroup.name }),
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: workspaceGroupPageState.workspaceGroups[workspaceGroupPageState.selectedIndices[0]]?.name }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER: workspaceGroupPageStore.updateModalSettings({
@@ -118,26 +119,24 @@ const setupModal = (type) => {
     }
 };
 
-const handleSelect = (index) => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedUserIndices = index;
-    });
+const handleSelect = (index:number[]) => {
+    userTabState.selectedUserIndices = index;
 };
 
-const handleChange = (options: any = {}) => {
+const handleChange = async (options: any = {}) => {
     if (options.pageStart) {
-        workspaceGroupPageStore.$patch((_state) => {
-            _state.state.groupUserPageStart = options.pageStart;
-        });
+        userTabState.pageStart = options.pageStart;
     }
 
     if (options.pageLimit) {
-        workspaceGroupPageStore.$patch((_state) => {
-            _state.state.groupUserPageStart = 1;
-            _state.state.groupUserPageLimit = options.pageLimit;
-            _state.state.groupUserPage = 1;
-        });
+        userTabState.pageStart = 1;
+        userTabState.pageLimit = options.pageLimit;
+        userTabState.thisPage = 1;
     }
+    if (options.searchText) {
+        userTabState.thisPage = 1;
+    }
+    await workspaceGroupPageStore.listWorkspaceGroupUsers();
 };
 
 const handleSelectMenu = async (value:{label:string, name:string, role_type: RoleType}) => {
@@ -146,7 +145,7 @@ const handleSelectMenu = async (value:{label:string, name:string, role_type: Rol
 
         const roleId = value.name;
         const userId = selectedGroupUser.user_id;
-        const workspaceGroupId = workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id;
+        const workspaceGroupId = workspaceGroupPageGetters.selectedWorkspaceGroupId;
 
         await SpaceConnector.clientV2.identity.workspaceGroup.updateRole<WorkspaceGroupUpdateRoleParameters>({
             workspace_group_id: workspaceGroupId,
@@ -157,11 +156,13 @@ const handleSelectMenu = async (value:{label:string, name:string, role_type: Rol
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
-        emit('refresh', { isGroupUser: true });
+        await workspaceGroupPageStore.listWorkspaceGroupUsers();
     }
 };
 
-const handleRefresh = () => {
+const handleRefresh = async () => {
+    await workspaceGroupPageStore.listWorkspaceGroupUsers();
+
     emit('refresh', { isGroupUser: true });
 };
 
@@ -180,24 +181,20 @@ const handleSelectedGroupUserRemoveButtonClick = (item:WorkspaceUser) => {
     };
 };
 
-const handleChangeSort = (name, isDesc) => {
-    workspaceGroupPageStore.$patch((_state) => {
-        if (name === 'role') {
-            _state.state.groupUserSortBy = `${name}_type`;
-        } else {
-            _state.state.groupUserSortBy = name;
-        }
+const handleChangeSort = (name:string, isDesc:boolean) => {
+    if (name === 'role') {
+        userTabState.sortBy = `${name}_type`;
+    } else {
+        userTabState.sortBy = name;
+    }
 
-        _state.state.selectedUserIndices = [];
-        _state.state.isUserSortDesc = isDesc;
-    });
+    userTabState.selectedUserIndices = [];
+    userTabState.sortDesc = isDesc;
 };
 
-watch(() => workspaceGroupPageState.groupUserSearchText, () => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedUserIndices = [];
-    });
-});
+watch(() => workspaceGroupPageGetters.selectedWorkspaceGroupId, () => {
+    workspaceGroupPageStore.listWorkspaceGroupUsers();
+}, { immediate: true });
 
 onUnmounted(() => {
     workspaceGroupPageStore.resetGroupUser();
@@ -209,7 +206,7 @@ onUnmounted(() => {
         <p-heading class="workspace-group-tab-group-user-header"
                    :title="$t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER')"
                    use-total-count
-                   :total-count="workspaceGroupPageGetters.groupUserTotalCount"
+                   :total-count="userTabState.userInSelectedGroupTotalCount"
                    heading-type="sub"
         >
             <template v-if="state.hasReadWriteAccess"
@@ -217,7 +214,7 @@ onUnmounted(() => {
             >
                 <div class="workspace-group-tab-group-user-button-wrapper">
                     <p-button style-type="negative-primary"
-                              :disabled="!workspaceGroupPageGetters.selectedGroupUsersByIndices.length"
+                              :disabled="!userTabState.selectedUserIndices.length"
                               @click="handleSelectedGroupUsersRemoveButtonClick"
                     >
                         {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
@@ -234,14 +231,14 @@ onUnmounted(() => {
         <p-toolbox-table class="workspace-group-tab-group-user-table"
                          :loading="workspaceGroupPageState.loading"
                          :fields="tableState.fields"
-                         :items="workspaceGroupPageGetters.workspaceGroupUsers"
-                         :select-index="workspaceGroupPageState.selectedUserIndices"
-                         :total-count="workspaceGroupPageGetters.groupUserTotalCount"
+                         :items="userTabState.userInSelectedGroup"
+                         :select-index="userTabState.selectedUserIndices"
+                         :total-count="userTabState.userInSelectedGroupTotalCount"
                          sort-by="user_id"
                          search-type="plain"
                          :sort-desc="true"
-                         :this-page.sync="workspaceGroupPageState.groupUserPage"
-                         :search-text.sync="workspaceGroupPageState.groupUserSearchText"
+                         :this-page.sync="userTabState.thisPage"
+                         :search-text.sync="userTabState.searchText"
                          :selectable="state.hasReadWriteAccess"
                          sortable
                          searchable
