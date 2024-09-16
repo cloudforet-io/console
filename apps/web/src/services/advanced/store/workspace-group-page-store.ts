@@ -4,15 +4,19 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceGroupModel, WorkspaceUser } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
+
 
 export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', () => {
     const state = reactive({
@@ -34,15 +38,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         groupUserPageLimit: 15,
         roles: [] as RoleModel[],
 
-        // Workspace Tab
-        workspacePage: 1,
-        workspaceSearchText: '',
-        workspaceSortBy: 'name',
-        isWorkspaceSortDesc: false,
-        selectedWorkspaceIndices: [] as number[],
-        workspacePageStart: 1,
-        workspacePageLimit: 15,
-
         modal: {
             type: '',
             title: '',
@@ -53,15 +48,24 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         modalAdditionalData: {} as { workspaceGroupId?: string, selectedWorkspace?: TableDataItem, selectedGroupUser?: WorkspaceUser },
     });
 
+    const workspaceTabState = reactive({
+        selectedWorkspaceIndices: [] as number[],
+        workspacesInSelectedGroup: [] as WorkspaceModel[],
+        workspacesInSelectedGroupTotalCount: 0,
+        searchText: '',
+        thisPage: 1,
+        sortBy: 'name',
+        sortDesc: true,
+        pageStart: 1,
+        pageLimit: 15,
+        loading: false,
+    });
+
     // The getters method using reactive will not work when using the store.$dispose method with the error
     //  "Write operation failed: computed value is readonly" error message when using the store.$dispose method,
     // so we change to a method that doesn't use the reactive API.
     const getters = {
-        selectedWorkspaceGroup: computed(() => {
-            const [index] = state.selectedIndices;
-
-            return state.workspaceGroups[index];
-        }),
+        selectedWorkspaceGroupId: computed(() => state.workspaceGroups[state.selectedIndices[0]]?.workspace_group_id),
         workspaceGroupUsers: computed(() => {
             const filteredUsers = getters.selectedWorkspaceGroup?.users?.filter(actions.filterUser);
 
@@ -94,45 +98,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
 
             return groupUsers ?? [];
         }),
-        workspacesInSelectedGroup: computed(() => {
-            const filteredWorkspaces = getters.selectedWorkspaceGroup?.workspaces?.filter(actions.filterWorkspace);
-
-            const sortedWorkspacesInSelectedGroup = filteredWorkspaces?.sort((a, b) => {
-                const aValue = a[state.workspaceSortBy];
-                const bValue = b[state.workspaceSortBy];
-
-                if (aValue === undefined) return 1;
-                if (bValue === undefined) return -1;
-
-                if (typeof aValue === 'number' && state.isWorkspaceSortDesc) {
-                    return bValue - aValue;
-                }
-                if (typeof aValue === 'number' && !state.isWorkspaceSortDesc) {
-                    return aValue - bValue;
-                }
-
-                if (state.isWorkspaceSortDesc) {
-                    return bValue.localeCompare(aValue);
-                }
-
-                return aValue.localeCompare(bValue);
-            });
-
-            if (getters.workspaceTotalCount < state.workspacePageStart - 1 + state.workspacePageLimit) {
-                return sortedWorkspacesInSelectedGroup.slice(state.workspacePageStart - 1);
-            }
-
-            return sortedWorkspacesInSelectedGroup?.slice(state.workspacePageStart - 1, state.workspacePageStart - 1 + state.workspacePageLimit);
-        }),
-        selectedWorkspacesByIndices: computed<string[]>(() => {
-            const workspaces: any[] = [];
-
-            state.selectedWorkspaceIndices.forEach((d:number) => {
-                workspaces.push(getters.workspacesInSelectedGroup[d]);
-            });
-
-            return workspaces ?? [];
-        }),
         groupUserTotalCount: computed(() => {
             const [index] = state.selectedIndices;
 
@@ -144,18 +109,8 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
 
             return state.workspaceGroups[index]?.users?.length;
         }),
-        workspaceTotalCount: computed(() => {
-            const [index] = state.selectedIndices;
-
-            if (state.workspaceSearchText) {
-                const filteredWorkspaces = state.workspaceGroups[index].workspaces.filter(actions.filterWorkspace);
-
-                return filteredWorkspaces.length;
-            }
-
-            return state.workspaceGroups[index]?.workspaces?.length;
-        }),
         groupUserPage: computed(() => state.groupUserPageStart / state.groupUserPageLimit),
+        selectedWorkspaceIds: computed<string[]>(() => workspaceTabState.selectedWorkspaceIndices.map((index: number) => workspaceTabState.workspacesInSelectedGroup[index].workspace_id)),
     };
 
     const actions = {
@@ -188,17 +143,14 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             state.groupUserPageStart = 1;
             state.groupUserPageLimit = 15;
         },
-        resetWorkspace: () => {
-            state.workspacePage = 1;
-            state.workspaceSearchText = '';
-            state.workspaceSortBy = 'name';
-            state.isWorkspaceSortDesc = false;
-            state.selectedWorkspaceIndices = [] as number[];
-            state.workspacePageStart = 1;
-            state.workspacePageLimit = 15;
-        },
-        resetSelectedWorkspace: () => {
-            state.selectedWorkspaceIndices = [];
+        resetWorkspaceTab: () => {
+            workspaceTabState.searchText = '';
+            workspaceTabState.thisPage = 1;
+            workspaceTabState.sortBy = 'name';
+            workspaceTabState.sortDesc = true;
+            workspaceTabState.pageStart = 1;
+            workspaceTabState.pageLimit = 15;
+            workspaceTabState.selectedWorkspaceIndices = [] as number[];
         },
         reset: () => {
             state.loading = false;
@@ -209,8 +161,11 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             state.totalCount = 0;
 
             actions.resetGroupUser();
-            actions.resetWorkspace();
+            actions.resetWorkspaceTab();
             actions.closeModal();
+        },
+        resetSelectedWorkspace: () => {
+            workspaceTabState.selectedWorkspaceIndices = [] as number[];
         },
         filterUser: (user) => {
             const searchText = state.groupUserSearchText.trim();
@@ -223,17 +178,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             const userNameMatches = user.name && user.name.includes(searchText);
 
             return userIdMatches || userNameMatches;
-        },
-        filterWorkspace: (workspace) => {
-            const searchText = state.workspaceSearchText.trim();
-
-            if (searchText === '') {
-                return true;
-            }
-
-            const workspaceNameMatches = workspace.name && workspace.name.includes(searchText);
-
-            return workspaceNameMatches;
         },
         listRoles: async () => {
             try {
@@ -250,9 +194,29 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
                 state.roles = [];
             }
         },
+        listWorkspacesInSelectedGroup: async (query: Query) => {
+            workspaceTabState.loading = true;
+            try {
+                const { results, total_count } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+                    query,
+                });
+                workspaceTabState.workspacesInSelectedGroup = results || [];
+                workspaceTabState.workspacesInSelectedGroupTotalCount = total_count || 0;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                workspaceTabState.workspacesInSelectedGroup = [];
+                workspaceTabState.workspacesInSelectedGroupTotalCount = 0;
+            } finally {
+                workspaceTabState.loading = false;
+            }
+        },
+        // removeSelectedWorkspace: async () => {
+        //
+        // }
     };
     return {
         state,
+        workspaceTabState,
         getters,
         ...actions,
     };
