@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -113,6 +114,17 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         selectedWorkspaceIds: computed<string[]>(() => workspaceTabState.selectedWorkspaceIndices.map((index: number) => workspaceTabState.workspacesInSelectedGroup[index].workspace_id)),
     };
 
+
+    const apiQuery = new ApiQueryHelper();
+    const getWorkspacesInSelectedGroupApiQuery = ():Query => {
+        apiQuery.setSort(workspaceTabState.sortBy, workspaceTabState.sortDesc)
+            .setPage(workspaceTabState.pageStart, workspaceTabState.pageLimit)
+            .setFilters([
+                { k: 'workspace_group_id', v: getters.selectedWorkspaceGroupId, o: '=' },
+                { k: 'name', v: workspaceTabState.searchText, o: '' },
+            ]);
+        return apiQuery.data;
+    };
     const actions = {
         updateModalSettings: ({
             type, title, themeColor = 'primary', visible, additionalData = {},
@@ -194,11 +206,11 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
                 state.roles = [];
             }
         },
-        listWorkspacesInSelectedGroup: async (query: Query) => {
+        listWorkspacesInSelectedGroup: async () => {
             workspaceTabState.loading = true;
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
-                    query,
+                    query: getWorkspacesInSelectedGroupApiQuery(),
                 });
                 workspaceTabState.workspacesInSelectedGroup = results || [];
                 workspaceTabState.workspacesInSelectedGroupTotalCount = total_count || 0;

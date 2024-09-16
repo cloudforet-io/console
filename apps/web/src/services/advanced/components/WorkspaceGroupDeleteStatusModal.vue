@@ -6,10 +6,8 @@ import { PTableCheckModal, PLink, PStatus } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceGroupRemoveUsersParameters } from '@/schema/identity/workspace-group/api-verbs/remove-users';
-import type {
-    WorkspaceGroupRemoveWorkspacesParameters,
-} from '@/schema/identity/workspace-group/api-verbs/remove-workspaces';
 import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceChangeWorkspaceGroupParameters } from '@/schema/identity/workspace/api-verbs/change-workspace-group';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -22,7 +20,6 @@ import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-t
 import { workspaceStateFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
-import type { WorkspaceGroupFetchParameters } from '@/services/advanced/types/admin-workspace-group-type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
@@ -30,9 +27,9 @@ import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-con
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
-const emit = defineEmits<{(e: 'confirm', option: WorkspaceGroupFetchParameters): void }>();
 const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
@@ -41,6 +38,7 @@ const state = reactive({
     isRemoveGroupUserType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER)),
     isRemoveSingleGroupUserType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER)),
     isRemoveWorkspacesType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES)),
+    isRemoveSingleWorkspaceType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE)),
     items: computed<(WorkspaceUser|WorkspaceModel|TableDataItem)[]>(() => {
         switch (workspaceGroupPageState.modal.type) {
         case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER:
@@ -51,9 +49,7 @@ const state = reactive({
         case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER:
             return [workspaceGroupPageState.modalAdditionalData.selectedGroupUser];
         case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES:
-            return workspaceGroupPageGetters.selectedWorkspacesByIndices?.map((workspace) => ({
-                ...state.workspaces[workspace],
-            }));
+            return workspaceTabState.selectedWorkspaceIndices.map((index: number) => workspaceTabState.workspacesInSelectedGroup[index]);
         case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE:
             return [workspaceGroupPageState.modalAdditionalData.selectedWorkspace];
         default:
@@ -66,9 +62,9 @@ const userTableFields = [{ name: 'user_id', label: 'User ID' },
     { name: 'state', label: 'State' },
     { name: 'role_type', label: 'Group Role Type' }];
 const workspaceTableField = [{ name: 'name', label: 'Name' },
-    { name: 'data.state', label: 'State' },
-    { name: 'data.user', label: 'User' },
-    { name: 'data.service_account_count', label: 'Service Account' }];
+    { name: 'state', label: 'State' },
+    { name: 'user_count', label: 'User' },
+    { name: 'service_account_count', label: 'Service Account' }];
 
 
 const getWorkspaceRouteLocationByWorkspaceId = (item) => ({
@@ -101,7 +97,7 @@ const deleteGroupUsers = async () => {
             ? [workspaceGroupPageState.modalAdditionalData?.selectedGroupUser]
             : workspaceGroupPageGetters.selectedGroupUsersByIndices;
         await SpaceConnector.clientV2.identity.workspaceGroup.removeUsers<WorkspaceGroupRemoveUsersParameters>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
+            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
             users: users.map((item) => ({ user_id: item.user_id })),
         });
     } catch (e) {
@@ -115,10 +111,17 @@ const deleteWorkspaces = async () => {
     state.loading = true;
 
     try {
-        await SpaceConnector.clientV2.identity.workspaceGroup.removeWorkspaces<WorkspaceGroupRemoveWorkspacesParameters>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
-            workspaces: state.isRemoveWorkspacesType ? workspaceGroupPageGetters.selectedWorkspacesByIndices : [workspaceGroupPageState.modalAdditionalData?.selectedWorkspace?.key],
-        });
+        if (state.isRemoveSingleWorkspaceType) {
+            await SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
+                workspace_id: workspaceGroupPageState.modalAdditionalData.selectedWorkspace?.workspace_id,
+            });
+        } else {
+        // eslint-disable-next-line max-len
+            await Promise.allSettled(workspaceGroupPageGetters.selectedWorkspaceIds.map((item) => SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
+                workspace_id: item,
+            })));
+        }
+        await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -135,7 +138,6 @@ const handleConfirm = async () => {
         workspaceGroupPageStore.resetSelectedWorkspace();
     }
 
-    emit('confirm', { isGroupUser: true });
     workspaceGroupPageStore.closeModal();
 };
 
@@ -163,11 +165,12 @@ const handleCloseModal = () => {
                          @close="handleCloseModal"
     >
         <template #col-name-format="{ value, item }">
-            <div v-if="state.isRemoveWorkspacesType"
+            <div v-if="state.isRemoveWorkspacesType || state.isRemoveSingleWorkspaceType"
                  class="name-wrapper"
             >
                 <workspace-logo-icon :text="value"
                                      size="xs"
+                                     :theme="item?.tags?.theme"
                 />
                 <p-link :text="value"
                         action-icon="internal-link"

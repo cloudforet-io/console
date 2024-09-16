@@ -7,13 +7,13 @@ import { useRoute } from 'vue-router/composables';
 import dayjs from 'dayjs';
 import { clone } from 'lodash';
 
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PHeading, PI, PLink, PStatus, PToolboxTable, PTooltip,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -50,6 +50,11 @@ const route = useRoute();
 const storeState = reactive({
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
+
+interface WorkspaceTableItem extends WorkspaceModel {
+    remove_button: WorkspaceModel;
+}
+
 const state = reactive({
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
@@ -62,7 +67,7 @@ const state = reactive({
 const tableState = reactive({
     timezone: computed(() => store.state.user.timezone),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
-    tableItems: computed(() => workspaceTabState.workspacesInSelectedGroup?.map((workspace) => ({
+    tableItems: computed<WorkspaceTableItem[]>(() => workspaceTabState.workspacesInSelectedGroup?.map((workspace) => ({
         ...workspace,
         remove_button: workspace,
     }))),
@@ -131,7 +136,7 @@ const handleSelect = (index:number[]) => {
     workspaceTabState.selectedWorkspaceIndices = index;
 };
 
-const handleChange = (options: any = {}) => {
+const handleChange = async (options: any = {}) => {
     if (options.pageStart) {
         workspaceTabState.pageStart = options.pageStart;
     }
@@ -144,7 +149,7 @@ const handleChange = (options: any = {}) => {
     if (options.searchText) {
         workspaceTabState.thisPage = 1;
     }
-    workspaceGroupPageStore.listWorkspacesInSelectedGroup(getQuery());
+    await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
 };
 
 const handleAddWorkspaceButtonClick = () => {
@@ -155,7 +160,7 @@ const handleSelectedWorkspacesRemoveButtonClick = () => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES);
 };
 
-const handleSelectedWorkspaceRemoveButtonClick = (item) => {
+const handleSelectedWorkspaceRemoveButtonClick = (item:WorkspaceTableItem) => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE);
     workspaceGroupPageState.modalAdditionalData = {
         selectedWorkspace: item,
@@ -163,7 +168,7 @@ const handleSelectedWorkspaceRemoveButtonClick = (item) => {
 };
 
 const handleRefresh = () => {
-    workspaceGroupPageStore.listWorkspacesInSelectedGroup(getQuery());
+    workspaceGroupPageStore.listWorkspacesInSelectedGroup();
 };
 
 const handleChangeSort = (name:string, isDesc:boolean) => {
@@ -171,22 +176,11 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
     workspaceTabState.selectedWorkspaceIndices = [];
     workspaceTabState.sortDesc = isDesc;
     workspaceTabState.thisPage = 1;
-    workspaceGroupPageStore.listWorkspacesInSelectedGroup(getQuery());
-};
-
-const apiQuery = new ApiQueryHelper();
-const getQuery = () => {
-    apiQuery.setSort(workspaceTabState.sortBy, workspaceTabState.sortDesc)
-        .setPage(workspaceTabState.pageStart, workspaceTabState.pageLimit)
-        .setFilters([
-            { k: 'workspace_group_id', v: workspaceGroupPageGetters.selectedWorkspaceGroupId, o: '=' },
-            { k: 'name', v: workspaceTabState.searchText, o: '' },
-        ]);
-    return apiQuery.data;
+    workspaceGroupPageStore.listWorkspacesInSelectedGroup();
 };
 
 watch(() => workspaceGroupPageGetters.selectedWorkspaceGroupId, () => {
-    workspaceGroupPageStore.listWorkspacesInSelectedGroup(getQuery());
+    workspaceGroupPageStore.listWorkspacesInSelectedGroup();
 }, { immediate: true });
 </script>
 
