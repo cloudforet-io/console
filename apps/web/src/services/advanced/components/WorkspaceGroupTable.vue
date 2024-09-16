@@ -90,8 +90,8 @@ const handleUpdateSelectIndices = (indices: number[]) => {
         _state.state.selectedIndices = indices;
         _state.state.selectedUserIndices = [];
         _state.state.groupUserSearchText = '';
-        _state.state.selectedWorkspaceIndices = [];
-        _state.state.workspaceSearchText = '';
+        _state.workspaceTabState.selectedWorkspaceIndices = [];
+        _state.workspaceTabState.searchText = '';
     });
 };
 

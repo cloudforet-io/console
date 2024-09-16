@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    reactive, watch, onUnmounted, computed,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -8,13 +8,17 @@ import dayjs from 'dayjs';
 import { clone } from 'lodash';
 
 import {
-    PHeading, PButton, PToolboxTable, PLink, PStatus, PTooltip, PI,
+    PButton, PHeading, PI, PLink, PStatus, PToolboxTable, PTooltip,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+import { numberFormatter } from '@cloudforet/utils';
 
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
@@ -28,15 +32,17 @@ import { workspaceStateFormatter } from '@/services/advanced/composables/refined
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
+
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
-
-const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
-
+const costReportPageStore = useCostReportPageStore();
+const costReportPageGetters = costReportPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 
 const route = useRoute();
@@ -44,6 +50,11 @@ const route = useRoute();
 const storeState = reactive({
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
+
+interface WorkspaceTableItem extends WorkspaceModel {
+    remove_button: WorkspaceModel;
+}
+
 const state = reactive({
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
@@ -51,22 +62,23 @@ const state = reactive({
         return closestRoute?.meta?.menuId;
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    currency: computed<Currency|undefined>(() => costReportPageGetters.currency),
 });
 const tableState = reactive({
     timezone: computed(() => store.state.user.timezone),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
-    tableItems: computed(() => workspaceGroupPageGetters.workspacesInSelectedGroup?.map((workspace) => ({
-        ...tableState.workspaces[workspace],
+    tableItems: computed<WorkspaceTableItem[]>(() => workspaceTabState.workspacesInSelectedGroup?.map((workspace) => ({
+        ...workspace,
         remove_button: workspace,
     }))),
     fields: computed<DataTableFieldType[]>(() => {
         const defaultFields: DataTableFieldType[] = [
             { name: 'name', label: 'Name' },
-            { name: 'data.state', label: 'State' },
-            { name: 'data.user', label: 'User' },
-            { name: 'data.service_account_count', label: 'Service Account' },
-            { name: 'data.cost_info', label: 'Cost' },
-            { name: 'data.created_at', label: 'Created' },
+            { name: 'state', label: 'State' },
+            { name: 'user_count', label: 'User' },
+            { name: 'service_account_count', label: 'Service Account' },
+            { name: 'cost_info', label: 'Cost' },
+            { name: 'created_at', label: 'Created' },
         ];
         if (state.hasReadWriteAccess) {
             defaultFields.push({ name: 'remove_button', label: ' ', sortable: false });
@@ -120,26 +132,24 @@ const setupModal = (type) => {
     }
 };
 
-const handleSelect = (index) => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedWorkspaceIndices = index;
-    });
+const handleSelect = (index:number[]) => {
+    workspaceTabState.selectedWorkspaceIndices = index;
 };
 
-const handleChange = (options: any = {}) => {
+const handleChange = async (options: any = {}) => {
     if (options.pageStart) {
-        workspaceGroupPageStore.$patch((_state) => {
-            _state.state.workspacePageStart = options.pageStart;
-        });
+        workspaceTabState.pageStart = options.pageStart;
     }
 
     if (options.pageLimit) {
-        workspaceGroupPageStore.$patch((_state) => {
-            _state.state.workspacePageStart = 1;
-            _state.state.workspacePageLimit = options.pageLimit;
-            _state.state.workspacePage = 1;
-        });
+        workspaceTabState.pageStart = 1;
+        workspaceTabState.pageLimit = options.pageLimit;
+        workspaceTabState.thisPage = 1;
     }
+    if (options.searchText) {
+        workspaceTabState.thisPage = 1;
+    }
+    await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
 };
 
 const handleAddWorkspaceButtonClick = () => {
@@ -150,7 +160,7 @@ const handleSelectedWorkspacesRemoveButtonClick = () => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES);
 };
 
-const handleSelectedWorkspaceRemoveButtonClick = (item) => {
+const handleSelectedWorkspaceRemoveButtonClick = (item:WorkspaceTableItem) => {
     setupModal(WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE);
     workspaceGroupPageState.modalAdditionalData = {
         selectedWorkspace: item,
@@ -158,26 +168,20 @@ const handleSelectedWorkspaceRemoveButtonClick = (item) => {
 };
 
 const handleRefresh = () => {
-    emit('refresh', { isWorkspace: true });
+    workspaceGroupPageStore.listWorkspacesInSelectedGroup();
 };
 
-const handleChangeSort = (name, isDesc) => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.workspaceSortBy = name;
-        _state.state.selectedWorkspaceIndices = [];
-        _state.state.isWorkspaceSortDesc = isDesc;
-    });
+const handleChangeSort = (name:string, isDesc:boolean) => {
+    workspaceTabState.sortBy = name;
+    workspaceTabState.selectedWorkspaceIndices = [];
+    workspaceTabState.sortDesc = isDesc;
+    workspaceTabState.thisPage = 1;
+    workspaceGroupPageStore.listWorkspacesInSelectedGroup();
 };
 
-watch(() => workspaceGroupPageState.workspaceSearchText, () => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.selectedWorkspaceIndices = [];
-    });
-});
-
-onUnmounted(() => {
-    workspaceGroupPageStore.resetWorkspace();
-});
+watch(() => workspaceGroupPageGetters.selectedWorkspaceGroupId, () => {
+    workspaceGroupPageStore.listWorkspacesInSelectedGroup();
+}, { immediate: true });
 </script>
 
 <template>
@@ -185,7 +189,7 @@ onUnmounted(() => {
         <p-heading class="workspace-group-tab-workspace-header"
                    :title="$t('IAM.WORKSPACE_GROUP.TAB.WORKSPACE')"
                    use-total-count
-                   :total-count="workspaceGroupPageGetters.workspaceTotalCount"
+                   :total-count="workspaceTabState.workspacesInSelectedGroupTotalCount"
                    heading-type="sub"
         >
             <template v-if="state.hasReadWriteAccess"
@@ -193,7 +197,7 @@ onUnmounted(() => {
             >
                 <div class="workspace-group-tab-workspace-button-wrapper">
                     <p-button style-type="negative-primary"
-                              :disabled="!workspaceGroupPageGetters.selectedWorkspacesByIndices.length"
+                              :disabled="!workspaceTabState.selectedWorkspaceIndices.length"
                               @click="handleSelectedWorkspacesRemoveButtonClick"
                     >
                         {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
@@ -208,16 +212,16 @@ onUnmounted(() => {
             </template>
         </p-heading>
         <p-toolbox-table class="workspace-group-tab-workspace-table"
-                         :loading="workspaceGroupPageState.loading"
+                         :loading="workspaceTabState.loading"
                          :fields="tableState.fields"
                          :items="tableState.tableItems"
-                         :select-index="workspaceGroupPageState.selectedWorkspaceIndices"
-                         :total-count="workspaceGroupPageGetters.workspaceTotalCount"
+                         :select-index.sync="workspaceTabState.selectedWorkspaceIndices"
+                         :total-count="workspaceTabState.workspacesInSelectedGroupTotalCount"
                          sort-by="name"
                          search-type="plain"
                          :sort-desc="true"
-                         :this-page.sync="workspaceGroupPageState.workspacePage"
-                         :search-text.sync="workspaceGroupPageState.workspaceSearchText"
+                         :this-page.sync="workspaceTabState.thisPage"
+                         :search-text.sync="workspaceTabState.searchText"
                          :selectable="state.hasReadWriteAccess"
                          sortable
                          searchable
@@ -265,6 +269,7 @@ onUnmounted(() => {
             <template #col-name-format="{ value, item }">
                 <div class="name-wrapper">
                     <workspace-logo-icon :text="value"
+                                         :theme="item?.tags.theme"
                                          size="xs"
                     />
                     <p-link :text="value"
@@ -274,29 +279,32 @@ onUnmounted(() => {
                     />
                 </div>
             </template>
-            <template #col-data.state-format="{ value }">
+            <template #col-state-format="{ value }">
                 <p-status v-bind="workspaceStateFormatter(value)"
                           class="capitalize"
                 />
             </template>
-            <template #col-data.user-format="{ value, item }">
+            <template #col-user_count-format="{ value, item }">
                 <p-link :text="value"
                         action-icon="internal-link"
                         new-tab
                         :to="getUserRouteLocationByWorkspaceId(item)"
                 />
             </template>
-            <template #col-data.service_account_count-format="{ value, item }">
+            <template #col-service_account_count-format="{ value, item }">
                 <p-link :text="value || 0"
                         action-icon="internal-link"
                         new-tab
                         :to="getServiceAccountRouteLocationByWorkspaceId(item)"
                 />
             </template>
-            <template #col-data.cost_info-format="{ value }">
-                {{ value?.month ?? '-' }}
+            <template #col-cost_info-format="{ value }">
+                <p>
+                    <span>{{ CURRENCY_SYMBOL[state.currency ?? 'USD'] }}</span>
+                    {{ numberFormatter(value?.month) || 0 }}
+                </p>
             </template>
-            <template #col-data.created_at-format="{ value }">
+            <template #col-created_at-format="{ value }">
                 {{ dayjs.tz(dayjs.utc(value), tableState.timezone).format('YYYY-MM-DD HH:mm') }}
             </template>
             <template #col-remove_button-format="{ item }">

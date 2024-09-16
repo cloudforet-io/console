@@ -31,7 +31,7 @@ interface SelectDropDownListState<T> {
     totalCount: number,
     list: T[],
     menuList: ComputedRef<SelectDropdownMenuItem[]>,
-    selectedItems: T[],
+    selectedItems: (SelectDropdownMenuItem & T)[],
     pageStart: number,
     pageLimit: number,
     isShowMore: ComputedRef<boolean>,
@@ -57,7 +57,7 @@ export const useSelectDropDownList = <DataModel>({
 
             return menuList;
         }),
-        selectedItems: [] as DataModel[],
+        selectedItems: [],
         pageStart: 1,
         pageLimit: pageSize,
         isShowMore: computed(() => {

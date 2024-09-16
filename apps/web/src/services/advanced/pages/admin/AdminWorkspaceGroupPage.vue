@@ -120,8 +120,8 @@ onUnmounted(() => {
         />
         <workspace-group-edit-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-modal @confirm="fetchWorkspaceGroups" />
-        <workspace-group-delete-status-modal @confirm="fetchWorkspaceGroups" />
-        <workspace-group-add-workspaces-modal @confirm="fetchWorkspaceGroups" />
+        <workspace-group-delete-status-modal />
+        <workspace-group-add-workspaces-modal />
         <workspace-group-add-users-modal @confirm="() => {refreshTab({isGroupUser: true})}" />
     </section>
 </template>

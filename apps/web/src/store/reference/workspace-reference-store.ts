@@ -19,7 +19,7 @@ import type {
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
-type PickedWorkspaceModel = Pick<WorkspaceModel, 'state' | 'tags'|'cost_info'|'service_account_count' |'created_at'>;
+type PickedWorkspaceModel = Pick<WorkspaceModel, 'state' | 'tags'|'cost_info'|'service_account_count' |'created_at'|'user_count'>;
 export type WorkspaceItem = Required<Pick<ReferenceItem<PickedWorkspaceModel>, 'key'|'label'|'name'|'data'>>;
 export type WorkspaceReferenceMap = ReferenceMap<WorkspaceItem>;
 
@@ -60,7 +60,7 @@ export const useWorkspaceReferenceStore = defineStore('reference-workspace', () 
 
         const params: WorkspaceListParameters = {
             query: {
-                only: ['name', 'workspace_id', 'state', 'tags', 'cost_info', 'service_account_count', 'created_at'],
+                only: ['name', 'workspace_id', 'state', 'tags', 'cost_info', 'service_account_count', 'created_at', 'user_count'],
             },
         };
 
@@ -86,6 +86,7 @@ export const useWorkspaceReferenceStore = defineStore('reference-workspace', () 
                     cost_info: workspace.cost_info,
                     service_account_count: workspace.service_account_count,
                     created_at: workspace.created_at,
+                    user_count: workspace.user_count,
                 },
             };
         });
@@ -107,6 +108,7 @@ export const useWorkspaceReferenceStore = defineStore('reference-workspace', () 
                     cost_info: workspace.cost_info,
                     service_account_count: workspace.service_account_count,
                     created_at: workspace.created_at,
+                    user_count: workspace.user_count,
                 },
             },
         };

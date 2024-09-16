@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
+
+import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PSelectDropdown, PIconButton, PAvatar,
+    PButtonModal, PFieldGroup, PSelectDropdown, PIconButton, PAvatar, PTextInput,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
-import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
-import type { UserModel } from '@/schema/identity/user/model';
+import type { WorkspaceGroupUserFindParameters } from '@/schema/identity/workspace-group-user/api-verbs/find';
+import type { WorkspaceGroupUserSummaryModel } from '@/schema/identity/workspace-group-user/model';
 import type { WorkspaceGroupAddUsersParameters } from '@/schema/identity/workspace-group/api-verbs/add-users';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import { i18n } from '@/translations';
@@ -24,19 +27,17 @@ import { useSelectDropDownList } from '@/services/advanced/composables/use-selec
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
-
-
+import { USER_STATE } from '@/services/iam/constants/user-constant';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void}>();
 
-
-
 const state = reactive({
     loading: false,
-    isAllValid: computed(() => roleSelectedItems.value.length > 0 && userSelectedItems.value.length > 0),
+    isAllValid: computed(() => roleSelectedItems.value.length > 0 && userDropdownState.selectedItems.length > 0),
 });
 
 const {
@@ -60,35 +61,36 @@ const {
     }),
 });
 
-const {
-    loading: userLoading, searchText: userSearchText, menuList: userMenuList, selectedItems: userSelectedItems, handleClickShowMore: handleClickShowMoreUser,
-} = useSelectDropDownList<UserModel>({
-    pageSize: 10,
-    transformer: (_user) => ({
-        name: _user.name,
-        user_id: _user.user_id,
-    }),
-    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>({
-        query: apiQueryHelper.data,
-    }),
-    searchKey: 'user_id',
+const userDropdownState = reactive({
+    userList: [] as WorkspaceGroupUserSummaryModel[],
+    menuList: computed(() => userDropdownState.userList.map((user) => ({
+        label: user.user_id,
+        name: user.user_id,
+        disabled: userDropdownState.selectedItems.includes(user.user_id),
+    }))),
+    inputSelectedItem: [] as MenuItem[],
+    selectedItems: [] as string[],
+    searchText: '',
+    loading: false,
+    pageLimit: 10,
 });
 
 const resetState = () => {
     roleSelectedItems.value = [];
-    userSelectedItems.value = [];
+    userDropdownState.menuList = [];
 };
 
 const handleConfirm = async () => {
     try {
         state.loading = true;
         await SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>({
-            workspace_group_id: workspaceGroupPageState.modalAdditionalData?.workspaceGroupId ?? workspaceGroupPageStore.getters.selectedWorkspaceGroup?.workspace_group_id,
-            users: userSelectedItems.value.map((item) => ({
-                user_id: item?.user_id, role_id: roleSelectedItems.value[0]?.name,
+            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
+            users: userDropdownState.selectedItems.map((item) => ({
+                user_id: item, role_id: roleSelectedItems.value[0]?.name,
             })),
         });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
+        await workspaceGroupPageStore.listWorkspaceGroupUsers();
         emit('confirm');
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -103,9 +105,48 @@ const handleCloseModal = () => {
     workspaceGroupPageStore.closeModal();
 };
 
-const handleRemoveUser = (item: UserModel) => {
-    userSelectedItems.value = userSelectedItems.value.filter((selectedItem) => selectedItem.user_id !== item.user_id);
+const handleRemoveUser = (item: string) => {
+    userDropdownState.selectedItems = userDropdownState.selectedItems.filter((selectedItem) => selectedItem !== item);
 };
+
+const fetchUserFindList = async ():Promise<WorkspaceGroupUserSummaryModel[]> => {
+    userDropdownState.loading = true;
+
+    try {
+        if (!workspaceGroupPageGetters.selectedWorkspaceGroupId) throw Error('Invalid Workspace Group Id.');
+        const { results } = await SpaceConnector.clientV2.identity.workspaceGroupUser.find<WorkspaceGroupUserFindParameters, ListResponse<WorkspaceGroupUserSummaryModel>>({
+            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
+            keyword: userDropdownState.searchText,
+            state: USER_STATE.ENABLE,
+            page: {
+                start: 0,
+                limit: userDropdownState.pageLimit,
+            },
+        });
+        return results ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    } finally {
+        userDropdownState.loading = false;
+    }
+};
+
+const handleEnter = (user: [MenuItem]) => {
+    const selectedUser = user[0]?.name;
+    const isExistUser = userDropdownState.selectedItems.find((selectedItem:string) => selectedItem === selectedUser);
+    if (!selectedUser || isExistUser) return;
+    userDropdownState.selectedItems.push(selectedUser);
+    userDropdownState.inputSelectedItem = [];
+};
+
+(async () => {
+    userDropdownState.userList = await fetchUserFindList();
+})();
+
+watch(() => userDropdownState.searchText, debounce(async () => {
+    userDropdownState.userList = await fetchUserFindList() || [];
+}, 300));
 </script>
 
 <template>
@@ -163,38 +204,27 @@ const handleRemoveUser = (item: UserModel) => {
                                style-type="secondary"
                 >
                     <template #default>
-                        <p-select-dropdown
-                            is-filterable
-                            use-fixed-menu-style
-                            class="user-select-dropdown"
-                            style-type="TERTIARY_ICON_BUTTON"
-                            disable-handler
-                            multi-selectable
-                            :menu="userMenuList"
-                            :selected.sync="userSelectedItems"
-                            :search-text.sync="userSearchText"
-                            :loading="userLoading"
-                            :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.USER_DROP_DOWN_PLACEHOLDER')"
-                            @click-show-more="handleClickShowMoreUser"
-                        >
-                            <template #menu-item--format="{ item }">
-                                <div class="user-menu-item">
-                                    <span class="role-user_id">{{ item.user_id }}({{ item.name }})</span>
-                                </div>
-                            </template>
-                        </p-select-dropdown>
+                        <p-text-input :value.sync="userDropdownState.searchText"
+                                      class="user-search-input"
+                                      :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.USER_DROP_DOWN_PLACEHOLDER')"
+                                      :selected="userDropdownState.inputSelectedItem"
+                                      use-auto-complete
+                                      use-fixed-menu-style
+                                      :menu="userDropdownState.menuList"
+                                      @update:selected="handleEnter"
+                        />
                     </template>
                 </p-field-group>
             </div>
-            <div v-for="item in userSelectedItems"
-                 :key="item.user_id"
+            <div v-for="item in userDropdownState.selectedItems"
+                 :key="item"
                  class="selected-user-item"
             >
                 <div class="flex items-center gap-2">
                     <p-avatar class="menu-icon"
                               size="md"
                     />
-                    {{ item.user_id }}
+                    {{ item }}
                 </div>
                 <p-icon-button name="ic_close"
                                size="md"
