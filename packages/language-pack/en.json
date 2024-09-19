@@ -2834,8 +2834,9 @@
 			"MODAL": {
 				"ADD": "Add",
 				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
-				"ADD_WORKSPACES_TITLE": "Add Workspaces to {name}",
+				"ADD_WORKSPACES_TITLE": "Add Workspaces to \"{name}\"",
 				"ALT_S_ADD_USERS": "Users successfully added",
+				"ALT_S_ADD_WORKSPACE": "Workspaces successfully added",
 				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
 				"CREATE_DROP_DOWN_PLACEHOLDER": "Select Workspaces",
 				"CREATE_GROUP_NAME": "Name",

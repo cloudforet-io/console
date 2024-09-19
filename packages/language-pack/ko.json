@@ -2834,8 +2834,9 @@
 			"MODAL": {
 				"ADD": "추가",
 				"ADD_USERS_TITLE": "\"{name}\"에 사용자 추가",
-				"ADD_WORKSPACES_TITLE": "{name}에 워크스페이스 추가",
+				"ADD_WORKSPACES_TITLE": "\"{name}\"에 워크스페이스 추가",
 				"ALT_S_ADD_USERS": "사용자 추가 완료",
+				"ALT_S_ADD_WORKSPACE": "워크스페이스 추가 완료",
 				"ALT_S_CREATE_WORKSPACE": "워크스페이스 그룹 생성 완료",
 				"CREATE_DROP_DOWN_PLACEHOLDER": "워크스페이스 선택",
 				"CREATE_GROUP_NAME": "이름",

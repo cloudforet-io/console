@@ -124,7 +124,7 @@ const setupModal = (type) => {
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_WORKSPACES_TITLE', { name: 'yubeom kim' }),
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_WORKSPACES_TITLE', { name: workspaceGroupPageGetters.selectedWorkspaceGroup.name }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
     }); break;
     default:
