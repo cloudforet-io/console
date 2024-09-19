@@ -1774,6 +1774,10 @@
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
+			"ALT_E_DELETE_DASHBOARD": "Failed to delete dashboard",
+			"ALT_E_MOVE_DASHBOARD": "Failed to move dashboard",
+			"ALT_S_DELETE_DASHBOARD": "Dashboards successfully deleted",
+			"ALT_S_MOVE_DASHBOARD": "Dashboard successfully moved",
 			"CREATE": "Create",
 			"CREAT_NEW_DASHBOARD": "Create New Dashboard",
 			"DASHBOARD": "Dashboard",
@@ -1804,7 +1808,11 @@
 			"LABEL_PUBLIC": "Public",
 			"LABEL_SCOPE": "Scope",
 			"LABEL_VIWERS": "Viewers",
+			"LOCATION": "Location",
+			"MOVE_DASHBOARDS": "Move {count} Dashboards",
 			"NEW_DASHBOARD": "New Dashboard",
+			"NO_DASHBOARD": "No Dashboard",
+			"NO_PARENT_FOLDER": "No Parent Folder",
 			"PRIVATE": "Private",
 			"PROJECT": "Project",
 			"SHARED": "Shared",

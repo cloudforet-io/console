@@ -1774,6 +1774,10 @@
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
+			"ALT_E_DELETE_DASHBOARD": "",
+			"ALT_E_MOVE_DASHBOARD": "",
+			"ALT_S_DELETE_DASHBOARD": "",
+			"ALT_S_MOVE_DASHBOARD": "",
 			"CREATE": "생성",
 			"CREAT_NEW_DASHBOARD": "대시보드 생성",
 			"DASHBOARD": "대시보드",
@@ -1804,7 +1808,11 @@
 			"LABEL_PUBLIC": "공개",
 			"LABEL_SCOPE": "범위",
 			"LABEL_VIWERS": "공개 여부",
+			"LOCATION": "",
+			"MOVE_DASHBOARDS": "",
 			"NEW_DASHBOARD": "",
+			"NO_DASHBOARD": "대시보드 없음",
+			"NO_PARENT_FOLDER": "",
 			"PRIVATE": "비공개",
 			"PROJECT": "프로젝트",
 			"SHARED": "공유됨",
