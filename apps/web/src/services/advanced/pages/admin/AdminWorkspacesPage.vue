@@ -180,19 +180,24 @@ onUnmounted(() => {
         </p-horizontal-layout>
         <workspaces-user-management-tab :has-read-write-access="state.hasReadWriteAccess" />
         <workspaces-create-modal
+            v-if="state.hasReadWriteAccess"
             :visible.sync="modalState.createModalVisible"
             :create-type="modalState.createType"
             @confirm="handleConfirm"
             @refresh="refreshWorkspaceList"
         />
-        <workspaces-delete-modal :visible.sync="modalState.deleteModalVisible"
+        <workspaces-delete-modal v-if="state.hasReadWriteAccess"
+                                 :visible.sync="modalState.deleteModalVisible"
                                  @refresh="refreshWorkspaceList"
         />
-        <workspaces-set-enable-modal :visible.sync="modalState.setEnableModalVisible"
+        <workspaces-set-enable-modal v-if="state.hasReadWriteAccess"
+                                     :visible.sync="modalState.setEnableModalVisible"
                                      :enable-modal-type="modalState.enableState"
                                      @refresh="refreshWorkspaceList"
         />
-        <user-management-add-modal @confirm="refreshWorkspaceList" />
+        <user-management-add-modal v-if="state.hasReadWriteAccess"
+                                   @confirm="refreshWorkspaceList"
+        />
     </section>
 </template>
 

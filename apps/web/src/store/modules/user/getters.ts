@@ -5,8 +5,8 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { languages } from '@/store/modules/user/config';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
-import { PAGE_ACCESS } from '@/lib/access-control/config';
 import {
+    checkAllMenuReadonly,
     getDefaultPageAccessPermissionList, getMinimalPageAccessPermissionList, getPageAccessMapFromRawData,
 } from '@/lib/access-control/page-access-helper';
 import type { MenuId } from '@/lib/menu/config';
@@ -31,6 +31,10 @@ export const getCurrentRoleInfo: Getter<UserState, any> = (state: UserState): Ro
 
 export const getCurrentGrantInfo: Getter<UserState, any> = (state: UserState): GrantInfo|undefined => state.currentGrantInfo;
 
+export const isRootRoleReadonly: Getter<UserState, any> = (state: UserState, getters): boolean => {
+    const roleBasePagePermissions = getters.getCurrentGrantInfo?.pageAccess ?? ['my_page.*'];
+    return checkAllMenuReadonly(roleBasePagePermissions);
+};
 export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
     const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
     const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
@@ -58,10 +62,7 @@ export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters):
     const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
     const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
 
-    const isAllReadOnly = roleBasePagePermissions.every((item) => {
-        const accessType = item.split('.*')[0].split(':')[1];
-        return accessType === PAGE_ACCESS.READONLY;
-    });
+    const isAllReadOnly = checkAllMenuReadonly(roleBasePagePermissions);
 
     getters.pageAccessPermissionList.forEach((menuId) => {
         if (!result[menuId]) {

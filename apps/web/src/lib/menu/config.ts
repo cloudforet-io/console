@@ -2,7 +2,7 @@
 import type { HighlightTagType } from '@/store/modules/display/type';
 
 export const MENU_ID = Object.freeze({
-    WORKSPACE_HOME: 'workspace-home',
+    WORKSPACE_HOME: 'workspace_home',
     DASHBOARDS: 'dashboards',
     PROJECT: 'project',
     ASSET_INVENTORY: 'asset_inventory',

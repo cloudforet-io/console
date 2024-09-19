@@ -16,6 +16,7 @@ export interface RoleInfo {
 export interface GrantInfo {
     scope: GrantScope;
     workspaceId?: string;
+    pageAccess?: string[];
 }
 
 export interface UserState {

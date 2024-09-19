@@ -4,6 +4,8 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { clone } from 'lodash';
+
 import {
     PIconButton,
 } from '@cloudforet/mirinae';
@@ -14,6 +16,8 @@ import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
@@ -32,7 +36,6 @@ import { gray } from '@/styles/colors';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
-const route = useRoute();
 
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -41,15 +44,24 @@ const dashboardGetters = dashboardStore.getters;
 
 const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
-
 const router = useRouter();
+const route = useRoute();
+
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     favoriteItems: computed(() => favoriteGetters.dashboardItems),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     loading: true,
     currentPath: computed(() => route.fullPath),
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     favoriteItemMap: computed(() => {
         const result: Record<string, FavoriteConfig> = {};
         storeState.favoriteItems?.forEach((d) => {
@@ -252,7 +264,9 @@ callApiWithGrantGuard();
             <l-s-b-router-menu-item :current-path="state.currentPath"
                                     :item="item"
             >
-                <template #right-extra>
+                <template v-if="state.hasReadWriteAccess"
+                          #right-extra
+                >
                     <p-icon-button name="ic_plus"
                                    size="sm"
                                    style-type="tertiary"

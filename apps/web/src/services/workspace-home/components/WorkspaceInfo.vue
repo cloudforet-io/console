@@ -63,6 +63,7 @@ const storeState = reactive({
     workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageState.workspaceUserTotalCount),
     appsTotalCount: computed<number|undefined>(() => workspaceHomePageState.appsTotalCount),
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    isRootRoleReadonly: computed<boolean>(() => store.getters['user/isRootRoleReadonly']),
 });
 const state = reactive({
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),
@@ -140,13 +141,13 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
                                          class="favorite-button"
                                          scale="0.8"
                         />
-                        <p-icon-button v-if="storeState.isDomainAdmin"
+                        <p-icon-button v-if="storeState.isDomainAdmin && !storeState.isRootRoleReadonly"
                                        name="ic_settings"
                                        width="1.5rem"
                                        height="1.5rem"
                                        @click="handleActionButton('edit')"
                         />
-                        <p-icon-button v-if="storeState.isDomainAdmin"
+                        <p-icon-button v-if="storeState.isDomainAdmin && !storeState.isRootRoleReadonly"
                                        name="ic_delete"
                                        width="1.5rem"
                                        height="1.5rem"
