@@ -12,8 +12,8 @@ import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceGroupUserListParameters } from '@/schema/identity/workspace-group-user/api-verbs/list';
-import type { WorkspaceGroupUserModel } from '@/schema/identity/workspace-group-user/model';
-import type { WorkspaceGroupModel, WorkspaceUser } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceGroupUserModel, WorkspaceGroupUser } from '@/schema/identity/workspace-group-user/model';
+import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
@@ -41,7 +41,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             visible: '',
         },
         // Additional data added for data transfer between modals
-        modalAdditionalData: {} as { workspaceGroupId?: string, selectedWorkspace?: TableDataItem, selectedGroupUser?: WorkspaceUser },
+        modalAdditionalData: {} as { workspaceGroupId?: string, selectedWorkspace?: TableDataItem, selectedGroupUser?: WorkspaceGroupUser },
     });
 
     const userTabState = reactive({
@@ -51,7 +51,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         searchText: '',
         thisPage: 1,
         sortBy: 'name',
-        sortDesc: true,
+        sortDesc: false,
         pageStart: 1,
         pageLimit: 15,
         loading: false,
@@ -64,7 +64,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         searchText: '',
         thisPage: 1,
         sortBy: 'name',
-        sortDesc: true,
+        sortDesc: false,
         pageStart: 1,
         pageLimit: 15,
         loading: false,
@@ -91,16 +91,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
                 { k: 'name', v: workspaceTabState.searchText, o: '' },
             ]);
         return workspacesInSelectedGroupApiQuery.data;
-    };
-
-    const workspacesGroupUserApiQuery = new ApiQueryHelper();
-    const getWorkspacesGroupUserApiQuery = ():Query => {
-        workspacesGroupUserApiQuery.setSort(workspaceTabState.sortBy, workspaceTabState.sortDesc)
-            .setPage(workspaceTabState.pageStart, workspaceTabState.pageLimit)
-            .setFilters([
-                { k: 'name', v: workspaceTabState.searchText, o: '' },
-            ]);
-        return workspacesGroupUserApiQuery.data;
     };
     const actions = {
         updateModalSettings: ({
@@ -191,10 +181,14 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             userTabState.loading = true;
             try {
                 const { results } = await SpaceConnector.clientV2.identity.workspaceGroupUser.list<WorkspaceGroupUserListParameters, ListResponse<WorkspaceGroupUserModel>>({
-                    query: getWorkspacesGroupUserApiQuery(),
                     workspace_group_id: getters.selectedWorkspaceGroupId,
                 });
-                userTabState.userInSelectedGroup = results?.[0].users || [];
+                const users = results?.[0].users || [];
+                const searchFilteredUsers = users.filter(filterSearchUser);
+                const sortedSelectedGroupUsers = filterSortUser(searchFilteredUsers);
+
+
+                userTabState.userInSelectedGroup = sortedSelectedGroupUsers || [];
                 userTabState.userInSelectedGroupTotalCount = results?.[0].users?.length || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -205,6 +199,40 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             }
         },
     };
+    const filterSearchUser = (user:WorkspaceGroupUser) => {
+        const searchText = userTabState.searchText.trim();
+
+        if (searchText === '') {
+            return true;
+        }
+
+        const userIdMatches = user.user_id && user.user_id.includes(searchText);
+
+        return userIdMatches;
+    };
+
+    const filterSortUser = (users: WorkspaceGroupUser[]) : WorkspaceGroupUser[] => {
+        const sortedSelectedGroupUsers = users?.sort((a, b) => {
+            const aValue = a[userTabState.sortBy];
+            const bValue = b[userTabState.sortBy];
+
+            if (aValue === undefined) return 1;
+            if (bValue === undefined) return -1;
+
+            if (userTabState.sortDesc) {
+                return bValue.localeCompare(aValue);
+            }
+
+            return aValue.localeCompare(bValue);
+        });
+
+        if (userTabState.userInSelectedGroupTotalCount < userTabState.pageStart - 1 + userTabState.pageLimit) {
+            return sortedSelectedGroupUsers.slice(userTabState.pageStart - 1);
+        }
+
+        return sortedSelectedGroupUsers?.slice(userTabState.pageStart - 1, userTabState.pageStart - 1 + userTabState.pageLimit);
+    };
+
     return {
         state,
         userTabState,
