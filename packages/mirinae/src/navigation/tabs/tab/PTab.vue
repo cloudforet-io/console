@@ -48,7 +48,7 @@ const state = reactive({
         if (!props.tabs.length) return undefined;
         if (typeof props.tabs[0] === 'string') return undefined;
         const flattenTabs = props.tabs.reduce((acc, tab) => {
-            if (tab?.type === 'folder') {
+            if (tab?.tabType === 'folder') {
                 acc.push(...(tab?.subItems ?? []));
             } else {
                 acc.push(tab);
@@ -75,7 +75,7 @@ const state = reactive({
                     iconColor: '#0062B8',
                 },
                 {
-                    type: 'divider',
+                    tabType: 'divider',
                 },
                 ...selectedTab?.subItems || [],
             ];
@@ -103,7 +103,11 @@ const handleSelectGroupTabMenu = (tab: TabItem, idx: number) => {
 };
 const handleClickHiddenTabsMenu = () => {
     state.selectedHiddenParentTab = undefined;
-    state.hiddenTabsVisible = !state.hiddenTabsVisible;
+    if (state.hiddenTabsVisible) {
+        state.hiddenTabsVisible = false;
+    } else {
+        state.hiddenTabsVisible = true;
+    }
 };
 const handleSelectHiddenTab = (tab: TabItem, idx: number) => {
     if (tab.subItems) {
@@ -160,7 +164,7 @@ const calculateWidths = () => {
     const visibleTabs = tabItems.value.slice(0, lastValidIndex + 1);
     const hiddenTabs = tabItems.value.slice(lastValidIndex + 1);
     state.visibleTabItems = visibleTabs;
-    state.hiddenTabItems = hiddenTabs.filter((tab) => tab.type !== 'divider');
+    state.hiddenTabItems = hiddenTabs.filter((tab) => tab.tabType !== 'divider');
     state.firstRenderDone = true; // This is to prevent the tabs from being hidden on the first render
 };
 useResizeObserver(tabContainerRef, throttle(() => {
@@ -183,13 +187,13 @@ onClickOutside(hiddenTabsMenuRef, () => { state.hiddenTabsVisible = false; });
                 :class="{stretch}"
             >
                 <template v-for="(tab, idx) in state.firstRenderDone ? state.visibleTabItems : tabItems">
-                    <p-divider v-if="tab.type === 'divider'"
+                    <p-divider v-if="tab.tabType === 'divider'"
                                :key="tab.name"
                                ref="tabItemsRef"
                                class="divider-item"
                                vertical
                     />
-                    <li v-else-if="tab.type === 'folder'"
+                    <li v-else-if="tab.tabType === 'folder'"
                         :key="tab.name"
                         ref="tabItemsRef"
                         :class="{active: tab.subItems?.some((subItem) => activeTab === subItem.name)}"
@@ -202,7 +206,7 @@ onClickOutside(hiddenTabsMenuRef, () => { state.hiddenTabsVisible = false; });
                                 {{ tab.label }}
                             </span>
                             <p-i class="sub-item-dropdown-icon"
-                                 name="ic_chevron-down"
+                                 :name="state.selectedFolderTab === tab.name ? 'ic_chevron-up' : 'ic_chevron-down'"
                                  width="1.25rem"
                                  height="1.25rem"
                                  color="inherit"
@@ -250,10 +254,10 @@ onClickOutside(hiddenTabsMenuRef, () => { state.hiddenTabsVisible = false; });
                     >
                         <div class="content-wrapper">
                             <p-i class="hidden-tabs-icon"
-                                 name="ic_chevron-down"
+                                 :name="state.hiddenTabsVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
                                  width="1.25rem"
                                  height="1.25rem"
-                                 color="inherit"
+                                 :color="state.hiddenTabsVisible ? '#232533' : 'inherit'"
                             />
                         </div>
                         <p-context-menu v-if="state.hiddenTabsVisible"
@@ -362,12 +366,14 @@ onClickOutside(hiddenTabsMenuRef, () => { state.hiddenTabsVisible = false; });
                 top: 100%;
                 left: 0;
                 z-index: 100;
+                width: max-content;
             }
             .hidden-tabs-menu {
                 position: absolute;
                 top: 100%;
                 right: 0;
                 z-index: 100;
+                width: max-content;
             }
         }
         .divider-item {
