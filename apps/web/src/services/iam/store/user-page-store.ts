@@ -19,7 +19,6 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getWorkspaceRoleBindingIdFromRoleBindingsInfo } from '@/services/iam/helpers/role-binding-helpers';
 import type { UserListItemType } from '@/services/iam/types/user-type';
 
 export const useUserPageStore = defineStore('page-user', {
@@ -94,17 +93,14 @@ export const useUserPageStore = defineStore('page-user', {
         async listWorkspaceUsers(params: WorkspaceUserListParameters) {
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
-                this.users = (results ?? [])?.map((item) => {
-                    const workspaceRoleBinding = getWorkspaceRoleBindingIdFromRoleBindingsInfo(item.role_bindings_info);
-                    return ({
-                        ...item,
-                        role_type: item.role_type,
-                        role_binding: {
-                            type: workspaceRoleBinding?.role_type ?? ROLE_TYPE.USER,
-                            name: this.roles.find((role) => role.role_id === workspaceRoleBinding?.role_id)?.name ?? '',
-                        },
-                    });
-                });
+                this.users = (results ?? [])?.map((item) => ({
+                    ...item,
+                    role_type: item.role_type,
+                    role_binding: {
+                        type: item.role_binding_info?.role_type ?? ROLE_TYPE.USER,
+                        name: this.roles?.find((role) => role.role_id === item.role_binding_info?.role_id)?.name ?? '',
+                    },
+                }));
                 this.totalCount = total_count ?? 0;
                 this.selectedIndices = [];
             } catch (e) {
@@ -117,13 +113,12 @@ export const useUserPageStore = defineStore('page-user', {
         async getWorkspaceUser(params: WorkspaceUserGetParameters) {
             try {
                 const res = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>(params);
-                const workspaceRoleBinding = getWorkspaceRoleBindingIdFromRoleBindingsInfo(res.role_bindings_info);
                 return {
                     ...res,
                     role_type: res.role_type,
                     role_binding: {
-                        type: workspaceRoleBinding?.role_type ?? ROLE_TYPE.USER,
-                        name: this.roles.find((role) => role.role_id === workspaceRoleBinding?.role_id)?.name ?? '',
+                        type: res.role_binding_info?.role_type ?? ROLE_TYPE.USER,
+                        name: this.roles?.find((role) => role.role_id === res.role_binding_info?.role_id)?.name ?? '',
                     },
                 };
             } catch (e: any) {

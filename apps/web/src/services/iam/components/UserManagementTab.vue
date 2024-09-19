@@ -156,7 +156,7 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
 const handleSelectDropdownItem = async (value, rowIndex:number) => {
     try {
         const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
-            role_binding_id: multiItemTabState.refinedUserItems[rowIndex]?.role_bindings_info?.[0]?.role_binding_id || '',
+            role_binding_id: multiItemTabState.refinedUserItems[rowIndex]?.role_binding_info?.role_binding_id || '',
             role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
@@ -173,8 +173,6 @@ const handleSelectDropdownItem = async (value, rowIndex:number) => {
     }
 };
 
-const roleBindingsContents = (roleBindings: RoleBindingModel[])
-    :string => roleBindings.filter((rb) => (rb.workspace_group_id && rb.workspace_id)).map((roleBinding) => userPageStore.roleMap[roleBinding.role_id]?.name).join('\n');
 /* Watcher */
 watch(() => userPageState.selectedIndices[0], (index) => {
     const user_id = userPageState.users[index]?.user_id;
@@ -249,7 +247,7 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                             <span>{{ useRoleFormatter(value).name }}</span>
                         </div>
                     </template>
-                    <template #col-role_binding-format="{value, rowIndex, item: {role_bindings_info}}">
+                    <template #col-role_binding-format="{value, rowIndex}">
                         <div class="role-type-wrapper">
                             <p-tooltip position="bottom"
                                        :contents="useRoleFormatter(value?.type).name"
@@ -291,19 +289,6 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                                 </template>
                             </p-select-dropdown>
                             <span v-else>{{ value.name }}</span>
-                            <p-tooltip v-if="roleBindingsContents(role_bindings_info).length"
-                                       position="bottom"
-                                       :contents="roleBindingsContents(role_bindings_info)"
-                                       class="tooltip"
-                            >
-                                <p-badge badge-type="subtle"
-                                         shape="round"
-                                         style-type="blue200"
-                                         class="ml-2"
-                                >
-                                    +{{ role_bindings_info.filter((rb) => rb.workspace_id && rb.workspace_group_id).length }}
-                                </p-badge>
-                            </p-tooltip>
                         </div>
                     </template>
                     <template #col-tags-format="{value}">
