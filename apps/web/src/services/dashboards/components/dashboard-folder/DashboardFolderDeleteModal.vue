@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PI } from '@cloudforet/mirinae';
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
 import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/private-dashboard/api-verbs/delete';
 import type { PrivateFolderDeleteParameters } from '@/schema/dashboard/private-folder/api-verbs/delete';
@@ -22,7 +21,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { gray } from '@/styles/colors';
 
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
-import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
@@ -32,12 +30,6 @@ const DELETE_TABLE_FIELDS = [
 ];
 type FolderDeleteParams = PublicFolderDeleteParameters | PrivateFolderDeleteParameters;
 type DashboardDeleteParams = PublicDashboardDeleteParameters | PrivateDashboardDeleteParameters;
-interface DataTableItem {
-    id: string;
-    name: string;
-    location?: string;
-    type: 'DASHBOARD' | 'FOLDER';
-}
 interface Props {
     visible?: boolean;
 }
@@ -48,68 +40,11 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const dashboardStore = useDashboardStore();
 const dashboardMainPageStore = useDashboardMainPageStore();
-const dashboardMainPageState = dashboardMainPageStore.state;
 const dashboardMainPageGetters = dashboardMainPageStore.getters;
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
-    dashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => [...dashboardMainPageGetters.publicDashboardTreeData, ...dashboardMainPageGetters.privateDashboardTreeData]),
-    tableItems: computed<DataTableItem[]>(() => {
-        if (dashboardMainPageState.selectedFolderId) return getSelectedFolderItems(dashboardMainPageState.selectedFolderId);
-        return getSelectedFolderAndDashboardItems();
-    }),
 });
-
-/* Util */
-const getSelectedFolderAndDashboardItems = (): DataTableItem[] => {
-    const _tableItems: DataTableItem[] = [];
-    dashboardMainPageGetters.selectedTreeData.forEach((node) => {
-        if (node.data.type === 'FOLDER') {
-            _tableItems.push({
-                id: node.data.id,
-                name: node.data.name,
-                type: 'FOLDER',
-            });
-            node.children?.forEach((child) => {
-                _tableItems.push({
-                    id: child.data.id,
-                    name: child.data.name,
-                    location: node.data.name,
-                    type: 'DASHBOARD',
-                });
-            });
-        } else {
-            const _folderId = node.data?.folderId;
-            const _folderName = state.dashboardTreeData.find((d) => d.id === _folderId)?.data?.name;
-            _tableItems.push({
-                id: node.data.id,
-                name: node.data.name,
-                location: _folderName,
-                type: 'DASHBOARD',
-            });
-        }
-    });
-    return _tableItems;
-};
-const getSelectedFolderItems = (selectedFolderId: string): DataTableItem[] => {
-    const _tableItems: DataTableItem[] = [];
-    const _selectedFolder = state.dashboardTreeData.find((d) => d.id === selectedFolderId);
-    if (!_selectedFolder) return _tableItems; // it doesn't happen
-    _tableItems.push({
-        id: _selectedFolder.id,
-        name: _selectedFolder.data.name,
-        type: 'FOLDER',
-    });
-    _selectedFolder.children?.forEach((child) => {
-        _tableItems.push({
-            id: child.id,
-            name: child.data.name,
-            location: _selectedFolder.data.name,
-            type: 'DASHBOARD',
-        });
-    });
-    return _tableItems;
-};
 
 /* Api */
 const deleteFolder = async (folderId: string): Promise<boolean> => {
@@ -136,10 +71,10 @@ const deleteDashboard = async (dashboardId: string): Promise<boolean> => {
 };
 
 /* Event */
-const handleDelete = async () => {
+const handleDeleteConfirm = async () => {
     state.loading = true;
     const _deletePromises: Promise<boolean>[] = [];
-    state.tableItems.forEach((item) => {
+    dashboardMainPageGetters.modalTableItems.forEach((item) => {
         if (item.type === 'DASHBOARD') {
             _deletePromises.push(deleteDashboard(item.id));
         } else {
@@ -154,6 +89,7 @@ const handleDelete = async () => {
     }
     await dashboardStore.load();
     state.loading = false;
+    dashboardMainPageStore.setSelectedIdMap({});
     state.proxyVisible = false;
 };
 
@@ -171,10 +107,10 @@ watch(() => state.proxyVisible, (visible) => {
                   :loading="state.loading"
                   :enable-scroll="true"
                   class="dashboard-folder-delete-modal"
-                  @confirm="handleDelete"
+                  @confirm="handleDeleteConfirm"
     >
         <template #delete-modal-body>
-            <p-data-table :items="state.tableItems"
+            <p-data-table :items="dashboardMainPageGetters.modalTableItems"
                           :fields="DELETE_TABLE_FIELDS"
                           :loading="state.loading"
             >

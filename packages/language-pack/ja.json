@@ -1774,10 +1774,13 @@
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
+			"ALT_E_CLONE_DASHBOARD": "",
 			"ALT_E_DELETE_DASHBOARD": "",
 			"ALT_E_MOVE_DASHBOARD": "",
+			"ALT_S_CLONE_DASHBOARD": "",
 			"ALT_S_DELETE_DASHBOARD": "",
 			"ALT_S_MOVE_DASHBOARD": "",
+			"CLONE_DASHBOARD": "ダッシュボードの複製",
 			"CREATE": "作成",
 			"CREAT_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"DASHBOARD": "ダッシュボード",

@@ -43,14 +43,9 @@ const state = reactive({
             clickEvent: handleEditFolderName,
         },
         {
-            name: 'clone',
-            icon: 'ic_clone',
+            name: 'share',
+            icon: 'ic_share',
             clickEvent: () => {},
-        },
-        {
-            name: 'delete',
-            icon: 'ic_delete',
-            clickEvent: handleClickDeleteFolderButton,
         },
     ])),
 });
@@ -87,10 +82,6 @@ const handleClickTreeItem = (): void => {
             dashboardId: props.treeData.data.id || '',
         },
     }));
-};
-const handleClickDeleteFolderButton = (): void => {
-    dashboardMainPageStore.setSelectedFolderId(props.treeData.data.id);
-    dashboardMainPageStore.setFolderDeleteModalVisible(true);
 };
 const handleEditFolderName = () => {
     dashboardMainPageStore.setFolderFormModalType('UPDATE');
