@@ -22,7 +22,7 @@ const emit = defineEmits<{(e: 'confirm'): void,
 const state = reactive({
     sequence: 'first',
     loading: false,
-    isDeleteAble: computed(() => workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_count === 0 && workspaceGroupPageGetters.selectedWorkspaceGroup.users?.length === 0),
+    isDeleteAble: computed(() => (workspaceGroupPageGetters.selectedWorkspaceGroup?.workspace_count ?? 0) === 0 && (workspaceGroupPageGetters.selectedWorkspaceGroup?.users?.length ?? 0) === 0),
 });
 
 const deleteWorkspaceGroups = async () => {
