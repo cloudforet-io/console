@@ -8,6 +8,9 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceChangeWorkspaceGroupParameters } from '@/schema/identity/workspace/api-verbs/change-workspace-group';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -51,6 +54,7 @@ const addWorkspace = async () => {
             workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
             workspace_id: item.name,
         })));
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_WORKSPACE'), '');
 
         await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
     } catch (e) {
@@ -89,7 +93,6 @@ const handleCloseModal = () => {
             <div class="form-wrapper">
                 <p-field-group required
                                :label="$t('IAM.WORKSPACE_GROUP.MODAL.WORKSPACE_SELECT_DROP_DOWN_TITLE')"
-                               style-type="secondary"
                 >
                     <template #default>
                         <div class="dropdown-wrapper">
@@ -101,6 +104,7 @@ const handleCloseModal = () => {
                                 multi-selectable
                                 show-delete-all-button
                                 use-fixed-menu-style
+                                show-select-marker
                                 disable-handler
                                 :menu="menuList"
                                 :selected.sync="selectedItems"

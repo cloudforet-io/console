@@ -88,8 +88,8 @@ const fetchWorkspaceGroups = async () => {
 const handleUpdateSelectIndices = (indices: number[]) => {
     workspaceGroupPageStore.$patch((_state) => {
         _state.state.selectedIndices = indices;
-        _state.state.selectedUserIndices = [];
-        _state.state.groupUserSearchText = '';
+        _state.userTabState.selectedUserIndices = [];
+        _state.userTabState.searchText = '';
         _state.workspaceTabState.selectedWorkspaceIndices = [];
         _state.workspaceTabState.searchText = '';
     });
@@ -117,7 +117,7 @@ const handleChange = (options: any = {}) => {
     fetchWorkspaceGroups();
 };
 
-const handleChangeSort = (name, desc) => {
+const handleChangeSort = (name:string, desc:boolean) => {
     workspaceGroupListApiQueryHelper.setSort(name, desc);
 };
 </script>

@@ -137,7 +137,6 @@ const handleModalClose = () => {
                     :label="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_GROUP_NAME')"
                     :invalid="invalidState.groupName"
                     :invalid-text="invalidTexts.groupName"
-                    style-type="secondary"
                 >
                     <p-text-input :value="groupName"
                                   :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_GROUP_NAME_PLACEHOLDER')"
@@ -147,7 +146,6 @@ const handleModalClose = () => {
                 </p-field-group>
                 <p-field-group
                     :label="$t('IAM.WORKSPACE_GROUP.MODAL.WORKSPACE_SELECT_DROP_DOWN_TITLE')"
-                    style-type="secondary"
                 >
                     <template #default>
                         <div class="dropdown-wrapper">

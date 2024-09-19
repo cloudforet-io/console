@@ -159,7 +159,6 @@ watch(() => userDropdownState.searchText, debounce(async () => {
             <div class="form-wrapper">
                 <p-field-group required
                                :label="$t('IAM.WORKSPACE_GROUP.MODAL.ROLE_SELECT_DROP_DOWN_TITLE')"
-                               style-type="secondary"
                 >
                     <template #default>
                         <p-select-dropdown
@@ -196,7 +195,6 @@ watch(() => userDropdownState.searchText, debounce(async () => {
                 </p-field-group>
                 <p-field-group required
                                :label="$t('IAM.WORKSPACE_GROUP.MODAL.USER_SELECT_DROP_DOWN_TITLE')"
-                               style-type="secondary"
                 >
                     <template #default>
                         <p-text-input :value.sync="userDropdownState.searchText"
