@@ -84,7 +84,7 @@ const handleConfirm = async () => {
     try {
         state.loading = true;
         await SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
+            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId ?? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId,
             users: userDropdownState.selectedItems.map((item) => ({
                 user_id: item, role_id: roleSelectedItems.value[0]?.name,
             })),
@@ -111,11 +111,10 @@ const handleRemoveUser = (item: string) => {
 
 const fetchUserFindList = async ():Promise<WorkspaceGroupUserSummaryModel[]> => {
     userDropdownState.loading = true;
-
     try {
-        if (!workspaceGroupPageGetters.selectedWorkspaceGroupId) throw Error('Invalid Workspace Group Id.');
+        if (!(workspaceGroupPageGetters.selectedWorkspaceGroupId ?? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId)) throw Error('Invalid Workspace Group Id.');
         const { results } = await SpaceConnector.clientV2.identity.workspaceGroupUser.find<WorkspaceGroupUserFindParameters, ListResponse<WorkspaceGroupUserSummaryModel>>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
+            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId ?? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId,
             keyword: userDropdownState.searchText,
             state: USER_STATE.ENABLE,
             page: {
@@ -139,10 +138,6 @@ const handleEnter = (user: [MenuItem]) => {
     userDropdownState.selectedItems.push(selectedUser);
     userDropdownState.inputSelectedItem = [];
 };
-
-(async () => {
-    userDropdownState.userList = await fetchUserFindList();
-})();
 
 watch(() => userDropdownState.searchText, debounce(async () => {
     userDropdownState.userList = await fetchUserFindList() || [];
@@ -262,19 +257,8 @@ watch(() => userDropdownState.searchText, debounce(async () => {
         }
     }
 
-    .user-select-dropdown {
-        .user-menu-item {
-            @apply flex items-center justify-between;
-            gap: 0.25rem;
-        }
-
-        :deep(.dropdown-button)::before {
-            content: "Add Users";
-        }
-
-        :deep(.selection-display-wrapper) {
-            display: none;
-        }
+    .user-search-input {
+        @apply w-full;
     }
 
     .selected-user-item {

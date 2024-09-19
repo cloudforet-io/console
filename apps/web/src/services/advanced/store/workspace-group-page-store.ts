@@ -74,6 +74,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
     //  "Write operation failed: computed value is readonly" error message when using the store.$dispose method,
     // so we change to a method that doesn't use the reactive API.
     const getters = reactive({
+        selectedWorkspaceGroup: computed(() => state.workspaceGroups[state.selectedIndices[0]]),
         selectedWorkspaceGroupId: computed(() => state.workspaceGroups[state.selectedIndices[0]]?.workspace_group_id),
         groupUserPage: computed(() => userTabState.pageStart / userTabState.pageLimit),
         selectedWorkspaceIds: computed<string[]>(() => workspaceTabState.selectedWorkspaceIndices.map((index: number) => workspaceTabState.workspacesInSelectedGroup[index].workspace_id)),
@@ -194,7 +195,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
                     workspace_group_id: getters.selectedWorkspaceGroupId,
                 });
                 userTabState.userInSelectedGroup = results?.[0].users || [];
-                userTabState.userInSelectedGroupTotalCount = results?.[0].users.length || 0;
+                userTabState.userInSelectedGroupTotalCount = results?.[0].users?.length || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 userTabState.userInSelectedGroup = [];

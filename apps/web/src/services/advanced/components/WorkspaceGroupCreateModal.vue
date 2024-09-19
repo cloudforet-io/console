@@ -58,7 +58,7 @@ const {
     },
 });
 const {
-    loading, searchText, menuList, selectedItems, handleClickShowMore,
+    loading, searchText, menuList, selectedItems, handleClickShowMore, reset: resetWorkspaceMenuList,
 } = useSelectDropDownList<WorkspaceModel>({
     pageSize: 10,
     transformer: (_workspace) => ({
@@ -89,6 +89,7 @@ const createWorkspaceGroup = async (): Promise<string | undefined> => {
             workspace_group_id,
             workspace_id: item.name,
         })));
+        await resetWorkspaceMenuList();
 
         return workspace_group_id;
     } catch (e) {
