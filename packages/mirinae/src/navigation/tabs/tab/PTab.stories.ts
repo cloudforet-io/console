@@ -143,11 +143,12 @@ export const TabMenuType: Story = {
                 tabs: [
                     { name: 'detail', label: 'Detail' },
                     { name: 'info', label: 'Info' },
-                    { name: 'divider', type: 'divider' },
+                    { name: 'divider', tabType: 'divider' },
                     { name: 'tags', label: 'Tags' },
                     {
                         name: 'Folder',
-                        type: 'folder',
+                        tabType: 'folder',
+                        icon: 'ic_folder',
                         subItems: [
                             { name: 'sub1' },
                             { name: 'sub2' },
@@ -181,7 +182,7 @@ export const OverflowTabMenus: Story = {
                 tabs: [
                     { name: 'detail', label: 'Detail' },
                     { name: 'info', label: 'Info' },
-                    { name: 'divider', type: 'divider' },
+                    { name: 'divider', tabType: 'divider' },
                     { name: 'tags', label: 'Tags' },
                     { name: 'long menu', label: 'Long Menu' },
                     { name: 'long long menu', label: 'Long Long Long Menu' },
@@ -191,7 +192,8 @@ export const OverflowTabMenus: Story = {
                     {
                         name: 'long long long long long long menu',
                         label: 'Long Long Long Long Long Long Long Menu',
-                        type: 'folder',
+                        tabType: 'folder',
+                        icon: 'ic_folder',
                         subItems: [
                             { name: 'sub1' },
                             { name: 'sub2' },

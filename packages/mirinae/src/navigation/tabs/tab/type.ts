@@ -12,7 +12,7 @@ export type TabMenuType = typeof TAB_MENU_TYPE[keyof typeof TAB_MENU_TYPE];
 
 export interface TabItem {
     name: string;
-    type?: TabMenuType;
+    tabType?: TabMenuType;
     label?: string | TranslateResult;
     keepAlive?: boolean;
     subItems?: TabItem[];

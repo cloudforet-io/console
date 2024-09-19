@@ -36,14 +36,14 @@ export const useTab = ({ tabs, activeTab }: TabStateArgs) => {
                 name: tab,
                 label: tab,
                 keepAlive: false,
-                type: 'tab',
+                tabType: 'tab',
             };
         }
         return {
             name: tab.name,
             label: tab.label ?? tab.name,
             keepAlive: !!tab.keepAlive,
-            type: tab.type ?? 'tab',
+            tabType: tab.tabType ?? 'tab',
             icon: tab.icon,
             subItems: tab.subItems?.map((subItem) => generateTabItem(subItem)),
         };
