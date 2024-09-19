@@ -50,7 +50,7 @@ const state = reactive({
         {
             name: 'delete',
             icon: 'ic_delete',
-            clickEvent: () => emit('delete-folder', props.treeData.data.id),
+            clickEvent: handleClickDeleteFolderButton,
         },
     ])),
 });
@@ -87,6 +87,10 @@ const handleClickTreeItem = (): void => {
             dashboardId: props.treeData.data.id || '',
         },
     }));
+};
+const handleClickDeleteFolderButton = (): void => {
+    dashboardMainPageStore.setSelectedFolderId(props.treeData.data.id);
+    dashboardMainPageStore.setFolderDeleteModalVisible(true);
 };
 const handleEditFolderName = () => {
     dashboardMainPageStore.setFolderFormModalType('UPDATE');

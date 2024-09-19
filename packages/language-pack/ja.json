@@ -1774,6 +1774,10 @@
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
+			"ALT_E_DELETE_DASHBOARD": "",
+			"ALT_E_MOVE_DASHBOARD": "",
+			"ALT_S_DELETE_DASHBOARD": "",
+			"ALT_S_MOVE_DASHBOARD": "",
 			"CREATE": "作成",
 			"CREAT_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"DASHBOARD": "ダッシュボード",
@@ -1804,7 +1808,11 @@
 			"LABEL_PUBLIC": "公開",
 			"LABEL_SCOPE": "スコープ",
 			"LABEL_VIWERS": "公開可否",
+			"LOCATION": "",
+			"MOVE_DASHBOARDS": "",
 			"NEW_DASHBOARD": "",
+			"NO_DASHBOARD": "ダッシュボードなし",
+			"NO_PARENT_FOLDER": "",
 			"PRIVATE": "非公開",
 			"PROJECT": "プロジェクト",
 			"SHARED": "共有",

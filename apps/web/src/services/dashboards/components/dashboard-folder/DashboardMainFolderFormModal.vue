@@ -26,19 +26,17 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
+
 
 type FolderModel = PublicFolderModel | PrivateFolderModel;
 type FolderCreateParams = PublicFolderCreateParameters | PrivateFolderCreateParameters;
 type FolderUpdateParams = PublicFolderUpdateParameters | PrivateFolderUpdateParameters;
 interface Props {
     visible: boolean;
-    type?: 'EDIT' | 'CREATE';
-    folder?: FolderModel;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
-    type: 'CREATE',
-    folder: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
@@ -46,23 +44,34 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
+const dashboardMainPageStore = useDashboardMainPageStore();
+const dashboardMainPageState = dashboardMainPageStore.state;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
-    proxyVisible: useProxyValue('visible', props, emit),
+    proxyVisible: useProxyValue<boolean>('visible', props, emit),
     isPrivate: false,
+    selectedFolder: computed<FolderModel|undefined>(() => {
+        if (dashboardMainPageState.folderFormModalType === 'UPDATE') {
+            if (dashboardMainPageState.selectedFolderId?.startsWith('private')) {
+                return dashboardState.privateFolderItems.find((d) => d.folder_id === dashboardMainPageState.selectedFolderId);
+            }
+            return dashboardState.publicFolderItems.find((d) => d.folder_id === dashboardMainPageState.selectedFolderId);
+        }
+        return undefined;
+    }),
     existingNameList: computed<string[]>(() => {
         const _publicNames = dashboardState.publicFolderItems.map((d) => d.name);
         const _privateNames = dashboardState.privateFolderItems.map((d) => d.name);
         const _names = [..._publicNames, ..._privateNames];
-        if (props.type === 'EDIT') {
-            return _names.filter((d) => d !== props.folder?.name);
+        if (dashboardMainPageState.folderFormModalType === 'UPDATE') {
+            return _names.filter((d) => d !== state.selectedFolder?.name);
         }
         return _names;
     }),
     headerTitle: computed(() => {
-        if (props.type === 'EDIT') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.EDIT_FOLDER_NAME');
+        if (dashboardMainPageState.folderFormModalType === 'UPDATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.EDIT_FOLDER_NAME');
         return i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.CREATE_FOLDER');
     }),
 });
@@ -102,10 +111,10 @@ const createFolder = async () => {
 };
 const updateFolderName = async () => {
     try {
-        const _isPrivate = props.folder?.user_id?.length > 0;
+        const _isPrivate = dashboardMainPageState.selectedFolderId?.startsWith('private');
         const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.update : SpaceConnector.clientV2.dashboard.publicFolder.update;
         const params: FolderUpdateParams = {
-            folder_id: props.folder?.folder_id as string,
+            folder_id: state.selectedFolder?.folder_id as string,
             name: name.value as string,
         };
         await fetcher(params);
@@ -119,7 +128,7 @@ const updateFolderName = async () => {
 /* Event */
 const handleFormConfirm = async () => {
     if (!isAllValid) return;
-    if (props.type === 'EDIT') {
+    if (dashboardMainPageState.folderFormModalType === 'UPDATE') {
         await updateFolderName();
     } else {
         await createFolder();
@@ -132,10 +141,13 @@ const handleUpdatePrivate = (value: boolean) => {
 
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
-    if (visible && props.type === 'EDIT') {
-        setForm('name', props.folder?.name);
+    if (visible) {
+        if (dashboardMainPageState.folderFormModalType === 'UPDATE') {
+            setForm('name', state.selectedFolder?.name);
+        }
     } else {
         initForm();
+        dashboardMainPageStore.reset();
     }
 });
 
@@ -167,7 +179,8 @@ watch(() => state.proxyVisible, (visible) => {
                     />
                 </template>
             </p-field-group>
-            <p-field-group :label="$t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.MAKE_PRIVATE')"
+            <p-field-group v-if="dashboardMainPageState.folderFormModalType === 'CREATE'"
+                           :label="$t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.MAKE_PRIVATE')"
                            required
             >
                 <p-toggle-button :value="state.isPrivate"

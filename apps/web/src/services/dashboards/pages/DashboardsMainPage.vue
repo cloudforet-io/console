@@ -27,11 +27,15 @@ import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import DashboardFolderDeleteModal
+    from '@/services/dashboards/components/dashboard-folder/DashboardFolderDeleteModal.vue';
+import DashboardFolderMoveModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderMoveModal.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import DashboardMainFolderFormModal
     from '@/services/dashboards/components/dashboard-folder/DashboardMainFolderFormModal.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
 
 
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -39,6 +43,8 @@ const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
+const dashboardMainPageStore = useDashboardMainPageStore();
+const dashboardMainPageState = dashboardMainPageStore.state;
 const router = useRouter();
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
@@ -47,7 +53,6 @@ const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: computed(() => dashboardState.loading),
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    folderFormModalVisible: false,
     sharedDashboardList: computed<PublicDashboardModel[]>(() => {
         if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE' && !state.isWorkspaceOwner) return [];
         if (!storeState.isWorkspaceOwner) return [];
@@ -95,7 +100,17 @@ const queryState = reactive({
 
 const handleCreateDashboard = () => { router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME })); };
 const handleCreateFolder = () => {
-    state.folderFormModalVisible = true;
+    dashboardMainPageStore.setFolderFormModalType('CREATE');
+    dashboardMainPageStore.setFolderFormModalVisible(true);
+};
+const handleUpdateFolderFormModalVisible = (visible: boolean) => {
+    dashboardMainPageStore.setFolderFormModalVisible(visible);
+};
+const handleUpdateFolderDeleteModalVisible = (visible: boolean) => {
+    dashboardMainPageStore.setFolderDeleteModalVisible(visible);
+};
+const handleUpdateFolderMoveModalVisible = (visible: boolean) => {
+    dashboardMainPageStore.setFolderMoveModalVisible(visible);
 };
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
@@ -226,8 +241,7 @@ onUnmounted(() => {
             />
             <template v-else>
                 <dashboard-folder-tree v-if="state.isWorkspaceOwner"
-                                       :dashboard-list="state.sharedDashboardList"
-                                       :folder-list="dashboardGetters.sharedFolderItems"
+                                       type="PUBLIC"
                 />
                 <dashboard-main-board-list v-if="state.deprecatedDashboardList.length"
                                            class="dashboard-list"
@@ -236,8 +250,14 @@ onUnmounted(() => {
                                            is-collapsed
                 />
             </template>
-            <dashboard-main-folder-form-modal :visible.sync="state.folderFormModalVisible"
-                                              type="CREATE"
+            <dashboard-main-folder-form-modal :visible="dashboardMainPageState.folderFormModalVisible"
+                                              @update:visible="handleUpdateFolderFormModalVisible"
+            />
+            <dashboard-folder-delete-modal :visible="dashboardMainPageState.folderDeleteModalVisible"
+                                           @update:visible="handleUpdateFolderDeleteModalVisible"
+            />
+            <dashboard-folder-move-modal :visible="dashboardMainPageState.folderMoveModalVisible"
+                                         @update:visible="handleUpdateFolderMoveModalVisible"
             />
         </p-data-loader>
     </div>
