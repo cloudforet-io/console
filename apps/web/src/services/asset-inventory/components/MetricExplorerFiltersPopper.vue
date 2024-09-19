@@ -65,6 +65,10 @@ const state = reactive({
 const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
+        const queryOptions: Record<string, any> = {};
+        if (labelKey.key === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
+            queryOptions.is_dormant = false;
+        }
         if (isEmpty(labelKey.reference)) {
             const MetricVariableModel = new VariableModelFactory(
                 { type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.metric_data },
@@ -86,7 +90,7 @@ const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
             }
         }
         if (!variableModelInfo) return async () => ({ results: [] });
-        const handler = getVariableModelMenuHandler([variableModelInfo]);
+        const handler = getVariableModelMenuHandler([variableModelInfo], queryOptions);
         return async (...args) => {
             try {
                 state.loading = true;

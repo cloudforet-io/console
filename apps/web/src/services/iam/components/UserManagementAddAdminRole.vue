@@ -9,7 +9,6 @@ import {
 } from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,
-    SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 
@@ -64,32 +63,52 @@ const roleState = reactive({
     searchText: '',
 });
 
-const roleListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('name', true);
-const workspaceListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('name', true);
+const roleListApiQueryHelper = new ApiQueryHelper().setSort('name', true);
+const workspaceListApiQueryHelper = new ApiQueryHelper();
 
-/* Component */
-const workspaceMenuHandler: AutocompleteHandler = async (inputText: string) => {
-    await fetchListWorkspaces(inputText);
-    return {
-        results: workspaceState.menuItems as SelectDropdownMenuItem[],
-    };
-};
-const roleMenuHandler: AutocompleteHandler = async (inputText: string) => {
-    await fetchListRoles(inputText);
-    return {
-        results: roleState.menuItems as SelectDropdownMenuItem[],
-    };
-};
 const handleChangeToggleButton = () => {
     state.proxyIsSetAdminRole = !state.proxyIsSetAdminRole;
 };
 
-/* API */
-const fetchListRoles = async (inputText: string) => {
+const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
+    workspaceState.loading = true;
+
+    workspaceListApiQueryHelper
+        .setSort('name', true)
+        .setFilters([
+            { k: 'name', v: inputText, o: '' },
+            { k: 'state', v: 'ENABLED', o: '' },
+            { k: 'is_dormant', v: false, o: '' },
+        ]);
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+            query: workspaceListApiQueryHelper.data,
+        });
+        const refinedMenuItems = (results ?? []).map((workspace) => ({
+            label: workspace.name,
+            name: workspace.workspace_id,
+            tags: workspace.tags,
+            is_dormant: workspace.is_dormant,
+        }));
+
+        const totalCount = pageStart - 1 + Number(pageLimit);
+        const slicedResults = refinedMenuItems?.slice(pageStart - 1, totalCount);
+        workspaceState.menuItems = slicedResults;
+        return {
+            results: slicedResults,
+            more: totalCount < refinedMenuItems.length,
+        };
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return {
+            results: [],
+            more: false,
+        };
+    } finally {
+        workspaceState.loading = false;
+    }
+};
+const roleMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
     roleState.loading = true;
 
     if (state.proxyIsSetAdminRole) {
@@ -122,38 +141,27 @@ const fetchListRoles = async (inputText: string) => {
                 ],
             },
         });
-        roleState.menuItems = (results ?? []).map((role) => ({
+        const refinedMenuItems = (results ?? []).map((role) => ({
             label: role.name,
             name: role.role_id,
             role_type: role.role_type,
         }));
+        const totalCount = pageStart - 1 + Number(pageLimit);
+        const slicedResults = refinedMenuItems?.slice(pageStart - 1, totalCount);
+        roleState.menuItems = slicedResults;
+        return {
+            results: slicedResults,
+            more: totalCount < refinedMenuItems.length,
+        };
     } catch (e) {
         ErrorHandler.handleError(e);
+
+        return {
+            results: [],
+            more: false,
+        };
     } finally {
         roleState.loading = false;
-    }
-};
-const fetchListWorkspaces = async (inputText: string) => {
-    workspaceState.loading = true;
-
-    workspaceListApiQueryHelper.setFilters([
-        { k: 'name', v: inputText, o: '' },
-        { k: 'state', v: 'ENABLED', o: '' },
-    ]);
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
-            query: workspaceListApiQueryHelper.data,
-        });
-        workspaceState.menuItems = (results ?? []).map((workspace) => ({
-            label: workspace.name,
-            name: workspace.workspace_id,
-            tags: workspace.tags,
-            is_dormant: workspace.is_dormant,
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        workspaceState.loading = false;
     }
 };
 
@@ -187,6 +195,7 @@ watch(() => state.proxyIsSetAdminRole, () => {
                            class="workspace-role-form"
             >
                 <p-select-dropdown use-fixed-menu-style
+                                   page-size="10"
                                    :placeholder="$t('IAM.USER.FORM.SELECT_WORKSPACE')"
                                    :visible-menu.sync="workspaceState.visible"
                                    :loading="workspaceState.loading"
@@ -256,6 +265,7 @@ watch(() => state.proxyIsSetAdminRole, () => {
                                    :selected.sync="roleState.selectedItems"
                                    :handler="roleMenuHandler"
                                    is-filterable
+                                   page-size="10"
                                    show-delete-all-button
                                    class="role-select-dropdown"
                 >

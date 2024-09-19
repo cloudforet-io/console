@@ -83,6 +83,11 @@ const state = reactive({
         fields.push(...state.dateFields);
         return fields.map((d) => {
             const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
+            if (d.name === 'workspace_id') field.reference = { reference_key: 'workspace_id', resource_type: 'identity.Workspace' };
+            if (d.name === 'project_id') field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
+            if (d.name === 'service_account_id') field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
+            if (d.name === 'region_code') field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
+            if (d.name === 'provider') field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
             return field;
         });
     }),

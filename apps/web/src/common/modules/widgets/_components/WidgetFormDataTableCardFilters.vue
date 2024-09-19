@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { onClickOutside } from '@vueuse/core';
 import {
     computed, onMounted, reactive, ref, toRef, watch,
@@ -90,7 +89,7 @@ const state = reactive({
         const handlerMaps = {};
         if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
             state.selectedItems.forEach(({ name, presetKeys }) => {
-                handlerMaps[name] = getCostMenuHandler(name, {}, state.primaryCostStatOptions, { presetKeys });
+                handlerMaps[name] = getCostMenuHandler(name, { presetKeys });
             });
         } else {
             assetFilterState.refinedLabelKeys.forEach((labelInfo) => {
@@ -195,18 +194,20 @@ const resetFilterByKey = (key: string) => {
 };
 const getCostMenuHandler = (
     groupBy: string,
-    listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>,
-    primaryOptions: Record<string, any>,
     modelOptions?: Record<string, any>,
 ): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
+        let queryOptions: Record<string, any> = {};
         const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
         if (_variableOption) {
             variableModelInfo = {
                 variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableOption.key }),
                 dataKey: _variableOption.dataKey,
             };
+            if (groupBy === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
+                queryOptions.is_dormant = false;
+            }
         } else {
             const CostVariableModel = new VariableModelFactory({ type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.cost });
             CostVariableModel[groupBy] = CostVariableModel.generateProperty({ key: groupBy, presetValues: modelOptions?.presetKeys });
@@ -214,8 +215,9 @@ const getCostMenuHandler = (
                 variableModel: CostVariableModel,
                 dataKey: groupBy,
             };
+            queryOptions = { ...queryOptions, ...state.primaryCostStatOptions };
         }
-        const handler = getVariableModelMenuHandler([variableModelInfo], listQueryOptions, primaryOptions);
+        const handler = getVariableModelMenuHandler([variableModelInfo], queryOptions);
 
         return async (...args) => {
             if (!groupBy) return { results: [] };
@@ -259,7 +261,12 @@ const getAssetMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
             }
         }
         if (!variableModelInfo) return async () => ({ results: [] });
-        const handler = getVariableModelMenuHandler([variableModelInfo]);
+
+        const queryOptions: Record<string, any> = {};
+        if (labelKey.key === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
+            queryOptions.is_dormant = false;
+        }
+        const handler = getVariableModelMenuHandler([variableModelInfo], queryOptions);
         return async (...args) => {
             try {
                 state.loading = true;

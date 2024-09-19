@@ -267,6 +267,7 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
             @apply relative;
             display: flex;
             align-items: flex-start;
+            padding-left: 0.5rem;
 
             .save-button {
                 border-top-right-radius: 0;
