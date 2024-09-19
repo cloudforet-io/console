@@ -105,3 +105,8 @@ export const filterLSBMenuByAccessPermission = (menuSet: LSBMenu[], pagePermissi
 }, [] as LSBMenu[]);
 
 export const getAccessPermissionOfMenu = (menuId: MenuId, pagePermissions: MenuId[]): boolean => pagePermissions.some((id) => id === menuId);
+
+export const checkAllMenuReadonly = (permissions: string[]) => permissions.every((item) => {
+    const accessType = item.split('.*')[0].split(':')[1];
+    return accessType === PAGE_ACCESS.READONLY;
+});
