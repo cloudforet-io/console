@@ -10,8 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
-import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
-import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
+import type { DashboardChangeFolderParams } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -24,7 +23,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
 
 
-type DashboardUpdateParams = PublicDashboardUpdateParameters | PrivateDashboardUpdateParameters;
 interface Props {
     visible: boolean;
 }
@@ -74,11 +72,13 @@ const state = reactive({
 const updateDashboard = async (dashboardId: string): Promise<boolean> => {
     try {
         const _isPrivate = dashboardId.startsWith('private');
-        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateDashboard.update : SpaceConnector.clientV2.dashboard.publicDashboard.update;
-        const params: DashboardUpdateParams = {
+        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateDashboard.changeFolder : SpaceConnector.clientV2.dashboard.publicDashboard.changeFolder;
+        const params: DashboardChangeFolderParams = {
             dashboard_id: dashboardId,
-            folder_id: state.selectedItem,
         };
+        if (state.selectedItem) {
+            params.folder_id = state.selectedItem;
+        }
         await fetcher(params);
         return true;
     } catch (e) {
