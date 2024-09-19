@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, reactive, ref,
+    computed, reactive, ref, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
@@ -10,7 +10,7 @@ import ejs from 'ejs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PI, PDivider, PButton, PCopyButton, PTooltip, PAvatar, PLazyImg, PBadge,
+    PI, PDivider, PButton, PCopyButton, PTooltip, PAvatar, PLazyImg,
 } from '@cloudforet/mirinae';
 
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
@@ -58,6 +58,7 @@ const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     roles: computed<RoleReferenceMap>(() => allReferenceStore.getters.role),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isUserMode: computed(() => appContextStore.getters.isUserMode),
     userIcon: computed<string>(() => {
         if (store.getters['user/isSystemAdmin']) return SystemAdminImage;
         if (store.getters['user/isDomainAdmin']) return DomainAdminImage;
@@ -75,7 +76,7 @@ const state = reactive({
         return 'User';
     }),
     userRoles: [] as RoleBindingModel[],
-    currentWorkspaceRole: computed<RoleBindingModel>(() => state.userRoles.find((role) => role.workspace_id && !role.workspace_group_id)),
+    currentWorkspaceRole: computed<RoleBindingModel>(() => state.userRoles?.[0]),
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
     language: computed(() => store.getters['user/languageLabel']),
@@ -191,8 +192,6 @@ const handleClickSignOut = async () => {
     };
     await router.push(res);
 };
-const roleBindingsContents = (roleBindings: RoleBindingModel[])
-    :string => roleBindings.filter((rb) => (rb.workspace_group_id && rb.workspace_id)).map((roleBinding) => state.roles[roleBinding.role_id]?.name).join('\n');
 const fetchUserRoles = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.identity.roleBinding.list({
@@ -212,9 +211,11 @@ const fetchUserRoles = async () => {
     }
 };
 
-(async () => {
-    await fetchUserRoles();
-})();
+watch(() => props.visible, (value) => {
+    if (value && !state.isUserMode) {
+        fetchUserRoles();
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -275,25 +276,11 @@ const fetchUserRoles = async () => {
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE_TYPE') }}</span>
                     <span class="value">{{ state.visibleRoleType }}</span>
                 </div>
-                <div v-else
+                <div v-else-if="state.currentWorkspaceRole?.role_id"
                      class="info-menu"
                 >
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
-                    <span class="value">{{ state.roles[state.currentWorkspaceRole?.role_id]?.label }}</span>
-                    <p-tooltip v-if="roleBindingsContents(state.userRoles).length"
-                               position="bottom"
-                               :contents="roleBindingsContents(state.userRoles)"
-                               class="tooltip"
-                    >
-                        <p-badge badge-type="subtle"
-                                 shape="round"
-                                 style-type="blue200"
-                                 size="sm"
-                                 class="ml-2"
-                        >
-                            +{{ state.userRoles.filter((rb) => rb.workspace_id && rb.workspace_group_id).length }}
-                        </p-badge>
-                    </p-tooltip>
+                    <span class="value">{{ state.roles[state.currentWorkspaceRole?.role_id]?.label ?? 'User' }}</span>
                 </div>
                 <div v-on-click-outside="handleClickOutsideLanguageMenu"
                      class="info-menu language"
