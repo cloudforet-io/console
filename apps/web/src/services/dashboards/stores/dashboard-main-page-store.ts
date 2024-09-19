@@ -81,12 +81,12 @@ const _getSelectedTreeData = (dashboardTreeData: TreeNode<DashboardTreeDataType>
         const _node = dashboardTreeData.find((node) => node.data.id === id);
         if (!_node) return;
         if (_node?.data.type === 'FOLDER') {
+            const _childrenDashboards = _node.children?.filter((child) => selectedIdMap[child.id]);
             // get folder id only if all children are selected
-            if (_node.children?.every((child) => selectedIdMap[child.id])) {
+            if (_childrenDashboards?.length === _node.children?.length) {
                 _selectedNodeList.push(_node);
-            } else {
-                const _childrenDashboards = _node.children?.filter((child) => selectedIdMap[child.id]);
-                if (_childrenDashboards) _selectedNodeList.push(..._childrenDashboards);
+            } else if (_childrenDashboards) {
+                _selectedNodeList.push(..._childrenDashboards);
             }
         } else {
             _selectedNodeList.push(_node);

@@ -94,7 +94,7 @@ const getSelectedFolderAndDashboardItems = (): DataTableItem[] => {
 const getSelectedFolderItems = (selectedFolderId: string): DataTableItem[] => {
     const _tableItems: DataTableItem[] = [];
     const _selectedFolder = state.dashboardTreeData.find((d) => d.id === selectedFolderId);
-    if (!_selectedFolder) return _tableItems;
+    if (!_selectedFolder) return _tableItems; // it doesn't happen
     _tableItems.push({
         id: _selectedFolder.id,
         name: _selectedFolder.data.name,
