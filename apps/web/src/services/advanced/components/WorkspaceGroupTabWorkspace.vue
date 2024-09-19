@@ -285,7 +285,7 @@ watch(() => workspaceGroupPageGetters.selectedWorkspaceGroupId, () => {
                 />
             </template>
             <template #col-user_count-format="{ value, item }">
-                <p-link :text="value"
+                <p-link :text="value || 0"
                         action-icon="internal-link"
                         new-tab
                         :to="getUserRouteLocationByWorkspaceId(item)"
