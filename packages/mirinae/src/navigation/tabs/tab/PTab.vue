@@ -1,3 +1,174 @@
+<script setup lang="ts">
+import {
+    computed, nextTick, reactive, ref,
+} from 'vue';
+
+import { onClickOutside, useResizeObserver } from '@vueuse/core';
+import { throttle } from 'lodash';
+
+import PI from '@/foundation/icons/PI.vue';
+import { useTab } from '@/hooks/tab';
+import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
+import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import type { MenuItem } from '@/inputs/context-menu/type';
+import PDivider from '@/layouts/divider/PDivider.vue';
+import type { TabItem, TabProps } from '@/navigation/tabs/tab/type';
+
+const CUSTOM_BACK_BUTTON = 'CUSTOM_BACK_BUTTON';
+
+const props = defineProps<TabProps>();
+const emit = defineEmits<{(e: 'update:active-tab', value: string): void;
+    (e: 'change', value: string, idx: number): void;
+}>();
+
+const tabContainerRef = ref<HTMLElement|null>(null);
+const tabItemsRef = ref<(HTMLElement|typeof PDivider)[]>([]);
+const slotRef = ref<HTMLElement|null>(null);
+const groupTabMenuRef = ref<HTMLElement|null>(null);
+const hiddenTabsMenuRef = ref<HTMLElement|null>(null);
+
+const {
+    tabItems,
+    keepAliveTabNames,
+    nonKeepAliveTabNames,
+    currentTabItem,
+} = useTab({
+    tabs: computed(() => props.tabs),
+    activeTab: computed(() => props.activeTab),
+});
+
+const state = reactive({
+    selectedFolderTab: undefined as string|undefined,
+    selectedContextMenuItem: computed<MenuItem|undefined>(() => {
+        if (!props.tabs.length) return undefined;
+        if (typeof props.tabs[0] === 'string') return undefined;
+        const flattenTabs = props.tabs.reduce((acc, tab) => {
+            if (tab?.type === 'folder') {
+                acc.push(...(tab?.subItems ?? []));
+            } else {
+                acc.push(tab);
+            }
+            return acc;
+        }, [] as TabItem[]);
+        return {
+            name: props.activeTab,
+            label: flattenTabs.find((tab) => tab.name === props.activeTab)?.label || props.activeTab,
+        };
+    }),
+    visibleTabItems: [] as TabItem[],
+    hiddenTabItems: [] as TabItem[],
+    firstRenderDone: false,
+    hiddenTabsVisible: false,
+    selectedHiddenParentTab: undefined as string|undefined,
+    hiddenTabMenuItems: computed<MenuItem[]>(() => {
+        if (state.selectedHiddenParentTab) {
+            const selectedTab = state.hiddenTabItems.find((tab) => tab.name === state.selectedHiddenParentTab);
+            return [
+                {
+                    name: CUSTOM_BACK_BUTTON, // Custom Menu Item for back button
+                    icon: 'ic_arrow-left',
+                    iconColor: '#0062B8',
+                },
+                {
+                    type: 'divider',
+                },
+                ...selectedTab?.subItems || [],
+            ];
+        }
+        return state.hiddenTabItems;
+    }),
+});
+
+
+/* Events */
+const handleSelectTab = (tab: TabItem, idx: number) => {
+    selectTab(tab, idx);
+    hideGroupTab();
+};
+const handleSelectGroupTab = (tab: TabItem) => {
+    if (state.selectedFolderTab === tab.name) {
+        hideGroupTab();
+    } else {
+        state.selectedFolderTab = tab.name;
+    }
+};
+const handleSelectGroupTabMenu = (tab: TabItem, idx: number) => {
+    selectTab(tab, idx);
+    hideGroupTab();
+};
+const handleClickHiddenTabsMenu = () => {
+    state.selectedHiddenParentTab = undefined;
+    state.hiddenTabsVisible = !state.hiddenTabsVisible;
+};
+const handleSelectHiddenTab = (tab: TabItem, idx: number) => {
+    if (tab.subItems) {
+        state.selectedHiddenParentTab = tab.name;
+    } else if (tab.name === CUSTOM_BACK_BUTTON) {
+        state.selectedHiddenParentTab = undefined;
+    } else {
+        selectTab(tab, idx);
+        state.hiddenTabsVisible = false;
+    }
+};
+
+
+/* Utils */
+const selectTab = (tab: TabItem, idx: number) => {
+    if (props.activeTab !== tab.name) {
+        emit('update:active-tab', tab.name);
+        emit('change', tab.name, idx);
+    }
+};
+
+const hideGroupTab = () => {
+    state.selectedFolderTab = undefined;
+};
+
+// Calculate the width of the tabs and hide the tabs that do not fit in the container
+const calculateWidths = () => {
+    const ulWidth = (tabContainerRef?.value?.offsetWidth || 0) - (slotRef?.value?.clientWidth || 0) - 16;
+    let totalWidth = 0;
+    let lastValidTotalWidth = 0;
+    let i = 0;
+    let lastValidIndex = -1;
+    let lastTabWidth = 0;
+
+    while (i < tabItemsRef.value.length && totalWidth <= ulWidth) {
+        const item = tabItemsRef.value[i];
+        const itemWidth = item.clientWidth || (item.$el.clientWidth + 16) || 0;
+
+        totalWidth += itemWidth;
+        lastValidTotalWidth += itemWidth;
+        lastTabWidth = itemWidth;
+
+        if (totalWidth <= ulWidth) {
+            lastValidIndex = i;
+        }
+
+        i++;
+    }
+
+    if (lastValidTotalWidth - lastTabWidth > ulWidth - 36 && lastValidIndex > 0) {
+        lastValidIndex--;
+    }
+
+    const visibleTabs = tabItems.value.slice(0, lastValidIndex + 1);
+    const hiddenTabs = tabItems.value.slice(lastValidIndex + 1);
+    state.visibleTabItems = visibleTabs;
+    state.hiddenTabItems = hiddenTabs.filter((tab) => tab.type !== 'divider');
+    state.firstRenderDone = true; // This is to prevent the tabs from being hidden on the first render
+};
+useResizeObserver(tabContainerRef, throttle(() => {
+    state.firstRenderDone = false;
+    nextTick(() => {
+        calculateWidths();
+    });
+}, 500));
+
+onClickOutside(hiddenTabsMenuRef, () => { state.hiddenTabsVisible = false; });
+
+</script>
+
 <template>
     <div ref="tabContainerRef"
          class="p-tab"
@@ -6,7 +177,7 @@
             <ul class="tab-item-wrapper"
                 :class="{stretch}"
             >
-                <template v-for="(tab, idx) in firstRenderDone ? visibleTabItems : tabItems">
+                <template v-for="(tab, idx) in state.firstRenderDone ? state.visibleTabItems : tabItems">
                     <p-divider v-if="tab.type === 'divider'"
                                :key="tab.name"
                                ref="tabItemsRef"
@@ -32,11 +203,11 @@
                                  color="inherit"
                             />
                         </div>
-                        <p-context-menu v-if="selectedFolderTab === tab.name"
+                        <p-context-menu v-if="state.selectedFolderTab === tab.name"
                                         ref="groupTabMenuRef"
                                         class="sub-item-menu"
                                         :menu="tab?.subItems ?? []"
-                                        :selected="selectedContextMenuItem ? [selectedContextMenuItem]: undefined"
+                                        :selected="state.selectedContextMenuItem ? [state.selectedContextMenuItem]: undefined"
                                         @select="handleSelectGroupTabMenu"
                         />
                     </li>
@@ -63,11 +234,11 @@
                 </template>
             </ul>
             <div class="right-contents">
-                <ul v-if="hiddenTabItems?.length"
+                <ul v-if="state.hiddenTabItems?.length"
                     class="tab-item-wrapper"
                 >
                     <li key="hidden-tabs"
-                        :class="{active: hiddenTabItems.some((item) => activeTab === item.name || item.subItems?.some((subItem) => activeTab === subItem.name) )}"
+                        :class="{active: state.hiddenTabItems.some((item) => activeTab === item.name || item.subItems?.some((subItem) => activeTab === subItem.name) )}"
                         role="tab"
                         @keydown.enter="handleClickHiddenTabsMenu"
                         @click="handleClickHiddenTabsMenu"
@@ -80,15 +251,15 @@
                                  color="inherit"
                             />
                         </div>
-                        <p-context-menu v-if="hiddenTabsVisible"
+                        <p-context-menu v-if="state.hiddenTabsVisible"
                                         ref="hiddenTabsMenuRef"
                                         class="hidden-tabs-menu"
-                                        :menu="hiddenTabMenuItems"
-                                        :selected="selectedContextMenuItem ? [selectedContextMenuItem]: undefined"
+                                        :menu="state.hiddenTabMenuItems"
+                                        :selected="state.selectedContextMenuItem ? [state.selectedContextMenuItem]: undefined"
                                         @select="handleSelectHiddenTab"
                         >
                             <template #item--format="{ item }">
-                                <p-text-button v-if="item?.name === 'CUSTOM_BACK_BUTTON'"
+                                <p-text-button v-if="item?.name === CUSTOM_BACK_BUTTON"
                                                style-type="highlight"
                                 >
                                     {{ $t('Back') }}
@@ -123,216 +294,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed, defineComponent, nextTick, reactive, ref, toRefs,
-} from 'vue';
-
-import { onClickOutside, useResizeObserver } from '@vueuse/core';
-import { throttle } from 'lodash';
-
-import PI from '@/foundation/icons/PI.vue';
-import { useTab } from '@/hooks/tab';
-import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
-import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import type { MenuItem } from '@/inputs/context-menu/type';
-import PDivider from '@/layouts/divider/PDivider.vue';
-import type { TabItem, TabProps } from '@/navigation/tabs/tab/type';
-
-export default defineComponent<TabProps>({
-    name: 'PTab',
-    components: {
-        PTextButton, PContextMenu, PDivider, PI,
-    },
-    model: {
-        prop: 'activeTab',
-        event: 'update:activeTab',
-    },
-    props: {
-        /* tab item props */
-        tabs: {
-            type: Array as PropType<Array<string|TabItem>>,
-            default: () => [],
-        },
-        activeTab: {
-            type: String,
-            required: true,
-        },
-        /* tab props */
-        stretch: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const tabContainerRef = ref<HTMLElement|null>(null);
-        const tabItemsRef = ref<(HTMLElement|typeof PDivider)[]>([]);
-        const slotRef = ref<HTMLElement|null>(null);
-        const groupTabMenuRef = ref<HTMLElement|null>(null);
-        const hiddenTabsMenuRef = ref<HTMLElement|null>(null);
-
-        const {
-            tabItems,
-            keepAliveTabNames,
-            nonKeepAliveTabNames,
-            currentTabItem,
-        } = useTab({
-            tabs: computed(() => props.tabs),
-            activeTab: computed(() => props.activeTab),
-        });
-
-        const state = reactive({
-            selectedFolderTab: undefined as string|undefined,
-            selectedContextMenuItem: computed<MenuItem|undefined>(() => {
-                if (!props.tabs.length) return undefined;
-                if (typeof props.tabs[0] === 'string') return undefined;
-                const flattenTabs = props.tabs.reduce((acc, tab) => {
-                    if (tab?.type === 'folder') {
-                        acc.push(...(tab?.subItems ?? []));
-                    } else {
-                        acc.push(tab);
-                    }
-                    return acc;
-                }, [] as TabItem[]);
-                return {
-                    name: props.activeTab,
-                    label: flattenTabs.find((tab) => tab.name === props.activeTab)?.label || props.activeTab,
-                };
-            }),
-            visibleTabItems: [] as TabItem[],
-            hiddenTabItems: [] as TabItem[],
-            firstRenderDone: false,
-            hiddenTabsVisible: false,
-            selectedHiddenParentTab: undefined as string|undefined,
-            hiddenTabMenuItems: computed<MenuItem[]>(() => {
-                if (state.selectedHiddenParentTab) {
-                    const selectedTab = state.hiddenTabItems.find((tab) => tab.name === state.selectedHiddenParentTab);
-                    return [
-                        {
-                            name: 'CUSTOM_BACK_BUTTON', // Custom Menu Item for back button
-                            icon: 'ic_arrow-left',
-                            iconColor: '#0062B8',
-                        },
-                        {
-                            type: 'divider',
-                        },
-                        ...selectedTab?.subItems || [],
-                    ];
-                }
-                return state.hiddenTabItems;
-            }),
-        });
-
-
-        /* Events */
-        const handleSelectTab = (tab: TabItem, idx: number) => {
-            selectTab(tab, idx);
-            hideGroupTab();
-        };
-        const handleSelectGroupTab = (tab: TabItem) => {
-            if (state.selectedFolderTab === tab.name) {
-                hideGroupTab();
-            } else {
-                state.selectedFolderTab = tab.name;
-            }
-        };
-        const handleSelectGroupTabMenu = (tab: TabItem, idx: number) => {
-            selectTab(tab, idx);
-            hideGroupTab();
-        };
-        const handleClickHiddenTabsMenu = () => {
-            state.selectedHiddenParentTab = undefined;
-            state.hiddenTabsVisible = !state.hiddenTabsVisible;
-        };
-        const handleSelectHiddenTab = (tab: TabItem, idx: number) => {
-            if (tab.subItems) {
-                state.selectedHiddenParentTab = tab.name;
-            } else if (tab.name === 'CUSTOM_BACK_BUTTON') {
-                state.selectedHiddenParentTab = undefined;
-            } else {
-                selectTab(tab, idx);
-                state.hiddenTabsVisible = false;
-            }
-        };
-
-
-        /* Utils */
-        const selectTab = (tab: TabItem, idx: number) => {
-            if (props.activeTab !== tab.name) {
-                emit('update:activeTab', tab.name);
-                emit('change', tab.name, idx);
-            }
-        };
-
-        const hideGroupTab = () => {
-            state.selectedFolderTab = undefined;
-        };
-
-        // Calculate the width of the tabs and hide the tabs that do not fit in the container
-        const calculateWidths = () => {
-            const ulWidth = (tabContainerRef?.value?.offsetWidth || 0) - (slotRef?.value?.clientWidth || 0) - 16;
-            let totalWidth = 0;
-            let lastValidTotalWidth = 0;
-            let i = 0;
-            let lastValidIndex = -1;
-            let lastTabWidth = 0;
-
-            while (i < tabItemsRef.value.length && totalWidth <= ulWidth) {
-                const item = tabItemsRef.value[i];
-                const itemWidth = item.clientWidth || (item.$el.clientWidth + 16) || 0;
-
-                totalWidth += itemWidth;
-                lastValidTotalWidth += itemWidth;
-                lastTabWidth = itemWidth;
-
-                if (totalWidth <= ulWidth) {
-                    lastValidIndex = i;
-                }
-
-                i++;
-            }
-
-            if (lastValidTotalWidth - lastTabWidth > ulWidth - 36 && lastValidIndex > 0) {
-                lastValidIndex--;
-            }
-
-            const visibleTabs = tabItems.value.slice(0, lastValidIndex + 1);
-            const hiddenTabs = tabItems.value.slice(lastValidIndex + 1);
-            state.visibleTabItems = visibleTabs;
-            state.hiddenTabItems = hiddenTabs.filter((tab) => tab.type !== 'divider');
-            state.firstRenderDone = true; // This is to prevent the tabs from being hidden on the first render
-        };
-        useResizeObserver(tabContainerRef, throttle(() => {
-            state.firstRenderDone = false;
-            nextTick(() => {
-                calculateWidths();
-            });
-        }, 500));
-
-        onClickOutside(hiddenTabsMenuRef, () => { state.hiddenTabsVisible = false; });
-
-        return {
-            tabContainerRef,
-            tabItemsRef,
-            slotRef,
-            groupTabMenuRef,
-            hiddenTabsMenuRef,
-            tabItems,
-            keepAliveTabNames,
-            nonKeepAliveTabNames,
-            currentTabItem,
-            handleSelectTab,
-            handleSelectGroupTab,
-            handleSelectGroupTabMenu,
-            handleSelectHiddenTab,
-            handleClickHiddenTabsMenu,
-            ...toRefs(state),
-        };
-    },
-});
-</script>
 
 <style lang="postcss">
 .p-tab {
