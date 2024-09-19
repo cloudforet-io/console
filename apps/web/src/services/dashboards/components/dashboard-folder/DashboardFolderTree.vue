@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PI, PCheckbox, PIconButton,
@@ -21,18 +21,19 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const dashboardStore = useDashboardStore();
 const dashboardMainPageStore = useDashboardMainPageStore();
+const dashboardMainPageState = dashboardMainPageStore.state;
 const dashboardMainPageGetters = dashboardMainPageStore.getters;
 const state = reactive({
     isAllSelected: computed(() => {
         let _isAllSelected = true;
         state.dashboardTreeData.forEach((node) => {
-            if (!state.selectedIdMap[node.data.id]) _isAllSelected = false;
+            if (!dashboardMainPageState.selectedIdMap[node.data.id]) _isAllSelected = false;
         });
         return _isAllSelected;
     }),
     isIndeterminate: computed<boolean>(() => {
         if (state.isAllSelected) return false;
-        return Object.values(state.selectedIdMap).some((v) => v);
+        return Object.values(dashboardMainPageState.selectedIdMap).some((v) => v);
     }),
     dashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         if (props.type === 'PUBLIC') {
@@ -40,7 +41,7 @@ const state = reactive({
         }
         return dashboardMainPageGetters.privateDashboardTreeData;
     }),
-    selectedIdMap: {} as Record<string, boolean>,
+    // selectedIdMap: {} as Record<string, boolean>,
     childrenShowMap: {} as Record<string, boolean>,
     controlButtons: computed(() => ([
         {
@@ -71,38 +72,56 @@ const isIndeterminate = (node: TreeNode<DashboardTreeDataType>): boolean => {
     if (node.data.type === 'DASHBOARD' || !node.children) return false;
     if (node.children.length === 0) return false;
     // check all children are selected
-    if (node.children.every((child) => state.selectedIdMap[child.id])) return false;
-    return node.children.some((child) => state.selectedIdMap[child.id]);
+    if (node.children.every((child) => dashboardMainPageState.selectedIdMap[child.id])) return false;
+    return node.children.some((child) => dashboardMainPageState.selectedIdMap[child.id]);
 };
 
 /* Event */
 const handleChangeAllSelected = (value: boolean) => {
     if (!value) {
-        state.selectedIdMap = {};
+        dashboardMainPageStore.setSelectedIdMap({});
     } else {
         state.dashboardTreeData.forEach((node) => {
-            state.selectedIdMap = { ...state.selectedIdMap, [node.data.id]: true };
+            dashboardMainPageStore.setSelectedIdMap({
+                ...dashboardMainPageState.selectedIdMap,
+                [node.data.id]: true,
+            });
         });
     }
 };
 const handleSelectTreeItem = (node: TreeNode<DashboardTreeDataType>, value: [boolean]) => {
     const _isSelected = value[0];
     if (node.data.type === 'FOLDER') {
-        state.selectedIdMap = { ...state.selectedIdMap, [node.data.id]: _isSelected };
+        dashboardMainPageStore.setSelectedIdMap({
+            ...dashboardMainPageState.selectedIdMap,
+            [node.data.id]: _isSelected,
+        });
         if (node.children) {
             node.children.forEach((child) => {
-                state.selectedIdMap = { ...state.selectedIdMap, [child.id]: _isSelected };
+                dashboardMainPageStore.setSelectedIdMap({
+                    ...dashboardMainPageState.selectedIdMap,
+                    [child.id]: _isSelected,
+                });
             });
         }
     } else {
-        state.selectedIdMap = { ...state.selectedIdMap, [node.data.id]: _isSelected };
+        dashboardMainPageStore.setSelectedIdMap({
+            ...dashboardMainPageState.selectedIdMap,
+            [node.data.id]: _isSelected,
+        });
         if (node.data.folderId) {
             if (_isSelected) {
-                state.selectedIdMap = { ...state.selectedIdMap, [node.data.folderId]: true };
+                dashboardMainPageStore.setSelectedIdMap({
+                    ...dashboardMainPageState.selectedIdMap,
+                    [node.data.folderId]: true,
+                });
             } else {
                 const _folderNode = state.dashboardTreeData.find((n) => n.data.id === node.data.folderId);
-                if (_folderNode?.children?.every((child) => !state.selectedIdMap[child.id])) {
-                    state.selectedIdMap = { ...state.selectedIdMap, [node.data.folderId]: false };
+                if (_folderNode?.children?.every((child) => !dashboardMainPageState.selectedIdMap[child.id])) {
+                    dashboardMainPageStore.setSelectedIdMap({
+                        ...dashboardMainPageState.selectedIdMap,
+                        [node.data.folderId]: false,
+                    });
                 }
             }
         }
@@ -124,11 +143,6 @@ const handleClickDeleteButton = () => {
 const handleClickMoveButton = () => {
     dashboardMainPageStore.setFolderMoveModalVisible(true);
 };
-
-/* Watcher */
-watch(() => state.selectedIdMap, (selectedIdMap) => {
-    dashboardMainPageStore.setSelectedIdMap(selectedIdMap);
-});
 </script>
 
 <template>
@@ -156,7 +170,7 @@ watch(() => state.selectedIdMap, (selectedIdMap) => {
              class="tree-content-wrapper"
         >
             <div class="folder-row-wrapper">
-                <p-checkbox :selected="state.selectedIdMap[treeData.data.id]"
+                <p-checkbox :selected="dashboardMainPageState.selectedIdMap[treeData.data.id]"
                             :indeterminate="isIndeterminate(treeData)"
                             @change="handleSelectTreeItem(treeData, $event)"
                 />
@@ -176,7 +190,7 @@ watch(() => state.selectedIdMap, (selectedIdMap) => {
                      :key="`${child.data.id}-${child.data.type}`"
                      class="folder-row-wrapper"
                 >
-                    <p-checkbox :selected="state.selectedIdMap[child.data.id]"
+                    <p-checkbox :selected="dashboardMainPageState.selectedIdMap[child.data.id]"
                                 @change="handleSelectTreeItem(child, $event)"
                     />
                     <dashboard-folder-tree-item :tree-data="child" />

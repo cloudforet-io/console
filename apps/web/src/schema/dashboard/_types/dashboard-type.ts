@@ -5,13 +5,24 @@ import type {
 import type {
     InheritOptions, WidgetOptions, WidgetSize,
 } from '@/schema/dashboard/_types/widget-type';
+import type { PrivateDashboardChangeFolderParameters } from '@/schema/dashboard/private-dashboard/api-verbs/change-folder';
+import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
+import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
+import type { PublicDashboardChangeFolderParameters } from '@/schema/dashboard/public-dashboard/api-verbs/change-folder';
+import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
+import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 
 import type { VariableModelType } from '@/lib/variable-models';
 import type { Value } from '@/lib/variable-models/_base/types';
 
 
+
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
 export type DashboardFolderType = 'PUBLIC'|'PRIVATE';
+
+export type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
+export type DashboardCreateParams = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
+export type DashboardChangeFolderParams = PublicDashboardChangeFolderParameters | PrivateDashboardChangeFolderParameters;
 
 // dashboard variable schema types
 type VariableSelectionType = 'SINGLE' | 'MULTI';
