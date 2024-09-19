@@ -7,7 +7,7 @@ import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/worksp
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
 interface Props {
-    hasReadWriteAccess: boolean
+    hasReadWriteAccess?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {

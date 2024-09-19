@@ -21,7 +21,7 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 
 interface Props {
     tableHeight: number;
-    hasReadWriteAccess: boolean
+    hasReadWriteAccess?: boolean
 }
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();

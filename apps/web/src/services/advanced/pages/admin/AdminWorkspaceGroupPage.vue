@@ -68,11 +68,11 @@ const fetchWorkspaceGroups = async (tabRefresh:WorkspaceGroupFetchParameters = {
         }
 
         if (tabRefresh.isGroupUser) {
-            workspaceGroupPageState.selectedUserIndices = [];
+            workspaceGroupPageStore.userTabState.selectedUserIndices = [];
         }
 
         if (tabRefresh.isWorkspace) {
-            workspaceGroupPageState.selectedWorkspaceIndices = [];
+            workspaceGroupPageStore.workspaceTabState.selectedWorkspaceIndices = [];
         }
     } catch (e) {
         ErrorHandler.handleError(e);

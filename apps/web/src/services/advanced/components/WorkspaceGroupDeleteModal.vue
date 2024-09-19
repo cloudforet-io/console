@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PI } from '@cloudforet/mirinae';
@@ -22,6 +22,7 @@ const emit = defineEmits<{(e: 'confirm'): void,
 const state = reactive({
     sequence: 'first',
     loading: false,
+    isDeleteAble: computed(() => workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_count === 0 && workspaceGroupPageGetters.selectedWorkspaceGroup.users?.length === 0),
 });
 
 const deleteWorkspaceGroups = async () => {
@@ -29,7 +30,7 @@ const deleteWorkspaceGroups = async () => {
 
     try {
         await SpaceConnector.clientV2.identity.workspaceGroup.delete<WorkspaceGroupDeleteParameters, WorkspaceGroupModel>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
+            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -66,6 +67,7 @@ const handleCloseModal = () => {
                     :theme-color="workspaceGroupPageState.modal.themeColor"
                     :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.DELETE"
                     :loading="state.loading"
+                    :disabled="!state.isDeleteAble"
                     size="sm"
                     @confirm="handleConfirm"
                     @cancel="handleCloseModal"
@@ -76,7 +78,9 @@ const handleCloseModal = () => {
                  class="delete-modal-first-message-wrapper"
             >
                 <p>
-                    {{ $t('IAM.WORKSPACE_GROUP.MODAL.DELETE_MODAL_FIRST_MESSAGE') }}
+                    {{ $t('IAM.WORKSPACE_GROUP.MODAL.DELETE_MODAL_FIRST_MESSAGE', {
+                        WorkspaceGroupName: workspaceGroupPageGetters.selectedWorkspaceGroup.name,
+                    }) }}
                 </p>
                 <div class="count-wrappers">
                     <div class="count-wrapper">
@@ -84,7 +88,7 @@ const handleCloseModal = () => {
                             Workspace
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.workspaces?.length || 0 }}
+                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_count || 0 }}
                         </p>
                     </div>
                     <div class="count-wrapper">
@@ -156,15 +160,6 @@ const handleCloseModal = () => {
 
         .count {
             margin-top: 0.125rem;
-        }
-
-        .link-button {
-            position: absolute;
-            top: 0.7rem;
-            right: 1rem;
-            padding: 0.25rem;
-            min-width: 1.5rem;
-            max-width: 1.5rem;
         }
     }
 }
