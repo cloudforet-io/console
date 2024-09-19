@@ -2,7 +2,9 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -24,6 +26,9 @@ import { store } from '@/store';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -31,15 +36,18 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
-
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
+
 const router = useRouter();
+const route = useRoute();
+
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -69,6 +77,13 @@ const state = reactive({
         }
         return !!(state.dashboardTotalCount && (state.sharedDashboardList.length || state.privateDashboardList.length || state.deprecatedDashboardList.length));
     }),
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const searchQueryHelper = new QueryHelper();
@@ -163,7 +178,9 @@ onUnmounted(() => {
                    use-total-count
                    :total-count="state.dashboardTotalCount"
         >
-            <template #extra>
+            <template v-if="state.hasReadWriteAccess"
+                      #extra
+            >
                 <p-button icon-left="ic_plus_bold"
                           @click="handleCreateDashboard"
                 >
@@ -190,14 +207,16 @@ onUnmounted(() => {
             <template #no-data>
                 <p-empty
                     show-image
-                    show-button
+                    :show-button="state.hasReadWriteAccess"
                 >
                     <template #image>
                         <img alt="empty-default-image"
                              src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
                         >
                     </template>
-                    <template #button>
+                    <template v-if="state.hasReadWriteAccess"
+                              #button
+                    >
                         <p-button icon-left="ic_plus_bold"
                                   @click="handleCreateDashboard"
                         >
