@@ -41,13 +41,12 @@ const state = reactive({
         }
         return dashboardMainPageGetters.privateDashboardTreeData;
     }),
-    // selectedIdMap: {} as Record<string, boolean>,
     childrenShowMap: {} as Record<string, boolean>,
     controlButtons: computed(() => ([
         {
             name: 'clone',
             icon: 'ic_clone',
-            clickEvent: () => {},
+            clickEvent: handleClickCloneButton,
         },
         {
             name: 'move',
@@ -144,6 +143,9 @@ const handleClickDeleteButton = () => {
 };
 const handleClickMoveButton = () => {
     dashboardMainPageStore.setFolderMoveModalVisible(true);
+};
+const handleClickCloneButton = () => {
+    dashboardMainPageStore.setFolderCloneModalVisible(true);
 };
 </script>
 
