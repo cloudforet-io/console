@@ -1774,10 +1774,13 @@
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
+			"ALT_E_CLONE_DASHBOARD": "",
 			"ALT_E_DELETE_DASHBOARD": "",
 			"ALT_E_MOVE_DASHBOARD": "",
+			"ALT_S_CLONE_DASHBOARD": "",
 			"ALT_S_DELETE_DASHBOARD": "",
 			"ALT_S_MOVE_DASHBOARD": "",
+			"CLONE_DASHBOARD": "대시보드 복제",
 			"CREATE": "생성",
 			"CREAT_NEW_DASHBOARD": "대시보드 생성",
 			"DASHBOARD": "대시보드",
