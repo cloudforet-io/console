@@ -18,6 +18,13 @@ import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboar
 
 type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
 type FolderModel = PublicFolderModel | PrivateFolderModel;
+interface DataTableItem {
+    id: string;
+    name: string;
+    location?: string;
+    type: 'DASHBOARD' | 'FOLDER';
+    isFolderSelected?: boolean;
+}
 const _getDashboardTreeData = (folderList: FolderModel[], dashboardList: DashboardModel[]): TreeNode<DashboardTreeDataType>[] => {
     const nodes: Record<string, TreeNode<DashboardTreeDataType>> = {};
     folderList.forEach((d) => {
@@ -132,6 +139,48 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         selectedTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
             const _treeData: TreeNode<DashboardTreeDataType>[] = [...getters.publicDashboardTreeData, ...getters.privateDashboardTreeData];
             return _getSelectedTreeData(_treeData, state.selectedIdMap);
+        }),
+        modalTableItems: computed<DataTableItem[]>(() => {
+            const _treeData = [...getters.publicDashboardTreeData, ...getters.privateDashboardTreeData];
+            const _tableItems: DataTableItem[] = [];
+            getters.selectedTreeData.forEach((node) => {
+                if (node.data.type === 'FOLDER') {
+                    _tableItems.push({
+                        id: node.data.id,
+                        name: node.data.name,
+                        type: 'FOLDER',
+                    });
+                    node.children?.forEach((child) => {
+                        _tableItems.push({
+                            id: child.data.id,
+                            name: child.data.name,
+                            location: node.data.name,
+                            type: 'DASHBOARD',
+                            isFolderSelected: true,
+                        });
+                    });
+                } else {
+                    const _folderId = node.data?.folderId;
+                    const _folderName = _treeData.find((d) => d.id === _folderId)?.data?.name;
+                    _tableItems.push({
+                        id: node.data.id,
+                        name: node.data.name,
+                        location: _folderName,
+                        type: 'DASHBOARD',
+                    });
+                }
+            });
+            return _tableItems;
+        }),
+        existingFolderNameList: computed<string[]>(() => {
+            const _publicNames = dashboardState.publicFolderItems.map((d) => d.name);
+            const _privateNames = dashboardState.privateFolderItems.map((d) => d.name);
+            return [..._publicNames, ..._privateNames];
+        }),
+        existingDashboardNameList: computed<string[]>(() => {
+            const _publicNames = dashboardState.publicDashboardItems.map((d) => d.name);
+            const _privateNames = dashboardState.privateDashboardItems.map((d) => d.name);
+            return [..._publicNames, ..._privateNames];
         }),
     });
 

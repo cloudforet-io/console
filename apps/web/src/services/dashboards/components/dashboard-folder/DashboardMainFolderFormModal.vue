@@ -46,6 +46,7 @@ const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const dashboardMainPageStore = useDashboardMainPageStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
+const dashboardMainPageGetters = dashboardMainPageStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -62,13 +63,10 @@ const state = reactive({
         return undefined;
     }),
     existingNameList: computed<string[]>(() => {
-        const _publicNames = dashboardState.publicFolderItems.map((d) => d.name);
-        const _privateNames = dashboardState.privateFolderItems.map((d) => d.name);
-        const _names = [..._publicNames, ..._privateNames];
         if (dashboardMainPageState.folderFormModalType === 'UPDATE') {
-            return _names.filter((d) => d !== state.selectedFolder?.name);
+            return dashboardMainPageGetters.existingDashboardNameList.filter((d) => d !== state.selectedFolder?.name);
         }
-        return _names;
+        return dashboardMainPageGetters.existingDashboardNameList;
     }),
     headerTitle: computed(() => {
         if (dashboardMainPageState.folderFormModalType === 'UPDATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.EDIT_FOLDER_NAME');
