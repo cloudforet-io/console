@@ -116,7 +116,7 @@ const handleClickEditButton = (order: number) => {
 
 const handleCancelSetRule = () => {
     if (state.isAddCase) {
-        collectorFormState.additionalRules = [];
+        collectorFormState.additionalRules = collectorFormState.originCollectorRules;
     }
     state.editModeCardOrder = 0;
 };
