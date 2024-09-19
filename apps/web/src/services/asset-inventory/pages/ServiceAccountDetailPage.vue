@@ -49,8 +49,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
-
 
 const router = useRouter();
 
@@ -58,7 +56,6 @@ const props = defineProps<{
     serviceAccountId?: string;
 }>();
 
-const costReportPageStore = useCostReportPageStore();
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
@@ -164,7 +161,7 @@ const handleClickBackbutton = () => {
 
 onMounted(async () => {
     if (storeState.isWorkspaceMember) return;
-    await costReportPageStore.fetchCostReportConfig();
+    await serviceAccountPageStore.fetchCostReportConfig();
 });
 
 watch(() => state.providerId, async (provider) => {

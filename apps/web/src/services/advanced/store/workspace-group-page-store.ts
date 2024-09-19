@@ -8,6 +8,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
+import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
@@ -17,9 +19,10 @@ import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/mode
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
+import type { Currency } from '@/store/modules/display/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
-
 
 export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', () => {
     const state = reactive({
@@ -68,6 +71,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         pageStart: 1,
         pageLimit: 15,
         loading: false,
+        costReportConfig: null as CostReportConfigModel|null|undefined,
     });
 
     // The getters method using reactive will not work when using the store.$dispose method with the error
@@ -79,6 +83,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         groupUserPage: computed(() => userTabState.pageStart / userTabState.pageLimit),
         selectedWorkspaceIds: computed<string[]>(() => workspaceTabState.selectedWorkspaceIndices.map((index: number) => workspaceTabState.workspacesInSelectedGroup[index].workspace_id)),
         selectedGroupUsersByIndices: computed(() => userTabState.selectedUserIndices.map((index: number) => userTabState.userInSelectedGroup[index])),
+        currency: computed<Currency|undefined>(() => workspaceTabState.costReportConfig?.currency),
     });
 
 
@@ -196,6 +201,16 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
                 userTabState.userInSelectedGroupTotalCount = 0;
             } finally {
                 userTabState.loading = false;
+            }
+        },
+        fetchCostReportConfig: async () => {
+            if (workspaceTabState.costReportConfig !== null) return;
+            try {
+                const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+                workspaceTabState.costReportConfig = results?.[0];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                workspaceTabState.costReportConfig = undefined;
             }
         },
     };

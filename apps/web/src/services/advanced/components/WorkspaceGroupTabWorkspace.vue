@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -32,7 +32,6 @@ import { workspaceStateFormatter } from '@/services/advanced/composables/refined
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
@@ -41,8 +40,6 @@ const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
-const costReportPageStore = useCostReportPageStore();
-const costReportPageGetters = costReportPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 
 const route = useRoute();
@@ -62,7 +59,7 @@ const state = reactive({
         return closestRoute?.meta?.menuId;
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
-    currency: computed<Currency|undefined>(() => costReportPageGetters.currency),
+    currency: computed<Currency|undefined>(() => workspaceGroupPageGetters.currency),
 });
 const tableState = reactive({
     timezone: computed(() => store.state.user.timezone),
@@ -182,6 +179,10 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
 watch(() => workspaceGroupPageGetters.selectedWorkspaceGroupId, () => {
     workspaceGroupPageStore.listWorkspacesInSelectedGroup();
 }, { immediate: true });
+
+onMounted(async () => {
+    await workspaceGroupPageStore.fetchCostReportConfig();
+});
 </script>
 
 <template>
