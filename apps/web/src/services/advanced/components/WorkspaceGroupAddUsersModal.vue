@@ -90,6 +90,7 @@ const handleConfirm = async () => {
             })),
         });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
+        await workspaceGroupPageStore.fetchWorkspaceGroups({ blockSelectedIndicesReset: true });
         await workspaceGroupPageStore.listWorkspaceGroupUsers();
         emit('confirm');
     } catch (e) {

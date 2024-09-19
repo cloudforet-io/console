@@ -15,6 +15,7 @@ import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceGroupUserListParameters } from '@/schema/identity/workspace-group-user/api-verbs/list';
 import type { WorkspaceGroupUserModel, WorkspaceGroupUser } from '@/schema/identity/workspace-group-user/model';
+import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -150,6 +151,25 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         },
         resetSelectedWorkspace: () => {
             workspaceTabState.selectedWorkspaceIndices = [] as number[];
+        },
+        fetchWorkspaceGroups: async (option?: {
+            query?: Query, blockSelectedIndicesReset?: boolean
+        }) => {
+            state.loading = true;
+
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>({
+                    query: option?.query,
+                });
+
+                state.workspaceGroups = results || [];
+                if (!option?.blockSelectedIndicesReset) state.selectedIndices = [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.workspaceGroups = [];
+            } finally {
+                state.loading = false;
+            }
         },
         listRoles: async () => {
             try {

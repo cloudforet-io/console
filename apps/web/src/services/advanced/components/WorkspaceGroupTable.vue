@@ -3,16 +3,10 @@ import { computed, reactive } from 'vue';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PToolboxTable } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import WorkspaceGroupTableToolbox from '@/services/advanced/components/WorkspaceGroupTableToolbox.vue';
@@ -67,23 +61,7 @@ const tableState = reactive({
     }),
 });
 
-const fetchWorkspaceGroups = async () => {
-    workspaceGroupPageState.loading = true;
 
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>({
-            query: workspaceGroupListApiQuery,
-        });
-
-        workspaceGroupPageState.workspaceGroups = results || [];
-        workspaceGroupPageState.selectedIndices = [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        workspaceGroupPageState.workspaceGroups = [];
-    } finally {
-        workspaceGroupPageState.loading = false;
-    }
-};
 
 const handleUpdateSelectIndices = (indices: number[]) => {
     workspaceGroupPageStore.$patch((_state) => {
@@ -95,7 +73,7 @@ const handleUpdateSelectIndices = (indices: number[]) => {
     });
 };
 
-const handleChange = (options: any = {}) => {
+const handleChange = async (options: any = {}) => {
     workspaceGroupListApiQuery = getApiQueryWithToolboxOptions(workspaceGroupListApiQueryHelper, options) ?? workspaceGroupListApiQuery;
     if (options.queryTags !== undefined) {
         workspaceGroupPageStore.$patch((_state) => {
@@ -114,7 +92,7 @@ const handleChange = (options: any = {}) => {
         });
     }
 
-    fetchWorkspaceGroups();
+    await workspaceGroupPageStore.fetchWorkspaceGroups({ query: workspaceGroupListApiQuery });
 };
 
 const handleChangeSort = (name:string, desc:boolean) => {

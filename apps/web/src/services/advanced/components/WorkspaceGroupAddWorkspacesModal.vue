@@ -56,6 +56,7 @@ const addWorkspace = async () => {
         })));
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_WORKSPACE'), '');
 
+        await workspaceGroupPageStore.fetchWorkspaceGroups({ blockSelectedIndicesReset: true });
         await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
     } catch (e) {
         ErrorHandler.handleError(e);

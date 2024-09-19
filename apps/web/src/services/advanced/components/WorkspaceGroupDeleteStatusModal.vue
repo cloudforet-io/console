@@ -99,9 +99,10 @@ const deleteGroupUsers = async () => {
             : workspaceGroupPageGetters.selectedGroupUsersByIndices;
         await SpaceConnector.clientV2.identity.workspaceGroup.removeUsers<WorkspaceGroupRemoveUsersParameters>({
             workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
-            users: users.map((item) => ({ user_id: item.user_id })),
+            users: users.map((item) => ({ user_id: item?.user_id ?? '' })),
         });
 
+        await workspaceGroupPageStore.fetchWorkspaceGroups({ blockSelectedIndicesReset: true });
         await workspaceGroupPageStore.listWorkspaceGroupUsers();
         userTabState.selectedUserIndices = [];
     } catch (e) {
