@@ -219,7 +219,7 @@ watch(() => workspaceGroupPageGetters.selectedWorkspaceGroupId, () => {
                          :total-count="workspaceTabState.workspacesInSelectedGroupTotalCount"
                          sort-by="name"
                          search-type="plain"
-                         :sort-desc="true"
+                         :sort-desc="workspaceTabState.sortDesc"
                          :this-page.sync="workspaceTabState.thisPage"
                          :search-text.sync="workspaceTabState.searchText"
                          :selectable="state.hasReadWriteAccess"

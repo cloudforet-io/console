@@ -7,7 +7,7 @@ export interface WorkspaceGroupUserModel {
     workspace_group_id: string;
     name: string;
     workspaces: WorkspaceModel[];
-    users: WorkspaceUser[];
+    users: WorkspaceGroupUser[];
     tags: Tags;
     domain_id: string;
     created_by: string;
@@ -22,8 +22,9 @@ export interface WorkspaceGroupUserSummaryModel {
     state: UserState;
 }
 
-export interface WorkspaceUser {
+export interface WorkspaceGroupUser {
     user_id: string;
     role_id: string;
     role_type: RoleType;
+    state: UserState;
 }
