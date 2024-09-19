@@ -34,9 +34,6 @@ import {
     calculateTime, userStateFormatter, useRoleFormatter, userMfaFormatter,
 } from '@/services/iam/composables/refined-table-data';
 import { USER_SEARCH_HANDLERS, USER_STATE } from '@/services/iam/constants/user-constant';
-import {
-    getWorkspaceRoleBindingIdFromRoleBindingsInfo,
-} from '@/services/iam/helpers/role-binding-helpers';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { ExtendUserListItemType } from '@/services/iam/types/user-type';
 
@@ -195,7 +192,7 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
 const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
         const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
-            role_binding_id: state.refinedUserItems[rowIndex]?.role_bindings_info?.[0]?.role_binding_id || '',
+            role_binding_id: state.refinedUserItems[rowIndex]?.role_binding_info?.role_binding_id || '',
             role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
@@ -238,9 +235,6 @@ const handleRemoveButton = async () => {
         modalState.loading = false;
     }
 };
-
-const roleBindingsContents = (roleBindings: RoleBindingModel[])
-    :string => roleBindings.filter((rb) => (rb.workspace_group_id && rb.workspace_id)).map((roleBinding) => userPageStore.roleMap[roleBinding.role_id]?.name).join('\n');
 </script>
 
 <template>
@@ -286,7 +280,7 @@ const roleBindingsContents = (roleBindings: RoleBindingModel[])
                     <span class="pr-4">{{ userPageStore.roleMap[value]?.name ?? '' }}</span>
                 </div>
             </template>
-            <template #col-role_binding-format="{value, rowIndex, item: {role_bindings_info}}">
+            <template #col-role_binding-format="{value, rowIndex}">
                 <div class="role-type-wrapper">
                     <p-tooltip position="bottom"
                                :contents="useRoleFormatter(value?.type).name"
@@ -329,19 +323,6 @@ const roleBindingsContents = (roleBindings: RoleBindingModel[])
                         </template>
                     </p-select-dropdown>
                     <span v-else>{{ value.name }}</span>
-                    <p-tooltip v-if="roleBindingsContents(role_bindings_info).length"
-                               position="bottom"
-                               :contents="roleBindingsContents(role_bindings_info)"
-                               class="tooltip"
-                    >
-                        <p-badge badge-type="subtle"
-                                 shape="round"
-                                 style-type="blue200"
-                                 class="ml-2"
-                        >
-                            +{{ role_bindings_info.filter((rb) => rb.workspace_id && rb.workspace_group_id).length }}
-                        </p-badge>
-                    </p-tooltip>
                 </div>
             </template>
             <template #col-mfa_state-format="{value}">
@@ -383,7 +364,7 @@ const roleBindingsContents = (roleBindings: RoleBindingModel[])
                 <p-button style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
-                          @click.stop="handleClickButton(getWorkspaceRoleBindingIdFromRoleBindingsInfo(value.item.role_bindings_info))"
+                          @click.stop="handleClickButton(value.item.role_binding_info)"
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
