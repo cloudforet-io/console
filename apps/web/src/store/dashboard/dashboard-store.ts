@@ -183,6 +183,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         const _publicDashboardParams = {
             query: {
                 ...publicDashboardApiQueryHelper.data,
+                sort: [{ key: 'created_at', desc: true }],
             },
         };
         state.loading = true;
