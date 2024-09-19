@@ -67,10 +67,9 @@ import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agen
 import { stateFormatter } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import type { QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
-
 
 const { width } = useWindowSize();
 
@@ -79,8 +78,8 @@ const route = useRoute();
 const { query } = router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
-const costReportPageStore = useCostReportPageStore();
-const constReportPageGetters = costReportPageStore.getters;
+const serviceAccountPageStore = useServiceAccountPageStore();
+const serviceAccountPageGetters = serviceAccountPageStore.getters;
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountSchemaState = serviceAccountSchemaStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -90,6 +89,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+    currency: computed<Currency|undefined>(() => serviceAccountPageGetters.currency),
 });
 const state = reactive({
     selectedMenuId: computed(() => {
@@ -102,7 +102,6 @@ const state = reactive({
         return targetMenuId;
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
-    currency: computed<Currency|undefined>(() => constReportPageGetters.currency),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -349,7 +348,7 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
 
 onMounted(async () => {
     if (tableState.isWorkspaceMember) return;
-    await costReportPageStore.fetchCostReportConfig();
+    await serviceAccountPageStore.fetchCostReportConfig();
 });
 
 (async () => {
@@ -466,7 +465,7 @@ onMounted(async () => {
                           #col-cost_info-format="{value}"
                 >
                     <p>
-                        <span>{{ CURRENCY_SYMBOL[state.currency] }}</span>
+                        <span>{{ CURRENCY_SYMBOL[storeState.currency] }}</span>
                         {{ numberFormatter(value?.month) || 0 }}
                     </p>
                 </template>

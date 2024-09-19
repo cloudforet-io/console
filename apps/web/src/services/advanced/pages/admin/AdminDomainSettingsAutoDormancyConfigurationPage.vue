@@ -16,6 +16,8 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
 import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config/api-verbs/update';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
+import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
+import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
@@ -34,21 +36,17 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { DormancyConfig } from '@/services/advanced/types/preferences-type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 const DORMANCY_CONFIG_NAME = 'identity:dormancy:workspace';
-
-const costReportPageStore = useCostReportPageStore();
-const constReportPageGetters = costReportPageStore.getters;
 
 const router = useRouter();
 const route = useRoute();
 
 const storeState = reactive({
-    currency: computed<Currency|undefined>(() => constReportPageGetters.currency),
     pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
+    currency: undefined as Currency|undefined,
     toggleText: computed<string>(() => (state.statusToggle
         ? 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_TOGGLE_ENABLED'
         : 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_TOGGLE_DISABLED'
@@ -158,6 +156,16 @@ const fetchDomainSettings = async () => {
         state.dormancyConfig = null;
     }
 };
+const fetchCostReportConfig = async () => {
+    if (!state.currency) return;
+    try {
+        const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+        state.currency = results?.[0]?.currency;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.currency = undefined;
+    }
+};
 
 watch(() => state.dormancyConfig, (config) => {
     if (!config) return;
@@ -169,7 +177,7 @@ watch(() => state.dormancyConfig, (config) => {
 onMounted(async () => {
     await initForm();
     await fetchDomainSettings();
-    await costReportPageStore.fetchCostReportConfig();
+    await fetchCostReportConfig;
 });
 </script>
 
@@ -238,7 +246,7 @@ onMounted(async () => {
                                               class="cost-input"
                                               @update:value="handleUpdateCost"
                                 />
-                                <span class="placeholder">{{ CURRENCY_SYMBOL[storeState.currency] }} {{ storeState.currency }}</span>
+                                <span class="placeholder">{{ CURRENCY_SYMBOL[state.currency] }} {{ state.currency }}</span>
                             </div>
                         </template>
                     </p-field-group>

@@ -44,7 +44,6 @@ import {
 import type { WorkspaceTableModel } from '@/services/advanced/store/workspace-page-store';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
@@ -61,8 +60,6 @@ const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
 
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
-const costReportPageStore = useCostReportPageStore();
-const constReportPageGetters = costReportPageStore.getters;
 
 const route = useRoute();
 
@@ -87,7 +84,7 @@ const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
     selectedType: computed<string>(() => workspacePageState.selectedType),
     searchFilters: computed<ConsoleFilter[]>(() => workspacePageState.searchFilters),
-    currency: computed<Currency|undefined>(() => constReportPageGetters.currency),
+    currency: computed<Currency|undefined>(() => workspacePageStore.currency),
 });
 const state = reactive({
     typeField: computed<ValueItem[]>(() => ([
@@ -218,7 +215,7 @@ const getServiceAccountRouteLocationByWorkspaceName = (item: WorkspaceTableModel
 });
 
 onMounted(async () => {
-    await costReportPageStore.fetchCostReportConfig();
+    await workspacePageStore.fetchCostReportConfig();
 });
 </script>
 

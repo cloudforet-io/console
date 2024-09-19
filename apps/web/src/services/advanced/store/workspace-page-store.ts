@@ -4,6 +4,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
+import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { RoleBindingListParameters, RoleBindingListResponse } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
@@ -28,6 +30,7 @@ interface WorkspacePageState {
     searchFilters: ConsoleFilter[],
     roleBindings: RoleBindingModel[],
     selectedType: string,
+    costReportConfig: CostReportConfigModel|null|undefined,
     // workspace users
     workspaceUsersLoading: boolean,
     workspaceUsers: WorkspaceUserModel[],
@@ -54,6 +57,7 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
         searchFilters: [],
         roleBindings: [],
         selectedType: 'ALL',
+        costReportConfig: null,
         // workspace users
         workspaceUsersLoading: false,
         workspaceUsers: [],
@@ -78,6 +82,7 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
             map[roleBinding.role_binding_id] = roleBinding;
             return map;
         }, {}),
+        currency: (state) => state.costReportConfig?.currency,
     },
     actions: {
         async load(params: WorkspaceListParameters) {
@@ -139,6 +144,16 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
                 ErrorHandler.handleError(e);
                 this.roles = [];
                 throw e;
+            }
+        },
+        async fetchCostReportConfig() {
+            if (this.costReportConfig !== null) return;
+            try {
+                const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+                this.costReportConfig = results?.[0];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                this.costReportConfig = undefined;
             }
         },
     },
