@@ -24,24 +24,30 @@ export const useTab = ({ tabs, activeTab }: TabStateArgs) => {
         activeTab,
     });
     const tabState: UnwrapRef<TabState> = reactive({
-        tabItems: computed<Required<TabItem>[]>(() => state.tabs.map((tab) => {
-            if (typeof tab === 'string') {
-                return {
-                    name: tab,
-                    label: tab,
-                    keepAlive: false,
-                };
-            }
-            return {
-                name: tab.name,
-                label: tab.label ?? tab.name,
-                keepAlive: !!tab.keepAlive,
-            };
-        })),
+        tabItems: computed<TabItem[]>(() => state.tabs.map((tab) => generateTabItem(tab))),
         keepAliveTabNames: computed<string[]>(() => tabState.tabItems.filter((tabItem) => tabItem.keepAlive).map((tabItem) => tabItem.name)),
         nonKeepAliveTabNames: computed<string[]>(() => tabState.tabItems.filter((tabItem) => !tabItem.keepAlive).map((tabItem) => tabItem.name)),
         currentTabItem: computed<TabItem | undefined>(() => tabState.tabItems.find((tabItem) => tabItem.name === state.activeTab)),
     });
+
+    const generateTabItem = (tab: string | TabItem): TabItem => {
+        if (typeof tab === 'string') {
+            return {
+                name: tab,
+                label: tab,
+                keepAlive: false,
+                type: 'tab',
+            };
+        }
+        return {
+            name: tab.name,
+            label: tab.label ?? tab.name,
+            keepAlive: !!tab.keepAlive,
+            type: tab.type ?? 'tab',
+            icon: tab.icon,
+            subItems: tab.subItems?.map((subItem) => generateTabItem(subItem)),
+        };
+    };
 
     return {
         ...toRefs(tabState),
