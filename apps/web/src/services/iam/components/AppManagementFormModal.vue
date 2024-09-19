@@ -253,7 +253,7 @@ watch(() => storeState.isEdit, (isEdit) => {
                         :visible="appPageState.modal.visible.form"
                         :disabled="storeState.isEdit
                             ? formState.name === ''
-                            : formState.name === '' || dropdownState.selectedMenuItems.length === 0"
+                            : formState.name === '' || dropdownState.selectedMenuItems.length === 0 || (state.activeProject && state.selectedProjects.length === 0)"
                         :loading="appPageState.modal.loading"
                         @confirm="handleConfirm"
                         @cancel="handleClose"
