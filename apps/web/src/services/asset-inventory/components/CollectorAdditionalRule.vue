@@ -21,6 +21,7 @@ import CollectorAdditionalRuleContent from '@/services/asset-inventory/component
 import CollectorAdditionalRuleEmptyCase
     from '@/services/asset-inventory/components/CollectorAdditionalRuleEmptyCase.vue';
 import CollectorAdditionalRuleForm from '@/services/asset-inventory/components/CollectorAdditionalRuleForm.vue';
+import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
@@ -30,6 +31,7 @@ import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
+const collectorDetailPageStore = useCollectorDetailPageStore();
 
 interface Props {
     collectorId?: string;
@@ -48,6 +50,8 @@ const state = reactive({
     collectorProvider: computed(() => collectorFormState.originCollector?.provider),
     isAddCase: computed<boolean>(() => collectorFormState.originCollectorRules?.length === 0
         || collectorFormState.originCollectorRules.length < collectorFormState.additionalRules.length),
+    isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
+    isEditable: computed<boolean>(() => state.editModeCardOrder === 0 && !state.isNotiVisible),
 });
 
 const changeOrder = (targetData, clickedData, tempOrder) => {
@@ -175,7 +179,9 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                    heading-type="sub"
         />
         <div v-if="state.isEmptyCase">
-            <collector-additional-rule-empty-case @add-rule="handleClickAddEventRule" />
+            <collector-additional-rule-empty-case :is-editable="state.isEditable"
+                                                  @add-rule="handleClickAddEventRule"
+            />
         </div>
         <div v-else>
             <div class="card-list-wrapper">
@@ -259,7 +265,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                 <p-button style-type="tertiary"
                           icon-left="ic_plus_bold"
                           class="add-event-rule-button"
-                          :disabled="!!state.editModeCardOrder"
+                          :disabled="!state.isEditable"
                           @click="handleClickAddEventRule"
                 >
                     {{ $t('INVENTORY.COLLECTOR.ADD_ADDITIONAL_RULE') }}

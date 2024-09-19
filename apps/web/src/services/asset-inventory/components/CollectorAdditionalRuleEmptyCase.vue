@@ -2,7 +2,13 @@
 import { PButton } from '@cloudforet/mirinae';
 
 const emit = defineEmits<{(e: 'add-rule'): void; }>();
+interface Props {
+    isEditable: boolean;
+}
 
+const props = withDefaults(defineProps<Props>(), {
+    isEditable: false,
+});
 const handleClickAddEventRule = async () => {
     emit('add-rule');
 };
@@ -21,6 +27,7 @@ const handleClickAddEventRule = async () => {
         </div>
         <p-button icon-left="ic_plus_bold"
                   class="mb-10"
+                  :disabled="!props.isEditable"
                   @click="handleClickAddEventRule"
         >
             {{ $t('INVENTORY.COLLECTOR.ADD_ADDITIONAL_RULE') }}

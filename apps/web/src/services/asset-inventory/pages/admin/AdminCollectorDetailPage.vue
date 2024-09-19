@@ -50,7 +50,9 @@
         <collector-options-section class="section"
                                    data-test-id="collector-options-section"
         />
-
+        <collector-additional-rule class="section"
+                                   :collector-id="props.collectorId"
+        />
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
                               :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
                               :verification-text="state.collectorName"
@@ -114,6 +116,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import CollectorAdditionalRule from '@/services/asset-inventory/components/CollectorAdditionalRule.vue';
 import CollectorBaseInfoSection from '@/services/asset-inventory/components/CollectorBaseInfoSection.vue';
 import CollectorDataModal
     from '@/services/asset-inventory/components/CollectorDataModal.vue';
