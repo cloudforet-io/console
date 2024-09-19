@@ -3703,6 +3703,7 @@
 		"NAME": "名前",
 		"NOT_FOUND_ACCESS_WORKSPACE": "アクセス可能なワークスペースがありません。",
 		"NOT_FOUND_DESC": "まだ作成されたワークスペースがありません。",
+		"NO_WORKSPACE": "ワークスペースなし",
 		"RECENT": "最近のアクセス",
 		"ROLE_TYPE_MEMBER": "構成員",
 		"ROLE_TYPE_OWNER": "オーナー",

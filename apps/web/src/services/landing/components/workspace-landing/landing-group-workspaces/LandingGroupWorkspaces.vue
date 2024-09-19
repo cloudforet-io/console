@@ -6,7 +6,7 @@ import { partition, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldTitle, PButton, PButtonTab, PIconButton,
+    PFieldTitle, PButton, PButtonTab, PIconButton, PEmpty,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -189,6 +189,12 @@ watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
                                  :board-type="BOARD_TYPE.ALL_WORKSPACE"
                                  :is-domain-admin="props.isDomainAdmin"
         />
+        <p-empty v-if="state.workspaceBoardSets.length === 0"
+                 show-image
+                 image-size="sm"
+        >
+            {{ $t('LADING.NO_WORKSPACE') }}
+        </p-empty>
         <div class="show-more-button-wrapper">
             <p-button v-if="state.isShowAllVisible"
                       icon-right="ic_chevron-down"

@@ -3703,6 +3703,7 @@
 		"NAME": "Name",
 		"NOT_FOUND_ACCESS_WORKSPACE": "There are no accessible workspaces.",
 		"NOT_FOUND_DESC": "Looks like you don’t have any workspace.",
+		"NO_WORKSPACE": "No Workspace",
 		"RECENT": "Recent Visits",
 		"ROLE_TYPE_MEMBER": "Member",
 		"ROLE_TYPE_OWNER": "Owner",

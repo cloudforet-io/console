@@ -3703,6 +3703,7 @@
 		"NAME": "이름",
 		"NOT_FOUND_ACCESS_WORKSPACE": "접근 가능한 워크스페이스가 없습니다.",
 		"NOT_FOUND_DESC": "아직 생성된 워크스페이스가 없습니다.",
+		"NO_WORKSPACE": "워크스페이스 없음",
 		"RECENT": "최근 방문",
 		"ROLE_TYPE_MEMBER": "멤버",
 		"ROLE_TYPE_OWNER": "소유자",
