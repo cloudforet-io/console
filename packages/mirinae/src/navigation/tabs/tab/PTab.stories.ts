@@ -5,6 +5,8 @@ import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
 import { useProxyValue } from '@/hooks';
+import PButton from '@/inputs/buttons/button/PButton.vue';
+import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 import {
     getTabArgTypes, getTabParameters, getTabArgs, Inner,
 } from '@/navigation/tabs/tab/story-helper';
@@ -40,9 +42,9 @@ const Template: Story = {
         <div class="h-full w-full overflow p-8">
             <p-tab
                 :tabs="tabs"
-                v-model="proxyActiveTab"
+                :active-tab="proxyActiveTab"
                 :stretch="stretch"
-                @update:activeTab="onUpdateActiveTab"
+                @update:active-tab="onUpdateActiveTab"
                 @change="onChange"
             >
                 <div v-if="defaultSlot" v-html="defaultSlot"/>
@@ -67,7 +69,7 @@ export const Basic: Story = {
           <div class="h-full w-full overflow p-8">
               <p-tab
                 :tabs="tabs"
-                v-model="activeTab"
+                :active-tab.sync="activeTab"
                 ></p-tab>
           </div>
         `,
@@ -95,10 +97,128 @@ export const Stretch: Story = {
             <div class="h-full w-full overflow p-8">
                 <p-tab
                     :tabs="tabs"
-                    v-model="activeTab"
+                    :active-tab.sync="activeTab"
                     stretch
                     ></p-tab>
             </div>
+        `,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        setup(props) {
+            const state = reactive({
+                tabs: [
+                    { name: 'detail', label: 'Detail' },
+                    { name: 'info', label: 'Info' },
+                    { name: 'tags', label: 'Tags' },
+                ],
+                activeTab: 'detail',
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
+export const TabMenuType: Story = {
+    render: () => ({
+        components: { PTab, PTextEditor },
+        template: `
+            <div class="w-full p-8">
+                <p-tab
+                    :tabs="tabs"
+                    :active-tab.sync="activeTab"
+                />
+                <br/>
+                <br/>
+                <p-text-editor :code="JSON.stringify(tabs, null, 2)"
+                               mode="readOnly"
+                               style="height: 200px; max-height: 400px;"
+                />
+            </div>
+            <!--<div>-->
+        `,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        setup(props) {
+            const state = reactive({
+                tabs: [
+                    { name: 'detail', label: 'Detail' },
+                    { name: 'info', label: 'Info' },
+                    { name: 'divider', type: 'divider' },
+                    { name: 'tags', label: 'Tags' },
+                    {
+                        name: 'Folder',
+                        type: 'folder',
+                        subItems: [
+                            { name: 'sub1' },
+                            { name: 'sub2' },
+                        ],
+                    },
+                ],
+                activeTab: 'detail',
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
+export const OverflowTabMenus: Story = {
+    render: () => ({
+        components: { PTab },
+        template: `
+            <div class="w-full p-8">
+                <p-tab
+                    :tabs="tabs"
+                    :active-tab.sync="activeTab"
+                />
+            </div>
+            <!--<div>-->
+        `,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        setup(props) {
+            const state = reactive({
+                tabs: [
+                    { name: 'detail', label: 'Detail' },
+                    { name: 'info', label: 'Info' },
+                    { name: 'divider', type: 'divider' },
+                    { name: 'tags', label: 'Tags' },
+                    { name: 'long menu', label: 'Long Menu' },
+                    { name: 'long long menu', label: 'Long Long Long Menu' },
+                    { name: 'long long long menu', label: 'Long Long Long Long Menu' },
+                    { name: 'long long long long menu', label: 'Long Long Long Long Long Menu' },
+                    { name: 'long long long long long menu', label: 'Long Long Long Long Long Long Menu' },
+                    {
+                        name: 'long long long long long long menu',
+                        label: 'Long Long Long Long Long Long Long Menu',
+                        type: 'folder',
+                        subItems: [
+                            { name: 'sub1' },
+                            { name: 'sub2' },
+                        ],
+                    },
+                ],
+                activeTab: 'detail',
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
+    }),
+};
+
+export const SlotsforHeaderRightContents: Story = {
+    render: () => ({
+        components: { PTab, PButton },
+        template: `
+            <div class="h-full w-full overflow p-8">
+                <p-tab
+                    :tabs="tabs"
+                    :active-tab.sync="activeTab"
+                >
+                </p-tab>
+            </div>
+            <!--<div>-->
         `,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         setup(props) {
@@ -124,7 +244,7 @@ export const SlotsforContents: Story = {
             <div class="h-full w-full overflow p-8">
                 <p-tab
                     :tabs="tabs"
-                    v-model="activeTab"
+                    :active-tab.sync="activeTab"
                 >
                     <template #detail="slotProps">
                         <div class="p-4">
@@ -175,7 +295,7 @@ export const KeepAlive: Story = {
             <div class="h-full w-full overflow p-8">
                 <p-tab
                     :tabs="tabs"
-                    v-model="activeTab"
+                    :active-tab.sync="activeTab"
                 >
                     <template #detail="{name}">
                         <inner key="detail" name="Detail. this tab is keep alive."/>
@@ -215,7 +335,7 @@ export const ExtraSlot: Story = {
                 <p class="mb-6 font-bold text-xl">Slot Props: tab item (name, label, keepAlive)</p>
                 <p-tab
                     :tabs="tabs"
-                    v-model="activeTab"
+                    :active-tab.sync="activeTab"
                 >
                     <template #extra="tab">
                         <p-badge v-if="tab.name === 'info'" style-type="gray200">18</p-badge>
