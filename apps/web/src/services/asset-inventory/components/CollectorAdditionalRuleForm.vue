@@ -288,7 +288,7 @@ const handleClickDone = () => {
 // search fetchers
 const fetchCloudServiceGroup = async (keyword = '', idx:number):Promise<SelectDropdownMenuItem[]> => {
     try {
-        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.stat<CloudServiceTypeStatParameters, ListResponse<string[]>>(
+        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.stat<CloudServiceTypeStatParameters, ListResponse<string>>(
             {
                 query: {
                     distinct: 'group',
@@ -343,7 +343,7 @@ const fetchRegion = async (keyword = '', idx:number):Promise<SelectDropdownMenuI
         );
         const menu = results?.map((i) => ({
             label: i.name,
-            name: i.region_id,
+            name: i.region_code,
         })) ?? [];
         state.regionMenu[idx] = menu;
         return menu;

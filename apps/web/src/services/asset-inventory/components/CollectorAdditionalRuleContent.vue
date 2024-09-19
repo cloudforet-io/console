@@ -62,6 +62,7 @@ const state = reactive({
         return props.data.actions;
     }),
     projects: computed(() => allReferenceStore.getters.project),
+    region: computed(() => allReferenceStore.getters.region),
     changeProjectId: computed(() => props.data?.actions?.change_project ?? ''),
     conditions: computed(() => ({
         ANY: _i18n.t('PROJECT.EVENT_RULE.ANY'),
@@ -89,7 +90,8 @@ const state = reactive({
                         >
                             <td>{{ field.label }}</td>
                             <td>
-                                {{ state.conditionItems[index]?.operator }} {{ state.conditionItems[index]?.value }}
+                                {{ state.conditionItems[index]?.operator }} <span v-if="field.label !== 'Region'">{{ state.conditionItems[index]?.value }}</span>
+                                <span v-else>{{ state.region[state.conditionItems[index]?.value]?.label }}</span>
                             </td>
                         </tr>
                     </template>
