@@ -12,11 +12,16 @@ import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import PDivider from '@/layouts/divider/PDivider.vue';
-import type { TabItem, TabProps } from '@/navigation/tabs/tab/type';
+import type { TabItem } from '@/navigation/tabs/tab/type';
 
 const CUSTOM_BACK_BUTTON = 'CUSTOM_BACK_BUTTON';
+interface Props {
+    activeTab: string;
+    tabs: string[] | TabItem[];
+    stretch?: boolean;
+}
 
-const props = defineProps<TabProps>();
+const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:active-tab', value: string): void;
     (e: 'change', value: string, idx: number): void;
 }>();

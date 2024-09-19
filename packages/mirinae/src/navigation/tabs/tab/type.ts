@@ -18,9 +18,3 @@ export interface TabItem {
     subItems?: Array<TabItem>;
     icon?: string;
 }
-
-export interface TabProps {
-    activeTab: string;
-    tabs: Array<string|TabItem>;
-    stretch?: boolean;
-}
