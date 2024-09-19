@@ -112,11 +112,11 @@ const fetchWorkspaces = async (groupId:string) => {
         return;
     }
     try {
-        const { results, total_count } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<UserProfileGetWorkspacesParameters, ListResponse<MyWorkspaceModel>>({
+        const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<UserProfileGetWorkspacesParameters, ListResponse<MyWorkspaceModel>>({
             workspace_group_id: groupId,
         });
         state.workspacesInSelectedGroup = results ?? [];
-        state.workspacesInSelectedGroupTotalCount = total_count ?? 0;
+        state.workspacesInSelectedGroupTotalCount = results?.length ?? 0;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
