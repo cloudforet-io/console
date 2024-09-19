@@ -122,6 +122,9 @@ const handleSelectHiddenTab = (tab: TabItem, idx: number) => {
 
 
 /* Utils */
+const hideHiddenTabs = () => {
+    state.hiddenTabsVisible = false;
+};
 const selectTab = (tab: TabItem, idx: number) => {
     if (props.activeTab !== tab.name) {
         emit('update:active-tab', tab.name);
@@ -174,7 +177,7 @@ useResizeObserver(tabContainerRef, throttle(() => {
     });
 }, 500));
 
-onClickOutside(hiddenTabsMenuRef, () => { state.hiddenTabsVisible = false; });
+onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
 
 </script>
 
