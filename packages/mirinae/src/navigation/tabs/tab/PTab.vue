@@ -211,7 +211,7 @@ onClickOutside(hiddenTabsMenuRef, () => { state.hiddenTabsVisible = false; });
                         <p-context-menu v-if="state.selectedFolderTab === tab.name"
                                         ref="groupTabMenuRef"
                                         class="sub-item-menu"
-                                        :menu="tab?.subItems ?? []"
+                                        :menu="tab?.subItems || []"
                                         :selected="state.selectedContextMenuItem ? [state.selectedContextMenuItem]: undefined"
                                         @select="handleSelectGroupTabMenu"
                         />

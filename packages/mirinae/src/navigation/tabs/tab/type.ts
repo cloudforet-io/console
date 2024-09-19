@@ -15,6 +15,6 @@ export interface TabItem {
     type?: TabMenuType;
     label?: string | TranslateResult;
     keepAlive?: boolean;
-    subItems?: Array<TabItem>;
+    subItems?: TabItem[];
     icon?: string;
 }
