@@ -1819,6 +1819,7 @@
 			"PRIVATE": "非公開",
 			"PROJECT": "プロジェクト",
 			"SHARED": "共有",
+			"SHOW_ALL": "",
 			"SINGLE_PROJECT": "個別プロジェクト",
 			"TOOLTIP_CLONE": "複製",
 			"TOOLTIP_DELETE": "削除",
