@@ -72,7 +72,7 @@ const state = reactive({
             id: d.name,
             icon: { name: 'ic_document-filled', color: peacock[600] },
             to: getProperRouteLocation({
-                name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+                name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                 params: { id: d.itemId },
             }),
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: d.name },
@@ -101,7 +101,7 @@ const state = reactive({
     //         type: MENU_ITEM_TYPE.ITEM,
     //         label: i18n.t('PROJECT.DETAIL.DASHBOARD.DASHBOARD'),
     //         id: 'project-dashboard',
-    //         to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME }),
+    //         to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.SuMMARY._NAME }),
     //         hideFavorite: true,
     //     },
     //     {
@@ -154,7 +154,7 @@ const state = reactive({
             id: project.key,
             icon: { name: 'ic_document-filled', color: peacock[600] },
             to: getProperRouteLocation({
-                name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+                name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                 params: { id: project.key, workspaceId: storeState.currentWorkspaceId },
             }),
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: project.key },

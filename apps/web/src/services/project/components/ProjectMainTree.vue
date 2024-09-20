@@ -96,7 +96,7 @@ const state = reactive({
                     id: key,
                     parentGroupId: project.data.groupInfo?.id,
                     to: getProperRouteLocation({
-                        name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+                        name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                         params: {
                             id: key,
                         },

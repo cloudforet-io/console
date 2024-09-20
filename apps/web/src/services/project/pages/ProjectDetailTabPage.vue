@@ -100,27 +100,35 @@ const state = reactive({
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
         {
-            name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_DASHBOARD'),
+            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+            label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
         },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
-        },
+        // {
+        //     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
+        //     label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
+        // },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
         },
+        // {
+        //     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+        //     label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
+        // },
+        // {
+        //     name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
+        //     label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
+        // },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
         },
         {
-            name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
+            name: 'divider',
+            tabType: 'divider',
         },
     ]),
-    activeTab: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+    activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
     webhookDetailTab: computed<TabItem[]>(() => {
         const defaultTab = [{
             name: 'details',
@@ -160,8 +168,16 @@ watch(() => projectDetailPageState.projectId, async (projectId) => {
     }
 });
 watch(() => route.name, () => {
-    const exactRoute = route.matched.find((d) => singleItemTabState.tabs.find((tab) => tab.name === d.name));
-    singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME;
+    const flattenTabs = singleItemTabState.tabs.reduce((acc, tab) => {
+        if (tab?.subItems) {
+            acc.push(...tab.subItems);
+        } else {
+            acc.push(tab);
+        }
+        return acc;
+    }, [] as TabItem[]);
+    const exactRoute = route.matched.find((d) => flattenTabs.find((tab) => tab.name === d.name));
+    singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
 }, { immediate: true });
 watch([
     () => props.id,
