@@ -19,12 +19,14 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
 interface Props {
+    id?: string,
     item?: ProjectModel,
     tabs: TabItem[],
     activeTab: string,
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    id: undefined,
     item: undefined,
     tabs: () => [],
     activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
@@ -46,9 +48,17 @@ const state = reactive({
     })),
 });
 
-const onChangeTab = (activeTab) => {
+const onChangeTab = (activeTab: string) => {
     if (activeTab === route.name) return;
-    router.replace(getProperRouteLocation({ name: activeTab }));
+    const isDashboardTab = activeTab.startsWith('public-dash-');
+    const dashboardTabRoute = {
+        name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+        params: {
+            id: props.id as string,
+            dashboardId: activeTab,
+        },
+    };
+    router.replace(getProperRouteLocation(isDashboardTab ? dashboardTabRoute : { name: activeTab }));
 };
 </script>
 
@@ -70,3 +80,9 @@ const onChangeTab = (activeTab) => {
         </template>
     </p-tab>
 </template>
+
+<style scoped lang="postcss">
+.edit-button {
+    margin-right: 0.5rem;
+}
+</style>
