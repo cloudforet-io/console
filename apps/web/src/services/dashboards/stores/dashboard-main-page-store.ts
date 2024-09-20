@@ -11,6 +11,7 @@ import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import type { DashboardTreeDataType, ModalDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
@@ -143,9 +144,11 @@ const _isControlButtonDisabled = (selectedPublicTreeData: TreeNode<DashboardTree
     return result;
 };
 export const useDashboardMainPageStore = defineStore('page-dashboard-main', () => {
+    const appContextStore = useAppContextStore();
     const dashboardStore = useDashboardStore();
     const dashboardState = dashboardStore.state;
     const storeState = reactive({
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
         isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
     const state = reactive({
@@ -161,21 +164,41 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         newIdList: [] as string[],
     });
     const getters = reactive({
+        // admin
+        adminTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => ({
+            clone: getters.selectedPublicTreeData.length === 0,
+            move: getters.selectedPublicTreeData.length === 0,
+            delete: getters.selectedPublicTreeData.length === 0,
+        })),
         // public
         publicDashboardItems: computed<PublicDashboardModel[]>(() => {
-            if (!storeState.isWorkspaceOwner) return [];
-            return dashboardState.publicDashboardItems
-                .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
-                .filter((item) => !(item.resource_group === 'DOMAIN' && item.scope === 'PROJECT'))
-                .filter((d) => d.version === '2.0')
-                || [];
+            if (storeState.isAdminMode) {
+                return dashboardState.publicDashboardItems
+                    .filter((item) => item.resource_group === 'DOMAIN')
+                    || [];
+            }
+            if (storeState.isWorkspaceOwner) {
+                return dashboardState.publicDashboardItems
+                    .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
+                    .filter((item) => !(item.resource_group === 'DOMAIN' && item.project_id === '*'))
+                    .filter((d) => d.version === '2.0')
+                    || [];
+            }
+            return [];
         }),
         publicFolderItems: computed<PublicFolderModel[]>(() => {
-            if (!storeState.isWorkspaceOwner) return [];
-            return dashboardState.publicFolderItems
-                .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
-                .filter((item) => item.resource_group !== 'DOMAIN')
-                || [];
+            if (storeState.isAdminMode) {
+                return dashboardState.publicFolderItems
+                    .filter((item) => item.resource_group === 'DOMAIN')
+                    || [];
+            }
+            if (storeState.isWorkspaceOwner) {
+                return dashboardState.publicFolderItems
+                    .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
+                    .filter((item) => !(item.resource_group === 'DOMAIN' && item.project_id === '*')) // excluded shared to project
+                    || [];
+            }
+            return [];
         }),
         publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
         selectedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.publicDashboardTreeData, state.selectedPublicIdMap)),

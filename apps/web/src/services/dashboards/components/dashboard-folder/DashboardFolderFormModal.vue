@@ -152,6 +152,7 @@ watch(() => state.proxyVisible, (visible) => {
     } else {
         initForm();
         dashboardMainPageStore.reset();
+        state.isPrivate = false;
     }
 });
 
@@ -183,7 +184,7 @@ watch(() => state.proxyVisible, (visible) => {
                     />
                 </template>
             </p-field-group>
-            <p-field-group v-if="dashboardMainPageState.folderFormModalType === 'CREATE'"
+            <p-field-group v-if="dashboardMainPageState.folderFormModalType === 'CREATE' && !storeState.isAdminMode"
                            :label="$t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.MAKE_PRIVATE')"
                            required
             >
