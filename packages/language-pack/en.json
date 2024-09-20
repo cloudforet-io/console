@@ -438,6 +438,7 @@
 					"THIS_MONTH": "This Month",
 					"TITLE": "Anomaly Detection History"
 				},
+				"PERIOD": "Period",
 				"POLICY": {
 					"TITLE": "Policy Management"
 				},

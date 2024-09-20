@@ -103,7 +103,7 @@ const handleSelectPeriod = (periodMenuName: string) => {
             <template #extra>
                 <div class="extra-wrapper">
                     <p-select-dropdown :menu="state.periodMenuItems"
-                                       :selection-label="$t('INVENTORY.ASSET_ANALYSIS.PERIOD.PERIOD')"
+                                       :selection-label="$t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.PERIOD')"
                                        disable-proxy
                                        reset-selection-on-menu-close
                                        style-type="rounded"
