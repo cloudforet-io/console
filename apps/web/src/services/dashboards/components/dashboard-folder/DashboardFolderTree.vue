@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PI, PCheckbox, PIconButton,
+    PI, PCheckbox, PIconButton, PButton,
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
@@ -62,6 +62,11 @@ const state = reactive({
             clickEvent: () => emit('click-refresh'),
         },
     ])),
+    showAll: false,
+    slicedTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
+        if (state.showAll) return props.dashboardTreeData;
+        return props.dashboardTreeData.slice(0, 10);
+    }),
 });
 
 /* Util */
@@ -117,6 +122,9 @@ const handleClickCollapseButton = (node: TreeNode<DashboardTreeDataType>) => {
         state.childrenShowMap = { ...state.childrenShowMap, [node.data.id]: true };
     }
 };
+const handleClickShowAll = () => {
+    state.showAll = true;
+};
 </script>
 
 <template>
@@ -139,7 +147,7 @@ const handleClickCollapseButton = (node: TreeNode<DashboardTreeDataType>) => {
                 />
             </div>
         </div>
-        <div v-for="treeData in props.dashboardTreeData"
+        <div v-for="treeData in state.slicedTreeData"
              :key="`${treeData.data.id}-${treeData.data.type}`"
              class="tree-content-wrapper"
         >
@@ -175,6 +183,16 @@ const handleClickCollapseButton = (node: TreeNode<DashboardTreeDataType>) => {
                     <span>{{ $t('DASHBOARDS.ALL_DASHBOARDS.NO_DASHBOARD') }}</span>
                 </div>
             </template>
+        </div>
+        <div v-if="!state.showAll && props.dashboardTreeData.length > 10"
+             class="show-all-wrapper"
+        >
+            <p-button style-type="transparent"
+                      size="sm"
+                      @click="handleClickShowAll"
+            >
+                {{ $t('DASHBOARDS.ALL_DASHBOARDS.SHOW_ALL') }}
+            </p-button>
         </div>
     </div>
 </template>
@@ -214,6 +232,12 @@ const handleClickCollapseButton = (node: TreeNode<DashboardTreeDataType>) => {
             @apply text-paragraph-md text-gray-300;
             padding: 0.5rem 0.5rem 0.5rem 2.875rem;
         }
+    }
+    .show-all-wrapper {
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 </style>
