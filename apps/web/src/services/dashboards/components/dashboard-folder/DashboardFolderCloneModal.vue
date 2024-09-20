@@ -5,6 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDataTable, PI, PToggleButton, PButtonModal,
 } from '@cloudforet/mirinae';
+import { getClonedName } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
@@ -62,16 +63,6 @@ const state = reactive({
     privateMap: {} as Record<string, boolean>,
 });
 
-/* Util */
-const getUniqueFolderName = (name: string): string => {
-    const _newName = `Clone - ${name}`;
-    return dashboardMainPageGetters.existingFolderNameList.find((n) => n === _newName) ? getUniqueFolderName(_newName) : _newName;
-};
-const getUniqueDashboardName = (name: string): string => {
-    const _newName = `Clone - ${name}`;
-    return dashboardMainPageGetters.existingDashboardNameList.find((n) => n === _newName) ? getUniqueDashboardName(_newName) : _newName;
-};
-
 /* Api */
 const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]> => {
     try {
@@ -92,7 +83,7 @@ const createFolder = async (originFolderName: string, isPrivate: boolean): Promi
     try {
         const fetcher = isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
         const params: FolderCreateParams = {
-            name: getUniqueFolderName(originFolderName),
+            name: getClonedName(dashboardMainPageGetters.existingFolderNameList, originFolderName),
         };
         if (!isPrivate) {
             (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;
@@ -115,7 +106,7 @@ const createDashboard = async (treeData: DashboardTreeDataType, isPrivate?: bool
     const _dashboardWidgets = await listDashboardWidgets(_dashboard.dashboard_id);
     const _sharedLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets, storeState.costDataSource);
     let _sharedDashboard: DashboardCreateParams = {
-        name: getUniqueDashboardName(_dashboard.name),
+        name: getClonedName(dashboardMainPageGetters.existingDashboardNameList, _dashboard.name),
         layouts: _sharedLayouts,
         options: _dashboard.options || {},
         labels: _dashboard.labels || [],
