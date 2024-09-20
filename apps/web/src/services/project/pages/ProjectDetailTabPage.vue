@@ -107,22 +107,10 @@ const singleItemTabState = reactive({
             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
         },
-        // {
-        //     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-        //     label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
-        // },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
         },
-        // {
-        //     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-        //     label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
-        // },
-        // {
-        //     name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
-        //     label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
-        // },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
@@ -202,7 +190,6 @@ watch(() => projectDetailPageState.projectId, async (projectId) => {
     }
 });
 watch(() => route.name, (routeName) => {
-    console.debug('routeName', routeName);
     const flattenTabs = singleItemTabState.tabs.reduce((acc, tab) => {
         if (tab?.subItems) {
             acc.push(...tab.subItems);
