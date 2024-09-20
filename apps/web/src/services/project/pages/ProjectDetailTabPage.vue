@@ -134,7 +134,7 @@ const singleItemTabState = reactive({
         ...singleItemTabState.dahsboardTabs,
     ]),
     dahsboardTabs: computed(() => {
-        const projectDashboardItems = storeState.dashboardList.filter((dashboard) => dashboard.project_id === '*');
+        const projectDashboardItems = storeState.dashboardList.filter((dashboard) => dashboard.project_id === '*' && dashboard.version === '2.0');
         const projectFolderItems = storeState.folderList.filter((folder) => folder.project_id === '*');
 
         const folderTabs = projectFolderItems.map((folder) => ({
