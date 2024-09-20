@@ -2,7 +2,7 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
-// import { useRoute, useRouter } from 'vue-router/composables';
+import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -22,6 +22,10 @@ import type { ProjectModel } from '@/schema/identity/project/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
+import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
+import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -31,6 +35,7 @@ import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, peacock } from '@/styles/colors';
@@ -39,6 +44,7 @@ import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import ProjectMemberInviteModal from '@/services/project/components/ProjectMemberInviteModal.vue';
 import ProjectTagsModal from '@/services/project/components/ProjectTagsModal.vue';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
@@ -54,7 +60,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 // const route = useRoute();
-// const router = useRouter();
+const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
@@ -120,6 +127,12 @@ const tagsState = reactive({
     tags: computed(() => state.currentProject?.tags ?? {}),
 });
 
+const webhooksState = reactive({
+    loading: false,
+    webhookCount: 0,
+    alertActivated: false,
+});
+
 /* Event */
 const handleSelectItem = (selected: MenuItem) => {
     if (selected.name === 'update') projectPageStore.openProjectFormModal();
@@ -127,6 +140,14 @@ const handleSelectItem = (selected: MenuItem) => {
     if (selected.name === 'delete') state.projectDeleteModalVisible = true;
 };
 
+const handleClickWebhook = () => {
+    if (!props.id) return;
+    if (!webhooksState.alertActivated) {
+        router.push(getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id } }));
+        return;
+    }
+    router.push(getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id }, query: { tab: 'webhook' } }));
+};
 const handleOpenMemberModal = () => {
     memberState.memberModalVisible = true;
 };
@@ -172,7 +193,6 @@ const fetchWorkspaceUserList = async () => {
     memberState.loading = true;
     try {
         const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>();
-        console.debug('res', res);
         memberState.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
         memberState.totalCount = res.total_count ?? 0;
     } catch (e) {
@@ -208,10 +228,38 @@ const fetchUserList = () => {
     }
 };
 
+const listWebhooks = async () => {
+    if (!props.id) return;
+    try {
+        const res = await SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
+            project_id: props.id,
+            query: {},
+        });
+        webhooksState.webhookCount = res.total_count ?? 0;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+const getProjectAlertActivated = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.monitoring.projectAlertConfig.list<ProjectAlertConfigListParameters, ListResponse<ProjectAlertConfigModel>>({
+            project_id: props.id,
+        });
+        webhooksState.alertActivated = !!results?.length;
+    } catch (e) {
+        webhooksState.alertActivated = false;
+        ErrorHandler.handleError(e);
+    }
+};
+
 
 /* Watchers */
-watch(() => projectDetailPageGetters.projectType, () => {
-    fetchUserList();
+watch(() => projectDetailPageGetters.projectType, async () => {
+    await Promise.allSettled([
+        getProjectAlertActivated(),
+        listWebhooks(),
+        fetchUserList(),
+    ]);
 }, { immediate: false });
 
 watch(() => projectDetailPageState.projectId, async (projectId) => {
@@ -292,9 +340,10 @@ onUnmounted(() => {
                         <div class="info-item"
                              @click="handleOpenMemberModal"
                         >
-                            <p-i name="ic_member"
-                                 width="0.625rem"
-                                 height="0.625rem"
+                            <p-i class="info-icon"
+                                 name="ic_member"
+                                 width="0.75rem"
+                                 height="0.75rem"
                                  color="inherit"
                             />
                             <span>{{ memberState.totalCount }} Members</span>
@@ -304,13 +353,16 @@ onUnmounted(() => {
                              height="0.125rem"
                              :color="gray[400]"
                         />
-                        <div class="info-item">
-                            <p-i name="ic_webhook"
-                                 width="0.625rem"
-                                 height="0.625rem"
+                        <div class="info-item"
+                             @click="handleClickWebhook"
+                        >
+                            <p-i class="info-icon"
+                                 name="ic_webhook"
+                                 width="0.75rem"
+                                 height="0.75rem"
                                  color="inherit"
                             />
-                            <span>{{ 3 }} Webhooks</span>
+                            <span>{{ webhooksState.webhookCount }} Webhooks</span>
                         </div>
                         <p-i name="ic_dot"
                              width="0.125rem"
@@ -320,9 +372,10 @@ onUnmounted(() => {
                         <div class="info-item"
                              @click="handleOpenTagsModal"
                         >
-                            <p-i name="ic_label "
-                                 width="0.625rem"
-                                 height="0.625rem"
+                            <p-i class="info-icon"
+                                 name="ic_label"
+                                 width="0.75rem"
+                                 height="0.75rem"
                                  color="inherit"
                             />
                             <span>{{ Object.keys(tagsState.tags).length }} Tags</span>
@@ -445,7 +498,9 @@ onUnmounted(() => {
                     .info-item {
                         @apply flex items-center text-label-sm text-gray-700 cursor-pointer;
                         gap: 0.15625rem;
-
+                        .info-icon {
+                            min-width: 0.75rem;
+                        }
                         &.invite-only {
                             @apply text-gray-900 cursor-auto;
                         }
