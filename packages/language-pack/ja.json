@@ -1230,7 +1230,7 @@
 			"SEND_NEW_CODE": "再送信",
 			"SENT_DESC": "認証コードが入力したメールアドレスに送信されました:",
 			"SUCCESS": "確認コードが通知メールに送信されました。",
-			"TITLE": "メールアドレス認証",
+			"TITLE": "",
 			"VERIFICATION_CODE": "認証コード",
 			"VERIFY": "認証"
 		},
@@ -4036,13 +4036,15 @@
 		"MFA": {
 			"BTN_CHANGE": "変更",
 			"BTN_SEND_MAIL": "認証コード送信",
-			"EMAIL": "",
 			"EMAIL_DESC": "",
 			"ENABLE_MFA": "MFA有効化",
 			"MS_DESC": "",
-			"MS_TITLE": "",
 			"STATE_NOT_VERIFIED": "認証されていません",
 			"STATE_VERIFIED": "認証済みです",
+			"STEP1": "",
+			"STEP2": "",
+			"STEP3": "",
+			"STEP_DESC": "",
 			"SYNC": "",
 			"TITLE": "マルチファクタ認証",
 			"TYPE": "MFAタイプ"
