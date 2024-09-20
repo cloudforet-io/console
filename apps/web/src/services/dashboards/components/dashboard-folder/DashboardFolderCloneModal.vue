@@ -144,7 +144,7 @@ const handleCloneConfirm = async () => {
     state.loading = true;
     const _createDashboardPromises: Promise<void>[] = [];
 
-    await Promise.allSettled(dashboardMainPageGetters.selectedTreeData.map(async (item) => {
+    await Promise.allSettled(state.selectedTreeData.map(async (item) => {
         const _isPrivate = state.privateMap[item.data.id];
         if (item.data.type === 'FOLDER') {
             const createdFolderId = await createFolder(item.data.name, _isPrivate);

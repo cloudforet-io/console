@@ -1819,6 +1819,7 @@
 			"PRIVATE": "Private",
 			"PROJECT": "Project",
 			"SHARED": "Shared",
+			"SHOW_ALL": "Show all",
 			"SINGLE_PROJECT": "Single Project",
 			"TOOLTIP_CLONE": "Clone",
 			"TOOLTIP_DELETE": "Delete",

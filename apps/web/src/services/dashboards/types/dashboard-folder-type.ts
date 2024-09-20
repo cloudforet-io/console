@@ -10,6 +10,7 @@ export interface DashboardTreeDataType extends TreeData {
     scope?: string;
     userId?: string;
     createdBy?: string;
+    isNew?: boolean;
 }
 
 export interface ModalDataTableItem {

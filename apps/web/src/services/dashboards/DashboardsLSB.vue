@@ -30,6 +30,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { gray } from '@/styles/colors';
 
+import DashboardLSBTree from '@/services/dashboards/components/dashboard-main/DashboardLSBTree.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 const route = useRoute();
@@ -276,12 +277,8 @@ callApiWithGrantGuard();
                                          is-sub-item
                                          show-sub-item-count
             >
-                <template #collapsible-contents="{ item: _item }">
-                    <l-s-b-menu-item v-for="item in _item?.subItems"
-                                     :key="item.id"
-                                     :menu-data="item"
-                                     :current-path="state.currentPath"
-                    />
+                <template #collapsible-contents>
+                    <dashboard-l-s-b-tree type="PUBLIC" />
                 </template>
             </l-s-b-collapsible-menu-item>
         </template>
@@ -296,12 +293,8 @@ callApiWithGrantGuard();
                                          is-sub-item
                                          show-sub-item-count
             >
-                <template #collapsible-contents="{ item: _item }">
-                    <l-s-b-menu-item v-for="item in _item?.subItems"
-                                     :key="item.id"
-                                     :menu-data="item"
-                                     :current-path="state.currentPath"
-                    />
+                <template #collapsible-contents>
+                    <dashboard-l-s-b-tree type="PRIVATE" />
                 </template>
             </l-s-b-collapsible-menu-item>
         </template>

@@ -12,6 +12,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import NewMark from '@/common/components/marks/NewMark.vue';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -107,6 +108,9 @@ const handleEditFolderName = () => {
                              height="1rem"
                         />
                         <span class="text">{{ node.data.name }}</span>
+                        <div v-if="node.data.isNew">
+                            <new-mark class="new-mark" />
+                        </div>
                         <div class="hidden-wrapper">
                             <favorite-button v-if="node.data.type === 'DASHBOARD'"
                                              :item-id="node.data.id"
@@ -165,6 +169,9 @@ const handleEditFolderName = () => {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
+                }
+                .new-mark {
+                    margin-left: 0;
                 }
             }
             .right-part {

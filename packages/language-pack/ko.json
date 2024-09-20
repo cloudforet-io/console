@@ -1819,6 +1819,7 @@
 			"PRIVATE": "비공개",
 			"PROJECT": "프로젝트",
 			"SHARED": "공유됨",
+			"SHOW_ALL": "",
 			"SINGLE_PROJECT": "개별 프로젝트",
 			"TOOLTIP_CLONE": "복제",
 			"TOOLTIP_DELETE": "삭제",
