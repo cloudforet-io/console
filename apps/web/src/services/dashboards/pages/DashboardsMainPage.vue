@@ -34,6 +34,7 @@ import DashboardMainFolderFormModal
     from '@/services/dashboards/components/dashboard-folder/DashboardFolderFormModal.vue';
 import DashboardFolderMoveModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderMoveModal.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
+import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
@@ -274,6 +275,9 @@ onUnmounted(() => {
                 <div v-if="state.isWorkspaceOwner"
                      class="tree-wrapper"
                 >
+                    <dashboard-folder-tree-title :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SHARED')"
+                                                 :is-collapsed.sync="state.treeCollapseMap.public"
+                    />
                     <dashboard-folder-tree v-if="!state.treeCollapseMap.public"
                                            :selected-id-map="dashboardMainPageState.selectedPublicIdMap"
                                            :dashboard-tree-data="dashboardMainPageGetters.publicDashboardTreeData"
@@ -285,6 +289,9 @@ onUnmounted(() => {
                     />
                 </div>
                 <div class="tree-wrapper">
+                    <dashboard-folder-tree-title :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
+                                                 :is-collapsed.sync="state.treeCollapseMap.private"
+                    />
                     <dashboard-folder-tree v-if="!state.treeCollapseMap.private"
                                            :selected-id-map="dashboardMainPageState.selectedPrivateIdMap"
                                            :dashboard-tree-data="dashboardMainPageGetters.privateDashboardTreeData"
