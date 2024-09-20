@@ -33,6 +33,7 @@ import DashboardFolderDeleteModal
 import DashboardMainFolderFormModal
     from '@/services/dashboards/components/dashboard-folder/DashboardFolderFormModal.vue';
 import DashboardFolderMoveModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderMoveModal.vue';
+import DashboardFolderShareModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderShareModal.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
@@ -297,6 +298,9 @@ onUnmounted(() => {
             />
             <dashboard-folder-clone-modal :visible="dashboardMainPageState.folderCloneModalVisible"
                                           @update:visible="dashboardMainPageStore.setFolderCloneModalVisible"
+            />
+            <dashboard-folder-share-modal :visible="dashboardMainPageState.folderShareModalVisible"
+                                          @update:visible="dashboardMainPageStore.setFolderShareModalVisible"
             />
         </p-data-loader>
     </div>
