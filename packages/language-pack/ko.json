@@ -4039,6 +4039,8 @@
 			"EMAIL_DESC": "",
 			"ENABLE_MFA": "MFA 활성화",
 			"MS_DESC": "",
+			"RESYNC_DESC": "",
+			"RESYNC_TITLE": "",
 			"STATE_NOT_VERIFIED": "인증되지 않음",
 			"STATE_VERIFIED": "인증됨",
 			"STEP1": "",
