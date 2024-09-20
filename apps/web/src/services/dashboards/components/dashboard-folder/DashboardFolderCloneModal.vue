@@ -12,6 +12,7 @@ import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { DashboardCreateParams } from '@/schema/dashboard/_types/dashboard-type';
 import type { FolderCreateParams } from '@/schema/dashboard/_types/folder-type';
 import type { WidgetModel, WidgetListParams } from '@/schema/dashboard/_types/widget-type';
+import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -105,7 +106,7 @@ const createDashboard = async (treeData: DashboardTreeDataType, isPrivate?: bool
         : dashboardMainPageGetters.privateDashboardItems.find((item) => item.dashboard_id === treeData.id);
     const _dashboardWidgets = await listDashboardWidgets(_dashboard.dashboard_id);
     const _sharedLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets, storeState.costDataSource);
-    let _sharedDashboard: DashboardCreateParams = {
+    const _sharedDashboard: DashboardCreateParams = {
         name: getClonedName(dashboardMainPageGetters.existingDashboardNameList, _dashboard.name),
         layouts: _sharedLayouts,
         options: _dashboard.options || {},
@@ -114,15 +115,9 @@ const createDashboard = async (treeData: DashboardTreeDataType, isPrivate?: bool
         folder_id: folderId,
     };
     if (storeState.isAdminMode) {
-        _sharedDashboard = {
-            ..._sharedDashboard,
-            resource_group: RESOURCE_GROUP.DOMAIN,
-        };
+        (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
     } else if (!isPrivate) {
-        _sharedDashboard = {
-            ..._sharedDashboard,
-            resource_group: _dashboard?.resource_group || RESOURCE_GROUP.WORKSPACE,
-        };
+        (_sharedDashboard as PublicDashboardCreateParameters).resource_group = _dashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
     }
     const createdDashboard = await dashboardStore.createDashboard(_dashboardType, _sharedDashboard);
     dashboardMainPageStore.setNewIdList([
@@ -140,9 +135,7 @@ const handleCloneConfirm = async () => {
         const _isPrivate = state.privateMap[item.data.id];
         if (item.data.type === 'FOLDER') {
             const createdFolderId = await createFolder(item.data.name, _isPrivate);
-            if (!createdFolderId) {
-                return;
-            }
+            if (!createdFolderId) return;
             item.children.forEach((child) => {
                 _createDashboardPromises.push(createDashboard(child.data, _isPrivate, createdFolderId));
             });
