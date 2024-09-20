@@ -45,6 +45,10 @@ type DashboardUpdateParameters = PublicDashboardUpdateParameters | PrivateDashbo
 type DashboardDeleteParameters = PublicDashboardDeleteParameters | PrivateDashboardDeleteParameters;
 type FolderListParameters = PublicFolderListParameters|PrivateFolderListParameters;
 type FolderModel = PublicFolderModel|PrivateFolderModel;
+interface LoadOptions {
+    isProjectDashboard?: boolean;
+}
+
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
@@ -156,7 +160,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const publicDashboardApiQueryHelper = new ApiQueryHelper();
-    const load = async (isProject?: boolean) => {
+    const load = async (options?: LoadOptions) => {
+        const { isProjectDashboard } = options || {};
         publicDashboardApiQueryHelper.setFilters([]);
         if (_state.isAdminMode) {
             publicDashboardApiQueryHelper.addFilter({
@@ -172,7 +177,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             });
         }
 
-        if (isProject) {
+        if (isProjectDashboard) {
             publicDashboardApiQueryHelper.addFilter({
                 k: 'project_id',
                 v: '*',
@@ -192,7 +197,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
                 _fetchDashboard('PUBLIC', _publicDashboardParams),
                 _fetchFolder('PUBLIC', _publicDashboardParams),
             ]);
-        } else if (isProject) {
+        } else if (isProjectDashboard) {
             await Promise.all([
                 _fetchDashboard('PUBLIC', _publicDashboardParams),
                 _fetchFolder('PUBLIC', _publicDashboardParams),
