@@ -233,7 +233,6 @@ const listWebhooks = async () => {
     try {
         const res = await SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
             project_id: props.id,
-            query: {},
         });
         webhooksState.webhookCount = res.total_count ?? 0;
     } catch (e) {
