@@ -7,7 +7,7 @@ import { uniq } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldTitle, PToolbox, PEmpty,
+    PFieldTitle, PToolbox, PEmpty, PPaneLayout,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -117,7 +117,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="project-main">
+    <p-pane-layout class="project-main">
         <p-toolbox class="project-tool-box"
                    :page-size="state.pageSize"
                    :total-count="state.filteredCardList.length"
@@ -179,11 +179,12 @@ onMounted(async () => {
                 </div>
             </p-empty>
         </div>
-    </div>
+    </p-pane-layout>
 </template>
 
 <style scoped lang="postcss">
 .project-main {
+    padding: 1.5rem 1rem 2.5rem;
 
     .project-tool-box {
         margin-bottom: 0.5rem;

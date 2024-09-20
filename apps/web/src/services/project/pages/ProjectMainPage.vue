@@ -6,7 +6,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PHeading, PButton, PContextMenu, useContextMenuController, PIconButton,
+    PHeading, PButton, PContextMenu, PIconButton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -22,6 +22,8 @@ import { MENU_ID } from '@/lib/menu/config';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+
+import { indigo, peacock } from '@/styles/colors';
 
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import ProjectGroupMemberManagementModal from '@/services/project/components/ProjectGroupMemberManagementModal.vue';
@@ -53,14 +55,19 @@ const storeState = reactive({
 
 const state = reactive({
     currentProjectGroupId: computed(() => route.params.projectGroupId),
+    createMenuVisible: false,
     createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: 'project',
             label: i18n.t('PROJECT.LANDING.PROJECT') as string,
+            icon: 'ic_document-filled',
+            iconColor: peacock[600],
         },
         {
             name: 'projectGroup',
             label: i18n.t('PROJECT.LANDING.PROJECT_GROUP') as string,
+            icon: 'ic_folder-filled',
+            iconColor: indigo[500],
         },
     ])),
     projectGroupModalVisible: false,
@@ -79,18 +86,9 @@ const modalState = reactive({
     projectGroupUpdateMode: false,
 });
 
-const {
-    visibleMenu,
-    contextMenuStyle,
-    showContextMenu,
-    hideContextMenu,
-} = useContextMenuController({
-    useFixedStyle: true,
-    targetRef,
-    contextMenuRef: menuRef,
-    menu: state.createDropdownMenuItems,
+onClickOutside(menuRef, () => {
+    state.createMenuVisible = false;
 });
-onClickOutside(menuRef, hideContextMenu);
 
 /* Event */
 const handleClickProjectGroupEditButton = () => {
@@ -109,7 +107,7 @@ const handleClickAddProjectGroupMember = () => {
     state.projectGroupMemberManagementModalVisible = true;
 };
 const handleClickCreateButton = () => {
-    showContextMenu();
+    state.createMenuVisible = !state.createMenuVisible;
 };
 const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
@@ -170,22 +168,23 @@ onUnmounted(() => {
                               class="pl-1"
                         >({{ state.projectGroupMemberCount }})</span>
                     </p-button>
-                    <template v-if="projectPageState.isWorkspaceOwner">
+                    <div v-if="projectPageState.isWorkspaceOwner"
+                         class="create-button-wrapper"
+                    >
                         <p-button ref="targetRef"
                                   icon-left="ic_plus_bold"
                                   @click="handleClickCreateButton"
                         >
                             {{ $t('PROJECT.LANDING.CREATE') }}
                         </p-button>
-                        <p-context-menu v-show="visibleMenu"
+                        <p-context-menu v-show="state.createMenuVisible"
                                         ref="menuRef"
                                         class="create-context-menu"
                                         no-select-indication
-                                        :style="contextMenuStyle"
                                         :menu="state.createDropdownMenuItems"
                                         @select="handleSelectCreateMenu"
                         />
-                    </template>
+                    </div>
                 </div>
             </template>
         </p-heading>
@@ -241,7 +240,15 @@ onUnmounted(() => {
     float: right;
     margin-left: auto;
     .create-context-menu {
+        @apply absolute;
+        top: 100%;
+        right: 0;
         z-index: 10;
+        width: max-content;
+    }
+    .create-button-wrapper {
+        @apply relative inline-block;
+        height: 2rem;
     }
 }
 
@@ -267,4 +274,9 @@ onUnmounted(() => {
     @apply flex-grow;
 }
 
+/* custom design-system component - p-heading */
+:deep(.p-heading) {
+    @apply border-none;
+    padding-bottom: 0;
+}
 </style>
