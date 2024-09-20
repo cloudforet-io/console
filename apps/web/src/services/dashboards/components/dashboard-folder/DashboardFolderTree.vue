@@ -227,7 +227,9 @@ const handleClickCloneButton = () => {
     .tree-content-wrapper {
         &:last-child {
             .folder-row-wrapper {
-                @apply border-0;
+                &:last-child {
+                    @apply border-b-0;
+                }
             }
         }
     }
