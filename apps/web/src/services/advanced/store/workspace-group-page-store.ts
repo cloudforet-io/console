@@ -98,6 +98,11 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             ]);
         return workspacesInSelectedGroupApiQuery.data;
     };
+
+    const workspaceGroupListApiQueryHelper = new ApiQueryHelper()
+        .setPageStart(state.pageStart).setPageLimit(state.pageLimit)
+        .setSort('name', true);
+    const workspaceGroupListApiQuery = workspaceGroupListApiQueryHelper.data;
     const actions = {
         updateModalSettings: ({
             type, title, themeColor = 'primary', visible, additionalData = {},
@@ -159,7 +164,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
 
             try {
                 const { results } = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceGroupListParameters, ListResponse<WorkspaceGroupModel>>({
-                    query: option?.query,
+                    query: option?.query ?? workspaceGroupListApiQuery,
                 });
 
                 state.workspaceGroups = results || [];
