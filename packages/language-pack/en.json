@@ -2838,6 +2838,7 @@
 				"ALT_S_ADD_USERS": "Users successfully added",
 				"ALT_S_ADD_WORKSPACE": "Workspaces successfully added",
 				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
+				"ALT_S_EDIT_WORKSPACE": "Workspace Group successfully updated",
 				"CREATE_DROP_DOWN_PLACEHOLDER": "Select Workspaces",
 				"CREATE_GROUP_NAME": "Name",
 				"CREATE_GROUP_NAME_PLACEHOLDER": "Enter Name",

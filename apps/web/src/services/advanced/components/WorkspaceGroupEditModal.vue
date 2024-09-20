@@ -6,6 +6,9 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import type { WorkspaceGroupUpdateParameters } from '@/schema/identity/workspace-group/api-verbs/update';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -32,6 +35,7 @@ const updateWorkspaceGroups = async () => {
             workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
             name: state.groupName,
         });
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_EDIT_WORKSPACE'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

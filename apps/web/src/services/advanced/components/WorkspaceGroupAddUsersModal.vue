@@ -268,4 +268,15 @@ watch(() => userDropdownState.searchText, debounce(async () => {
         }
     }
 }
+
+/* custom design-system component - p-button-modal */
+:deep(.p-button-modal) {
+    .modal-content {
+        .header {
+            .modal-header {
+                word-break: break-all;
+            }
+        }
+    }
+}
 </style>

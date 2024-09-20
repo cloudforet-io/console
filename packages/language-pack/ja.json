@@ -2838,6 +2838,7 @@
 				"ALT_S_ADD_USERS": "ユーザー追加完了",
 				"ALT_S_ADD_WORKSPACE": "",
 				"ALT_S_CREATE_WORKSPACE": "ワークスペースグループの作成が完了しました",
+				"ALT_S_EDIT_WORKSPACE": "ワークスペースグループが正常に更新されました",
 				"CREATE_DROP_DOWN_PLACEHOLDER": "ワークスペースの選択",
 				"CREATE_GROUP_NAME": "名前",
 				"CREATE_GROUP_NAME_PLACEHOLDER": "名前を入力",
