@@ -69,8 +69,8 @@ const handleSelectProjectGroup = () => {
 
 <style scoped lang="postcss">
 .project-main-project-group-card {
-    @apply flex items-center justify-between bg-white border border-gray-200 rounded-lg cursor-pointer;
-    height: 2.625rem;
+    @apply flex items-center justify-between bg-gray-100 rounded-lg cursor-pointer;
+    height: 3rem;
     padding: 0.75rem;
 
     .project-group-item {
@@ -90,7 +90,7 @@ const handleSelectProjectGroup = () => {
     }
 
     &:hover {
-        @apply bg-blue-100;
+        @apply bg-gray-150;
 
         .favorite-button {
             display: block;

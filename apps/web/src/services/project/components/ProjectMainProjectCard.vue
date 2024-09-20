@@ -129,9 +129,8 @@ const handleSelectProject = () => {
                     <span class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
                 </router-link>
             </div>
-            <p-badge v-if="item.projectType === 'PRIVATE'"
-                     badge-type="subtle"
-                     style-type="gray100"
+            <div v-if="item.projectType === 'PRIVATE'"
+                 class="private-badge"
             >
                 <p-i name="ic_lock-filled"
                      scale="0.8"
@@ -139,24 +138,26 @@ const handleSelectProject = () => {
                      class="badge-icon"
                 />
                 {{ $t('PROJECT.LANDING.INVITE_ONLY') }}
-            </p-badge>
+            </div>
         </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .project-main-project-card {
-    @apply flex flex-col justify-between bg-white border border-gray-200 rounded-lg cursor-pointer;
-    height: 6.625rem;
-    padding: 1rem 1rem 0.75rem;
+    @apply flex flex-col justify-between bg-gray-100 rounded-lg cursor-pointer;
+    height: 6.5rem;
+    padding: 0.75rem 0.75rem 1rem;
 
     .main-contents {
         .title-wrapper {
             @apply flex items-center justify-between;
             .title {
-                @apply flex gap-1 items-center text-label-lg text-gray-900;
+                @apply flex gap-1 items-center text-paragraph-md text-gray-900;
                 margin-bottom: 0.25rem;
             }
+
+
         }
         .project-group {
             @apply text-label-md text-gray-600;
@@ -205,7 +206,7 @@ const handleSelectProject = () => {
             }
         }
         .account-add {
-            @apply flex-shrink-0 inline-flex text-gray-900;
+            @apply flex-shrink-0 inline-flex text-gray-700;
             .add-label {
                 @apply text-xs;
                 line-height: 1.2;
@@ -216,8 +217,12 @@ const handleSelectProject = () => {
                 }
             }
         }
-        .badge-icon {
-            margin-right: 0.125rem;
+        .private-badge {
+            @apply text-gray-500 flex items-center text-label-sm;
+            gap: 0.125rem;
+            .badge-icon {
+                margin-right: 0.125rem;
+            }
         }
     }
 
@@ -229,11 +234,30 @@ const handleSelectProject = () => {
         }
     }
 
-    &:hover {
-        @apply bg-blue-100;
+    .toolset-group {
+        @apply flex gap-1 items-center;
+        display: none;
+    }
 
+    &:hover {
+        @apply bg-gray-150;
+
+        .toolset-group {
+            display: flex;
+        }
         .favorite-button {
             display: block;
+        }
+    }
+}
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    .dropdown-button-component {
+        @apply bg-white rounded-full;
+
+        &.opened {
+            @apply rounded-full;
         }
     }
 }
