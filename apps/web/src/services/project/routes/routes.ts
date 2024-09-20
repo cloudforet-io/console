@@ -12,7 +12,7 @@ const ProjectMainPage = () => import('@/services/project/pages/ProjectMainPage.v
 const ProjectDetailPageNew = () => import('@/services/project/pages/ProjectDetailPageNew.vue');
 const ProjectDetailTabPage = () => import('@/services/project/pages/ProjectDetailTabPage.vue');
 
-const ProjectOverviewPage = () => import('@/services/project/pages/ProjectOverviewPage.vue');
+const ProjectSummaryPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
 const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
 const ProjectAlertWebhookCreatePage = () => import('@/services/project/pages/ProjectAlertWebhookCreatePage.vue');
 const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectNotificationPage.vue');
@@ -55,7 +55,7 @@ export default {
                             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                             meta: { lsbVisible: true },
                             props: true,
-                            component: ProjectOverviewPage,
+                            component: ProjectSummaryPage,
                         },
                         // {
                         //     path: 'member',
