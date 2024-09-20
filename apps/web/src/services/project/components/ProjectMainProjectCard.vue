@@ -3,7 +3,7 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PI, PBadge, PTextHighlighting } from '@cloudforet/mirinae';
+import { PI, PTextHighlighting } from '@cloudforet/mirinae';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -156,8 +156,6 @@ const handleSelectProject = () => {
                 @apply flex gap-1 items-center text-paragraph-md text-gray-900;
                 margin-bottom: 0.25rem;
             }
-
-
         }
         .project-group {
             @apply text-label-md text-gray-600;
