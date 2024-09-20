@@ -438,6 +438,7 @@
 					"THIS_MONTH": "今月",
 					"TITLE": "コスト異常検知履歴"
 				},
+				"PERIOD": "期間",
 				"POLICY": {
 					"TITLE": "ポリシー管理"
 				},
