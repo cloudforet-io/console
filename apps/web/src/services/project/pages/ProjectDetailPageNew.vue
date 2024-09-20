@@ -415,6 +415,7 @@ onUnmounted(() => {
                                                    @confirm="handleConfirmProjectGroupMoveModal"
             />
         </div>
+        <router-view />
     </div>
 </template>
 

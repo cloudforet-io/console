@@ -6,8 +6,8 @@ export const PROJECT_ROUTE = Object.freeze({
         _NAME: `${MENU_ID.PROJECT}.detail`,
         TAB: {
             _NAME: `${MENU_ID.PROJECT}.detail.tab`,
-            DASHBOARD: { _NAME: `${MENU_ID.PROJECT}.detail.tab.dashboard` },
-            MEMBER: { _NAME: `${MENU_ID.PROJECT}.detail.tab.member` },
+            OVERVIEW: { _NAME: `${MENU_ID.PROJECT}.detail.tab.overview` },
+            // MEMBER: { _NAME: `${MENU_ID.PROJECT}.detail.tab.member` },
             ALERT: {
                 _NAME: `${MENU_ID.PROJECT}.detail.tab.alert`,
                 WEBHOOK: {
@@ -18,7 +18,8 @@ export const PROJECT_ROUTE = Object.freeze({
                 _NAME: `${MENU_ID.PROJECT}.detail.tab.notification`,
                 ADD: { _NAME: `${MENU_ID.PROJECT}.detail.tab.notification.add` },
             },
-            TAG: { _NAME: `${MENU_ID.PROJECT}.detail.tab.tag` },
+            // TAG: { _NAME: `${MENU_ID.PROJECT}.detail.tab.tag` },
+            DASHBOARD: { _NAME: `${MENU_ID.PROJECT}.detail.tab.dashboard` },
         },
         EVENT_RULE: { _NAME: `${MENU_ID.PROJECT}.detail.tab.alert.event_rule` },
     },

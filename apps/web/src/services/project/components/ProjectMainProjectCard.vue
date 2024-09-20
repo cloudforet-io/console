@@ -52,7 +52,7 @@ const getProvider = (name: string): ProviderItem => storeState.providers[name] |
 
 const handleSelectProject = () => {
     router.push(getProperRouteLocation({
-        name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+        name: PROJECT_ROUTE.DETAIL.TAB.OVERVIEW._NAME,
         params: {
             id: props.item.id as string,
         },

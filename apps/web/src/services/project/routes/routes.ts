@@ -8,15 +8,14 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 const ProjectContainer = () => import('@/services/project/ProjectContainer.vue');
 
 const ProjectMainPage = () => import('@/services/project/pages/ProjectMainPage.vue');
-const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
+// const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
+const ProjectDetailPageNew = () => import('@/services/project/pages/ProjectDetailPageNew.vue');
 const ProjectDetailTabPage = () => import('@/services/project/pages/ProjectDetailTabPage.vue');
 
-const ProjectDashboardPage = () => import('@/services/project/pages/ProjectDashboardPage.vue');
-const ProjectMemberPage = () => import('@/services/project/pages/ProjectMemberPage.vue');
+const ProjectOverviewPage = () => import('@/services/project/pages/ProjectOverviewPage.vue');
 const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
 const ProjectAlertWebhookCreatePage = () => import('@/services/project/pages/ProjectAlertWebhookCreatePage.vue');
 const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectNotificationPage.vue');
-const ProjectTagPage = () => import('@/services/project/pages/ProjectTagPage.vue');
 const ProjectAlertEventRulePage = () => import('@/services/project/pages/ProjectAlertEventRulePage.vue');
 const ProjectNotificationAddPage = () => import('@/services/project/pages/ProjectNotificationAddPage.vue');
 export default {
@@ -40,31 +39,31 @@ export default {
         {
             path: 'detail/:id',
             name: PROJECT_ROUTE.DETAIL._NAME,
-            redirect: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+            redirect: PROJECT_ROUTE.DETAIL.TAB.OVERVIEW._NAME,
             props: true,
-            component: ProjectDetailPage,
+            component: ProjectDetailPageNew,
             children: [
                 {
                     path: '/',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
-                    redirect: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+                    redirect: PROJECT_ROUTE.DETAIL.TAB.OVERVIEW._NAME,
                     props: true,
                     component: ProjectDetailTabPage,
                     children: [
                         {
-                            path: 'dashboard',
-                            name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+                            path: 'overview',
+                            name: PROJECT_ROUTE.DETAIL.TAB.OVERVIEW._NAME,
                             meta: { lsbVisible: true },
                             props: true,
-                            component: ProjectDashboardPage,
+                            component: ProjectOverviewPage,
                         },
-                        {
-                            path: 'member',
-                            name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-                            meta: { lsbVisible: true },
-                            props: true,
-                            component: ProjectMemberPage,
-                        },
+                        // {
+                        //     path: 'member',
+                        //     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
+                        //     meta: { lsbVisible: true },
+                        //     props: true,
+                        //     component: ProjectMemberPage,
+                        // },
                         {
                             path: 'alert',
                             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
@@ -80,12 +79,19 @@ export default {
                             component: ProjectNotificationsPage,
                         },
                         {
-                            path: 'tag',
-                            name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
+                            path: 'dashboard/:dashboardId',
+                            name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
                             meta: { lsbVisible: true },
                             props: true,
-                            component: ProjectTagPage,
+                            component: ProjectNotificationsPage,
                         },
+                        // {
+                        //     path: 'tag',
+                        //     name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
+                        //     meta: { lsbVisible: true },
+                        //     props: true,
+                        //     component: ProjectTagPage,
+                        // },
                         {
                             path: '*',
                             redirect: 'member',
