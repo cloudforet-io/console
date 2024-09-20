@@ -146,7 +146,6 @@ const handleCloneConfirm = async () => {
     state.loading = true;
     const _createDashboardPromises: Promise<boolean>[] = [];
 
-    // 상단 버튼 클릭 시
     await Promise.all(dashboardMainPageGetters.selectedTreeData.map(async (item) => {
         if (item.data.type === 'FOLDER') {
             const _isPrivate = state.privateMap[item.data.id];
