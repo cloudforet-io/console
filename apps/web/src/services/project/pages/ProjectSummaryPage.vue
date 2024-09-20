@@ -50,7 +50,7 @@ const getProjectAlertConfig = async () => {
 </script>
 
 <template>
-    <div class="grid grid-cols-12 project-dashboard-page">
+    <div class="grid grid-cols-12 project-summary-page">
         <project-summary-all-summary-widget
             class="col-span-12"
             :project-id="props.id"
@@ -104,7 +104,7 @@ const getProjectAlertConfig = async () => {
     }
 }
 
-.project-dashboard-page {
+.project-summary-page {
     grid-gap: 1rem;
     padding: 2rem 1rem 0;
 

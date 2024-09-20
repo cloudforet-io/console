@@ -20,6 +20,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
@@ -50,12 +51,15 @@ const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
+const dashboardStore = useDashboardStore();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     selectedWebhookItem: computed<WebhookModel|undefined>(() => projectDetailPageGetters.selectedWebhookItem),
     language: computed(() => store.state.user.language),
+    dashboardList: computed(() => dashboardStore.state.publicDashboardItems),
+    folderList: computed(() => dashboardStore.state.publicFolderItems),
 });
 const state = reactive({
     item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
@@ -103,22 +107,10 @@ const singleItemTabState = reactive({
             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
         },
-        // {
-        //     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-        //     label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
-        // },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
         },
-        // {
-        //     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-        //     label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
-        // },
-        // {
-        //     name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
-        //     label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
-        // },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
@@ -127,7 +119,33 @@ const singleItemTabState = reactive({
             name: 'divider',
             tabType: 'divider',
         },
+        ...singleItemTabState.dahsboardTabs,
     ]),
+    dahsboardTabs: computed(() => {
+        const projectDashboardItems = storeState.dashboardList.filter((dashboard) => dashboard.project_id === '*' && dashboard.version === '2.0');
+        const projectFolderItems = storeState.folderList.filter((folder) => folder.project_id === '*');
+
+        const folderTabs = projectFolderItems.map((folder) => ({
+            name: folder.folder_id,
+            label: folder.name,
+            tabType: 'folder',
+            icon: 'ic_folder',
+            subItems: projectDashboardItems.filter((dashboard) => dashboard.folder_id === folder.folder_id).map((dashboard) => ({
+                name: dashboard.dashboard_id,
+                label: dashboard.name,
+                icon: 'ic_service_dashboard',
+            })),
+        }));
+        const dashboardTabs = projectDashboardItems.filter((dashboard) => !dashboard.folder_id).map((dashboard) => ({
+            name: dashboard.dashboard_id,
+            label: dashboard.name,
+            icon: 'ic_service_dashboard',
+        }));
+        return [
+            ...folderTabs,
+            ...dashboardTabs,
+        ];
+    }),
     activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
     webhookDetailTab: computed<TabItem[]>(() => {
         const defaultTab = [{
@@ -155,6 +173,10 @@ const tableState = reactive({
     ]),
 });
 
+const listProjectDashboard = async () => {
+    await dashboardStore.load();
+};
+
 /* Watchers */
 watch(() => storeState.selectedWebhookItem, () => {
     singleItemTabState.webhookDetailActiveTab = 'details';
@@ -167,7 +189,7 @@ watch(() => projectDetailPageState.projectId, async (projectId) => {
         ]);
     }
 });
-watch(() => route.name, () => {
+watch(() => route.name, (routeName) => {
     const flattenTabs = singleItemTabState.tabs.reduce((acc, tab) => {
         if (tab?.subItems) {
             acc.push(...tab.subItems);
@@ -177,7 +199,11 @@ watch(() => route.name, () => {
         return acc;
     }, [] as TabItem[]);
     const exactRoute = route.matched.find((d) => flattenTabs.find((tab) => tab.name === d.name));
-    singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
+    if (routeName === PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME) {
+        singleItemTabState.activeTab = route.params.dashboardId;
+    } else {
+        singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
+    }
 }, { immediate: true });
 watch([
     () => props.id,
@@ -197,9 +223,11 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 
 onMounted(async () => {
     state.webhookTypeList = await projectDetailPageStore.getListWebhookType();
+    await listProjectDashboard();
 });
 onUnmounted(() => {
     projectDetailPageStore.reset();
+    dashboardStore.reset();
 });
 </script>
 
@@ -215,7 +243,8 @@ onUnmounted(() => {
                                  :height="522"
             >
                 <template #container="{ height }">
-                    <project-detail-tab :style="{ height: `${height}px` }"
+                    <project-detail-tab :id="props.id"
+                                        :style="{ height: `${height}px` }"
                                         :item="state.item"
                                         :tabs="singleItemTabState.tabs"
                                         :active-tab.sync="singleItemTabState.activeTab"
@@ -290,7 +319,8 @@ onUnmounted(() => {
             </p-tab>
         </div>
         <div v-else>
-            <project-detail-tab :item="state.item"
+            <project-detail-tab :id="props.id"
+                                :item="state.item"
                                 :tabs="singleItemTabState.tabs"
                                 :active-tab.sync="singleItemTabState.activeTab"
             />

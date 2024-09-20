@@ -11,7 +11,7 @@ const ProjectMainPage = () => import('@/services/project/pages/ProjectMainPage.v
 // const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
 const ProjectDetailPageNew = () => import('@/services/project/pages/ProjectDetailPageNew.vue');
 const ProjectDetailTabPage = () => import('@/services/project/pages/ProjectDetailTabPage.vue');
-
+const ProjectDashboardPage = () => import('@/services/project/pages/ProjectDashboardPage.vue');
 const ProjectSummaryPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
 const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
 const ProjectAlertWebhookCreatePage = () => import('@/services/project/pages/ProjectAlertWebhookCreatePage.vue');
@@ -83,7 +83,7 @@ export default {
                             name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
                             meta: { lsbVisible: true },
                             props: true,
-                            component: ProjectNotificationsPage,
+                            component: ProjectDashboardPage,
                         },
                         // {
                         //     path: 'tag',
