@@ -18,7 +18,7 @@ import type { DashboardTreeDataType, ModalDataTableItem } from '@/services/dashb
 
 type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
 type FolderModel = PublicFolderModel | PrivateFolderModel;
-const _getDashboardTreeData = (folderList: FolderModel[], dashboardList: DashboardModel[]): TreeNode<DashboardTreeDataType>[] => {
+const _getDashboardTreeData = (folderList: FolderModel[], dashboardList: DashboardModel[], newIdList: string[]): TreeNode<DashboardTreeDataType>[] => {
     const nodes: Record<string, TreeNode<DashboardTreeDataType>> = {};
     folderList.forEach((d) => {
         nodes[d.folder_id] = {
@@ -28,6 +28,7 @@ const _getDashboardTreeData = (folderList: FolderModel[], dashboardList: Dashboa
                 name: d.name,
                 type: 'FOLDER',
                 id: d.folder_id,
+                isNew: newIdList.includes(d.folder_id),
             },
             children: [],
         };
@@ -45,6 +46,7 @@ const _getDashboardTreeData = (folderList: FolderModel[], dashboardList: Dashboa
                 scope: d?.scope,
                 userId: d?.user_id,
                 createdBy: d.tags?.created_by,
+                isNew: newIdList.includes(d.dashboard_id),
             },
         };
     });
@@ -141,6 +143,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         selectedFolderId: undefined as string | undefined,
         selectedPublicIdMap: {} as Record<string, boolean>,
         selectedPrivateIdMap: {} as Record<string, boolean>,
+        newIdList: [] as string[],
     });
     const getters = reactive({
         publicDashboardItems: computed<PublicDashboardModel[]>(() => {
@@ -158,10 +161,10 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
                 .filter((item) => !(item.resource_group === 'DOMAIN' && item.project_id.length > 1))
                 || [];
         }),
-        publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems)),
+        publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
         privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems),
         privateFolderItems: computed<PrivateFolderModel[]>(() => dashboardState.privateFolderItems),
-        privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getDashboardTreeData(getters.privateFolderItems, getters.privateDashboardItems)),
+        privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getDashboardTreeData(getters.privateFolderItems, getters.privateDashboardItems, state.newIdList)),
         selectedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.publicDashboardTreeData, state.selectedPublicIdMap)),
         selectedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.privateDashboardTreeData, state.selectedPrivateIdMap)),
         publicModalTableItems: computed<ModalDataTableItem[]>(() => _getModalTableItems(getters.publicDashboardTreeData, getters.selectedPublicTreeData)),
@@ -206,6 +209,9 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
     const setFolderModalType = (type: 'PUBLIC' | 'PRIVATE') => {
         state.folderModalType = type;
     };
+    const setNewIdList = (newIdList: string[]) => {
+        state.newIdList = newIdList;
+    };
     const mutations = {
         setFolderFormModalVisible,
         setFolderFormModalType,
@@ -216,6 +222,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         setSelectedPrivateIdMap,
         setFolderModalType,
         setFolderCloneModalVisible,
+        setNewIdList,
     };
 
     /* Actions */

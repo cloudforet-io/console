@@ -100,7 +100,11 @@ const createFolder = async () => {
         if (!state.isPrivate) {
             (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;
         }
-        await fetcher(params);
+        const createdFolder = await fetcher(params);
+        dashboardMainPageStore.setNewIdList([
+            ...dashboardMainPageState.newIdList,
+            createdFolder.folder_id,
+        ]);
         showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_CREATE_FOLDER'), '');
         state.proxyVisible = false;
     } catch (e) {
