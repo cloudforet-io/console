@@ -38,7 +38,13 @@ const dashboardMainPageStore = useDashboardMainPageStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
-    targetDashboardIdList: computed<string[]>(() => Object.entries(dashboardMainPageState.selectedIdMap)
+    selectedIdMap: computed<Record<string, boolean>>(() => {
+        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
+            return dashboardMainPageState.selectedPublicIdMap;
+        }
+        return dashboardMainPageState.selectedPrivateIdMap;
+    }),
+    targetDashboardIdList: computed<string[]>(() => Object.entries(state.selectedIdMap)
         .filter(([, value]) => value)
         .filter(([key]) => key.includes('dash'))
         .map(([key]) => key)),
@@ -48,7 +54,7 @@ const state = reactive({
             label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.NO_PARENT_FOLDER'),
             name: '',
         };
-        if (dashboardMainPageState.folderMoveModalType === 'PUBLIC') {
+        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
             return [
                 defaultItem,
                 ...dashboardState.publicFolderItems.map((folder) => ({
@@ -97,7 +103,7 @@ const handleFormConfirm = async () => {
         ErrorHandler.handleRequestError(new Error(''), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_MOVE_DASHBOARD', { count: failCount }));
     }
     await dashboardStore.load();
-    dashboardMainPageStore.setSelectedIdMap({});
+    dashboardMainPageStore.resetSelectedIdMap(dashboardMainPageState.folderModalType);
     state.proxyVisible = false;
 };
 

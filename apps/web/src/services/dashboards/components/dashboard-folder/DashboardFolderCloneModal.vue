@@ -31,7 +31,7 @@ import { gray } from '@/styles/colors';
 
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
-import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
+import type { DashboardTreeDataType, ModalDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
@@ -62,6 +62,18 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     privateMap: {} as Record<string, boolean>,
+    selectedTreeData: computed(() => {
+        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
+            return dashboardMainPageGetters.selectedPublicTreeData;
+        }
+        return dashboardMainPageGetters.selectedPrivateTreeData;
+    }),
+    modalTableItems: computed<ModalDataTableItem[]>(() => {
+        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
+            return dashboardMainPageGetters.publicModalTableItems;
+        }
+        return dashboardMainPageGetters.privateModalTableItems;
+    }),
 });
 
 /* Api */
@@ -153,7 +165,7 @@ const handleCloneConfirm = async () => {
         ErrorHandler.handleRequestError(new Error('Clone failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }));
     }
     await dashboardStore.load();
-    dashboardMainPageStore.setSelectedIdMap({});
+    dashboardMainPageStore.setSelectedIdMap({}, dashboardMainPageState.folderModalType);
     state.loading = false;
     state.proxyVisible = false;
 };
@@ -165,7 +177,7 @@ const handleChangePrivate = (id: string, value: boolean) => {
 
     const _isFolder = id.includes('folder');
     if (_isFolder) {
-        dashboardMainPageGetters.selectedTreeData.find((item) => item.data.id === id)?.children.forEach((child) => {
+        state.selectedTreeData.find((item) => item.data.id === id)?.children.forEach((child) => {
             state.privateMap = {
                 ...state.privateMap,
                 [child.data.id]: value,
@@ -194,7 +206,7 @@ watch(() => state.proxyVisible, (visible) => {
                     @confirm="handleCloneConfirm"
     >
         <template #body>
-            <p-data-table :items="dashboardMainPageGetters.modalTableItems"
+            <p-data-table :items="state.modalTableItems"
                           :fields="DELETE_TABLE_FIELDS"
                           :loading="state.loading"
             >
