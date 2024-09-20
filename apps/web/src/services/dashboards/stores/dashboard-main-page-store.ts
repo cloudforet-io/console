@@ -13,18 +13,11 @@ import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
-import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
+import type { DashboardTreeDataType, ModalDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
 type FolderModel = PublicFolderModel | PrivateFolderModel;
-interface DataTableItem {
-    id: string;
-    name: string;
-    location?: string;
-    type: 'DASHBOARD' | 'FOLDER';
-    isFolderSelected?: boolean;
-}
 const _getDashboardTreeData = (folderList: FolderModel[], dashboardList: DashboardModel[]): TreeNode<DashboardTreeDataType>[] => {
     const nodes: Record<string, TreeNode<DashboardTreeDataType>> = {};
     folderList.forEach((d) => {
@@ -101,6 +94,37 @@ const _getSelectedTreeData = (dashboardTreeData: TreeNode<DashboardTreeDataType>
     });
     return _selectedNodeList;
 };
+const _getModalTableItems = (treeData: TreeNode<DashboardTreeDataType>[], selectedTreeData: TreeNode<DashboardTreeDataType>[]): ModalDataTableItem[] => {
+    const _tableItems: ModalDataTableItem[] = [];
+    selectedTreeData.forEach((node) => {
+        if (node.data.type === 'FOLDER') {
+            _tableItems.push({
+                id: node.data.id,
+                name: node.data.name,
+                type: 'FOLDER',
+            });
+            node.children?.forEach((child) => {
+                _tableItems.push({
+                    id: child.data.id,
+                    name: child.data.name,
+                    location: node.data.name,
+                    type: 'DASHBOARD',
+                    isFolderSelected: true,
+                });
+            });
+        } else {
+            const _folderId = node.data?.folderId;
+            const _folderName = treeData.find((d) => d.id === _folderId)?.data?.name;
+            _tableItems.push({
+                id: node.data.id,
+                name: node.data.name,
+                location: _folderName,
+                type: 'DASHBOARD',
+            });
+        }
+    });
+    return _tableItems;
+};
 export const useDashboardMainPageStore = defineStore('page-dashboard-main', () => {
     const dashboardStore = useDashboardStore();
     const dashboardState = dashboardStore.state;
@@ -110,12 +134,13 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
     const state = reactive({
         folderFormModalVisible: false,
         folderFormModalType: 'CREATE' as 'CREATE' | 'UPDATE',
-        folderMoveModalType: 'PUBLIC' as 'PUBLIC' | 'PRIVATE',
+        folderModalType: 'PUBLIC' as 'PUBLIC' | 'PRIVATE',
         folderDeleteModalVisible: false,
         folderMoveModalVisible: false,
         folderCloneModalVisible: false,
         selectedFolderId: undefined as string | undefined,
-        selectedIdMap: {} as Record<string, boolean>,
+        selectedPublicIdMap: {} as Record<string, boolean>,
+        selectedPrivateIdMap: {} as Record<string, boolean>,
     });
     const getters = reactive({
         publicDashboardItems: computed<PublicDashboardModel[]>(() => {
@@ -137,42 +162,10 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems),
         privateFolderItems: computed<PrivateFolderModel[]>(() => dashboardState.privateFolderItems),
         privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getDashboardTreeData(getters.privateFolderItems, getters.privateDashboardItems)),
-        selectedTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-            const _treeData: TreeNode<DashboardTreeDataType>[] = [...getters.publicDashboardTreeData, ...getters.privateDashboardTreeData];
-            return _getSelectedTreeData(_treeData, state.selectedIdMap);
-        }),
-        modalTableItems: computed<DataTableItem[]>(() => {
-            const _treeData = [...getters.publicDashboardTreeData, ...getters.privateDashboardTreeData];
-            const _tableItems: DataTableItem[] = [];
-            getters.selectedTreeData.forEach((node) => {
-                if (node.data.type === 'FOLDER') {
-                    _tableItems.push({
-                        id: node.data.id,
-                        name: node.data.name,
-                        type: 'FOLDER',
-                    });
-                    node.children?.forEach((child) => {
-                        _tableItems.push({
-                            id: child.data.id,
-                            name: child.data.name,
-                            location: node.data.name,
-                            type: 'DASHBOARD',
-                            isFolderSelected: true,
-                        });
-                    });
-                } else {
-                    const _folderId = node.data?.folderId;
-                    const _folderName = _treeData.find((d) => d.id === _folderId)?.data?.name;
-                    _tableItems.push({
-                        id: node.data.id,
-                        name: node.data.name,
-                        location: _folderName,
-                        type: 'DASHBOARD',
-                    });
-                }
-            });
-            return _tableItems;
-        }),
+        selectedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.publicDashboardTreeData, state.selectedPublicIdMap)),
+        selectedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.privateDashboardTreeData, state.selectedPrivateIdMap)),
+        publicModalTableItems: computed<ModalDataTableItem[]>(() => _getModalTableItems(getters.publicDashboardTreeData, getters.selectedPublicTreeData)),
+        privateModalTableItems: computed<ModalDataTableItem[]>(() => _getModalTableItems(getters.privateDashboardTreeData, getters.selectedPrivateTreeData)),
         existingFolderNameList: computed<string[]>(() => {
             const _publicNames = dashboardState.publicFolderItems.map((d) => d.name);
             const _privateNames = dashboardState.privateFolderItems.map((d) => d.name);
@@ -204,11 +197,14 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
     const setFolderCloneModalVisible = (visible: boolean) => {
         state.folderCloneModalVisible = visible;
     };
-    const setSelectedIdMap = (idMap: Record<string, boolean>) => {
-        state.selectedIdMap = idMap;
+    const setSelectedPublicIdMap = (idMap: Record<string, boolean>) => {
+        state.selectedPublicIdMap = idMap;
     };
-    const setFolderMoveModalType = (type: 'PUBLIC' | 'PRIVATE') => {
-        state.folderMoveModalType = type;
+    const setSelectedPrivateIdMap = (idMap: Record<string, boolean>) => {
+        state.selectedPrivateIdMap = idMap;
+    };
+    const setFolderModalType = (type: 'PUBLIC' | 'PRIVATE') => {
+        state.folderModalType = type;
     };
     const mutations = {
         setFolderFormModalVisible,
@@ -216,8 +212,9 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         setSelectedFolderId,
         setFolderDeleteModalVisible,
         setFolderMoveModalVisible,
-        setSelectedIdMap,
-        setFolderMoveModalType,
+        setSelectedPublicIdMap,
+        setSelectedPrivateIdMap,
+        setFolderModalType,
         setFolderCloneModalVisible,
     };
 
@@ -228,11 +225,27 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         setSelectedFolderId(undefined);
         setFolderDeleteModalVisible(false);
         setFolderMoveModalVisible(false);
-        setFolderMoveModalType('PUBLIC');
+        setFolderModalType('PUBLIC');
         setFolderCloneModalVisible(false);
+    };
+    const resetSelectedIdMap = (type: 'PUBLIC'|'PRIVATE') => {
+        if (type === 'PUBLIC') {
+            setSelectedPublicIdMap({});
+        } else {
+            setSelectedPrivateIdMap({});
+        }
+    };
+    const setSelectedIdMap = (idMap: Record<string, boolean>, type: 'PUBLIC'|'PRIVATE') => {
+        if (type === 'PUBLIC') {
+            setSelectedPublicIdMap(idMap);
+        } else {
+            setSelectedPrivateIdMap(idMap);
+        }
     };
     const actions = {
         reset,
+        resetSelectedIdMap,
+        setSelectedIdMap,
     };
 
     return {

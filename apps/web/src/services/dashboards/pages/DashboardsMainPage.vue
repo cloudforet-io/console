@@ -46,6 +46,7 @@ const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
 const dashboardMainPageStore = useDashboardMainPageStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
+const dashboardMainPageGetters = dashboardMainPageStore.getters;
 const router = useRouter();
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
@@ -78,6 +79,10 @@ const state = reactive({
         }
         return !!(state.dashboardTotalCount && (state.sharedDashboardList.length || state.privateDashboardList.length || state.deprecatedDashboardList.length));
     }),
+    treeCollapseMap: {
+        public: false,
+        private: false,
+    } as Record<string, boolean>,
 });
 
 const searchQueryHelper = new QueryHelper();
@@ -122,6 +127,28 @@ const handleQueryChange = (options: ToolboxOptions = {}) => {
         dashboardStore.setSearchFilters(searchQueryHelper.filters);
         dashboardStore.load();
     }
+};
+const handleUpdateSelectedIdMap = (type: 'PUBLIC' | 'PRIVATE', selectedIdMap: Record<string, boolean>) => {
+    if (type === 'PUBLIC') {
+        dashboardMainPageStore.setSelectedPublicIdMap(selectedIdMap);
+    } else {
+        dashboardMainPageStore.setSelectedPrivateIdMap(selectedIdMap);
+    }
+};
+const handleClickCloneButton = (type: 'PUBLIC' | 'PRIVATE') => {
+    dashboardMainPageStore.setFolderModalType(type);
+    dashboardMainPageStore.setFolderCloneModalVisible(true);
+};
+const handleClickDeleteButton = (type: 'PUBLIC' | 'PRIVATE') => {
+    dashboardMainPageStore.setFolderModalType(type);
+    dashboardMainPageStore.setFolderDeleteModalVisible(true);
+};
+const handleClickMoveButton = (type: 'PUBLIC' | 'PRIVATE') => {
+    dashboardMainPageStore.setFolderModalType(type);
+    dashboardMainPageStore.setFolderMoveModalVisible(true);
+};
+const handleClickRefreshButton = () => {
+    dashboardStore.load();
 };
 
 /* init */
@@ -244,9 +271,30 @@ onUnmounted(() => {
                                        :dashboard-list="dashboardGetters.domainItems"
             />
             <template v-else>
-                <dashboard-folder-tree v-if="state.isWorkspaceOwner"
-                                       type="PUBLIC"
-                />
+                <div v-if="state.isWorkspaceOwner"
+                     class="tree-wrapper"
+                >
+                    <dashboard-folder-tree v-if="!state.treeCollapseMap.public"
+                                           :selected-id-map="dashboardMainPageState.selectedPublicIdMap"
+                                           :dashboard-tree-data="dashboardMainPageGetters.publicDashboardTreeData"
+                                           @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
+                                           @click-clone="handleClickCloneButton('PUBLIC')"
+                                           @click-delete="handleClickDeleteButton('PUBLIC')"
+                                           @click-move="handleClickMoveButton('PUBLIC')"
+                                           @click-refresh="handleClickRefreshButton()"
+                    />
+                </div>
+                <div class="tree-wrapper">
+                    <dashboard-folder-tree v-if="!state.treeCollapseMap.private"
+                                           :selected-id-map="dashboardMainPageState.selectedPrivateIdMap"
+                                           :dashboard-tree-data="dashboardMainPageGetters.privateDashboardTreeData"
+                                           @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
+                                           @click-clone="handleClickCloneButton('PRIVATE')"
+                                           @click-delete="handleClickDeleteButton('PRIVATE')"
+                                           @click-move="handleClickMoveButton('PRIVATE')"
+                                           @click-refresh="handleClickRefreshButton()"
+                    />
+                </div>
                 <dashboard-main-board-list v-if="state.deprecatedDashboardList.length"
                                            class="dashboard-list"
                                            :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED')"
@@ -261,6 +309,7 @@ onUnmounted(() => {
                                            @update:visible="handleUpdateFolderDeleteModalVisible"
             />
             <dashboard-folder-move-modal :visible="dashboardMainPageState.folderMoveModalVisible"
+
                                          @update:visible="handleUpdateFolderMoveModalVisible"
             />
             <dashboard-folder-clone-modal :visible="dashboardMainPageState.folderCloneModalVisible"
@@ -282,6 +331,9 @@ onUnmounted(() => {
         gap: 0.5rem;
         min-height: 16.875rem;
 
+        .tree-wrapper {
+            margin-bottom: 1rem;
+        }
         .dashboard-list {
             @apply flex-grow w-full;
         }

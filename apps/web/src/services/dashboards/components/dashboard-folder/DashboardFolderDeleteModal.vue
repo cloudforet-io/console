@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PI } from '@cloudforet/mirinae';
@@ -21,6 +21,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { gray } from '@/styles/colors';
 
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
+import type { ModalDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
@@ -40,10 +41,17 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const dashboardStore = useDashboardStore();
 const dashboardMainPageStore = useDashboardMainPageStore();
+const dashboardMainPageState = dashboardMainPageStore.state;
 const dashboardMainPageGetters = dashboardMainPageStore.getters;
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
+    modalTableItems: computed<ModalDataTableItem[]>(() => {
+        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
+            return dashboardMainPageGetters.publicModalTableItems;
+        }
+        return dashboardMainPageGetters.privateModalTableItems;
+    }),
 });
 
 /* Api */
@@ -74,7 +82,7 @@ const deleteDashboard = async (dashboardId: string): Promise<boolean> => {
 const handleDeleteConfirm = async () => {
     state.loading = true;
     const _deletePromises: Promise<boolean>[] = [];
-    dashboardMainPageGetters.modalTableItems.forEach((item) => {
+    state.modalTableItems.forEach((item) => {
         if (item.type === 'DASHBOARD') {
             _deletePromises.push(deleteDashboard(item.id));
         } else {
@@ -89,7 +97,7 @@ const handleDeleteConfirm = async () => {
     }
     await dashboardStore.load();
     state.loading = false;
-    dashboardMainPageStore.setSelectedIdMap({});
+    dashboardMainPageStore.setSelectedIdMap({}, dashboardMainPageState.folderModalType);
     state.proxyVisible = false;
 };
 
@@ -110,7 +118,7 @@ watch(() => state.proxyVisible, (visible) => {
                   @confirm="handleDeleteConfirm"
     >
         <template #delete-modal-body>
-            <p-data-table :items="dashboardMainPageGetters.modalTableItems"
+            <p-data-table :items="state.modalTableItems"
                           :fields="DELETE_TABLE_FIELDS"
                           :loading="state.loading"
             >

@@ -11,3 +11,11 @@ export interface DashboardTreeDataType extends TreeData {
     userId?: string;
     createdBy?: string;
 }
+
+export interface ModalDataTableItem {
+    id: string;
+    name: string;
+    location?: string;
+    type: 'DASHBOARD' | 'FOLDER';
+    isFolderSelected?: boolean;
+}
