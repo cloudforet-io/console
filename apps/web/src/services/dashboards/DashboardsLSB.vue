@@ -12,6 +12,7 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { MENU_ID } from '@/lib/menu/config';
@@ -33,20 +34,24 @@ import { gray } from '@/styles/colors';
 import DashboardLSBTree from '@/services/dashboards/components/dashboard-main/DashboardLSBTree.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
+
+
 const route = useRoute();
 
+const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 
 const router = useRouter();
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     favoriteItems: computed(() => favoriteGetters.dashboardItems),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     loading: true,
@@ -145,6 +150,11 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
+    adminMenu: computed<LSBItem>(() => ({
+        type: MENU_ITEM_TYPE.SLOT,
+        label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.ADMIN'),
+        id: 'admin',
+    })),
     sharedMenu: computed<LSBItem>(() => ({
         type: MENU_ITEM_TYPE.SLOT,
         label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARED'),
@@ -181,31 +191,29 @@ const state = reactive({
             {
                 type: MENU_ITEM_TYPE.TOP_TITLE,
                 label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARD'),
-                subText: isAdminMode.value ? `(${state.domainMenuSet.length})` : undefined,
+                subText: storeState.isAdminMode ? `(${state.domainMenuSet.length})` : undefined,
             },
         ];
 
-        if (isAdminMode.value) {
-            return [
-                ...defaultMenuSet,
-                ...state.domainMenuSet,
-            ];
+        const menuSet: LSBMenu[] = [...defaultMenuSet];
+        if (storeState.isAdminMode) {
+            menuSet.push(state.adminMenu);
+        } else {
+            // favorite
+            defaultMenuSet.unshift(
+                {
+                    type: MENU_ITEM_TYPE.STARRED,
+                    childItems: state.starredMenuItems,
+                    currentPath: state.currentPath,
+                },
+                { type: MENU_ITEM_TYPE.DIVIDER },
+            );
+
+            // shared, private
+            menuSet.push(state.sharedMenu);
+            menuSet.push(state.privateMenu);
         }
 
-        defaultMenuSet.unshift(
-            {
-                type: MENU_ITEM_TYPE.STARRED,
-                childItems: state.starredMenuItems,
-                currentPath: state.currentPath,
-            },
-            { type: MENU_ITEM_TYPE.DIVIDER },
-        );
-
-        const menuSet: LSBMenu[] = [
-            ...defaultMenuSet,
-            state.sharedMenu,
-            state.privateMenu,
-        ];
         if (state.deprecatedSubItem.length) {
             menuSet.push(state.deprecatedMenu);
         }
@@ -263,6 +271,11 @@ callApiWithGrantGuard();
                     />
                 </template>
             </l-s-b-router-menu-item>
+        </template>
+        <template v-if="storeState.isAdminMode"
+                  #slot-admin
+        >
+            <dashboard-l-s-b-tree type="PUBLIC" />
         </template>
         <template v-if="storeState.isWorkspaceOwner"
                   #slot-shared
