@@ -51,7 +51,7 @@ export default {
                     component: ProjectDetailTabPage,
                     children: [
                         {
-                            path: 'overview',
+                            path: 'summary',
                             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                             meta: { lsbVisible: true },
                             props: true,
@@ -79,6 +79,10 @@ export default {
                             component: ProjectNotificationsPage,
                         },
                         {
+                            path: '*',
+                            redirect: 'summary',
+                        },
+                        {
                             path: 'dashboard/:dashboardId',
                             name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
                             meta: { lsbVisible: true },
@@ -92,10 +96,6 @@ export default {
                         //     props: true,
                         //     component: ProjectTagPage,
                         // },
-                        {
-                            path: '*',
-                            redirect: 'member',
-                        },
                     ],
                 },
                 {

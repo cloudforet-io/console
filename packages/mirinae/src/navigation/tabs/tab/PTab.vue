@@ -250,6 +250,7 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
                     class="tab-item-wrapper"
                 >
                     <li key="hidden-tabs"
+                        ref="hiddenTabsMenuRef"
                         :class="{active: state.hiddenTabItems.some((item) => activeTab === item.name || item.subItems?.some((subItem) => activeTab === subItem.name) )}"
                         role="tab"
                         @keydown.enter="handleClickHiddenTabsMenu"
@@ -264,7 +265,6 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
                             />
                         </div>
                         <p-context-menu v-if="state.hiddenTabsVisible"
-                                        ref="hiddenTabsMenuRef"
                                         class="hidden-tabs-menu"
                                         :menu="state.hiddenTabMenuItems"
                                         :selected="state.selectedContextMenuItem ? [state.selectedContextMenuItem]: undefined"
