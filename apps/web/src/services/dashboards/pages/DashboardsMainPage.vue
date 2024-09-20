@@ -51,39 +51,32 @@ const dashboardMainPageGetters = dashboardMainPageStore.getters;
 const router = useRouter();
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: computed(() => dashboardState.loading),
-    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    sharedDashboardList: computed<PublicDashboardModel[]>(() => {
-        if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE' && !state.isWorkspaceOwner) return [];
-        if (!storeState.isWorkspaceOwner) return [];
-        return dashboardGetters.workspaceItems.filter((d) => d.version === '2.0') || [];
-    }),
-    privateDashboardList: computed<PrivateDashboardModel[]>(() => {
-        if (dashboardState.scope && dashboardState.scope !== 'PRIVATE') return [];
-        return dashboardGetters.privateItems.filter((d) => d.version === '2.0') || [];
-    }),
     deprecatedDashboardList: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
         const _publicDeprecated = dashboardGetters.workspaceItems.filter((d) => d.version === '1.0');
         const _privateDeprecated = dashboardGetters.privateItems.filter((d) => d.version === '1.0');
         return [..._publicDeprecated, ..._privateDeprecated];
     }),
-    dashboardTotalCount: computed<number>(() => {
-        if (state.isAdminMode) return dashboardGetters.domainItems.length;
-        return state.sharedDashboardList.length + state.privateDashboardList.length + state.deprecatedDashboardList.length;
-    }),
-    filteredDashboardStatus: computed<boolean>(() => {
-        if (state.isAdminMode) {
-            return !!(dashboardGetters.domainItems.length);
-        }
-        return !!(state.dashboardTotalCount && (state.sharedDashboardList.length || state.privateDashboardList.length || state.deprecatedDashboardList.length));
+    isDashboardExist: computed<boolean>(() => {
+        if (state.isAdminMode) return !!dashboardMainPageGetters.publicDashboardItems.length;
+        return !!(
+            dashboardMainPageGetters.publicDashboardItems.length
+            || dashboardMainPageGetters.privateDashboardItems.length
+            || state.deprecatedDashboardList.length
+        );
     }),
     treeCollapseMap: {
         public: false,
         private: false,
     } as Record<string, boolean>,
+    publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
+        if (storeState.isAdminMode) return dashboardMainPageGetters.adminTreeControlButtonDisableMap;
+        return dashboardMainPageGetters.publicTreeControlButtonDisableMap;
+    }),
 });
 
 const searchQueryHelper = new QueryHelper();
@@ -109,18 +102,6 @@ const handleCreateDashboard = () => { router.push(getProperRouteLocation({ name:
 const handleCreateFolder = () => {
     dashboardMainPageStore.setFolderFormModalType('CREATE');
     dashboardMainPageStore.setFolderFormModalVisible(true);
-};
-const handleUpdateFolderFormModalVisible = (visible: boolean) => {
-    dashboardMainPageStore.setFolderFormModalVisible(visible);
-};
-const handleUpdateFolderDeleteModalVisible = (visible: boolean) => {
-    dashboardMainPageStore.setFolderDeleteModalVisible(visible);
-};
-const handleUpdateFolderMoveModalVisible = (visible: boolean) => {
-    dashboardMainPageStore.setFolderMoveModalVisible(visible);
-};
-const handleUpdateFolderCloneModalVisible = (visible: boolean) => {
-    dashboardMainPageStore.setFolderCloneModalVisible(visible);
 };
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
@@ -212,10 +193,7 @@ onUnmounted(() => {
 
 <template>
     <div class="dashboards-main-page">
-        <p-heading :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')"
-                   use-total-count
-                   :total-count="state.dashboardTotalCount"
-        >
+        <p-heading :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')">
             <template #extra>
                 <p-button icon-left="ic_plus_bold"
                           style-type="tertiary"
@@ -244,7 +222,7 @@ onUnmounted(() => {
                    @refresh="handleQueryChange()"
         />
         <p-data-loader :loading="state.loading"
-                       :data="state.filteredDashboardStatus"
+                       :data="state.isDashboardExist"
                        class="dashboard-list-wrapper"
         >
             <template #no-data>
@@ -267,62 +245,58 @@ onUnmounted(() => {
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
                 </p-empty>
             </template>
-            <dashboard-main-board-list v-if="state.isAdminMode"
-                                       class="dashboard-list"
-                                       :dashboard-list="dashboardGetters.domainItems"
-            />
-            <template v-else>
-                <div v-if="state.isWorkspaceOwner"
-                     class="tree-wrapper"
-                >
-                    <dashboard-folder-tree-title :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SHARED')"
-                                                 :is-collapsed.sync="state.treeCollapseMap.public"
-                    />
-                    <dashboard-folder-tree v-if="!state.treeCollapseMap.public"
-                                           :selected-id-map="dashboardMainPageState.selectedPublicIdMap"
-                                           :dashboard-tree-data="dashboardMainPageGetters.publicDashboardTreeData"
-                                           :button-disable-map="dashboardMainPageGetters.publicTreeControlButtonDisableMap"
-                                           @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
-                                           @click-clone="handleClickCloneButton('PUBLIC')"
-                                           @click-delete="handleClickDeleteButton('PUBLIC')"
-                                           @click-move="handleClickMoveButton('PUBLIC')"
-                                           @click-refresh="handleClickRefreshButton()"
-                    />
-                </div>
-                <div class="tree-wrapper">
-                    <dashboard-folder-tree-title :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
-                                                 :is-collapsed.sync="state.treeCollapseMap.private"
-                    />
-                    <dashboard-folder-tree v-if="!state.treeCollapseMap.private"
-                                           :selected-id-map="dashboardMainPageState.selectedPrivateIdMap"
-                                           :dashboard-tree-data="dashboardMainPageGetters.privateDashboardTreeData"
-                                           :button-disable-map="dashboardMainPageGetters.privateTreeControlButtonDisableMap"
-                                           @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
-                                           @click-clone="handleClickCloneButton('PRIVATE')"
-                                           @click-delete="handleClickDeleteButton('PRIVATE')"
-                                           @click-move="handleClickMoveButton('PRIVATE')"
-                                           @click-refresh="handleClickRefreshButton()"
-                    />
-                </div>
-                <dashboard-main-board-list v-if="state.deprecatedDashboardList.length"
-                                           class="dashboard-list"
-                                           :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED')"
-                                           :dashboard-list="state.deprecatedDashboardList"
-                                           is-collapsed
+            <div v-if="storeState.isAdminMode || storeState.isWorkspaceOwner"
+                 class="tree-wrapper"
+            >
+                <dashboard-folder-tree-title v-if="storeState.isWorkspaceOwner"
+                                             :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SHARED')"
+                                             :is-collapsed.sync="state.treeCollapseMap.public"
                 />
-            </template>
+                <dashboard-folder-tree v-if="!state.treeCollapseMap.public"
+                                       :selected-id-map="dashboardMainPageState.selectedPublicIdMap"
+                                       :dashboard-tree-data="dashboardMainPageGetters.publicDashboardTreeData"
+                                       :button-disable-map="state.publicTreeControlButtonDisableMap"
+                                       @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
+                                       @click-clone="handleClickCloneButton('PUBLIC')"
+                                       @click-delete="handleClickDeleteButton('PUBLIC')"
+                                       @click-move="handleClickMoveButton('PUBLIC')"
+                                       @click-refresh="handleClickRefreshButton()"
+                />
+            </div>
+            <div v-if="!storeState.isAdminMode"
+                 class="tree-wrapper"
+            >
+                <dashboard-folder-tree-title :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
+                                             :is-collapsed.sync="state.treeCollapseMap.private"
+                />
+                <dashboard-folder-tree v-if="!state.treeCollapseMap.private"
+                                       :selected-id-map="dashboardMainPageState.selectedPrivateIdMap"
+                                       :dashboard-tree-data="dashboardMainPageGetters.privateDashboardTreeData"
+                                       :button-disable-map="dashboardMainPageGetters.privateTreeControlButtonDisableMap"
+                                       @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
+                                       @click-clone="handleClickCloneButton('PRIVATE')"
+                                       @click-delete="handleClickDeleteButton('PRIVATE')"
+                                       @click-move="handleClickMoveButton('PRIVATE')"
+                                       @click-refresh="handleClickRefreshButton()"
+                />
+            </div>
+            <dashboard-main-board-list v-if="state.deprecatedDashboardList.length"
+                                       class="dashboard-list"
+                                       :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED')"
+                                       :dashboard-list="state.deprecatedDashboardList"
+                                       is-collapsed
+            />
             <dashboard-main-folder-form-modal :visible="dashboardMainPageState.folderFormModalVisible"
-                                              @update:visible="handleUpdateFolderFormModalVisible"
+                                              @update:visible="dashboardMainPageStore.setFolderFormModalVisible"
             />
             <dashboard-folder-delete-modal :visible="dashboardMainPageState.folderDeleteModalVisible"
-                                           @update:visible="handleUpdateFolderDeleteModalVisible"
+                                           @update:visible="dashboardMainPageStore.setFolderDeleteModalVisible"
             />
             <dashboard-folder-move-modal :visible="dashboardMainPageState.folderMoveModalVisible"
-
-                                         @update:visible="handleUpdateFolderMoveModalVisible"
+                                         @update:visible="dashboardMainPageStore.setFolderMoveModalVisible"
             />
             <dashboard-folder-clone-modal :visible="dashboardMainPageState.folderCloneModalVisible"
-                                          @update:visible="handleUpdateFolderCloneModalVisible"
+                                          @update:visible="dashboardMainPageStore.setFolderCloneModalVisible"
             />
         </p-data-loader>
     </div>
