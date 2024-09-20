@@ -6,62 +6,60 @@ import {
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardFolderTreeItem from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeItem.vue';
-import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 interface Props {
-    type: 'PUBLIC' | 'PRIVATE';
+    selectedIdMap: Record<string, boolean>;
+    dashboardTreeData: TreeNode<DashboardTreeDataType>[];
 }
 const props = withDefaults(defineProps<Props>(), {
-    type: 'PUBLIC',
+    selectedIdMap: () => ({}),
+    dashboardTreeData: () => ([]),
 });
-const dashboardStore = useDashboardStore();
-const dashboardMainPageStore = useDashboardMainPageStore();
-const dashboardMainPageState = dashboardMainPageStore.state;
-const dashboardMainPageGetters = dashboardMainPageStore.getters;
+const emit = defineEmits<{(e: 'update:selectedIdMap', selectedIdMap: Record<string, boolean>): void;
+    (e: 'click-delete');
+    (e: 'click-move');
+    (e: 'click-clone');
+    (e: 'click-refresh');
+}>();
 const state = reactive({
+    proxySelectedIdMap: useProxyValue('selectedIdMap', props, emit),
     isAllSelected: computed(() => {
         let _isAllSelected = true;
-        state.dashboardTreeData.forEach((node) => {
-            if (!dashboardMainPageState.selectedIdMap[node.data.id]) _isAllSelected = false;
+        props.dashboardTreeData.forEach((node) => {
+            if (!state.proxySelectedIdMap[node.data.id]) _isAllSelected = false;
         });
         return _isAllSelected;
     }),
     isIndeterminate: computed<boolean>(() => {
         if (state.isAllSelected) return false;
-        return Object.values(dashboardMainPageState.selectedIdMap).some((v) => v);
-    }),
-    dashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-        if (props.type === 'PUBLIC') {
-            return dashboardMainPageGetters.publicDashboardTreeData;
-        }
-        return dashboardMainPageGetters.privateDashboardTreeData;
+        return Object.values(state.proxySelectedIdMap).some((v) => v);
     }),
     childrenShowMap: {} as Record<string, boolean>,
     controlButtons: computed(() => ([
         {
             name: 'clone',
             icon: 'ic_clone',
-            clickEvent: handleClickCloneButton,
+            clickEvent: () => emit('click-clone'),
         },
         {
             name: 'move',
             icon: 'ic_move',
-            clickEvent: handleClickMoveButton,
+            clickEvent: () => emit('click-move'),
         },
         {
             name: 'delete',
             icon: 'ic_delete',
-            clickEvent: handleClickDeleteButton,
+            clickEvent: () => emit('click-delete'),
         },
         {
             name: 'refresh',
             icon: 'ic_refresh',
-            clickEvent: handleClickRefreshButton,
+            clickEvent: () => emit('click-refresh'),
         },
     ])),
 });
@@ -71,62 +69,46 @@ const isIndeterminate = (node: TreeNode<DashboardTreeDataType>): boolean => {
     if (node.data.type === 'DASHBOARD' || !node.children) return false;
     if (node.children.length === 0) return false;
     // check all children are selected
-    if (node.children.every((child) => dashboardMainPageState.selectedIdMap[child.id])) return false;
-    return node.children.some((child) => dashboardMainPageState.selectedIdMap[child.id]);
+    if (node.children.every((child) => state.proxySelectedIdMap[child.id])) return false;
+    return node.children.some((child) => state.proxySelectedIdMap[child.id]);
 };
 
 /* Event */
 const handleChangeAllSelected = (value: boolean) => {
     if (!value) {
-        dashboardMainPageStore.setSelectedIdMap({});
+        state.proxySelectedIdMap = {};
     } else {
-        state.dashboardTreeData.forEach((node) => {
-            dashboardMainPageStore.setSelectedIdMap({
-                ...dashboardMainPageState.selectedIdMap,
-                [node.data.id]: true,
-            });
+        props.dashboardTreeData.forEach((node) => {
+            state.proxySelectedIdMap[node.data.id] = true;
             if (node.data.type === 'FOLDER') {
                 node.children?.forEach((child) => {
-                    dashboardMainPageStore.setSelectedIdMap({
-                        ...dashboardMainPageState.selectedIdMap,
-                        [child.id]: true,
-                    });
+                    state.proxySelectedIdMap[child.id] = true;
                 });
             }
         });
     }
+    state.proxySelectedIdMap = { ...state.proxySelectedIdMap };
 };
 const handleSelectTreeItem = (node: TreeNode<DashboardTreeDataType>, value: [boolean]) => {
     const _isSelected = value[0];
-    dashboardMainPageStore.setSelectedIdMap({
-        ...dashboardMainPageState.selectedIdMap,
-        [node.data.id]: _isSelected,
-    });
+    state.proxySelectedIdMap[node.data.id] = _isSelected;
     if (node.data.type === 'FOLDER') {
         if (node.children) {
             node.children.forEach((child) => {
-                dashboardMainPageStore.setSelectedIdMap({
-                    ...dashboardMainPageState.selectedIdMap,
-                    [child.id]: _isSelected,
-                });
+                state.proxySelectedIdMap[child.id] = _isSelected;
             });
         }
     } else if (node.data.folderId) {
         if (_isSelected) {
-            dashboardMainPageStore.setSelectedIdMap({
-                ...dashboardMainPageState.selectedIdMap,
-                [node.data.folderId]: true,
-            });
+            state.proxySelectedIdMap[node.data.folderId] = true;
         } else {
-            const _folderNode = state.dashboardTreeData.find((n) => n.data.id === node.data.folderId);
-            if (_folderNode?.children?.every((child) => !dashboardMainPageState.selectedIdMap[child.id])) {
-                dashboardMainPageStore.setSelectedIdMap({
-                    ...dashboardMainPageState.selectedIdMap,
-                    [node.data.folderId]: false,
-                });
+            const _folderNode = props.dashboardTreeData.find((n) => n.data.id === node.data.folderId);
+            if (_folderNode?.children?.every((child) => !state.proxySelectedIdMap[child.id])) {
+                state.proxySelectedIdMap[node.data.folderId] = false;
             }
         }
     }
+    state.proxySelectedIdMap = { ...state.proxySelectedIdMap };
 };
 const handleClickCollapseButton = (node: TreeNode<DashboardTreeDataType>) => {
     if (state.childrenShowMap[node.data.id]) {
@@ -134,18 +116,6 @@ const handleClickCollapseButton = (node: TreeNode<DashboardTreeDataType>) => {
     } else {
         state.childrenShowMap = { ...state.childrenShowMap, [node.data.id]: true };
     }
-};
-const handleClickRefreshButton = () => {
-    dashboardStore.load();
-};
-const handleClickDeleteButton = () => {
-    dashboardMainPageStore.setFolderDeleteModalVisible(true);
-};
-const handleClickMoveButton = () => {
-    dashboardMainPageStore.setFolderMoveModalVisible(true);
-};
-const handleClickCloneButton = () => {
-    dashboardMainPageStore.setFolderCloneModalVisible(true);
 };
 </script>
 
@@ -169,12 +139,12 @@ const handleClickCloneButton = () => {
                 />
             </div>
         </div>
-        <div v-for="treeData in state.dashboardTreeData"
+        <div v-for="treeData in props.dashboardTreeData"
              :key="`${treeData.data.id}-${treeData.data.type}`"
              class="tree-content-wrapper"
         >
             <div class="folder-row-wrapper">
-                <p-checkbox :selected="dashboardMainPageState.selectedIdMap[treeData.data.id]"
+                <p-checkbox :selected="state.proxySelectedIdMap[treeData.data.id]"
                             :indeterminate="isIndeterminate(treeData)"
                             @change="handleSelectTreeItem(treeData, $event)"
                 />
@@ -194,7 +164,7 @@ const handleClickCloneButton = () => {
                      :key="`${child.data.id}-${child.data.type}`"
                      class="folder-row-wrapper"
                 >
-                    <p-checkbox :selected="dashboardMainPageState.selectedIdMap[child.data.id]"
+                    <p-checkbox :selected="state.proxySelectedIdMap[child.data.id]"
                                 @change="handleSelectTreeItem(child, $event)"
                     />
                     <dashboard-folder-tree-item :tree-data="child" />
