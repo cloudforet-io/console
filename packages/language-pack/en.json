@@ -1774,7 +1774,7 @@
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
-			"ALT_E_CLONE_DASHBOARD": "Failed to clone dashboard",
+			"ALT_E_CLONE_DASHBOARD": "Failed to clone {count} dashboards",
 			"ALT_E_DELETE_DASHBOARD": "Failed to delete dashboard",
 			"ALT_E_MOVE_DASHBOARD": "Failed to move dashboard",
 			"ALT_S_CLONE_DASHBOARD": "Dashboards successfully cloned",

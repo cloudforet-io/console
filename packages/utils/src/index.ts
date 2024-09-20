@@ -214,3 +214,10 @@ export const getContrastingColor = (hexColor?: string): string => {
     const brightness = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
     return brightness < 128 ? _white : _black;
 };
+
+
+export const getClonedName = (existingNames: string[], name: string): string => {
+    if (!existingNames.includes(name)) return name;
+    const _newName = `Clone - ${name}`;
+    return existingNames.find((n) => n === _newName) ? getClonedName(existingNames, _newName) : _newName;
+};

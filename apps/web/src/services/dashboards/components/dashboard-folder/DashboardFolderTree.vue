@@ -41,13 +41,12 @@ const state = reactive({
         }
         return dashboardMainPageGetters.privateDashboardTreeData;
     }),
-    // selectedIdMap: {} as Record<string, boolean>,
     childrenShowMap: {} as Record<string, boolean>,
     controlButtons: computed(() => ([
         {
             name: 'clone',
             icon: 'ic_clone',
-            clickEvent: () => {},
+            clickEvent: handleClickCloneButton,
         },
         {
             name: 'move',
@@ -86,16 +85,24 @@ const handleChangeAllSelected = (value: boolean) => {
                 ...dashboardMainPageState.selectedIdMap,
                 [node.data.id]: true,
             });
+            if (node.data.type === 'FOLDER') {
+                node.children?.forEach((child) => {
+                    dashboardMainPageStore.setSelectedIdMap({
+                        ...dashboardMainPageState.selectedIdMap,
+                        [child.id]: true,
+                    });
+                });
+            }
         });
     }
 };
 const handleSelectTreeItem = (node: TreeNode<DashboardTreeDataType>, value: [boolean]) => {
     const _isSelected = value[0];
+    dashboardMainPageStore.setSelectedIdMap({
+        ...dashboardMainPageState.selectedIdMap,
+        [node.data.id]: _isSelected,
+    });
     if (node.data.type === 'FOLDER') {
-        dashboardMainPageStore.setSelectedIdMap({
-            ...dashboardMainPageState.selectedIdMap,
-            [node.data.id]: _isSelected,
-        });
         if (node.children) {
             node.children.forEach((child) => {
                 dashboardMainPageStore.setSelectedIdMap({
@@ -104,25 +111,19 @@ const handleSelectTreeItem = (node: TreeNode<DashboardTreeDataType>, value: [boo
                 });
             });
         }
-    } else {
-        dashboardMainPageStore.setSelectedIdMap({
-            ...dashboardMainPageState.selectedIdMap,
-            [node.data.id]: _isSelected,
-        });
-        if (node.data.folderId) {
-            if (_isSelected) {
+    } else if (node.data.folderId) {
+        if (_isSelected) {
+            dashboardMainPageStore.setSelectedIdMap({
+                ...dashboardMainPageState.selectedIdMap,
+                [node.data.folderId]: true,
+            });
+        } else {
+            const _folderNode = state.dashboardTreeData.find((n) => n.data.id === node.data.folderId);
+            if (_folderNode?.children?.every((child) => !dashboardMainPageState.selectedIdMap[child.id])) {
                 dashboardMainPageStore.setSelectedIdMap({
                     ...dashboardMainPageState.selectedIdMap,
-                    [node.data.folderId]: true,
+                    [node.data.folderId]: false,
                 });
-            } else {
-                const _folderNode = state.dashboardTreeData.find((n) => n.data.id === node.data.folderId);
-                if (_folderNode?.children?.every((child) => !dashboardMainPageState.selectedIdMap[child.id])) {
-                    dashboardMainPageStore.setSelectedIdMap({
-                        ...dashboardMainPageState.selectedIdMap,
-                        [node.data.folderId]: false,
-                    });
-                }
             }
         }
     }
@@ -142,6 +143,9 @@ const handleClickDeleteButton = () => {
 };
 const handleClickMoveButton = () => {
     dashboardMainPageStore.setFolderMoveModalVisible(true);
+};
+const handleClickCloneButton = () => {
+    dashboardMainPageStore.setFolderCloneModalVisible(true);
 };
 </script>
 
@@ -223,7 +227,9 @@ const handleClickMoveButton = () => {
     .tree-content-wrapper {
         &:last-child {
             .folder-row-wrapper {
-                @apply border-0;
+                &:last-child {
+                    @apply border-b-0;
+                }
             }
         }
     }

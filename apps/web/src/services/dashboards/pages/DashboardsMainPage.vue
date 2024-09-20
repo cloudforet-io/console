@@ -27,12 +27,13 @@ import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import DashboardFolderCloneModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderCloneModal.vue';
 import DashboardFolderDeleteModal
     from '@/services/dashboards/components/dashboard-folder/DashboardFolderDeleteModal.vue';
+import DashboardMainFolderFormModal
+    from '@/services/dashboards/components/dashboard-folder/DashboardFolderFormModal.vue';
 import DashboardFolderMoveModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderMoveModal.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
-import DashboardMainFolderFormModal
-    from '@/services/dashboards/components/dashboard-folder/DashboardMainFolderFormModal.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
@@ -111,6 +112,9 @@ const handleUpdateFolderDeleteModalVisible = (visible: boolean) => {
 };
 const handleUpdateFolderMoveModalVisible = (visible: boolean) => {
     dashboardMainPageStore.setFolderMoveModalVisible(visible);
+};
+const handleUpdateFolderCloneModalVisible = (visible: boolean) => {
+    dashboardMainPageStore.setFolderCloneModalVisible(visible);
 };
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
@@ -258,6 +262,9 @@ onUnmounted(() => {
             />
             <dashboard-folder-move-modal :visible="dashboardMainPageState.folderMoveModalVisible"
                                          @update:visible="handleUpdateFolderMoveModalVisible"
+            />
+            <dashboard-folder-clone-modal :visible="dashboardMainPageState.folderCloneModalVisible"
+                                          @update:visible="handleUpdateFolderCloneModalVisible"
             />
         </p-data-loader>
     </div>

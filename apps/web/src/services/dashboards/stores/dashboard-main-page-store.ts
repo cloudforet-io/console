@@ -113,6 +113,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         folderMoveModalType: 'PUBLIC' as 'PUBLIC' | 'PRIVATE',
         folderDeleteModalVisible: false,
         folderMoveModalVisible: false,
+        folderCloneModalVisible: false,
         selectedFolderId: undefined as string | undefined,
         selectedIdMap: {} as Record<string, boolean>,
     });
@@ -200,6 +201,9 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
     const setFolderMoveModalVisible = (visible: boolean) => {
         state.folderMoveModalVisible = visible;
     };
+    const setFolderCloneModalVisible = (visible: boolean) => {
+        state.folderCloneModalVisible = visible;
+    };
     const setSelectedIdMap = (idMap: Record<string, boolean>) => {
         state.selectedIdMap = idMap;
     };
@@ -214,6 +218,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         setFolderMoveModalVisible,
         setSelectedIdMap,
         setFolderMoveModalType,
+        setFolderCloneModalVisible,
     };
 
     /* Actions */
@@ -224,6 +229,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         setFolderDeleteModalVisible(false);
         setFolderMoveModalVisible(false);
         setFolderMoveModalType('PUBLIC');
+        setFolderCloneModalVisible(false);
     };
     const actions = {
         reset,

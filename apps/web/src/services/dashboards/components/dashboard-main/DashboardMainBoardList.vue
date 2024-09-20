@@ -216,11 +216,11 @@ onMounted(() => {
     margin-bottom: 1.25rem;
 
     .title-wrapper {
-        @apply text-label-md;
+        @apply text-label-lg;
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
-        font-weight: bold;
+        font-weight: 500;
         cursor: pointer;
         margin-bottom: 0.5rem;
         .arrow-button {
