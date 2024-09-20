@@ -179,7 +179,8 @@ watch(() => state.id, () => {
                             <span class="author">{{ title }}</span>
                             <span class="date">{{ iso8601Formatter(state.noteList[index].created_at, state.timezone) }}</span>
                         </p>
-                        <p-select-dropdown style-type="icon-button"
+                        <p-select-dropdown v-if="state.hasReadWriteAccess"
+                                           style-type="icon-button"
                                            button-icon="ic_ellipsis-horizontal"
                                            :menu="state.menuItems"
                                            menu-position="right"
