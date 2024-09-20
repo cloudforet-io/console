@@ -39,20 +39,20 @@ export default {
         {
             path: 'detail/:id',
             name: PROJECT_ROUTE.DETAIL._NAME,
-            redirect: PROJECT_ROUTE.DETAIL.TAB.OVERVIEW._NAME,
+            redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             props: true,
             component: ProjectDetailPageNew,
             children: [
                 {
                     path: '/',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
-                    redirect: PROJECT_ROUTE.DETAIL.TAB.OVERVIEW._NAME,
+                    redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                     props: true,
                     component: ProjectDetailTabPage,
                     children: [
                         {
                             path: 'overview',
-                            name: PROJECT_ROUTE.DETAIL.TAB.OVERVIEW._NAME,
+                            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                             meta: { lsbVisible: true },
                             props: true,
                             component: ProjectOverviewPage,

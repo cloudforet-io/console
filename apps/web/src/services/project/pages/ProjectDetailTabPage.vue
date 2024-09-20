@@ -100,8 +100,8 @@ const state = reactive({
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
         {
-            name: PROJECT_ROUTE.DETAIL.TAB.OVERVIEW._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_OVERVIEW'),
+            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+            label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
         },
         // {
         //     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
@@ -128,7 +128,7 @@ const singleItemTabState = reactive({
             tabType: 'divider',
         },
     ]),
-    activeTab: PROJECT_ROUTE.DETAIL.TAB.OVERVIEW._NAME,
+    activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
     webhookDetailTab: computed<TabItem[]>(() => {
         const defaultTab = [{
             name: 'details',
@@ -177,7 +177,7 @@ watch(() => route.name, () => {
         return acc;
     }, [] as TabItem[]);
     const exactRoute = route.matched.find((d) => flattenTabs.find((tab) => tab.name === d.name));
-    singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME;
+    singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
 }, { immediate: true });
 watch([
     () => props.id,

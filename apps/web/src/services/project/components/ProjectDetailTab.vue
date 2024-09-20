@@ -27,7 +27,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     item: undefined,
     tabs: () => [],
-    activeTab: PROJECT_ROUTE.DETAIL.TAB.OVERVIEW._NAME,
+    activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
 });
 
 const route = useRoute();
