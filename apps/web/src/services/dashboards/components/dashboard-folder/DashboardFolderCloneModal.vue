@@ -97,6 +97,7 @@ const createFolder = async (originFolderName: string, isPrivate: boolean): Promi
         const fetcher = isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
         const params: FolderCreateParams = {
             name: getClonedName(dashboardMainPageGetters.existingFolderNameList, originFolderName),
+            tags: { created_by: store.state.user.userId },
         };
         if (!isPrivate) {
             (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;

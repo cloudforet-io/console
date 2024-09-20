@@ -28,6 +28,8 @@ const _getDashboardTreeData = (folderList: FolderModel[], dashboardList: Dashboa
                 name: d.name,
                 type: 'FOLDER',
                 id: d.folder_id,
+                shared: d?.shared,
+                createdBy: d.tags?.created_by,
                 isNew: newIdList.includes(d.folder_id),
             },
             children: [],

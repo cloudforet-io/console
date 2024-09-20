@@ -15,6 +15,7 @@ import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model
 import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
 import type { PublicFolderUpdateParameters } from '@/schema/dashboard/public-folder/api-verbs/update';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -96,6 +97,7 @@ const createFolder = async () => {
         const fetcher = state.isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
         const params: FolderCreateParams = {
             name: name.value as string,
+            tags: { created_by: store.state.user.userId },
         };
         if (!state.isPrivate) {
             (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;
