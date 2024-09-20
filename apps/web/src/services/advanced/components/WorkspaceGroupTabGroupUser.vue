@@ -254,10 +254,6 @@ onUnmounted(() => {
             </template>
             <template #col-role-format="{ item }">
                 <span class="role-type">
-                    <img :src="useRoleFormatter(item.role_type).image"
-                         alt="role-type-icon"
-                         class="role-type-icon"
-                    >
                     <p-select-dropdown
                         is-filterable
                         use-fixed-menu-style
@@ -274,7 +270,10 @@ onUnmounted(() => {
                         @select="handleSelectMenu"
                     >
                         <template #dropdown-button>
-                            <span>{{ tableState.roleMap[item.role_id].name }}</span>
+                            <img :src="useRoleFormatter(item.role_type).image"
+                                 alt="role-type-icon"
+                                 class="role-type-icon"
+                            ><span>{{ tableState.roleMap[item.role_id].name }}</span>
                         </template>
                         <!-- eslint-disable vue/no-template-shadow -->
                         <template #menu-item--format="{ item }">
@@ -324,8 +323,8 @@ onUnmounted(() => {
 
         .role-type-icon {
             @apply rounded-full;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1rem;
+            height: 1rem;
         }
     }
 

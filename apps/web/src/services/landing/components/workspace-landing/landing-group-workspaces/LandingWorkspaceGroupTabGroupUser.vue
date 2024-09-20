@@ -59,6 +59,7 @@ const tableState = reactive({
     loginUserRoleType: computed(() => landingPageStoreGetter.workspaceGroupUsers.find((user) => user.user_id === tableState.loginUserId).role_type),
     isUserOwnerRole: computed(() => store.state.user.roleType === ROLE_TYPE.DOMAIN_ADMIN || tableState.loginUserRoleType === ROLE_TYPE.WORKSPACE_OWNER),
     items: [] as WorkspaceUser[],
+    roleMap: {} as Record<string, BasicRoleModel>,
 });
 
 const {
@@ -149,6 +150,18 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
         _state.groupUserTableState.isDesc = isDesc;
     });
 };
+
+const setRoleMap = async () => {
+    const { results } = await SpaceConnector.clientV2.identity.role.listBasicRole<RoleListParameters, ListResponse<RoleModel>>();
+    tableState.roleMap = results.reduce((acc, role) => {
+        acc[role.role_id] = role;
+        return acc;
+    }, {});
+};
+
+(() => {
+    setRoleMap();
+})();
 </script>
 
 <template>
@@ -205,11 +218,6 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
             </template>
             <template #col-role-format="{ item }">
                 <span class="role-type">
-                    <img :src="useRoleFormatter(item.role_type).image"
-                         alt="role-type-icon"
-                         class="role-type-icon"
-                    >
-                    <span>{{ useRoleFormatter(item.role_type).name }}</span>
                     <p-select-dropdown
                         v-if="tableState.isUserOwnerRole"
                         is-filterable
@@ -226,7 +234,10 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
                         @select="handleSelectMenu($event, item.user_id)"
                     >
                         <template #dropdown-button>
-                            <span />
+                            <img :src="useRoleFormatter(item.role_type).image"
+                                 alt="role-type-icon"
+                                 class="role-type-icon"
+                            ><span>{{ tableState.roleMap[item.role_id]?.name }}</span>
                         </template>
                         <!-- eslint-disable vue/no-template-shadow -->
                         <template #menu-item--format="{ item }">
@@ -286,8 +297,8 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
 
         .role-type-icon {
             @apply rounded-full;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1rem;
+            height: 1rem;
         }
     }
 
