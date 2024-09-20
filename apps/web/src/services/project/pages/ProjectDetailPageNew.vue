@@ -48,6 +48,7 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
+
 const ROLE_INFO_MAP = {
     [ROLE_TYPE.SYSTEM_ADMIN]: { icon: SystemAdminImage, label: 'System Admin' },
     [ROLE_TYPE.DOMAIN_ADMIN]: { icon: DomainAdminImage, label: 'Domain Admin' },
@@ -72,6 +73,7 @@ const projectPageState = projectPageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const gnbStore = useGnbStore();
+
 
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
@@ -320,38 +322,37 @@ onUnmounted(() => {
                 </div>
                 <div class="header-sub-contents">
                     <div class="description">
-                        <div v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
-                             class="info-item invite-only"
-                        >
-                            <p-i name="ic_lock-filled"
-                                 width="0.625rem"
-                                 height="0.625rem"
-                                 color="inherit"
+                        <template v-if="projectDetailPageGetters.projectType === 'PRIVATE'">
+                            <div class="info-item invite-only">
+                                <p-i name="ic_lock-filled"
+                                     width="0.625rem"
+                                     height="0.625rem"
+                                     color="inherit"
+                                />
+                                <span>Invite only</span>
+                            </div>
+                            <p-i name="ic_dot"
+                                 width="0.125rem"
+                                 height="0.125rem"
+                                 :color="gray[400]"
                             />
-                            <span>Invite only</span>
-                        </div>
-                        <p-i v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
-                             name="ic_dot"
-                             width="0.125rem"
-                             height="0.125rem"
-                             :color="gray[400]"
-                        />
-                        <div class="info-item"
-                             @click="handleOpenMemberModal"
-                        >
-                            <p-i class="info-icon"
-                                 name="ic_member"
-                                 width="0.75rem"
-                                 height="0.75rem"
-                                 color="inherit"
+                            <div class="info-item"
+                                 @click="handleOpenMemberModal"
+                            >
+                                <p-i class="info-icon"
+                                     name="ic_member"
+                                     width="0.75rem"
+                                     height="0.75rem"
+                                     color="inherit"
+                                />
+                                <span>{{ memberState.totalCount }} Members</span>
+                            </div>
+                            <p-i name="ic_dot"
+                                 width="0.125rem"
+                                 height="0.125rem"
+                                 :color="gray[400]"
                             />
-                            <span>{{ memberState.totalCount }} Members</span>
-                        </div>
-                        <p-i name="ic_dot"
-                             width="0.125rem"
-                             height="0.125rem"
-                             :color="gray[400]"
-                        />
+                        </template>
                         <div class="info-item"
                              @click="handleClickWebhook"
                         >
@@ -467,6 +468,11 @@ onUnmounted(() => {
                                                    @confirm="handleConfirmProjectGroupMoveModal"
             />
         </div>
+
+        <div class="quick-link-wrapper">
+            <span class="field-title">{{ $t('View in') }}</span>
+        </div>
+
         <router-view />
     </div>
 </template>
@@ -544,6 +550,18 @@ onUnmounted(() => {
                     }
                 }
             }
+        }
+    }
+
+    .quick-link-wrapper {
+        @apply flex items-center gap-4 bg-white border border-gray-200 rounded-lg;
+        width: 100%;
+        height: 2.75rem;
+        padding: 0.75rem 1rem;
+        margin-top: 1.5rem;
+
+        .field-title {
+            @apply text-label-md font-bold text-gray-600;
         }
     }
 }
