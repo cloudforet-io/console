@@ -4,6 +4,7 @@ import {
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PI, PIconButton } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
@@ -12,15 +13,15 @@ import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
+import { gray, indigo } from '@/styles/colors';
+
 import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
 import ProjectSummaryAlertWidget from '@/services/project/components/ProjectSummaryAlertWidget.vue';
 import ProjectSummaryAllSummaryWidget from '@/services/project/components/ProjectSummaryAllSummaryWidget.vue';
-// import ProjectSummaryBillingWidget from '@/services/project/components/ProjectSummaryBillingWidget.vue';
 import ProjectSummaryBillingWidget from '@/services/project/components/ProjectSummaryBillingWidget.vue';
 import ProjectSummaryPersonalHealthDashboardWidget from '@/services/project/components/ProjectSummaryPersonalHealthDashboardWidget.vue';
 import ProjectSummaryServiceAccountsWidget from '@/services/project/components/ProjectSummaryServiceAccountsWidget.vue';
 import ProjectSummaryTrustedAdvisorWidget from '@/services/project/components/ProjectSummaryTrustedAdvisorWidget.vue';
-
 
 interface Props {
     id: string;
@@ -28,7 +29,12 @@ interface Props {
 const props = defineProps<Props>();
 const state = reactive({
     hasAlertConfig: false,
+    deprecatedNotiVisible: true,
 });
+
+const handleClickNotiClose = () => {
+    state.deprecatedNotiVisible = false;
+};
 
 /* api */
 const getProjectAlertConfig = async () => {
@@ -50,7 +56,33 @@ const getProjectAlertConfig = async () => {
 </script>
 
 <template>
-    <div class="grid grid-cols-12 project-summary-page">
+    <div class="project-summary-page">
+        <div v-if="state.deprecatedNotiVisible"
+             class="deprecated-notification"
+        >
+            <div class="contents-wrapper">
+                <p-i name="ic_info-circle"
+                     width="1.25rem"
+                     height="1.25rem"
+                     :color="indigo[500]"
+                />
+                <div>
+                    <p class="title">
+                        {{ $t('Project Summary will be deprecated.') }}
+                    </p>
+                    <p class="description">
+                        {{ $t('You can see more details than the summary in project dashboard, which is currently in beta service.') }}
+                    </p>
+                </div>
+            </div>
+            <p-icon-button name="ic_close"
+                           size="sm"
+                           width="1.5rem"
+                           height="1.5rem"
+                           :color="gray[400]"
+                           @click="handleClickNotiClose"
+            />
+        </div>
         <project-summary-all-summary-widget
             class="col-span-12"
             :project-id="props.id"
@@ -107,6 +139,23 @@ const getProjectAlertConfig = async () => {
 .project-summary-page {
     grid-gap: 1rem;
     padding: 2rem 1rem 0;
+
+    .deprecated-notification {
+        @apply bg-indigo-100 rounded-md flex w-full justify-between;
+        padding: 1rem 0.5rem;
+        margin-bottom: 1.5rem;
+
+        .contents-wrapper {
+            @apply flex gap-1;
+
+            .title {
+                @apply text-label-lg font-bold text-indigo-600;
+            }
+            .description {
+                @apply text-paragraph-md text-gray-900;
+            }
+        }
+    }
 
     .left-part, .right-part {
         display: grid;
