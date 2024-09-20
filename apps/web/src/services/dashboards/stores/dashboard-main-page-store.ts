@@ -146,6 +146,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         newIdList: [] as string[],
     });
     const getters = reactive({
+        // public
         publicDashboardItems: computed<PublicDashboardModel[]>(() => {
             if (!storeState.isWorkspaceOwner) return [];
             return dashboardState.publicDashboardItems
@@ -162,13 +163,15 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
                 || [];
         }),
         publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
+        selectedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.publicDashboardTreeData, state.selectedPublicIdMap)),
+        publicModalTableItems: computed<ModalDataTableItem[]>(() => _getModalTableItems(getters.publicDashboardTreeData, getters.selectedPublicTreeData)),
+        // private
         privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems),
         privateFolderItems: computed<PrivateFolderModel[]>(() => dashboardState.privateFolderItems),
         privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getDashboardTreeData(getters.privateFolderItems, getters.privateDashboardItems, state.newIdList)),
-        selectedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.publicDashboardTreeData, state.selectedPublicIdMap)),
         selectedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.privateDashboardTreeData, state.selectedPrivateIdMap)),
-        publicModalTableItems: computed<ModalDataTableItem[]>(() => _getModalTableItems(getters.publicDashboardTreeData, getters.selectedPublicTreeData)),
         privateModalTableItems: computed<ModalDataTableItem[]>(() => _getModalTableItems(getters.privateDashboardTreeData, getters.selectedPrivateTreeData)),
+        //
         existingFolderNameList: computed<string[]>(() => {
             const _publicNames = dashboardState.publicFolderItems.map((d) => d.name);
             const _privateNames = dashboardState.privateFolderItems.map((d) => d.name);
