@@ -40,12 +40,16 @@ const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     folderControlButtons: computed(() => {
         if (props.hideButtons) return [];
+        const _defaultButtons = [{
+            name: 'edit',
+            icon: 'ic_edit-text',
+            clickEvent: handleEditFolderName,
+        }];
+        if (props.treeData.data.id.startsWith('private')) {
+            return _defaultButtons;
+        }
         return [
-            {
-                name: 'edit',
-                icon: 'ic_edit-text',
-                clickEvent: handleEditFolderName,
-            },
+            ..._defaultButtons,
             {
                 name: 'share',
                 icon: 'ic_share',
