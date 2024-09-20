@@ -101,7 +101,7 @@ const handleClickButton = () => {
 
 onMounted(async () => {
     try {
-        await landingPageStore.setLoading(true);
+        landingPageStore.setLoading(true);
         await userWorkspaceStore.load();
         await recentStore.fetchRecent({
             type: RECENT_TYPE.WORKSPACE,
@@ -109,7 +109,7 @@ onMounted(async () => {
         });
         await favoriteStore.fetchWorkspaceFavorite();
     } finally {
-        await landingPageStore.setLoading(false);
+        landingPageStore.setLoading(false);
     }
 });
 

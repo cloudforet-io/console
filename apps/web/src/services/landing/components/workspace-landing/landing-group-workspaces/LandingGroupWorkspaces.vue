@@ -225,6 +225,7 @@ watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
             .button-group {
                 margin: 0;
                 flex-wrap: nowrap;
+                min-height: unset;
 
                 > button {
                     flex-shrink: 0;
