@@ -101,25 +101,26 @@ const createFolder = async (originFolderName: string, isPrivate: boolean): Promi
 };
 const createDashboard = async (treeData: DashboardTreeDataType, isPrivate?: boolean, folderId?: string) => {
     const _dashboardType = isPrivate ? 'PRIVATE' : 'PUBLIC';
-    const _dashboard = isPrivate
-        ? dashboardMainPageGetters.publicDashboardItems.find((item) => item.dashboard_id === treeData.id)
-        : dashboardMainPageGetters.privateDashboardItems.find((item) => item.dashboard_id === treeData.id);
+    const _isOriginDashboardPrivate = treeData.id.startsWith('private');
+    const _dashboard = _isOriginDashboardPrivate
+        ? dashboardMainPageGetters.privateDashboardItems.find((item) => item.dashboard_id === treeData.id)
+        : dashboardMainPageGetters.publicDashboardItems.find((item) => item.dashboard_id === treeData.id);
     const _dashboardWidgets = await listDashboardWidgets(_dashboard.dashboard_id);
-    const _sharedLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets, storeState.costDataSource);
-    const _sharedDashboard: DashboardCreateParams = {
+    const _createdLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets, storeState.costDataSource);
+    const _createdDashboardParams: DashboardCreateParams = {
         name: getClonedName(dashboardMainPageGetters.existingDashboardNameList, _dashboard.name),
-        layouts: _sharedLayouts,
+        layouts: _createdLayouts,
         options: _dashboard.options || {},
         labels: _dashboard.labels || [],
         tags: { created_by: store.state.user.userId },
         folder_id: folderId,
     };
     if (storeState.isAdminMode) {
-        (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+        (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
     } else if (!isPrivate) {
-        (_sharedDashboard as PublicDashboardCreateParameters).resource_group = _dashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
+        (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = _dashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
     }
-    const createdDashboard = await dashboardStore.createDashboard(_dashboardType, _sharedDashboard);
+    const createdDashboard = await dashboardStore.createDashboard(_dashboardType, _createdDashboardParams);
     dashboardMainPageStore.setNewIdList([
         ...dashboardMainPageState.newIdList,
         createdDashboard.dashboard_id as string,
