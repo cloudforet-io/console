@@ -8,7 +8,7 @@ import {
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { DashboardModel, DashboardCreateParams } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardCreateParams } from '@/schema/dashboard/_types/dashboard-type';
 import type { FolderCreateParams } from '@/schema/dashboard/_types/folder-type';
 import type { WidgetModel, WidgetListParams } from '@/schema/dashboard/_types/widget-type';
 import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
@@ -29,6 +29,7 @@ import { gray } from '@/styles/colors';
 
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
+import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
@@ -106,63 +107,65 @@ const createFolder = async (originFolderName: string, isPrivate: boolean): Promi
         return undefined;
     }
 };
-const createDashboard = async (dashboard: DashboardModel, isPrivate?: boolean, folderId?: string): Promise<boolean> => {
-    try {
-        const _dashboardType = isPrivate ? 'PRIVATE' : 'PUBLIC';
-        const _dashboardWidgets = await listDashboardWidgets(dashboard.dashboard_id);
-        const _sharedLayouts = await getSharedDashboardLayouts(dashboard.layouts, _dashboardWidgets, storeState.costDataSource);
-        let _sharedDashboard: DashboardCreateParams = {
-            name: getUniqueDashboardName(dashboard.name),
-            layouts: _sharedLayouts,
-            options: dashboard.options || {},
-            labels: dashboard.labels || [],
-            tags: { created_by: store.state.user.userId },
-            folder_id: folderId,
+const createDashboard = async (treeData: DashboardTreeDataType, isPrivate?: boolean, folderId?: string) => {
+    const _dashboardType = isPrivate ? 'PRIVATE' : 'PUBLIC';
+    const _dashboard = isPrivate
+        ? dashboardMainPageGetters.publicDashboardItems.find((item) => item.dashboard_id === treeData.id)
+        : dashboardMainPageGetters.privateDashboardItems.find((item) => item.dashboard_id === treeData.id);
+    const _dashboardWidgets = await listDashboardWidgets(_dashboard.dashboard_id);
+    const _sharedLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets, storeState.costDataSource);
+    let _sharedDashboard: DashboardCreateParams = {
+        name: getUniqueDashboardName(_dashboard.name),
+        layouts: _sharedLayouts,
+        options: _dashboard.options || {},
+        labels: _dashboard.labels || [],
+        tags: { created_by: store.state.user.userId },
+        folder_id: folderId,
+    };
+    if (storeState.isAdminMode) {
+        _sharedDashboard = {
+            ..._sharedDashboard,
+            resource_group: RESOURCE_GROUP.DOMAIN,
         };
-        if (storeState.isAdminMode) {
-            _sharedDashboard = {
-                ..._sharedDashboard,
-                resource_group: RESOURCE_GROUP.DOMAIN,
-            };
-        } else if (!isPrivate) {
-            _sharedDashboard = {
-                ..._sharedDashboard,
-                resource_group: dashboard?.resource_group || RESOURCE_GROUP.WORKSPACE,
-            };
-        }
-        const createdDashboard = await dashboardStore.createDashboard(_dashboardType, _sharedDashboard);
-        dashboardMainPageStore.setNewIdList([
-            ...dashboardMainPageState.newIdList,
-            createdDashboard.dashboard_id as string,
-        ]);
-        return true;
-    } catch (e) {
-        return false;
+    } else if (!isPrivate) {
+        _sharedDashboard = {
+            ..._sharedDashboard,
+            resource_group: _dashboard?.resource_group || RESOURCE_GROUP.WORKSPACE,
+        };
     }
+    const createdDashboard = await dashboardStore.createDashboard(_dashboardType, _sharedDashboard);
+    dashboardMainPageStore.setNewIdList([
+        ...dashboardMainPageState.newIdList,
+        createdDashboard.dashboard_id as string,
+    ]);
 };
 
 /* Event */
 const handleCloneConfirm = async () => {
     state.loading = true;
-    const _createDashboardPromises: Promise<boolean>[] = [];
+    const _createDashboardPromises: Promise<void>[] = [];
 
-    await Promise.all(dashboardMainPageGetters.selectedTreeData.map(async (item) => {
+    await Promise.allSettled(dashboardMainPageGetters.selectedTreeData.map(async (item) => {
+        const _isPrivate = state.privateMap[item.data.id];
         if (item.data.type === 'FOLDER') {
-            const _isPrivate = state.privateMap[item.data.id];
             const createdFolderId = await createFolder(item.data.name, _isPrivate);
+            if (!createdFolderId) {
+                return;
+            }
             item.children.forEach((child) => {
                 _createDashboardPromises.push(createDashboard(child.data, _isPrivate, createdFolderId));
             });
         } else {
-            _createDashboardPromises.push(createDashboard(item.data, false));
+            _createDashboardPromises.push(createDashboard(item.data, _isPrivate));
         }
     }));
-    const _results = await Promise.all(_createDashboardPromises);
+    const _results = await Promise.allSettled(_createDashboardPromises);
 
-    if (_results.every((r) => r)) {
+    if (_results.every((r) => r.status === 'fulfilled')) {
         showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_S_CLONE_DASHBOARD'), '');
     } else {
-        ErrorHandler.handleRequestError(new Error('Delete failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD'));
+        const _failedCount = _results.map((r) => r.status !== 'fulfilled').length;
+        ErrorHandler.handleRequestError(new Error('Clone failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }));
     }
     await dashboardStore.load();
     dashboardMainPageStore.setSelectedIdMap({});
