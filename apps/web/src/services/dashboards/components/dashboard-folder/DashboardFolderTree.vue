@@ -12,13 +12,22 @@ import DashboardFolderTreeItem from '@/services/dashboards/components/dashboard-
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
+interface ControlButton {
+    name: string;
+    icon: string;
+    clickEvent: () => void;
+    disabled?: boolean;
+}
 interface Props {
     selectedIdMap: Record<string, boolean>;
     dashboardTreeData: TreeNode<DashboardTreeDataType>[];
+    hideButtons?: boolean;
+    buttonDisableMap?: Record<string, boolean>;
 }
 const props = withDefaults(defineProps<Props>(), {
     selectedIdMap: () => ({}),
     dashboardTreeData: () => ([]),
+    buttonDisableMap: () => ({}),
 });
 const emit = defineEmits<{(e: 'update:selectedIdMap', selectedIdMap: Record<string, boolean>): void;
     (e: 'click-delete');
@@ -40,28 +49,35 @@ const state = reactive({
         return Object.values(state.proxySelectedIdMap).some((v) => v);
     }),
     childrenShowMap: {} as Record<string, boolean>,
-    controlButtons: computed(() => ([
-        {
-            name: 'clone',
-            icon: 'ic_clone',
-            clickEvent: () => emit('click-clone'),
-        },
-        {
-            name: 'move',
-            icon: 'ic_move',
-            clickEvent: () => emit('click-move'),
-        },
-        {
-            name: 'delete',
-            icon: 'ic_delete',
-            clickEvent: () => emit('click-delete'),
-        },
-        {
+    controlButtons: computed<ControlButton[]>(() => {
+        const _defaultButtons = [{
             name: 'refresh',
             icon: 'ic_refresh',
             clickEvent: () => emit('click-refresh'),
-        },
-    ])),
+        }];
+        if (props.hideButtons) return _defaultButtons;
+        return [
+            {
+                name: 'clone',
+                icon: 'ic_clone',
+                clickEvent: () => emit('click-clone'),
+                disabled: !!props.buttonDisableMap?.clone,
+            },
+            {
+                name: 'move',
+                icon: 'ic_move',
+                clickEvent: () => emit('click-move'),
+                disabled: !!props.buttonDisableMap?.move,
+            },
+            {
+                name: 'delete',
+                icon: 'ic_delete',
+                clickEvent: () => emit('click-delete'),
+                disabled: !!props.buttonDisableMap?.delete,
+            },
+            ..._defaultButtons,
+        ];
+    }),
     showAll: false,
     slicedTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         if (state.showAll) return props.dashboardTreeData;
@@ -142,6 +158,7 @@ const handleClickShowAll = () => {
                 <p-icon-button v-for="controlButton in state.controlButtons"
                                :key="`control-button-${controlButton.name}`"
                                :name="controlButton.icon"
+                               :disabled="controlButton.disabled"
                                size="sm"
                                @click="controlButton.clickEvent"
                 />
@@ -164,6 +181,7 @@ const handleClickShowAll = () => {
                      @click="handleClickCollapseButton(treeData)"
                 />
                 <dashboard-folder-tree-item :tree-data="treeData"
+                                            :hide-buttons="props.hideButtons"
                                             @toggle-folder="handleClickCollapseButton(treeData)"
                 />
             </div>
@@ -175,7 +193,9 @@ const handleClickShowAll = () => {
                     <p-checkbox :selected="state.proxySelectedIdMap[child.data.id]"
                                 @change="handleSelectTreeItem(child, $event)"
                     />
-                    <dashboard-folder-tree-item :tree-data="child" />
+                    <dashboard-folder-tree-item :tree-data="child"
+                                                :hide-buttons="props.hideButtons"
+                    />
                 </div>
                 <div v-if="!treeData.children?.length"
                      class="folder-row-wrapper no-dashboard"
