@@ -26,6 +26,7 @@ import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboar
 
 interface Props {
     treeData: TreeNode<DashboardTreeDataType>;
+    hideButtons?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
 });
@@ -37,18 +38,21 @@ const appContextStore = useAppContextStore();
 const dashboardMainPageStore = useDashboardMainPageStore();
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    folderControlButtons: computed(() => ([
-        {
-            name: 'edit',
-            icon: 'ic_edit-text',
-            clickEvent: handleEditFolderName,
-        },
-        {
-            name: 'share',
-            icon: 'ic_share',
-            clickEvent: () => {},
-        },
-    ])),
+    folderControlButtons: computed(() => {
+        if (props.hideButtons) return [];
+        return [
+            {
+                name: 'edit',
+                icon: 'ic_edit-text',
+                clickEvent: handleEditFolderName,
+            },
+            {
+                name: 'share',
+                icon: 'ic_share',
+                clickEvent: () => {},
+            },
+        ];
+    }),
 });
 
 /* Util */

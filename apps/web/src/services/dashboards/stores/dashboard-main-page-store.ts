@@ -28,6 +28,8 @@ const _getDashboardTreeData = (folderList: FolderModel[], dashboardList: Dashboa
                 name: d.name,
                 type: 'FOLDER',
                 id: d.folder_id,
+                shared: d?.shared,
+                createdBy: d.tags?.created_by,
                 isNew: newIdList.includes(d.folder_id),
             },
             children: [],
@@ -127,6 +129,19 @@ const _getModalTableItems = (treeData: TreeNode<DashboardTreeDataType>[], select
     });
     return _tableItems;
 };
+const _isControlButtonDisabled = (selectedPublicTreeData: TreeNode<DashboardTreeDataType>[]): boolean => {
+    if (selectedPublicTreeData.length === 0) return true;
+    let result = false;
+    selectedPublicTreeData.forEach((node) => {
+        if (result) return;
+        if (node.data.type === 'FOLDER') {
+            node.children?.forEach((child) => {
+                if (child.data.shared) result = true;
+            });
+        } else if (node.data.shared) result = true;
+    });
+    return result;
+};
 export const useDashboardMainPageStore = defineStore('page-dashboard-main', () => {
     const dashboardStore = useDashboardStore();
     const dashboardState = dashboardStore.state;
@@ -159,18 +174,28 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
             if (!storeState.isWorkspaceOwner) return [];
             return dashboardState.publicFolderItems
                 .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
-                .filter((item) => !(item.resource_group === 'DOMAIN' && item.project_id.length > 1))
+                .filter((item) => item.resource_group !== 'DOMAIN')
                 || [];
         }),
         publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
         selectedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.publicDashboardTreeData, state.selectedPublicIdMap)),
         publicModalTableItems: computed<ModalDataTableItem[]>(() => _getModalTableItems(getters.publicDashboardTreeData, getters.selectedPublicTreeData)),
+        publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => ({
+            clone: getters.selectedPublicTreeData.length === 0,
+            move: _isControlButtonDisabled(getters.selectedPublicTreeData),
+            delete: _isControlButtonDisabled(getters.selectedPublicTreeData),
+        })),
         // private
         privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems),
         privateFolderItems: computed<PrivateFolderModel[]>(() => dashboardState.privateFolderItems),
         privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getDashboardTreeData(getters.privateFolderItems, getters.privateDashboardItems, state.newIdList)),
         selectedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.privateDashboardTreeData, state.selectedPrivateIdMap)),
         privateModalTableItems: computed<ModalDataTableItem[]>(() => _getModalTableItems(getters.privateDashboardTreeData, getters.selectedPrivateTreeData)),
+        privateTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => ({
+            clone: getters.selectedPrivateTreeData.length === 0,
+            move: getters.selectedPrivateTreeData.length === 0,
+            delete: getters.selectedPrivateTreeData.length === 0,
+        })),
         //
         existingFolderNameList: computed<string[]>(() => {
             const _publicNames = dashboardState.publicFolderItems.map((d) => d.name);

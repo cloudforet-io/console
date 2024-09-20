@@ -55,9 +55,10 @@ const state = reactive({
             name: '',
         };
         if (dashboardMainPageState.folderModalType === 'PUBLIC') {
+            const _targetFolderItems = dashboardState.publicFolderItems.filter((d) => !d.shared);
             return [
                 defaultItem,
-                ...dashboardState.publicFolderItems.map((folder) => ({
+                ..._targetFolderItems.map((folder) => ({
                     label: folder.name,
                     name: folder.folder_id,
                 })),
