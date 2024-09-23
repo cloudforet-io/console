@@ -77,12 +77,6 @@ const state = reactive({
     })),
     projectGroupMemberManagementModalVisible: false,
     projectGroupMemberCount: computed<number|undefined>(() => storeState.projectGroups?.[state.currentProjectGroupIds]?.data.users?.length),
-});
-
-const modalState = reactive({
-    projectGroupFormVisible: false,
-    projectGroupDeleteCheckModalVisible: false,
-    projectFormModalVisible: false,
     projectGroupUpdateMode: false,
 });
 
@@ -92,7 +86,7 @@ onClickOutside(menuRef, () => {
 
 /* Event */
 const handleClickProjectGroupEditButton = () => {
-    modalState.projectGroupUpdateMode = true;
+    state.projectGroupUpdateMode = true;
     projectPageStore.setProjectGroupFormVisible(true);
 };
 const handleClickProjectGroupDeleteButton = () => {
@@ -113,7 +107,7 @@ const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
         projectPageStore.setProjectFormModalVisible(true);
     } else if (item.name === 'projectGroup') {
-        modalState.projectGroupUpdateMode = false;
+        state.projectGroupUpdateMode = false;
         projectPageStore.setProjectGroupFormVisible(true);
     }
 };
@@ -223,7 +217,7 @@ onUnmounted(() => {
         <project-main-project-group-form-modal v-if="projectPageState.projectGroupFormVisible"
                                                :visible="projectPageState.projectGroupFormVisible"
                                                :project-group-id="projectPageState.currentSelectedProjectGroupId || state.currentProjectGroupId"
-                                               :update-mode="!!projectPageState.currentSelectedProjectGroupId || modalState.projectGroupUpdateMode"
+                                               :update-mode="!!projectPageState.currentSelectedProjectGroupId || state.projectGroupUpdateMode"
                                                @update:visible="handleUpdateProjectGroupFormModalVisible"
                                                @confirm="handleRefreshTree"
         />
