@@ -48,13 +48,13 @@ const {
         name: _role.role_id,
         role_type: _role.role_type,
     }),
-    filter: [{ k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '!=' }],
     fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
         query: {
             ...apiQueryHelper.data,
             filter: [
                 ...(apiQueryHelper.data.filter || []),
                 { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'not' },
             ],
         },
     }),

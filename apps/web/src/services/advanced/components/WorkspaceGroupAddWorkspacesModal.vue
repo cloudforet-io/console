@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
 
@@ -21,14 +22,22 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
 const state = reactive({
     loading: false,
+    workspaceDropdownFilter: computed<ConsoleFilter[]>(() => [
+        { k: 'workspace_id', v: workspaceTabState.workspacesInSelectedGroup.map((w) => w.workspace_id) || [], o: '!=' },
+    ]),
 });
 
+const workspaceDropdownFilter = computed<ConsoleFilter[]>(() => [
+    { k: 'workspace_id', v: workspaceTabState.workspacesInSelectedGroup.map((w) => w.workspace_id) || [], o: '!=' },
+]);
+
 const {
-    loading, searchText, menuList, selectedItems, handleClickShowMore,
+    loading, searchText, menuList, selectedItems, handleClickShowMore, reset,
 } = useSelectDropDownList<WorkspaceModel>({
     pageSize: 10,
     transformer: (_workspace) => ({
@@ -40,6 +49,7 @@ const {
     fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
         query: apiQueryHelper.data,
     }),
+    filter: workspaceDropdownFilter,
 });
 
 const addWorkspace = async () => {
@@ -77,6 +87,12 @@ const handleCloseModal = () => {
     resetForm();
     workspaceGroupPageStore.closeModal();
 };
+
+watch(() => workspaceGroupPageState.modal, (value) => {
+    if (value.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES) {
+        reset();
+    }
+});
 </script>
 
 <template>

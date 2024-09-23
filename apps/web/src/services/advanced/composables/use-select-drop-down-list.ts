@@ -18,7 +18,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface SelectDownListProps<T> {
     isSearch?: boolean;
-    filter?: ConsoleFilter[];
+    filter?: ComputedRef<ConsoleFilter[]>;
     pageSize?: number;
     transformer: (item: T) => SelectDropdownMenuItem,
     fetcher: (apiQueryHelper: ApiQueryHelper) => Promise<ListResponse<any>>
@@ -81,8 +81,8 @@ export const useSelectDropDownList = <DataModel>({
                 { k: searchKey, v: state.searchText, o: '' },
             ];
 
-            if (filter) {
-                filters = filters.concat(filter);
+            if (filter?.value) {
+                filters = filters.concat(filter.value);
             }
 
             apiQueryHelper.setFilters(filters);
