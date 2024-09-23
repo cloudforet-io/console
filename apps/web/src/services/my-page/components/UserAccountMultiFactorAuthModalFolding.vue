@@ -9,20 +9,25 @@ import { postUserProfileDisableMfa, postEnableMfa } from '@/lib/helper/multi-fac
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import {
+    MULTI_FACTOR_AUTH_TYPE,
+} from '@/services/my-page/types/multi-factor-auth-type';
+
 interface Props {
-    mfaType?: string
-    type: string
-    isSentCode?: boolean
+    isDisabledModal: boolean
+    isSentCode: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    mfaType: '',
-    type: '',
+    isDisabledModal: false,
     isSentCode: false,
 });
 
 const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 
+const storeState = reactive({
+    email: computed<string>(() => store.state.user.mfa?.options?.email || undefined),
+});
 const state = reactive({
     isCollapsed: true,
     userId: computed<string>(() => store.state.user.userId),
@@ -31,16 +36,15 @@ const state = reactive({
 });
 
 const handleClickSendEmailButton = async () => {
-    if (props.type === 'disabled' || props.type === 'change') {
-        const response = await postUserProfileDisableMfa();
-        await store.dispatch('user/setUser', response);
+    if (props.isDisabledModal) {
+        await postUserProfileDisableMfa();
     } else {
         await postEnableMfa({
-            mfa_type: props.mfaType,
+            mfa_type: MULTI_FACTOR_AUTH_TYPE.EMAIL,
             options: {
-                email: state.userEmail,
+                email: storeState.email,
             },
-        }, true);
+        }, false);
     }
     state.proxyIsSentCode = true;
 };
@@ -59,7 +63,7 @@ const handleClickSendEmailButton = async () => {
             {{ $t('COMMON.MFA_MODAL.COLLAPSE_DESC') }}
             <p-text-button class="send-code-button"
                            style-type="highlight"
-                           :disabled="!props.isSentCode"
+                           :disabled="props.isDisabledModal ? !storeState.email : !props.isSentCode"
                            @click.prevent="handleClickSendEmailButton"
             >
                 <span class="emphasis">{{ $t('COMMON.MFA_MODAL.SEND_NEW_CODE') }}</span>

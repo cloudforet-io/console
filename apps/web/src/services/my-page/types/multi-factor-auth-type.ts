@@ -1,3 +1,5 @@
+import type { RoleType } from '@/schema/identity/role/type';
+import type { UserModel } from '@/schema/identity/user/model';
 import { i18n } from '@/translations';
 
 export const MULTI_FACTOR_AUTH_TYPE = {
@@ -22,10 +24,17 @@ export const MULTI_FACTOR_AUTH_ITEMS = [
     },
 ];
 
-export const MULTI_FACTOR_AUTH_MODAL_TYPE = {
-    MS: MULTI_FACTOR_AUTH_TYPE.MS,
-    EMAIL: MULTI_FACTOR_AUTH_TYPE.EMAIL,
-    DISABLED: 'disabled',
-} as const;
+export type MultiFactorAuthModalDataType = {
+    type: MultiFactorAuthType,
+    state?: boolean,
+    isReSync?: boolean,
+};
 
-export type MultiFactorAuthModalType = typeof MULTI_FACTOR_AUTH_MODAL_TYPE[keyof typeof MULTI_FACTOR_AUTH_MODAL_TYPE];
+type RoleBindingType = {
+    type: RoleType;
+    name: string;
+};
+
+export type UserInfoType = Partial<UserModel> & {
+    role_binding?: RoleBindingType
+};

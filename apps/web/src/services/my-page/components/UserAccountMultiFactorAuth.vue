@@ -1,34 +1,21 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    reactive,
 } from 'vue';
-
-import { store } from '@/store';
 
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
 import UserAccountMultiFactorAuthItems from '@/services/my-page/components/UserAccountMultiFactorAuthItems.vue';
 import UserAccountMultiFactorAuthModal from '@/services/my-page/components/UserAccountMultiFactorAuthModal.vue';
-import type { MultiFactorAuthModalType } from '@/services/my-page/types/multi-factor-auth-type';
-import { MULTI_FACTOR_AUTH_MODAL_TYPE } from '@/services/my-page/types/multi-factor-auth-type';
-
-const state = reactive({
-    userId: computed(() => store.state.user.userId),
-    mfa: computed(() => store.state.user.mfa || undefined),
-    isVerified: computed(() => state.mfa?.state === 'ENABLED'),
-});
+import type { MultiFactorAuthModalDataType } from '@/services/my-page/types/multi-factor-auth-type';
 
 const modalState = reactive({
     isModalVisible: false,
-    modalType: MULTI_FACTOR_AUTH_MODAL_TYPE.EMAIL as MultiFactorAuthModalType,
+    modalData: {} as MultiFactorAuthModalDataType,
 });
 
-const handleChangeToggle = (type: MultiFactorAuthModalType, value: boolean) => {
+const handleModalType = (data: MultiFactorAuthModalDataType) => {
     modalState.isModalVisible = true;
-    if (!value) {
-        modalState.modalType = MULTI_FACTOR_AUTH_MODAL_TYPE.DISABLED;
-    } else {
-        modalState.modalType = type;
-    }
+    modalState.modalData = data;
 };
 </script>
 
@@ -45,12 +32,11 @@ const handleChangeToggle = (type: MultiFactorAuthModalType, value: boolean) => {
                 </div>
             </template>
             <user-account-multi-factor-auth-items :modal-visible="modalState.isModalVisible"
-                                                  @change-toggle="handleChangeToggle"
+                                                  @handle-modal="handleModalType"
             />
         </user-account-module-container>
         <user-account-multi-factor-auth-modal v-if="modalState.isModalVisible"
-                                              :type="modalState.modalType"
-                                              :verified="state.isVerified"
+                                              :data="modalState.modalData"
                                               :visible.sync="modalState.isModalVisible"
         />
     </div>
