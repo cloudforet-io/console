@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PI, PTooltip, PDivider, PButton, PTextInput, PFieldGroup,
+    PI, PButton, PTextInput, PFieldGroup,
 } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
@@ -15,18 +15,17 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type { UserListItemType } from '@/services/iam/types/user-type';
+import { MULTI_FACTOR_AUTH_MODAL_TYPE } from '@/services/my-page/types/multi-factor-auth-type';
 
 interface Props {
     email?: string
     type?: string
-    mfaType?: string
     isSentCode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     email: '',
     type: '',
-    mfaType: '',
     isSentCode: false,
 });
 
@@ -56,9 +55,9 @@ const {
 const handleClickSendCodeButton = async () => {
     state.loading = true;
     try {
-        if (props.type === 'new') {
+        if (props.type === MULTI_FACTOR_AUTH_MODAL_TYPE.EMAIL) {
             state.data = await postEnableMfa({
-                mfa_type: props.mfaType,
+                mfa_type: props.type,
                 options: {
                     email: email.value,
                 },
@@ -79,7 +78,7 @@ const handleClickSendCodeButton = async () => {
 
 <template>
     <div class="email-info-wrapper">
-        <div v-if="props.type === 'new'"
+        <div v-if="props.type !== MULTI_FACTOR_AUTH_MODAL_TYPE.DISABLED"
              class="email-form-wrapper"
         >
             <p-field-group
@@ -92,6 +91,7 @@ const handleClickSendCodeButton = async () => {
                 <p-text-input :value="email"
                               :invalid="invalidState.email"
                               is-focused
+                              :disabled="state.loading || state.proxyIsSentCode"
                               block
                               @update:value="setForm('email', $event)"
                 />
@@ -107,28 +107,9 @@ const handleClickSendCodeButton = async () => {
         <div v-else
              class="email-view-wrapper"
         >
-            <div v-if="props.type === 'change'"
-                 class="change-info-wrapper"
-            >
-                <div class="change-info">
-                    <p>{{ $t('COMMON.MFA_MODAL.CHANGE.DESC') }}</p>
-                    <p-tooltip
-                        :contents="$t('COMMON.MFA_MODAL.CHANGE.TOOLTIP')"
-                        position="bottom"
-                    >
-                        <p-i name="ic_info-circle"
-                             class="icon-info"
-                             height="1rem"
-                             width="1rem"
-                             color="inherit"
-                        />
-                    </p-tooltip>
-                </div>
-                <p-divider />
-            </div>
             <div class="contents-wrapper">
                 <div class="email-info">
-                    <p>{{ props.type === 'verify' ? $t('COMMON.MFA_MODAL.SENT_DESC') : $t('COMMON.MFA_MODAL.ALT.EMAIL_INFO') }}</p>
+                    <p>{{ $t('COMMON.MFA_MODAL.ALT.EMAIL_INFO') }}</p>
                     <div class="email-wrapper">
                         <p-i name="ic_envelope-filled"
                              height="0.875rem"
@@ -141,8 +122,7 @@ const handleClickSendCodeButton = async () => {
                         </p>
                     </div>
                 </div>
-                <p-button v-if="props.type !== 'verify'"
-                          style-type="secondary"
+                <p-button style-type="secondary"
                           :loading="state.loading"
                           :disabled="state.proxyIsSentCode"
                           @click="handleClickSendCodeButton"
@@ -156,7 +136,7 @@ const handleClickSendCodeButton = async () => {
 
 <style scoped lang="postcss">
 .email-info-wrapper {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
     .email-form-wrapper {
         @apply flex items-end;
         gap: 1rem;
@@ -168,17 +148,6 @@ const handleClickSendCodeButton = async () => {
         @apply flex flex-col bg-gray-100 rounded text-label-md text-gray-700;
         padding: 0.5rem;
         gap: 0.375rem;
-        .change-info-wrapper {
-            @apply flex flex-col;
-            gap: 0.375rem;
-            .change-info {
-                @apply flex;
-                gap: 0.25rem;
-                .icon-info {
-                    @apply text-gray-900;
-                }
-            }
-        }
         .contents-wrapper {
             @apply flex justify-between items-center;
             .email-info {

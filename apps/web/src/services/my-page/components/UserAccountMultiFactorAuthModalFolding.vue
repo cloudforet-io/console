@@ -11,14 +11,12 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     mfaType?: string
-    email?: string
     type: string
     isSentCode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     mfaType: '',
-    email: '',
     type: '',
     isSentCode: false,
 });
@@ -27,7 +25,8 @@ const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 
 const state = reactive({
     isCollapsed: true,
-    userId: computed(() => store.state.user.userId),
+    userId: computed<string>(() => store.state.user.userId),
+    userEmail: computed<string>(() => store.state.user.email),
     proxyIsSentCode: useProxyValue('is-sent-code', props, emit),
 });
 
@@ -39,7 +38,7 @@ const handleClickSendEmailButton = async () => {
         await postEnableMfa({
             mfa_type: props.mfaType,
             options: {
-                email: props.email,
+                email: state.userEmail,
             },
         }, true);
     }
@@ -60,6 +59,7 @@ const handleClickSendEmailButton = async () => {
             {{ $t('COMMON.MFA_MODAL.COLLAPSE_DESC') }}
             <p-text-button class="send-code-button"
                            style-type="highlight"
+                           :disabled="!props.isSentCode"
                            @click.prevent="handleClickSendEmailButton"
             >
                 <span class="emphasis">{{ $t('COMMON.MFA_MODAL.SEND_NEW_CODE') }}</span>
@@ -77,6 +77,9 @@ const handleClickSendEmailButton = async () => {
             @apply inline-block text-label-xs font-normal text-blue-700;
             margin-left: 0.25rem;
             padding: 0;
+            &.disabled {
+                @apply text-gray-400;
+            }
         }
     }
 }

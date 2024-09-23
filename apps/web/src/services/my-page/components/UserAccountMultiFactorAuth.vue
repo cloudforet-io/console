@@ -8,6 +8,8 @@ import { store } from '@/store';
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
 import UserAccountMultiFactorAuthItems from '@/services/my-page/components/UserAccountMultiFactorAuthItems.vue';
 import UserAccountMultiFactorAuthModal from '@/services/my-page/components/UserAccountMultiFactorAuthModal.vue';
+import type { MultiFactorAuthModalType } from '@/services/my-page/types/multi-factor-auth-type';
+import { MULTI_FACTOR_AUTH_MODAL_TYPE } from '@/services/my-page/types/multi-factor-auth-type';
 
 const state = reactive({
     userId: computed(() => store.state.user.userId),
@@ -17,46 +19,17 @@ const state = reactive({
 
 const modalState = reactive({
     isModalVisible: false,
-    modalType: '' as 'confirm' | 'form',
+    modalType: MULTI_FACTOR_AUTH_MODAL_TYPE.EMAIL as MultiFactorAuthModalType,
 });
 
-// const handleClickVerifyButton = async () => {
-//     if (state.isVerified) {
-//         modalState.modalType = 'change';
-//     } else {
-//         state.loading = true;
-//         try {
-//             await postEnableMfa({
-//                 mfa_type: state.selectedItem,
-//                 options: {
-//                     email: email.value,
-//                 },
-//             }, true);
-//             modalState.modalType = 'verify';
-//         } finally {
-//             state.loading = false;
-//         }
-//     }
-//     modalState.isModalVisible = true;
-// };
-
-// const {
-//     forms: {
-//         email,
-//     },
-//     setForm,
-//     invalidState,
-//     invalidTexts,
-// } = useFormValidator({
-//     email: '',
-// }, {
-//     email(value: string) { return !emailValidator(value) ? '' : i18n.t('MY_PAGE.NOTIFICATION_EMAIL.EMAIL_INVALID'); },
-// });
-//
-// /* Watcher */
-// watch(() => state.mfa, (mfa) => {
-//     setForm('email', mfa?.options?.email || '');
-// }, { immediate: true });
+const handleChangeToggle = (type: MultiFactorAuthModalType, value: boolean) => {
+    modalState.isModalVisible = true;
+    if (!value) {
+        modalState.modalType = MULTI_FACTOR_AUTH_MODAL_TYPE.DISABLED;
+    } else {
+        modalState.modalType = type;
+    }
+};
 </script>
 
 <template>
@@ -71,7 +44,9 @@ const modalState = reactive({
                     </p>
                 </div>
             </template>
-            <user-account-multi-factor-auth-items />
+            <user-account-multi-factor-auth-items :modal-visible="modalState.isModalVisible"
+                                                  @change-toggle="handleChangeToggle"
+            />
         </user-account-module-container>
         <user-account-multi-factor-auth-modal v-if="modalState.isModalVisible"
                                               :type="modalState.modalType"
