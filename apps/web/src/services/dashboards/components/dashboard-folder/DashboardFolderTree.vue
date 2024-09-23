@@ -38,6 +38,7 @@ const emit = defineEmits<{(e: 'update:selectedIdMap', selectedIdMap: Record<stri
 const state = reactive({
     proxySelectedIdMap: useProxyValue('selectedIdMap', props, emit),
     isAllSelected: computed(() => {
+        if (props.dashboardTreeData.length === 0) return false;
         let _isAllSelected = true;
         props.dashboardTreeData.forEach((node) => {
             if (!state.proxySelectedIdMap[node.data.id]) _isAllSelected = false;
