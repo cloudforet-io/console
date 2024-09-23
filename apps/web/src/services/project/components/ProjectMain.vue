@@ -61,15 +61,10 @@ const state = reactive({
         const projectListFilteredByKeyword = state.currentProjectList.filter((item) => item.name.includes(state.searchText));
         return [...projectGroupListFilteredByKeyword, ...projectListFilteredByKeyword];
     }),
-    paginatedCardList: computed(() => {
-        const paginatedList = getPaginatedItems(state.filteredCardList);
-        return {
-            projectGroup: paginatedList.filter((item) => item.type === 'projectGroup'),
-            project: paginatedList.filter((item) => item.type === 'project'),
-        };
-    }),
-    pageSize: 48,
-    pageStart: 1,
+    paginatedCardList: computed(() => ({
+        projectGroup: state.filteredCardList.filter((item) => item.type === 'projectGroup'),
+        project: state.filteredCardList.filter((item) => item.type === 'project'),
+    })),
     searchText: '',
     searchResultLabelText: computed(() => `${i18n.t('Search Result for')} "${state.searchText}"`),
     placeholer: computed(() => {
@@ -83,17 +78,10 @@ const handleChange = async (options?: any) => {
     if (options?.searchText !== undefined) {
         state.searchText = options.searchText;
     }
-    if (options?.pageLimit !== undefined) {
-        state.pageSize = options.pageLimit;
-    }
-    if (options?.pageStart !== undefined) {
-        state.pageStart = options.pageStart;
-    }
 };
 
 /* Utill */
 const getDistinctProviders = (projectId: string): string[] => uniq(state.serviceAccountList.filter((d) => d.project_id === projectId).map((d) => d.provider));
-const getPaginatedItems = (items: ProjectCardItemType[]) => items.slice(state.pageStart - 1, state.pageSize + state.pageStart - 1);
 
 const listServiceAccount = async () => {
     try {
@@ -119,9 +107,9 @@ onMounted(async () => {
 <template>
     <p-pane-layout class="project-main">
         <p-toolbox class="project-tool-box"
-                   :page-size="state.pageSize"
-                   :total-count="state.filteredCardList.length"
                    :placeholder="state.placeholer"
+                   :pagination-visible="false"
+                   :page-size-changeable="false"
                    @change="handleChange"
                    @refresh="handleChange()"
         />
@@ -137,11 +125,7 @@ onMounted(async () => {
                 <p-field-title v-if="!state.searchText"
                                class="content-title"
                                :label="$t('Project Group')"
-                >
-                    <template #right>
-                        <span>({{ state.currentProjectGroupList.length }})</span>
-                    </template>
-                </p-field-title>
+                />
                 <div class="card-contents">
                     <project-main-project-group-card v-for="(projectGroup, idx) in state.paginatedCardList.projectGroup"
                                                      :key="`project-group-${idx}`"
@@ -156,11 +140,7 @@ onMounted(async () => {
                 <p-field-title v-if="!state.searchText"
                                class="content-title"
                                :label="$t('Project')"
-                >
-                    <template #right>
-                        <span>({{ state.currentProjectList.length }})</span>
-                    </template>
-                </p-field-title>
+                />
                 <div class="card-contents">
                     <project-main-project-card v-for="(project, idx) in state.paginatedCardList.project"
                                                :key="`project-${idx}`"
