@@ -90,8 +90,6 @@ const handleCloseModal = () => {
 
 watch(() => workspaceGroupPageState.modal, (value) => {
     if (value.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES) {
-        console.log('reset', value);
-        console.log('filter', state.workspaceDropdownFilter);
         reset();
     }
 });
