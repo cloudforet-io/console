@@ -124,7 +124,7 @@ const handleShareFolder = () => {
                             <new-mark class="new-mark" />
                         </div>
                         <div class="hidden-wrapper">
-                            <favorite-button v-if="node.data.type === 'DASHBOARD'"
+                            <favorite-button v-if="node.data.type === 'DASHBOARD' && !props.hideButtons"
                                              :item-id="node.data.id"
                                              :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                              scale="0.8"

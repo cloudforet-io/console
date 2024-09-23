@@ -19,7 +19,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { gray } from '@/styles/colors';
 
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
-import type { ModalDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
+import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
@@ -43,7 +43,7 @@ const dashboardMainPageGetters = dashboardMainPageStore.getters;
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
-    modalTableItems: computed<ModalDataTableItem[]>(() => {
+    modalTableItems: computed<DashboardDataTableItem[]>(() => {
         if (dashboardMainPageState.folderModalType === 'PUBLIC') {
             return dashboardMainPageGetters.publicModalTableItems;
         }
