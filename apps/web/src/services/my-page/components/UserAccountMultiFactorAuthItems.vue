@@ -1,37 +1,52 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
+
+import { keyBy, mapValues } from 'lodash';
 
 import { PI, PToggleButton, PBadge } from '@cloudforet/mirinae';
 
-import { i18n } from '@/translations';
+import { store } from '@/store';
 
-const MULTI_FACTOR_AUTH_ITEMS = [
-    {
-        id: 'ms',
-        icon: 'microsoft',
-        title: i18n.t('MY_PAGE.MFA.MS_TITLE'),
-        desc: i18n.t('MY_PAGE.MFA.MS_DESC'),
-    },
-    {
-        id: 'email',
-        icon: 'ic_notification-protocol_envelope',
-        title: i18n.t('MY_PAGE.MFA.EMAIL'),
-        desc: i18n.t('MY_PAGE.MFA.EMAIL_DESC'),
-    },
-];
+import type { MultiFactorAuthType } from '@/services/my-page/types/multi-factor-auth-type';
+import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/my-page/types/multi-factor-auth-type';
 
-const state = reactive({
-    enableMfa: {
-        ms: false,
-        email: false,
-    },
+interface Props {
+    modalVisible: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    modalVisible: false,
 });
+const emit = defineEmits<{(e: 'change-toggle', type: string, value: boolean): void }>();
+
+const storeState = reactive({
+    mfa: computed(() => store.state.user.mfa || undefined),
+});
+const state = reactive({
+    enableMfa: mapValues(keyBy(MULTI_FACTOR_AUTH_ITEMS, 'type'), () => false) as Record<MultiFactorAuthType, boolean>,
+    isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
+    type: computed<string>(() => storeState.mfa?.type),
+    selectedType: '',
+});
+
+const handleChangeToggle = (type: string, value: boolean) => {
+    state.selectedType = type;
+    state.enableMfa[type] = value;
+    emit('change-toggle', type, value);
+};
+
+watch(() => props.modalVisible, (modalVisible) => {
+    if (!modalVisible) {
+        state.enableMfa[state.selectedType] = state.type === state.selectedType ? state.isVerified : false;
+        state.selectedType = '';
+    }
+}, { immediate: true });
 </script>
 
 <template>
     <div class="user-account-multi-factor-auth-items">
         <div v-for="(item, idx) in MULTI_FACTOR_AUTH_ITEMS"
-             :key="`${item.id} - ${idx}`"
+             :key="`${item.type} - ${idx}`"
              class="user-account-multi-factor-auth-item"
         >
             <p-i class="icon"
@@ -41,7 +56,9 @@ const state = reactive({
             />
             <div class="title-wrapper">
                 <div class="toggle-wrapper">
-                    <p-toggle-button :value="state.enableMfa[item.id]" />
+                    <p-toggle-button :value="state.enableMfa[item.type]"
+                                     @change-toggle="handleChangeToggle(item.type, $event)"
+                    />
                     <p class="title">
                         {{ item.title }}
                     </p>
@@ -68,7 +85,7 @@ const state = reactive({
         @apply flex items-center border border-gray-200;
         padding: 1rem;
         border-radius: 0.375rem;
-        gap: 0.375rem;
+        gap: 1rem;
         .title-wrapper {
             @apply flex flex-col;
             gap: 0.5rem;
