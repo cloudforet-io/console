@@ -15,7 +15,7 @@ export interface DashboardTreeDataType extends TreeData {
     labels?: string[];
 }
 
-export interface ModalDataTableItem {
+export interface DashboardDataTableItem {
     id: string;
     name: string;
     location?: string;

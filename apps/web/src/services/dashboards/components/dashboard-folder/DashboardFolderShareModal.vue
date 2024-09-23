@@ -21,7 +21,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { gray } from '@/styles/colors';
 
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
-import type { DashboardTreeDataType, ModalDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
+import type { DashboardTreeDataType, DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
@@ -55,7 +55,7 @@ const state = reactive({
         return dashboardMainPageGetters.publicDashboardTreeData.find((d) => d.data.id === _selectedFolderId);
     }),
     needToShare: computed<boolean>(() => !state.selectedTreeData?.data?.shared),
-    modalTableItems: computed<ModalDataTableItem[]>(() => getModalTableItems(state.selectedTreeData)),
+    modalTableItems: computed<DashboardDataTableItem[]>(() => getModalTableItems(state.selectedTreeData)),
     headerTitle: computed(() => {
         if (storeState.isAdminMode) {
             if (state.needToShare) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARE_DASHBOARD');
@@ -73,9 +73,9 @@ const state = reactive({
 });
 
 /* Util */
-const getModalTableItems = (selectedTreeData: TreeNode<DashboardTreeDataType>): ModalDataTableItem[] => {
+const getModalTableItems = (selectedTreeData: TreeNode<DashboardTreeDataType>): DashboardDataTableItem[] => {
     if (!selectedTreeData) return [];
-    const _tableItems: ModalDataTableItem[] = [];
+    const _tableItems: DashboardDataTableItem[] = [];
 
     // set folder
     _tableItems.push({

@@ -31,7 +31,7 @@ import { gray } from '@/styles/colors';
 
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
-import type { DashboardTreeDataType, ModalDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
+import type { DashboardTreeDataType, DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
@@ -68,7 +68,7 @@ const state = reactive({
         }
         return dashboardMainPageGetters.selectedPrivateTreeData;
     }),
-    modalTableItems: computed<ModalDataTableItem[]>(() => {
+    modalTableItems: computed<DashboardDataTableItem[]>(() => {
         if (dashboardMainPageState.folderModalType === 'PUBLIC') {
             return dashboardMainPageGetters.publicModalTableItems;
         }
