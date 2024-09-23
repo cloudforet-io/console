@@ -121,61 +121,43 @@ const getSeriesData = (slicedData: CostAnalyzeRawData[], etcData: CostAnalyzeRaw
     const _seriesData: any[] = [];
     const _today = dayjs.utc();
     slicedData.forEach((vd) => {
-        let _data;
-        if (accumulated) {
-            let _accumulatedData = 0;
-            _data = state.xAxisData.map((xAxis) => {
-                if (dayjs.utc(xAxis).isAfter(_today)) return 0;
-                const _targetData = vd.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
-                const _value = _targetData?.value ?? 0;
-                if (costAnalysisPageState.granularity === 'DAILY') {
-                    _accumulatedData += _value;
-                    return _accumulatedData;
-                }
-                return _value;
-            });
-        } else {
-            _data = state.xAxisData.map((xAxis) => {
-                const _elem = vd.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
-                return _elem ? _elem?.value : undefined;
-            });
-        }
+        let _accumulatedData = 0;
         _seriesData.push({
             name: vd[state.parsedChartGroupBy] || 'Unknown',
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
-            data: _data,
+            data: state.xAxisData.map((xAxis) => {
+                if (dayjs.utc(xAxis).isAfter(_today)) return 0;
+                const _elem = vd.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
+                const _value = _elem ? _elem?.value : 0;
+                if (accumulated) {
+                    _accumulatedData += _value;
+                    return _accumulatedData;
+                }
+                return _value;
+            }),
         });
     });
     if (etcData.length) {
-        let _etcData;
-        if (accumulated) {
-            let _accumulatedData = 0;
-            _etcData = state.xAxisData.map((xAxis) => {
-                if (dayjs.utc(xAxis).isAfter(_today)) return 0;
-                const _value = etcData.reduce((acc, etcd) => {
-                    const _elem = etcd.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
-                    return acc + (_elem ? _elem.value : 0);
-                }, 0);
-                _accumulatedData += _value;
-                return _accumulatedData;
-            });
-        } else {
-            _etcData = state.xAxisData.map((xAxis) => {
-                const _value = etcData.reduce((acc, etcd) => {
-                    const _elem = etcd.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
-                    return acc + (_elem ? _elem.value : 0);
-                }, 0);
-                return _value;
-            });
-        }
+        let _accumulatedData = 0;
         _seriesData.push({
             name: 'etc',
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
-            data: _etcData,
+            data: state.xAxisData.map((xAxis) => {
+                if (dayjs.utc(xAxis).isAfter(_today)) return 0;
+                const _value = etcData.reduce((acc, etcd) => {
+                    const _elem = etcd.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
+                    return acc + (_elem ? _elem.value : 0);
+                }, 0);
+                if (accumulated) {
+                    _accumulatedData += _value;
+                    return _accumulatedData;
+                }
+                return _value;
+            }),
         });
     }
     return _seriesData;
