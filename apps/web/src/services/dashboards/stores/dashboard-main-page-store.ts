@@ -30,6 +30,8 @@ const _getDashboardTreeData = (folderList: FolderModel[], dashboardList: Dashboa
                 type: 'FOLDER',
                 id: d.folder_id,
                 shared: d?.shared,
+                projectId: d?.project_id,
+                workspaceId: d?.workspace_id,
                 createdBy: d.tags?.created_by,
                 isNew: newIdList.includes(d.folder_id),
             },
@@ -46,7 +48,8 @@ const _getDashboardTreeData = (folderList: FolderModel[], dashboardList: Dashboa
                 type: 'DASHBOARD',
                 folderId: d.folder_id,
                 shared: d?.shared,
-                scope: d?.scope,
+                projectId: d?.project_id,
+                workspaceId: d?.workspace_id,
                 userId: d?.user_id,
                 createdBy: d.tags?.created_by,
                 isNew: newIdList.includes(d.dashboard_id),
@@ -158,6 +161,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         folderDeleteModalVisible: false,
         folderMoveModalVisible: false,
         folderCloneModalVisible: false,
+        folderShareModalVisible: false,
         selectedFolderId: undefined as string | undefined,
         selectedPublicIdMap: {} as Record<string, boolean>,
         selectedPrivateIdMap: {} as Record<string, boolean>,
@@ -263,6 +267,9 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
     const setNewIdList = (newIdList: string[]) => {
         state.newIdList = newIdList;
     };
+    const setFolderShareModalVisible = (visible: boolean) => {
+        state.folderShareModalVisible = visible;
+    };
     const mutations = {
         setFolderFormModalVisible,
         setFolderFormModalType,
@@ -274,6 +281,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         setFolderModalType,
         setFolderCloneModalVisible,
         setNewIdList,
+        setFolderShareModalVisible,
     };
 
     /* Actions */
@@ -285,6 +293,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         setFolderMoveModalVisible(false);
         setFolderModalType('PUBLIC');
         setFolderCloneModalVisible(false);
+        setFolderShareModalVisible(false);
     };
     const resetSelectedIdMap = (type: 'PUBLIC'|'PRIVATE') => {
         if (type === 'PUBLIC') {

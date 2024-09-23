@@ -40,16 +40,20 @@ const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     folderControlButtons: computed(() => {
         if (props.hideButtons) return [];
+        const _defaultButtons = [{
+            name: 'edit',
+            icon: 'ic_edit-text',
+            clickEvent: handleEditFolderName,
+        }];
+        if (props.treeData.data.id.startsWith('private')) {
+            return _defaultButtons;
+        }
         return [
-            {
-                name: 'edit',
-                icon: 'ic_edit-text',
-                clickEvent: handleEditFolderName,
-            },
+            ..._defaultButtons,
             {
                 name: 'share',
                 icon: 'ic_share',
-                clickEvent: () => {},
+                clickEvent: handleShareFolder,
             },
         ];
     }),
@@ -58,7 +62,7 @@ const state = reactive({
 /* Util */
 const getSharedColor = (node: TreeNode<DashboardTreeDataType>): string|undefined => {
     if (node.data.shared) {
-        if (node.data.scope === 'PROJECT') return violet[500];
+        if (node.data.projectId === '*') return violet[500];
         return indigo[500];
     }
     return undefined;
@@ -66,10 +70,10 @@ const getSharedColor = (node: TreeNode<DashboardTreeDataType>): string|undefined
 const getSharedText = (node: TreeNode<DashboardTreeDataType>): TranslateResult|undefined => {
     if (node.data.shared) {
         if (state.isAdminMode) {
-            if (node.data.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+            if (node.data.projectId === '*') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
         }
-        if (node.data.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+        if (node.data.projectId === '*') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
         return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
     }
     return undefined;
@@ -92,6 +96,10 @@ const handleEditFolderName = () => {
     dashboardMainPageStore.setFolderFormModalType('UPDATE');
     dashboardMainPageStore.setSelectedFolderId(props.treeData.data.id);
     dashboardMainPageStore.setFolderFormModalVisible(true);
+};
+const handleShareFolder = () => {
+    dashboardMainPageStore.setSelectedFolderId(props.treeData.data.id);
+    dashboardMainPageStore.setFolderShareModalVisible(true);
 };
 </script>
 
