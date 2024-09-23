@@ -3,7 +3,12 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PI, PTextHighlighting } from '@cloudforet/mirinae';
+import {
+    PI, PTextHighlighting, PSelectDropdown,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -18,7 +23,11 @@ import { peacock } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type { ProjectCardItemType } from '@/services/project/types/project-type';
+
+
+
 
 interface Props {
     item: ProjectCardItemType;
@@ -31,6 +40,9 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
+const projectPageStore = useProjectPageStore();
+
+
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -46,9 +58,31 @@ const state = reactive({
         return storeState.projectGroup[props.item.parentId].name;
     }),
     isStarred: computed(() => storeState.favoriteItems.some((item) => item.itemId === props.item.id)),
+    toolsetMenuItems: [
+        {
+            type: 'item',
+            name: 'rename',
+            label: i18n.t('Rename'),
+            icon: 'ic_settings',
+        },
+        {
+            type: 'item',
+            name: 'move',
+            label: i18n.t('Move'),
+            icon: 'ic_move',
+        },
+        { type: 'divider', name: 'divider' },
+        {
+            type: 'item',
+            name: 'delete',
+            label: i18n.t('Delete'),
+            icon: 'ic_delete',
+        },
+    ],
+    toolsetMenuVisible: false,
 });
-const getProvider = (name: string): ProviderItem => storeState.providers[name] || {};
 
+const getProvider = (name: string): ProviderItem => storeState.providers[name] || {};
 
 const handleSelectProject = () => {
     router.push(getProperRouteLocation({
@@ -58,10 +92,26 @@ const handleSelectProject = () => {
         },
     }));
 };
+
+const handleSelectItem = (selected: MenuItem) => {
+    if (selected.name === 'rename') {
+        projectPageStore.setCurrentSelectedProjectId(props.item.id);
+        projectPageStore.openProjectFormModal();
+    }
+    if (selected.name === 'move') {
+        projectPageStore.setCurrentSelectedProjectId(props.item.id);
+        projectPageStore.setProjectGroupMoveModalVisible(true);
+    }
+    if (selected.name === 'delete') {
+        projectPageStore.setCurrentSelectedProjectId(props.item.id);
+        projectPageStore.setProjectDeleteModalVisible(true);
+    }
+};
+
 </script>
 
 <template>
-    <div class="project-main-project-card"
+    <div :class="{'project-main-project-card': true, 'toolset-active': state.toolsetMenuVisible }"
          @click="handleSelectProject"
     >
         <div class="main-contents">
@@ -78,10 +128,23 @@ const handleSelectProject = () => {
                     />
                 </div>
 
-                <favorite-button :class="{'favorite-button': true, 'starred': state.isStarred }"
-                                 :item-id="props.item.id"
-                                 :favorite-type="FAVORITE_TYPE.PROJECT"
-                />
+                <div class="toolset-group">
+                    <p-select-dropdown class="toolset-button"
+                                       style-type="tertiary-icon-button"
+                                       button-icon="ic_ellipsis-horizontal"
+                                       size="sm"
+                                       :visible-menu.sync="state.toolsetMenuVisible"
+                                       :menu="state.toolsetMenuItems"
+                                       :selected="[]"
+                                       use-fixed-menu-style
+                                       reset-selection-on-menu-close
+                                       @select="handleSelectItem"
+                    />
+                    <favorite-button :class="{'favorite-button': true, 'starred': state.isStarred }"
+                                     :item-id="props.item.id"
+                                     :favorite-type="FAVORITE_TYPE.PROJECT"
+                    />
+                </div>
             </div>
             <span class="project-group">
                 {{ state.projectGroupName }}
@@ -231,21 +294,26 @@ const handleSelectProject = () => {
             display: block;
         }
     }
+    .toolset-button {
+        display: none;
+    }
 
     .toolset-group {
         @apply flex gap-1 items-center;
-        display: none;
     }
 
     &:hover {
         @apply bg-gray-150;
 
-        .toolset-group {
-            display: flex;
+        .toolset-button {
+            display: block;
         }
         .favorite-button {
             display: block;
         }
+    }
+    &.toolset-active {
+        @apply bg-blue-200;
     }
 }
 

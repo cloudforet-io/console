@@ -28,7 +28,7 @@ import { indigo, peacock } from '@/styles/colors';
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import ProjectGroupMemberManagementModal from '@/services/project/components/ProjectGroupMemberManagementModal.vue';
 import ProjectMain from '@/services/project/components/ProjectMain.vue';
-import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
+import ProjectMainDeleteModal from '@/services/project/components/ProjectMainDeleteModal.vue';
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
@@ -96,7 +96,8 @@ const handleClickProjectGroupEditButton = () => {
     modalState.projectGroupFormVisible = true;
 };
 const handleClickProjectGroupDeleteButton = () => {
-    modalState.projectGroupDeleteCheckModalVisible = true;
+    projectPageStore.setCurrentSelectedProjectGroupId(state.currentProjectGroupId);
+    projectPageStore.setProjectDeleteModalVisible(true);
 };
 const handleOpenProjectGroupMoveModal = () => {
     state.projectGroupModalVisible = true;
@@ -111,10 +112,34 @@ const handleClickCreateButton = () => {
 };
 const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
-        modalState.projectFormModalVisible = true;
+        projectPageStore.setProjectFormModalVisible(true);
     } else if (item.name === 'projectGroup') {
         modalState.projectGroupUpdateMode = false;
         modalState.projectGroupFormVisible = true;
+    }
+};
+const handleUpdateProjectGroupMoveModal = (visible: boolean) => {
+    projectPageStore.setProjectGroupMoveModalVisible(visible);
+    if (projectPageState.currentSelectedProjectGroupId && !visible) {
+        projectPageStore.setCurrentSelectedProjectGroupId(undefined);
+    }
+    if (projectPageState.currentSelectedProjectId && !visible) {
+        projectPageStore.setCurrentSelectedProjectId(undefined);
+    }
+};
+const handleUpdateProjectFormModalVisible = (visible: boolean) => {
+    projectPageStore.setProjectFormModalVisible(visible);
+    if (projectPageState.currentSelectedProjectId && !visible) {
+        projectPageStore.setCurrentSelectedProjectId(undefined);
+    }
+};
+const handleUpdateDeleteModalVisible = (visible: boolean) => {
+    projectPageStore.setProjectDeleteModalVisible(visible);
+    if (projectPageState.currentSelectedProjectGroupId && !visible) {
+        projectPageStore.setCurrentSelectedProjectGroupId(undefined);
+    }
+    if (projectPageState.currentSelectedProjectId && !visible) {
+        projectPageStore.setCurrentSelectedProjectId(undefined);
     }
 };
 
@@ -196,24 +221,30 @@ onUnmounted(() => {
                                                :update-mode="modalState.projectGroupUpdateMode"
                                                @confirm="handleRefreshTree"
         />
-        <project-main-project-group-delete-check-modal v-if="modalState.projectGroupDeleteCheckModalVisible"
-                                                       :visible.sync="modalState.projectGroupDeleteCheckModalVisible"
-                                                       :project-group-id="state.currentProjectGroupId"
-                                                       @confirm="handleRefreshTree"
-        />
-        <project-main-project-group-move-modal v-if="state.projectGroupModalVisible"
-                                               :visible.sync="state.projectGroupModalVisible"
-                                               :is-project="false"
-                                               :target-id="state.currentProjectGroupId"
-                                               @confirm="handleRefreshTree"
-        />
         <project-group-member-management-modal v-if="state.projectGroupMemberManagementModalVisible"
                                                :visible.sync="state.projectGroupMemberManagementModalVisible"
                                                :project-group-id="state.currentProjectGroupId"
         />
-        <project-form-modal v-if="modalState.projectFormModalVisible"
-                            :visible.sync="modalState.projectFormModalVisible"
+        <project-main-delete-modal v-if="projectPageState.projectDeleteModalVisible"
+                                   :visible="projectPageState.projectDeleteModalVisible"
+                                   :is-project="!!projectPageState.currentSelectedProjectId"
+                                   :target-id="projectPageState.currentSelectedProjectId || projectPageState.currentSelectedProjectGroupId"
+                                   :need-redirect="!projectPageState.currentSelectedProjectId"
+                                   @update:visible="handleUpdateDeleteModalVisible"
+                                   @confirm="handleRefreshTree"
+        />
+        <project-main-project-group-move-modal v-if="projectPageState.projectGroupMoveModalVisible"
+                                               :visible="projectPageState.projectGroupMoveModalVisible"
+                                               :is-project="!!projectPageState.currentSelectedProjectId"
+                                               :target-id="projectPageState.currentSelectedProjectId || projectPageState.currentSelectedProjectGroupId"
+                                               @update:visible="handleUpdateProjectGroupMoveModal"
+                                               @confirm="handleRefreshTree"
+        />
+        <project-form-modal v-if="projectPageState.projectFormModalVisible"
+                            :visible="projectPageState.projectFormModalVisible"
+                            :project-id="projectPageState.currentSelectedProjectId"
                             :project-group-id="state.currentProjectGroupId"
+                            @update:visible="handleUpdateProjectFormModalVisible"
                             @confirm="handleRefreshTree"
         />
     </div>

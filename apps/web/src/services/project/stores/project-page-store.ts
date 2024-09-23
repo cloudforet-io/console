@@ -43,9 +43,13 @@ export const useProjectPageStore = defineStore('page-project', () => {
         //
         projectGroupFormVisible: false as boolean,
         projectGroupFormUpdateMode: false as boolean,
-        projectGroupDeleteCheckModalVisible: false as boolean,
+        projectDeleteModalVisible: false as boolean,
         projectFormModalVisible: false as boolean,
+        projectGroupMoveModalVisible: false as boolean,
         shouldUpdateProjectList: false as boolean,
+        // form
+        currentSelectedProjectId: undefined as string|undefined,
+        currentSelectedProjectGroupId: undefined as string|undefined,
         //
         isWorkspaceOwner: computed<boolean>(() => _state.currentRoleType === 'WORKSPACE_OWNER'),
     });
@@ -86,8 +90,11 @@ export const useProjectPageStore = defineStore('page-project', () => {
     const setProjectFormModalVisible = (val?: boolean) => {
         state.projectFormModalVisible = !!val;
     };
-    const setProjectGroupDeleteCheckModalVisible = (val?: boolean) => {
-        state.projectGroupDeleteCheckModalVisible = !!val;
+    const setProjectGroupMoveModalVisible = (val?: boolean) => {
+        state.projectGroupMoveModalVisible = !!val;
+    };
+    const setProjectDeleteModalVisible = (val?: boolean) => {
+        state.projectDeleteModalVisible = !!val;
     };
     const setProjectGroupFormVisible = (val?: boolean) => {
         state.projectGroupFormVisible = !!val;
@@ -106,6 +113,12 @@ export const useProjectPageStore = defineStore('page-project', () => {
     };
     const setRootNode = (root?: ProjectTreeRoot) => {
         state.rootNode = root || null;
+    };
+    const setCurrentSelectedProjectId = (projectId?: string) => {
+        state.currentSelectedProjectId = projectId;
+    };
+    const setCurrentSelectedProjectGroupId = (groupId?: string) => {
+        state.currentSelectedProjectGroupId = groupId;
     };
 
     /* action */
@@ -139,10 +152,7 @@ export const useProjectPageStore = defineStore('page-project', () => {
         state.projectGroupFormUpdateMode = !!isUpdateMode;
         state.projectGroupFormVisible = true;
     };
-    const openProjectGroupDeleteCheckModal = (target: ProjectGroupTreeItem = {}) => {
-        state.actionTargetItem = target;
-        state.projectGroupDeleteCheckModalVisible = true;
-    };
+
     const openProjectFormModal = (target: ProjectGroupTreeItem = {}) => {
         state.actionTargetItem = target;
         state.projectFormModalVisible = true;
@@ -281,19 +291,21 @@ export const useProjectPageStore = defineStore('page-project', () => {
     const mutations = {
         setShouldUpdateProjectList,
         setProjectFormModalVisible,
-        setProjectGroupDeleteCheckModalVisible,
+        setProjectGroupMoveModalVisible,
+        setProjectDeleteModalVisible,
         setProjectGroupFormVisible,
         setTreeEditMode,
         setIsInitiated,
         setSelectedItem,
         setProjectCount,
         setRootNode,
+        setCurrentSelectedProjectId,
+        setCurrentSelectedProjectGroupId,
     };
     const actions = {
         reset,
         selectNode,
         openProjectGroupFormModal,
-        openProjectGroupDeleteCheckModal,
         createProjectGroup,
         updateProjectGroup,
         deleteProjectGroup,
