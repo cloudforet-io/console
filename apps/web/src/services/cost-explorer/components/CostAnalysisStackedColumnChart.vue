@@ -234,7 +234,7 @@ useResizeObserver(chartContext, throttle(() => {
 
 <template>
     <p-data-loader :loading="props.loading"
-                   :data="props.data?.results"
+                   :data="state.chartData"
                    class="cost-analysis-stacked-column-chart"
     >
         <template #loader>

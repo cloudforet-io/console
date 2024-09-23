@@ -72,6 +72,7 @@ const fetchCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnaly
 const analyzeApiQueryHelper = new ApiQueryHelper();
 const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<CostAnalyzeRawData>> => {
     try {
+        state.loading = true;
         analyzeApiQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
         let dateFormat = 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
@@ -93,17 +94,19 @@ const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<Cost
                 ...analyzeApiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response;
+        if (status === 'succeed') {
+            state.loading = false;
+            return response;
+        }
         return { more: false, results: [] };
     } catch (e) {
         ErrorHandler.handleError(e);
+        state.loading = false;
         return { more: false, results: [] };
     }
 };
 const setChartData = debounce(async (period:Period) => {
-    state.loading = true;
     state.data = await listCostAnalysisData(period);
-    state.loading = false;
 }, 300);
 
 /* Event */
