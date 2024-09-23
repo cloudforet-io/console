@@ -83,7 +83,7 @@ const storeState = reactive({
 const state = reactive({
     active: computed(() => {
         const targetList = props.favoriteType === FAVORITE_TYPE.WORKSPACE ? storeState.favoriteWorkspaceMenuList : storeState.favoriteMenuList;
-        const favoriteItem = targetList.findIndex((d) => (d.itemId === props.itemId
+        const favoriteItem = targetList.findIndex((d) => (d.itemId === props?.itemId
             && (d.itemType === props.favoriteType)));
         return favoriteItem > -1;
     }),
@@ -97,13 +97,13 @@ const handleClickFavoriteButton = async (event: MouseEvent) => {
         await favoriteStore.deleteFavorite({
             itemType: props.favoriteType,
             workspaceId: storeState.currentWorkspaceId,
-            itemId: props.itemId,
+            itemId: props?.itemId,
         });
     } else {
         const params = {
             itemType: props.favoriteType,
             workspaceId: storeState.currentWorkspaceId,
-            itemId: props.itemId,
+            itemId: props?.itemId,
         };
         await favoriteStore.createFavorite(convertFavoriteToReferenceData(params as ConfigData));
     }
