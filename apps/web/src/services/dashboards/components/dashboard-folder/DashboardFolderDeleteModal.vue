@@ -4,9 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PI } from '@cloudforet/mirinae';
 
-import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/private-dashboard/api-verbs/delete';
 import type { PrivateFolderDeleteParameters } from '@/schema/dashboard/private-folder/api-verbs/delete';
-import type { PublicDashboardDeleteParameters } from '@/schema/dashboard/public-dashboard/api-verbs/delete';
 import type { PublicFolderDeleteParameters } from '@/schema/dashboard/public-folder/api-verbs/delete';
 import { i18n } from '@/translations';
 
@@ -30,7 +28,6 @@ const DELETE_TABLE_FIELDS = [
     { name: 'location', label: 'Location' },
 ];
 type FolderDeleteParams = PublicFolderDeleteParameters | PrivateFolderDeleteParameters;
-type DashboardDeleteParams = PublicDashboardDeleteParameters | PrivateDashboardDeleteParameters;
 interface Props {
     visible?: boolean;
 }
@@ -67,11 +64,8 @@ const deleteFolder = async (folderId: string): Promise<boolean> => {
     }
 };
 const deleteDashboard = async (dashboardId: string): Promise<boolean> => {
-    const fetcher = dashboardId.startsWith('private')
-        ? SpaceConnector.clientV2.dashboard.privateDashboard.delete
-        : SpaceConnector.clientV2.dashboard.publicDashboard.delete;
     try {
-        await fetcher<DashboardDeleteParams>({ dashboard_id: dashboardId });
+        await dashboardStore.deleteDashboard(dashboardId);
         return true;
     } catch (e) {
         return false;

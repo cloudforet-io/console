@@ -200,7 +200,7 @@ const state = reactive({
             menuSet.push(state.adminMenu);
         } else {
             // favorite
-            defaultMenuSet.unshift(
+            menuSet.unshift(
                 {
                     type: MENU_ITEM_TYPE.STARRED,
                     childItems: state.starredMenuItems,

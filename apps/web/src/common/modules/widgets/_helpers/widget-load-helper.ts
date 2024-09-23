@@ -39,8 +39,8 @@ export const getWidgetLoadApiQueryDateRange = (granularity: string, dateRange: D
 };
 
 export const getWidgetLoadApiQuery = (dataFieldInfo: TableDataFieldValue, xAxisField: string): Record<string, any> => {
-    const _dataFieldType = dataFieldInfo.fieldType;
-    const _dataField = _dataFieldType === 'staticField' ? dataFieldInfo.staticFieldInfo?.fieldValue : dataFieldInfo.dynamicFieldInfo?.fieldValue;
+    const _dataFieldType = dataFieldInfo?.fieldType;
+    const _dataField = _dataFieldType === 'staticField' ? dataFieldInfo?.staticFieldInfo?.fieldValue : dataFieldInfo?.dynamicFieldInfo?.fieldValue;
     const _criteria = dataFieldInfo?.dynamicFieldInfo?.criteria;
     const _dynamicFixedFieldValue = dataFieldInfo?.dynamicFieldInfo?.fixedValue;
 
