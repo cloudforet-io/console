@@ -71,15 +71,19 @@ export const useDashboardStore = defineStore('dashboard', () => {
     });
 
     const getters = reactive({
-        allItems: computed<Array<DashboardModel>>(() => [...state.privateDashboardItems, ...state.publicDashboardItems] as DashboardModel[]),
-        domainItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'DOMAIN')),
-        workspaceItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems
+        allDashboardItems: computed<DashboardModel[]>(() => [...state.privateDashboardItems, ...state.publicDashboardItems] as DashboardModel[]),
+        domainDashboardItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'DOMAIN')),
+        workspaceDashboardItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems
             .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
             .filter((item) => !(item.resource_group === 'DOMAIN' && item.scope === 'PROJECT'))),
-        privateItems: computed<PrivateDashboardModel[]>(() => state.privateDashboardItems),
-        sharedFolderItems: computed<PublicFolderModel[]>(() => state.publicFolderItems
+        privateDashboardItems: computed<PrivateDashboardModel[]>(() => state.privateDashboardItems),
+        //
+        allFolderItems: computed<FolderModel[]>(() => [...state.privateFolderItems, ...state.publicFolderItems]),
+        domainFolderItems: computed<PublicFolderModel[]>(() => state.publicFolderItems.filter((item) => item.resource_group === 'DOMAIN')),
+        workspaceFolderItems: computed<PublicFolderModel[]>(() => state.publicFolderItems
             .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
-            .filter((item) => !(item.resource_group === 'DOMAIN' && item.project_id.length > 0))),
+            .filter((item) => !(item.resource_group === 'DOMAIN' && item.project_id === '*'))),
+        privateFolderItems: computed<PrivateFolderModel[]>(() => state.privateFolderItems),
     });
 
     /* Mutations */

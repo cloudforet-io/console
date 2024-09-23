@@ -146,7 +146,7 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
 
         // existing dashboard case
         if (state.selectedDashboardId) {
-            const _dashboard = dashboardGetters.allItems.find((dashboard) => dashboard.dashboard_id === state.selectedDashboardId);
+            const _dashboard = dashboardGetters.allDashboardItems.find((dashboard) => dashboard.dashboard_id === state.selectedDashboardId);
             if (_dashboard) {
                 const _dashboardLayouts = _dashboard.layouts;
                 const _dashboardWidgets = await listDashboardWidgets(state.selectedDashboardId);

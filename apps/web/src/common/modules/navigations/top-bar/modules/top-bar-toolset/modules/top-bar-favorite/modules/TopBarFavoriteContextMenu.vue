@@ -197,7 +197,7 @@ const state = reactive({
         if (!isUserAccessibleToDashboards) return [];
         return convertDashboardConfigToReferenceData(
             favoriteGetters.dashboardItems ?? [],
-            [...dashboardGetters.workspaceItems, ...dashboardGetters.privateItems],
+            [...dashboardGetters.workspaceDashboardItems, ...dashboardGetters.privateDashboardItems],
         );
     }),
     favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {

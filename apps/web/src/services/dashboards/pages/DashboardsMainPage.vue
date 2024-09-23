@@ -58,8 +58,8 @@ const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: computed(() => dashboardState.loading),
     deprecatedDashboardList: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
-        const _publicDeprecated = dashboardGetters.workspaceItems.filter((d) => d.version === '1.0');
-        const _privateDeprecated = dashboardGetters.privateItems.filter((d) => d.version === '1.0');
+        const _publicDeprecated = dashboardGetters.workspaceDashboardItems.filter((d) => d.version === '1.0');
+        const _privateDeprecated = dashboardGetters.privateDashboardItems.filter((d) => d.version === '1.0');
         return [..._publicDeprecated, ..._privateDeprecated];
     }),
     isDashboardExist: computed<boolean>(() => {
