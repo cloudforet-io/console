@@ -20,6 +20,7 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbo
 import { iso8601Formatter, numberFormatter } from '@cloudforet/utils';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -41,7 +42,6 @@ import {
     WORKSPACE_SEARCH_HANDLERS, WORKSPACE_STATE,
     WORKSPACE_TABLE_FIELDS,
 } from '@/services/advanced/constants/workspace-constant';
-import type { WorkspaceTableModel } from '@/services/advanced/store/workspace-page-store';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
@@ -194,20 +194,20 @@ const handleExport = async () => {
     }
 };
 
-const getWorkspaceRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
+const getWorkspaceRouteLocationByWorkspaceName = (item: WorkspaceModel) => ({
     name: WORKSPACE_HOME_ROUTE._NAME,
     params: {
         workspaceId: item?.workspace_id,
     },
 });
 
-const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
+const getUserRouteLocationByWorkspaceName = (item: WorkspaceModel) => ({
     name: IAM_ROUTE.USER._NAME,
     params: {
         workspaceId: item?.workspace_id,
     },
 });
-const getServiceAccountRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
+const getServiceAccountRouteLocationByWorkspaceName = (item: WorkspaceModel) => ({
     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
     params: {
         workspaceId: item?.workspace_id,
@@ -324,8 +324,8 @@ onMounted(async () => {
                           class="capitalize"
                 />
             </template>
-            <template #col-users-format="{value, item}">
-                <p-link :text="value"
+            <template #col-user_count-format="{value, item}">
+                <p-link :text="value ?? 0"
                         action-icon="internal-link"
                         :disabled="item.state === WORKSPACE_STATE.DISABLE || item.is_dormant"
                         new-tab

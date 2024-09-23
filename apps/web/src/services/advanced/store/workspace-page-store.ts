@@ -22,7 +22,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 interface WorkspacePageState {
     loading: boolean;
     userLoading: boolean;
-    workspaces: WorkspaceTableModel[];
+    workspaces: WorkspaceModel[];
     totalCount: number;
     selectedIndices: number[];
     pageStart: number,
@@ -41,15 +41,11 @@ interface WorkspacePageState {
     roles: RoleModel[],
 }
 
-export interface WorkspaceTableModel extends WorkspaceModel {
-    users?: string;
-}
-
 export const useWorkspacePageStore = defineStore('page-workspace', {
     state: (): WorkspacePageState => ({
         loading: false,
         userLoading: false,
-        workspaces: [] as WorkspaceTableModel[],
+        workspaces: [] as WorkspaceModel[],
         totalCount: 0,
         selectedIndices: [] as number[],
         pageStart: 1,
@@ -98,13 +94,6 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
 
                 const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, RoleBindingListResponse>();
                 this.roleBindings = response.results || [];
-                this.workspaces = this.workspaces.map((workspace) => {
-                    const roleBindingsFilteredByWorkspaceId = this.roleBindings.filter((roleBinding) => roleBinding.workspace_id === workspace.workspace_id);
-                    return {
-                        ...workspace,
-                        users: roleBindingsFilteredByWorkspaceId.length.toString(),
-                    };
-                });
             } catch (e) {
                 ErrorHandler.handleError(e);
                 this.workspaces = [];

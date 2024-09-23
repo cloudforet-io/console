@@ -8,7 +8,7 @@ import * as styles from '@/styles/colors';
 export const WORKSPACE_TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
     { name: 'state', label: 'State', sortable: false },
-    { name: 'users', label: 'Users' },
+    { name: 'user_count', label: 'Users' },
     { name: 'service_account_count', label: 'Service Accounts' },
     { name: 'cost_info', label: 'Cost' },
     { name: 'created_at', label: 'Created', sortable: false },
