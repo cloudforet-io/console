@@ -2,11 +2,14 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
+import type { Location } from 'vue-router/types/router';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PI, PIconButton, PSelectDropdown, PButtonModal, PButton, PEmpty, PLazyImg,
+    PI, PIconButton, PSelectDropdown, PButtonModal, PButton, PEmpty, PLazyImg, PLink,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
@@ -30,9 +33,11 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { arrayToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -40,6 +45,9 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, peacock } from '@/styles/colors';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import ProjectMemberInviteModal from '@/services/project/components/ProjectMemberInviteModal.vue';
@@ -56,6 +64,10 @@ const ROLE_INFO_MAP = {
     [ROLE_TYPE.WORKSPACE_MEMBER]: { icon: WorkspaceMemberImage, label: 'Workspace Member' },
     [ROLE_TYPE.USER]: { icon: UserImage, label: 'User' },
 } as const;
+interface ViewInItem {
+    label: TranslateResult;
+    to: Location;
+}
 interface Props {
     id?: string;
 }
@@ -74,10 +86,11 @@ const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const gnbStore = useGnbStore();
 
-
+const queryHelper = new QueryHelper();
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     projects: computed(() => allReferenceStore.getters.project),
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
     menuItems: [
@@ -101,6 +114,43 @@ const state = reactive({
             icon: 'ic_delete',
         },
     ],
+    viewInItems: computed<ViewInItem[]>(() => ([
+        {
+            label: i18n.t('PROJECT.DETAIL.CLOUD_SERVICE'),
+            to: getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+                params: {
+                    // TODO: set params
+                },
+            }),
+        },
+        {
+            label: i18n.t('PROJECT.DETAIL.SERVICE_ACCOUNT'),
+            to: getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+                query: {
+                    filters: queryHelper.setFilters([
+                        { k: 'project_id', v: [props.id], o: '' },
+                    ]).rawQueryStrings,
+                },
+            }),
+        },
+        {
+            label: i18n.t('PROJECT.DETAIL.COST_ANALYSIS'),
+            to: getProperRouteLocation({
+                name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                params: {
+                    dataSourceId: Object.keys(storeState.costDataSource)?.[0],
+                    costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+                },
+                query: {
+                    filters: arrayToQueryString([
+                        { k: 'project_id', v: [props.id], o: 'in' },
+                    ]),
+                },
+            }),
+        },
+    ])),
     currentProject: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
     parentGroupId: computed(() => storeState.projects[props.id]?.data.groupInfo.id),
     projectGroupMoveModalVisible: false,
@@ -470,7 +520,16 @@ onUnmounted(() => {
         </div>
 
         <div class="quick-link-wrapper">
-            <span class="field-title">{{ $t('View in') }}</span>
+            <span class="field-title">{{ $t('PROJECT.DETAIL.VIEW_IN') }}</span>
+            <p-link v-for="(item, idx) in state.viewInItems"
+                    :key="`view-in-${idx}`"
+                    new-tab
+                    action-icon="internal-link"
+                    size="md"
+                    :to="item.to"
+            >
+                {{ item.label }}
+            </p-link>
         </div>
 
         <router-view />
