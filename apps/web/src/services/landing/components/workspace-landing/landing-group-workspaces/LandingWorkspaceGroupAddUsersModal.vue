@@ -64,7 +64,7 @@ const {
             filter: [
                 ...(apiQueryHelper.data.filter || []),
                 { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
-                { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'not_in' },
+                { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'not' },
             ],
         },
     }),

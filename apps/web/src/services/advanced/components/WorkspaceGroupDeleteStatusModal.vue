@@ -142,6 +142,7 @@ const handleConfirm = async () => {
         await deleteWorkspaces();
         workspaceGroupPageStore.resetSelectedWorkspace();
     }
+    await workspaceGroupPageStore.fetchWorkspaceGroups({ blockSelectedIndicesReset: true });
 
     workspaceGroupPageStore.closeModal();
 };
