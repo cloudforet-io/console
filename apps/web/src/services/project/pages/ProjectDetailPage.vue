@@ -97,20 +97,20 @@ const state = reactive({
         {
             type: 'item',
             name: 'update',
-            label: i18n.t('Update'),
+            label: i18n.t('PROJECT.DETAIL.UPDATE'),
             icon: 'ic_settings',
         },
         {
             type: 'item',
             name: 'move',
-            label: i18n.t('Move'),
+            label: i18n.t('PROJECT.DETAIL.MOVE'),
             icon: 'ic_move',
         },
         { type: 'divider', name: 'divider' },
         {
             type: 'item',
             name: 'delete',
-            label: i18n.t('Delete'),
+            label: i18n.t('PROJECT.DETAIL.DELETE'),
             icon: 'ic_delete',
         },
     ],
@@ -277,11 +277,11 @@ const fetchProjectUsers = async () => {
         memberState.loading = false;
     }
 };
-const fetchUserList = () => {
+const fetchUserList = async () => {
     if (projectDetailPageGetters.projectType === 'PUBLIC') {
-        fetchWorkspaceUserList();
+        await fetchWorkspaceUserList();
     } else {
-        fetchProjectUsers();
+        await fetchProjectUsers();
     }
 };
 
@@ -448,7 +448,7 @@ onUnmounted(() => {
                     <div class="member-contents-wrapper">
                         <div class="member-contents">
                             <div class="contents-header">
-                                <span>{{ $t('Members with access to this project') }}</span>
+                                <span>{{ $t('PROJECT.DETAIL.INVITE_MEMBER_DESC') }}</span>
                                 <p-button v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
                                           icon-left="ic_plus_bold"
                                           style-type="tertiary"

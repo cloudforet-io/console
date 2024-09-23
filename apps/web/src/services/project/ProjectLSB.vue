@@ -92,7 +92,7 @@ const state = reactive({
     projectLandingMenuSet: computed(() => [
         {
             type: MENU_ITEM_TYPE.SLOT,
-            label: 'All Projects',
+            label: i18n.t('PROJECT.LANDING.ALL_PROJECTS'),
             id: MENU_ID.PROJECT,
             icon: 'ic_dots-4-square',
             to: getProperRouteLocation({ name: PROJECT_ROUTE._NAME }),
@@ -103,7 +103,7 @@ const state = reactive({
         },
         {
             type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: 'Project',
+            label: i18n.t('PROJECT.LANDING.PROJECT'),
             id: 'project',
         },
     ]),

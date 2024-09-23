@@ -66,9 +66,9 @@ const state = reactive({
         project: state.filteredCardList.filter((item) => item.type === 'project'),
     })),
     searchText: '',
-    searchResultLabelText: computed(() => `${i18n.t('Search Result for')} "${state.searchText}"`),
+    searchResultLabelText: computed(() => `${i18n.t('PROJECT.LANDING.SEARCH_RESULT_LABEL')} "${state.searchText}"`),
     placeholer: computed(() => {
-        const defaultPlaceholder = i18n.t('Search project or project group') as string;
+        const defaultPlaceholder = i18n.t('PROJECT.LANDING.SEARCH_PLACEHOLDER') as string;
         return defaultPlaceholder;
     }),
 });
@@ -124,7 +124,7 @@ onMounted(async () => {
             >
                 <p-field-title v-if="!state.searchText"
                                class="content-title"
-                               :label="$t('Project Group')"
+                               :label="$t('PROJECT.LANDING.PROJECT_GROUP')"
                 />
                 <div class="card-contents">
                     <project-main-project-group-card v-for="(projectGroup, idx) in state.paginatedCardList.projectGroup"
@@ -139,7 +139,7 @@ onMounted(async () => {
             >
                 <p-field-title v-if="!state.searchText"
                                class="content-title"
-                               :label="$t('Project')"
+                               :label="$t('PROJECT.LANDING.PROJECT')"
                 />
                 <div class="card-contents">
                     <project-main-project-card v-for="(project, idx) in state.paginatedCardList.project"
@@ -155,7 +155,7 @@ onMounted(async () => {
                      class="empty-contents"
             >
                 <div class="empty-text">
-                    <p>{{ state.searchText ? $t('Looks like there is no result') : $t('Looks like you don’t have any project. Create one by clicking the "Create" button.') }}</p>
+                    <p>{{ state.searchText ? $t('PROJECT.LANDING.EMPTY_TEXT_SEARCH') : $t('PROJECT.LANDING.EMPTY_TEXT') }}</p>
                 </div>
             </p-empty>
         </div>
