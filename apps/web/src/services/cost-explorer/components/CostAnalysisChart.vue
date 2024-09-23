@@ -163,7 +163,7 @@ watch(() => costAnalysisPageState.granularity, () => {
             <div v-if="state.showAccumulatedToggle"
                  class="accumulated-toggle-wrapper"
             >
-                <p-field-title>Accumulated</p-field-title>
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ACCUMULATED') }}</p-field-title>
                 <p-toggle-button :value="state.isAccumulated"
                                  @update:value="handleToggleAccumulated"
                 />
