@@ -29,7 +29,7 @@ interface Props {
     visible: boolean;
     targetId: string;
     isProject?: boolean;
-    needRedirect?: boolean;
+    skipRedirect?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -67,7 +67,7 @@ const handleConfirmDelete = async () => {
     } finally {
         state.loading = false;
         state.proxyVisible = false;
-        if (props.needRedirect) {
+        if (!props.skipRedirect) {
             await router.replace({
                 name: PROJECT_ROUTE._NAME,
             });

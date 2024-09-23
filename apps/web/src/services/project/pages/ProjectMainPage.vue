@@ -93,14 +93,13 @@ onClickOutside(menuRef, () => {
 /* Event */
 const handleClickProjectGroupEditButton = () => {
     modalState.projectGroupUpdateMode = true;
-    modalState.projectGroupFormVisible = true;
+    projectPageStore.setProjectGroupFormVisible(true);
 };
 const handleClickProjectGroupDeleteButton = () => {
-    projectPageStore.setCurrentSelectedProjectGroupId(state.currentProjectGroupId);
     projectPageStore.setProjectDeleteModalVisible(true);
 };
 const handleOpenProjectGroupMoveModal = () => {
-    state.projectGroupModalVisible = true;
+    projectPageStore.setProjectGroupMoveModalVisible(true);
 };
 
 /* Handling Forms */
@@ -115,7 +114,7 @@ const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
         projectPageStore.setProjectFormModalVisible(true);
     } else if (item.name === 'projectGroup') {
         modalState.projectGroupUpdateMode = false;
-        modalState.projectGroupFormVisible = true;
+        projectPageStore.setProjectGroupFormVisible(true);
     }
 };
 const handleUpdateProjectGroupMoveModal = (visible: boolean) => {
@@ -140,6 +139,12 @@ const handleUpdateDeleteModalVisible = (visible: boolean) => {
     }
     if (projectPageState.currentSelectedProjectId && !visible) {
         projectPageStore.setCurrentSelectedProjectId(undefined);
+    }
+};
+const handleUpdateProjectGroupFormModalVisible = (visible: boolean) => {
+    projectPageStore.setProjectGroupFormVisible(visible);
+    if (projectPageState.currentSelectedProjectGroupId && !visible) {
+        projectPageStore.setCurrentSelectedProjectGroupId(undefined);
     }
 };
 
@@ -215,10 +220,11 @@ onUnmounted(() => {
         </p-heading>
         <project-main />
 
-        <project-main-project-group-form-modal v-if="modalState.projectGroupFormVisible"
-                                               :visible.sync="modalState.projectGroupFormVisible"
-                                               :project-group-id="state.currentProjectGroupId"
-                                               :update-mode="modalState.projectGroupUpdateMode"
+        <project-main-project-group-form-modal v-if="projectPageState.projectGroupFormVisible"
+                                               :visible="projectPageState.projectGroupFormVisible"
+                                               :project-group-id="projectPageState.currentSelectedProjectGroupId || state.currentProjectGroupId"
+                                               :update-mode="!!projectPageState.currentSelectedProjectGroupId || modalState.projectGroupUpdateMode"
+                                               @update:visible="handleUpdateProjectGroupFormModalVisible"
                                                @confirm="handleRefreshTree"
         />
         <project-group-member-management-modal v-if="state.projectGroupMemberManagementModalVisible"
@@ -228,15 +234,15 @@ onUnmounted(() => {
         <project-main-delete-modal v-if="projectPageState.projectDeleteModalVisible"
                                    :visible="projectPageState.projectDeleteModalVisible"
                                    :is-project="!!projectPageState.currentSelectedProjectId"
-                                   :target-id="projectPageState.currentSelectedProjectId || projectPageState.currentSelectedProjectGroupId"
-                                   :need-redirect="!projectPageState.currentSelectedProjectId"
+                                   :target-id="projectPageState.currentSelectedProjectId || projectPageState.currentSelectedProjectGroupId || state.currentProjectGroupId"
+                                   :skip-redirect="!!projectPageState.currentSelectedProjectId || !!projectPageState.currentSelectedProjectGroupId"
                                    @update:visible="handleUpdateDeleteModalVisible"
                                    @confirm="handleRefreshTree"
         />
         <project-main-project-group-move-modal v-if="projectPageState.projectGroupMoveModalVisible"
                                                :visible="projectPageState.projectGroupMoveModalVisible"
                                                :is-project="!!projectPageState.currentSelectedProjectId"
-                                               :target-id="projectPageState.currentSelectedProjectId || projectPageState.currentSelectedProjectGroupId"
+                                               :target-id="projectPageState.currentSelectedProjectId || projectPageState.currentSelectedProjectGroupId || state.currentProjectGroupId"
                                                @update:visible="handleUpdateProjectGroupMoveModal"
                                                @confirm="handleRefreshTree"
         />
