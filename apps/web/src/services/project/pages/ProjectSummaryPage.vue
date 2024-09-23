@@ -68,10 +68,10 @@ const getProjectAlertConfig = async () => {
                 />
                 <div>
                     <p class="title">
-                        {{ $t('Project Summary will be deprecated.') }}
+                        {{ $t('PROJECT.DETAIL.SUMMARY.DEPRECATED_TITLE') }}
                     </p>
                     <p class="description">
-                        {{ $t('You can see more details than the summary in project dashboard, which is currently in beta service.') }}
+                        {{ $t('PROJECT.DETAIL.SUMMARY.DEPRECATED_DESC') }}
                     </p>
                 </div>
             </div>
