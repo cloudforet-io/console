@@ -12,6 +12,7 @@ export interface DashboardTreeDataType extends TreeData {
     userId?: string;
     createdBy?: string;
     isNew?: boolean;
+    labels?: string[];
 }
 
 export interface ModalDataTableItem {
