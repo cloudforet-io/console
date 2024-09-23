@@ -206,6 +206,26 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('public_dashboard', data);
     },
+    '/dashboard/public-folder/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_folder', data);
+    },
+    '/dashboard/public-folder/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_folder', data);
+    },
+    '/dashboard/public-folder/share': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_folder', data);
+    },
+    '/dashboard/public-folder/unshare': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_folder', data);
+    },
 });
 
 const getSessionTimeoutCallback = (store) => () => {
