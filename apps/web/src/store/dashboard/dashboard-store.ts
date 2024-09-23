@@ -10,7 +10,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ResourceGroupType } from '@/schema/_common/type';
-import type { DashboardType, DashboardFolderType } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardType, DashboardFolderType, DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
 import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/private-dashboard/api-verbs/delete';
 import type { PrivateDashboardListParameters } from '@/schema/dashboard/private-dashboard/api-verbs/list';
@@ -33,9 +33,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
-import type {
-    DashboardModel,
-} from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 
