@@ -57,13 +57,6 @@ export default {
                             props: true,
                             component: ProjectSummaryPage,
                         },
-                        // {
-                        //     path: 'member',
-                        //     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-                        //     meta: { lsbVisible: true },
-                        //     props: true,
-                        //     component: ProjectMemberPage,
-                        // },
                         {
                             path: 'alert',
                             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
@@ -89,13 +82,6 @@ export default {
                             props: true,
                             component: ProjectDashboardPage,
                         },
-                        // {
-                        //     path: 'tag',
-                        //     name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
-                        //     meta: { lsbVisible: true },
-                        //     props: true,
-                        //     component: ProjectTagPage,
-                        // },
                     ],
                 },
                 {
