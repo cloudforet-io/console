@@ -3,6 +3,8 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
+import dayjs from 'dayjs';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PToolboxTable, PLink, PStatus, PTooltip, PI,
@@ -11,13 +13,13 @@ import {
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserProfileGetWorkspacesParameters } from '@/schema/identity/user-profile/api-verbs/get-workspaces';
 import type { MyWorkspaceModel } from '@/schema/identity/user-profile/model';
+import { store } from '@/store';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
@@ -78,17 +80,11 @@ const tableState = reactive({
     searchText: '',
     sortBy: 'name',
     sortDesc: true,
+    timezone: computed(() => store.state.user.timezone),
 });
 
 const getWorkspaceRouteLocationByWorkspaceId = (item) => ({
     name: WORKSPACE_HOME_ROUTE._NAME,
-    params: {
-        workspaceId: item?.workspace_id,
-    },
-});
-
-const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
-    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
     params: {
         workspaceId: item?.workspace_id,
     },
@@ -200,12 +196,8 @@ onMounted(() => {
                           class="capitalize"
                 />
             </template>
-            <template #col-service_account-format="{ value, item }">
-                <p-link :text="value"
-                        action-icon="internal-link"
-                        new-tab
-                        :to="getServiceAccountRouteLocationByWorkspaceId(item)"
-                />
+            <template #col-created_at-format="{ value }">
+                {{ dayjs.tz(dayjs.utc(value), tableState.timezone).format('YYYY-MM-DD HH:mm') }}
             </template>
         </p-toolbox-table>
     </section>

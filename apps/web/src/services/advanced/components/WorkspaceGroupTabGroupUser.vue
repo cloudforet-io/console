@@ -144,7 +144,7 @@ const handleSelectMenu = async (value:{label:string, name:string, role_type: Rol
         const selectedGroupUser = workspaceGroupPageGetters.selectedGroupUsersByIndices[0];
 
         const roleId = value.name;
-        const userId = selectedGroupUser.user_id;
+        const userId = selectedGroupUser?.user_id;
         const workspaceGroupId = workspaceGroupPageGetters.selectedWorkspaceGroupId;
 
         await SpaceConnector.clientV2.identity.workspaceGroup.updateRole<WorkspaceGroupUpdateRoleParameters>({
