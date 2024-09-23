@@ -91,6 +91,7 @@ const handleAdminRoleChangeInput = (items: AddAdminRoleFormState) => {
     if (items.workspaceGroup) state.workspaceGroup = items.workspaceGroup;
 };
 const handleChangeInput = (items) => {
+    if (items.role) state.role = items.role;
     if (items.userList) {
         state.userList = items.userList;
         const newUserItem = state.userList.filter((item) => item.isNew);
