@@ -71,6 +71,26 @@ export const getDashboardTreeData = (folderList: FolderModel[], dashboardList: D
     return rootNodes;
 };
 
+export const getSelectedTreeData = (dashboardTreeData: TreeNode<DashboardTreeDataType>[], selectedIdMap: Record<string, boolean>): TreeNode<DashboardTreeDataType>[] => {
+    const _selectedIdList = Object.keys(selectedIdMap).filter((key) => selectedIdMap[key]);
+    const _selectedNodeList: TreeNode<DashboardTreeDataType>[] = [];
+    _selectedIdList.forEach((id) => {
+        const _node = dashboardTreeData.find((node) => node.data.id === id);
+        if (!_node) return;
+        if (_node?.data.type === 'FOLDER') {
+            const _childrenDashboards = _node.children?.filter((child) => selectedIdMap[child.id]);
+            // get folder id only if all children are selected
+            if (_childrenDashboards?.length === _node.children?.length) {
+                _selectedNodeList.push(_node);
+            } else if (_childrenDashboards) {
+                _selectedNodeList.push(..._childrenDashboards);
+            }
+        } else {
+            _selectedNodeList.push(_node);
+        }
+    });
+    return _selectedNodeList;
+};
 
 export const convertTreeDataToDataTableItems = (treeData: TreeNode<DashboardTreeDataType>[], selectedTreeData: TreeNode<DashboardTreeDataType>[]): DashboardDataTableItem[] => {
     const _tableItems: DashboardDataTableItem[] = [];
