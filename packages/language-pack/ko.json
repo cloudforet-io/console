@@ -2633,6 +2633,7 @@
 				"ROLE_TITLE": "이 역할(Role)로 초대: ",
 				"SELECT_ROLE": "역할(Role) 선택",
 				"SELECT_WORKSPACE": "하나 이상의 워크스페이스 선택",
+				"SELECT_WORKSPACE_GROUP": "하나 이상의 워크스페이스 그룹 선택",
 				"TAGS": "태그",
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다. 다른 검색어로 검색해보세요.",
 				"USER_ID": "사용자 ID",
@@ -2640,7 +2641,9 @@
 				"USER_ID_INVALID": "같은 아이디가 존재합니다.",
 				"USER_ID_INVALID_DOMAIN": "{userId}는 이미 도메인 내 존재합니다.",
 				"USER_ID_INVALID_WORKSPACE": "{userId}는 이미 워크스페이스 내 존재합니다.",
-				"WITH_ROLE": "역할(Role)"
+				"WITH_ROLE": "역할(Role)",
+				"WORKSPACE": "워크스페이스",
+				"WORKSPACE_GROUP": "워크스페이스 그룹"
 			},
 			"INVITE": "초대",
 			"MAIN": {

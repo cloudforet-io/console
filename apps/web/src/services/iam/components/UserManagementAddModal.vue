@@ -16,6 +16,8 @@ import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';
+import type { WorkspaceGroupAddUsersParameters } from '@/schema/identity/workspace-group/api-verbs/add-users';
+import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceUserCreateParameters } from '@/schema/identity/workspace-user/api-verbs/create';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
@@ -35,7 +37,7 @@ import UserManagementAddUser from '@/services/iam/components/UserManagementAddUs
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { AddModalMenuItem } from '@/services/iam/types/user-type';
+import type { AddModalMenuItem, AddAdminRoleFormState } from '@/services/iam/types/user-type';
 
 
 const userPageStore = useUserPageStore();
@@ -76,15 +78,19 @@ const state = reactive({
     // role
     role: {} as AddModalMenuItem,
     workspace: [] as AddModalMenuItem[],
+    workspaceGroup: [] as AddModalMenuItem[],
     isSetAdminRole: false,
     // tag
     tags: {} as Tags,
 });
 
 /* Component */
-const handleChangeInput = (items) => {
+const handleAdminRoleChangeInput = (items: AddAdminRoleFormState) => {
     if (items.role) state.role = items.role;
     if (items.workspace) state.workspace = items.workspace;
+    if (items.workspaceGroup) state.workspaceGroup = items.workspaceGroup;
+};
+const handleChangeInput = (items) => {
     if (items.userList) {
         state.userList = items.userList;
         const newUserItem = state.userList.filter((item) => item.isNew);
@@ -146,7 +152,8 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
         } else if (userPageState.afterWorkspaceCreated) {
             await fetchCreateRoleBinding({ ...item, workspace_id: userPageState.createdWorkspaceId });
         } else {
-            await Promise.all(state.workspace.map((w) => fetchCreateRoleBinding(item, w)));
+            await Promise.allSettled(state.workspace.map((w) => fetchCreateRoleBinding(item, w)));
+            await Promise.allSettled(state.workspaceGroup.map((wg) => fetchAddUserToWorkspaceGroup(item, wg)));
         }
     };
 
@@ -189,6 +196,15 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
     await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(roleParams);
 };
 
+const fetchAddUserToWorkspaceGroup = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
+    await SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>({
+        workspace_group_id: item?.name || '',
+        users: [{
+            user_id: userItem.user_id, role_id: state.role.name || '',
+        }],
+    });
+};
+
 watch(() => route.query, (query) => {
     if (!query) return;
     if (query.isAddUser) {
@@ -223,7 +239,7 @@ watch(() => route.query, (query) => {
                 />
                 <user-management-add-admin-role v-if="userPageState.isAdminMode"
                                                 :is-set-admin-role.sync="state.isSetAdminRole"
-                                                @change-input="handleChangeInput"
+                                                @change-input="handleAdminRoleChangeInput"
                 />
                 <user-management-add-role v-else
                                           @change-input="handleChangeInput"
@@ -239,6 +255,7 @@ watch(() => route.query, (query) => {
 
 <style lang="postcss">
 .user-management-additional-modal {
+    min-height: 34.875rem;
     .modal-contents {
         @apply flex flex-col bg-primary-4 rounded-md;
         margin-bottom: 9rem;

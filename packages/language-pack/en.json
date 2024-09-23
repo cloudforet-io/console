@@ -2633,6 +2633,7 @@
 				"ROLE_TITLE": "Invite with a role:",
 				"SELECT_ROLE": "Select a Role",
 				"SELECT_WORKSPACE": "Select one workspace or more",
+				"SELECT_WORKSPACE_GROUP": "Select one workspace group or more",
 				"TAGS": "Tag",
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
 				"USER_ID": "User ID",
@@ -2640,7 +2641,9 @@
 				"USER_ID_INVALID": "Same ID exists.",
 				"USER_ID_INVALID_DOMAIN": "{userId} is already in this domain.",
 				"USER_ID_INVALID_WORKSPACE": "{userId} is already in this workspace.",
-				"WITH_ROLE": "with a role"
+				"WITH_ROLE": "with a role",
+				"WORKSPACE": "Workspace",
+				"WORKSPACE_GROUP": "Workspace Group"
 			},
 			"INVITE": "Invite",
 			"MAIN": {

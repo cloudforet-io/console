@@ -80,7 +80,6 @@ watch(() => workspaceGroupPageState.modal.visible, () => {
                 <p-field-group
                     required
                     :label="$t('IAM.WORKSPACE_GROUP.MODAL.EDIT_GROUP_NAME')"
-                    style-type="secondary"
                 >
                     <p-text-input v-model="state.groupName"
                                   :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.EDIT_GROUP_NAME_PLACEHOLDER')"
