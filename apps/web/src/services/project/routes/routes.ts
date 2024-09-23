@@ -8,8 +8,7 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 const ProjectContainer = () => import('@/services/project/ProjectContainer.vue');
 
 const ProjectMainPage = () => import('@/services/project/pages/ProjectMainPage.vue');
-// const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
-const ProjectDetailPageNew = () => import('@/services/project/pages/ProjectDetailPageNew.vue');
+const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
 const ProjectDetailTabPage = () => import('@/services/project/pages/ProjectDetailTabPage.vue');
 const ProjectDashboardPage = () => import('@/services/project/pages/ProjectDashboardPage.vue');
 const ProjectSummaryPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
@@ -41,7 +40,7 @@ export default {
             name: PROJECT_ROUTE.DETAIL._NAME,
             redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             props: true,
-            component: ProjectDetailPageNew,
+            component: ProjectDetailPage,
             children: [
                 {
                     path: '/',
