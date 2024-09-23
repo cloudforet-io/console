@@ -147,11 +147,6 @@ export const useProjectPageStore = defineStore('page-project', () => {
 
         return null;
     };
-    const openProjectGroupFormModal = (target: ProjectGroupTreeItem = {}, isUpdateMode?: boolean) => {
-        state.actionTargetItem = target;
-        state.projectGroupFormUpdateMode = !!isUpdateMode;
-        state.projectGroupFormVisible = true;
-    };
 
     const openProjectFormModal = (target: ProjectGroupTreeItem = {}) => {
         state.actionTargetItem = target;
@@ -168,7 +163,7 @@ export const useProjectPageStore = defineStore('page-project', () => {
         state.actionTargetItem = {};
         state.projectGroupFormVisible = false;
         state.projectGroupFormUpdateMode = false;
-        state.projectGroupDeleteCheckModalVisible = false;
+        state.projectDeleteModalVisible = false;
         state.projectFormModalVisible = false;
         state.shouldUpdateProjectList = false;
     };
@@ -305,7 +300,6 @@ export const useProjectPageStore = defineStore('page-project', () => {
     const actions = {
         reset,
         selectNode,
-        openProjectGroupFormModal,
         createProjectGroup,
         updateProjectGroup,
         deleteProjectGroup,
