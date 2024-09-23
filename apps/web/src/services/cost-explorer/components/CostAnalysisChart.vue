@@ -12,7 +12,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PSelectButton,
-    PSelectDropdown,
+    PSelectDropdown, PToggleButton, PFieldTitle,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -51,6 +51,8 @@ const state = reactive({
         };
     })),
     showHideAll: computed(() => Object.values(state.legend).some((d) => d)),
+    showAccumulatedToggle: computed(() => costAnalysisPageState.granularity === GRANULARITY.DAILY),
+    isAccumulated: false,
 });
 
 /* Util */
@@ -122,6 +124,9 @@ const handleToggleAllLegends = () => {
     }
     state.legend = _legend;
 };
+const handleToggleAccumulated = (value: boolean) => {
+    state.isAccumulated = value;
+};
 
 /* Watcher */
 watch([
@@ -141,6 +146,9 @@ watch(() => state.groupByMenuItems, (after) => {
 watch([() => costAnalysisPageState.chartGroupBy, () => costAnalysisPageState.granularity], () => {
     state.legend = {};
 });
+watch(() => costAnalysisPageState.granularity, () => {
+    if (state.isAccumulated) state.isAccumulated = false;
+});
 </script>
 
 <template>
@@ -152,6 +160,14 @@ watch([() => costAnalysisPageState.chartGroupBy, () => costAnalysisPageState.gra
                                class="group-by-select-dropdown"
                                @select="handleChartGroupByItem"
             />
+            <div v-if="state.showAccumulatedToggle"
+                 class="accumulated-toggle-wrapper"
+            >
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ACCUMULATED') }}</p-field-title>
+                <p-toggle-button :value="state.isAccumulated"
+                                 @update:value="handleToggleAccumulated"
+                />
+            </div>
             <div class="select-button-wrapper">
                 <p-select-button :selected="true"
                                  icon-name="ic_chart-bar"
@@ -179,6 +195,7 @@ watch([() => costAnalysisPageState.chartGroupBy, () => costAnalysisPageState.gra
             <cost-analysis-stacked-column-chart :loading="state.loading"
                                                 :data="state.data"
                                                 :legend.sync="state.legend"
+                                                :accumulated="state.isAccumulated"
             />
         </div>
     </div>
@@ -193,13 +210,19 @@ watch([() => costAnalysisPageState.chartGroupBy, () => costAnalysisPageState.gra
 
     .top-part {
         display: flex;
-        justify-content: space-between;
         text-align: right;
+        gap: 1rem;
+        .accumulated-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
         .select-button-wrapper {
             display: flex;
             justify-content: flex-end;
             gap: 0.375rem;
             padding-bottom: 0.5rem;
+            flex: 1;
         }
         .group-by-select-dropdown {
             width: 24%;

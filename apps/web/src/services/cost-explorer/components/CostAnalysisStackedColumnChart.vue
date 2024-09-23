@@ -41,12 +41,14 @@ interface Props {
     loading: boolean;
     data: AnalyzeResponse<CostAnalyzeRawData>;
     legend?: Record<string, boolean>;
+    accumulated?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
     data: () => ({}),
     legend: () => ({}),
+    accumulated: false,
 });
 const emit = defineEmits<{(e: 'update:legend', value): void;
 }>();
@@ -115,56 +117,88 @@ const state = reactive({
 });
 
 /* Util */
-const getGroupByData = (rawData: AnalyzeResponse<CostAnalyzeRawData>): BarSeriesOption[] => {
-    const _slicedData = rawData.results?.slice(0, LIMIT);
-    const _etcData = rawData.results?.slice(LIMIT);
-
+const getSeriesData = (slicedData: CostAnalyzeRawData[], etcData: CostAnalyzeRawData[], accumulated: boolean) => {
     const _seriesData: any[] = [];
-    _slicedData?.forEach((d) => {
+    const _today = dayjs.utc();
+    slicedData.forEach((vd) => {
+        let _accumulatedData = 0;
         _seriesData.push({
-            name: d[state.parsedChartGroupBy] || 'Unknown',
+            name: vd[state.parsedChartGroupBy] || 'Unknown',
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
             data: state.xAxisData.map((xAxis) => {
-                const _data = d.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
-                return _data ? _data?.value : undefined;
+                if (dayjs.utc(xAxis).isAfter(_today)) return 0;
+                const _elem = vd.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
+                const _value = _elem ? _elem?.value : 0;
+                if (accumulated) {
+                    _accumulatedData += _value;
+                    return _accumulatedData;
+                }
+                return _value;
             }),
         });
     });
-    if (_etcData?.length) {
+    if (etcData.length) {
+        let _accumulatedData = 0;
         _seriesData.push({
             name: 'etc',
             type: 'bar',
             stack: true,
             barMaxWidth: 50,
             data: state.xAxisData.map((xAxis) => {
-                const _data = _etcData.reduce((acc, d) => {
-                    const _value = d.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
-                    return acc + (_value ? _value.value : 0);
+                if (dayjs.utc(xAxis).isAfter(_today)) return 0;
+                const _value = etcData.reduce((acc, etcd) => {
+                    const _elem = etcd.value_sum?.find((v) => v[DATE_FIELD_NAME] === xAxis);
+                    return acc + (_elem ? _elem.value : 0);
                 }, 0);
-                return _data;
+                if (accumulated) {
+                    _accumulatedData += _value;
+                    return _accumulatedData;
+                }
+                return _value;
             }),
         });
     }
     return _seriesData;
 };
-const getTotalData = (rawData: AnalyzeResponse<CostAnalyzeRawData>): BarSeriesOption[] => [{
-    name: 'Total',
-    type: 'bar',
-    barMaxWidth: 50,
-    data: state.xAxisData.map((d) => {
-        const _data = rawData.results?.[0]?.value_sum?.find((v) => v[DATE_FIELD_NAME] === d);
-        return _data ? _data.value : 0;
-    }),
-}];
+const getGroupByData = (rawData: AnalyzeResponse<CostAnalyzeRawData>, accumulated: boolean): BarSeriesOption[] => {
+    const _slicedData = rawData.results?.slice(0, LIMIT) ?? [];
+    const _etcData = rawData.results?.slice(LIMIT) ?? [];
+    return getSeriesData(_slicedData, _etcData, accumulated);
+};
+const getTotalData = (rawData: AnalyzeResponse<CostAnalyzeRawData>, accumulated: boolean) => {
+    let _data;
+    if (accumulated) {
+        let _accumulatedData = 0;
+        const _today = dayjs.utc();
+        _data = state.xAxisData.map((d) => {
+            if (dayjs.utc(d).isAfter(_today)) return 0;
+            const _elem = rawData.results?.[0]?.value_sum?.find((v) => v[DATE_FIELD_NAME] === d);
+            const _value = _elem?.value ?? 0;
+            _accumulatedData += _value;
+            return _accumulatedData;
+        });
+    } else {
+        _data = state.xAxisData.map((d) => {
+            const _elem = rawData.results?.[0]?.value_sum?.find((v) => v[DATE_FIELD_NAME] === d);
+            return _elem ? _elem.value : 0;
+        });
+    }
+    return [{
+        name: 'Total',
+        type: 'bar',
+        barMaxWidth: 50,
+        data: _data,
+    }];
+};
 const drawChart = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
     if (isEmpty(rawData)) return;
 
     if (costAnalysisPageState.chartGroupBy) {
-        state.chartData = getGroupByData(rawData);
+        state.chartData = getGroupByData(rawData, props.accumulated);
     } else {
-        state.chartData = getTotalData(rawData);
+        state.chartData = getTotalData(rawData, props.accumulated);
     }
 
     // init legend
@@ -184,7 +218,7 @@ const drawChart = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
     });
 };
 
-watch([() => chartContext.value, () => props.loading, () => props.data], async ([_chartContext, loading, data]) => {
+watch([() => chartContext.value, () => props.loading, () => props.data, () => props.accumulated], async ([_chartContext, loading, data]) => {
     if (_chartContext && !loading) {
         drawChart(data);
     }
