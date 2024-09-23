@@ -280,7 +280,6 @@ export default defineComponent<ButtonModalProps>({
         transition: all 0.3s ease;
         justify-content: space-between;
         padding: 2rem 2rem;
-        margin-top: 4rem;
 
         &.no-footer {
             padding-bottom: 2.5rem;

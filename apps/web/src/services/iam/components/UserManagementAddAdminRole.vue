@@ -16,6 +16,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
+import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
@@ -30,7 +31,7 @@ import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constan
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
-import type { AddModalMenuItem } from '@/services/iam/types/user-type';
+import type { AddModalMenuItem, AddAdminRoleFormState } from '@/services/iam/types/user-type';
 
 interface Props {
     isSetAdminRole: boolean;
@@ -42,13 +43,22 @@ const props = withDefaults(defineProps<Props>(), {
 
 const router = useRouter();
 
-const emit = defineEmits<{(e: 'change-input', formState): void,
+
+
+const emit = defineEmits<{(e: 'change-input', formState: AddAdminRoleFormState): void,
 }>();
 
 const state = reactive({
     proxyIsSetAdminRole: useProxyValue('isSetAdminRole', props, emit),
 });
 const workspaceState = reactive({
+    loading: true,
+    visible: false,
+    menuItems: [] as AddModalMenuItem[],
+    selectedItems: [] as AddModalMenuItem[],
+    searchText: '',
+});
+const workspaceGroupState = reactive({
     loading: true,
     visible: false,
     menuItems: [] as AddModalMenuItem[],
@@ -65,11 +75,45 @@ const roleState = reactive({
 
 const roleListApiQueryHelper = new ApiQueryHelper().setSort('name', true);
 const workspaceListApiQueryHelper = new ApiQueryHelper();
+const workspaceGroupListApiQueryHelper = new ApiQueryHelper();
 
 const handleChangeToggleButton = () => {
     state.proxyIsSetAdminRole = !state.proxyIsSetAdminRole;
 };
+const workspaceGroupMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
+    workspaceGroupState.loading = true;
 
+    workspaceGroupListApiQueryHelper
+        .setSort('name', true)
+        .setFilters([
+            { k: 'name', v: inputText, o: '' },
+        ]);
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.workspaceGroup.list<WorkspaceListParameters, ListResponse<WorkspaceGroupModel>>({
+            query: workspaceGroupListApiQueryHelper.data,
+        });
+        const refinedMenuItems = (results ?? []).map((workspaceGroup:WorkspaceGroupModel) => ({
+            label: workspaceGroup.name,
+            name: workspaceGroup.workspace_group_id,
+        }));
+
+        const totalCount = pageStart - 1 + Number(pageLimit);
+        const slicedResults = refinedMenuItems?.slice(pageStart - 1, totalCount);
+        workspaceGroupState.menuItems = slicedResults;
+        return {
+            results: slicedResults,
+            more: totalCount < refinedMenuItems.length,
+        };
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return {
+            results: [],
+            more: false,
+        };
+    } finally {
+        workspaceGroupState.loading = false;
+    }
+};
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
     workspaceState.loading = true;
 
@@ -166,10 +210,11 @@ const roleMenuHandler: AutocompleteHandler = async (inputText: string, pageStart
 };
 
 /* Watcher */
-watch([() => roleState.selectedItems, () => workspaceState.selectedItems], ([role, workspace]) => {
+watch([() => roleState.selectedItems, () => workspaceState.selectedItems, () => workspaceGroupState.selectedItems], ([role, workspace, workspaceGroup]) => {
     emit('change-input', {
         role: role[0],
         workspace,
+        workspaceGroup,
     });
 });
 watch(() => state.proxyIsSetAdminRole, () => {
@@ -194,65 +239,126 @@ watch(() => state.proxyIsSetAdminRole, () => {
                            required
                            class="workspace-role-form"
             >
-                <p-select-dropdown use-fixed-menu-style
-                                   page-size="10"
-                                   :placeholder="$t('IAM.USER.FORM.SELECT_WORKSPACE')"
-                                   :visible-menu.sync="workspaceState.visible"
-                                   :loading="workspaceState.loading"
-                                   :search-text.sync="workspaceState.searchText"
-                                   :selected.sync="workspaceState.selectedItems"
-                                   :handler="workspaceMenuHandler"
-                                   parent-id="workspace-role-form"
-                                   show-select-marker
-                                   show-select-header
-                                   is-filterable
-                                   multi-selectable
-                                   appearance-type="badge"
-                                   show-delete-all-button
-                                   class="workspace-select-dropdown"
-                                   :class="{'no-data': workspaceState.menuItems.length === 0 && !workspaceState.loading}"
-                >
-                    <template #menu-item--format="{item}">
-                        <div class="menu-item-wrapper"
-                             :class="{'is-dormant': item?.is_dormant}"
+                <div class="target-wrapper">
+                    <p-field-group style-type="substitutive"
+                                   :label="$t('IAM.USER.FORM.WORKSPACE_GROUP')"
+                                   required
+                    >
+                        <p-select-dropdown use-fixed-menu-style
+                                           page-size="10"
+                                           :placeholder="$t('IAM.USER.FORM.SELECT_WORKSPACE_GROUP')"
+                                           :visible-menu.sync="workspaceGroupState.visible"
+                                           :loading="workspaceGroupState.loading"
+                                           :search-text.sync="workspaceGroupState.searchText"
+                                           :selected.sync="workspaceGroupState.selectedItems"
+                                           :handler="workspaceGroupMenuHandler"
+                                           parent-id="workspace-role-form"
+                                           show-select-marker
+                                           show-select-header
+                                           is-filterable
+                                           multi-selectable
+                                           appearance-type="badge"
+                                           show-delete-all-button
+                                           class="workspace-select-dropdown"
+                                           :class="{'no-data': workspaceGroupState.menuItems.length === 0 && !workspaceGroupState.loading}"
                         >
-                            <div class="label">
-                                <workspace-logo-icon :text="item?.label || ''"
-                                                     :theme="item?.tags?.theme"
-                                                     size="xs"
-                                />
-                                <span class="label-text">{{ item.label }}</span>
-                                <p-status v-if="item?.is_dormant"
-                                          v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
-                                          class="capitalize state"
-                                />
-                            </div>
-                        </div>
-                    </template>
-                    <template #no-data-area>
-                        <p-empty v-if="workspaceState.menuItems.length === 0 && !workspaceState.loading"
-                                 image-size="sm"
-                                 show-image
-                                 show-button
-                                 class="no-data-wrapper"
+                            <template #menu-item--format="{item}">
+                                <div class="menu-item-wrapper"
+                                     :class="{'is-dormant': item?.is_dormant}"
+                                >
+                                    <span class="label-text">{{ item.label }}</span>
+                                </div>
+                            </template>
+                            <template #no-data-area>
+                                <p-empty v-if="workspaceGroupState.menuItems.length === 0 && !workspaceGroupState.loading"
+                                         image-size="sm"
+                                         show-image
+                                         show-button
+                                         class="no-data-wrapper"
+                                >
+                                    <template #image>
+                                        <img src="@/assets/images/illust_planet.svg"
+                                             alt="empty-options"
+                                        >
+                                    </template>
+                                    <template #button>
+                                        <p-button style-type="substitutive"
+                                                  icon-left="ic_plus_bold"
+                                                  @click="router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME) })"
+                                        >
+                                            {{ $t('IAM.USER.FORM.CREATE_WORKSPACE') }}
+                                        </p-button>
+                                    </template>
+                                    {{ $t('IAM.USER.FORM.NO_WORKSPACE') }}
+                                </p-empty>
+                            </template>
+                        </p-select-dropdown>
+                    </p-field-group>
+                    <p-field-group style-type="substitutive"
+                                   :label="$t('IAM.USER.FORM.WORKSPACE')"
+                                   required
+                    >
+                        <p-select-dropdown use-fixed-menu-style
+                                           page-size="10"
+                                           :placeholder="$t('IAM.USER.FORM.SELECT_WORKSPACE')"
+                                           :visible-menu.sync="workspaceState.visible"
+                                           :loading="workspaceState.loading"
+                                           :search-text.sync="workspaceState.searchText"
+                                           :selected.sync="workspaceState.selectedItems"
+                                           :handler="workspaceMenuHandler"
+                                           parent-id="workspace-role-form"
+                                           show-select-marker
+                                           show-select-header
+                                           is-filterable
+                                           multi-selectable
+                                           appearance-type="badge"
+                                           show-delete-all-button
+                                           class="workspace-select-dropdown"
+                                           :class="{'no-data': workspaceState.menuItems.length === 0 && !workspaceState.loading}"
                         >
-                            <template #image>
-                                <img src="@/assets/images/illust_planet.svg"
-                                     alt="empty-options"
+                            <template #menu-item--format="{item}">
+                                <div class="menu-item-wrapper"
+                                     :class="{'is-dormant': item?.is_dormant}"
                                 >
+                                    <div class="label">
+                                        <workspace-logo-icon :text="item?.label || ''"
+                                                             :theme="item?.tags?.theme"
+                                                             size="xs"
+                                        />
+                                        <span class="label-text">{{ item.label }}</span>
+                                        <p-status v-if="item?.is_dormant"
+                                                  v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                                                  class="capitalize state"
+                                        />
+                                    </div>
+                                </div>
                             </template>
-                            <template #button>
-                                <p-button style-type="substitutive"
-                                          icon-left="ic_plus_bold"
-                                          @click="router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME) })"
+                            <template #no-data-area>
+                                <p-empty v-if="workspaceState.menuItems.length === 0 && !workspaceState.loading"
+                                         image-size="sm"
+                                         show-image
+                                         show-button
+                                         class="no-data-wrapper"
                                 >
-                                    {{ $t('IAM.USER.FORM.CREATE_WORKSPACE') }}
-                                </p-button>
+                                    <template #image>
+                                        <img src="@/assets/images/illust_planet.svg"
+                                             alt="empty-options"
+                                        >
+                                    </template>
+                                    <template #button>
+                                        <p-button style-type="substitutive"
+                                                  icon-left="ic_plus_bold"
+                                                  @click="router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME) })"
+                                        >
+                                            {{ $t('IAM.USER.FORM.CREATE_WORKSPACE') }}
+                                        </p-button>
+                                    </template>
+                                    {{ $t('IAM.USER.FORM.NO_WORKSPACE') }}
+                                </p-empty>
                             </template>
-                            {{ $t('IAM.USER.FORM.NO_WORKSPACE') }}
-                        </p-empty>
-                    </template>
-                </p-select-dropdown>
+                        </p-select-dropdown>
+                    </p-field-group>
+                </div>
             </p-field-group>
             <p-field-group :label="$t('IAM.USER.FORM.WITH_ROLE')"
                            required
@@ -391,24 +497,29 @@ watch(() => state.proxyIsSetAdminRole, () => {
         gap: 0.75rem;
         .workspace-role-form {
             margin-bottom: 0;
-            .workspace-select-dropdown {
-                .menu-item-wrapper {
-                    @apply flex justify-between;
-                    max-width: 100%;
 
-                    .label {
-                        @apply flex items-center gap-2;
-                    }
-                    .state {
-                        @apply text-label-sm;
-                    }
-                    .label-text {
-                        @apply truncate;
-                        max-width: 36.875rem;
-                    }
-                    &.is-dormant {
+            .target-wrapper {
+                @apply p-2 flex flex-col gap-2 bg-gray-100 rounded-md;
+
+                .workspace-select-dropdown {
+                    .menu-item-wrapper {
+                        @apply flex justify-between;
+                        max-width: 100%;
+
+                        .label {
+                            @apply flex items-center gap-2;
+                        }
+                        .state {
+                            @apply text-label-sm;
+                        }
                         .label-text {
-                            max-width: 31.25rem;
+                            @apply truncate;
+                            max-width: 36.875rem;
+                        }
+                        &.is-dormant {
+                            .label-text {
+                                max-width: 31.25rem;
+                            }
                         }
                     }
                 }

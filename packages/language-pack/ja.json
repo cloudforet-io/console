@@ -2633,6 +2633,7 @@
 				"ROLE_TITLE": "この役割で招待",
 				"SELECT_ROLE": "役割を選択してください",
 				"SELECT_WORKSPACE": "1つ以上のワークスペースを選択",
+				"SELECT_WORKSPACE_GROUP": "",
 				"TAGS": "タグ",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
 				"USER_ID": "User ID",
@@ -2640,7 +2641,9 @@
 				"USER_ID_INVALID": "同じIDが存在します。",
 				"USER_ID_INVALID_DOMAIN": "{userId}は既にドメイン内に存在します。",
 				"USER_ID_INVALID_WORKSPACE": "{userId}は既にワークスペース内に存在します。",
-				"WITH_ROLE": "役割(Role)"
+				"WITH_ROLE": "役割(Role)",
+				"WORKSPACE": "ワークスペース",
+				"WORKSPACE_GROUP": "ワークスペースグループ"
 			},
 			"INVITE": "招待",
 			"MAIN": {
