@@ -94,16 +94,14 @@ const handleSelectProject = () => {
 };
 
 const handleSelectItem = (selected: MenuItem) => {
+    projectPageStore.setCurrentSelectedProjectId(props.item.id);
     if (selected.name === 'rename') {
-        projectPageStore.setCurrentSelectedProjectId(props.item.id);
-        projectPageStore.openProjectFormModal();
+        projectPageStore.setProjectFormModalVisible(true);
     }
     if (selected.name === 'move') {
-        projectPageStore.setCurrentSelectedProjectId(props.item.id);
         projectPageStore.setProjectGroupMoveModalVisible(true);
     }
     if (selected.name === 'delete') {
-        projectPageStore.setCurrentSelectedProjectId(props.item.id);
         projectPageStore.setProjectDeleteModalVisible(true);
     }
 };
