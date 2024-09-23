@@ -1,7 +1,6 @@
 <script setup lang="ts">
+import { debouncedWatch } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
-
-import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -140,9 +139,15 @@ const handleEnter = (user: [MenuItem]) => {
     userDropdownState.inputSelectedItem = [];
 };
 
-watch(() => userDropdownState.searchText, debounce(async () => {
+debouncedWatch(() => userDropdownState.searchText, async () => {
     userDropdownState.userList = await fetchUserFindList() || [];
-}, 300));
+}, { debounce: 300 });
+
+watch(() => workspaceGroupPageState.modal.visible, async (visible) => {
+    if (visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS) {
+        userDropdownState.userList = await fetchUserFindList() || [];
+    }
+});
 </script>
 
 <template>
