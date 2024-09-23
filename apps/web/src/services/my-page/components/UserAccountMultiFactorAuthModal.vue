@@ -86,9 +86,6 @@ const handleClickCancel = async () => {
         await store.dispatch('user/setUser', state.data);
     }
 };
-const handleConfirmButton = () => {
-    handleClickVerifyButton();
-};
 const handleClickRefreshButton = () => {};
 
 /* API */
@@ -128,7 +125,7 @@ watch(() => state.userId, (userId) => {
         :theme-color="props.type === MULTI_FACTOR_AUTH_MODAL_TYPE.DISABLED? 'alert' : 'primary'"
         :disabled="validationState.verificationCode === '' || !state.isSentCode"
         :loading="state.loading"
-        @confirm="handleConfirmButton"
+        @confirm="handleClickVerifyButton"
         @cancel="handleClickCancel"
         @close="handleClickCancel"
     >
