@@ -14,29 +14,29 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { UserListItemType } from '@/services/iam/types/user-type';
-import { MULTI_FACTOR_AUTH_MODAL_TYPE } from '@/services/my-page/types/multi-factor-auth-type';
-
 interface Props {
-    email?: string
-    type?: string
+    mfaType?: string
+    isDisabledModal?: boolean
     isSentCode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    email: '',
-    type: '',
+    mfaType: '',
+    isDisabledModal: false,
     isSentCode: false,
 });
 
 const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 
+const storeState = reactive({
+    email: computed<string>(() => store.state.user.mfa?.options?.email || undefined),
+});
 const state = reactive({
     loading: false,
-    data: {} as UserListItemType,
-    userId: computed(() => store.state.user.userId),
+    userEmail: computed<string>(() => store.state.user.email),
+    userId: computed<string>(() => store.state.user.userId),
     proxyIsSentCode: useProxyValue('isSentCode', props, emit),
-    originEmail: props.email,
+    originEmail: storeState.email,
 });
 
 const {
@@ -55,19 +55,16 @@ const {
 const handleClickSendCodeButton = async () => {
     state.loading = true;
     try {
-        if (props.type === MULTI_FACTOR_AUTH_MODAL_TYPE.EMAIL) {
-            state.data = await postEnableMfa({
-                mfa_type: props.type,
+        if (!props.isDisabledModal) {
+            await postEnableMfa({
+                mfa_type: props.mfaType,
                 options: {
                     email: email.value,
                 },
-            }, false) as UserListItemType;
-            await store.dispatch('user/setUser', {
-                email: state.data.email,
-            });
+            }, false);
+            await store.dispatch('user/setUser', { mfa: { options: { email: email.value } } });
         } else {
-            const response = await postUserProfileDisableMfa();
-            await store.dispatch('user/setUser', response);
+            await postUserProfileDisableMfa();
         }
         state.proxyIsSentCode = true;
     } finally {
@@ -78,7 +75,7 @@ const handleClickSendCodeButton = async () => {
 
 <template>
     <div class="email-info-wrapper">
-        <div v-if="props.type !== MULTI_FACTOR_AUTH_MODAL_TYPE.DISABLED"
+        <div v-if="!props.isDisabledModal"
              class="email-form-wrapper"
         >
             <p-field-group
@@ -118,7 +115,7 @@ const handleClickSendCodeButton = async () => {
                              class="icon-envelope"
                         />
                         <p class="email-text">
-                            {{ props.email || state.originEmail }}
+                            {{ storeState.email || state.originEmail }}
                         </p>
                     </div>
                 </div>

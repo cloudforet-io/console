@@ -3,12 +3,19 @@ import { computed, reactive, watch } from 'vue';
 
 import { keyBy, mapValues } from 'lodash';
 
-import { PI, PToggleButton, PBadge } from '@cloudforet/mirinae';
+import {
+    PI, PToggleButton, PBadge, PButton,
+} from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 
-import type { MultiFactorAuthType } from '@/services/my-page/types/multi-factor-auth-type';
-import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/my-page/types/multi-factor-auth-type';
+import type {
+    MultiFactorAuthType,
+    MultiFactorAuthModalDataType,
+} from '@/services/my-page/types/multi-factor-auth-type';
+import {
+    MULTI_FACTOR_AUTH_ITEMS,
+} from '@/services/my-page/types/multi-factor-auth-type';
 
 interface Props {
     modalVisible: boolean;
@@ -17,7 +24,9 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     modalVisible: false,
 });
-const emit = defineEmits<{(e: 'change-toggle', type: string, value: boolean): void }>();
+const emit = defineEmits<
+    {(e: 'handle-modal', data: MultiFactorAuthModalDataType): void}
+>();
 
 const storeState = reactive({
     mfa: computed(() => store.state.user.mfa || undefined),
@@ -25,16 +34,32 @@ const storeState = reactive({
 const state = reactive({
     enableMfa: mapValues(keyBy(MULTI_FACTOR_AUTH_ITEMS, 'type'), () => false) as Record<MultiFactorAuthType, boolean>,
     isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
-    type: computed<string>(() => storeState.mfa?.type),
+    type: computed<string>(() => storeState.mfa?.mfa_type),
     selectedType: '',
 });
 
-const handleChangeToggle = (type: string, value: boolean) => {
+const handleChangeToggle = (type: MultiFactorAuthType, value: boolean) => {
     state.selectedType = type;
     state.enableMfa[type] = value;
-    emit('change-toggle', type, value);
+    emit('handle-modal', {
+        type,
+        state: value,
+    });
+};
+const handleClickReSyncButton = (type: MultiFactorAuthType) => {
+    emit('handle-modal', {
+        type,
+        isReSync: true,
+    });
 };
 
+watch(() => storeState.mfa.mfa_type, (mfa_type) => {
+    if (mfa_type) {
+        state.enableMfa[mfa_type] = storeState.mfa.state === 'ENABLED';
+    } else {
+        state.enableMfa = mapValues(keyBy(MULTI_FACTOR_AUTH_ITEMS, 'type'), () => false) as Record<MultiFactorAuthType, boolean>;
+    }
+}, { immediate: true });
 watch(() => props.modalVisible, (modalVisible) => {
     if (!modalVisible) {
         state.enableMfa[state.selectedType] = state.type === state.selectedType ? state.isVerified : false;
@@ -62,7 +87,8 @@ watch(() => props.modalVisible, (modalVisible) => {
                     <p class="title">
                         {{ item.title }}
                     </p>
-                    <p-badge style-type="green200"
+                    <p-badge v-if="state.type === item.type && state.isVerified"
+                             style-type="green200"
                              badge-type="subtle"
                              class="badge"
                     >
@@ -73,6 +99,14 @@ watch(() => props.modalVisible, (modalVisible) => {
                     {{ item.desc }}
                 </p>
             </div>
+            <p-button v-if="state.type === item.type && state.isVerified"
+                      class="re-sync-button"
+                      style-type="tertiary"
+                      size="sm"
+                      @click="handleClickReSyncButton(item.type)"
+            >
+                {{ $t('MY_PAGE.MFA.RESYNC') }}
+            </p-button>
         </div>
     </div>
 </template>
@@ -100,6 +134,9 @@ watch(() => props.modalVisible, (modalVisible) => {
             .desc {
                 @apply text-label-md text-gray-600;
             }
+        }
+        .re-sync-button {
+            margin-left: auto;
         }
     }
 }

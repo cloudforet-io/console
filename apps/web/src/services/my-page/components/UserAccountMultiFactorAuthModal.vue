@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import { useQRCode } from '@vueuse/integrations/useQRCode';
 import {
     computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PIconButton,
+    PButtonModal, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
@@ -16,48 +15,52 @@ import { postValidationMfaCode } from '@/lib/helper/multi-factor-auth-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { UserListItemType } from '@/services/iam/types/user-type';
 import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/components/UserAccountMultiFactorAuthModalEmailInfo.vue';
 import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
-import type { MultiFactorAuthModalType } from '@/services/my-page/types/multi-factor-auth-type';
-import { MULTI_FACTOR_AUTH_MODAL_TYPE } from '@/services/my-page/types/multi-factor-auth-type';
+import UserAccountMultiFactorAuthModalMSInfo
+    from '@/services/my-page/components/UserAccountMultiFactorAuthModalMSInfo.vue';
+import type {
+    MultiFactorAuthModalDataType,
+    MultiFactorAuthType,
+    UserInfoType,
+} from '@/services/my-page/types/multi-factor-auth-type';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/services/my-page/types/multi-factor-auth-type';
 
 interface Props {
-    type: MultiFactorAuthModalType
-    verified?: boolean
+    data: MultiFactorAuthModalDataType
     visible: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    type: MULTI_FACTOR_AUTH_MODAL_TYPE.EMAIL,
-    verified: false,
+    data: undefined,
     visible: false,
-});
-
-const qrcode = useQRCode('https://vueuse.org', {
-    margin: 0,
 });
 
 const emit = defineEmits<{(e: 'refresh'): void }>();
 
+const storeState = reactive({
+    userId: computed<string>(() => store.state.user.userId),
+});
 const state = reactive({
     loading: false,
-    data: {} as UserListItemType,
-    userId: computed(() => store.state.user.userId),
+    mfaType: computed<MultiFactorAuthType>(() => props.data?.type),
+    isReSyncModal: computed<boolean>(() => props.data.isReSync || false),
+    isDisabledModal: computed<boolean>(() => !state.isReSyncModal && !props.data.state),
+    userInfo: {} as UserInfoType,
     isCollapsed: true,
     isSentCode: false,
-
-    // TEMP DATA
-    passkey: '5PFZQPE3HQTY7D74',
 });
 
 const modalState = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     title: computed(() => {
-        if (props.type === MULTI_FACTOR_AUTH_MODAL_TYPE.DISABLED) {
+        if (state.isReSyncModal) {
+            return _i18n.t('MY_PAGE.MFA.RESYNC_TITLE');
+        }
+        if (state.isDisabledModal) {
             return _i18n.t('COMMON.MFA_MODAL.ALT.TITLE');
         }
-        const type = props.type.toLowerCase()
+        const type = state.mfaType.toLowerCase()
             .replace(/_/g, ' ')
             .replace(/\b\w/g, (char) => char.toUpperCase());
         return _i18n.t('COMMON.MFA_MODAL.TITLE', { type });
@@ -82,23 +85,22 @@ const handleChangeInput = (value: string) => {
 const handleClickCancel = async () => {
     modalState.proxyVisible = false;
     await resetFormData();
-    if (state.userId === state.data.user_id) {
-        await store.dispatch('user/setUser', state.data);
+    if (storeState.userId === state.userInfo.user_id) {
+        await store.dispatch('user/setUser', state.userInfo);
     }
 };
-const handleClickRefreshButton = () => {};
 
 /* API */
 const handleClickVerifyButton = async () => {
     state.loading = true;
     try {
-        state.data = await postValidationMfaCode({
+        state.userInfo = await postValidationMfaCode({
             verify_code: validationState.verificationCode,
-        }) as UserListItemType;
-        modalState.proxyVisible = false;
-        if (state.userId === state.data.user_id) {
-            await store.dispatch('user/setUser', state.data);
+        }) as UserInfoType;
+        if (storeState.userId === state.userInfo.user_id) {
+            await store.dispatch('user/setUser', state.userInfo);
         }
+        modalState.proxyVisible = false;
         resetFormData();
     } catch (e: any) {
         validationState.isValidationCodeValid = false;
@@ -109,9 +111,9 @@ const handleClickVerifyButton = async () => {
 };
 
 /* Watcher */
-watch(() => state.userId, (userId) => {
+watch(() => storeState.userId, (userId) => {
     if (userId) {
-        state.data = store.state.user;
+        state.userInfo = store.state.user;
     }
 }, { immediate: true });
 </script>
@@ -122,7 +124,7 @@ watch(() => state.userId, (userId) => {
         :header-title="modalState.title"
         class="mfa-modal-wrapper"
         size="sm"
-        :theme-color="props.type === MULTI_FACTOR_AUTH_MODAL_TYPE.DISABLED? 'alert' : 'primary'"
+        :theme-color="state.isDisabledModal? 'alert' : 'primary'"
         :disabled="validationState.verificationCode === '' || !state.isSentCode"
         :loading="state.loading"
         @confirm="handleClickVerifyButton"
@@ -130,56 +132,25 @@ watch(() => state.userId, (userId) => {
         @close="handleClickCancel"
     >
         <template #body>
-            <div class="modal-content-wrapper">
-                <span v-if="props.type === MULTI_FACTOR_AUTH_MODAL_TYPE.DISABLED"
+            <p v-if="state.isReSyncModal"
+               class="re-sync-desc"
+            >
+                {{ $t('MY_PAGE.MFA.RESYNC_DESC') }}
+            </p>
+            <div v-else
+                 class="modal-content-wrapper"
+            >
+                <span v-if="state.isDisabledModal"
                       class="disable-modal-desc"
                 >
                     {{ $t('COMMON.MFA_MODAL.ALT.DESC') }}
                 </span>
-                <user-account-multi-factor-auth-modal-email-info v-if="props.type === MULTI_FACTOR_AUTH_MODAL_TYPE.EMAIL"
-                                                                 email="test"
-                                                                 :type="props.type"
+                <user-account-multi-factor-auth-modal-email-info v-if="state.mfaType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
+                                                                 :mfa-type="props.data?.type"
+                                                                 :is-disabled-modal="state.isDisabledModal"
                                                                  :is-sent-code.sync="state.isSentCode"
                 />
-                <div v-else
-                     class="set-up-desc-wrapper"
-                >
-                    <p class="set-up-title">
-                        <i18n path="MY_PAGE.MFA.STEP_DESC">
-                            <template #type>
-                                <router-link to="https://www.microsoft.com/en-us/security/mobile-authenticator-app">
-                                    <u>Microsoft Authenticator App</u>
-                                </router-link>
-                            </template>
-                        </i18n>
-                    </p>
-                    <ol class="set-up-desc">
-                        <li>{{ $t('MY_PAGE.MFA.STEP1') }}</li>
-                        <li>{{ $t('MY_PAGE.MFA.STEP2') }}</li>
-                    </ol>
-                    <img :src="qrcode"
-                         alt="QR Code"
-                         class="qrcode"
-                    >
-                    <div class="passkey-wrapper">
-                        <p-text-input :value="state.passkey"
-                                      class="passkey"
-                                      disabled
-                                      block
-                        />
-                        <p-icon-button name="ic_refresh"
-                                       class="refresh-btn"
-                                       size="md"
-                                       style-type="tertiary"
-                                       @click="handleClickRefreshButton"
-                        />
-                    </div>
-                    <ol class="set-up-desc"
-                        start="3"
-                    >
-                        <li>{{ $t('MY_PAGE.MFA.STEP3') }}</li>
-                    </ol>
-                </div>
+                <user-account-multi-factor-auth-modal-m-s-info v-else-if="state.mfaType === MULTI_FACTOR_AUTH_TYPE.MS && props.data.state" />
                 <div class="validation-code-form">
                     <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
                                    :invalid="!validationState.isValidationCodeValid"
@@ -195,17 +166,18 @@ watch(() => state.userId, (userId) => {
                         />
                     </p-field-group>
                 </div>
-                <user-account-multi-factor-auth-modal-folding v-if="props.type !== MULTI_FACTOR_AUTH_MODAL_TYPE.MS"
-                                                              :type="props.type"
+                <user-account-multi-factor-auth-modal-folding v-if="state.mfaType === MULTI_FACTOR_AUTH_TYPE.EMAIL"
+                                                              :is-disabled-modal="state.isDisabledModal"
                                                               :is-sent-code.sync="state.isSentCode"
                 />
             </div>
         </template>
-        <template #confirm-button>
-            <span v-if="props.type === MULTI_FACTOR_AUTH_MODAL_TYPE.DISABLED">
+        <template v-if="!state.isReSyncModal"
+                  #confirm-button
+        >
+            <span v-if="state.isDisabledModal">
                 {{ $t('COMMON.MFA_MODAL.ALT.DISABLED') }}
             </span>
-            <span v-else>{{ $t('COMMON.MFA_MODAL.VERIFY') }}</span>
         </template>
     </p-button-modal>
 </template>
@@ -217,33 +189,8 @@ watch(() => state.userId, (userId) => {
         margin-top: 1.625rem;
         margin-bottom: 1rem;
     }
-    .set-up-desc-wrapper {
-        @apply flex flex-col text-paragraph-md;
-        margin-bottom: 0.5rem;
-        .set-up-desc {
-            list-style: decimal;
-            padding-left: 1rem;
-        }
-    }
-    .qrcode {
-        width: 6.25rem;
-        height: 6.25rem;
-        margin: 1rem auto;
-    }
-    .passkey-wrapper {
-        @apply flex;
-        margin-bottom: 0.5rem;
-        gap: 0.5rem;
-
-        /* custom design-system component - p-text-input */
-        :deep(.p-text-input) {
-            .input-container.disabled {
-                background-color: white;
-            }
-        }
-        .refresh-btn {
-            border-radius: 0.25rem;
-        }
+    .re-sync-desc {
+        margin-top: 1rem;
     }
     .validation-code-form {
         @apply flex items-end;
