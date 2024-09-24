@@ -62,9 +62,8 @@ const state = reactive({
     }),
     privateMap: {} as Record<string, boolean>,
     tableFields: computed(() => {
-        if (state.bundleCaseType === 'TEMPLATE') {
-            return TABLE_FIELDS.filter((f) => f.name !== 'location');
-        }
+        if (storeState.isAdminMode) return TABLE_FIELDS.filter((f) => f.name !== 'private');
+        if (state.bundleCaseType === 'TEMPLATE') return TABLE_FIELDS.filter((f) => f.name !== 'location');
         return TABLE_FIELDS;
     }),
     dataTableItems: computed(() => {
@@ -186,6 +185,7 @@ const handleConfirm = async () => {
     } else {
         await createBundleDashboards();
     }
+    await dashboardStore.load();
     await SpaceRouter.router.push(getProperRouteLocation({
         name: DASHBOARDS_ROUTE._NAME,
     }));

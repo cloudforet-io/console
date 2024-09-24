@@ -4,8 +4,9 @@ import {
 } from 'vue';
 
 import {
-    PI, PFieldGroup, PTextInput,
+    PI, PFieldGroup, PTextInput, PSelectDropdown,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 import type { InputItem } from '@cloudforet/mirinae/types/inputs/input/text-input/type';
 
 import { SpaceRouter } from '@/router';
@@ -40,6 +41,7 @@ const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
+const dashboardGetters = dashboardStore.getters;
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
@@ -50,6 +52,29 @@ const state = reactive({
     proxyIsValid: useProxyValue('isValid', props, emit),
     dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardCreatePageGetters.dashboardType)),
     labels: [] as InputItem[],
+    folderMenuItems: computed<SelectDropdownMenuItem[]>(() => {
+        const defaultItem = {
+            label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.NO_PARENT_FOLDER'),
+            name: '',
+        };
+        if (dashboardCreatePageState.dashboardScope === 'PRIVATE') {
+            return [
+                defaultItem,
+                ...dashboardGetters.privateFolderItems.map((folder) => ({
+                    label: folder.name,
+                    name: folder.folder_id,
+                })),
+            ];
+        }
+        return [
+            defaultItem,
+            ...dashboardGetters.workspaceFolderItems.map((folder) => ({
+                label: folder.name,
+                name: folder.folder_id,
+            })),
+        ];
+    }),
+    selectedFolderId: '' as string,
 });
 const {
     forms: {
@@ -77,6 +102,7 @@ const createSingleDashboard = async () => {
         name: dashboardName.value,
         labels: state.labels.map((item) => item.name),
         tags: { created_by: store.state.user.userId },
+        folder_id: state.selectedFolderId,
     };
     try {
         if (storeState.isAdminMode) {
@@ -98,6 +124,7 @@ const createSingleDashboard = async () => {
 const handleConfirm = async () => {
     dashboardCreatePageStore.setLoading(true);
     const createdDashboardId = await createSingleDashboard();
+    await dashboardStore.load();
     if (createdDashboardId) {
         await SpaceRouter.router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
@@ -154,6 +181,27 @@ defineExpose({
                 />
             </p-field-group>
             <dashboard-create-scope-form v-if="!storeState.isAdminMode" />
+            <p-field-group :label="$t('DASHBOARDS.ALL_DASHBOARDS.LOCATION')"
+                           required
+                           class="mt-4"
+            >
+                <p-select-dropdown :selected.sync="state.selectedFolderId"
+                                   :menu="state.folderMenuItems"
+                                   block
+                                   show-select-marker
+                                   use-fixed-menu-style
+                                   class="w-full"
+                >
+                    <template #menu-item--format="{item}">
+                        <p-i v-if="item.name"
+                             name="ic_folder"
+                             width="1rem"
+                             height="1rem"
+                        />
+                        {{ item.label }}
+                    </template>
+                </p-select-dropdown>
+            </p-field-group>
         </div>
     </div>
 </template>
@@ -175,11 +223,6 @@ defineExpose({
             @apply text-label-lg;
             font-weight: 500;
         }
-    }
-}
-.input-form-wrapper {
-    .p-field-group {
-        margin-bottom: 1.5rem;
     }
 }
 </style>

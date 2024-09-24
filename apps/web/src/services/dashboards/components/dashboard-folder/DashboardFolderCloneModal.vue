@@ -7,6 +7,7 @@ import {
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -20,7 +21,7 @@ import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboa
 
 
 
-const DELETE_TABLE_FIELDS = [
+const CLONE_TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
     { name: 'location', label: 'Location' },
     { name: 'private', label: 'Make Private' },
@@ -33,14 +34,24 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardMainPageStore = useDashboardMainPageStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
 const dashboardMainPageGetters = dashboardMainPageStore.getters;
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     privateMap: {} as Record<string, boolean>,
+    tableFields: computed(() => {
+        if (storeState.isAdminMode) {
+            return CLONE_TABLE_FIELDS.filter((f) => f.name !== 'private');
+        }
+        return CLONE_TABLE_FIELDS;
+    }),
     selectedTreeData: computed(() => {
         if (dashboardMainPageState.folderModalType === 'PUBLIC') {
             return dashboardMainPageGetters.selectedPublicTreeData;
@@ -135,7 +146,7 @@ watch(() => state.proxyVisible, (visible) => {
     >
         <template #body>
             <p-data-table :items="state.modalTableItems"
-                          :fields="DELETE_TABLE_FIELDS"
+                          :fields="state.tableFields"
                           :loading="state.loading"
             >
                 <template #col-name-format="{item}">
