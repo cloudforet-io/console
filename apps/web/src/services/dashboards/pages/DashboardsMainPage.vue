@@ -184,7 +184,7 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
 })();
 
 watch(() => dashboardMainPageState.searchQueryTags, (queryTags) => {
-    searchQueryHelper.setFiltersAsQueryTag(queryTags);
+    searchQueryHelper.setFiltersAsQueryTag(queryTags || []);
     dashboardStore.setSearchFilters(searchQueryHelper.filters);
     dashboardStore.load();
 }, { immediate: true });

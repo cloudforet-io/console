@@ -194,7 +194,7 @@ const handleClickLabel = (label: string) => {
                             <p-label v-for="label in node.data?.labels?.slice(0, 3)"
                                      :key="`${node.data.id}-label-${label}`"
                                      :text="label"
-                                     clickable
+                                     :clickable="!props.readonlyMode"
                                      @item-click="handleClickLabel(label)"
                             />
                             <p-popover v-if="state.showMoreLabels"
@@ -209,7 +209,7 @@ const handleClickLabel = (label: string) => {
                                         <p-label v-for="label in node.data.labels.slice(LABELS_LIMIT)"
                                                  :key="`${node.data.id}-label-${label}`"
                                                  :text="label"
-                                                 clickable
+                                                 :clickable="!props.readonlyMode"
                                                  @item-click="handleClickLabel(label)"
                                         />
                                     </div>
