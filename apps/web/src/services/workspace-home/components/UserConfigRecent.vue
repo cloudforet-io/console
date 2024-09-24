@@ -69,7 +69,7 @@ const state = reactive({
 const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData => {
     const { itemType } = recentConfig;
     if (itemType === RECENT_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([recentConfig], [...dashboardGetters.workspaceItems, ...dashboardGetters.privateItems])[0];
+        return convertDashboardConfigToReferenceData([recentConfig], [...dashboardGetters.workspaceDashboardItems, ...dashboardGetters.privateDashboardItems])[0];
     }
     if (itemType === RECENT_TYPE.PROJECT) {
         return convertProjectConfigToReferenceData([recentConfig], storeState.projects)[0];

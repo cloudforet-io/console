@@ -67,7 +67,7 @@ const state = reactive({
         ...(storeState.isWorkspaceOwner ? filterStarredItems(state.workspaceV2MenuSet) : []),
         ...filterStarredItems(state.privateV2MenuSet),
     ]),
-    domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
+    domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainDashboardItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -82,7 +82,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    workspaceV2MenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.filter((d) => d.version === '2.0').map((d) => ({
+    workspaceV2MenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceDashboardItems.filter((d) => d.version === '2.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -97,7 +97,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    workspaceV1MenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.filter((d) => d.version === '1.0').map((d) => ({
+    workspaceV1MenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -112,7 +112,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    privateV2MenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.filter((d) => d.version === '2.0').map((d) => ({
+    privateV2MenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateDashboardItems.filter((d) => d.version === '2.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -131,7 +131,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    privateV1MenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.filter((d) => d.version === '1.0').map((d) => ({
+    privateV1MenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,

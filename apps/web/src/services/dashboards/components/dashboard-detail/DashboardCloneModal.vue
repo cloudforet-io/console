@@ -79,7 +79,7 @@ const state = reactive({
     isPrivate: true,
     targetDashboard: computed(() => dashboardDetailState.dashboardInfo),
     dashboardNameList: computed<string[]>(() => {
-        if (storeState.isAdminMode) return dashboardGetters.domainItems.map((item) => item.name);
+        if (storeState.isAdminMode) return dashboardGetters.domainDashboardItems.map((item) => item.name);
         return dashboardStore.getDashboardNameList(state.dashboardType);
     }),
 });

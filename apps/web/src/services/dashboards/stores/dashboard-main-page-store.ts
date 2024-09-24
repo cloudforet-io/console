@@ -16,31 +16,11 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import {
     convertTreeDataToDataTableItems,
-    getDashboardTreeData,
+    getDashboardTreeData, getSelectedTreeData,
 } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import type { DashboardTreeDataType, DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
-const _getSelectedTreeData = (dashboardTreeData: TreeNode<DashboardTreeDataType>[], selectedIdMap: Record<string, boolean>): TreeNode<DashboardTreeDataType>[] => {
-    const _selectedIdList = Object.keys(selectedIdMap).filter((key) => selectedIdMap[key]);
-    const _selectedNodeList: TreeNode<DashboardTreeDataType>[] = [];
-    _selectedIdList.forEach((id) => {
-        const _node = dashboardTreeData.find((node) => node.data.id === id);
-        if (!_node) return;
-        if (_node?.data.type === 'FOLDER') {
-            const _childrenDashboards = _node.children?.filter((child) => selectedIdMap[child.id]);
-            // get folder id only if all children are selected
-            if (_childrenDashboards?.length === _node.children?.length) {
-                _selectedNodeList.push(_node);
-            } else if (_childrenDashboards) {
-                _selectedNodeList.push(..._childrenDashboards);
-            }
-        } else {
-            _selectedNodeList.push(_node);
-        }
-    });
-    return _selectedNodeList;
-};
 const _isControlButtonDisabled = (selectedPublicTreeData: TreeNode<DashboardTreeDataType>[]): boolean => {
     if (selectedPublicTreeData.length === 0) return true;
     let result = false;
@@ -113,7 +93,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
             return [];
         }),
         publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
-        selectedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.publicDashboardTreeData, state.selectedPublicIdMap)),
+        selectedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSelectedTreeData(getters.publicDashboardTreeData, state.selectedPublicIdMap)),
         publicModalTableItems: computed<DashboardDataTableItem[]>(() => convertTreeDataToDataTableItems(getters.publicDashboardTreeData, getters.selectedPublicTreeData)),
         publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => ({
             clone: getters.selectedPublicTreeData.length === 0,
@@ -124,7 +104,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems),
         privateFolderItems: computed<PrivateFolderModel[]>(() => dashboardState.privateFolderItems),
         privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.privateFolderItems, getters.privateDashboardItems, state.newIdList)),
-        selectedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => _getSelectedTreeData(getters.privateDashboardTreeData, state.selectedPrivateIdMap)),
+        selectedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSelectedTreeData(getters.privateDashboardTreeData, state.selectedPrivateIdMap)),
         privateModalTableItems: computed<DashboardDataTableItem[]>(() => convertTreeDataToDataTableItems(getters.privateDashboardTreeData, getters.selectedPrivateTreeData)),
         privateTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => ({
             clone: getters.selectedPrivateTreeData.length === 0,

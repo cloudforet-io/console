@@ -41,8 +41,8 @@ const state = reactive({
         }));
     }),
     existingTemplateSets: computed<BoardSet[]>(() => {
-        let dashboardItems: DashboardModel[] = dashboardGetters.allItems;
-        if (storeState.isWorkspaceMember) dashboardItems = dashboardGetters.privateItems;
+        let dashboardItems: DashboardModel[] = dashboardGetters.allDashboardItems;
+        if (storeState.isWorkspaceMember) dashboardItems = dashboardGetters.privateDashboardItems;
         const _filteredDashboards = getFilteredTemplates(dashboardItems, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
         return _filteredDashboards.map((d) => ({
             dashboard_id: d.dashboard_id,
@@ -52,7 +52,7 @@ const state = reactive({
     }),
     allExistingLabels: computed(() => {
         const OOTBTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
-        const dashboards: DashboardModel[] = storeState.isWorkspaceMember ? dashboardGetters.privateItems : dashboardGetters.allItems;
+        const dashboards: DashboardModel[] = storeState.isWorkspaceMember ? dashboardGetters.privateDashboardItems : dashboardGetters.allDashboardItems;
         const existingTemplates = getFilteredTemplates(dashboards, '', [], []);
         return uniq([
             ...flatMapDeep(OOTBTemplates.map((d) => d.labels)),
