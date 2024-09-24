@@ -160,7 +160,7 @@ onMounted(() => {
                     />
                     <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedOotbIdMap"
                                            :dashboard-tree-data="state.ootbTemplateTreeData"
-                                           hide-buttons
+                                           readonly-mode
                                            disable-link
                                            @update:selectedIdMap="dashboardCreatePageStore.setSelectedOotbIdMap"
                     />
@@ -168,8 +168,7 @@ onMounted(() => {
                 <dashboard-folder-tree v-else
                                        :selected-id-map="dashboardCreatePageState.selectedExistingDashboardIdMap"
                                        :dashboard-tree-data="state.existingDashboardTreeData"
-                                       hide-buttons
-                                       external-link
+                                       readonly-mode
                                        @update:selectedIdMap="dashboardCreatePageStore.setSelectedExistingDashboardIdMap"
                 />
                 <p-empty v-if="!state.ootbTemplateTreeData.length && !state.existingDashboardTreeData.length"

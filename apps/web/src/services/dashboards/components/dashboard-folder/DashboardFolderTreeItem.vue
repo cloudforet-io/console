@@ -26,9 +26,9 @@ import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboar
 
 interface Props {
     treeData: TreeNode<DashboardTreeDataType>;
-    hideButtons?: boolean;
-    externalLink?: boolean;
+    // for dashboard create page
     disableLink?: boolean;
+    readonlyMode?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
 });
@@ -41,7 +41,7 @@ const dashboardMainPageStore = useDashboardMainPageStore();
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     folderControlButtons: computed(() => {
-        if (props.hideButtons) return [];
+        if (props.readonlyMode) return [];
         const _defaultButtons = [{
             name: 'edit',
             icon: 'ic_edit-text',
@@ -94,7 +94,7 @@ const handleClickTreeItem = (): void => {
             dashboardId: props.treeData.data.id || '',
         },
     });
-    const _target = props.externalLink ? '_blank' : '_self';
+    const _target = props.readonlyMode ? '_blank' : '_self';
     if (_target === '_blank') {
         window.open(router.resolve(_location).href, _target);
         return;
@@ -128,17 +128,23 @@ const handleShareFolder = () => {
                              width="1rem"
                              height="1rem"
                         />
+                        <p-i v-if="props.readonlyMode && node.id.startsWith('private')"
+                             name="ic_lock-filled"
+                             width="0.75rem"
+                             height="0.75rem"
+                             :color="gray[500]"
+                        />
                         <span class="text">{{ node.data.name }}</span>
                         <div v-if="node.data.isNew">
                             <new-mark class="new-mark" />
                         </div>
-                        <p-i v-if="node.data.type === 'DASHBOARD' && props.externalLink"
+                        <p-i v-if="!props.disableLink && node.data.type === 'DASHBOARD' && props.readonlyMode"
                              name="ic_arrow-right-up"
                              width="0.75rem"
                              height="0.75rem"
                         />
                         <div class="hidden-wrapper">
-                            <favorite-button v-if="node.data.type === 'DASHBOARD' && !props.hideButtons"
+                            <favorite-button v-if="node.data.type === 'DASHBOARD' && !props.readonlyMode"
                                              :item-id="node.data.id"
                                              :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                              scale="0.8"

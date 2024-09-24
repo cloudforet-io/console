@@ -21,10 +21,10 @@ interface ControlButton {
 interface Props {
     selectedIdMap: Record<string, boolean>;
     dashboardTreeData: TreeNode<DashboardTreeDataType>[];
-    hideButtons?: boolean;
     buttonDisableMap?: Record<string, boolean>;
-    externalLink?: boolean;
+    // for dashboard create page
     disableLink?: boolean;
+    readonlyMode?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     selectedIdMap: () => ({}),
@@ -184,8 +184,7 @@ const handleClickShowAll = () => {
                      @click="handleClickCollapseButton(treeData)"
                 />
                 <dashboard-folder-tree-item :tree-data="treeData"
-                                            :hide-buttons="props.hideButtons"
-                                            :external-link="props.externalLink"
+                                            :readonly-mode="props.readonlyMode"
                                             :disable-link="props.disableLink"
                                             @toggle-folder="handleClickCollapseButton(treeData)"
                 />
@@ -199,9 +198,8 @@ const handleClickShowAll = () => {
                                 @change="handleSelectTreeItem(child, $event)"
                     />
                     <dashboard-folder-tree-item :tree-data="child"
-                                                :hide-buttons="props.hideButtons"
-                                                :external-link="props.externalLink"
                                                 :disable-link="props.disableLink"
+                                                :readonly-mode="props.readonlyMode"
                     />
                 </div>
                 <div v-if="!treeData.children?.length"
