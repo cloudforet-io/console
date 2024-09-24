@@ -22,9 +22,9 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import DashboardCreateBlankBoardItem from '@/services/dashboards/components/dashboard-create/DashboardCreateBlankBoardItem.vue';
 import type { FilterLabelItem } from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
-import DashboardCreateTemplateBoard from '@/services/dashboards/components/dashboard-create/DashboardCreateTemplateBoard.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -151,15 +151,9 @@ onMounted(() => {
                           class="search-wrapper"
                 />
                 <template v-if="filterState.selectedStartOption === 'templates'">
-                    <dashboard-create-template-board :template-sets="state.blankTemplate"
-                                                     class="blank-board"
-                    >
-                        <template #bottom>
-                            <span class="blank-description">
-                                {{ $t('DASHBOARDS.CREATE.BLANK_DESC') }}
-                            </span>
-                        </template>
-                    </dashboard-create-template-board>
+                    <dashboard-create-blank-board-item :template-sets="state.blankTemplate"
+                                                       class="blank-board"
+                    />
                     <p-field-title :label="i18n.t('DASHBOARDS.CREATE.OOTB_DASHBOARD')"
                                    class="field-title"
                                    required
@@ -229,9 +223,6 @@ onMounted(() => {
             }
             .blank-board {
                 padding-bottom: 2rem;
-                .blank-description {
-                    @apply text-paragraph-sm text-gray-500;
-                }
             }
             .field-title {
                 margin-bottom: 0.5rem;

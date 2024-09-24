@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    PBoard, PLabel, PI,
+    PBoard, PI,
 } from '@cloudforet/mirinae';
 import type { BoardSet } from '@cloudforet/mirinae/src/data-display/board/type';
 
@@ -17,13 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 /* Event */
-const handleClickBoardItem = (boardItem: BoardSet) => {
-    if (boardItem.template_id) {
-        dashboardCreatePageStore.setSelectedTemplateId(boardItem.template_id);
-    }
-    dashboardCreatePageStore.setTemplateName(boardItem.name);
-    dashboardCreatePageStore.setTemplateLabels(boardItem.labels);
-    dashboardCreatePageStore.setDashboardLabels(boardItem.labels);
+const handleClickBlankBoardItem = () => {
     dashboardCreatePageStore.setCreateType('SINGLE');
     dashboardCreatePageStore.setCurrentStep(2);
 };
@@ -31,24 +25,21 @@ const handleClickBoardItem = (boardItem: BoardSet) => {
 
 <template>
     <p-board :board-sets="props.templateSets"
-             class="dashboard-create-template-board"
+             class="dashboard-create-blank-board-item"
              selectable
              style-type="cards"
-             @item-click="handleClickBoardItem"
+             @item-click="handleClickBlankBoardItem"
     >
-        <template #item-content="{board}">
+        <template #item-content>
             <div class="board-item-wrapper">
                 <div class="left-part">
                     <div class="board-item-title">
-                        {{ board.name }}
+                        Blank
                     </div>
                     <div class="label-wrapper">
-                        <slot name="bottom">
-                            <p-label v-for="(label, idx) in board.labels"
-                                     :key="`${label}-${idx}`"
-                                     :text="label"
-                            />
-                        </slot>
+                        <span class="blank-description">
+                            {{ $t('DASHBOARDS.CREATE.BLANK_DESC') }}
+                        </span>
                     </div>
                 </div>
                 <div class="right-part">
@@ -64,12 +55,15 @@ const handleClickBoardItem = (boardItem: BoardSet) => {
 </template>
 
 <style lang="postcss" scoped>
-.dashboard-create-template-board {
+.dashboard-create-blank-board-item {
     .board-item-wrapper {
         display: flex;
         gap: 0.25rem;
         .left-part {
             flex-grow: 1;
+            .blank-description {
+                @apply text-paragraph-sm text-gray-500;
+            }
         }
         .right-part {
             align-items: center;

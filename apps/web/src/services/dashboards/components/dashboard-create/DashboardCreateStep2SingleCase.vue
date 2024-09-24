@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import {
-    computed, defineExpose, onMounted, reactive, watch,
+    computed, defineExpose, reactive, watch,
 } from 'vue';
 
 import {
-    PLabel, PI, PFieldGroup, PTextInput,
+    PI, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 import type { InputItem } from '@cloudforet/mirinae/types/inputs/input/text-input/type';
 
@@ -74,8 +74,8 @@ const {
 /* Api */
 const createSingleDashboard = async () => {
     const _dashboardParams: DashboardCreateParams = {
-        name: dashboardCreatePageState.dashboardName,
-        labels: dashboardCreatePageState.dashboardLabels,
+        name: dashboardName.value,
+        labels: state.labels.map((item) => item.name),
         tags: { created_by: store.state.user.userId },
     };
     try {
@@ -95,14 +95,6 @@ const createSingleDashboard = async () => {
 };
 
 /* Event */
-const handleUpdateDashboardName = (value: string) => {
-    setForm('dashboardName', value);
-    dashboardCreatePageStore.setDashboardName(value);
-};
-const handleUpdateLabels = (items: InputItem[]) => {
-    state.labels = items;
-    dashboardCreatePageStore.setDashboardLabels(items.map((item) => item.name));
-};
 const handleConfirm = async () => {
     dashboardCreatePageStore.setLoading(true);
     const createdDashboardId = await createSingleDashboard();
@@ -121,12 +113,6 @@ watch(() => isAllValid.value, (value) => {
     emit('update:is-valid', value);
 });
 
-/* Lifecycle */
-onMounted(() => {
-    dashboardCreatePageStore.setDashboardLabels(dashboardCreatePageState.templateLabels);
-    state.labels = dashboardCreatePageState.dashboardLabels.map((label) => ({ name: label }));
-});
-
 /* Expose */
 defineExpose({
     handleConfirm,
@@ -142,14 +128,8 @@ defineExpose({
             />
             <div class="description-wrapper">
                 <p class="description-title">
-                    {{ dashboardCreatePageState.templateName }}
+                    Blank
                 </p>
-                <div class="label-wrapper">
-                    <p-label v-for="(label, idx) in dashboardCreatePageState.templateLabels"
-                             :key="`${label}-${idx}`"
-                             :text="label"
-                    />
-                </div>
             </div>
         </div>
         <div class="input-form-wrapper">
@@ -162,16 +142,15 @@ defineExpose({
                     <p-text-input :value="dashboardName"
                                   :invalid="invalid"
                                   block
-                                  @update:value="handleUpdateDashboardName"
+                                  @update:value="setForm('dashboardName', $event)"
                     />
                 </template>
             </p-field-group>
             <p-field-group :label="$t('DASHBOARDS.CREATE.LABEL')">
                 <p-text-input multi-input
                               appearance-type="stack"
-                              :selected="state.labels"
+                              :selected.sync="state.labels"
                               block
-                              @update:selected="handleUpdateLabels"
                 />
             </p-field-group>
             <dashboard-create-scope-form v-if="!storeState.isAdminMode" />

@@ -22,23 +22,18 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         currentStep: 1 as number,
         dashboardCreated: false as boolean,
         dashboardTemplates: [] as DashboardTemplateModel[],
-        templateLabels: [] as string[],
-        templateName: '' as string,
         // single case
-        selectedTemplateId: undefined as string | undefined,
-        dashboardName: '' as string,
-        dashboardLabels: [] as string[],
         dashboardScope: 'WORKSPACE' as 'WORKSPACE' | 'PRIVATE',
         // bundle case
-        selectedTemplateIdMap: {} as Record<string, boolean>,
+        selectedOotbIdMap: {} as Record<string, boolean>,
         selectedExistingDashboardIdMap: {} as Record<string, boolean>,
     });
     const getters = reactive({
         dashboardType: computed<DashboardType>(() => (state.dashboardScope === 'PRIVATE' ? 'PRIVATE' : 'PUBLIC')),
         noBundleSelected: computed<boolean>(() => {
-            const _isTemplateSelected = Object.values(state.selectedTemplateIdMap).some((v) => v);
+            const _isOotbSelected = Object.values(state.selectedOotbIdMap).some((v) => v);
             const _isExistingDashboardSelected = Object.values(state.selectedExistingDashboardIdMap).some((v) => v);
-            return !_isTemplateSelected && !_isExistingDashboardSelected;
+            return !_isOotbSelected && !_isExistingDashboardSelected;
         }),
     });
 
@@ -46,27 +41,18 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
     const setLoading = (loading: boolean) => { state.loading = loading; };
     const setCurrentStep = (step: number) => { state.currentStep = step; };
     const setCreateType = (type: 'SINGLE' | 'BUNDLE') => { state.createType = type; };
-    const setSelectedTemplateId = (templateId?: string) => { state.selectedTemplateId = templateId; };
-    const setSelectedTemplateIdMap = (templateIdMap: Record<string, boolean>) => { state.selectedTemplateIdMap = templateIdMap; };
+    const setSelectedOotbIdMap = (templateIdMap: Record<string, boolean>) => { state.selectedOotbIdMap = templateIdMap; };
     const setSelectedExistingDashboardIdMap = (dashboardIdMap: Record<string, boolean>) => { state.selectedExistingDashboardIdMap = dashboardIdMap; };
-    const setTemplateName = (name: string) => { state.templateName = name; };
-    const setTemplateLabels = (labels: string[]) => { state.templateLabels = labels; };
+    // const setTemplateName = (name: string) => { state.templateName = name; };
     const setDashboardScope = (dashboardScope: DashboardScope) => { state.dashboardScope = dashboardScope; };
-    const setDashboardName = (name: string) => { state.dashboardName = name; };
-    const setDashboardLabels = (labels: string[]) => { state.dashboardLabels = labels; };
     const setDashboardCreated = (created: boolean) => { state.dashboardCreated = created; };
     const mutations = {
         setLoading,
         setCurrentStep,
         setCreateType,
-        setSelectedTemplateId,
-        setSelectedTemplateIdMap,
+        setSelectedOotbIdMap,
         setSelectedExistingDashboardIdMap,
-        setTemplateName,
-        setTemplateLabels,
         setDashboardScope,
-        setDashboardName,
-        setDashboardLabels,
         setDashboardCreated,
     };
 
@@ -75,13 +61,8 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         setLoading(false);
         setCurrentStep(1);
         setCreateType('SINGLE');
-        setSelectedTemplateId();
-        setTemplateName('');
-        setTemplateLabels([]);
         setDashboardScope('WORKSPACE');
-        setDashboardName('');
-        setDashboardLabels([]);
-        setSelectedTemplateIdMap({});
+        setSelectedOotbIdMap({});
         setSelectedExistingDashboardIdMap({});
         setDashboardCreated(false);
     };

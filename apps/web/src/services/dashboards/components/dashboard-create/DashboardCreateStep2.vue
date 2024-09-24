@@ -27,7 +27,6 @@ const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     disableCreateButton: computed<boolean>(() => {
         if (dashboardCreatePageState.createType === 'SINGLE') {
-            if (!dashboardCreatePageState.selectedTemplateId) return true;
             return !state.isSingleCreateValid;
         }
         return dashboardCreatePageGetters.noBundleSelected;
