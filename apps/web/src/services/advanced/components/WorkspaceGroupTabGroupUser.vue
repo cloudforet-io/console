@@ -139,12 +139,9 @@ const handleChange = async (options: any = {}) => {
     await workspaceGroupPageStore.listWorkspaceGroupUsers();
 };
 
-const handleSelectMenu = async (value:{label:string, name:string, role_type: RoleType}) => {
+const handleSelectMenu = async (value:{label:string, name:string, role_type: RoleType}, userId: string) => {
     try {
-        const selectedGroupUser = workspaceGroupPageGetters.selectedGroupUsersByIndices[0];
-
         const roleId = value.name;
-        const userId = selectedGroupUser?.user_id;
         const workspaceGroupId = workspaceGroupPageGetters.selectedWorkspaceGroupId;
 
         await SpaceConnector.clientV2.identity.workspaceGroup.updateRole<WorkspaceGroupUpdateRoleParameters>({
@@ -267,7 +264,7 @@ onUnmounted(() => {
                         disable-handler
                         page-size="10"
                         @click-show-more="handleClickShowMore"
-                        @select="handleSelectMenu"
+                        @select="handleSelectMenu($event, item.user_id)"
                     >
                         <template #dropdown-button>
                             <img :src="useRoleFormatter(item.role_type).image"
