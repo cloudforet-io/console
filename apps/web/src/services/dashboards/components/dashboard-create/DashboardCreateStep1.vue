@@ -1,29 +1,49 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { flatMapDeep, uniq } from 'lodash';
 
-import { PEmpty, PFieldTitle, PSearch } from '@cloudforet/mirinae';
+import {
+    PEmpty, PSearch, PFieldTitle, PButton,
+} from '@cloudforet/mirinae';
+import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
+import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import type { FilterLabelItem } from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateTemplateBoard from '@/services/dashboards/components/dashboard-create/DashboardCreateTemplateBoard.vue';
+import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
+import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
+
+const emit = defineEmits<{(e: 'click-next'): void }>();
+const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
+const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
@@ -32,23 +52,35 @@ const state = reactive({
         template_id: 'blank',
         name: 'Blank',
     }])),
-    outOfTheBoxTemplateSets: computed<BoardSet[]>(() => {
+    templateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
+        const results: TreeNode<DashboardTreeDataType>[] = [];
         const _filteredTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
-        return _filteredTemplates.map((d) => ({
-            template_id: d.template_id,
-            name: d.name,
-            labels: d.labels,
-        }));
+        _filteredTemplates.forEach((d) => {
+            results.push({
+                id: d.template_id,
+                depth: 0,
+                data: {
+                    name: d.name,
+                    id: d.template_id,
+                    type: 'DASHBOARD',
+                    labels: d.labels,
+                },
+            });
+        });
+        return results;
     }),
-    existingTemplateSets: computed<BoardSet[]>(() => {
-        let dashboardItems: DashboardModel[] = dashboardGetters.allDashboardItems;
-        if (storeState.isWorkspaceMember) dashboardItems = dashboardGetters.privateDashboardItems;
-        const _filteredDashboards = getFilteredTemplates(dashboardItems, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
-        return _filteredDashboards.map((d) => ({
-            dashboard_id: d.dashboard_id,
-            name: d.name,
-            labels: d.labels,
-        }));
+    existingDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
+        let folderItems: FolderModel[] = dashboardGetters.allFolderItems;
+        let dashboardItems: DashboardModel[] = getFilteredTemplates(dashboardGetters.allDashboardItems, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
+        if (storeState.isAdminMode) {
+            folderItems = dashboardGetters.domainFolderItems;
+            dashboardItems = dashboardGetters.domainDashboardItems;
+        } else if (storeState.isWorkspaceMember) {
+            folderItems = dashboardGetters.privateFolderItems;
+            dashboardItems = dashboardGetters.privateDashboardItems;
+        }
+        const _refinedDashboardItems = dashboardItems.filter((d) => d.version !== '1.0');
+        return getDashboardTreeData(folderItems, _refinedDashboardItems);
     }),
     allExistingLabels: computed(() => {
         const OOTBTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
@@ -65,6 +97,7 @@ const filterState = reactive({
     inputValue: '',
     selectedLabels: [] as string[],
     selectedProviders: [] as string[],
+    selectedStartOption: 'templates',
 });
 
 /* Util */
@@ -91,6 +124,14 @@ const handleSelectLabels = (labels: FilterLabelItem[]) => {
 const handleSelectProvider = (providers: FilterLabelItem[]) => {
     filterState.selectedProviders = providers.map((d) => d.label.toLowerCase());
 };
+const handleSelectStartOption = (startOption: string) => {
+    filterState.selectedStartOption = startOption;
+    dashboardCreatePageStore.setSelectedTemplateIdMap({});
+    dashboardCreatePageStore.setSelectedExistingDashboardIdMap({});
+};
+const handleClickCancel = () => {
+    router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
+};
 
 onMounted(() => {
     dashboardCreatePageStore.listDashboardTemplates();
@@ -99,23 +140,44 @@ onMounted(() => {
 
 <template>
     <div class="dashboard-create-step-1">
-        <p-search :value.sync="filterState.inputValue" />
         <div class="contents-container">
             <dashboard-create-step1-search-filter :labels="state.allExistingLabels"
                                                   @select-label="handleSelectLabels"
                                                   @select-provider="handleSelectProvider"
+                                                  @select-start-option="handleSelectStartOption"
             />
             <div class="template-contents-area">
-                <dashboard-create-template-board :template-sets="state.blankTemplate"
-                                                 class="blank-board"
-                >
-                    <template #bottom>
-                        <span class="blank-description">
-                            {{ $t('DASHBOARDS.CREATE.BLANK_DESC') }}
-                        </span>
-                    </template>
-                </dashboard-create-template-board>
-                <p-empty v-if="!state.outOfTheBoxTemplateSets.length && !state.existingTemplateSets.length"
+                <p-search :value.sync="filterState.inputValue"
+                          class="search-wrapper"
+                />
+                <template v-if="filterState.selectedStartOption === 'templates'">
+                    <dashboard-create-template-board :template-sets="state.blankTemplate"
+                                                     class="blank-board"
+                    >
+                        <template #bottom>
+                            <span class="blank-description">
+                                {{ $t('DASHBOARDS.CREATE.BLANK_DESC') }}
+                            </span>
+                        </template>
+                    </dashboard-create-template-board>
+                    <p-field-title :label="i18n.t('DASHBOARDS.CREATE.OOTB_DASHBOARD')"
+                                   class="field-title"
+                                   required
+                    />
+                    <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedTemplateIdMap"
+                                           :dashboard-tree-data="state.templateTreeData"
+                                           hide-buttons
+                                           @update:selectedIdMap="dashboardCreatePageStore.setSelectedTemplateIdMap"
+                    />
+                </template>
+                <dashboard-folder-tree v-else
+                                       :selected-id-map="dashboardCreatePageState.selectedExistingDashboardIdMap"
+                                       :dashboard-tree-data="state.existingDashboardTreeData"
+                                       hide-buttons
+                                       external-link
+                                       @update:selectedIdMap="dashboardCreatePageStore.setSelectedExistingDashboardIdMap"
+                />
+                <p-empty v-if="!state.templateTreeData.length && !state.existingDashboardTreeData.length"
                          show-image
                          class="empty-template"
                 >
@@ -127,31 +189,19 @@ onMounted(() => {
                     </template>
                     No Data
                 </p-empty>
-                <div v-if="state.outOfTheBoxTemplateSets.length"
-                     class="out-of-the-box"
-                >
-                    <p-field-title class="title">
-                        {{ $t('DASHBOARDS.CREATE.TEMPLATE.FIELD_OOTB_TEMPLATE') }}
-                    </p-field-title>
-                    <div class="out-of-the-box-contents">
-                        <dashboard-create-template-board :template-sets="state.outOfTheBoxTemplateSets"
-                                                         :column="2"
-                                                         :keyword="filterState.inputValue"
-                        />
-                    </div>
-                </div>
-                <div v-if="state.existingTemplateSets.length"
-                     class="existing"
-                >
-                    <p-field-title class="title">
-                        {{ $t('DASHBOARDS.CREATE.TEMPLATE.FIELD_EXISTING_TEMPLATE') }}
-                    </p-field-title>
-                    <div class="existing-contents">
-                        <dashboard-create-template-board :template-sets="state.existingTemplateSets"
-                                                         show-view-link
-                                                         :keyword="filterState.inputValue"
-                        />
-                    </div>
+                <div class="step-button-wrapper">
+                    <p-button style-type="transparent"
+                              @click="handleClickCancel"
+                    >
+                        {{ $t('DASHBOARDS.CREATE.CANCEL') }}
+                    </p-button>
+                    <p-button icon-right="ic_arrow-right"
+                              style-type="substitutive"
+                              :disabled="dashboardCreatePageGetters.noBundleSelected"
+                              @click="emit('click-next')"
+                    >
+                        {{ $t('DASHBOARDS.CREATE.NEXT') }}
+                    </p-button>
                 </div>
             </div>
         </div>
@@ -174,11 +224,17 @@ onMounted(() => {
         .template-contents-area {
             flex-grow: 1;
 
+            .search-wrapper {
+                margin-bottom: 1.5rem;
+            }
             .blank-board {
                 padding-bottom: 2rem;
                 .blank-description {
                     @apply text-paragraph-sm text-gray-500;
                 }
+            }
+            .field-title {
+                margin-bottom: 0.5rem;
             }
             .empty-template {
                 padding-top: 3rem;
@@ -187,20 +243,11 @@ onMounted(() => {
                     height: 5rem;
                 }
             }
-
-            .out-of-the-box {
-                margin-bottom: 2rem;
-
-                .out-of-the-box-contents {
-                    margin-top: 0.5rem;
-                }
-            }
-
-            .existing {
-
-                .existing-contents {
-                    margin-top: 0.5rem;
-                }
+            .step-button-wrapper {
+                display: flex;
+                gap: 1rem;
+                margin-top: 2rem;
+                justify-content: end;
             }
         }
     }
