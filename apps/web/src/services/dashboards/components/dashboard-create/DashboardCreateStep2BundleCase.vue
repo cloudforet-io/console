@@ -185,6 +185,7 @@ const handleConfirm = async () => {
     } else {
         await createBundleDashboards();
     }
+    await dashboardStore.load();
     await SpaceRouter.router.push(getProperRouteLocation({
         name: DASHBOARDS_ROUTE._NAME,
     }));

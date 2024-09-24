@@ -124,6 +124,7 @@ const createSingleDashboard = async () => {
 const handleConfirm = async () => {
     dashboardCreatePageStore.setLoading(true);
     const createdDashboardId = await createSingleDashboard();
+    await dashboardStore.load();
     if (createdDashboardId) {
         await SpaceRouter.router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
