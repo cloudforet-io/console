@@ -86,13 +86,18 @@ const handleClickTreeItem = (): void => {
         emit('toggle-folder');
         return;
     }
-    const _target = props.externalLink ? '_blank' : '_self';
-    window.open(router.resolve(getProperRouteLocation({
+    const _location = getProperRouteLocation({
         name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
             dashboardId: props.treeData.data.id || '',
         },
-    })).href, _target);
+    });
+    const _target = props.externalLink ? '_blank' : '_self';
+    if (_target === '_blank') {
+        window.open(router.resolve(_location).href, _target);
+        return;
+    }
+    router.push(_location);
 };
 const handleEditFolderName = () => {
     dashboardMainPageStore.setFolderFormModalType('UPDATE');
