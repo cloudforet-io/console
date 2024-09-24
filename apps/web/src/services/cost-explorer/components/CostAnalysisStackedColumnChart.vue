@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
     legend: () => ({}),
     accumulated: false,
 });
-const emit = defineEmits<{(e: 'update:legend', value): void;
+const emit = defineEmits<{(e: 'update:legend', value: Record<string, boolean>): void;
 }>();
 
 const LIMIT = 15;
@@ -192,7 +192,7 @@ const getTotalData = (rawData: AnalyzeResponse<CostAnalyzeRawData>, accumulated:
         data: _data,
     }];
 };
-const drawChart = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
+const drawChart = (rawData: AnalyzeResponse<CostAnalyzeRawData>, updateLegend = false) => {
     if (isEmpty(rawData)) return;
 
     if (costAnalysisPageState.chartGroupBy) {
@@ -202,25 +202,26 @@ const drawChart = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
     }
 
     // init legend
-    const _legend: Record<string, boolean> = {};
-    if (isEmpty(state.proxyLegend)) {
-        const _series = state.chartData.map((d) => d.name);
-        _series.forEach((d) => {
-            _legend[d] = true;
+    if (updateLegend) {
+        const _legend: Record<string, boolean> = {};
+        state.chartData.forEach((d) => {
+            _legend[d.name] = true;
         });
         state.proxyLegend = _legend;
     }
 
     state.chart = init(chartContext.value);
     state.chart.setOption(state.chartOptions, true);
-    state.chart.on('legendselectchanged', (d) => {
-        state.proxyLegend = d.selected;
-    });
+    if (updateLegend) {
+        state.chart.on('legendselectchanged', (d) => {
+            state.proxyLegend = d.selected;
+        });
+    }
 };
 
-watch([() => chartContext.value, () => props.loading, () => props.data, () => props.accumulated], async ([_chartContext, loading, data]) => {
+watch([() => chartContext.value, () => props.loading, () => props.data, () => props.accumulated], async ([_chartContext, loading, data], prev) => {
     if (_chartContext && !loading) {
-        drawChart(data);
+        drawChart(data, prev[2] !== data);
     }
 });
 watch(() => state.proxyLegend, () => {

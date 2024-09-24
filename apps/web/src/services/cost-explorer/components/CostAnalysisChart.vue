@@ -70,9 +70,8 @@ const getValueSumKey = (dataType:string) => {
 /* Api */
 const fetchCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper();
-const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<CostAnalyzeRawData>> => {
+const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<CostAnalyzeRawData>|undefined> => {
     try {
-        state.loading = true;
         analyzeApiQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
         let dateFormat = 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
@@ -94,20 +93,21 @@ const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<Cost
                 ...analyzeApiQueryHelper.data,
             },
         });
-        if (status === 'succeed') {
-            state.loading = false;
-            return response;
-        }
-        return { more: false, results: [] };
+        if (status === 'succeed') return response;
+        return undefined;
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.loading = false;
         return { more: false, results: [] };
     }
 };
 const setChartData = debounce(async (period:Period) => {
-    state.data = await listCostAnalysisData(period);
-}, 300);
+    state.loading = true;
+    const res = await listCostAnalysisData(period);
+    if (res) {
+        state.data = res;
+        state.loading = false;
+    }
+}, 0);
 
 /* Event */
 const handleChartGroupByItem = (groupBy?: string) => {
