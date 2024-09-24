@@ -14,8 +14,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-
 
 interface Props {
     data?: CollectorRuleModel;
@@ -23,7 +21,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     data: undefined,
 });
-const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 
 interface Field {
@@ -112,9 +109,10 @@ const state = reactive({
                             <td v-if="field.name === 'change_project'">
                                 <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                                         new-tab
-                                        :to="getProperRouteLocation(referenceRouter(
+                                        :to="referenceRouter(
                                             state.changeProjectId,
-                                            { resource_type: 'identity.Project' }))"
+                                            { resource_type: 'identity.Project',
+                                              workspace_id: state.projects[state.changeProjectId]?.data?.workspaceId },)"
                                 >
                                     {{ state.projects[state.changeProjectId] ? state.projects[state.changeProjectId].label : state.changeProjectId ?? '--' }}
                                 </p-link>
