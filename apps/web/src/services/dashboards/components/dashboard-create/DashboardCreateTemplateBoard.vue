@@ -1,51 +1,30 @@
 <script setup lang="ts">
-import type { Location } from 'vue-router';
-
 import {
-    PBoard, PLabel, PTextHighlighting, PI, PLink,
+    PBoard, PLabel, PI,
 } from '@cloudforet/mirinae';
 import type { BoardSet } from '@cloudforet/mirinae/src/data-display/board/type';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 
 
 interface Props {
     templateSets: BoardSet[];
-    column?: number;
-    showViewLink?: boolean;
-    keyword?: string;
 }
 
 const dashboardCreatePageStore = useDashboardCreatePageStore();
-const { getProperRouteLocation } = useProperRouteLocation();
 const props = withDefaults(defineProps<Props>(), {
     templateSets: () => [],
-    column: 1,
-    showViewLink: false,
-    keyword: '',
 });
 
 /* Event */
-const getDashboardViewLink = (boardItem: BoardSet): Location|undefined => {
-    const dashboardId = boardItem.dashboard_id;
-    if (!dashboardId) return undefined;
-    return getProperRouteLocation({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId } });
-};
 const handleClickBoardItem = (boardItem: BoardSet) => {
-    if (boardItem.dashboard_id) {
-        dashboardCreatePageStore.setSelectedDashboardId(boardItem.dashboard_id);
-        dashboardCreatePageStore.setSelectedTemplateId(undefined);
-    } else if (boardItem.template_id) {
-        dashboardCreatePageStore.setSelectedDashboardId(undefined);
+    if (boardItem.template_id) {
         dashboardCreatePageStore.setSelectedTemplateId(boardItem.template_id);
     }
     dashboardCreatePageStore.setTemplateName(boardItem.name);
     dashboardCreatePageStore.setTemplateLabels(boardItem.labels);
     dashboardCreatePageStore.setDashboardLabels(boardItem.labels);
+    dashboardCreatePageStore.setCreateType('SINGLE');
     dashboardCreatePageStore.setCurrentStep(2);
 };
 </script>
@@ -55,19 +34,13 @@ const handleClickBoardItem = (boardItem: BoardSet) => {
              class="dashboard-create-template-board"
              selectable
              style-type="cards"
-             :style-options="{
-                 column: props.column,
-             }"
              @item-click="handleClickBoardItem"
     >
         <template #item-content="{board}">
             <div class="board-item-wrapper">
                 <div class="left-part">
                     <div class="board-item-title">
-                        <p-text-highlighting :text="board.name"
-                                             :term="props.keyword"
-                                             style-type="secondary"
-                        />
+                        {{ board.name }}
                     </div>
                     <div class="label-wrapper">
                         <slot name="bottom">
@@ -77,20 +50,11 @@ const handleClickBoardItem = (boardItem: BoardSet) => {
                             />
                         </slot>
                     </div>
-                    <p-link v-if="props.showViewLink"
-                            :action-icon="ACTION_ICON.INTERNAL_LINK"
-                            new-tab
-                            highlight
-                            size="sm"
-                            :to="getDashboardViewLink(board)"
-                    >
-                        {{ $t('DASHBOARDS.CREATE.VIEW_THIS_DASHBOARD') }}
-                    </p-link>
                 </div>
                 <div class="right-part">
-                    <p-i name="ic_chevron-right"
-                         width="1.5rem"
-                         height="1.5rem"
+                    <p-i name="ic_arrow-right"
+                         width="1rem"
+                         height="1rem"
                          class="arrow-icon"
                     />
                 </div>
