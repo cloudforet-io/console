@@ -161,6 +161,7 @@ onMounted(() => {
                     <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedOotbIdMap"
                                            :dashboard-tree-data="state.ootbTemplateTreeData"
                                            hide-buttons
+                                           disable-link
                                            @update:selectedIdMap="dashboardCreatePageStore.setSelectedOotbIdMap"
                     />
                 </template>

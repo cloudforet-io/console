@@ -28,6 +28,7 @@ interface Props {
     treeData: TreeNode<DashboardTreeDataType>;
     hideButtons?: boolean;
     externalLink?: boolean;
+    disableLink?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
 });
@@ -86,6 +87,7 @@ const handleClickTreeItem = (): void => {
         emit('toggle-folder');
         return;
     }
+    if (props.disableLink) return;
     const _location = getProperRouteLocation({
         name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
