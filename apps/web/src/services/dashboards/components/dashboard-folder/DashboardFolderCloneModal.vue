@@ -9,9 +9,8 @@ import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
@@ -91,7 +90,7 @@ const handleCloneConfirm = async () => {
         showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_S_CLONE_DASHBOARD'), '');
     } else {
         const _failedCount = _results.map((r) => r.status !== 'fulfilled').length;
-        ErrorHandler.handleRequestError(new Error('Clone failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }));
+        showErrorMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }), '');
     }
     await dashboardStore.load();
     dashboardMainPageStore.setSelectedIdMap({}, dashboardMainPageState.folderModalType);
