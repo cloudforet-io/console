@@ -52,7 +52,7 @@ const state = reactive({
         template_id: 'blank',
         name: 'Blank',
     }])),
-    templateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
+    ootbTemplateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         const results: TreeNode<DashboardTreeDataType>[] = [];
         const _filteredTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
         _filteredTemplates.forEach((d) => {
@@ -83,11 +83,11 @@ const state = reactive({
         return getDashboardTreeData(folderItems, _refinedDashboardItems);
     }),
     allExistingLabels: computed(() => {
-        const OOTBTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
+        const ootbTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
         const dashboards: DashboardModel[] = storeState.isWorkspaceMember ? dashboardGetters.privateDashboardItems : dashboardGetters.allDashboardItems;
         const existingTemplates = getFilteredTemplates(dashboards, '', [], []);
         return uniq([
-            ...flatMapDeep(OOTBTemplates.map((d) => d.labels)),
+            ...flatMapDeep(ootbTemplates.map((d) => d.labels)),
             ...flatMapDeep(existingTemplates.map((d) => d.labels)),
         ]);
     }),
@@ -126,7 +126,7 @@ const handleSelectProvider = (providers: FilterLabelItem[]) => {
 };
 const handleSelectStartOption = (startOption: string) => {
     filterState.selectedStartOption = startOption;
-    dashboardCreatePageStore.setSelectedTemplateIdMap({});
+    dashboardCreatePageStore.setSelectedOotbIdMap({});
     dashboardCreatePageStore.setSelectedExistingDashboardIdMap({});
 };
 const handleClickCancel = () => {
@@ -158,10 +158,10 @@ onMounted(() => {
                                    class="field-title"
                                    required
                     />
-                    <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedTemplateIdMap"
-                                           :dashboard-tree-data="state.templateTreeData"
+                    <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedOotbIdMap"
+                                           :dashboard-tree-data="state.ootbTemplateTreeData"
                                            hide-buttons
-                                           @update:selectedIdMap="dashboardCreatePageStore.setSelectedTemplateIdMap"
+                                           @update:selectedIdMap="dashboardCreatePageStore.setSelectedOotbIdMap"
                     />
                 </template>
                 <dashboard-folder-tree v-else
@@ -171,7 +171,7 @@ onMounted(() => {
                                        external-link
                                        @update:selectedIdMap="dashboardCreatePageStore.setSelectedExistingDashboardIdMap"
                 />
-                <p-empty v-if="!state.templateTreeData.length && !state.existingDashboardTreeData.length"
+                <p-empty v-if="!state.ootbTemplateTreeData.length && !state.existingDashboardTreeData.length"
                          show-image
                          class="empty-template"
                 >

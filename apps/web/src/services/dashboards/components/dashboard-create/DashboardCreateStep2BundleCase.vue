@@ -57,7 +57,7 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     bundleCaseType: computed(() => {
-        if (!isEmpty(dashboardCreatePageState.selectedTemplateIdMap)) return 'TEMPLATE';
+        if (!isEmpty(dashboardCreatePageState.selectedOotbIdMap)) return 'TEMPLATE';
         return 'EXISTING';
     }),
     privateMap: {} as Record<string, boolean>,
@@ -68,7 +68,7 @@ const state = reactive({
         return TABLE_FIELDS;
     }),
     dataTableItems: computed(() => {
-        if (state.bundleCaseType === 'TEMPLATE') return state.templateItems;
+        if (state.bundleCaseType === 'TEMPLATE') return state.ootbItems;
         return state.existingDashboardItems;
     }),
     existingFolderNameList: computed<string[]>(() => {
@@ -77,9 +77,9 @@ const state = reactive({
         return [..._publicNames, ..._privateNames];
     }),
     // template
-    templateItems: computed<DashboardDataTableItem[]>(() => {
-        const _selectedTemplates = dashboardCreatePageState.dashboardTemplates.filter((d) => dashboardCreatePageState.selectedTemplateIdMap[d.template_id]);
-        return _selectedTemplates.map((d) => ({
+    ootbItems: computed<DashboardDataTableItem[]>(() => {
+        const _selectedOotbList = dashboardCreatePageState.dashboardTemplates.filter((d) => dashboardCreatePageState.selectedOotbIdMap[d.template_id]);
+        return _selectedOotbList.map((d) => ({
             id: d.template_id,
             name: d.name,
             type: 'DASHBOARD',
@@ -105,16 +105,16 @@ const addToNewIdList = (id: string) => {
 };
 
 /* Api */
-const createBundleTemplates = async () => {
+const createBundleOotb = async () => {
     const _promises: Promise<DashboardModel>[] = [];
-    const _selectedTemplates = dashboardCreatePageState.dashboardTemplates.filter((d) => dashboardCreatePageState.selectedTemplateIdMap[d.template_id]);
-    await Promise.allSettled(_selectedTemplates.map(async (template) => {
-        const _isPrivate = state.privateMap[template.template_id];
-        const _dashboard = template.dashboards[0];
+    const _selectedOotbList = dashboardCreatePageState.dashboardTemplates.filter((d) => dashboardCreatePageState.selectedOotbIdMap[d.template_id]);
+    await Promise.allSettled(_selectedOotbList.map(async (ootb) => {
+        const _isPrivate = state.privateMap[ootb.template_id];
+        const _dashboard = ootb.dashboards[0];
         const _existingDashboardNameList = _isPrivate ? state.existingPrivateDashboardNameList : state.existingPublicDashboardNameList;
         const _dashboardParams: DashboardCreateParams = {
-            name: getClonedName(_existingDashboardNameList, template.name),
-            labels: template.labels,
+            name: getClonedName(_existingDashboardNameList, ootb.name),
+            labels: ootb.labels,
             layouts: _dashboard.layouts,
             options: _dashboard.options,
             tags: { created_by: store.state.user.userId },
@@ -180,9 +180,9 @@ const handleChangePrivate = (id: string, value: boolean) => {
 };
 const handleConfirm = async () => {
     dashboardCreatePageStore.setLoading(true);
-    const _isTemplateSelected = Object.values(dashboardCreatePageState.selectedTemplateIdMap).some((v) => v);
-    if (_isTemplateSelected) {
-        await createBundleTemplates();
+    const _isOotbSelected = Object.values(dashboardCreatePageState.selectedOotbIdMap).some((v) => v);
+    if (_isOotbSelected) {
+        await createBundleOotb();
     } else {
         await createBundleDashboards();
     }
