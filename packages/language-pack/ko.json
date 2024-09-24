@@ -1836,6 +1836,8 @@
 			"WORKSPACE": "워크스페이스"
 		},
 		"CREATE": {
+			"ALT_E_CREATE_DASHBOARD": "",
+			"ALT_S_CREATE_DASHBOARD": "",
 			"BLANK": "빈 대시보드",
 			"BLANK_DESC": "빈 대시보드 사용하여 처음부터 전체 구성",
 			"CANCEL": "취소",

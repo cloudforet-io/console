@@ -1836,6 +1836,8 @@
 			"WORKSPACE": "ワークスペース"
 		},
 		"CREATE": {
+			"ALT_E_CREATE_DASHBOARD": "",
+			"ALT_S_CREATE_DASHBOARD": "",
 			"BLANK": "空のダッシュボード",
 			"BLANK_DESC": "空のダッシュボードを利用して、最初から作成",
 			"CANCEL": "キャンセル",
