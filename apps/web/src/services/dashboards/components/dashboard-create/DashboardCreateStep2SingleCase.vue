@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
 import {
@@ -8,36 +8,46 @@ import {
 } from '@cloudforet/mirinae';
 import type { InputItem } from '@cloudforet/mirinae/types/inputs/input/text-input/type';
 
+import { SpaceRouter } from '@/router';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { DashboardCreateParams } from '@/schema/dashboard/_types/dashboard-type';
+import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardCreateScopeForm from '@/services/dashboards/components/dashboard-create/DashboardCreateScopeForm.vue';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 
-
-const appContextStore = useAppContextStore();
 
 
 interface Props {
     isValid: boolean;
 }
-
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void
 }>();
 
+const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     proxyIsValid: useProxyValue('isValid', props, emit),
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardCreatePageGetters.dashboardType)),
     labels: [] as InputItem[],
 });
@@ -61,6 +71,29 @@ const {
     },
 });
 
+/* Api */
+const createSingleDashboard = async () => {
+    const _dashboardParams: DashboardCreateParams = {
+        name: dashboardCreatePageState.dashboardName,
+        labels: dashboardCreatePageState.dashboardLabels,
+        tags: { created_by: store.state.user.userId },
+    };
+    try {
+        if (storeState.isAdminMode) {
+            (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+        } else if (dashboardCreatePageState.dashboardScope !== 'PRIVATE') {
+            (_dashboardParams as PublicDashboardCreateParameters).resource_group = dashboardCreatePageState.dashboardScope || RESOURCE_GROUP.WORKSPACE;
+        }
+        const _dashboardType = dashboardCreatePageState.dashboardScope === 'PRIVATE' ? 'PRIVATE' : 'PUBLIC';
+        const res = await dashboardStore.createDashboard(_dashboardType, _dashboardParams);
+        dashboardCreatePageStore.setDashboardCreated(true);
+        return res.dashboard_id;
+    } catch (e) {
+        showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'), e);
+        return undefined;
+    }
+};
+
 /* Event */
 const handleUpdateDashboardName = (value: string) => {
     setForm('dashboardName', value);
@@ -70,15 +103,33 @@ const handleUpdateLabels = (items: InputItem[]) => {
     state.labels = items;
     dashboardCreatePageStore.setDashboardLabels(items.map((item) => item.name));
 };
+const handleConfirm = async () => {
+    dashboardCreatePageStore.setLoading(true);
+    const createdDashboardId = await createSingleDashboard();
+    if (createdDashboardId) {
+        await SpaceRouter.router.push(getProperRouteLocation({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            params: {
+                dashboardId: createdDashboardId,
+            },
+        }));
+    }
+};
 
 /* Watcher */
 watch(() => isAllValid.value, (value) => {
     emit('update:is-valid', value);
 });
 
+/* Lifecycle */
 onMounted(() => {
     dashboardCreatePageStore.setDashboardLabels(dashboardCreatePageState.templateLabels);
     state.labels = dashboardCreatePageState.dashboardLabels.map((label) => ({ name: label }));
+});
+
+/* Expose */
+defineExpose({
+    handleConfirm,
 });
 </script>
 
@@ -123,7 +174,7 @@ onMounted(() => {
                               @update:selected="handleUpdateLabels"
                 />
             </p-field-group>
-            <dashboard-create-scope-form v-if="!state.isAdminMode" />
+            <dashboard-create-scope-form v-if="!storeState.isAdminMode" />
         </div>
     </div>
 </template>
