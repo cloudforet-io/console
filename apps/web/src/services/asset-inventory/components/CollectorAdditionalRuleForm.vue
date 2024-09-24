@@ -27,6 +27,7 @@ import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/l
 import type { RegionModel } from '@/schema/inventory/region/model';
 import { i18n as _i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
@@ -51,8 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const allReferenceStore = useAllReferenceStore();
-
-
+const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(e: 'click-done', formData?: CollectorRuleForm): void;
     (e: 'click-cancel'): void;
@@ -91,6 +91,7 @@ const convertToApiCondition = (condition:AdditionalRuleConditionWithSubkey[]):Ad
 });
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     workspace: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     provider: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -262,6 +263,10 @@ const handleSelectProjectId = (value) => {
     state.selectedProjectId = value;
 };
 
+const handleSelectWorkspaceId = (value:SelectDropdownMenuItem[]) => {
+    state.selectedWorkspaceId = value;
+    state.selectedProjectId = [];
+};
 const handleClickDone = () => {
     const actions:AdditionalRuleAction = {};
 
@@ -513,14 +518,15 @@ onMounted(() => {
                 </div>
                 <div class="action-contents-wrapper">
                     <div v-if="state.selectedActionRadioIdx === 'change_project'">
-                        <p-field-group class="action-field-group"
+                        <p-field-group v-if="state.isAdminMode"
+                                       class="action-field-group"
                                        :label="$t('INVENTORY.COLLECTOR.DETAIL.WORKSPACE')"
                                        required
                         >
                             <workspace-select-dropdown class="action-workspace"
                                                        is-fixed-width
                                                        :selected-workspace-ids="state.selectedWorkspaceId"
-                                                       @update:selected-workspace-ids="handleSelectProjectId"
+                                                       @update:selected-workspace-ids="handleSelectWorkspaceId"
                             />
                         </p-field-group>
                         <p-field-group class="action-field-group"
@@ -531,6 +537,7 @@ onMounted(() => {
                                                      is-fixed-width
                                                      :selected-project-ids="state.selectedProjectId"
                                                      :project-group-selectable="false"
+                                                     :workspace-id="state.selectedWorkspaceId[0]?.name"
                                                      @update:selected-project-ids="handleSelectProjectId"
                             />
                         </p-field-group>

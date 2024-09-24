@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PCheckbox, PI, PRadio, PSelectDropdown, PTree, PBadge,
 } from '@cloudforet/mirinae';
@@ -41,6 +42,7 @@ interface Props {
     position?: 'left' | 'right';
     selectionLabel?: string;
     hideCreateButton?: boolean;
+    workspaceId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -56,6 +58,7 @@ const props = withDefaults(defineProps<Props>(), {
     position: 'left',
     selectionLabel: undefined,
     hideCreateButton: false,
+    workspaceId: undefined,
 });
 
 const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
@@ -145,6 +148,8 @@ const dataSetter = (text: string, node: ProjectTreeNode) => {
     node.data.name = text;
 };
 const dataGetter = (node: ProjectTreeNode): string => node.data.name;
+
+const workspaceApiQuery = new ApiQueryHelper();
 const dataFetcher = async (node: ProjectTreeNode): Promise<ProjectTreeNodeData[]> => {
     try {
         const params: ProjectTreeOptions = {
@@ -153,6 +158,12 @@ const dataFetcher = async (node: ProjectTreeNode): Promise<ProjectTreeNodeData[]
             check_child: true,
         };
 
+        if (props.workspaceId) {
+            workspaceApiQuery.setFilters([
+                { k: 'workspace_id', v: props.workspaceId, o: '=' },
+            ]);
+            params.query = workspaceApiQuery.data;
+        }
         if (!props.projectSelectable) params.exclude_type = 'PROJECT';
 
         if (node.data?.id && node.data?.item_type) {
@@ -161,13 +172,10 @@ const dataFetcher = async (node: ProjectTreeNode): Promise<ProjectTreeNodeData[]
         }
 
         if (props.projectGroupSelectOptions?.type === 'PROJECT_GROUP' && (props.projectGroupSelectOptions?.currentProjectGroupId === node.data?.id)) {
-            params.query = {
-                filter: [{
-                    k: 'project_group_id',
-                    v: props.projectGroupSelectOptions.id,
-                    o: 'not',
-                }],
-            };
+            workspaceApiQuery.addFilter(
+                { k: 'project_group_id', v: props.projectGroupSelectOptions?.id ?? '', o: '!=' },
+            );
+            params.query = workspaceApiQuery.data;
         }
 
         return await projectTreeHelper.getProjectTree(params);
