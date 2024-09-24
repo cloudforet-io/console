@@ -1836,6 +1836,8 @@
 			"WORKSPACE": "Workspace"
 		},
 		"CREATE": {
+			"ALT_E_CREATE_DASHBOARD": "Failed to create {count} dashboard",
+			"ALT_S_CREATE_DASHBOARD": "Dashboards successfully created",
 			"BLANK": "Blank",
 			"BLANK_DESC": "Build your own dashboard from scratch.",
 			"CANCEL": "Cancel",

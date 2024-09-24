@@ -4,8 +4,10 @@ import { computed, reactive } from 'vue';
 import { uniq } from 'lodash';
 
 import {
-    PFieldTitle, PCheckboxGroup, PCheckbox, PLazyImg, PSelectDropdown,
+    PFieldTitle, PCheckboxGroup, PCheckbox, PLazyImg, PSelectDropdown, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
+
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginItem } from '@/store/reference/plugin-reference-store';
@@ -27,10 +29,10 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e:'select-label', labels: FilterLabelItem[]):void;
     (e:'select-provider', plugins: FilterLabelItem[]):void;
     (e:'select-plugin', plugins: PluginItem[]):void;
+    (e:'select-start-option', startOption: string):void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
-
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -45,8 +47,13 @@ const state = reactive({
         name: label,
         image: null,
     }))),
+    startOptionList: computed(() => ([
+        { name: 'templates', label: i18n.t('DASHBOARDS.CREATE.TEMPLATES') },
+        { name: 'existing', label: i18n.t('DASHBOARDS.CREATE.EXISTING_DASHBOARDS') },
+    ])),
     selectedProviders: [],
     selectedLabels: [],
+    selectedStartOption: 'templates',
 });
 
 const handleChangeLabelFilter = (selected: FilterLabelItem[]) => {
@@ -58,10 +65,30 @@ const handleChangeProviderFilter = (selected: FilterLabelItem[]) => {
     state.selectedProviders = selected;
     emit('select-provider', selected);
 };
+
+const handleChangeStartOption = (selected: string) => {
+    state.selectedStartOption = selected;
+    emit('select-start-option', state.selectedStartOption);
+};
 </script>
 <template>
     <div class="dashboard-create-step-1-search-filter">
         <div class="label-container">
+            <div class="label">
+                <p-field-title class="title">
+                    {{ $t('DASHBOARDS.CREATE.START_OPTION') }}
+                </p-field-title>
+                <p-radio-group direction="vertical">
+                    <p-radio v-for="startOption in state.startOptionList"
+                             :key="`start-option-${startOption.name}`"
+                             :selected="state.selectedStartOption"
+                             :value="startOption.name"
+                             @change="handleChangeStartOption"
+                    >
+                        {{ startOption.label }}
+                    </p-radio>
+                </p-radio-group>
+            </div>
             <div class="label">
                 <p-field-title class="title">
                     {{ $t('DASHBOARDS.CREATE.TEMPLATE.FILTER_PROVIDER') }}

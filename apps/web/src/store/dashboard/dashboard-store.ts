@@ -254,18 +254,13 @@ export const useDashboardStore = defineStore('dashboard', () => {
         const fetcher = dashboardType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateDashboard.create
             : SpaceConnector.clientV2.dashboard.publicDashboard.create;
-        try {
-            const result = await fetcher<DashboardCreateParameters, DashboardModel>(params);
-            if (dashboardType === 'PRIVATE') {
-                state.privateDashboardItems.push(result as PrivateDashboardModel);
-            } else {
-                state.publicDashboardItems.push(result as PublicDashboardModel);
-            }
-            return result;
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            throw e;
+        const result = await fetcher<DashboardCreateParameters, DashboardModel>(params);
+        if (dashboardType === 'PRIVATE') {
+            state.privateDashboardItems.push(result as PrivateDashboardModel);
+        } else {
+            state.publicDashboardItems.push(result as PublicDashboardModel);
         }
+        return result;
     };
     const updateDashboard = async (dashboardId: string, params: DashboardUpdateParameters): Promise<DashboardModel> => {
         const isPrivate = dashboardId?.startsWith('private');
@@ -327,7 +322,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         if (dashboardType === 'PRIVATE') return (state.privateDashboardItems.filter((i) => i.version === '2.0')).map((item) => item.name);
         return state.publicDashboardItems.filter((i) => i.version === '2.0').map((item) => item.name);
     };
-    const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId?: string): Promise<DashboardModel|undefined> => {
+    const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId?: string): Promise<DashboardModel> => {
         const _dashboardType = isPrivate ? 'PRIVATE' : 'PUBLIC';
         const _dashboard = getters.allDashboardItems.find((item) => item.dashboard_id === dashboardId);
         if (!_dashboard) throw new Error('Dashboard not found');
@@ -346,7 +341,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         if (_state.isAdminMode) {
             (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
         } else if (!isPrivate) {
-            (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = _dashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
+            (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
         }
         const createdDashboard = await createDashboard(_dashboardType, _createdDashboardParams);
         return createdDashboard;
@@ -356,8 +351,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const createFolder = async (name: string, isPrivate: boolean): Promise<string|undefined> => {
         try {
             const fetcher = isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
+            const _existingFolderNameList = isPrivate ? state.privateFolderItems.map((d) => d.name) : state.publicFolderItems.map((d) => d.name);
             const params: FolderCreateParams = {
-                name: getClonedName(getters.existingFolderNameList, name),
+                name: getClonedName(_existingFolderNameList, name),
                 tags: { created_by: store.state.user.userId },
             };
             if (!isPrivate) {

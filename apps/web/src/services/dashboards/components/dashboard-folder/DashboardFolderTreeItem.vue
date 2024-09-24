@@ -27,6 +27,7 @@ import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboar
 interface Props {
     treeData: TreeNode<DashboardTreeDataType>;
     hideButtons?: boolean;
+    externalLink?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
 });
@@ -85,12 +86,18 @@ const handleClickTreeItem = (): void => {
         emit('toggle-folder');
         return;
     }
-    router.push(getProperRouteLocation({
+    const _location = getProperRouteLocation({
         name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
             dashboardId: props.treeData.data.id || '',
         },
-    }));
+    });
+    const _target = props.externalLink ? '_blank' : '_self';
+    if (_target === '_blank') {
+        window.open(router.resolve(_location).href, _target);
+        return;
+    }
+    router.push(_location);
 };
 const handleEditFolderName = () => {
     dashboardMainPageStore.setFolderFormModalType('UPDATE');
@@ -123,6 +130,11 @@ const handleShareFolder = () => {
                         <div v-if="node.data.isNew">
                             <new-mark class="new-mark" />
                         </div>
+                        <p-i v-if="node.data.type === 'DASHBOARD' && props.externalLink"
+                             name="ic_arrow-right-up"
+                             width="0.75rem"
+                             height="0.75rem"
+                        />
                         <div class="hidden-wrapper">
                             <favorite-button v-if="node.data.type === 'DASHBOARD' && !props.hideButtons"
                                              :item-id="node.data.id"
