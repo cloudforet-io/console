@@ -6,7 +6,10 @@ import { PLink } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { isNotEmpty } from '@cloudforet/utils';
 
-import { COLLECTOR_RULE_CONDITION_KEY_LABEL } from '@/schema/inventory/collector-rule/constant';
+import {
+    COLLECTOR_RULE_CONDITION_KEY_LABEL,
+    COLLECTOR_RULE_CONDITION_OPERATOR_LABEL,
+} from '@/schema/inventory/collector-rule/constant';
 import type { CollectorRuleModel, AdditionalRuleAction } from '@/schema/inventory/collector-rule/model';
 import { i18n as _i18n } from '@/translations';
 
@@ -86,8 +89,9 @@ const state = reactive({
                             :key="`${field}-${index}`"
                         >
                             <td>{{ field.label }}</td>
+                            <td>{{ COLLECTOR_RULE_CONDITION_OPERATOR_LABEL[state.conditionItems[index]?.operator]?.toLowerCase() }}</td>
                             <td>
-                                {{ state.conditionItems[index]?.operator }} <span v-if="field.label !== 'Region'">{{ state.conditionItems[index]?.value }}</span>
+                                <span v-if="field.label !== 'Region'">{{ state.conditionItems[index]?.value }}</span>
                                 <span v-else>{{ state.region[state.conditionItems[index]?.value]?.label }}</span>
                             </td>
                         </tr>
@@ -152,8 +156,7 @@ h4 {
     @apply col-span-5;
 }
 table {
-    display: flex;
-    width: 100%;
+    @apply text-label-md w-full;
     td, th {
         @apply px-4 py-2;
     }
@@ -161,15 +164,13 @@ table {
     tbody {
         width: 100%;
         tr {
-            @apply border-gray-300 border-b;
+            @apply border-gray-300 border-b w-full;
             td, th {
-                width: 100%;
                 vertical-align: top;
                 &:first-child {
                     @apply text-gray-500;
                     font-size: 0.875rem;
                     line-height: 150%;
-                    width: 11rem;
                     flex-shrink: 0;
                 }
                 &:last-child {
