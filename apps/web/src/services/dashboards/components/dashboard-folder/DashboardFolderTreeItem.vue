@@ -4,9 +4,10 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PI, PIconButton, PTreeItem,
+    PI, PIconButton, PTreeItem, PLabel, PPopover,
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
 
 import { i18n } from '@/translations';
 
@@ -34,10 +35,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'toggle-folder'): void;
 }>();
+const LABELS_LIMIT = 3;
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardMainPageStore = useDashboardMainPageStore();
+const dashboardMainPageState = dashboardMainPageStore.state;
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     folderControlButtons: computed(() => {
@@ -58,6 +61,11 @@ const state = reactive({
                 clickEvent: handleShareFolder,
             },
         ];
+    }),
+    slicedLabels: computed(() => props.treeData.data?.labels?.slice(0, 3) || []),
+    showMoreLabels: computed(() => {
+        if (!props.treeData.data.labels) return false;
+        return props.treeData.data.labels.length > LABELS_LIMIT;
     }),
 });
 
@@ -109,6 +117,16 @@ const handleEditFolderName = () => {
 const handleShareFolder = () => {
     dashboardMainPageStore.setSelectedFolderId(props.treeData.data.id);
     dashboardMainPageStore.setFolderShareModalVisible(true);
+};
+const handleClickLabel = (label: string) => {
+    dashboardMainPageStore.setSearchQueryTags([
+        ...dashboardMainPageState.searchQueryTags,
+        {
+            key: { name: 'labels', label: 'Label' },
+            value: { name: label, label },
+            operator: '=',
+        } as QueryTag,
+    ]);
 };
 </script>
 
@@ -171,6 +189,32 @@ const handleShareFolder = () => {
                                            class="hidden-wrapper"
                                            @click.stop="controlButton.clickEvent"
                             />
+                        </template>
+                        <template v-else>
+                            <p-label v-for="label in node.data?.labels?.slice(0, 3)"
+                                     :key="`${node.data.id}-label-${label}`"
+                                     :text="label"
+                                     clickable
+                                     @item-click="handleClickLabel(label)"
+                            />
+                            <p-popover v-if="state.showMoreLabels"
+                                       class="popover"
+                                       position="bottom-end"
+                            >
+                                <p-label :text="`+${node.data.labels.length - 3}`"
+                                         clickable
+                                />
+                                <template #content>
+                                    <div class="grid gap-2">
+                                        <p-label v-for="label in node.data.labels.slice(LABELS_LIMIT)"
+                                                 :key="`${node.data.id}-label-${label}`"
+                                                 :text="label"
+                                                 clickable
+                                                 @item-click="handleClickLabel(label)"
+                                        />
+                                    </div>
+                                </template>
+                            </p-popover>
                         </template>
                     </div>
                 </div>

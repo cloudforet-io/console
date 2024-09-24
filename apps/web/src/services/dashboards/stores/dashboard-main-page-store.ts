@@ -3,6 +3,7 @@ import { computed, reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+import type { QueryTag } from '@cloudforet/mirinae/src/inputs/search/query-search-tags/type';
 
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
 import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
@@ -54,6 +55,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         selectedPublicIdMap: {} as Record<string, boolean>,
         selectedPrivateIdMap: {} as Record<string, boolean>,
         newIdList: [] as string[],
+        searchQueryTags: [] as QueryTag[],
     });
     const getters = reactive({
         // admin
@@ -158,6 +160,9 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
     const setFolderShareModalVisible = (visible: boolean) => {
         state.folderShareModalVisible = visible;
     };
+    const setSearchQueryTags = (queryTags: QueryTag[]) => {
+        state.searchQueryTags = queryTags;
+    };
     const mutations = {
         setFolderFormModalVisible,
         setFolderFormModalType,
@@ -170,6 +175,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         setFolderCloneModalVisible,
         setNewIdList,
         setFolderShareModalVisible,
+        setSearchQueryTags,
     };
 
     /* Actions */
@@ -182,6 +188,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         setFolderModalType('PUBLIC');
         setFolderCloneModalVisible(false);
         setFolderShareModalVisible(false);
+        setSearchQueryTags([]);
     };
     const resetSelectedIdMap = (type: 'PUBLIC'|'PRIVATE') => {
         if (type === 'PUBLIC') {

@@ -82,10 +82,9 @@ const state = reactive({
 
 const searchQueryHelper = new QueryHelper();
 const queryState = reactive({
-    searchFilters: computed(() => dashboardState.searchFilters),
     urlQueryString: computed(() => ({
         scope: dashboardState.scope ? primitiveToQueryString(dashboardState.scope) : null,
-        filters: searchQueryHelper.setFilters(queryState.searchFilters).rawQueryStrings,
+        filters: searchQueryHelper.setFilters(dashboardState.searchFilters).rawQueryStrings,
     })),
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
@@ -106,9 +105,7 @@ const handleCreateFolder = () => {
 };
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
-        searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsQueryTag(options.queryTags);
-        dashboardStore.setSearchFilters(searchQueryHelper.filters);
-        dashboardStore.load();
+        dashboardMainPageStore.setSearchQueryTags(options.queryTags);
     }
 };
 const handleUpdateSelectedIdMap = (type: 'PUBLIC' | 'PRIVATE', selectedIdMap: Record<string, boolean>) => {
@@ -144,7 +141,7 @@ const init = async () => {
     };
 
     dashboardStore.setScope(useQueryValue.scope);
-    dashboardStore.setSearchFilters(useQueryValue.filters);
+    dashboardMainPageStore.setSearchQueryTags(searchQueryHelper.queryTags);
 
     urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
         replaceUrlQuery(urlQueryString);
@@ -185,6 +182,12 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
 (async () => {
     await init();
 })();
+
+watch(() => dashboardMainPageState.searchQueryTags, (queryTags) => {
+    searchQueryHelper.setFiltersAsQueryTag(queryTags);
+    dashboardStore.setSearchFilters(searchQueryHelper.filters);
+    dashboardStore.load();
+}, { immediate: true });
 
 onUnmounted(() => {
     // urlQueryString watcher is referencing dashboardStore which is destroyed on unmounted. so urlQueryString watcher must be destroyed on unmounted too.
