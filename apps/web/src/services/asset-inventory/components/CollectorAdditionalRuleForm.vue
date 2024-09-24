@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import { debounce } from 'lodash';
 
@@ -30,9 +30,11 @@ import { i18n as _i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+import WorkspaceSelectDropdown from '@/common/modules/workspace/WorkspaceSelectDropdown.vue';
 
 import CollectorAdditionalRuleFormOperatorDropdown
     from '@/services/asset-inventory/components/CollectorAdditionalRuleFormOperatorDropdown.vue';
@@ -90,6 +92,7 @@ const convertToApiCondition = (condition:AdditionalRuleConditionWithSubkey[]):Ad
 
 const state = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    workspace: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     provider: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     isConditionTooltipVisible: computed(() => {
         let isConditionTooltipVisible = false;
@@ -133,6 +136,7 @@ const state = reactive({
     })),
     selectedActionRadioIdx: 'change_project',
     selectedProjectId: props.data?.actions?.change_project ? [props.data?.actions?.change_project ?? ''] : undefined,
+    selectedWorkspaceId: [] as SelectDropdownMenuItem[],
     isStopProcessingChecked: false,
     sourceInput: '',
     targetInput: '',
@@ -377,6 +381,16 @@ const DEFAULT_SEARCH_MAP:Record<CollectorRuleConditionKey, SelectDropdownMenuIte
     state.conditionListKey = 1;
     state.searchLoading = false;
 })();
+
+onMounted(() => {
+    if (props.data?.actions?.change_project) {
+        const selectedProject = state.projects[props.data.actions.change_project];
+        state.selectedWorkspaceId = [{
+            name: selectedProject.data.workspaceId,
+            label: state.workspace[selectedProject.data.workspaceId].label,
+        }];
+    }
+});
 </script>
 
 <template>
@@ -499,12 +513,27 @@ const DEFAULT_SEARCH_MAP:Record<CollectorRuleConditionKey, SelectDropdownMenuIte
                 </div>
                 <div class="action-contents-wrapper">
                     <div v-if="state.selectedActionRadioIdx === 'change_project'">
-                        <project-select-dropdown class="action-project"
-                                                 is-fixed-width
-                                                 :selected-project-ids="state.selectedProjectId"
-                                                 :project-group-selectable="false"
-                                                 @update:selected-project-ids="handleSelectProjectId"
-                        />
+                        <p-field-group class="action-field-group"
+                                       :label="$t('INVENTORY.COLLECTOR.DETAIL.WORKSPACE')"
+                                       required
+                        >
+                            <workspace-select-dropdown class="action-workspace"
+                                                       is-fixed-width
+                                                       :selected-workspace-ids="state.selectedWorkspaceId"
+                                                       @update:selected-workspace-ids="handleSelectProjectId"
+                            />
+                        </p-field-group>
+                        <p-field-group class="action-field-group"
+                                       :label="$t('INVENTORY.COLLECTOR.DETAIL.PROJECT')"
+                                       required
+                        >
+                            <project-select-dropdown class="action-project"
+                                                     is-fixed-width
+                                                     :selected-project-ids="state.selectedProjectId"
+                                                     :project-group-selectable="false"
+                                                     @update:selected-project-ids="handleSelectProjectId"
+                            />
+                        </p-field-group>
                     </div>
                     <div v-else
                          class="match-box"
