@@ -7,10 +7,16 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { getClonedName } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { ResourceGroupType } from '@/schema/_common/type';
-import type { DashboardType, DashboardFolderType, DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type {
+    DashboardType, DashboardFolderType, DashboardModel, DashboardCreateParams,
+} from '@/schema/dashboard/_types/dashboard-type';
+import type { FolderCreateParams } from '@/schema/dashboard/_types/folder-type';
+import type { WidgetListParams, WidgetModel } from '@/schema/dashboard/_types/widget-type';
 import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
 import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/private-dashboard/api-verbs/delete';
 import type { PrivateDashboardListParameters } from '@/schema/dashboard/private-dashboard/api-verbs/list';
@@ -23,17 +29,23 @@ import type { PublicDashboardDeleteParameters } from '@/schema/dashboard/public-
 import type { PublicDashboardListParameters } from '@/schema/dashboard/public-dashboard/api-verbs/list';
 import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
+import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
 import type { PublicFolderListParameters } from '@/schema/dashboard/public-folder/api-verbs/list';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
+import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
+import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
+
 
 
 type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
@@ -46,16 +58,34 @@ interface LoadOptions {
     isProjectDashboard?: boolean;
 }
 
+
+const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]> => {
+    try {
+        const isPrivate = dashboardId.startsWith('private');
+        const fetcher = isPrivate
+            ? SpaceConnector.clientV2.dashboard.privateWidget.list
+            : SpaceConnector.clientV2.dashboard.publicWidget.list;
+        const { results } = await fetcher<WidgetListParams, ListResponse<WidgetModel>>({
+            dashboard_id: dashboardId,
+        });
+        return results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+};
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
     const favoriteStore = useFavoriteStore();
     const favoriteGetters = favoriteStore.getters;
+    const allReferenceStore = useAllReferenceStore();
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
         currentWorkspace: computed(() => userWorkspaceStore.getters.currentWorkspace),
         currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+        costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     });
     const state = reactive({
         publicDashboardItems: [] as PublicDashboardModel[],
@@ -81,6 +111,11 @@ export const useDashboardStore = defineStore('dashboard', () => {
             .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
             .filter((item) => !(item.resource_group === 'DOMAIN' && item.project_id === '*'))),
         privateFolderItems: computed<PrivateFolderModel[]>(() => state.privateFolderItems),
+        existingFolderNameList: computed<string[]>(() => {
+            const _publicNames = state.publicFolderItems.map((d) => d.name);
+            const _privateNames = state.privateFolderItems.map((d) => d.name);
+            return [..._publicNames, ..._privateNames];
+        }),
     });
 
     /* Mutations */
@@ -214,6 +249,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         state.loading = false;
     };
 
+    // dashboard
     const createDashboard = async (dashboardType: DashboardType, params: DashboardCreateParameters): Promise<DashboardModel> => {
         const fetcher = dashboardType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateDashboard.create
@@ -287,10 +323,51 @@ export const useDashboardStore = defineStore('dashboard', () => {
             throw e;
         }
     };
-    //
     const getDashboardNameList = (dashboardType: DashboardType) => {
         if (dashboardType === 'PRIVATE') return (state.privateDashboardItems.filter((i) => i.version === '2.0')).map((item) => item.name);
         return state.publicDashboardItems.filter((i) => i.version === '2.0').map((item) => item.name);
+    };
+    const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId?: string): Promise<DashboardModel|undefined> => {
+        const _dashboardType = isPrivate ? 'PRIVATE' : 'PUBLIC';
+        const _dashboard = getters.allDashboardItems.find((item) => item.dashboard_id === dashboardId);
+        if (!_dashboard) throw new Error('Dashboard not found');
+
+        const _dashboardNameList = getDashboardNameList(_dashboardType);
+        const _dashboardWidgets = await listDashboardWidgets(_dashboard.dashboard_id);
+        const _createdLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets, _state.costDataSource);
+        const _createdDashboardParams: DashboardCreateParams = {
+            name: getClonedName(_dashboardNameList, _dashboard.name),
+            layouts: _createdLayouts,
+            options: _dashboard.options || {},
+            labels: _dashboard.labels || [],
+            tags: { created_by: store.state.user.userId },
+            folder_id: folderId,
+        };
+        if (_state.isAdminMode) {
+            (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+        } else if (!isPrivate) {
+            (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = _dashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
+        }
+        const createdDashboard = await createDashboard(_dashboardType, _createdDashboardParams);
+        return createdDashboard;
+    };
+
+    // folder
+    const createFolder = async (name: string, isPrivate: boolean): Promise<string|undefined> => {
+        try {
+            const fetcher = isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
+            const params: FolderCreateParams = {
+                name: getClonedName(getters.existingFolderNameList, name),
+                tags: { created_by: store.state.user.userId },
+            };
+            if (!isPrivate) {
+                (params as PublicFolderCreateParameters).resource_group = _state.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;
+            }
+            const createdFolder = await fetcher(params);
+            return createdFolder.folder_id;
+        } catch (e) {
+            return undefined;
+        }
     };
 
 
@@ -305,6 +382,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
         deleteDashboard,
         getDashboardNameList,
         reset,
+        createFolder,
+        cloneDashboard,
     };
 
     return {
