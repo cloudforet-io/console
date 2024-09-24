@@ -7,7 +7,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-
 import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import type { PublicDashboardShareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/share';
 import type { PublicDashboardUnshareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/unshare';
@@ -16,10 +15,13 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { gray } from '@/styles/colors';
 
 import DashboardCloneModal from '@/services/dashboards/components/dashboard-detail/DashboardCloneModal.vue';
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
@@ -39,6 +41,8 @@ const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
+const dashboardStore = useDashboardStore();
+const dashboardGetters = dashboardStore.getters;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -152,6 +156,10 @@ const state = reactive({
             },
         ];
     }),
+    folderName: computed<string|undefined>(() => {
+        const folder = dashboardGetters.allFolderItems.find((d) => d.folder_id === dashboardDetailState.dashboardInfo?.folder_id);
+        return folder?.name;
+    }),
 });
 
 /* Api */
@@ -229,6 +237,16 @@ const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
 
 <template>
     <div class="dashboard-detail-header">
+        <div v-if="dashboardDetailState.dashboardInfo?.folder_id"
+             class="folder-name-wrapper"
+        >
+            <p-i name="ic_folder"
+                 width="1rem"
+                 height="1rem"
+                 :color="gray[600]"
+            />
+            <span class="folder-name">{{ state.folderName }}</span>
+        </div>
         <p-heading :title="dashboardDetailState.name">
             <p-skeleton v-if="!dashboardDetailState.name"
                         width="20rem"
@@ -338,6 +356,14 @@ const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
 <style lang="postcss" scoped>
 .dashboard-detail-header {
     margin-bottom: 0.75rem;
+    .folder-name-wrapper {
+        display: flex;
+        align-items: center;
+        .folder-name {
+            @apply text-paragraph-sm text-gray-600;
+            margin-left: 0.125rem;
+        }
+    }
     .dashboard-setting-dropdown {
         margin: 0 0.5rem;
     }
