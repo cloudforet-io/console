@@ -19,6 +19,8 @@ import type {
 interface PublicFolderResourceItemData {
     resourceGroup?: PublicFolderModel['resource_group'];
     projectId?: string;
+    workspaceId?: string;
+    shared?: boolean;
 }
 export type PublicFolderReferenceItem = Required<Pick<ReferenceItem<PublicFolderResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type PublicFolderReferenceMap = ReferenceMap<PublicFolderReferenceItem>;
@@ -56,7 +58,7 @@ export const usePublicFolderReferenceStore = defineStore('reference-folder', () 
 
         const params: PublicFolderListParameters = {
             query: {
-                only: ['folder_id', 'name', 'project_id', 'resource_group'],
+                only: ['folder_id', 'name', 'project_id', 'resource_group', 'workspace_id', 'shared'],
             },
         };
         const res = await SpaceConnector.clientV2.dashboard.publicFolder.list<PublicFolderListParameters, ListResponse<PublicFolderModel>>(params);
@@ -72,6 +74,8 @@ export const usePublicFolderReferenceStore = defineStore('reference-folder', () 
                 data: {
                     resourceGroup: folderInfo?.resource_group,
                     projectId: folderInfo?.project_id,
+                    workspaceId: folderInfo?.workspace_id,
+                    shared: folderInfo?.shared,
                 },
             };
         });
@@ -90,6 +94,8 @@ export const usePublicFolderReferenceStore = defineStore('reference-folder', () 
                 data: {
                     resourceGroup: folder?.resource_group,
                     projectId: folder?.project_id,
+                    workspaceId: folder?.workspace_id,
+                    shared: folder?.shared,
                 },
             },
         };
