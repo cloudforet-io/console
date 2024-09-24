@@ -22,7 +22,6 @@ import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/privat
 import type { PrivateDashboardListParameters } from '@/schema/dashboard/private-dashboard/api-verbs/list';
 import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PrivateFolderListParameters } from '@/schema/dashboard/private-folder/api-verbs/list';
 import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import type { PublicDashboardDeleteParameters } from '@/schema/dashboard/public-dashboard/api-verbs/delete';
@@ -30,7 +29,6 @@ import type { PublicDashboardListParameters } from '@/schema/dashboard/public-da
 import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
-import type { PublicFolderListParameters } from '@/schema/dashboard/public-folder/api-verbs/list';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 import { store } from '@/store';
 
@@ -52,7 +50,6 @@ type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashbo
 type DashboardListParameters = PublicDashboardListParameters|PrivateDashboardListParameters;
 type DashboardUpdateParameters = PublicDashboardUpdateParameters | PrivateDashboardUpdateParameters;
 type DashboardDeleteParameters = PublicDashboardDeleteParameters | PrivateDashboardDeleteParameters;
-type FolderListParameters = PublicFolderListParameters|PrivateFolderListParameters;
 type FolderModel = PublicFolderModel|PrivateFolderModel;
 interface LoadOptions {
     isProjectDashboard?: boolean;
@@ -167,17 +164,17 @@ export const useDashboardStore = defineStore('dashboard', () => {
             }
         }
     };
-    const _fetchFolder = async (folderType: DashboardFolderType, params?: FolderListParameters) => {
+    const _fetchFolder = async (folderType: DashboardFolderType) => {
         const fetcher = folderType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateFolder.list
             : SpaceConnector.clientV2.dashboard.publicFolder.list;
         try {
-            fetchApiQueryHelper.setFilters(state.searchFilters);
+            const _refinedFilter = state.searchFilters.filter((d) => d.k !== 'labels');
+            fetchApiQueryHelper.setFilters(_refinedFilter);
             const res: ListResponse<FolderModel> = await fetcher({
-                ...params,
                 query: {
-                    ...(params?.query || {}),
                     ...fetchApiQueryHelper.data,
+                    sort: [{ key: 'created_at', desc: true }],
                 },
             });
             const results = res.results || [];
@@ -231,19 +228,19 @@ export const useDashboardStore = defineStore('dashboard', () => {
         if (_state.isAdminMode) {
             await Promise.all([
                 _fetchDashboard('PUBLIC', _publicDashboardParams),
-                _fetchFolder('PUBLIC', _publicDashboardParams),
+                _fetchFolder('PUBLIC'),
             ]);
         } else if (isProjectDashboard) {
             await Promise.all([
                 _fetchDashboard('PUBLIC', _publicDashboardParams),
-                _fetchFolder('PUBLIC', _publicDashboardParams),
+                _fetchFolder('PUBLIC'),
             ]);
         } else {
             await Promise.allSettled([
                 _fetchDashboard('PRIVATE'),
                 _fetchDashboard('PUBLIC', _publicDashboardParams),
                 _fetchFolder('PRIVATE'),
-                _fetchFolder('PUBLIC', _publicDashboardParams),
+                _fetchFolder('PUBLIC'),
             ]);
         }
         state.loading = false;
