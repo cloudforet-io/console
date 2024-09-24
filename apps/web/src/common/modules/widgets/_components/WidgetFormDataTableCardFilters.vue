@@ -311,35 +311,37 @@ onMounted(() => {
         <div class="filters-area">
             <div v-for="(item) in state.selectedItems"
                  :key="`filter-${item.name}`"
+                 class="filter-field-wrapper"
             >
-                <p-field-group class="field-title"
-                               style-type="secondary"
-                               required
-                               :label="item.label"
-                               size="sm"
-                               color="gray"
-                >
-                    <div class="filter-select-wrapper">
-                        <p-select-dropdown class="filters-dropdown"
-                                           is-filterable
-                                           :handler="state.handlerMap[item.name]"
-                                           :selected="state.selectedItemsMap[item.name] ?? []"
-                                           :loading="state.loading"
-                                           multi-selectable
-                                           appearance-type="badge"
-                                           show-select-marker
-                                           :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
-                                           :show-delete-all-button="false"
-                                           :page-size="10"
-                                           @update:selected="handleUpdateFilterDropdown(item.name, $event)"
-                        />
-                        <p-icon-button name="ic_delete"
-                                       style-type="transparent"
-                                       size="sm"
-                                       @click="handleDeleteFilter(item.name)"
-                        />
+                <div class="filter-header">
+                    <div class="content">
+                        <span class="filter-name">{{ item.label }}</span>
+                        <div class="operator-dropdown">
+                            <div class="operator-button">
+                                Contains
+                            </div>
+                            <p-context-menu class="operator-menu" />
+                        </div>
                     </div>
-                </p-field-group>
+                    <p-icon-button name="ic_delete"
+                                   style-type="transparent"
+                                   size="sm"
+                                   @click="handleDeleteFilter(item.name)"
+                    />
+                </div>
+                <p-select-dropdown class="filters-dropdown"
+                                   is-filterable
+                                   :handler="state.handlerMap[item.name]"
+                                   :selected="state.selectedItemsMap[item.name] ?? []"
+                                   :loading="state.loading"
+                                   multi-selectable
+                                   appearance-type="stack"
+                                   show-select-marker
+                                   :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
+                                   :show-delete-all-button="false"
+                                   :page-size="10"
+                                   @update:selected="handleUpdateFilterDropdown(item.name, $event)"
+                />
             </div>
             <div ref="containerRef"
                  class="filter-dropdown-wrapper"
@@ -373,12 +375,34 @@ onMounted(() => {
 <style lang="postcss" scoped>
 .widget-form-data-table-card-filters {
     .filters-area {
-        @apply bg-gray-100 rounded-lg;
-        padding: 0.5rem;
+        @apply bg-gray-100 rounded-lg flex flex-col gap-2;
+        padding: 0.75rem 0.5rem;
         margin-top: 0.25rem;
 
-        .filter-select-wrapper {
-            @apply flex items-center gap-1;
+        .filter-field-wrapper {
+            @apply bg-white border border-gray-150 rounded-lg;
+            width: 100%;
+            padding: 0 0.5rem 0.5rem;
+            .filter-header {
+                @apply flex items-center justify-between;
+                height: 2rem;
+
+                .content {
+                    @apply flex items-center gap-2;
+                    .filter-name {
+                        @apply text-label-md font-bold text-gray-800;
+                    }
+                    .operator-dropdown {
+                        @apply relative;
+                        .operator-button {
+                            @apply flex;
+                        }
+                        .operator-menu {
+                            @apply absolute;
+                        }
+                    }
+                }
+            }
         }
 
         .filter-dropdown-wrapper {
