@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
     legend: () => ({}),
     accumulated: false,
 });
-const emit = defineEmits<{(e: 'update:legend', value): void;
+const emit = defineEmits<{(e: 'update:legend', value: Record<string, boolean>): void;
 }>();
 
 const LIMIT = 15;
@@ -203,13 +203,10 @@ const drawChart = (rawData: AnalyzeResponse<CostAnalyzeRawData>) => {
 
     // init legend
     const _legend: Record<string, boolean> = {};
-    if (isEmpty(state.proxyLegend)) {
-        const _series = state.chartData.map((d) => d.name);
-        _series.forEach((d) => {
-            _legend[d] = true;
-        });
-        state.proxyLegend = _legend;
-    }
+    state.chartData.forEach((d) => {
+        _legend[d.name] = true;
+    });
+    state.proxyLegend = _legend;
 
     state.chart = init(chartContext.value);
     state.chart.setOption(state.chartOptions, true);
