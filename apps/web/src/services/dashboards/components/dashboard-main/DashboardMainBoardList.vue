@@ -216,18 +216,16 @@ onMounted(() => {
     margin-bottom: 1.25rem;
 
     .title-wrapper {
-        @apply text-label-lg;
+        @apply text-label-lg rounded-md;
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
         font-weight: 500;
         cursor: pointer;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
+        padding: 0.25rem 0.75rem 0.25rem 0.25rem;
         .arrow-button {
             transition: transform 0.3s ease-in-out;
-        }
-        .board-count {
-            font-weight: normal;
         }
     }
     .board {
