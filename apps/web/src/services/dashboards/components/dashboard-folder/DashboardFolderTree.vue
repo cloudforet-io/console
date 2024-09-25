@@ -174,6 +174,7 @@ const handleClickShowAll = () => {
             <div class="folder-row-wrapper">
                 <p-checkbox :selected="state.proxySelectedIdMap[treeData.data.id]"
                             :indeterminate="isIndeterminate(treeData)"
+                            class="item-checkbox"
                             @change="handleSelectTreeItem(treeData, $event)"
                 />
                 <p-i v-if="treeData.data.type === 'FOLDER'"
@@ -195,6 +196,7 @@ const handleClickShowAll = () => {
                      class="folder-row-wrapper"
                 >
                     <p-checkbox :selected="state.proxySelectedIdMap[child.data.id]"
+                                class="item-checkbox"
                                 @change="handleSelectTreeItem(child, $event)"
                     />
                     <dashboard-folder-tree-item :tree-data="child"
@@ -256,6 +258,13 @@ const handleClickShowAll = () => {
         &.no-dashboard {
             @apply text-paragraph-md text-gray-300;
             padding: 0.5rem 0.5rem 0.5rem 2.875rem;
+        }
+
+        @screen tablet {
+            .item-checkbox {
+                align-self: flex-start;
+                padding: 0.5rem 0;
+            }
         }
     }
     .show-all-wrapper {
