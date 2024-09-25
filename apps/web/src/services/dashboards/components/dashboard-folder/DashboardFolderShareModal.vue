@@ -143,11 +143,11 @@ watch(() => state.proxyVisible, (visible) => {
 </script>
 
 <template>
-    <p-button-modal v-if="state.proxyVisible && !state.loading"
-                    :visible.sync="state.proxyVisible"
+    <p-button-modal :visible.sync="state.proxyVisible"
                     size="md"
                     :header-title="state.headerTitle"
                     :loading="state.loading"
+                    :disabled="state.loading"
                     :enable-scroll="true"
                     class="dashboard-folder-share-modal"
                     @confirm="handleConfirm"

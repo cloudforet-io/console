@@ -102,11 +102,11 @@ watch(() => state.proxyVisible, (visible) => {
 </script>
 
 <template>
-    <delete-modal v-if="state.proxyVisible && !state.loading"
-                  :visible.sync="state.proxyVisible"
+    <delete-modal :visible.sync="state.proxyVisible"
                   size="md"
                   :header-title="$t('DASHBOARDS.ALL_DASHBOARDS.DELETE_DASHBOARD')"
                   :loading="state.loading"
+                  :disabled="state.loading"
                   :enable-scroll="true"
                   class="dashboard-folder-delete-modal"
                   @confirm="handleDeleteConfirm"

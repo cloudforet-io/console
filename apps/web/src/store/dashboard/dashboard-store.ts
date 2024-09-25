@@ -169,11 +169,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
             ? SpaceConnector.clientV2.dashboard.privateFolder.list
             : SpaceConnector.clientV2.dashboard.publicFolder.list;
         try {
-            const _refinedFilter = state.searchFilters.filter((d) => d.k !== 'labels');
-            fetchApiQueryHelper.setFilters(_refinedFilter);
             const res: ListResponse<FolderModel> = await fetcher({
                 query: {
-                    ...fetchApiQueryHelper.data,
                     sort: [{ key: 'created_at', desc: true }],
                 },
             });

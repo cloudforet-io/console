@@ -10,6 +10,7 @@ import {
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
 
+import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -21,7 +22,6 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
 interface Props {
@@ -175,14 +175,12 @@ onMounted(() => {
                         <p-badge v-if="showBadge(board)"
                                  badge-type="subtle"
                                  :style-type="getBadgeStyleType(board)"
-                                 class="dashboard-badge"
                         >
                             {{ getBadgeText(board) }}
                         </p-badge>
                         <p-badge v-if="isPrivate(board.dashboard_id)"
                                  badge-type="subtle"
                                  style-type="gray150"
-                                 class="dashboard-badge"
                         >
                             <p-i name="ic_lock-filled"
                                  width="0.75rem"
@@ -216,18 +214,16 @@ onMounted(() => {
     margin-bottom: 1.25rem;
 
     .title-wrapper {
-        @apply text-label-lg;
+        @apply text-label-lg rounded-md;
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
         font-weight: 500;
         cursor: pointer;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
+        padding: 0.25rem 0.75rem 0.25rem 0.25rem;
         .arrow-button {
             transition: transform 0.3s ease-in-out;
-        }
-        .board-count {
-            font-weight: normal;
         }
     }
     .board {
@@ -271,9 +267,7 @@ onMounted(() => {
 
             .labels-wrapper {
                 @apply flex items-center flex-wrap;
-                .dashboard-badge {
-                    margin-right: 0.375rem;
-                }
+                gap: 0.25rem;
             }
         }
     }

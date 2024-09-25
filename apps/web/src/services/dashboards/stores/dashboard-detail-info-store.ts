@@ -15,7 +15,7 @@ import type {
     DashboardVariables, DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
     TemplateType,
-    DashboardLayout, DashboardVars,
+    DashboardLayout, DashboardVars, DashboardModel,
 } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDashboardGetParameters } from '@/schema/dashboard/private-dashboard/api-verbs/get';
 import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
@@ -34,9 +34,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { migrateLegacyWidgetOptions } from '@/services/dashboards/helpers/widget-migration-helper';
-import type {
-    DashboardModel,
-} from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 

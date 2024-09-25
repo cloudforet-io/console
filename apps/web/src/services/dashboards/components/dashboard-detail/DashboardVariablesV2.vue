@@ -122,8 +122,7 @@ const handleResetVariables = () => {
 <style lang="postcss" scoped>
 .dashboard-variables-select-dropdown {
     &.detail-page {
-        @apply w-full rounded-xl bg-white;
-        padding: 0.75rem;
+        @apply w-full;
     }
     .variable-selector-box {
         position: relative;

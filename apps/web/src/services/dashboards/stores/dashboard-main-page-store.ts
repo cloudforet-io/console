@@ -160,7 +160,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
     const setFolderShareModalVisible = (visible: boolean) => {
         state.folderShareModalVisible = visible;
     };
-    const setSearchQueryTags = (queryTags: QueryTag[]) => {
+    const setSearchQueryTags = (queryTags: QueryTag[] = []) => {
         state.searchQueryTags = queryTags;
     };
     const mutations = {

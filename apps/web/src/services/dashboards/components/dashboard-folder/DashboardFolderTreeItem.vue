@@ -35,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'toggle-folder'): void;
 }>();
-const LABELS_LIMIT = 3;
+const LABELS_LIMIT = 2;
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
@@ -62,7 +62,7 @@ const state = reactive({
             },
         ];
     }),
-    slicedLabels: computed(() => props.treeData.data?.labels?.slice(0, 3) || []),
+    slicedLabels: computed(() => props.treeData.data?.labels?.slice(0, LABELS_LIMIT) || []),
     showMoreLabels: computed(() => {
         if (!props.treeData?.data?.labels) return false;
         return props.treeData.data.labels.length > LABELS_LIMIT;
@@ -171,50 +171,48 @@ const handleClickLabel = (label: string) => {
                                   class="shared-text"
                                   :style="{'color': getSharedColor(node)}"
                             >- {{ getSharedText(node) }}</span>
-                            <span v-if="node.data.createdBy"
-                                  class="created-by-text"
-                            >
-                                - {{ i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.CREATED_BY', { user: node.data.createdBy }) }}
-                            </span>
                         </div>
                     </div>
                     <div class="right-part">
-                        <template v-if="props.treeData.data.type === 'FOLDER'">
+                        <div v-if="props.treeData.data.type === 'FOLDER'"
+                             class="folder-button-wrapper hidden-wrapper"
+                        >
                             <p-icon-button v-for="controlButton in state.folderControlButtons"
                                            :key="`folder-control-button-${node.data.id}-${controlButton.name}`"
                                            :name="controlButton.icon"
                                            size="sm"
                                            style-type="tertiary"
                                            shape="square"
-                                           class="hidden-wrapper"
                                            @click.stop="controlButton.clickEvent"
                             />
-                        </template>
+                        </div>
                         <template v-else>
-                            <p-label v-for="label in node.data?.labels?.slice(0, 3)"
-                                     :key="`${node.data.id}-label-${label}`"
-                                     :text="label"
-                                     :clickable="!props.readonlyMode"
-                                     @item-click="handleClickLabel(label)"
-                            />
-                            <p-popover v-if="state.showMoreLabels"
-                                       class="popover"
-                                       position="bottom-end"
-                            >
-                                <p-label :text="`+${node.data.labels.length - 3}`"
-                                         clickable
+                            <div class="flex gap-1">
+                                <p-label v-for="label in node.data?.labels?.slice(0, LABELS_LIMIT)"
+                                         :key="`${node.data.id}-label-${label}`"
+                                         :text="label"
+                                         :clickable="!props.readonlyMode"
+                                         @item-click="handleClickLabel(label)"
                                 />
-                                <template #content>
-                                    <div class="grid gap-2">
-                                        <p-label v-for="label in node.data.labels.slice(LABELS_LIMIT)"
-                                                 :key="`${node.data.id}-label-${label}`"
-                                                 :text="label"
-                                                 :clickable="!props.readonlyMode"
-                                                 @item-click="handleClickLabel(label)"
-                                        />
-                                    </div>
-                                </template>
-                            </p-popover>
+
+                                <p-popover v-if="state.showMoreLabels"
+                                           position="bottom-end"
+                                >
+                                    <p-label :text="`+${node.data.labels.length - LABELS_LIMIT}`"
+                                             clickable
+                                    />
+                                    <template #content>
+                                        <div class="popper-label-wrapper">
+                                            <p-label v-for="label in node.data.labels.slice(LABELS_LIMIT)"
+                                                     :key="`${node.data.id}-label-${label}`"
+                                                     :text="label"
+                                                     :clickable="!props.readonlyMode"
+                                                     @item-click="handleClickLabel(label)"
+                                            />
+                                        </div>
+                                    </template>
+                                </p-popover>
+                            </div>
                         </template>
                     </div>
                 </div>
@@ -226,8 +224,10 @@ const handleClickLabel = (label: string) => {
 <style lang="postcss" scoped>
 .dashboard-folder-tree-item {
     .dashboard-folder-tree-item-content {
+        position: relative;
         padding: 0.5rem 0;
         .contents-wrapper {
+            position: relative;
             height: 1.5rem;
             display: flex;
             align-items: center;
@@ -253,7 +253,11 @@ const handleClickLabel = (label: string) => {
             .right-part {
                 display: flex;
                 align-items: center;
-                gap: 0.25rem;
+                .popper-label-wrapper {
+                    display: grid;
+                    gap: 0.25rem;
+                    min-width: 8rem;
+                }
             }
         }
     }
@@ -265,13 +269,35 @@ const handleClickLabel = (label: string) => {
         .shared-text {
             @apply text-label-sm;
         }
-        .created-by-text {
-            @apply text-label-sm text-gray-500;
-        }
     }
     &:hover {
         .hidden-wrapper {
             visibility: visible;
+        }
+    }
+
+    @screen tablet {
+        .dashboard-folder-tree-item-content {
+            .contents-wrapper {
+                flex-flow: wrap;
+                gap: 0.5rem;
+                height: auto;
+                .left-part {
+                    width: 95%;
+                }
+            }
+        }
+        .hidden-wrapper {
+            .shared-text {
+                display: none;
+            }
+        }
+        .folder-button-wrapper {
+            position: absolute;
+            right: 0;
+            top: -0.25rem;
+            display: flex;
+            gap: 0.25rem;
         }
     }
 }

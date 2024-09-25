@@ -17,6 +17,7 @@ interface ControlButton {
     icon: string;
     clickEvent: () => void;
     disabled?: boolean;
+    styleType?: string;
 }
 interface Props {
     selectedIdMap: Record<string, boolean>;
@@ -35,7 +36,6 @@ const emit = defineEmits<{(e: 'update:selectedIdMap', selectedIdMap: Record<stri
     (e: 'click-delete');
     (e: 'click-move');
     (e: 'click-clone');
-    (e: 'click-refresh');
 }>();
 const state = reactive({
     proxySelectedIdMap: useProxyValue('selectedIdMap', props, emit),
@@ -53,12 +53,7 @@ const state = reactive({
     }),
     childrenShowMap: {} as Record<string, boolean>,
     controlButtons: computed<ControlButton[]>(() => {
-        const _defaultButtons = [{
-            name: 'refresh',
-            icon: 'ic_refresh',
-            clickEvent: () => emit('click-refresh'),
-        }];
-        if (props.hideButtons) return _defaultButtons;
+        if (props.readonlyMode) return [];
         return [
             {
                 name: 'clone',
@@ -77,12 +72,13 @@ const state = reactive({
                 icon: 'ic_delete',
                 clickEvent: () => emit('click-delete'),
                 disabled: !!props.buttonDisableMap?.delete,
+                styleType: 'negative-transparent',
             },
-            ..._defaultButtons,
         ];
     }),
     showAll: false,
     slicedTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
+        if (props.readonlyMode) return props.dashboardTreeData;
         if (state.showAll) return props.dashboardTreeData;
         return props.dashboardTreeData.slice(0, 10);
     }),
@@ -162,6 +158,7 @@ const handleClickShowAll = () => {
                                :key="`control-button-${controlButton.name}`"
                                :name="controlButton.icon"
                                :disabled="controlButton.disabled"
+                               :style-type="controlButton.styleType || 'transparent'"
                                size="sm"
                                @click="controlButton.clickEvent"
                 />
@@ -174,6 +171,7 @@ const handleClickShowAll = () => {
             <div class="folder-row-wrapper">
                 <p-checkbox :selected="state.proxySelectedIdMap[treeData.data.id]"
                             :indeterminate="isIndeterminate(treeData)"
+                            class="item-checkbox"
                             @change="handleSelectTreeItem(treeData, $event)"
                 />
                 <p-i v-if="treeData.data.type === 'FOLDER'"
@@ -195,6 +193,7 @@ const handleClickShowAll = () => {
                      class="folder-row-wrapper"
                 >
                     <p-checkbox :selected="state.proxySelectedIdMap[child.data.id]"
+                                class="item-checkbox"
                                 @change="handleSelectTreeItem(child, $event)"
                     />
                     <dashboard-folder-tree-item :tree-data="child"
@@ -209,7 +208,7 @@ const handleClickShowAll = () => {
                 </div>
             </template>
         </div>
-        <div v-if="!state.showAll && props.dashboardTreeData.length > 10"
+        <div v-if="!props.readonlyMode && !state.showAll && props.dashboardTreeData.length > 10"
              class="show-all-wrapper"
         >
             <p-button style-type="transparent"
@@ -256,6 +255,13 @@ const handleClickShowAll = () => {
         &.no-dashboard {
             @apply text-paragraph-md text-gray-300;
             padding: 0.5rem 0.5rem 0.5rem 2.875rem;
+        }
+
+        @screen tablet {
+            .item-checkbox {
+                align-self: flex-start;
+                padding: 0.5rem 0;
+            }
         }
     }
     .show-all-wrapper {
