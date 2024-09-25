@@ -114,6 +114,8 @@ const handleCreateFolder = () => {
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         dashboardMainPageStore.setSearchQueryTags(options.queryTags);
+    } else {
+        dashboardStore.load();
     }
 };
 const handleUpdateSelectedIdMap = (type: 'PUBLIC' | 'PRIVATE', selectedIdMap: Record<string, boolean>) => {
@@ -134,9 +136,6 @@ const handleClickDeleteButton = (type: 'PUBLIC' | 'PRIVATE') => {
 const handleClickMoveButton = (type: 'PUBLIC' | 'PRIVATE') => {
     dashboardMainPageStore.setFolderModalType(type);
     dashboardMainPageStore.setFolderMoveModalVisible(true);
-};
-const handleClickRefreshButton = () => {
-    dashboardStore.load();
 };
 
 /* init */
@@ -193,7 +192,6 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
 })();
 
 watch(() => dashboardMainPageState.searchQueryTags, (queryTags) => {
-    console.log('queryTags', queryTags);
     queryTagsHelper.setQueryTags(queryTags || []);
     dashboardStore.setSearchFilters(queryTagsHelper.filters.value);
     dashboardStore.load();
@@ -227,7 +225,6 @@ onUnmounted(() => {
                    search-type="query"
                    :pagination-visible="false"
                    :page-size-changeable="false"
-                   :refreshable="false"
                    :key-item-sets="queryState.keyItemSets"
                    :value-handler-map="queryState.valueHandlerMap"
                    :query-tags="queryState.queryTags"
@@ -273,7 +270,6 @@ onUnmounted(() => {
                                        @click-clone="handleClickCloneButton('PUBLIC')"
                                        @click-delete="handleClickDeleteButton('PUBLIC')"
                                        @click-move="handleClickMoveButton('PUBLIC')"
-                                       @click-refresh="handleClickRefreshButton()"
                 />
             </div>
             <div v-if="!storeState.isAdminMode"
@@ -290,7 +286,6 @@ onUnmounted(() => {
                                        @click-clone="handleClickCloneButton('PRIVATE')"
                                        @click-delete="handleClickDeleteButton('PRIVATE')"
                                        @click-move="handleClickMoveButton('PRIVATE')"
-                                       @click-refresh="handleClickRefreshButton()"
                 />
             </div>
             <dashboard-main-board-list v-if="state.deprecatedDashboardList.length"

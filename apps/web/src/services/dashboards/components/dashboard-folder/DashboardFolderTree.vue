@@ -35,7 +35,6 @@ const emit = defineEmits<{(e: 'update:selectedIdMap', selectedIdMap: Record<stri
     (e: 'click-delete');
     (e: 'click-move');
     (e: 'click-clone');
-    (e: 'click-refresh');
 }>();
 const state = reactive({
     proxySelectedIdMap: useProxyValue('selectedIdMap', props, emit),
@@ -53,12 +52,7 @@ const state = reactive({
     }),
     childrenShowMap: {} as Record<string, boolean>,
     controlButtons: computed<ControlButton[]>(() => {
-        const _defaultButtons = [{
-            name: 'refresh',
-            icon: 'ic_refresh',
-            clickEvent: () => emit('click-refresh'),
-        }];
-        if (props.hideButtons) return _defaultButtons;
+        if (props.readonlyMode) return [];
         return [
             {
                 name: 'clone',
@@ -78,11 +72,11 @@ const state = reactive({
                 clickEvent: () => emit('click-delete'),
                 disabled: !!props.buttonDisableMap?.delete,
             },
-            ..._defaultButtons,
         ];
     }),
     showAll: false,
     slicedTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
+        if (props.readonlyMode) return props.dashboardTreeData;
         if (state.showAll) return props.dashboardTreeData;
         return props.dashboardTreeData.slice(0, 10);
     }),
@@ -211,7 +205,7 @@ const handleClickShowAll = () => {
                 </div>
             </template>
         </div>
-        <div v-if="!state.showAll && props.dashboardTreeData.length > 10"
+        <div v-if="!props.readonlyMode && !state.showAll && props.dashboardTreeData.length > 10"
              class="show-all-wrapper"
         >
             <p-button style-type="transparent"
