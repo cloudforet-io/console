@@ -64,7 +64,7 @@ const state = reactive({
     }),
     slicedLabels: computed(() => props.treeData.data?.labels?.slice(0, 3) || []),
     showMoreLabels: computed(() => {
-        if (!props.treeData.data.labels) return false;
+        if (!props.treeData?.data?.labels) return false;
         return props.treeData.data.labels.length > LABELS_LIMIT;
     }),
 });

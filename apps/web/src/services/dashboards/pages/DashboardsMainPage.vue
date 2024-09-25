@@ -5,10 +5,10 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import {
     PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
 } from '@cloudforet/mirinae';
+import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
 import type {
     HandlerResponse, KeyDataType, KeyItem, KeyItemSet, ValueHandler, ValueMenuItem,
 } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
@@ -26,6 +26,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import DashboardFolderCloneModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderCloneModal.vue';
 import DashboardFolderDeleteModal
@@ -50,6 +51,14 @@ const dashboardMainPageStore = useDashboardMainPageStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
 const dashboardMainPageGetters = dashboardMainPageStore.getters;
 const router = useRouter();
+const queryTagsHelper = useQueryTags({
+    keyItemSets: [{
+        title: 'Properties',
+        items: [
+            { name: 'labels', label: 'Label' },
+        ],
+    }],
+});
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -80,11 +89,10 @@ const state = reactive({
     }),
 });
 
-const searchQueryHelper = new QueryHelper();
 const queryState = reactive({
     urlQueryString: computed(() => ({
         scope: dashboardState.scope ? primitiveToQueryString(dashboardState.scope) : null,
-        filters: searchQueryHelper.setFilters(dashboardState.searchFilters).rawQueryStrings,
+        filters: queryTagsHelper.urlQueryStringFilters.value,
     })),
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
@@ -95,7 +103,7 @@ const queryState = reactive({
     valueHandlerMap: computed(() => ({
         labels: getDashboardValueHandler(),
     })),
-    queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(dashboardState.searchFilters).queryTags),
+    queryTags: computed<QueryTag[]>(() => queryTagsHelper.queryTags.value),
 });
 
 const handleCreateDashboard = () => { router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME })); };
@@ -135,13 +143,14 @@ const handleClickRefreshButton = () => {
 let urlQueryStringWatcherStop;
 const init = async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
+    queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
     const useQueryValue = {
         scope: queryStringToString(currentQuery.scope),
-        filters: searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
+        filters: queryTagsHelper.filters.value,
     };
 
     dashboardStore.setScope(useQueryValue.scope);
-    dashboardMainPageStore.setSearchQueryTags(searchQueryHelper.queryTags);
+    dashboardMainPageStore.setSearchQueryTags(queryState.queryTags);
 
     urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
         replaceUrlQuery(urlQueryString);
@@ -184,13 +193,13 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
 })();
 
 watch(() => dashboardMainPageState.searchQueryTags, (queryTags) => {
-    searchQueryHelper.setFiltersAsQueryTag(queryTags || []);
-    dashboardStore.setSearchFilters(searchQueryHelper.filters);
+    console.log('queryTags', queryTags);
+    queryTagsHelper.setQueryTags(queryTags || []);
+    dashboardStore.setSearchFilters(queryTagsHelper.filters.value);
     dashboardStore.load();
 }, { immediate: true });
 
 onUnmounted(() => {
-    // urlQueryString watcher is referencing dashboardStore which is destroyed on unmounted. so urlQueryString watcher must be destroyed on unmounted too.
     if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
 });
 </script>
