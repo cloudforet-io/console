@@ -2836,6 +2836,7 @@
 			},
 			"MODAL": {
 				"ADD": "추가",
+				"ADD_USERS_DESCRIPTION": "",
 				"ADD_USERS_TITLE": "\"{name}\"에 사용자 추가",
 				"ADD_WORKSPACES_TITLE": "\"{name}\"에 워크스페이스 추가",
 				"ALT_S_ADD_USERS": "사용자 추가 완료",

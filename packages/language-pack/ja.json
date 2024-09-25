@@ -2836,6 +2836,7 @@
 			},
 			"MODAL": {
 				"ADD": "追加",
+				"ADD_USERS_DESCRIPTION": "",
 				"ADD_USERS_TITLE": "\"{name}\"にユーザーを追加",
 				"ADD_WORKSPACES_TITLE": "\"{name}\" にワークスペースを追加",
 				"ALT_S_ADD_USERS": "ユーザー追加完了",
