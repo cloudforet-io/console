@@ -1753,6 +1753,9 @@
 				"WIDGET_HEIGHT": "ウィジェットの高さ"
 			},
 			"WIDGET_TITLE_REQUIRED": "ウィジェットのタイトルを入力してください。"
+		},
+		"WORKSPACE": {
+			"SELECT_WORKSPACE": "ワークスペースの選択"
 		}
 	},
 	"COST_EXPLORER": {
@@ -3297,6 +3300,7 @@
 				"PAGE_NOTIFICATION": "このコレクターの設定は管理者モードでのみ行うことができます。",
 				"PLUGIN": "プラグイン",
 				"PLUGIN_ID": "プラグイン ID",
+				"PROJECT": "プロジェクト",
 				"REGION": "Region",
 				"SAVE_CHANGES": "変更を保存",
 				"SCHEDULE": "スケジュール",
@@ -3310,7 +3314,8 @@
 				"SERVICE_CODE": "Service Code",
 				"SPECIFIC_SERVICE_ACCOUNT": "特定のサービスアカウント",
 				"TAG": "タグ",
-				"VERSION": "バージョン"
+				"VERSION": "バージョン",
+				"WORKSPACE": "ワークスペース"
 			},
 			"EDIT_ADDITIONAL_RULE": "追加ルールを編集",
 			"EMPTY": {

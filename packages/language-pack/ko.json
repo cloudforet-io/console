@@ -1753,6 +1753,9 @@
 				"WIDGET_HEIGHT": "위젯 높이"
 			},
 			"WIDGET_TITLE_REQUIRED": "위젯 제목을 입력해주세요."
+		},
+		"WORKSPACE": {
+			"SELECT_WORKSPACE": "워크스페이스 선택"
 		}
 	},
 	"COST_EXPLORER": {
@@ -3297,6 +3300,7 @@
 				"PAGE_NOTIFICATION": "Admin 모드에서만 설정을 변경할 수 있는 컬렉터입니다.",
 				"PLUGIN": "플러그인",
 				"PLUGIN_ID": "플러그인 ID",
+				"PROJECT": "프로젝트",
 				"REGION": "Region",
 				"SAVE_CHANGES": "변경 저장 ",
 				"SCHEDULE": "스케줄",
@@ -3310,7 +3314,8 @@
 				"SERVICE_CODE": "Service Code",
 				"SPECIFIC_SERVICE_ACCOUNT": "특정 서비스 어카운트",
 				"TAG": "태그",
-				"VERSION": "버전"
+				"VERSION": "버전",
+				"WORKSPACE": "워크스페이스"
 			},
 			"EDIT_ADDITIONAL_RULE": "추가 규칙 수",
 			"EMPTY": {
