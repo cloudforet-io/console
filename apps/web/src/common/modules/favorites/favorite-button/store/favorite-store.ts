@@ -14,7 +14,7 @@ import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import type { ReferenceData } from '@/lib/helper/config-data-helper';
+import type { ReferenceData, ConfigData } from '@/lib/helper/config-data-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -88,7 +88,7 @@ export const useFavoriteStore = defineStore('favorite', () => {
                 state.favoriteWorkspaceMenuList = [];
             }
         },
-        createFavorite: async (param: ReferenceData) => {
+        createFavorite: async (param: ConfigData|ReferenceData) => {
             const { itemType, workspaceId, itemId } = param;
             try {
                 await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
