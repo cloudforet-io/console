@@ -4,7 +4,7 @@ import { onClickOutside } from '@vueuse/core/index';
 import { computed, reactive, ref } from 'vue';
 
 import {
-    PSelectDropdown, PContextMenu, PIconButton,
+    PSelectDropdown, PContextMenu, PIconButton, PI,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
@@ -12,6 +12,8 @@ import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropd
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATA_TABLE_QUERY_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
+
+import { blue, gray } from '@/styles/colors';
 
 interface Props {
     filterItem: MenuItem;
@@ -90,13 +92,18 @@ onClickOutside(operatorButtonRef, () => {
                     <div class="operator-button"
                          @click="handleClickDropdown"
                     >
-                        {{ DATA_TABLE_QUERY_OPERATOR[state.proxySelectedFilter.o]?.label }}
+                        <span class="selected">{{ DATA_TABLE_QUERY_OPERATOR[state.proxySelectedFilter.o]?.label }}</span>
+                        <p-i :name="state.visibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
+                             width="1.5rem"
+                             height="1.5rem"
+                             :color="state.visibleMenu ? blue[600] : gray[600]"
+                        />
                     </div>
                     <p-context-menu v-if="state.visibleMenu"
                                     class="operator-menu"
                                     :visible.sync="state.visibleMenu"
                                     :menu="state.operatorMenu"
-                                    :selected="[props.selectedFilter?.o]"
+                                    :selected="[{ name: props.selectedFilter?.o }]"
                                     @select="handleSelectOperator"
                     />
                 </div>
@@ -140,7 +147,10 @@ onClickOutside(operatorButtonRef, () => {
             .operator-dropdown {
                 @apply relative;
                 .operator-button {
-                    @apply flex;
+                    @apply flex items-center cursor-pointer gap-1;
+                    .selected {
+                        @apply text-label-md text-gray-800;
+                    }
                 }
                 .operator-menu {
                     @apply absolute;
