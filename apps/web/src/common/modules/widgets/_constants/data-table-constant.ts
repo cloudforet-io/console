@@ -35,3 +35,22 @@ export const EVAL_EXPRESSION_TYPE = {
     LABEL: 'LABEL',
     DATA: 'DATA',
 } as const;
+
+export const DATA_TABLE_QUERY_OPERATOR = {
+    contain_in: {
+        key: 'contain_in',
+        label: 'Contains',
+    },
+    not_contain_in: {
+        key: 'not_contain_in',
+        label: 'Does Not Contain',
+    },
+    in: {
+        key: 'in',
+        label: 'Equals',
+    },
+    not_in: {
+        key: 'not_in',
+        label: 'Does Not Equal',
+    },
+} as const;

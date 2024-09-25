@@ -9,10 +9,10 @@ import {
 } from 'lodash';
 
 import {
-    PFieldGroup, PButton, PSelectDropdown, PContextMenu, PIconButton, useContextMenuController,
+    PFieldGroup, PButton, PContextMenu, useContextMenuController,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
@@ -35,9 +35,12 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
+import WidgetFormDataTableCardFiltersItem
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardFiltersItem.vue';
+import { DATA_SOURCE_DOMAIN, DATA_TABLE_QUERY_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { DataTableSourceType } from '@/common/modules/widgets/types/widget-model';
+import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { DataTableSourceType, DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
@@ -57,13 +60,14 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
     [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.region },
     [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
 };
-const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({});
+
+const getInitialSelectedItemsMap = (): Record<string, DataTableQueryFilterForDropdown> => ({});
 interface Props {
     dataTableId: string;
     sourceType?: DataTableSourceType;
     sourceId?: string;
     sourceKey?: string;
-    filter: Record<string, string[]>;
+    filter: Record<string, DataTableQueryFilter>;
     filterItems: MenuItem[];
 }
 
@@ -82,7 +86,7 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
-    proxyFilter: useProxyValue('filter', props, emit),
+    proxyFilter: useProxyValue<Record<string, DataTableQueryFilter>>('filter', props, emit),
     filterItems: computed(() => props.filterItems),
     selectedItems: [] as any[],
     handlerMap: computed(() => {
@@ -101,7 +105,7 @@ const state = reactive({
     primaryCostStatOptions: computed<Record<string, any>>(() => ({
         data_source_id: props.sourceId,
     })),
-    selectedItemsMap: getInitialSelectedItemsMap() as Record<string, SelectDropdownMenuItem[]>,
+    selectedItemsMap: getInitialSelectedItemsMap() as Record<string, DataTableQueryFilterForDropdown>,
 });
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
@@ -138,16 +142,21 @@ onClickOutside(containerRef, hideContextMenu);
 
 
 /* Event */
-const handleUpdateFilterDropdown = (filterKey: string, selectedItems: SelectDropdownMenuItem[]) => {
+const handleUpdateFilter = (filterKey: string, filter: DataTableQueryFilterForDropdown) => {
     const selectedItemsMap = cloneDeep(state.selectedItemsMap);
-    selectedItemsMap[filterKey] = selectedItems;
+    selectedItemsMap[filterKey] = filter;
+
     state.selectedItemsMap = selectedItemsMap;
 
     state.proxyFilter = {
         ...state.proxyFilter,
-        [filterKey]: selectedItems.map((d) => d.name as string),
+        [filterKey]: {
+            ...selectedItemsMap[filterKey],
+            v: selectedItemsMap[filterKey].v.map((d) => d.name),
+        },
     };
 };
+
 const handleAddFilter = () => {
     if (visibleMenu.value) {
         hideContextMenu();
@@ -163,6 +172,11 @@ const handleSelectAddFilterMenuItem = (item: MenuItem, _: any, isSelected: boole
             ...state.selectedItems,
             item,
         ];
+        state.selectedItemsMap[item.name] = {
+            k: item.name,
+            v: [],
+            o: DATA_TABLE_QUERY_OPERATOR.contain_in.key,
+        };
     } else {
         state.selectedItems = state.selectedItems.filter((d) => d !== item.name);
         resetFilterByKey(item.name);
@@ -298,7 +312,10 @@ onMounted(() => {
             ...state.selectedItems,
             { name: filter.k, label: selectedFilteritemLabel },
         ];
-        state.selectedItemsMap[filter.k] = filter.v.map((d) => ({ name: d }));
+        state.selectedItemsMap[filter.k] = {
+            ...filter,
+            v: filter.v.map((d) => ({ name: d })),
+        };
     });
 });
 
@@ -309,38 +326,16 @@ onMounted(() => {
                    :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.FILTERS')"
     >
         <div class="filters-area">
-            <div v-for="(item) in state.selectedItems"
-                 :key="`filter-${item.name}`"
-            >
-                <p-field-group class="field-title"
-                               style-type="secondary"
-                               required
-                               :label="item.label"
-                               size="sm"
-                               color="gray"
-                >
-                    <div class="filter-select-wrapper">
-                        <p-select-dropdown class="filters-dropdown"
-                                           is-filterable
-                                           :handler="state.handlerMap[item.name]"
-                                           :selected="state.selectedItemsMap[item.name] ?? []"
-                                           :loading="state.loading"
-                                           multi-selectable
-                                           appearance-type="badge"
-                                           show-select-marker
-                                           :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
-                                           :show-delete-all-button="false"
-                                           :page-size="10"
-                                           @update:selected="handleUpdateFilterDropdown(item.name, $event)"
-                        />
-                        <p-icon-button name="ic_delete"
-                                       style-type="transparent"
-                                       size="sm"
-                                       @click="handleDeleteFilter(item.name)"
-                        />
-                    </div>
-                </p-field-group>
-            </div>
+            <widget-form-data-table-card-filters-item v-for="(item) in state.selectedItems"
+                                                      :key="`filter-${item.name}`"
+                                                      :filter-item="item"
+                                                      :handler="state.handlerMap[item.name]"
+                                                      :loading="state.loading"
+                                                      :selected-filter="state.selectedItemsMap[item.name]"
+                                                      :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
+                                                      @delete="handleDeleteFilter(item.name)"
+                                                      @update:selected-filter="handleUpdateFilter(item.name, $event)"
+            />
             <div ref="containerRef"
                  class="filter-dropdown-wrapper"
             >
@@ -373,13 +368,9 @@ onMounted(() => {
 <style lang="postcss" scoped>
 .widget-form-data-table-card-filters {
     .filters-area {
-        @apply bg-gray-100 rounded-lg;
-        padding: 0.5rem;
+        @apply bg-gray-100 rounded-lg flex flex-col gap-2;
+        padding: 0.75rem 0.5rem;
         margin-top: 0.25rem;
-
-        .filter-select-wrapper {
-            @apply flex items-center gap-1;
-        }
 
         .filter-dropdown-wrapper {
             @apply relative;
