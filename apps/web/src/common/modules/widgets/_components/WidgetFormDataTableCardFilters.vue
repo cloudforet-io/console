@@ -35,8 +35,8 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import WidgetFormDataTableCardFIltersItem
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardFIltersItem.vue';
+import WidgetFormDataTableCardFiltersItem
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardFiltersItem.vue';
 import { DATA_SOURCE_DOMAIN, DATA_TABLE_QUERY_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -326,15 +326,15 @@ onMounted(() => {
                    :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.FILTERS')"
     >
         <div class="filters-area">
-            <widget-form-data-table-card-f-ilters-item v-for="(item) in state.selectedItems"
-                                                       :key="`filter-${item.name}`"
-                                                       :filter-item="item"
-                                                       :handler="state.handlerMap[item.name]"
-                                                       :loading="state.loading"
-                                                       :selected-filter="state.selectedItemsMap[item.name]"
-                                                       :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
-                                                       @delete="handleDeleteFilter(item.name)"
-                                                       @update:selected-filter="handleUpdateFilter(item.name, $event)"
+            <widget-form-data-table-card-filters-item v-for="(item) in state.selectedItems"
+                                                      :key="`filter-${item.name}`"
+                                                      :filter-item="item"
+                                                      :handler="state.handlerMap[item.name]"
+                                                      :loading="state.loading"
+                                                      :selected-filter="state.selectedItemsMap[item.name]"
+                                                      :init-selected-with-handler="!!GROUP_BY_TO_VAR_MODELS[item.name] || props.sourceType === DATA_SOURCE_DOMAIN.ASSET"
+                                                      @delete="handleDeleteFilter(item.name)"
+                                                      @update:selected-filter="handleUpdateFilter(item.name, $event)"
             />
             <div ref="containerRef"
                  class="filter-dropdown-wrapper"
