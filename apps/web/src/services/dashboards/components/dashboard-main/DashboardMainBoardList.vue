@@ -10,6 +10,7 @@ import {
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
 
+import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -21,7 +22,6 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
 interface Props {

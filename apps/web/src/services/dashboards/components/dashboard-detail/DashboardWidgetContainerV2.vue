@@ -10,6 +10,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataLoader, PEmpty, PButton } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
 import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
 import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
@@ -53,7 +54,6 @@ import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { SharedDataTableInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
 

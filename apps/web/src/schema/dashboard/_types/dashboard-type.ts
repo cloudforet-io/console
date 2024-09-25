@@ -20,7 +20,9 @@ import type { Value } from '@/lib/variable-models/_base/types';
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
 export type DashboardFolderType = 'PUBLIC'|'PRIVATE';
 
-export type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type DashboardModel = PublicDashboardModel & PrivateDashboardModel;
 export type DashboardCreateParams = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
 export type DashboardChangeFolderParams = PublicDashboardChangeFolderParameters | PrivateDashboardChangeFolderParameters;
 
