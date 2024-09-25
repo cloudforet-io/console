@@ -122,7 +122,7 @@ onMounted(() => {
 <style scoped lang="postcss">
 .project-main-tree {
     width: 100%;
-    max-height: 20rem;
+    max-height: 19rem;
     overflow-y: auto;
     .dashboard-menu-item-content {
         @apply flex items-center justify-between w-full;
