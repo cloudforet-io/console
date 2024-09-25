@@ -28,12 +28,12 @@ import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import DashboardFolderBundleMoveModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderBundleMoveModal.vue';
 import DashboardFolderCloneModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderCloneModal.vue';
 import DashboardFolderDeleteModal
     from '@/services/dashboards/components/dashboard-folder/DashboardFolderDeleteModal.vue';
 import DashboardMainFolderFormModal
     from '@/services/dashboards/components/dashboard-folder/DashboardFolderFormModal.vue';
-import DashboardFolderMoveModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderMoveModal.vue';
 import DashboardFolderShareModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderShareModal.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
@@ -72,11 +72,15 @@ const state = reactive({
         return [..._publicDeprecated, ..._privateDeprecated];
     }),
     isDashboardExist: computed<boolean>(() => {
-        if (state.isAdminMode) return !!dashboardMainPageGetters.publicDashboardItems.length;
+        if (state.isAdminMode) {
+            return !!dashboardMainPageGetters.publicDashboardItems.length && !!dashboardMainPageGetters.publicFolderItems.length;
+        }
         return !!(
             dashboardMainPageGetters.publicDashboardItems.length
             || dashboardMainPageGetters.privateDashboardItems.length
             || state.deprecatedDashboardList.length
+            || dashboardMainPageGetters.publicFolderItems.length
+            || dashboardMainPageGetters.privateFolderItems.length
         );
     }),
     treeCollapseMap: {
@@ -223,6 +227,7 @@ onUnmounted(() => {
         <p-divider class="dashboard-divider" />
         <p-toolbox filters-visible
                    search-type="query"
+                   placeholder="Search Dashboard"
                    :pagination-visible="false"
                    :page-size-changeable="false"
                    :key-item-sets="queryState.keyItemSets"
@@ -300,8 +305,8 @@ onUnmounted(() => {
             <dashboard-folder-delete-modal :visible="dashboardMainPageState.folderDeleteModalVisible"
                                            @update:visible="dashboardMainPageStore.setFolderDeleteModalVisible"
             />
-            <dashboard-folder-move-modal :visible="dashboardMainPageState.folderMoveModalVisible"
-                                         @update:visible="dashboardMainPageStore.setFolderMoveModalVisible"
+            <dashboard-folder-bundle-move-modal :visible="dashboardMainPageState.folderMoveModalVisible"
+                                                @update:visible="dashboardMainPageStore.setFolderMoveModalVisible"
             />
             <dashboard-folder-clone-modal :visible="dashboardMainPageState.folderCloneModalVisible"
                                           @update:visible="dashboardMainPageStore.setFolderCloneModalVisible"
