@@ -187,28 +187,32 @@ const handleClickLabel = (label: string) => {
                             />
                         </div>
                         <template v-else>
-                            <p-label v-for="label in node.data?.labels?.slice(0, LABELS_LIMIT)"
-                                     :key="`${node.data.id}-label-${label}`"
-                                     :text="label"
-                                     :clickable="!props.readonlyMode"
-                                     @item-click="handleClickLabel(label)"
-                            />
-                            <p-popover v-if="state.showMoreLabels"
-                                       class="popover"
-                                       position="bottom-end"
-                            >
-                                <p-label :text="`+${node.data.labels.length - LABELS_LIMIT}`"
-                                         clickable
+                            <div class="flex gap-1">
+                                <p-label v-for="label in node.data?.labels?.slice(0, LABELS_LIMIT)"
+                                         :key="`${node.data.id}-label-${label}`"
+                                         :text="label"
+                                         :clickable="!props.readonlyMode"
+                                         @item-click="handleClickLabel(label)"
                                 />
-                                <template #content>
-                                    <p-label v-for="label in node.data.labels.slice(LABELS_LIMIT)"
-                                             :key="`${node.data.id}-label-${label}`"
-                                             :text="label"
-                                             :clickable="!props.readonlyMode"
-                                             @item-click="handleClickLabel(label)"
+
+                                <p-popover v-if="state.showMoreLabels"
+                                           position="bottom-end"
+                                >
+                                    <p-label :text="`+${node.data.labels.length - LABELS_LIMIT}`"
+                                             clickable
                                     />
-                                </template>
-                            </p-popover>
+                                    <template #content>
+                                        <div class="popper-label-wrapper">
+                                            <p-label v-for="label in node.data.labels.slice(LABELS_LIMIT)"
+                                                     :key="`${node.data.id}-label-${label}`"
+                                                     :text="label"
+                                                     :clickable="!props.readonlyMode"
+                                                     @item-click="handleClickLabel(label)"
+                                            />
+                                        </div>
+                                    </template>
+                                </p-popover>
+                            </div>
                         </template>
                     </div>
                 </div>
@@ -249,6 +253,11 @@ const handleClickLabel = (label: string) => {
             .right-part {
                 display: flex;
                 align-items: center;
+                .popper-label-wrapper {
+                    display: grid;
+                    gap: 0.25rem;
+                    min-width: 8rem;
+                }
             }
         }
     }

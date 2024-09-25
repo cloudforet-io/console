@@ -17,6 +17,7 @@ interface ControlButton {
     icon: string;
     clickEvent: () => void;
     disabled?: boolean;
+    styleType?: string;
 }
 interface Props {
     selectedIdMap: Record<string, boolean>;
@@ -71,6 +72,7 @@ const state = reactive({
                 icon: 'ic_delete',
                 clickEvent: () => emit('click-delete'),
                 disabled: !!props.buttonDisableMap?.delete,
+                styleType: 'negative-transparent',
             },
         ];
     }),
@@ -156,6 +158,7 @@ const handleClickShowAll = () => {
                                :key="`control-button-${controlButton.name}`"
                                :name="controlButton.icon"
                                :disabled="controlButton.disabled"
+                               :style-type="controlButton.styleType || 'transparent'"
                                size="sm"
                                @click="controlButton.clickEvent"
                 />
