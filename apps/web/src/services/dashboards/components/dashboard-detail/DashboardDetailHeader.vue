@@ -25,6 +25,8 @@ import { gray } from '@/styles/colors';
 
 import DashboardCloneModal from '@/services/dashboards/components/dashboard-detail/DashboardCloneModal.vue';
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
+import DashboardFolderSingleMoveModal
+    from '@/services/dashboards/components/dashboard-detail/DashboardFolderSingleMoveModal.vue';
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
 import DashboardNameEditModal from '@/services/dashboards/components/dashboard-detail/DashboardNameEditModal.vue';
 import DashboardShareWithCodeModal from '@/services/dashboards/components/dashboard-detail/DashboardShareWithCodeModal.vue';
@@ -57,6 +59,7 @@ const state = reactive({
     shareToProjectModalVisible: false,
     shareModalVisible: false,
     unshareModalVisible: false,
+    folderMoveModalVisible: false,
     isSharedDashboard: computed<boolean>(() => !!dashboardDetailState.dashboardInfo?.shared),
     sharedScope: computed<DashboardScope|undefined>(() => dashboardDetailState.dashboardInfo?.scope),
     selectedSharedScope: 'WORKSPACE' as DashboardScope,
@@ -139,6 +142,12 @@ const state = reactive({
                 label: i18n.t('DASHBOARDS.DETAIL.CLONE'),
                 icon: 'ic_clone',
             },
+            {
+                type: 'item',
+                name: 'move',
+                label: i18n.t('DASHBOARDS.DETAIL.MOVE'),
+                icon: 'ic_move',
+            },
             { type: 'divider', name: 'divider' },
             {
                 type: 'item',
@@ -157,7 +166,8 @@ const state = reactive({
         ];
     }),
     folderName: computed<string|undefined>(() => {
-        const folder = dashboardGetters.allFolderItems.find((d) => d.folder_id === dashboardDetailState.dashboardInfo?.folder_id);
+        const _folderId = dashboardGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
+        const folder = dashboardGetters.allFolderItems.find((d) => d.folder_id === _folderId);
         return folder?.name;
     }),
 });
@@ -207,6 +217,7 @@ const handleSelectItem = (selected: MenuItem) => {
         state.selectedSharedScope = 'WORKSPACE';
         state.shareModalVisible = true;
     }
+    if (selected.name === 'move') state.folderMoveModalVisible = true;
     if (selected.name === 'unshare') state.unshareModalVisible = true;
     if (selected.name === 'shareProject') {
         state.shareToProjectModalVisible = true;
@@ -237,7 +248,7 @@ const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
 
 <template>
     <div class="dashboard-detail-header">
-        <div v-if="dashboardDetailState.dashboardInfo?.folder_id"
+        <div v-if="state.folderName"
              class="folder-name-wrapper"
         >
             <p-i name="ic_folder"
@@ -350,6 +361,10 @@ const handleSelectSharedDashboardScope = (scope: DashboardScope) => {
                 {{ state.isSharedDashboard ? $t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS_DESC') : $t('DASHBOARDS.DETAIL.SHARE_TO_ALL_PROJECTS_DESC') }}
             </template>
         </p-button-modal>
+        <!-- Move Modal -->
+        <dashboard-folder-single-move-modal :dashboard-id="props.dashboardId"
+                                            :visible.sync="state.folderMoveModalVisible"
+        />
     </div>
 </template>
 
