@@ -1977,6 +1977,8 @@
 			"ADD_WIDGET": "ウィジェットを追加する",
 			"ALL_PROJECTS": "すべてのプロジェクト",
 			"ALL_WORKSPACES": "すべてのワークスペース",
+			"ALT_E_MOVE_DASHBOARD": "",
+			"ALT_S_MOVE_DASHBOARD": "",
 			"ALT_S_SHARE_DASHBOARD": "ダッシュボードの共有が成功しました",
 			"ALT_S_UNSHARE_DASHBOARD": "ダッシュボードの共有解除が成功しました",
 			"APPLY": "確認",
@@ -1997,6 +1999,8 @@
 			"EDIT_DASHBOARD_NAME": "ダッシュボード名の編集",
 			"EDIT_LAYOUT": "レイアウトを編集する",
 			"EXPORT": "エクスポート",
+			"MOVE": "",
+			"MOVE_DASHBOARDS": "",
 			"NO_WIDGET_TEXT": "データを追加して、ニーズに合わせたカスタムダッシュボードを設計してください。",
 			"OTHER_MONTHS": "他の月",
 			"PDF_EXPORT": {
