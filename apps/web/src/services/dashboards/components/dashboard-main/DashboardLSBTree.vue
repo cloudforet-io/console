@@ -107,7 +107,7 @@ onMounted(() => {
                         />
                         <span class="text">{{ node.data.name }}</span>
                     </div>
-                    <favorite-button v-if="node.type === 'DASHBOARD'"
+                    <favorite-button v-if="node.data.type === 'DASHBOARD'"
                                      :item-id="node.id"
                                      :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                      scale="0.8"
@@ -122,6 +122,8 @@ onMounted(() => {
 <style scoped lang="postcss">
 .project-main-tree {
     width: 100%;
+    max-height: 20rem;
+    overflow-y: auto;
     .dashboard-menu-item-content {
         @apply flex items-center justify-between w-full;
         height: 2rem;
