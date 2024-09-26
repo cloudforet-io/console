@@ -3146,7 +3146,9 @@
 					"SET_FILTER": "필터 설정"
 				},
 				"NO_REGION": "리전이 없습니다.",
+				"PROJECT": "프로젝트",
 				"REGION": "지역",
+				"SERVICE_ACCOUNT": "서비스 어카운트",
 				"SERVICE_CATEGORY": "서비스 분류",
 				"SERVICE_PROVIDER": "서비스 제공자",
 				"SET": "설정",

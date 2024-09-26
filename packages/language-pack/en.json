@@ -3146,7 +3146,9 @@
 					"SET_FILTER": "Set Filter"
 				},
 				"NO_REGION": "No Region",
+				"PROJECT": "Project",
 				"REGION": "Region",
+				"SERVICE_ACCOUNT": "Service Account",
 				"SERVICE_CATEGORY": "Service Category",
 				"SERVICE_PROVIDER": "Service Providers",
 				"SET": "Set",
