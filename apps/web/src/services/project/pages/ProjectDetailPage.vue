@@ -544,7 +544,6 @@ onUnmounted(() => {
             />
             <project-form-modal v-if="state.projectEditModalVisible"
                                 :visible.sync="state.projectEditModalVisible"
-                                :project-group-id="state.parentGroupId"
                                 :project-id="props.id"
                                 @confirm="handleConfirmProjectForm"
             />

@@ -99,6 +99,9 @@ export const useProjectPageStore = defineStore('page-project', () => {
     const setProjectGroupFormVisible = (val?: boolean) => {
         state.projectGroupFormVisible = !!val;
     };
+    const setProjectGroupFormUpdateMode = (val?: boolean) => {
+        state.projectGroupFormUpdateMode = !!val;
+    };
     const setTreeEditMode = (val?: boolean) => {
         state.treeEditMode = !!val;
     };
@@ -296,6 +299,7 @@ export const useProjectPageStore = defineStore('page-project', () => {
         setRootNode,
         setCurrentSelectedProjectId,
         setCurrentSelectedProjectGroupId,
+        setProjectGroupFormUpdateMode,
     };
     const actions = {
         reset,
