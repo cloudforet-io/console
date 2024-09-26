@@ -9,12 +9,18 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap, RegionReferenceItem } from '@/store/reference/region-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 
-import { CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
+import {
+    CLOUD_SERVICE_CATEGORY,
+    CLOUD_SERVICE_FILTER_KEY,
+    CLOUD_SERVICE_GLOBAL_FILTER_KEY,
+} from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { RegionMenuItem } from '@/services/asset-inventory/helpers/cloud-service-filter-helper';
 import { getRegionFilterMenuItem } from '@/services/asset-inventory/helpers/cloud-service-filter-helper';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
@@ -53,6 +59,8 @@ const cloudServicePageState = cloudServicePageStore.$state;
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
 });
 const state = reactive({
     searchTerm: '',
@@ -75,6 +83,18 @@ const state = reactive({
     }),
     regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => getRegionFilterMenuItem(d.key, storeState.regions, storeState.providers))),
     menuItems: computed<SelectDropdownMenuItem[]|RegionMenuItem[]>(() => {
+        if (props.type === CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT) {
+            return Object.values(storeState.projects).map((d) => ({
+                name: d.key,
+                label: d.label,
+            }));
+        }
+        if (props.type === CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT) {
+            return Object.values(storeState.serviceAccounts).map((d) => ({
+                name: d.key,
+                label: d.label,
+            }));
+        }
         if (props.type === CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY) {
             return categoryItems;
         } if (props.type === CLOUD_SERVICE_FILTER_KEY.REGION) {
@@ -84,9 +104,9 @@ const state = reactive({
     }),
     menuLoading: false,
 });
-const regionMenuHandler = (inputText: string) => {
+const menuHandler = (inputText: string) => {
     const trimmed = inputText?.trim();
-    let results: RegionMenuItem[];
+    let results: SelectDropdownMenuItem[]|RegionMenuItem[];
     if (trimmed) {
         const regex = getTextHighlightRegex(inputText);
         results = state.menuItems.filter((d) => regex.test(d.label));
@@ -116,7 +136,7 @@ const handleChangeSelected = (selected?: SelectDropdownMenuItem[]) => {
                        multi-selectable
                        use-fixed-menu-style
                        show-select-marker
-                       :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
+                       :handler="type !== CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY ? menuHandler : undefined"
                        is-filterable
                        show-select-header
                        @click-done="handleChangeSelected"

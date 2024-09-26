@@ -3208,7 +3208,9 @@
 					"SET_FILTER": "フィルター設定"
 				},
 				"NO_REGION": "リージョンがありません。",
+				"PROJECT": "プロジェクト",
 				"REGION": "リージョン",
+				"SERVICE_ACCOUNT": "サービスアカウント",
 				"SERVICE_CATEGORY": "サービスカテゴリー",
 				"SERVICE_PROVIDER": "サービスプロバイダー",
 				"SET": "設定",
