@@ -3,12 +3,14 @@ import { computed, reactive } from 'vue';
 
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PToolbox } from '@cloudforet/mirinae';
 import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 
 import CloudServiceExcelExportOptionModal from '@/services/asset-inventory/components/CloudServiceExcelExportOptionModal.vue';
+import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { Period } from '@/services/asset-inventory/types/type';
 
@@ -37,14 +39,16 @@ const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): v
 
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServiceLSBStore = useCloudServiceLSBStore();
 
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyItemSets ?? []);
 const state = reactive({
     queryTags: computed(() => searchQueryHelper.setFilters(cloudServicePageState.searchFilters).queryTags),
-    cloudServiceFilters: computed(() => cloudServicePageStore.allFilters.filter((f: any) => ![
-        'labels',
-        'service_code',
-    ].includes(f.k))),
+    cloudServiceFilters: computed<ConsoleFilter[]>(() => [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.getters.allFilters]
+        .filter((f: any) => ![
+            'labels',
+            'service_code',
+        ].includes(f.k))),
     keyItemSets: computed(() => props.handlers?.keyItemSets ?? []),
 });
 

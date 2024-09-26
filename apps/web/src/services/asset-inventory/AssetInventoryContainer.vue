@@ -15,9 +15,11 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 import AssetInventoryLSB from '@/services/asset-inventory/AssetInventoryLSB.vue';
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
+import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 
 const cloudServicePageStore = useCloudServicePageStore();
+const cloudServiceLSBStore = useCloudServiceLSBStore();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const assetInventorySettings = useAssetInventorySettingsStore();
 
@@ -42,6 +44,8 @@ assetInventorySettings.$onAction((action) => {
 });
 
 onUnmounted(() => {
+    cloudServiceLSBStore.$dispose();
+    cloudServiceLSBStore.$reset();
     cloudServicePageStore.$dispose();
     cloudServicePageStore.$reset();
     cloudServiceDetailPageStore.$dispose();
