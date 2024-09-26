@@ -190,10 +190,13 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         setFolderShareModalVisible(false);
         setSearchQueryTags([]);
     };
-    const resetSelectedIdMap = (type: 'PUBLIC'|'PRIVATE') => {
+    const resetSelectedIdMap = (type?: 'PUBLIC'|'PRIVATE') => {
         if (type === 'PUBLIC') {
             setSelectedPublicIdMap({});
+        } else if (type === 'PRIVATE') {
+            setSelectedPrivateIdMap({});
         } else {
+            setSelectedPublicIdMap({});
             setSelectedPrivateIdMap({});
         }
     };

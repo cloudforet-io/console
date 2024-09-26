@@ -575,6 +575,7 @@ watch([ // Fetch Dynamic Field
                                   :placeholder="$t('COMMON.WIDGETS.MAX_ITEMS')"
                                   :invalid="!state.proxyValue?.dynamicFieldInfo?.count"
                                   :value="state.proxyValue?.dynamicFieldInfo?.count"
+                                  block
                                   @update:value="handleUpdateCount"
                     />
                 </div>
@@ -604,11 +605,6 @@ watch([ // Fetch Dynamic Field
 }
 .dynamic-field-value-contents-wrapper {
     margin-top: 0.5rem;
-
-    /* custom design-system component - p-text-input */
-    :deep(.p-text-input) {
-        max-width: 7.5rem;
-    }
 }
 
 /* custom design-system component - p-field-group */

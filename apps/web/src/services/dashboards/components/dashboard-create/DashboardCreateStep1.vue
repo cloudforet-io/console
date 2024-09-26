@@ -80,7 +80,10 @@ const state = reactive({
             dashboardItems = dashboardGetters.privateDashboardItems;
         }
         const _refinedDashboardItems = dashboardItems.filter((d) => d.version !== '1.0');
-        return getDashboardTreeData(folderItems, _refinedDashboardItems);
+        return getDashboardTreeData(folderItems, _refinedDashboardItems).filter((d) => {
+            if (d.data.type === 'FOLDER') return !!d.children?.length;
+            return true;
+        });
     }),
     allExistingLabels: computed(() => {
         const ootbTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);

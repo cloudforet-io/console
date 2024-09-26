@@ -5,9 +5,11 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
 } from '@cloudforet/mirinae';
+import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
 import type {
     HandlerResponse, KeyDataType, KeyItem, KeyItemSet, ValueHandler, ValueMenuItem,
@@ -40,6 +42,7 @@ import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
+import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -66,6 +69,8 @@ const storeState = reactive({
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: computed(() => dashboardState.loading),
+    refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardMainPageGetters.publicDashboardTreeData, dashboardState.searchFilters)),
+    refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardMainPageGetters.privateDashboardTreeData, dashboardState.searchFilters)),
     deprecatedDashboardList: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
         const _publicDeprecated = dashboardGetters.workspaceDashboardItems.filter((d) => d.version === '1.0');
         const _privateDeprecated = dashboardGetters.privateDashboardItems.filter((d) => d.version === '1.0');
@@ -109,6 +114,15 @@ const queryState = reactive({
     })),
     queryTags: computed<QueryTag[]>(() => queryTagsHelper.queryTags.value),
 });
+
+/* Util */
+const getSearchedTreeData = (treeData: TreeNode<DashboardTreeDataType>[], searchFilters: ConsoleFilter[]): TreeNode<DashboardTreeDataType>[] => {
+    if (!searchFilters.length) return treeData;
+    return treeData.filter((node) => {
+        if (node.data.type === 'DASHBOARD') return true;
+        return !!node.children?.length;
+    });
+};
 
 const handleCreateDashboard = () => { router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME })); };
 const handleCreateFolder = () => {
@@ -197,12 +211,15 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
 
 watch(() => dashboardMainPageState.searchQueryTags, (queryTags) => {
     queryTagsHelper.setQueryTags(queryTags || []);
+    dashboardMainPageStore.resetSelectedIdMap();
     dashboardStore.setSearchFilters(queryTagsHelper.filters.value);
     dashboardStore.load();
 }, { immediate: true });
 
 onUnmounted(() => {
     if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
+    dashboardStore.setSearchFilters([]);
+    dashboardStore.load();
 });
 </script>
 
@@ -269,7 +286,7 @@ onUnmounted(() => {
                 />
                 <dashboard-folder-tree v-if="!state.treeCollapseMap.public"
                                        :selected-id-map="dashboardMainPageState.selectedPublicIdMap"
-                                       :dashboard-tree-data="dashboardMainPageGetters.publicDashboardTreeData"
+                                       :dashboard-tree-data="state.refinedPublicTreeData"
                                        :button-disable-map="state.publicTreeControlButtonDisableMap"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
                                        @click-clone="handleClickCloneButton('PUBLIC')"
@@ -285,7 +302,7 @@ onUnmounted(() => {
                 />
                 <dashboard-folder-tree v-if="!state.treeCollapseMap.private"
                                        :selected-id-map="dashboardMainPageState.selectedPrivateIdMap"
-                                       :dashboard-tree-data="dashboardMainPageGetters.privateDashboardTreeData"
+                                       :dashboard-tree-data="state.refinedPrivateTreeData"
                                        :button-disable-map="dashboardMainPageGetters.privateTreeControlButtonDisableMap"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
                                        @click-clone="handleClickCloneButton('PRIVATE')"

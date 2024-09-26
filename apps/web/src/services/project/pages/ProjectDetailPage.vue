@@ -156,6 +156,7 @@ const state = reactive({
     projectGroupMoveModalVisible: false,
     projectDeleteModalVisible: false,
     projectEditModalVisible: false,
+    isHeaderIconHovered: false,
 });
 
 const memberState = reactive({
@@ -242,6 +243,20 @@ const handleConfirmProjectGroupMoveModal = () => {
 
 const handleRefreshTree = () => {
     projectTreeStore.refreshProjectTree();
+};
+
+const handleHeaderIconHover = (isHovered: boolean) => {
+    state.isHeaderIconHovered = isHovered;
+};
+const handleClickBackButton = () => {
+    if (state.parentGroupId) {
+        router.push({
+            name: PROJECT_ROUTE._NAME,
+            params: { projectGroupId: state.parentGroupId },
+        });
+        return;
+    }
+    router.push({ name: PROJECT_ROUTE._NAME });
 };
 
 
@@ -353,7 +368,25 @@ onUnmounted(() => {
 <template>
     <div class="project-detail-page">
         <div class="header-container">
-            <div class="header-icon-wrapper">
+            <div class="header-icon-wrapper tablet"
+                 @mouseover="handleHeaderIconHover(true)"
+                 @mouseleave="handleHeaderIconHover(false)"
+            >
+                <p-i :name="state.isHeaderIconHovered ? 'ic_arrow-left' : 'ic_document-filled'"
+                     width="1.5rem"
+                     height="1.5rem"
+                     :color="state.isHeaderIconHovered ? gray[900] : peacock[600]"
+                     @click="handleClickBackButton"
+                />
+            </div>
+            <div class="header-icon-wrapper mobile">
+                <p-i name="ic_arrow-left"
+                     width="1.5rem"
+                     height="1.5rem"
+                     :color="gray[900]"
+                     class="cursor-pointer mr-2"
+                     @click="handleClickBackButton"
+                />
                 <p-i name="ic_document-filled"
                      width="1.5rem"
                      height="1.5rem"
@@ -557,6 +590,13 @@ onUnmounted(() => {
             height: 3.5rem;
             border-radius: 0.75rem;
             background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            &.tablet {
+                display: flex;
+            }
+            &.mobile {
+                display: none;
+            }
         }
         .header-contents {
             .title-wrapper {
@@ -631,6 +671,26 @@ onUnmounted(() => {
 
         .field-title {
             @apply text-label-md font-bold text-gray-600;
+        }
+    }
+}
+
+@screen mobile {
+    .project-detail-page {
+        .header-container {
+            .header-icon-wrapper {
+                @apply bg-transparent;
+                align-items: flex-start;
+                cursor: default;
+                border: none;
+                padding-top: 0.25rem;
+                &.tablet {
+                    display: none;
+                }
+                &.mobile {
+                    display: flex;
+                }
+            }
         }
     }
 }
