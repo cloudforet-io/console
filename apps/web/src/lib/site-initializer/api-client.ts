@@ -220,11 +220,13 @@ const getAfterCallApiMap = () => ({
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('public_folder', data);
+        allReferenceStore.load('public_dashboard', { force: true });
     },
     '/dashboard/public-folder/unshare': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('public_folder', data);
+        allReferenceStore.load('public_dashboard', { force: true });
     },
 });
 
