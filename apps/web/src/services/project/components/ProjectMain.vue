@@ -7,13 +7,12 @@ import { uniq } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldTitle, PToolbox, PEmpty, PPaneLayout,
+    PFieldTitle, PEmpty, PPaneLayout,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -56,31 +55,14 @@ const state = reactive({
         }));
         return allProjectList.filter((project) => project.parentId === state.currentProjectGroupId);
     }),
-    filteredCardList: computed<ProjectCardItemType[]>(() => {
-        const projectGroupListFilteredByKeyword = state.currentProjectGroupList.filter((item) => item.name.includes(state.searchText));
-        const projectListFilteredByKeyword = state.currentProjectList.filter((item) => item.name.includes(state.searchText));
-        return [...projectGroupListFilteredByKeyword, ...projectListFilteredByKeyword];
-    }),
+    filteredCardList: computed<ProjectCardItemType[]>(() => [...state.currentProjectGroupList, ...state.currentProjectList]),
     paginatedCardList: computed(() => ({
         projectGroup: state.filteredCardList.filter((item) => item.type === 'projectGroup'),
         project: state.filteredCardList.filter((item) => item.type === 'project'),
     })),
-    searchText: '',
-    searchResultLabelText: computed(() => `${i18n.t('PROJECT.LANDING.SEARCH_RESULT_LABEL')} "${state.searchText}"`),
-    placeholer: computed(() => {
-        const defaultPlaceholder = i18n.t('PROJECT.LANDING.SEARCH_PLACEHOLDER') as string;
-        return defaultPlaceholder;
-    }),
 });
 
-/* Event */
-const handleChange = async (options?: any) => {
-    if (options?.searchText !== undefined) {
-        state.searchText = options.searchText;
-    }
-};
-
-/* Utill */
+/* Util */
 const getDistinctProviders = (projectId: string): string[] => uniq(state.serviceAccountList.filter((d) => d.project_id === projectId).map((d) => d.provider));
 
 const listServiceAccount = async () => {
@@ -106,24 +88,11 @@ onMounted(async () => {
 
 <template>
     <p-pane-layout class="project-main">
-        <p-toolbox class="project-tool-box"
-                   :placeholder="state.placeholer"
-                   :pagination-visible="false"
-                   :page-size-changeable="false"
-                   :refreshable="false"
-                   @change="handleChange"
-        />
         <div class="project-contents">
-            <p v-if="state.searchText"
-               class="search-result-label"
-            >
-                {{ state.searchResultLabelText }}
-            </p>
             <div v-if="state.paginatedCardList.projectGroup.length"
                  class="contents-wrapper"
             >
-                <p-field-title v-if="!state.searchText"
-                               class="content-title"
+                <p-field-title class="content-title"
                                :label="$t('PROJECT.LANDING.PROJECT_GROUP')"
                 />
                 <div class="card-contents">
@@ -137,8 +106,7 @@ onMounted(async () => {
             <div v-if="state.paginatedCardList.project.length"
                  class="contents-wrapper"
             >
-                <p-field-title v-if="!state.searchText"
-                               class="content-title"
+                <p-field-title class="content-title"
                                :label="$t('PROJECT.LANDING.PROJECT')"
                 />
                 <div class="card-contents">
@@ -155,7 +123,7 @@ onMounted(async () => {
                      class="empty-contents"
             >
                 <div class="empty-text">
-                    <p>{{ state.searchText ? $t('PROJECT.LANDING.EMPTY_TEXT_SEARCH') : $t('PROJECT.LANDING.EMPTY_TEXT') }}</p>
+                    <p>{{ $t('PROJECT.LANDING.EMPTY_TEXT') }}</p>
                 </div>
             </p-empty>
         </div>
@@ -165,15 +133,6 @@ onMounted(async () => {
 <style scoped lang="postcss">
 .project-main {
     padding: 1.5rem 1rem 2.5rem;
-
-    .project-tool-box {
-        margin-bottom: 0.5rem;
-    }
-
-    .search-result-label {
-        @apply text-label-md font-bold text-gray-900;
-        margin-bottom: 1.5rem;
-    }
 
     .project-contents {
         .contents-wrapper {
