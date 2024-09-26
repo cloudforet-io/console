@@ -3,11 +3,13 @@ import { computed, reactive } from 'vue';
 
 import CloudServiceFilterSearchDropdown
     from '@/services/asset-inventory/components/CloudServiceFilterSearchDropdown.vue';
+import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 
 interface Props {
     type: string;
     label: string;
+    isGlobalFilter?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -17,12 +19,25 @@ const props = withDefaults(defineProps<Props>(), {
 
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServiceLSBStore = useCloudServiceLSBStore();
+const cloudServiceLSBState = cloudServiceLSBStore.$state;
 
 const state = reactive({
-    filters: computed(() => cloudServicePageState.additionalFilters),
+    filters: computed(() => {
+        if (props.isGlobalFilter) {
+            return cloudServiceLSBState.globalFilters;
+        }
+        return cloudServicePageState.additionalFilters;
+    }),
 });
 
 const handleFilterUpdate = (name: string, selected: string[]) => {
+    if (props.isGlobalFilter) {
+        cloudServiceLSBStore.$patch((_state) => {
+            _state.globalFilters = { ...state.filters, [name]: selected };
+        });
+        return;
+    }
     cloudServicePageStore.$patch((_state) => {
         _state.additionalFilters = { ...state.filters, [name]: selected };
     });

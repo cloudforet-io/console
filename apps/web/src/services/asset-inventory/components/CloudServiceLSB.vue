@@ -30,7 +30,10 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import CloudServiceLSBDropdownMenuItem from '@/services/asset-inventory/components/CloudServiceLSBDropdownMenuItem.vue';
-import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
+import {
+    CLOUD_SERVICE_FILTER_KEY,
+    CLOUD_SERVICE_GLOBAL_FILTER_KEY,
+} from '@/services/asset-inventory/constants/cloud-service-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
@@ -143,12 +146,12 @@ const state = reactive({
     menuSet: computed<LSBMenu[]>(() => [
         {
             type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: i18n.t('Project'),
+            label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.PROJECT'),
             id: PROJECT_MENU_ID,
         },
         {
             type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: i18n.t('Service Account'),
+            label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_ACCOUNT'),
             id: SERVICE_ACCOUNT_MENU_ID,
         },
         ...state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet,
@@ -223,13 +226,15 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
     >
         <template #collapsible-contents-project>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
-                                                    :type="CLOUD_SERVICE_FILTER_KEY.PROJECT"
+                                                    is-global-filter
+                                                    :type="CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT"
                                                     :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
             />
         </template>
         <template #collapsible-contents-service-account>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
-                                                    :type="CLOUD_SERVICE_FILTER_KEY.SERVICE_ACCOUNT"
+                                                    is-global-filter
+                                                    :type="CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT"
                                                     :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
             />
         </template>

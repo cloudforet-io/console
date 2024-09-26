@@ -16,7 +16,11 @@ import type { ServiceAccountReferenceMap } from '@/store/reference/service-accou
 
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 
-import { CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
+import {
+    CLOUD_SERVICE_CATEGORY,
+    CLOUD_SERVICE_FILTER_KEY,
+    CLOUD_SERVICE_GLOBAL_FILTER_KEY,
+} from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { RegionMenuItem } from '@/services/asset-inventory/helpers/cloud-service-filter-helper';
 import { getRegionFilterMenuItem } from '@/services/asset-inventory/helpers/cloud-service-filter-helper';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
@@ -79,13 +83,13 @@ const state = reactive({
     }),
     regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => getRegionFilterMenuItem(d.key, storeState.regions, storeState.providers))),
     menuItems: computed<SelectDropdownMenuItem[]|RegionMenuItem[]>(() => {
-        if (props.type === CLOUD_SERVICE_FILTER_KEY.PROJECT) {
+        if (props.type === CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT) {
             return Object.values(storeState.projects).map((d) => ({
                 name: d.key,
                 label: d.label,
             }));
         }
-        if (props.type === CLOUD_SERVICE_FILTER_KEY.SERVICE_ACCOUNT) {
+        if (props.type === CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT) {
             return Object.values(storeState.serviceAccounts).map((d) => ({
                 name: d.key,
                 label: d.label,
