@@ -115,8 +115,8 @@ const fetchOptionState = reactive({
 
 const state = reactive({
     urlQueryString: computed(() => ({
-        project: arrayToQueryString(cloudServiceLSBStore.selectedProjects),
-        service_account: arrayToQueryString(cloudServiceLSBStore.selectedServiceAccounts),
+        project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
+        service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
         filters: urlQueryStringFilters.value,
     })),
 });
@@ -298,7 +298,7 @@ const getQuery = () => {
     apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters(hiddenFilters.value)
-        .addFilter(...cloudServiceLSBStore.allFilters)
+        .addFilter(...cloudServiceLSBStore.getters.allFilters)
         .addFilter(...searchFilters.value);
 
     if (props.isSecurityPage) {
@@ -431,7 +431,7 @@ const initDefaultFilter = () => {
 };
 const initExcelFilter = () => {
     excelQuery.setFiltersAsRawQueryString(route.query.filters);
-    excelQuery.addFilter(...cloudServiceLSBStore.allFilters);
+    excelQuery.addFilter(...cloudServiceLSBStore.getters.allFilters);
 };
 
 /* Actions */

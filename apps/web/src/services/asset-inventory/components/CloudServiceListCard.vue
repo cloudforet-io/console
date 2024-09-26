@@ -94,8 +94,8 @@ const getCloudServiceDetailLink = (item: CloudServiceAnalyzeResult, resource?: C
             name: targetCloudServiceType.cloud_service_type,
         },
         query: {
-            project: arrayToQueryString(cloudServiceLSBStore.selectedProjects),
-            service_account: arrayToQueryString(cloudServiceLSBStore.selectedServiceAccounts),
+            project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
+            service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
             filters: cloudServiceDetailQueryHelper.rawQueryStrings,
             period: objectToQueryString(cloudServicePageState.period),
         },

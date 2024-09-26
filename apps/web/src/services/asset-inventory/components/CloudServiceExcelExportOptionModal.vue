@@ -3,6 +3,7 @@ import {
     defineProps, defineEmits, reactive, computed,
 } from 'vue';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -58,7 +59,7 @@ const state = reactive({
     downloadOptions: [DEFAULT_CONTENTS, DETAIL_CONTENTS] as string[],
     allOptionValue: false,
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-    cloudServiceFilters: computed(() => [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.allFilters]
+    cloudServiceFilters: computed<ConsoleFilter[]>(() => [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.getters.allFilters]
         .filter((f: any) => ![
             'service_code',
         ].includes(f.k)).map((f) => {

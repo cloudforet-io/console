@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -17,19 +17,19 @@ export const useCloudServiceLSBStore = defineStore('cloud-service-l-s-b', () => 
     });
 
     const getters = reactive({
-        selectedProjects: (): string[] => state.globalFilters[CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT] ?? [],
-        selectedServiceAccounts: (): string[] => state.globalFilters[CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT] ?? [],
-        allFilters(): ConsoleFilter[] {
+        selectedProjects: computed((): string[] => state.globalFilters[CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT] ?? []),
+        selectedServiceAccounts: computed((): string[] => state.globalFilters[CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT] ?? []),
+        allFilters: computed<ConsoleFilter[]>(() => {
             const filters: ConsoleFilter[] = [
             ];
-            if (this.selectedProjects.length) {
-                filters.push({ k: CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT, v: state.globalFilters[CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT] ?? [], o: '=' });
+            if (getters.selectedProjects.length) {
+                filters.push({ k: CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT, v: getters.selectedProjects, o: '=' });
             }
-            if (this.selectedServiceAccounts.length) {
-                filters.push({ k: `collection_info.${CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT}`, v: state.globalFilters[CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT] ?? [], o: '=' });
+            if (getters.selectedServiceAccounts.length) {
+                filters.push({ k: `collection_info.${CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT}`, v: getters.selectedServiceAccounts, o: '=' });
             }
             return filters;
-        },
+        }),
     });
 
     const mutations = {

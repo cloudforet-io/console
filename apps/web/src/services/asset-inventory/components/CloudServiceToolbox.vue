@@ -3,6 +3,7 @@ import { computed, reactive } from 'vue';
 
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PToolbox } from '@cloudforet/mirinae';
 import type { QueryTag } from '@cloudforet/mirinae/types/inputs/search/query-search-tags/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
@@ -43,7 +44,7 @@ const cloudServiceLSBStore = useCloudServiceLSBStore();
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyItemSets ?? []);
 const state = reactive({
     queryTags: computed(() => searchQueryHelper.setFilters(cloudServicePageState.searchFilters).queryTags),
-    cloudServiceFilters: computed(() => [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.allFilters]
+    cloudServiceFilters: computed<ConsoleFilter[]>(() => [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.getters.allFilters]
         .filter((f: any) => ![
             'labels',
             'service_code',

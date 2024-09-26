@@ -114,8 +114,8 @@ const state = reactive({
         provider: cloudServicePageState.selectedProvider === 'all' ? null : primitiveToQueryString(cloudServicePageState.selectedProvider),
         service: arrayToQueryString(cloudServicePageStore.selectedCategories),
         region: arrayToQueryString(cloudServicePageStore.selectedRegions),
-        project: arrayToQueryString(cloudServiceLSBStore.selectedProjects),
-        service_account: arrayToQueryString(cloudServiceLSBStore.selectedServiceAccounts),
+        project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
+        service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
         // period: objectToQueryString(cloudServicePageState.period),
         filters: searchQueryHelper.setFilters(cloudServicePageState.searchFilters).rawQueryStrings,
     })),
@@ -155,7 +155,7 @@ const listCloudServiceType = async () => {
 
         const { status, response } = await fetcher({
             query: getCloudServiceAnalyzeQuery(
-                [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.allFilters],
+                [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.getters.allFilters],
                 { start: state.pageStart, limit: state.pageLimit },
                 cloudServicePageState.period,
             ),

@@ -77,7 +77,7 @@ const apiQuery = new ApiQueryHelper();
 const getCloudServiceListQuery = () => {
     apiQuery.setMultiSortV2([{ key: 'created_at', desc: true }])
         .setFilters(props.hiddenFilters.concat(cloudServiceDetailPageStoreState.searchFilters))
-        .addFilter(...cloudServiceLSBStore.allFilters);
+        .addFilter(...cloudServiceLSBStore.getters.allFilters);
     return apiQuery.data;
 };
 

@@ -5,7 +5,7 @@ import CloudServiceFilterSearchDropdown
     from '@/services/asset-inventory/components/CloudServiceFilterSearchDropdown.vue';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-import type { CloudServiceGlobalFilterMap } from '@/services/asset-inventory/types/cloud-service-page-type';
+import type { CloudServiceGlobalFilterMap, CloudServiceFilterMap } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 interface Props {
     type: string;
@@ -24,7 +24,7 @@ const cloudServiceLSBStore = useCloudServiceLSBStore();
 const cloudServiceLSBState = cloudServiceLSBStore.state;
 
 const state = reactive({
-    filters: computed(() => {
+    filters: computed<CloudServiceFilterMap|CloudServiceGlobalFilterMap>(() => {
         if (props.isGlobalFilter) {
             return cloudServiceLSBState.globalFilters;
         }
@@ -38,7 +38,7 @@ const handleFilterUpdate = (name: string, selected: string[]) => {
         return;
     }
     cloudServicePageStore.$patch((_state) => {
-        _state.additionalFilters = { ...state.filters, [name]: selected };
+        _state.additionalFilters = { ...state.filters, [name]: selected } as CloudServiceFilterMap;
     });
 };
 </script>
