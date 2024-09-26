@@ -110,8 +110,8 @@ onMounted(async () => {
                    :placeholder="state.placeholer"
                    :pagination-visible="false"
                    :page-size-changeable="false"
+                   :refreshable="false"
                    @change="handleChange"
-                   @refresh="handleChange()"
         />
         <div class="project-contents">
             <p v-if="state.searchText"
