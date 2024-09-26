@@ -294,120 +294,6 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 
 <template>
     <div class="metric-explorer-l-s-b">
-        <l-s-b ref="lsbRef"
-               :menu-set="state.menuSet"
-        >
-            <template #collapsible-contents-starred>
-                <div v-if="state.starredMenuSet.length > 0">
-                    <p-tooltip v-for="(item, idx) of state.starredMenuSet"
-                               :key="`asset-analysis-starred-${idx}`"
-                               position="bottom"
-                               :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${storeState.metrics[item.to?.params?.metricId || '']?.name} > ${item.label}` : item.label"
-                    >
-                        <l-s-b-router-menu-item :item="item"
-                                                :idx="idx"
-                                                :current-path="state.currentPath"
-                                                is-hide-favorite
-                        />
-                    </p-tooltip>
-                </div>
-                <span v-else
-                      class="no-data"
-                >
-                    <p-i class="menu-icon"
-                         name="ic_star-filled"
-                         height="1rem"
-                         width="1rem"
-                         :color="yellow[500]"
-                    />
-                    {{ $t('COMMON.STARRED_NO_DATA') }}
-                </span>
-            </template>
-            <template #slot-namespace>
-                <p-data-loader :loading="state.loading"
-                               :loader-backdrop-opacity="0.5"
-                               :loader-backdrop-color="gray[100]"
-                               class="namespace-data-loader"
-                >
-                    <l-s-b-menu-item :menu-data="state.namespaceTopTitleMenu"
-                                     :current-path="state.currentPath"
-                                     :depth="1"
-                    />
-                    <div class="namespace-wrapper">
-                        <p-search class="namespace-search"
-                                  :value="namespaceState.inputValue"
-                                  @update:value="handleSearchNamespace"
-                        />
-                        <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
-                                                     v-show="!namespaceState.inputValue"
-                                                     :key="`namespace-${idx}`"
-                                                     class="category-menu-item"
-                                                     :item="item"
-                                                     is-sub-item
-                                                     :override-collapsed="item.initialCollapsed"
-                        >
-                            <template #left-image>
-                                <img v-if="item.icon === 'COMMON'"
-                                     class="title-image"
-                                     src="@/assets/images/img_common-asset@2x.png"
-                                     alt="common-namespace-image"
-                                >
-                                <p-lazy-img v-else
-                                            class="title-image"
-                                            :src="item.icon"
-                                            width="1rem"
-                                            height="1rem"
-                                />
-                            </template>
-                            <template #collapsible-contents="{ item: _item }">
-                                <div v-for="(_menu, _idx) in _item.subItems"
-                                     :key="`${_menu.label}-${_idx}`"
-                                     :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                     @click="handleClickNamespace(_menu)"
-                                >
-                                    <span class="text">
-                                        {{ _menu?.label || '' }}
-                                    </span>
-                                </div>
-                            </template>
-                        </l-s-b-collapsible-menu-item>
-                        <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
-                                                     v-show="namespaceState.inputValue"
-                                                     :key="`namespace-search-${idx}`"
-                                                     class="category-menu-item category-menu-item-by-keyword"
-                                                     :item="item"
-                                                     is-sub-item
-                                                     :override-collapsed="namespaceState.collapsed"
-                        >
-                            <template #collapsible-contents="{ item: _item }">
-                                <div v-for="(_menu, _idx) in _item.subItems"
-                                     :key="`${_menu.label}-${_idx}`"
-                                     :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                     @click="handleClickNamespace(_menu)"
-                                >
-                                    <p-text-highlighting class="text"
-                                                         :term="namespaceState.inputValue"
-                                                         :text="_menu?.label || ''"
-                                    />
-                                </div>
-                            </template>
-                        </l-s-b-collapsible-menu-item>
-                        <p-empty v-if="namespaceState.inputValue && !namespaceState.namespaceItemsByKeyword.length"
-                                 class="keyword-search-empty"
-                        >
-                            <span>
-                                {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
-                            </span>
-                        </p-empty>
-                    </div>
-                </p-data-loader>
-            </template>
-            <template #slot-metric>
-                <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage"
-                                              :metrics="state.currentMetrics"
-                />
-            </template>
-        </l-s-b>
         <p-popover class="metric-select-guide-popover"
                    :is-visible="guidePopoverState.metricGuideVisible"
                    position="right"
@@ -416,6 +302,120 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                    :trigger="POPOVER_TRIGGER.NONE"
                    :style="{ left: `${lsbWidth}px`}"
         >
+            <l-s-b ref="lsbRef"
+                   :menu-set="state.menuSet"
+            >
+                <template #collapsible-contents-starred>
+                    <div v-if="state.starredMenuSet.length > 0">
+                        <p-tooltip v-for="(item, idx) of state.starredMenuSet"
+                                   :key="`asset-analysis-starred-${idx}`"
+                                   position="bottom"
+                                   :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${storeState.metrics[item.to?.params?.metricId || '']?.name} > ${item.label}` : item.label"
+                        >
+                            <l-s-b-router-menu-item :item="item"
+                                                    :idx="idx"
+                                                    :current-path="state.currentPath"
+                                                    is-hide-favorite
+                            />
+                        </p-tooltip>
+                    </div>
+                    <span v-else
+                          class="no-data"
+                    >
+                        <p-i class="menu-icon"
+                             name="ic_star-filled"
+                             height="1rem"
+                             width="1rem"
+                             :color="yellow[500]"
+                        />
+                        {{ $t('COMMON.STARRED_NO_DATA') }}
+                    </span>
+                </template>
+                <template #slot-namespace>
+                    <p-data-loader :loading="state.loading"
+                                   :loader-backdrop-opacity="0.5"
+                                   :loader-backdrop-color="gray[100]"
+                                   class="namespace-data-loader"
+                    >
+                        <l-s-b-menu-item :menu-data="state.namespaceTopTitleMenu"
+                                         :current-path="state.currentPath"
+                                         :depth="1"
+                        />
+                        <div class="namespace-wrapper">
+                            <p-search class="namespace-search"
+                                      :value="namespaceState.inputValue"
+                                      @update:value="handleSearchNamespace"
+                            />
+                            <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
+                                                         v-show="!namespaceState.inputValue"
+                                                         :key="`namespace-${idx}`"
+                                                         class="category-menu-item"
+                                                         :item="item"
+                                                         is-sub-item
+                                                         :override-collapsed="item.initialCollapsed"
+                            >
+                                <template #left-image>
+                                    <img v-if="item.icon === 'COMMON'"
+                                         class="title-image"
+                                         src="@/assets/images/img_common-asset@2x.png"
+                                         alt="common-namespace-image"
+                                    >
+                                    <p-lazy-img v-else
+                                                class="title-image"
+                                                :src="item.icon"
+                                                width="1rem"
+                                                height="1rem"
+                                    />
+                                </template>
+                                <template #collapsible-contents="{ item: _item }">
+                                    <div v-for="(_menu, _idx) in _item.subItems"
+                                         :key="`${_menu.label}-${_idx}`"
+                                         :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                         @click="handleClickNamespace(_menu)"
+                                    >
+                                        <span class="text">
+                                            {{ _menu?.label || '' }}
+                                        </span>
+                                    </div>
+                                </template>
+                            </l-s-b-collapsible-menu-item>
+                            <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
+                                                         v-show="namespaceState.inputValue"
+                                                         :key="`namespace-search-${idx}`"
+                                                         class="category-menu-item category-menu-item-by-keyword"
+                                                         :item="item"
+                                                         is-sub-item
+                                                         :override-collapsed="namespaceState.collapsed"
+                            >
+                                <template #collapsible-contents="{ item: _item }">
+                                    <div v-for="(_menu, _idx) in _item.subItems"
+                                         :key="`${_menu.label}-${_idx}`"
+                                         :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                         @click="handleClickNamespace(_menu)"
+                                    >
+                                        <p-text-highlighting class="text"
+                                                             :term="namespaceState.inputValue"
+                                                             :text="_menu?.label || ''"
+                                        />
+                                    </div>
+                                </template>
+                            </l-s-b-collapsible-menu-item>
+                            <p-empty v-if="namespaceState.inputValue && !namespaceState.namespaceItemsByKeyword.length"
+                                     class="keyword-search-empty"
+                            >
+                                <span>
+                                    {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
+                                </span>
+                            </p-empty>
+                        </div>
+                    </p-data-loader>
+                </template>
+                <template #slot-metric>
+                    <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage"
+                                                  :metrics="state.currentMetrics"
+                    />
+                </template>
+            </l-s-b>
             <template #content>
                 <div class="metric-select-guide-content">
                     <p class="title">
@@ -493,7 +493,6 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 }
 
 .metric-select-guide-popover {
-    @apply absolute;
     top: 12rem;
 
     .metric-select-guide-content {

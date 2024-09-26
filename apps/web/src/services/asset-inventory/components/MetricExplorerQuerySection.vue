@@ -88,8 +88,7 @@ watch(() => route.params, async () => {
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
                            trigger="click"
-                           relative-style
-                           position="bottom-start"
+                           width="100%"
                            class="filters-popover"
                 >
                     <p-button style-type="tertiary"
@@ -155,24 +154,6 @@ watch(() => route.params, async () => {
         .filters-button {
             .filters-badge {
                 margin-left: 0.25rem;
-            }
-        }
-
-        /* custom design-system component - p-popover */
-        :deep(.p-popover) {
-            &.open {
-                .p-button.filters-button {
-                    @apply bg-gray-200;
-                }
-            }
-            .popper {
-                width: 100%;
-                max-width: 100%;
-                left: 2rem;
-                transform: translate(0, 3rem) !important;
-                .arrow {
-                    left: 1.25rem !important;
-                }
             }
         }
     }
