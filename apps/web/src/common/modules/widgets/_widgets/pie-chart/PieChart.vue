@@ -136,7 +136,13 @@ const state = reactive({
                     position: state.displaySeriesLabel?.position,
                     rotate: state.displaySeriesLabel?.rotate,
                     fontSize: 10,
-                    formatter: (p) => getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit),
+                    formatter: (p) => {
+                        if (p.percent < 5) return '';
+                        if (state.seriesFormat === 'percent') {
+                            return `${p.percent}%`;
+                        }
+                        return getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit);
+                    },
                 },
                 data: state.chartData,
             },
@@ -163,6 +169,7 @@ const state = reactive({
     }),
     numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
+    seriesFormat: computed<string>(() => state.displaySeriesLabel?.format || 'numeric'),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),

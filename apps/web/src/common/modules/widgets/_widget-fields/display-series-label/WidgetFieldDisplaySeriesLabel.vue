@@ -11,7 +11,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dr
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
+import type { DisplaySeriesLabelValue, DisplaySeriesLabelOptions } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
 import type {
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
@@ -21,7 +21,7 @@ import type {
 const ROTATE_MIN = -90;
 const ROTATE_MAX = 90;
 const emit = defineEmits<WidgetFieldComponentEmit<DisplaySeriesLabelValue>>();
-const props = defineProps<WidgetFieldComponentProps<undefined, DisplaySeriesLabelValue>>();
+const props = defineProps<WidgetFieldComponentProps<DisplaySeriesLabelOptions, DisplaySeriesLabelValue>>();
 const state = reactive({
     proxyValue: useProxyValue<DisplaySeriesLabelValue|undefined>('value', props, emit),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
@@ -50,6 +50,10 @@ const state = reactive({
             { name: 'insideBottom', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.INSIDE_BOTTOM') },
         ];
     }),
+    formatMenuItems: computed<SelectDropdownMenuItem[]>(() => [
+        { name: 'numeric', label: i18n.t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.NUMERICAL_VALUE') },
+        { name: 'percent', label: '%' },
+    ]),
     isRotateValid: computed<boolean>(() => {
         if (!state.proxyValue?.toggleValue) return true;
         if (state.proxyValue?.rotate === undefined) return false;
@@ -92,6 +96,12 @@ const handleUpdateRotate = (value: number) => {
         rotate: value,
     };
 };
+const handleSelectFormatMenuItem = (selected: string) => {
+    state.proxyValue = {
+        ...state.proxyValue,
+        format: selected,
+    };
+};
 
 /* Watcher */
 watch(() => state.isAllValid, (_isAllValid) => {
@@ -103,10 +113,12 @@ onMounted(() => {
         state.proxyValue = undefined;
         return;
     }
+    const _format = props.value?.format || 'numeric';
     state.proxyValue = {
         toggleValue: props.value?.toggleValue ?? false,
         position: props.value?.position ?? state.menuItems[0].name,
         rotate: props.value?.rotate ?? 0,
+        format: props.widgetFieldSchema?.options?.showFormatField ? _format : undefined,
     };
 });
 </script>
@@ -143,6 +155,18 @@ onMounted(() => {
                           :max="90"
                           show-input
                           @update:value="handleUpdateRotate"
+                />
+            </p-field-group>
+            <p-field-group v-if="props.widgetFieldSchema?.options?.showFormatField"
+                           :label="$t('COMMON.WIDGETS.DISPLAY_SERIES_LABEL.FORMAT')"
+                           style-type="secondary"
+            >
+                <p-select-dropdown class="w-full"
+                                   use-fixed-menu-style
+                                   reset-selection-on-menu-close
+                                   :menu="state.formatMenuItems"
+                                   :selected="state.proxyValue?.format"
+                                   @select="handleSelectFormatMenuItem"
                 />
             </p-field-group>
         </div>

@@ -1540,6 +1540,7 @@
 			"DISPLAY_SERIES_LABEL": {
 				"BOTTOM": "bottom",
 				"DISPLAY_SERIES_LABEL": "Display Series Label",
+				"FORMAT": "Format",
 				"INNER": "inner",
 				"INSIDE": "inside",
 				"INSIDE_BOTTOM": "inside bottom",
@@ -1547,6 +1548,7 @@
 				"INSIDE_RIGHT": "inside right",
 				"INSIDE_TOP": "inside top",
 				"LEFT": "left",
+				"NUMERICAL_VALUE": "Numerical value",
 				"OUTER": "outer",
 				"POSITION": "Position",
 				"RIGHT": "Right",

@@ -1540,6 +1540,7 @@
 			"DISPLAY_SERIES_LABEL": {
 				"BOTTOM": "下",
 				"DISPLAY_SERIES_LABEL": "系列ラベルを表示",
+				"FORMAT": "",
 				"INNER": "内側",
 				"INSIDE": "内側",
 				"INSIDE_BOTTOM": "内側下",
@@ -1547,6 +1548,7 @@
 				"INSIDE_RIGHT": "内側右",
 				"INSIDE_TOP": "内側上",
 				"LEFT": "左",
+				"NUMERICAL_VALUE": "",
 				"OUTER": "側",
 				"POSITION": "位置",
 				"RIGHT": "右",
