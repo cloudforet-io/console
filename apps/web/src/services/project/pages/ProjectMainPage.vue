@@ -264,11 +264,10 @@ onUnmounted(() => {
     margin-right: 0.5rem;
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
 }
 .top-button-box {
-    display: inline-block;
-    float: right;
+    display: flex;
+    align-self: center;
     margin-left: auto;
     .create-context-menu {
         @apply absolute;
