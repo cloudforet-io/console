@@ -42,6 +42,17 @@ import * as PPopoverStories from './PPopover.stories';
 <br/>
 <Canvas of={PPopoverStories.HideArrow} />
 
+## Width
+
+<br/>
+<br/>
+When the width is set as a percentage, it is designed to be influenced by the width of the parent element with ```position: relative```. <br/>
+However, in this example, the element appears to go beyond the boundaries of the parent element. <br/>
+This is an issue with the internal library([FloatingUI](https://floating-ui.com/docs/getting-started)) not adapting to Storybook's iFrame, but it does not cause any issues in actual usage. <br/>
+You can check the related issue through [this link](https://github.com/floating-ui/floating-ui/issues/2174).
+<br/>
+<Canvas of={PPopoverStories.Width} />
+
 ## Playground
 <Canvas of={PPopoverStories.Playground} />
 <Controls of={PPopoverStories.Playground} />

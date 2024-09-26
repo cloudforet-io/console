@@ -12,6 +12,7 @@ export const getPopoverArgs = (): Args => ({
     hidePadding: false,
     hideCloseButton: false,
     hideArrow: false,
+    width: '',
     'v-model': false,
     defaultSlot: null,
     contentRefSlot: null,
@@ -165,6 +166,21 @@ export const getPopoverArgTypes = (): ArgTypes => {
                 },
             },
             control: 'boolean',
+        },
+        width: {
+            name: 'width',
+            type: { name: 'string' },
+            description: 'Width of the popover.',
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: false,
+                },
+            },
+            control: 'text',
         },
         // model
         'v-model': {
