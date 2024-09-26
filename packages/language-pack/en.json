@@ -2836,6 +2836,7 @@
 			},
 			"MODAL": {
 				"ADD": "Add",
+				"ADD_USERS_DESCRIPTION": "The users will be added to the workspaces within this workspace group with the selected role assigned. If the user is already in a workspace, their role will be overwritten.",
 				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
 				"ADD_WORKSPACES_TITLE": "Add Workspaces to \"{name}\"",
 				"ALT_S_ADD_USERS": "Users successfully added",

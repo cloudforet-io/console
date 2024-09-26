@@ -20,6 +20,7 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
@@ -163,6 +164,49 @@ watch(() => workspaceGroupPageState.modal.visible, async (visible) => {
     >
         <template #body>
             <div class="form-wrapper">
+                <scoped-notification type="info"
+                                     title-icon="ic_info-circle"
+                                     hide-header-close-button
+                                     no-title
+                                     title="Title"
+                                     layout="in-section"
+                >
+                    {{ $t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_DESCRIPTION') }}
+                </scoped-notification>
+                <p-field-group required
+                               :label="$t('IAM.WORKSPACE_GROUP.MODAL.USER_SELECT_DROP_DOWN_TITLE')"
+                >
+                    <template #default>
+                        <div class="user-form-wrapper">
+                            <p-text-input :value.sync="userDropdownState.searchText"
+                                          class="user-search-input"
+                                          :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.USER_DROP_DOWN_PLACEHOLDER')"
+                                          :selected="userDropdownState.inputSelectedItem"
+                                          use-auto-complete
+                                          use-fixed-menu-style
+                                          :menu="userDropdownState.menuList"
+                                          @update:selected="handleEnter"
+                            />
+                            <div class="selected-user-list">
+                                <div v-for="item in userDropdownState.selectedItems"
+                                     :key="item"
+                                     class="selected-user-item"
+                                >
+                                    <div class="flex items-center gap-2">
+                                        <p-avatar class="menu-icon"
+                                                  size="md"
+                                        />
+                                        {{ item }}
+                                    </div>
+                                    <p-icon-button name="ic_close"
+                                                   size="md"
+                                                   @click="handleRemoveUser(item)"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </p-field-group>
                 <p-field-group required
                                :label="$t('IAM.WORKSPACE_GROUP.MODAL.ROLE_SELECT_DROP_DOWN_TITLE')"
                 >
@@ -199,36 +243,6 @@ watch(() => workspaceGroupPageState.modal.visible, async (visible) => {
                         </p-select-dropdown>
                     </template>
                 </p-field-group>
-                <p-field-group required
-                               :label="$t('IAM.WORKSPACE_GROUP.MODAL.USER_SELECT_DROP_DOWN_TITLE')"
-                >
-                    <template #default>
-                        <p-text-input :value.sync="userDropdownState.searchText"
-                                      class="user-search-input"
-                                      :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.USER_DROP_DOWN_PLACEHOLDER')"
-                                      :selected="userDropdownState.inputSelectedItem"
-                                      use-auto-complete
-                                      use-fixed-menu-style
-                                      :menu="userDropdownState.menuList"
-                                      @update:selected="handleEnter"
-                        />
-                    </template>
-                </p-field-group>
-            </div>
-            <div v-for="item in userDropdownState.selectedItems"
-                 :key="item"
-                 class="selected-user-item"
-            >
-                <div class="flex items-center gap-2">
-                    <p-avatar class="menu-icon"
-                              size="md"
-                    />
-                    {{ item }}
-                </div>
-                <p-icon-button name="ic_close"
-                               size="md"
-                               @click="handleRemoveUser(item)"
-                />
             </div>
         </template>
         <template #confirm-button>
@@ -261,21 +275,32 @@ watch(() => workspaceGroupPageState.modal.visible, async (visible) => {
         }
     }
 
-    .user-search-input {
-        @apply w-full;
+    .user-form-wrapper {
+        @apply p-4 border border-gray-200 rounded;
+
+        .selected-user-list {
+            margin-top: 0.5rem;
+            min-height: 7rem;
+            max-height: 17.5rem;
+            overflow-y: auto;
+
+            .selected-user-item {
+                @apply flex items-center justify-between rounded text-label-md;
+                padding: 0.5rem;
+                &:hover {
+                    @apply bg-blue-100;
+                }
+            }
+        }
     }
 
-    .selected-user-item {
-        @apply flex items-center justify-between rounded text-label-md;
-        padding: 0.5rem;
-        &:hover {
-            @apply bg-blue-100;
-        }
+    .user-search-input {
+        @apply w-full;
     }
 }
 
 /* custom design-system component - p-button-modal */
-:deep(.p-button-modal) {
+:deep() {
     .modal-content {
         .header {
             .modal-header {

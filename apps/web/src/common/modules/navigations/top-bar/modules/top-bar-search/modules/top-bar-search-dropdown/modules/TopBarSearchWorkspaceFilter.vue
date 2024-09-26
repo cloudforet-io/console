@@ -225,7 +225,7 @@ watch(() => state.searchText, (val) => {
                                      :title="$t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_FILTER_WARNING_TITLE')"
                                      title-icon="ic_warning-filled"
                                      :visible="true"
-                                     layout="insection"
+                                     layout="in-section"
                                      hide-header-close-button
                 >
                     <span class="text">{{ $t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_FILTER_WARNING_DESC') }}</span>
