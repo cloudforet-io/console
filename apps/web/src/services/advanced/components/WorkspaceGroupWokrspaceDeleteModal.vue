@@ -86,10 +86,10 @@ const deleteWorkspaces = async () => {
                 workspace_id: workspaceGroupPageState.modalAdditionalData.selectedWorkspace?.workspace_id,
             });
         } else {
-        // eslint-disable-next-line max-len
-            await Promise.allSettled(workspaceGroupPageGetters.selectedWorkspaceIds.map((item) => SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
-                workspace_id: item,
-            })));
+            const fetcher = (wId:string) => SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
+                workspace_id: wId,
+            });
+            await Promise.allSettled(workspaceGroupPageGetters.selectedWorkspaceIds.map((item) => fetcher(item)));
         }
         await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
     } catch (e) {
@@ -114,7 +114,6 @@ const handleCloseModal = () => {
 };
 
 const handleChangeSort = (sortBy:string, sortDesc:boolean) => {
-    console.log('>>', sortBy, sortDesc);
     state.sortBy = sortBy;
     state.sortDesc = sortDesc;
     state.items = sortTableItems<WorkspaceModel>(state.items, sortBy, sortDesc);
