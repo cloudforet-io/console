@@ -16,7 +16,7 @@ import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { objectToQueryString } from '@/lib/router-query-string';
+import { arrayToQueryString, objectToQueryString } from '@/lib/router-query-string';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useTextOverflowState } from '@/common/composables/text-overflow-state';
@@ -86,16 +86,6 @@ const getCloudServiceDetailLink = (item: CloudServiceAnalyzeResult, resource?: C
         'service_code',
     ].includes(f.k)));
 
-    // if (cloudServicePageStore.selectedRegions.length) {
-    //     cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: cloudServicePageStore.selectedRegions });
-    // }
-    if (cloudServiceLSBStore.selectedProjects.length) {
-        cloudServiceDetailQueryHelper.addFilter({ k: 'project_id', o: '=', v: cloudServiceLSBStore.selectedProjects });
-    }
-    if (cloudServiceLSBStore.selectedServiceAccounts.length) {
-        cloudServiceDetailQueryHelper.addFilter({ k: 'service_account_id', o: '=', v: cloudServiceLSBStore.selectedServiceAccounts });
-    }
-
     const res: Location = getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
         params: {
@@ -104,6 +94,8 @@ const getCloudServiceDetailLink = (item: CloudServiceAnalyzeResult, resource?: C
             name: targetCloudServiceType.cloud_service_type,
         },
         query: {
+            project: arrayToQueryString(cloudServiceLSBStore.selectedProjects),
+            service_account: arrayToQueryString(cloudServiceLSBStore.selectedServiceAccounts),
             filters: cloudServiceDetailQueryHelper.rawQueryStrings,
             period: objectToQueryString(cloudServicePageState.period),
         },
