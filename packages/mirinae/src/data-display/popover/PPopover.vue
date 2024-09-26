@@ -5,15 +5,16 @@
                v-on="$listeners"
     >
         <span ref="targetRef"
-              class="target-ref"
+              class="target"
         >
             <slot />
         </span>
         <div ref="contentRef"
-             class="popper"
+             class="floating"
              :class="{ 'visible': proxyIsVisible, 'hide-padding': hidePadding }"
+             :style="width ? { width } : {}"
         >
-            <div class="popper-content-wrapper">
+            <div class="floating-content-wrapper">
                 <slot name="content" />
                 <p-icon-button v-if="!hideCloseButton"
                                name="ic_close"
@@ -24,8 +25,8 @@
                 />
             </div>
             <div v-if="!hideArrow"
+                 ref="arrowRef"
                  class="arrow"
-                 data-popper-arrow
             />
         </div>
     </component>
@@ -35,11 +36,12 @@
 import type { PropType } from 'vue';
 import {
     defineComponent,
-    onMounted, onUnmounted, reactive, toRefs, watch, computed,
+    onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
-import type { Instance } from '@popperjs/core';
-import { createPopper } from '@popperjs/core';
+import {
+    computePosition, autoUpdate, offset, flip, shift, limitShift, arrow, size,
+} from '@floating-ui/dom';
 import vClickOutside from 'v-click-outside';
 
 import type { PopoverPlacement, PopoverTrigger } from '@/data-display/popover/type';
@@ -47,16 +49,24 @@ import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type'
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 interface PopoverProps {
-    isVisible: boolean;
-    tag: string;
+    isVisible?: boolean;
+    tag?: string;
     position?: PopoverPlacement;
     trigger?: PopoverTrigger;
     ignoreTargetClick?: boolean;
     ignoreOutsideClick?: boolean;
     hidePadding?: boolean;
     hideCloseButton?: boolean;
-    hideArrow?: boolean
+    hideArrow?: boolean;
+    width?: string;
 }
+
+const ARROW_STATIC_SIDES = {
+    top: 'bottom',
+    right: 'left',
+    bottom: 'top',
+    left: 'right',
+};
 
 export default defineComponent<PopoverProps>({
     name: 'PPopover',
@@ -73,7 +83,7 @@ export default defineComponent<PopoverProps>({
     props: {
         isVisible: {
             type: Boolean,
-            default: false,
+            default: undefined,
         },
         tag: {
             type: String,
@@ -85,7 +95,7 @@ export default defineComponent<PopoverProps>({
                 if (value === undefined) return true;
                 return Object.values(POPOVER_PLACEMENT).includes(value);
             },
-            default: POPOVER_PLACEMENT.BOTTOM_END,
+            default: undefined,
         },
         trigger: {
             type: String as PropType<PopoverTrigger>,
@@ -115,39 +125,29 @@ export default defineComponent<PopoverProps>({
             type: Boolean,
             default: false,
         },
+        width: {
+            type: String,
+            default: '',
+        },
     },
     setup(props, { emit }) {
-        let popperObject: Instance|undefined;
         const state = reactive({
             proxyIsVisible: false,
             contentRef: null as null|HTMLElement,
             targetRef: null as null|HTMLElement,
-            popperOptions: computed(() => ({
-                placement: props.position,
-                modifiers: [
-                    {
-                        name: 'offset',
-                        options: {
-                            offset: [0, props.hideArrow ? 11 : 21],
-                        },
-                    },
-                ],
-            })),
+            arrowRef: null as null|HTMLElement,
         });
+        let cleanup: (() => void)|undefined;
         const updateIsVisible = (visible: boolean, emitEvent = true) => {
             state.proxyIsVisible = visible;
             if (emitEvent) emit('update:is-visible', visible);
         };
         const hidePopover = (emitEvent = true) => {
             state.contentRef?.removeAttribute('data-show');
-            popperObject?.setOptions({ placement: props.position });
-            popperObject?.update();
             updateIsVisible(false, emitEvent);
         };
         const showPopover = (emitEvent = true) => {
             state.contentRef?.setAttribute('data-show', '');
-            popperObject?.setOptions({ placement: props.position });
-            popperObject?.update();
             updateIsVisible(true, emitEvent);
         };
         const handleClickTargetRef = (e) => {
@@ -172,7 +172,7 @@ export default defineComponent<PopoverProps>({
             hidePopover();
         };
         const bindEventToTargetRef = (eventType, handler, useCapture = false) => state.targetRef?.addEventListener(eventType, handler, useCapture);
-        const addEvent = () => {
+        const addEventByTrigger = () => {
             if (props.trigger === POPOVER_TRIGGER.CLICK) {
                 bindEventToTargetRef('click', handleClickTargetRef, true);
             } else if (props.trigger === POPOVER_TRIGGER.HOVER) {
@@ -191,22 +191,63 @@ export default defineComponent<PopoverProps>({
 
         onMounted(() => {
             if (state.targetRef && state.contentRef) {
-                popperObject = createPopper(state.targetRef, state.contentRef, state.popperOptions);
-                addEvent();
+                const referenceEl = state.targetRef;
+                const floatingEl = state.contentRef;
+                const arrowEl = state.arrowRef;
+                autoUpdate(referenceEl, floatingEl, () => {
+                    computePosition(referenceEl, floatingEl, {
+                        placement: props.position,
+                        middleware: [
+                            offset(props.hideArrow ? 1 : 11),
+                            shift({ limiter: limitShift() }),
+                            flip(),
+                            size({
+                                apply({ rects, elements }) {
+                                    Object.assign(elements.floating.style, {
+                                        minWidth: `${rects.reference.width}px`,
+                                    });
+                                },
+                            }),
+                            (arrowEl ? arrow({ element: arrowEl }) : undefined),
+                        ],
+                    }).then(({
+                        placement, x, y, middlewareData,
+                    }) => {
+                        Object.assign(floatingEl.style, {
+                            left: `${x}px`,
+                            top: `${y}px`,
+                        });
+                        const side = placement.split('-')[0];
 
-                document.addEventListener('keydown', handleEscKey);
+                        const staticSide = ARROW_STATIC_SIDES[side] ?? '';
 
-                watch(() => props.isVisible, (value) => {
-                    if (state.proxyIsVisible === value) return;
-                    state.proxyIsVisible = value;
-                    if (value) showPopover(false);
-                    else hidePopover(false);
-                }, { immediate: true });
+                        if (arrowEl && middlewareData.arrow) {
+                            const arrowState = middlewareData.arrow;
+                            Object.assign(arrowEl.style, {
+                                left: arrowState.x != null ? `${arrowState.x}px` : '',
+                                top: arrowState.y != null ? `${arrowState.y}px` : '',
+                                [staticSide]: `${-arrowEl.offsetWidth / 2}px`,
+                            });
+                            arrowEl.setAttribute('arrow-side', staticSide);
+                        }
+                        floatingEl.setAttribute('floating-placement', placement);
+
+                        addEventByTrigger();
+                        document.addEventListener('keydown', handleEscKey);
+                    });
+
+                    watch(() => props.isVisible, (value) => {
+                        if (value === undefined || state.proxyIsVisible === value) return;
+                        state.proxyIsVisible = value;
+                        if (value) showPopover(false);
+                        else hidePopover(false);
+                    }, { immediate: true });
+                });
             }
         });
 
         onUnmounted(() => {
-            popperObject?.destroy();
+            if (cleanup) cleanup();
             document.removeEventListener('keydown', handleEscKey);
         });
 
@@ -223,22 +264,31 @@ export default defineComponent<PopoverProps>({
 
 <style lang="postcss">
 .p-popover {
-    > .popper {
+    > .target {
+        @apply inline-flex;
+    }
+    > .floating {
         @apply bg-white border rounded-md border-gray-300;
+        width: max-content;
+        position: absolute;
+        top: 0;
+        left: 0;
         display: none;
         filter: drop-shadow(0 0 0.5rem rgba(0, 0, 0, 0.08));
         z-index: 99;
         padding: 1rem;
 
+        &.visible {
+            display: unset;
+        }
         &[data-show] {
             display: block;
         }
         &.hide-padding {
             padding: 0;
         }
-        > .popper-content-wrapper {
+        > .floating-content-wrapper {
             @apply flex w-full;
-
             .close-icon {
                 position: absolute;
                 right: 0.25rem;
@@ -247,68 +297,34 @@ export default defineComponent<PopoverProps>({
             }
         }
 
-        > .arrow,
-        > .arrow::before {
+        > .arrow {
             @apply border-gray-300 border;
             position: absolute;
             width: 1rem;
             height: 1rem;
             background: inherit;
-        }
-
-        > .arrow {
-            visibility: hidden;
-        }
-
-        > .arrow::before {
-            visibility: visible;
-            content: '';
             transform: rotate(45deg);
-        }
-
-        &[data-popper-placement^='top'] > .arrow {
-            bottom: -0.55rem;
-
-            &::before {
-                border-top: none;
-                border-left: none;
-            }
-        }
-
-        &[data-popper-placement^='bottom'] > .arrow {
-            top: -0.55rem;
-
-            &::before {
+            &[arrow-side='top'] {
                 border-bottom: none;
                 border-right: none;
             }
-        }
-
-        &[data-popper-placement^='left'] > .arrow {
-            right: -0.55rem;
-
-            &::before {
+            &[arrow-side='right'] {
                 border-bottom: none;
                 border-left: none;
             }
-        }
-
-        &[data-popper-placement^='right'] > .arrow {
-            left: -0.55rem;
-
-            &::before {
+            &[arrow-side='bottom'] {
+                border-top: none;
+                border-left: none;
+            }
+            &[arrow-side='left'] {
                 border-top: none;
                 border-right: none;
             }
-        }
-
-        &.visible {
-            display: unset;
         }
     }
 
     @screen mobile {
-        > .popper {
+        > .floating {
             max-width: 17rem;
         }
     }
