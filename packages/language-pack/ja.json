@@ -2839,6 +2839,7 @@
 				"ADD_USERS_DESCRIPTION": "",
 				"ADD_USERS_TITLE": "\"{name}\"にユーザーを追加",
 				"ADD_WORKSPACES_TITLE": "\"{name}\" にワークスペースを追加",
+				"ADD_WORKSPACE_DESCRIPTION": "",
 				"ALT_S_ADD_USERS": "ユーザー追加完了",
 				"ALT_S_ADD_WORKSPACE": "",
 				"ALT_S_CREATE_WORKSPACE": "ワークスペースグループの作成が完了しました",

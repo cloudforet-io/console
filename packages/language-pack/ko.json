@@ -2839,6 +2839,7 @@
 				"ADD_USERS_DESCRIPTION": "",
 				"ADD_USERS_TITLE": "\"{name}\"에 사용자 추가",
 				"ADD_WORKSPACES_TITLE": "\"{name}\"에 워크스페이스 추가",
+				"ADD_WORKSPACE_DESCRIPTION": "",
 				"ALT_S_ADD_USERS": "사용자 추가 완료",
 				"ALT_S_ADD_WORKSPACE": "워크스페이스 추가 완료",
 				"ALT_S_CREATE_WORKSPACE": "워크스페이스 그룹 생성 완료",

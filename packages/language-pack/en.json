@@ -2839,6 +2839,7 @@
 				"ADD_USERS_DESCRIPTION": "The users will be added to the workspaces within this workspace group with the selected role assigned. If the user is already in a workspace, their role will be overwritten.",
 				"ADD_USERS_TITLE": "Add Users to \"{name}\"",
 				"ADD_WORKSPACES_TITLE": "Add Workspaces to \"{name}\"",
+				"ADD_WORKSPACE_DESCRIPTION": "Group users will be added to all included workspaces with the roles assigned to them in the workspace group.",
 				"ALT_S_ADD_USERS": "Users successfully added",
 				"ALT_S_ADD_WORKSPACE": "Workspaces successfully added",
 				"ALT_S_CREATE_WORKSPACE": "Workspace group successfully created",
