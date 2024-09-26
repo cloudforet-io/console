@@ -34,7 +34,7 @@ import DashboardFolderBundleMoveModal from '@/services/dashboards/components/das
 import DashboardFolderCloneModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderCloneModal.vue';
 import DashboardFolderDeleteModal
     from '@/services/dashboards/components/dashboard-folder/DashboardFolderDeleteModal.vue';
-import DashboardMainFolderFormModal
+import DashboardFolderFormModal
     from '@/services/dashboards/components/dashboard-folder/DashboardFolderFormModal.vue';
 import DashboardFolderShareModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderShareModal.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
@@ -316,8 +316,8 @@ onUnmounted(() => {
                                        :dashboard-list="state.deprecatedDashboardList"
                                        is-collapsed
             />
-            <dashboard-main-folder-form-modal :visible="dashboardMainPageState.folderFormModalVisible"
-                                              @update:visible="dashboardMainPageStore.setFolderFormModalVisible"
+            <dashboard-folder-form-modal :visible="dashboardMainPageState.folderFormModalVisible"
+                                         @update:visible="dashboardMainPageStore.setFolderFormModalVisible"
             />
             <dashboard-folder-delete-modal :visible="dashboardMainPageState.folderDeleteModalVisible"
                                            @update:visible="dashboardMainPageStore.setFolderDeleteModalVisible"
