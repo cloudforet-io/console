@@ -146,6 +146,7 @@ debouncedWatch(() => userDropdownState.searchText, async () => {
 
 watch(() => workspaceGroupPageState.modal.visible, async (visible) => {
     if (visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS) {
+        userDropdownState.selectedItems = [];
         userDropdownState.userList = await fetchUserFindList() || [];
     }
 });

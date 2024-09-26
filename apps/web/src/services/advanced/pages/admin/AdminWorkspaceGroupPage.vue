@@ -25,6 +25,7 @@ import WorkspaceGroupEditModal from '@/services/advanced/components/WorkspaceGro
 import WorkspaceGroupHeader from '@/services/advanced/components/WorkspaceGroupHeader.vue';
 import WorkspaceGroupTab from '@/services/advanced/components/WorkspaceGroupTab.vue';
 import WorkspaceGroupTable from '@/services/advanced/components/WorkspaceGroupTable.vue';
+import WorkspaceGroupUserDeleteModal from '@/services/advanced/components/WorkspaceGroupUserDeleteModal.vue';
 import WorkspaceGroupWorkspaceDeleteModal from '@/services/advanced/components/WorkspaceGroupWokrspaceDeleteModal.vue';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
@@ -121,6 +122,7 @@ onUnmounted(() => {
         <workspace-group-edit-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-workspace-delete-modal />
+        <workspace-group-user-delete-modal />
         <workspace-group-add-workspaces-modal />
         <workspace-group-add-users-modal @confirm="() => {refreshTab({isGroupUser: true})}" />
     </section>
