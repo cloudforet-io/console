@@ -106,7 +106,7 @@ const state = reactive({
 });
 const menuHandler = (inputText: string) => {
     const trimmed = inputText?.trim();
-    let results: RegionMenuItem[];
+    let results: SelectDropdownMenuItem[]|RegionMenuItem[];
     if (trimmed) {
         const regex = getTextHighlightRegex(inputText);
         results = state.menuItems.filter((d) => regex.test(d.label));
