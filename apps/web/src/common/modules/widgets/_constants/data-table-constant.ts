@@ -54,3 +54,5 @@ export const DATA_TABLE_QUERY_OPERATOR = {
         label: 'does not equal',
     },
 } as const;
+
+export const KEYWORD_FILTER_DISABLED_KEYS = [GROUP_BY.PROJECT, GROUP_BY.WORKSPACE, GROUP_BY.SERVICE_ACCOUNT];

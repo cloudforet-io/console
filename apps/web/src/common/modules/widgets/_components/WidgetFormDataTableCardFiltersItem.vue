@@ -10,10 +10,14 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { DATA_TABLE_QUERY_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DATA_TABLE_QUERY_OPERATOR,
+    KEYWORD_FILTER_DISABLED_KEYS,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
 
 import { blue, gray } from '@/styles/colors';
+
 
 interface Props {
     filterItem: MenuItem;
@@ -32,24 +36,38 @@ const operatorButtonRef = ref<HTMLElement | null>(null);
 
 const state = reactive({
     visibleMenu: false,
-    operatorMenu: computed<MenuItem[]>(() => [
-        {
-            name: DATA_TABLE_QUERY_OPERATOR.contain_in.key,
-            label: DATA_TABLE_QUERY_OPERATOR.contain_in.label,
-        },
-        {
-            name: DATA_TABLE_QUERY_OPERATOR.not_contain_in.key,
-            label: DATA_TABLE_QUERY_OPERATOR.not_contain_in.label,
-        },
-        {
-            name: DATA_TABLE_QUERY_OPERATOR.in.key,
-            label: DATA_TABLE_QUERY_OPERATOR.in.label,
-        },
-        {
-            name: DATA_TABLE_QUERY_OPERATOR.not_in.key,
-            label: DATA_TABLE_QUERY_OPERATOR.not_in.label,
-        },
-    ]),
+    operatorMenu: computed<MenuItem[]>(() => {
+        if (KEYWORD_FILTER_DISABLED_KEYS.includes(props.filterItem?.name)) {
+            return [
+                {
+                    name: DATA_TABLE_QUERY_OPERATOR.in.key,
+                    label: DATA_TABLE_QUERY_OPERATOR.in.label,
+                },
+                {
+                    name: DATA_TABLE_QUERY_OPERATOR.not_in.key,
+                    label: DATA_TABLE_QUERY_OPERATOR.not_in.label,
+                },
+            ];
+        }
+        return [
+            {
+                name: DATA_TABLE_QUERY_OPERATOR.contain_in.key,
+                label: DATA_TABLE_QUERY_OPERATOR.contain_in.label,
+            },
+            {
+                name: DATA_TABLE_QUERY_OPERATOR.not_contain_in.key,
+                label: DATA_TABLE_QUERY_OPERATOR.not_contain_in.label,
+            },
+            {
+                name: DATA_TABLE_QUERY_OPERATOR.in.key,
+                label: DATA_TABLE_QUERY_OPERATOR.in.label,
+            },
+            {
+                name: DATA_TABLE_QUERY_OPERATOR.not_in.key,
+                label: DATA_TABLE_QUERY_OPERATOR.not_in.label,
+            },
+        ];
+    }),
     proxySelectedFilter: useProxyValue<DataTableQueryFilterForDropdown>('selectedFilter', props, emit),
 });
 

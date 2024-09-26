@@ -37,7 +37,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardFiltersItem
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardFiltersItem.vue';
-import { DATA_SOURCE_DOMAIN, DATA_TABLE_QUERY_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DATA_SOURCE_DOMAIN,
+    DATA_TABLE_QUERY_OPERATOR,
+    KEYWORD_FILTER_DISABLED_KEYS,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableSourceType, DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
@@ -165,6 +169,9 @@ const handleAddFilter = () => {
 
 const handleSelectAddFilterMenuItem = (item: MenuItem, _: any, isSelected: boolean) => {
     if (isSelected) {
+        const defaultOperator = KEYWORD_FILTER_DISABLED_KEYS.includes(item.name)
+            ? DATA_TABLE_QUERY_OPERATOR.in.key
+            : DATA_TABLE_QUERY_OPERATOR.contain_in.key;
         state.selectedItems = [
             ...state.selectedItems,
             item,
@@ -172,7 +179,7 @@ const handleSelectAddFilterMenuItem = (item: MenuItem, _: any, isSelected: boole
         state.selectedItemsMap[item.name] = {
             k: item.name,
             v: [],
-            o: DATA_TABLE_QUERY_OPERATOR.contain_in.key,
+            o: defaultOperator,
         };
     } else {
         state.selectedItems = state.selectedItems.filter((d) => d !== item.name);
