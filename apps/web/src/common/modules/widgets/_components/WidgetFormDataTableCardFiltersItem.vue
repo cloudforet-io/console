@@ -4,7 +4,7 @@ import { onClickOutside } from '@vueuse/core/index';
 import { computed, reactive, ref } from 'vue';
 
 import {
-    PSelectDropdown, PContextMenu, PIconButton, PI,
+    PSelectDropdown, PContextMenu, PIconButton, PI, PTextInput,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
@@ -61,7 +61,9 @@ const handleSelectOperator = (operator: MenuItem) => {
     state.proxySelectedFilter = {
         ...state.proxySelectedFilter,
         o: operator.name,
+        v: [],
     };
+    state.visibleMenu = false;
 };
 
 const handleDeleteFilter = () => {
@@ -69,6 +71,13 @@ const handleDeleteFilter = () => {
 };
 
 const handleUpdateFilterDropdown = (selected: MenuItem[]) => {
+    state.proxySelectedFilter = {
+        ...state.proxySelectedFilter,
+        v: selected,
+    };
+};
+
+const handleUpdateKeywordSelected = (selected: MenuItem[]) => {
     state.proxySelectedFilter = {
         ...state.proxySelectedFilter,
         v: selected,
@@ -103,7 +112,7 @@ onClickOutside(operatorButtonRef, () => {
                                     class="operator-menu"
                                     :visible.sync="state.visibleMenu"
                                     :menu="state.operatorMenu"
-                                    :selected="[{ name: props.selectedFilter?.o }]"
+                                    :selected="[{ name: state.proxySelectedFilter?.o }]"
                                     @select="handleSelectOperator"
                     />
                 </div>
@@ -114,10 +123,20 @@ onClickOutside(operatorButtonRef, () => {
                            @click="handleDeleteFilter"
             />
         </div>
-        <p-select-dropdown class="filters-dropdown"
+        <p-text-input v-if="state.proxySelectedFilter.o === DATA_TABLE_QUERY_OPERATOR.contain_in.key
+                          || state.proxySelectedFilter.o === DATA_TABLE_QUERY_OPERATOR.not_contain_in.key"
+                      :selected="state.proxySelectedFilter?.v"
+                      multi-input
+                      block
+                      appearance-type="stack"
+                      placeholder="Enter Value"
+                      @update="handleUpdateKeywordSelected"
+        />
+        <p-select-dropdown v-else
+                           class="filters-dropdown"
                            is-filterable
                            :handler="props.handler"
-                           :selected="props.selectedFilter?.v"
+                           :selected="state.proxySelectedFilter?.v"
                            :loading="props.loading"
                            multi-selectable
                            appearance-type="stack"

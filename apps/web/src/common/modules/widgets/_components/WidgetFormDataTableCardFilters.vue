@@ -5,7 +5,7 @@ import {
 } from 'vue';
 
 import {
-    cloneDeep, isEmpty, unset,
+    isEmpty, unset,
 } from 'lodash';
 
 import {
@@ -143,16 +143,13 @@ onClickOutside(containerRef, hideContextMenu);
 
 /* Event */
 const handleUpdateFilter = (filterKey: string, filter: DataTableQueryFilterForDropdown) => {
-    const selectedItemsMap = cloneDeep(state.selectedItemsMap);
-    selectedItemsMap[filterKey] = filter;
-
-    state.selectedItemsMap = selectedItemsMap;
+    state.selectedItemsMap[filterKey] = { ...filter };
 
     state.proxyFilter = {
         ...state.proxyFilter,
         [filterKey]: {
-            ...selectedItemsMap[filterKey],
-            v: selectedItemsMap[filterKey].v.map((d) => d.name),
+            ...filter,
+            v: filter.v.map((d) => d.name),
         },
     };
 };
