@@ -50,7 +50,7 @@ const {
         if (!value.length) {
             return false;
         }
-        if (state.workspaceGroupNames.includes(value)) {
+        if (state.workspaceGroupNames.includes(value.trim())) {
             return i18n.t('IAM.WORKSPACE_GROUP.MODAL.CREATE_NAME_INVALID_DUPLICATED');
         }
 

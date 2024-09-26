@@ -12,7 +12,7 @@ import PTableCheckModal from './PTableCheckModal.vue';
 type PTableCheckModalPropsAndCustomArgs = ComponentProps<typeof PTableCheckModal>;
 
 const meta : Meta<PTableCheckModalPropsAndCustomArgs> = {
-    title: 'Feedbacks/Modals/Advanced/Table Check Modal',
+    title: 'Feedbacks/Modals/Advanced/Table Check Modal(Deprecated)',
     component: PTableCheckModal,
     argTypes: {
         ...getTableCheckModalArgTypes(),

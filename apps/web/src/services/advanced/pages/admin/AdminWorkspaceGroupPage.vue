@@ -21,11 +21,12 @@ import WorkspaceGroupAddUsersModal from '@/services/advanced/components/Workspac
 import WorkspaceGroupAddWorkspacesModal from '@/services/advanced/components/WorkspaceGroupAddWorkspacesModal.vue';
 import WorkspaceGroupCreateModal from '@/services/advanced/components/WorkspaceGroupCreateModal.vue';
 import WorkspaceGroupDeleteModal from '@/services/advanced/components/WorkspaceGroupDeleteModal.vue';
-import WorkspaceGroupDeleteStatusModal from '@/services/advanced/components/WorkspaceGroupDeleteStatusModal.vue';
 import WorkspaceGroupEditModal from '@/services/advanced/components/WorkspaceGroupEditModal.vue';
 import WorkspaceGroupHeader from '@/services/advanced/components/WorkspaceGroupHeader.vue';
 import WorkspaceGroupTab from '@/services/advanced/components/WorkspaceGroupTab.vue';
 import WorkspaceGroupTable from '@/services/advanced/components/WorkspaceGroupTable.vue';
+import WorkspaceGroupUserDeleteModal from '@/services/advanced/components/WorkspaceGroupUserDeleteModal.vue';
+import WorkspaceGroupWorkspaceDeleteModal from '@/services/advanced/components/WorkspaceGroupWokrspaceDeleteModal.vue';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 import type { WorkspaceGroupFetchParameters } from '@/services/advanced/types/admin-workspace-group-type';
@@ -120,7 +121,8 @@ onUnmounted(() => {
         />
         <workspace-group-edit-modal @confirm="fetchWorkspaceGroups" />
         <workspace-group-delete-modal @confirm="fetchWorkspaceGroups" />
-        <workspace-group-delete-status-modal />
+        <workspace-group-workspace-delete-modal />
+        <workspace-group-user-delete-modal />
         <workspace-group-add-workspaces-modal />
         <workspace-group-add-users-modal @confirm="() => {refreshTab({isGroupUser: true})}" />
     </section>

@@ -108,6 +108,9 @@ watch(() => workspaceGroupPageState.modal, (value) => {
     >
         <template #body>
             <div class="form-wrapper">
+                <p class="text-paragraph-lg text-gray-900 mb-4">
+                    {{ $t('IAM.WORKSPACE_GROUP.MODAL.ADD_WORKSPACE_DESCRIPTION') }}
+                </p>
                 <p-field-group required
                                :label="$t('IAM.WORKSPACE_GROUP.MODAL.WORKSPACE_SELECT_DROP_DOWN_TITLE')"
                 >
