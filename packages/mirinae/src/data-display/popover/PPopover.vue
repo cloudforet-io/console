@@ -265,7 +265,7 @@ export default defineComponent<PopoverProps>({
 <style lang="postcss">
 .p-popover {
     > .target {
-        @apply inline-flex;
+        @apply inline-block;
     }
     > .floating {
         @apply bg-white border rounded-md border-gray-300;
