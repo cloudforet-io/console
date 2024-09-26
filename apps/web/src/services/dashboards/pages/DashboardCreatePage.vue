@@ -111,6 +111,7 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .dashboard-create-page {
+    margin: 0 auto;
     &.step-1 {
         width: 60rem;
     }
