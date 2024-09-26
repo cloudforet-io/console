@@ -221,6 +221,36 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('role', data);
     },
+    '/identity/workspace-group/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace_group', data);
+    },
+    '/identity/workspace-group/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace_group', data);
+    },
+    '/identity/workspace-group/delete': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace_group', data);
+    },
+    '/identity/workspace/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace', data);
+    },
+    '/identity/workspace/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace', data);
+    },
+    '/identity/workspace/delete': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace', data);
+    },
 });
 
 const getSessionTimeoutCallback = (store) => () => {

@@ -23,7 +23,6 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import type { Currency } from '@/store/modules/display/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 
 export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', () => {
     const state = reactive({
@@ -45,12 +44,12 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             visible: '',
         },
         // Additional data added for data transfer between modals
-        modalAdditionalData: {} as { workspaceGroupId?: string, selectedWorkspace?: TableDataItem, selectedGroupUser?: WorkspaceGroupUser },
+        modalAdditionalData: {} as { workspaceGroupId?: string, selectedWorkspace?: WorkspaceModel, selectedGroupUser?: WorkspaceGroupUser },
     });
 
     const userTabState = reactive({
         selectedUserIndices: [] as number[],
-        userInSelectedGroup: [] as WorkspaceGroupUserModel['users'],
+        userInSelectedGroup: [] as WorkspaceGroupUser[],
         userInSelectedGroupTotalCount: 0,
         searchText: '',
         thisPage: 1,
@@ -83,7 +82,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         selectedWorkspaceGroupId: computed(() => state.workspaceGroups[state.selectedIndices[0]]?.workspace_group_id),
         groupUserPage: computed(() => userTabState.pageStart / userTabState.pageLimit),
         selectedWorkspaceIds: computed<string[]>(() => workspaceTabState.selectedWorkspaceIndices.map((index: number) => workspaceTabState.workspacesInSelectedGroup[index].workspace_id)),
-        selectedGroupUsersByIndices: computed(() => userTabState.selectedUserIndices.map((index: number) => userTabState.userInSelectedGroup[index])),
+        selectedGroupUsersByIndices: computed<WorkspaceGroupUser[]>(() => userTabState.selectedUserIndices.map((index: number) => userTabState.userInSelectedGroup[index])),
         currency: computed<Currency|undefined>(() => workspaceTabState.costReportConfig?.currency),
     });
 

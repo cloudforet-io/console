@@ -175,6 +175,7 @@ watch(() => workspaceGroupPageState.modal.visible, async (visible) => {
                 </scoped-notification>
                 <p-field-group required
                                :label="$t('IAM.WORKSPACE_GROUP.MODAL.USER_SELECT_DROP_DOWN_TITLE')"
+                               class="mt-4"
                 >
                     <template #default>
                         <div class="user-form-wrapper">

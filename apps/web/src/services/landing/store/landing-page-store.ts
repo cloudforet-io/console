@@ -6,6 +6,8 @@ import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 
+import { sortTableItems } from '@/common/utils/table-sort';
+
 interface LandingPageStoreState {
     loading: boolean;
     selectedWorkspaceGroup: string;
@@ -36,21 +38,9 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
         workspaceGroupUsers: computed<WorkspaceUser[]>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[state.selectedWorkspaceGroup]?.users || []),
         workspaceGroupUserTotalCount: computed<number>(() => getters.workspaceGroupUsers.length || 0),
         workspaceGroupUserTableItem: computed<WorkspaceUser[]>(() => {
-            const filteredUsers = getters.workspaceGroupUsers?.filter(actions.filterUser);
+            const filteredUsers:WorkspaceUser[] = getters.workspaceGroupUsers.filter(actions.filterUser);
 
-            const sortedSelectedGroupUsers = filteredUsers?.sort((a, b) => {
-                const aValue = a[groupUserTableState.sortBy];
-                const bValue = b[groupUserTableState.sortBy];
-
-                if (aValue === undefined) return 1;
-                if (bValue === undefined) return -1;
-
-                if (groupUserTableState.isDesc) {
-                    return bValue.localeCompare(aValue);
-                }
-
-                return aValue.localeCompare(bValue);
-            });
+            const sortedSelectedGroupUsers = sortTableItems<WorkspaceUser>(filteredUsers, groupUserTableState.sortBy, groupUserTableState.isDesc);
 
             if (getters.groupUserTotalCount < groupUserTableState.pageStart - 1 + groupUserTableState.pageLimit) {
                 return sortedSelectedGroupUsers.slice(groupUserTableState.pageStart - 1);
@@ -67,7 +57,7 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
         initState: () => {
             state.loading = false;
         },
-        filterUser: (user:WorkspaceUser) => {
+        filterUser: (user:WorkspaceUser):boolean => {
             const searchText = groupUserTableState.searchText.trim();
 
             if (searchText === '') {
@@ -77,7 +67,7 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
             const userIdMatches = user.user_id && user.user_id.includes(searchText);
             const userNameMatches = user.user_name && user.user_name.includes(searchText);
 
-            return userIdMatches || userNameMatches;
+            return !!(userIdMatches || userNameMatches);
         },
     };
 
