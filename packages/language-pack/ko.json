@@ -1540,6 +1540,7 @@
 			"DISPLAY_SERIES_LABEL": {
 				"BOTTOM": "아래",
 				"DISPLAY_SERIES_LABEL": "시리즈 레이블 표시 ",
+				"FORMAT": "",
 				"INNER": "안쪽",
 				"INSIDE": "내부",
 				"INSIDE_BOTTOM": "내부 아래쪽",
@@ -1547,6 +1548,7 @@
 				"INSIDE_RIGHT": "내부 오른쪽",
 				"INSIDE_TOP": "내부 위쪽",
 				"LEFT": "왼쪽",
+				"NUMERICAL_VALUE": "",
 				"OUTER": "바깥쪽",
 				"POSITION": "위치",
 				"RIGHT": "오른쪽",
