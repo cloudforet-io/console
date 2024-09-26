@@ -1364,7 +1364,7 @@
 			"ADD_WIDGET": "Add Widget",
 			"ADD_WIDGET_TO_DASHBOARD": "Add Widget to Dashboard",
 			"ADVANCED_FORMAT_RULES": {
-				"COLOR_CODED_HEATMAP_DESC": "Heatmap color changes \baccording to the specified text in the legend.",
+				"COLOR_CODED_HEATMAP_DESC": "You can assign heatmap colors for each item in the legend.",
 				"COLOR_CODED_TABLE_HEATMAP_DESC": "Heatmap color changes based on threshold values."
 			},
 			"ALL_SUMMARY": {
@@ -4508,7 +4508,7 @@
 			"SUMMARY": {
 				"ACKNOWLEDGED": "Acknowledged",
 				"ALERT": "Alert",
-				"DEPRECATED_DESC": "You can see more details than the summary in project dashboard, which is currently in beta service.",
+				"DEPRECATED_DESC": "You can find more details in the project dashboards. (Beta)",
 				"DEPRECATED_TITLE": "Project Summary will be deprecated.",
 				"OPEN_ALERT": "Open Alert",
 				"RESOLVED": "Resolved",
@@ -4612,7 +4612,7 @@
 			"EMPTY_PROJECT_MSG": "Looks like you don't have any Project.",
 			"EMPTY_REQUEST_VALID_PERMISSION": "Please, Request valid permission to project Admin/Domain Administrator.",
 			"EMPTY_TEXT": "Looks like you don’t have any project. Create one by clicking the \"Create\" button.",
-			"EMPTY_TEXT_SEARCH": "Looks like there is no result",
+			"EMPTY_TEXT_SEARCH": "It appears that there are no results.",
 			"EVERYONE_AT_THIS_WORKSPACE": "Everyone at this workspace",
 			"FAVORITES": "Favorites",
 			"GROUP_MEMBER": "Group Member",
