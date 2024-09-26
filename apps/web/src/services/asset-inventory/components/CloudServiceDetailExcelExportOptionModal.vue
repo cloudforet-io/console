@@ -30,6 +30,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BASE_INFORMATION } from '@/services/asset-inventory/constants/cloud-service-detail-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
+import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 
 interface CloudServiceDetailSchema {
     name: string;
@@ -51,6 +52,7 @@ const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const cloudServiceDetailPageStoreState = cloudServiceDetailPageStore.$state;
+const cloudServiceLSBStore = useCloudServiceLSBStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 
@@ -74,7 +76,8 @@ const state = reactive({
 const apiQuery = new ApiQueryHelper();
 const getCloudServiceListQuery = () => {
     apiQuery.setMultiSortV2([{ key: 'created_at', desc: true }])
-        .setFilters(props.hiddenFilters.concat(cloudServiceDetailPageStoreState.searchFilters));
+        .setFilters(props.hiddenFilters.concat(cloudServiceDetailPageStoreState.searchFilters))
+        .addFilter(...cloudServiceLSBStore.allFilters);
     return apiQuery.data;
 };
 
