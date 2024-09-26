@@ -63,6 +63,7 @@ const handleSelectOperator = (operator: MenuItem) => {
         o: operator.name,
         v: [],
     };
+    state.visibleMenu = false;
 };
 
 const handleDeleteFilter = () => {
