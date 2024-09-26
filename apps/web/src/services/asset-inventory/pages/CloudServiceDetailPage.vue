@@ -422,7 +422,17 @@ const initPage = async (initQueryTags = false) => {
     }
     await fetchTableData();
 };
-
+const initDefaultFilter = () => {
+    const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : [route.query.default_filters]);
+    if (defaultSearchQuery.length) {
+        tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined))
+            .filter((d) => d);
+    }
+};
+const initExcelFilter = () => {
+    excelQuery.setFiltersAsRawQueryString(route.query.filters);
+    excelQuery.addFilter(...cloudServiceLSBStore.allFilters);
+};
 
 /* Actions */
 const handleDynamicLayoutFetch = (changed: ToolboxOptions = {}) => {
@@ -482,14 +492,8 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
 }));
 
 (async () => {
-    const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : [route.query.default_filters]);
-    if (defaultSearchQuery.length) {
-        tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined))
-            .filter((d) => d);
-    }
-    excelQuery.setFiltersAsRawQueryString(route.query.filters);
-    excelQuery.addFilter(...cloudServiceLSBStore.allFilters);
-
+    initDefaultFilter();
+    initExcelFilter();
 
     const urlQueryValue = {
         project: queryStringToArray(route.query.project),
