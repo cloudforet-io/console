@@ -131,7 +131,10 @@ const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
 
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
-    if (!visible) dashboardMainPageStore.reset();
+    if (!visible) {
+        dashboardMainPageStore.reset();
+        state.selectedTarget = 'WORKSPACE';
+    }
 });
 </script>
 
