@@ -121,7 +121,7 @@ const state = reactive({
             ...state.projectLandingMenuSet,
         ];
     }),
-    projectFilteredByKeyword: computed<LSBItem[]>(() => storeState.projectItems.filter((project) => project.name.includes(state.projectKeyword))
+    projectFilteredByKeyword: computed<LSBItem[]>(() => storeState.projectItems.filter((project) => project.name?.toLowerCase()?.includes(state.projectKeyword?.toLowerCase()))
         .map((project) => ({
             type: MENU_ITEM_TYPE.ITEM,
             label: project.name,
