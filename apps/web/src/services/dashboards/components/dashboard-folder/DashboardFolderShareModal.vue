@@ -1,31 +1,34 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDataTable, PI, PButtonModal, PRadioGroup, PRadio, PFieldGroup,
 } from '@cloudforet/mirinae';
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { PublicFolderShareParameters } from '@/schema/dashboard/public-folder/api-verbs/share';
+import type { PublicFolderUnshareParameters } from '@/schema/dashboard/public-folder/api-verbs/unshare';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-// import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-// import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PublicDashboardReferenceMap } from '@/store/reference/public-dashboard-reference-store';
+import type { PublicFolderReferenceItem, PublicFolderReferenceMap } from '@/store/reference/public-folder-reference-store';
 
-// import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-// import ErrorHandler from '@/common/composables/error/errorHandler';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
-import type { DashboardTreeDataType, DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
+import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
-const DELETE_TABLE_FIELDS = [
+const TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
     { name: 'location', label: 'Location' },
 ];
@@ -38,30 +41,42 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
-// const allReferenceStore = useAllReferenceStore();
-// const dashboardStore = useDashboardStore();
 const dashboardMainPageStore = useDashboardMainPageStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
-const dashboardMainPageGetters = dashboardMainPageStore.getters;
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    dashboards: computed<PublicDashboardReferenceMap>(() => allReferenceStore.getters.publicDashboard),
+    folders: computed<PublicFolderReferenceMap>(() => allReferenceStore.getters.publicFolder),
 });
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
-    selectedTreeData: computed<TreeNode<DashboardTreeDataType>|undefined>(() => {
-        const _selectedFolderId = dashboardMainPageState.selectedFolderId;
-        if (!_selectedFolderId) return undefined;
-        return dashboardMainPageGetters.publicDashboardTreeData.find((d) => d.data.id === _selectedFolderId);
+    targetFolderItem: computed<PublicFolderReferenceItem|undefined>(() => storeState.folders[dashboardMainPageState.selectedFolderId || '']),
+    needToShare: computed<boolean>(() => !state.targetFolderItem?.data?.shared),
+    modalTableItems: computed<DashboardDataTableItem[]>(() => {
+        const _folderName = state.targetFolderItem?.name || '';
+        const _folderItems: DashboardDataTableItem[] = [{
+            id: state.targetFolderItem?.key || '',
+            name: _folderName,
+            type: 'FOLDER',
+        }];
+        const _dashboardItems: DashboardDataTableItem[] = Object.entries(storeState.dashboards)
+            .filter(([, d]) => d.data.folderId === dashboardMainPageState.selectedFolderId)
+            .map(([, d]) => ({
+                id: d.key,
+                name: d.name,
+                location: _folderName,
+                type: 'DASHBOARD',
+            }));
+        return [..._folderItems, ..._dashboardItems];
     }),
-    needToShare: computed<boolean>(() => !state.selectedTreeData?.data?.shared),
-    modalTableItems: computed<DashboardDataTableItem[]>(() => getModalTableItems(state.selectedTreeData)),
     headerTitle: computed(() => {
         if (storeState.isAdminMode) {
             if (state.needToShare) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARE_DASHBOARD');
-            return i18n.t('DASHBOARDS.ALL_DASHBOARDS.UNSHARE_DASHBOARD');
+            if (state.targetFolderItem?.data?.projectId === '*') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.UNSHARE_DASHBOARD_FROM_ALL_PROJECTS');
+            return i18n.t('DASHBOARDS.ALL_DASHBOARDS.UNSHARE_DASHBOARD_FROM_ALL_WORKSPACES');
         }
-
         if (state.needToShare) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARE_DASHBOARD_TO_ALL_PROJECTS');
         return i18n.t('DASHBOARDS.ALL_DASHBOARDS.UNSHARE_DASHBOARD_FROM_ALL_PROJECTS');
     }),
@@ -72,63 +87,43 @@ const state = reactive({
     selectedTarget: 'WORKSPACE' as 'WORKSPACE' | 'PROJECT',
 });
 
-/* Util */
-const getModalTableItems = (selectedTreeData: TreeNode<DashboardTreeDataType>): DashboardDataTableItem[] => {
-    if (!selectedTreeData) return [];
-    const _tableItems: DashboardDataTableItem[] = [];
-
-    // set folder
-    _tableItems.push({
-        id: selectedTreeData.data.id,
-        name: selectedTreeData.data.name,
-        type: 'FOLDER',
-    });
-    // set children dashboards
-    selectedTreeData.children?.forEach((child) => {
-        _tableItems.push({
-            id: child.data.id,
-            name: child.data.name,
-            location: selectedTreeData.data.name,
-            type: 'DASHBOARD',
-            isFolderSelected: true,
-        });
-    });
-    return _tableItems;
-};
-
 /* Api */
-// const shareFolder = async (folderId: string) => {
-//     // share
-// };
-// const shareDashboard = async (dashboardId: string) => {
-//     // share dashboard
-// };
+const shareFolder = async () => {
+    state.loading = true;
+    try {
+        await SpaceConnector.clientV2.dashboard.publicFolder.share<PublicFolderShareParameters>({
+            folder_id: state.targetFolderItem?.key || '',
+            scope: storeState.isAdminMode ? state.selectedTarget : 'PROJECT',
+        });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
+        state.proxyVisible = false;
+    } catch (e: any) {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+const unshareFolder = async () => {
+    state.loading = true;
+    try {
+        await SpaceConnector.clientV2.dashboard.publicFolder.unshare<PublicFolderUnshareParameters>({
+            folder_id: state.targetFolderItem?.key || '',
+        });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
+        state.proxyVisible = false;
+    } catch (e: any) {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
 
 /* Event */
 const handleConfirm = async () => {
-    if (!state.selectedTreeData) return;
-    state.loading = true;
-    // const _promises: Promise<void>[] = [];
-
-    // share folder
-    // await shareFolder(state.selectedTreeData.data.id);
-
-    // share dashboards
-    // await Promise.allSettled(state.selectedTreeData.children?.forEach((child) => {
-    //     _promises.push(shareDashboard(child.data.id));
-    // }));
-    // const _results = await Promise.allSettled(_promises);
-
-    // if (_results.every((r) => r.status === 'fulfilled')) {
-    //     showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_S_SHARE_DASHBOARD'), '');
-    // } else {
-    //     const _failedCount = _results.map((r) => r.status !== 'fulfilled').length;
-    //     ErrorHandler.handleRequestError(new Error('Share failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_SHARE_DASHBOARD', { count: _failedCount }));
-    // }
-    // await dashboardStore.load();
-    // dashboardMainPageStore.setSelectedIdMap({}, dashboardMainPageState.folderModalType);
-    state.loading = false;
-    state.proxyVisible = false;
+    if (state.needToShare) await shareFolder();
+    else await unshareFolder();
 };
 const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
     state.selectedTarget = value;
@@ -136,9 +131,7 @@ const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
 
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
-    if (!visible) {
-        dashboardMainPageStore.reset();
-    }
+    if (!visible) dashboardMainPageStore.reset();
 });
 </script>
 
@@ -170,7 +163,7 @@ watch(() => state.proxyVisible, (visible) => {
                 </p-radio-group>
             </p-field-group>
             <p-data-table :items="state.modalTableItems"
-                          :fields="DELETE_TABLE_FIELDS"
+                          :fields="TABLE_FIELDS"
                           :loading="state.loading"
             >
                 <template #col-name-format="{item}">
