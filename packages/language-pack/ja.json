@@ -3353,7 +3353,8 @@
 				"SERVICE_CODE": "Service Code",
 				"SPECIFIC_SERVICE_ACCOUNT": "特定のサービスアカウント",
 				"TAG": "タグ",
-				"VERSION": "バージョン"
+				"VERSION": "バージョン",
+				"VIEW_IN_ADMIN_MODE": ""
 			},
 			"HISTORY": {
 				"ALL": "すべてを表示",
@@ -4456,6 +4457,7 @@
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
 				"USER_ID": "ユーザーID"
 			},
+			"MEMBERS": "",
 			"MEMBER_TITLE": "プロジェクト メンバー",
 			"MODAL_CREATE_PROJECT_LABEL": "名前",
 			"MODAL_CREATE_PROJECT_PLACEHOLDER": "プロジェクト名",
@@ -4529,8 +4531,12 @@
 			"TAB_REPORT": "レポート",
 			"TAB_SUMMARY": "概要情報",
 			"TAB_TAG": "タグ",
+			"TAGS": "",
 			"UPDATE": "編集",
+			"UPDATE_TAG": "",
+			"UPDATE_TAG_DESC": "",
 			"VIEW_IN": "詳細情報",
+			"WEBHOOKS": "",
 			"WEBHOOK_ACTION": "作業",
 			"WEBHOOK_ADD": "追加",
 			"WEBHOOK_DELETE": "削除",

@@ -3353,7 +3353,8 @@
 				"SERVICE_CODE": "Service Code",
 				"SPECIFIC_SERVICE_ACCOUNT": "Specific Service Account",
 				"TAG": "Tag",
-				"VERSION": "Version"
+				"VERSION": "Version",
+				"VIEW_IN_ADMIN_MODE": "View in Admin Mode"
 			},
 			"HISTORY": {
 				"ALL": "All",
@@ -4456,6 +4457,7 @@
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
 				"USER_ID": "User ID"
 			},
+			"MEMBERS": "{count} Members",
 			"MEMBER_TITLE": "Project Member",
 			"MODAL_CREATE_PROJECT_LABEL": "Name",
 			"MODAL_CREATE_PROJECT_PLACEHOLDER": "Project Name",
@@ -4529,8 +4531,12 @@
 			"TAB_REPORT": "Report",
 			"TAB_SUMMARY": "Summary",
 			"TAB_TAG": "Tag",
+			"TAGS": "{count} Tags",
 			"UPDATE": "Update",
+			"UPDATE_TAG": "Update Tag",
+			"UPDATE_TAG_DESC": "Set project's tag. Each tag consists of a key and an optional value. You can use tags to search and filter your project.",
 			"VIEW_IN": "View in",
+			"WEBHOOKS": "{count} Webhooks",
 			"WEBHOOK_ACTION": "Action",
 			"WEBHOOK_ADD": "Add",
 			"WEBHOOK_DELETE": "Delete",

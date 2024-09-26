@@ -3353,7 +3353,8 @@
 				"SERVICE_CODE": "Service Code",
 				"SPECIFIC_SERVICE_ACCOUNT": "특정 서비스 어카운트",
 				"TAG": "태그",
-				"VERSION": "버전"
+				"VERSION": "버전",
+				"VIEW_IN_ADMIN_MODE": ""
 			},
 			"HISTORY": {
 				"ALL": "모두 보기",
@@ -4456,6 +4457,7 @@
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다. 다른 검색어로 검색해보세요.",
 				"USER_ID": "사용자 ID"
 			},
+			"MEMBERS": "",
 			"MEMBER_TITLE": "프로젝트 멤버",
 			"MODAL_CREATE_PROJECT_LABEL": "이름 ",
 			"MODAL_CREATE_PROJECT_PLACEHOLDER": "프로젝트 이름 ",
@@ -4529,8 +4531,12 @@
 			"TAB_REPORT": "보고서",
 			"TAB_SUMMARY": "요약 정보 ",
 			"TAB_TAG": "태그 ",
+			"TAGS": "",
 			"UPDATE": "수정",
+			"UPDATE_TAG": "",
+			"UPDATE_TAG_DESC": "",
 			"VIEW_IN": "상세 정보",
+			"WEBHOOKS": "",
 			"WEBHOOK_ACTION": "작업",
 			"WEBHOOK_ADD": "추가",
 			"WEBHOOK_DELETE": "삭제",

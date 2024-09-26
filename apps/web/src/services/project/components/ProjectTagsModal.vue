@@ -61,7 +61,7 @@ onMounted(() => {
     <p-button-modal
         class="project-tags-modal"
         modal-body-id="project-tags"
-        :header-title="$t('Update Tag')"
+        :header-title="$t('PROJECT.DETAIL.UPDATE_TAG')"
         :fade="true"
         :backdrop="true"
         size="sm"
@@ -71,9 +71,7 @@ onMounted(() => {
     >
         <template #body>
             <p class="description">
-                Set project's tag.
-                Each tag consists of a key and an optional value.
-                You can use tags to search and filter your project
+                {{ $t('PROJECT.DETAIL.UPDATE_TAG_DESC') }}
             </p>
             <project-tags-input-group :tags="state.newTags"
                                       :disabled="props.loading"
