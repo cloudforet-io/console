@@ -22,6 +22,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { Period } from '@/services/asset-inventory/types/type';
 
@@ -44,6 +45,8 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServiceLSBStore = useCloudServiceLSBStore();
+
 const allReferenceStore = useAllReferenceStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -86,11 +89,11 @@ const getCloudServiceDetailLink = (item: CloudServiceAnalyzeResult, resource?: C
     // if (cloudServicePageStore.selectedRegions.length) {
     //     cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: cloudServicePageStore.selectedRegions });
     // }
-    if (cloudServicePageStore.selectedProjects.length) {
-        cloudServiceDetailQueryHelper.addFilter({ k: 'project_id', o: '=', v: cloudServicePageStore.selectedProjects });
+    if (cloudServiceLSBStore.selectedProjects.length) {
+        cloudServiceDetailQueryHelper.addFilter({ k: 'project_id', o: '=', v: cloudServiceLSBStore.selectedProjects });
     }
-    if (cloudServicePageStore.selectedServiceAccounts.length) {
-        cloudServiceDetailQueryHelper.addFilter({ k: 'service_account_id', o: '=', v: cloudServicePageStore.selectedServiceAccounts });
+    if (cloudServiceLSBStore.selectedServiceAccounts.length) {
+        cloudServiceDetailQueryHelper.addFilter({ k: 'service_account_id', o: '=', v: cloudServiceLSBStore.selectedServiceAccounts });
     }
 
     const res: Location = getProperRouteLocation({

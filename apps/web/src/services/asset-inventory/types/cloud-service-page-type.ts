@@ -2,7 +2,9 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
-import type { CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY, CLOUD_SERVICE_PAGE_URL_QUERY_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
+import type {
+    CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY, CLOUD_SERVICE_PAGE_URL_QUERY_KEY, CLOUD_SERVICE_GLOBAL_FILTER_KEY,
+} from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { Period } from '@/services/asset-inventory/types/type';
 
 type CloudServicePageUrlQueryKey = typeof CLOUD_SERVICE_PAGE_URL_QUERY_KEY[number];
@@ -24,8 +26,11 @@ export type CloudServicePageUrlQueryValue = {
 export type CloudServiceFilterKey = typeof CLOUD_SERVICE_FILTER_KEY[keyof typeof CLOUD_SERVICE_FILTER_KEY];
 
 export type CloudServiceFilterMap = {
-    [CLOUD_SERVICE_FILTER_KEY.PROJECT]?: string[];
-    [CLOUD_SERVICE_FILTER_KEY.SERVICE_ACCOUNT]?: string[];
     [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]?: CloudServiceCategory[];
     [CLOUD_SERVICE_FILTER_KEY.REGION]?: string[];
+};
+
+export type CloudServiceGlobalFilterMap = {
+    [CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT]?: string[];
+    [CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT]?: string[];
 };
