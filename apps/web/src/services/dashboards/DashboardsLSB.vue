@@ -8,6 +8,8 @@ import {
     PIconButton,
 } from '@cloudforet/mirinae';
 
+import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
+import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -57,6 +59,11 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     currentPath: computed(() => route.fullPath),
+    privateV2DashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems
+        .filter((d) => d.version !== '1.0')),
+    publicV2DashboardItems: computed<PublicDashboardModel[]>(() => dashboardState.publicDashboardItems
+        .filter((d) => d.version !== '1.0')
+        .filter((d) => d.project_id !== '*')),
     favoriteItemMap: computed(() => {
         const result: Record<string, FavoriteConfig> = {};
         storeState.favoriteItems?.forEach((d) => {
@@ -83,21 +90,6 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    workspaceV2MenuSet: computed<LSBItem[]>(() => dashboardState.publicDashboardItems.filter((d) => d.version === '2.0').map((d) => ({
-        type: MENU_ITEM_TYPE.ITEM,
-        id: d.dashboard_id,
-        label: d.name,
-        to: getProperRouteLocation({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: d.dashboard_id,
-            },
-        }),
-        favoriteOptions: {
-            type: FAVORITE_TYPE.DASHBOARD,
-            id: d.dashboard_id,
-        },
-    }))),
     workspaceV1MenuSet: computed<LSBItem[]>(() => dashboardState.publicDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
@@ -108,25 +100,6 @@ const state = reactive({
                 dashboardId: d.dashboard_id,
             },
         }),
-        favoriteOptions: {
-            type: FAVORITE_TYPE.DASHBOARD,
-            id: d.dashboard_id,
-        },
-    }))),
-    privateV2MenuSet: computed<LSBMenu[]>(() => dashboardState.privateDashboardItems.filter((d) => d.version === '2.0').map((d) => ({
-        type: MENU_ITEM_TYPE.ITEM,
-        id: d.dashboard_id,
-        label: d.name,
-        to: getProperRouteLocation({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: d.dashboard_id,
-            },
-        }),
-        icon: {
-            name: 'ic_lock-filled',
-            color: gray[500],
-        },
         favoriteOptions: {
             type: FAVORITE_TYPE.DASHBOARD,
             id: d.dashboard_id,
@@ -171,8 +144,6 @@ const state = reactive({
         label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED'),
         id: 'deprecated',
     })),
-    sharedSubItem: computed<LSBMenu[]>(() => (storeState.isWorkspaceOwner ? filterMenuItems(state.workspaceV2MenuSet) : [])),
-    privateSubItem: computed<LSBMenu[]>(() => filterMenuItems(state.privateV2MenuSet)),
     deprecatedSubItem: computed<LSBMenu[]>(() => [
         ...state.workspaceV1MenuSet,
         ...state.privateV1MenuSet,
@@ -232,15 +203,6 @@ const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
     });
     return result;
 };
-const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
-    const result = [] as LSBMenu[];
-    menuItems.forEach((d) => {
-        if (!Array.isArray(d)) {
-            result.push(d);
-        }
-    });
-    return result;
-};
 const loadDashboard = async () => {
     await dashboardStore.load();
 };
@@ -281,34 +243,36 @@ callApiWithGrantGuard();
         <template v-if="storeState.isWorkspaceOwner"
                   #slot-shared
         >
-            <l-s-b-collapsible-menu-item v-if="state.sharedSubItem.length"
+            <l-s-b-collapsible-menu-item v-if="state.publicV2DashboardItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
                                              label: $t('DASHBOARDS.LNB.SHARED'),
-                                             subItems: state.sharedSubItem,
                                          }"
                                          is-sub-item
                                          show-sub-item-count
             >
                 <template #collapsible-contents>
-                    <dashboard-l-s-b-tree type="PUBLIC" />
+                    <dashboard-l-s-b-tree type="PUBLIC"
+                                          :dashboards="state.publicV2DashboardItems"
+                    />
                 </template>
             </l-s-b-collapsible-menu-item>
         </template>
         <template #slot-private>
-            <l-s-b-collapsible-menu-item v-if="state.privateSubItem.length"
+            <l-s-b-collapsible-menu-item v-if="state.privateV2DashboardItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
                                              label: $t('DASHBOARDS.LNB.PRIVATE'),
-                                             subItems: state.privateSubItem,
                                          }"
                                          is-sub-item
                                          show-sub-item-count
             >
                 <template #collapsible-contents>
-                    <dashboard-l-s-b-tree type="PRIVATE" />
+                    <dashboard-l-s-b-tree type="PRIVATE"
+                                          :dashboards="state.privateV2DashboardItems"
+                    />
                 </template>
             </l-s-b-collapsible-menu-item>
         </template>
