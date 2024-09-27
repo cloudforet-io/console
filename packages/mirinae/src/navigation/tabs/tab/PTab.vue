@@ -12,6 +12,7 @@ import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import PDivider from '@/layouts/divider/PDivider.vue';
+import FolderTab from '@/navigation/tabs/tab/components/FolderTab.vue';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
 const CUSTOM_BACK_BUTTON = 'CUSTOM_BACK_BUTTON';
@@ -27,9 +28,8 @@ const emit = defineEmits<{(e: 'update:active-tab', value: string): void;
 }>();
 
 const tabContainerRef = ref<HTMLElement|null>(null);
-const tabItemsRef = ref<(HTMLElement|typeof PDivider)[]>([]);
+const tabItemsRef = ref<(HTMLElement|typeof PDivider|typeof FolderTab)[]>([]);
 const slotRef = ref<HTMLElement|null>(null);
-const groupTabMenuRef = ref<HTMLElement|null>(null);
 const hiddenTabsMenuRef = ref<HTMLElement|null>(null);
 
 const {
@@ -75,7 +75,7 @@ const state = reactive({
                     iconColor: '#0062B8',
                 },
                 {
-                    tabType: 'divider',
+                    type: 'divider',
                 },
                 ...selectedTab?.subItems || [],
             ];
@@ -196,33 +196,17 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
                                class="divider-item"
                                vertical
                     />
-                    <li v-else-if="tab.tabType === 'folder'"
-                        :key="tab.name"
-                        ref="tabItemsRef"
-                        :class="{active: tab.subItems?.some((subItem) => activeTab === subItem.name)}"
-                        role="tab"
-                        @keydown.enter="handleSelectGroupTab(tab)"
-                        @click="handleSelectGroupTab(tab)"
-                    >
-                        <div class="content-wrapper">
-                            <span class="label">
-                                {{ tab.label }}
-                            </span>
-                            <p-i class="sub-item-dropdown-icon"
-                                 :name="state.selectedFolderTab === tab.name ? 'ic_chevron-up' : 'ic_chevron-down'"
-                                 width="1.25rem"
-                                 height="1.25rem"
-                                 color="inherit"
-                            />
-                        </div>
-                        <p-context-menu v-if="state.selectedFolderTab === tab.name"
-                                        ref="groupTabMenuRef"
-                                        class="sub-item-menu"
-                                        :menu="tab?.subItems || []"
-                                        :selected="state.selectedContextMenuItem ? [state.selectedContextMenuItem]: undefined"
-                                        @select="handleSelectGroupTabMenu"
-                        />
-                    </li>
+                    <folder-tab v-else-if="tab.tabType === 'folder'"
+                                :key="tab.name"
+                                ref="tabItemsRef"
+                                :tab="tab"
+                                :active-tab="props.activeTab"
+                                :selected-folder-tab="state.selectedFolderTab"
+                                :selected-context-menu-item="state.selectedContextMenuItem"
+                                :visible-sub-menu="state.selectedFolderTab === tab.name"
+                                @select-tab="handleSelectGroupTab(tab)"
+                                @select-tab-menu="handleSelectGroupTabMenu"
+                    />
                     <li v-else
                         :key="tab.name"
                         ref="tabItemsRef"
@@ -274,11 +258,18 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
                                 <p-text-button v-if="item?.name === CUSTOM_BACK_BUTTON"
                                                style-type="highlight"
                                 >
-                                    {{ $t('Back') }}
+                                    {{ $t('TAB.BACK') }}
                                 </p-text-button>
                                 <template v-else>
                                     {{ item?.label || item?.name }}
                                 </template>
+                            </template>
+                            <template v-if="state.selectedHiddenParentTab && state.hiddenTabMenuItems.length === 2"
+                                      #bottom
+                            >
+                                <div class="empty-sub-menu-item">
+                                    {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
+                                </div>
                             </template>
                         </p-context-menu>
                     </li>
@@ -342,7 +333,7 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
 
             @media (hover: hover) {
                 &:hover {
-                    @apply text-gray-900;
+                    @apply text-gray-900 bg-gray-100;
                 }
             }
             &.active {
@@ -404,5 +395,9 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
     .footer {
         flex: 0 0;
     }
+}
+
+.empty-sub-menu-item {
+    @apply text-label-md text-gray-300;
 }
 </style>

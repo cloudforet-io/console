@@ -146,7 +146,7 @@ watch(() => props.projectGroupId, async (after) => {
                     fade
                     backdrop
                     :visible.sync="state.proxyVisible"
-                    :disabled="state.loading || !isAllValid"
+                    :disabled="state.loading || !isAllValid || storeState.projectGroups[props.projectGroupId]?.name === projectGroupName"
                     @confirm="confirm"
     >
         <template #body>
