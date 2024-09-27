@@ -83,7 +83,6 @@ const state = reactive({
         return undefined;
     }),
     isTextTruncate: undefined as boolean|undefined,
-    popoverVisible: false,
 });
 
 /* Watcher */
@@ -163,7 +162,7 @@ watch(() => costTypeRef.value, (costType) => {
                 >
                     <span class="cost-type-content">{{ state.providerListText }}</span>
                 </span>
-                <p-popover :is-visible="state.popoverVisible">
+                <p-popover>
                     <p-text-button v-if="state.isTextTruncate"
                                    style-type="highlight"
                     >

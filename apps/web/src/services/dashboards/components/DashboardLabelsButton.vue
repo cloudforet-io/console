@@ -103,7 +103,7 @@ onClickOutside(labelPopoverRef, () => { state.visible = false; });
 
     /* custom design-system component - p-popover */
     :deep(.p-popover) {
-        .popper-content-wrapper {
+        .floating-content-wrapper {
             min-height: 5.1875rem;
             min-width: 18rem;
             max-width: 28rem;

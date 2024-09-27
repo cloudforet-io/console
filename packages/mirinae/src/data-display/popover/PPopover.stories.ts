@@ -35,9 +35,9 @@ const Template: Story = {
         props: Object.keys(argTypes),
         components: { PPopover, PButton },
         template: `
-            <div class="w-full overflow p-8 flex justify-center items-center" style="height: 250px;">
+            <div class="w-full overflow p-8 flex justify-center items-center story-container" style="height: 250px;">
                 <p-popover :position="proxyPosition"
-                           :isVisible="proxyIsVisible"
+                           :isVisible.sync="proxyIsVisible"
                            :tag="tag"
                            :ignore-target-click="ignoreTargetClick"
                            :trigger="trigger"
@@ -45,6 +45,7 @@ const Template: Story = {
                            :hide-padding="hidePadding"
                            :hide-close-button="hideCloseButton"
                            :hide-arrow="hideArrow"
+                           :width="width"
                 >
                     <div v-if="defaultSlot" v-html="defaultSlot" />
                     <p-button v-else @click="handleClick">default</p-button>
@@ -112,13 +113,34 @@ export const BasicPopover: Story = {
                 <b>focus</b>
                 <br/>
                 <p-popover trigger="focus">
-                    <p-text-input style-type="primary" :outline="true">default</p-text-input>
+                    <input placeholder="This is basic input"/>
+                    <template #content>
+                        <p>content slot</p>
+                    </template>
+                </p-popover>
+                <br/>
+                <br/>
+                <b>focus - binding isVisible</b>
+                <br/>
+                <p-popover trigger="focus" :is-visible="isFocused">
+                    <p-text-input style-type="primary" :outline="true"
+                                  placeholder="This is PTextInput Component"
+                                  :is-focused.sync="isFocused"
+                    />
                     <template #content>
                         <p>content slot</p>
                     </template>
                 </p-popover>
             </div>
         `,
+        setup() {
+            const state = reactive({
+                isFocused: false,
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
     }),
 };
 
@@ -188,6 +210,28 @@ export const HideArrow: Story = {
                         <p>This popover hides arrow</p>
                     </template>
                 </p-popover>
+            </div>
+        `,
+    }),
+};
+
+export const Width: Story = {
+    render: () => ({
+        components: { PPopover, PButton },
+        template: `
+            <div class="w-full overflow p-8 flex flex-col gap-4" style="height: 300px;">
+                <div class="border border-blue-500 w-full relative p-4 popover-story-container">
+                    <p class="text-2xl my-4">The div(blue bordered) which contains all these contents has <strong>relative</strong> position.</p>
+                    <p-popover width="100%">
+                        <p-button>click me</p-button>
+                        <template #content>
+                            <div>
+                                <p>This popover has width 100%</p>
+                                <p>Which means it will be the same width as the blue bordered div</p>
+                            </div>
+                        </template>
+                    </p-popover>
+                </div>
             </div>
         `,
     }),

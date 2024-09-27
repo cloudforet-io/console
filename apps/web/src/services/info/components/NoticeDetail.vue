@@ -195,11 +195,11 @@ watch(() => props.postId, (postId) => {
                         <div v-else
                              class="workspace-wrapper"
                         >
-                            <workspace-logo-icon :text="state.scopedWorkspaceList[0].name || ''"
-                                                 :theme="state.scopedWorkspaceList[0].tags?.theme"
+                            <workspace-logo-icon :text="state.scopedWorkspaceList[0]?.name || ''"
+                                                 :theme="state.scopedWorkspaceList[0]?.tags?.theme"
                                                  size="xxs"
                             />
-                            <span>{{ state.scopedWorkspaceList[0].name }}</span>
+                            <span>{{ state.scopedWorkspaceList[0]?.name }}</span>
                             <p-badge v-if="state.scopedWorkspaceList?.length > 1"
                                      style-type="blue200"
                                      badge-type="subtle"
@@ -207,7 +207,7 @@ watch(() => props.postId, (postId) => {
                                 + {{ state.scopedWorkspaceList?.length - 1 }}
                             </p-badge>
                             <p-popover v-if="state.scopedWorkspaceList?.length > 1"
-                                       v-model="state.popoverVisible"
+                                       :is-visible.sync="state.popoverVisible"
                                        position="bottom"
                             >
                                 <p-text-button class="show-workspaces"
@@ -222,11 +222,11 @@ watch(() => props.postId, (postId) => {
                                          :key="idx"
                                          class="workspace-wrapper"
                                     >
-                                        <workspace-logo-icon :text="item.name || ''"
-                                                             :theme="item.tags?.theme"
+                                        <workspace-logo-icon :text="item?.name || ''"
+                                                             :theme="item?.tags?.theme"
                                                              size="xxs"
                                         />
-                                        <span>{{ item.name }}</span>
+                                        <span>{{ item?.name }}</span>
                                     </div>
                                 </template>
                             </p-popover>
