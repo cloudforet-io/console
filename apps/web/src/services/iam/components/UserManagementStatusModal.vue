@@ -9,7 +9,7 @@ import { cloneDeep, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PStatus, PTableCheckModal,
+    PStatus, PButtonModal, PDataTable,
 } from '@cloudforet/mirinae';
 
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
@@ -52,24 +52,25 @@ const state = reactive({
 });
 
 /* Component */
-const checkModalConfirm = async (items) => {
+const checkModalConfirm = async () => {
     let responses: boolean[] = [];
     let languagePrefix = 'DELETE';
+    const items = userPageGetters.selectedUsers;
     state.loading = true;
 
     try {
         if (userPageState.modal.type === USER_MODAL_TYPE.DELETE) {
-            responses = await Promise.all(map(items, (item) => deleteUser(item.user_id)));
+            responses = await Promise.all(map(items, (item) => deleteUser(item?.user_id)));
             userPageState.selectedIndices = [];
         } else if (userPageState.modal.type === USER_MODAL_TYPE.ENABLE) {
             languagePrefix = 'ENABLE';
-            responses = await Promise.all(map(items, (item) => enableUser(item.user_id)));
+            responses = await Promise.all(map(items, (item) => enableUser(item?.user_id)));
         } else if (userPageState.modal.type === USER_MODAL_TYPE.DISABLE) {
             languagePrefix = 'DISABLE';
-            responses = await Promise.all(map(items, (item) => disableUser(item.user_id)));
+            responses = await Promise.all(map(items, (item) => disableUser(item?.user_id)));
         } else if (userPageState.modal.type === USER_MODAL_TYPE.REMOVE) {
             languagePrefix = 'REMOVE';
-            responses = await Promise.all(map(items, (item) => removeUser(item?.role_binding_info.role_binding_id)));
+            responses = await Promise.all(map(items, (item) => removeUser(item?.role_binding_info?.role_binding_id)));
         }
 
         const successCount = responses.filter((d) => d).length;
@@ -97,8 +98,9 @@ const handleClose = () => {
 };
 
 /* API */
-const removeUser = async (role_binding_id: string): Promise<boolean> => {
+const removeUser = async (role_binding_id?: string): Promise<boolean> => {
     try {
+        if (!role_binding_id) return false;
         await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
             role_binding_id,
         });
@@ -108,8 +110,9 @@ const removeUser = async (role_binding_id: string): Promise<boolean> => {
     }
 };
 
-const deleteUser = async (userId: string): Promise<boolean> => {
+const deleteUser = async (userId?: string): Promise<boolean> => {
     try {
+        if (!userId) return false;
         await SpaceConnector.clientV2.identity.user.delete<UserDeleteParameters>({
             user_id: userId,
         });
@@ -118,8 +121,9 @@ const deleteUser = async (userId: string): Promise<boolean> => {
         return false;
     }
 };
-const enableUser = async (userId: string): Promise<boolean> => {
+const enableUser = async (userId?: string): Promise<boolean> => {
     try {
+        if (!userId) return false;
         await SpaceConnector.clientV2.identity.user.enable<UserEnableParameters>({
             user_id: userId,
         });
@@ -128,8 +132,9 @@ const enableUser = async (userId: string): Promise<boolean> => {
         return false;
     }
 };
-const disableUser = async (userId: string): Promise<boolean> => {
+const disableUser = async (userId?: string): Promise<boolean> => {
     try {
+        if (!userId) return false;
         await SpaceConnector.clientV2.identity.user.disable<UserDisableParameters>({
             user_id: userId,
         });
@@ -141,27 +146,34 @@ const disableUser = async (userId: string): Promise<boolean> => {
 </script>
 
 <template>
-    <p-table-check-modal :visible="userPageState.modal.visible.status"
-                         :header-title="userPageState.modal.title"
-                         :theme-color="userPageState.modal.themeColor"
-                         :fields="state.fields"
-                         :loading="state.loading"
-                         :items="userPageGetters.selectedUsers"
-                         modal-size="md"
-                         @confirm="checkModalConfirm"
-                         @cancel="handleClose"
+    <p-button-modal :visible="userPageState.modal.visible.status"
+                    :header-title="userPageState.modal.title"
+                    :theme-color="userPageState.modal.themeColor"
+                    :loading="state.loading"
+                    modal-size="md"
+                    @confirm="checkModalConfirm"
+                    @close="handleClose"
+                    @cancel="handleClose"
     >
-        <template #col-state-format="{value}">
-            <p-status v-bind="userStateFormatter(value)"
-                      class="capitalize"
-            />
+        <template #body>
+            <p-data-table
+                :fields="state.fields"
+                :items="userPageGetters.selectedUsers"
+                class="mt-8"
+            >
+                <template #col-state-format="{value}">
+                    <p-status v-bind="userStateFormatter(value)"
+                              class="capitalize"
+                    />
+                </template>
+                <template #col-role_id-format="{value}">
+                    <span v-if="!value">--</span>
+                    <span v-else> {{ userPageGetters.roleMap[value]?.name }}</span>
+                </template>
+                <template #col-role_type-format="{value}">
+                    <span> {{ useRoleFormatter(value, true).name }}</span>
+                </template>
+            </p-data-table>
         </template>
-        <template #col-role_id-format="{value}">
-            <span v-if="!value">--</span>
-            <span v-else> {{ userPageGetters.roleMap[value]?.name }}</span>
-        </template>
-        <template #col-role_type-format="{value}">
-            <span> {{ useRoleFormatter(value, true).name }}</span>
-        </template>
-    </p-table-check-modal>
+    </p-button-modal>
 </template>
