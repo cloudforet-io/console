@@ -45,7 +45,7 @@ const state = reactive({
     loading: false,
     items: [] as TableItem[],
     selectedRemoveItem: '',
-    selectedUser: computed(() => userPageStore.selectedUsers[0]),
+    selectedUser: computed(() => userPageStore.getters.selectedUsers[0]),
 });
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => {

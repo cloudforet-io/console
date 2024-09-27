@@ -113,11 +113,11 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
     router.push({ name: IAM_ROUTE.USER._NAME });
     if (isOpenModal) {
         userPageStore.$patch((_state) => {
-            _state.modal.type = USER_MODAL_TYPE.INVITE;
-            _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string;
-            _state.modal.themeColor = 'primary';
-            _state.modal.visible.add = true;
-            _state.modal = cloneDeep(_state.modal);
+            _state.state.modal.type = USER_MODAL_TYPE.INVITE;
+            _state.state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string;
+            _state.state.modal.themeColor = 'primary';
+            _state.state.modal.visible.add = true;
+            _state.state.modal = cloneDeep(_state.state.modal);
         });
     }
 };

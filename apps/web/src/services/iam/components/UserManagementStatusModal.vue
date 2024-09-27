@@ -28,7 +28,8 @@ import { useUserPageStore } from '@/services/iam/store/user-page-store';
 const vm = getCurrentInstance()?.proxy as Vue;
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
+const userPageGetters = userPageStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
@@ -57,16 +58,16 @@ const checkModalConfirm = async (items) => {
     state.loading = true;
 
     try {
-        if (userPageStore.modal.type === USER_MODAL_TYPE.DELETE) {
+        if (userPageState.modal.type === USER_MODAL_TYPE.DELETE) {
             responses = await Promise.all(map(items, (item) => deleteUser(item.user_id)));
-            userPageStore.$patch({ selectedIndices: [] });
-        } else if (userPageStore.modal.type === USER_MODAL_TYPE.ENABLE) {
+            userPageState.selectedIndices = [];
+        } else if (userPageState.modal.type === USER_MODAL_TYPE.ENABLE) {
             languagePrefix = 'ENABLE';
             responses = await Promise.all(map(items, (item) => enableUser(item.user_id)));
-        } else if (userPageStore.modal.type === USER_MODAL_TYPE.DISABLE) {
+        } else if (userPageState.modal.type === USER_MODAL_TYPE.DISABLE) {
             languagePrefix = 'DISABLE';
             responses = await Promise.all(map(items, (item) => disableUser(item.user_id)));
-        } else if (userPageStore.modal.type === USER_MODAL_TYPE.REMOVE) {
+        } else if (userPageState.modal.type === USER_MODAL_TYPE.REMOVE) {
             languagePrefix = 'REMOVE';
             responses = await Promise.all(map(items, (item) => removeUser(item?.role_binding_info.role_binding_id)));
         }
@@ -90,8 +91,8 @@ const checkModalConfirm = async (items) => {
 };
 const handleClose = () => {
     userPageStore.$patch((_state) => {
-        _state.modal.visible.status = false;
-        _state.modal = cloneDeep(_state.modal);
+        _state.state.modal.visible.status = false;
+        _state.state.modal = cloneDeep(_state.state.modal);
     });
 };
 
@@ -145,7 +146,7 @@ const disableUser = async (userId: string): Promise<boolean> => {
                          :theme-color="userPageState.modal.themeColor"
                          :fields="state.fields"
                          :loading="state.loading"
-                         :items="userPageStore.selectedUsers"
+                         :items="userPageGetters.selectedUsers"
                          modal-size="md"
                          @confirm="checkModalConfirm"
                          @cancel="handleClose"
@@ -157,7 +158,7 @@ const disableUser = async (userId: string): Promise<boolean> => {
         </template>
         <template #col-role_id-format="{value}">
             <span v-if="!value">--</span>
-            <span v-else> {{ userPageStore.roleMap[value]?.name }}</span>
+            <span v-else> {{ userPageGetters.roleMap[value]?.name }}</span>
         </template>
         <template #col-role_type-format="{value}">
             <span> {{ useRoleFormatter(value, true).name }}</span>

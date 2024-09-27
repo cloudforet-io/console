@@ -48,7 +48,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
+const userPageGetters = userPageStore.getters;
 
 const roleListApiQueryHelper = new ApiQueryHelper();
 const userListApiQueryHelper = new ApiQueryHelper()
@@ -66,7 +67,7 @@ const state = reactive({
     refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => ({
         ...user,
         mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
-        last_accessed_count: calculateTime(user?.last_accessed_at, userPageStore.timezone),
+        last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
     }))),
 });
 const tableState = reactive({
@@ -93,7 +94,7 @@ const tableState = reactive({
             { name: 'auth_type', label: 'Auth Type' },
             { name: 'last_accessed_count', label: 'Last Activity' },
         ];
-        return userPageStore.isWorkspaceOwner && props.hasReadWriteAccess
+        return userPageGetters.isWorkspaceOwner && props.hasReadWriteAccess
             ? [
                 ...baseFields,
                 { name: 'remove_button', label: ' ', sortable: false },
@@ -127,7 +128,7 @@ const modalState = reactive({
 
 /* Component */
 const handleSelect = async (index) => {
-    userPageStore.$patch({ selectedIndices: index });
+    userPageState.selectedIndices = index;
 };
 const handleClickButton = async (value: RoleBindingModel|undefined) => {
     if (!value) return;
@@ -139,11 +140,11 @@ const handleChange = (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
         userPageStore.$patch((_state) => {
-            _state.searchFilters = userListApiQueryHelper.filters;
+            _state.state.searchFilters = userListApiQueryHelper.filters;
         });
     }
-    if (options.pageStart !== undefined) userPageStore.$patch({ pageStart: options.pageStart });
-    if (options.pageLimit !== undefined) userPageStore.$patch({ pageLimit: options.pageLimit });
+    if (options.pageStart !== undefined) userPageState.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) userPageState.pageLimit = options.pageLimit;
     fetchUserList();
 };
 const closeRemoveModal = () => {
@@ -196,9 +197,9 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
             role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        const roleName = userPageStore.roleMap[response.role_id]?.name ?? '';
+        const roleName = userPageGetters.roleMap[response.role_id]?.name ?? '';
         userPageStore.$patch((_state) => {
-            _state.users[rowIndex].role_binding = {
+            _state.state.users[rowIndex].role_binding = {
                 name: roleName,
                 type: response.role_type,
             };
@@ -208,7 +209,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
     }
 };
 const fetchUserList = async () => {
-    userPageStore.$patch({ loading: true });
+    userPageState.loading = true;
     try {
         if (userPageState.isAdminMode) {
             await userPageStore.listUsers({ query: userListApiQuery });
@@ -216,7 +217,7 @@ const fetchUserList = async () => {
             await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
         }
     } finally {
-        userPageStore.$patch({ loading: false });
+        userPageState.loading = false;
     }
 };
 const handleRemoveButton = async () => {
@@ -270,14 +271,14 @@ const handleRemoveButton = async () => {
                 />
             </template>
             <template #col-role_id-format="{value}">
-                <div v-if="userPageStore.roleMap[value]?.name"
+                <div v-if="userPageGetters.roleMap[value]?.name"
                      class="role-type-wrapper"
                 >
-                    <img :src="useRoleFormatter(userPageStore.roleMap[value]?.role_type || ROLE_TYPE.USER).image"
+                    <img :src="useRoleFormatter(userPageGetters.roleMap[value]?.role_type || ROLE_TYPE.USER).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
-                    <span class="pr-4">{{ userPageStore.roleMap[value]?.name ?? '' }}</span>
+                    <span class="pr-4">{{ userPageGetters.roleMap[value]?.name ?? '' }}</span>
                 </div>
             </template>
             <template #col-role_binding-format="{value, rowIndex}">
@@ -291,7 +292,7 @@ const handleRemoveButton = async () => {
                              class="role-type-icon"
                         >
                     </p-tooltip>
-                    <p-select-dropdown v-if="userPageStore.isWorkspaceOwner && state.refinedUserItems[rowIndex].user_id !== storeState.loginUserId"
+                    <p-select-dropdown v-if="userPageGetters.isWorkspaceOwner && state.refinedUserItems[rowIndex].user_id !== storeState.loginUserId"
                                        is-filterable
                                        use-fixed-menu-style
                                        style-type="transparent"

@@ -23,7 +23,7 @@ const userPageStore = useUserPageStore();
 const emit = defineEmits<{(e: 'update:is-changed-toggle', type: string): void }>();
 
 const state = reactive({
-    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
+    data: computed<UserListItemType>(() => userPageStore.getters.selectedUsers[0]),
     isToggleActive: false,
     proxyIsChangedToggle: useProxyValue('isChangedToggle', props, emit),
 });

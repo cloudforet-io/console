@@ -67,7 +67,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
@@ -78,7 +78,7 @@ const state = reactive({
     items: [] as TableItem[],
     sortBy: 'workspace_id',
     sortDesc: true,
-    selectedUser: computed(() => userPageStore.selectedUsers[0]),
+    selectedUser: computed(() => userPageStore.getters.selectedUsers[0]),
     selectedRemoveItem: '',
 });
 const tableState = reactive({

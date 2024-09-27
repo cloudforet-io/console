@@ -28,7 +28,7 @@ import type { AddModalMenuItem, LocalType } from '@/services/iam/types/user-type
 
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
 const domainStore = useDomainStore();
 
 const containerRef = ref<HTMLElement|null>(null);

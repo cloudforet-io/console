@@ -46,7 +46,7 @@ const roleState = reactive({
     loading: true,
     visible: false,
     searchText: '',
-    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
+    data: computed<UserListItemType>(() => userPageStore.getters.selectedUsers[0]),
     menuItems: [] as AddModalMenuItem[],
     proxySelectedItems: useProxyValue('role', props, emit),
     selectedItems: computed(() => {
