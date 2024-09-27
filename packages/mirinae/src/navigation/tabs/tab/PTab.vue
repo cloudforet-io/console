@@ -258,7 +258,7 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
                                 <p-text-button v-if="item?.name === CUSTOM_BACK_BUTTON"
                                                style-type="highlight"
                                 >
-                                    {{ 'Back' }}
+                                    {{ $t('TAB.BACK') }}
                                 </p-text-button>
                                 <template v-else>
                                     {{ item?.label || item?.name }}

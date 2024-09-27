@@ -101,6 +101,9 @@
 	"SELECT_DROPDOWN": {
 		"SELECT": "選択"
 	},
+	"TAB": {
+		"BACK": "戻る"
+	},
 	"TEXT_INPUT": {
 		"HIDE": "隠す",
 		"SHOW": "もっと見る"
