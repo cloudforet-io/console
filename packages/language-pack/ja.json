@@ -4322,6 +4322,7 @@
 		"DETAIL": {
 			"ACCESS": "アクセス",
 			"ADD": "追加",
+			"ADD_MEMBERS": "",
 			"ALERT": {
 				"ACKNOWLEDGED": "確認",
 				"ALL_NOTIFICATIONS": "全ての通知",
