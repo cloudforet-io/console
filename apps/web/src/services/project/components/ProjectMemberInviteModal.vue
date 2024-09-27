@@ -191,7 +191,7 @@ const handleConfirm = async () => {
                                             height="1rem"
                                 />
                                 <span>
-                                    {{ storeState.users[item.name]?.label }}
+                                    {{ storeState.users[item.name]?.label || item.label }}
                                 </span>
                             </template>
                         </p-select-dropdown>
