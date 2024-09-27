@@ -53,7 +53,7 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     targetFolderItem: computed<PublicFolderReferenceItem|undefined>(() => storeState.folders[dashboardMainPageState.selectedFolderId || '']),
-    isShared: computed<boolean>(() => !!state.targetDashboardItem?.data?.shared),
+    isShared: computed<boolean>(() => !!state.targetFolderItem?.data?.shared),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
         const _folderName = state.targetFolderItem?.name || '';
         const _folderItems: DashboardDataTableItem[] = [{
@@ -124,6 +124,7 @@ const unshareFolder = async () => {
 const handleConfirm = async () => {
     if (!state.isShared) await shareFolder();
     else await unshareFolder();
+    await dashboardMainPageStore.load();
 };
 const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
     state.selectedTarget = value;
