@@ -33,12 +33,14 @@ import { gray, indigo } from '@/styles/colors';
 interface Props {
     visible?: boolean;
     projectId?: string;
+    projectGroupId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     projectId: undefined,
+    projectGroupId: undefined,
 });
-const emit = defineEmits<{(e: 'confirm', project?: ProjectModel): void;
+const emit = defineEmits<{(e: 'confirm', isCreating: boolean, project?: ProjectModel): void;
     (e: 'update:visible', visible?: boolean): void;
 }>();
 
@@ -90,6 +92,7 @@ const createProject = async (): Promise<ProjectModel|undefined> => {
         const params: ProjectCreateParameters = {
             name: projectName.value?.trim() as string,
             project_type: state.selectedAccess,
+            project_group_id: props.projectGroupId,
         };
         const res = await SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>({
             ...params,
@@ -151,15 +154,15 @@ const confirm = async () => {
         const updatedProject2 = await updateProjectType();
         if ((updatedProject1 && updatedProject2) || updatedProject2) {
             await projectStore.sync(updatedProject2);
-            emit('confirm', updatedProject2);
+            emit('confirm', false, updatedProject2);
         } else if (updatedProject1) {
             await projectStore.sync(updatedProject1);
-            emit('confirm', updatedProject1);
+            emit('confirm', false, updatedProject1);
         }
     } else { // create project
         const project = await createProject();
         if (project) {
-            emit('confirm');
+            emit('confirm', true, project);
         }
     }
     state.proxyVisible = false;
