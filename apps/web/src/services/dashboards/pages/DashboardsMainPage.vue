@@ -25,7 +25,7 @@ import { store } from '@/store';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
-import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -49,7 +49,6 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
-const dashboardGetters = dashboardStore.getters;
 const dashboardMainPageStore = useDashboardMainPageStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
 const dashboardMainPageGetters = dashboardMainPageStore.getters;
@@ -68,24 +67,23 @@ const storeState = reactive({
 });
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    loading: computed(() => dashboardState.loading),
-    refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardMainPageGetters.publicDashboardTreeData, dashboardState.searchFilters)),
-    refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardMainPageGetters.privateDashboardTreeData, dashboardState.searchFilters)),
+    refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardMainPageGetters.publicDashboardTreeData, dashboardMainPageState.searchFilters)),
+    refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardMainPageGetters.privateDashboardTreeData, dashboardMainPageState.searchFilters)),
     deprecatedDashboardList: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
-        const _publicDeprecated = dashboardGetters.workspaceDashboardItems.filter((d) => d.version === '1.0');
-        const _privateDeprecated = dashboardGetters.privateDashboardItems.filter((d) => d.version === '1.0');
+        const _publicDeprecated = dashboardState.publicDashboardItems.filter((d) => d.version === '1.0');
+        const _privateDeprecated = dashboardState.privateDashboardItems.filter((d) => d.version === '1.0');
         return [..._publicDeprecated, ..._privateDeprecated];
     }),
     isDashboardExist: computed<boolean>(() => {
         if (state.isAdminMode) {
-            return !!dashboardMainPageGetters.publicDashboardItems.length && !!dashboardMainPageGetters.publicFolderItems.length;
+            return !!dashboardMainPageState.publicDashboardList.length && !!dashboardMainPageState.publicFolderList.length;
         }
         return !!(
-            dashboardMainPageGetters.publicDashboardItems.length
-            || dashboardMainPageGetters.privateDashboardItems.length
+            dashboardMainPageState.publicDashboardList.length
+            || dashboardMainPageState.privateDashboardList.length
             || state.deprecatedDashboardList.length
-            || dashboardMainPageGetters.publicFolderItems.length
-            || dashboardMainPageGetters.privateFolderItems.length
+            || dashboardMainPageState.publicFolderList.length
+            || dashboardMainPageState.privateFolderList.length
         );
     }),
     treeCollapseMap: {
@@ -100,7 +98,6 @@ const state = reactive({
 
 const queryState = reactive({
     urlQueryString: computed(() => ({
-        scope: dashboardState.scope ? primitiveToQueryString(dashboardState.scope) : null,
         filters: queryTagsHelper.urlQueryStringFilters.value,
     })),
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -133,7 +130,7 @@ const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         dashboardMainPageStore.setSearchQueryTags(options.queryTags);
     } else {
-        dashboardStore.load();
+        dashboardMainPageStore.load();
     }
 };
 const handleUpdateSelectedIdMap = (type: 'PUBLIC' | 'PRIVATE', selectedIdMap: Record<string, boolean>) => {
@@ -161,17 +158,12 @@ let urlQueryStringWatcherStop;
 const init = async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
     queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
-    const useQueryValue = {
-        scope: queryStringToString(currentQuery.scope),
-        filters: queryTagsHelper.filters.value,
-    };
-
-    dashboardStore.setScope(useQueryValue.scope);
     dashboardMainPageStore.setSearchQueryTags(queryState.queryTags);
 
     urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
         replaceUrlQuery(urlQueryString);
     });
+    await dashboardMainPageStore.load();
 };
 
 const getDashboardValueHandler = (): ValueHandler | undefined => {
@@ -212,14 +204,14 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
 watch(() => dashboardMainPageState.searchQueryTags, (queryTags) => {
     queryTagsHelper.setQueryTags(queryTags || []);
     dashboardMainPageStore.resetSelectedIdMap();
-    dashboardStore.setSearchFilters(queryTagsHelper.filters.value);
-    dashboardStore.load();
+    dashboardMainPageStore.setSearchFilters(queryTagsHelper.filters.value);
+    dashboardMainPageStore.load();
 }, { immediate: true });
 
 onUnmounted(() => {
     if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
-    dashboardStore.setSearchFilters([]);
-    dashboardStore.load();
+    dashboardMainPageStore.setSearchFilters([]);
+    dashboardMainPageStore.load();
 });
 </script>
 
@@ -253,7 +245,7 @@ onUnmounted(() => {
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <p-data-loader :loading="state.loading"
+        <p-data-loader :loading="dashboardMainPageState.loading"
                        :data="state.isDashboardExist"
                        class="dashboard-list-wrapper"
         >

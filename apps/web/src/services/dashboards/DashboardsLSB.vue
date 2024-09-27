@@ -42,6 +42,7 @@ const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const dashboardStore = useDashboardStore();
+const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
 
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -82,7 +83,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    workspaceV2MenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceDashboardItems.filter((d) => d.version === '2.0').map((d) => ({
+    workspaceV2MenuSet: computed<LSBItem[]>(() => dashboardState.publicDashboardItems.filter((d) => d.version === '2.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -97,7 +98,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    workspaceV1MenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
+    workspaceV1MenuSet: computed<LSBItem[]>(() => dashboardState.publicDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -112,7 +113,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    privateV2MenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateDashboardItems.filter((d) => d.version === '2.0').map((d) => ({
+    privateV2MenuSet: computed<LSBMenu[]>(() => dashboardState.privateDashboardItems.filter((d) => d.version === '2.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -131,7 +132,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    privateV1MenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
+    privateV1MenuSet: computed<LSBMenu[]>(() => dashboardState.privateDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
