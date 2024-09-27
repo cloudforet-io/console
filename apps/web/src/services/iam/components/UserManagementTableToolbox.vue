@@ -13,7 +13,8 @@ import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { ModalSettingState } from '@/services/iam/types/user-type';
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
+const userPageGetters = userPageStore.getters;
 
 const state = reactive({
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
@@ -32,13 +33,13 @@ const state = reactive({
             type: 'item',
             name: USER_MODAL_TYPE.ENABLE,
             label: i18n.t('IAM.USER.MAIN.ENABLE'),
-            disabled: !state.isSelected || userPageStore.selectedUsers[0].state === USER_STATE.ENABLE,
+            disabled: !state.isSelected || userPageGetters.selectedUsers[0].state === USER_STATE.ENABLE,
         },
         {
             type: 'item',
             name: USER_MODAL_TYPE.DISABLE,
             label: i18n.t('IAM.USER.MAIN.DISABLE'),
-            disabled: !state.isSelected || userPageStore.selectedUsers[0].state === USER_STATE.DISABLE,
+            disabled: !state.isSelected || userPageGetters.selectedUsers[0].state === USER_STATE.DISABLE,
         },
     ])),
 });
@@ -78,13 +79,13 @@ const updateModalSettings = ({
     type, title, themeColor, statusVisible, addVisible, formVisible,
 }: ModalSettingState) => {
     userPageStore.$patch((_state) => {
-        _state.modal.type = type;
-        _state.modal.title = title;
-        _state.modal.themeColor = themeColor;
-        _state.modal.visible.status = statusVisible ?? false;
-        _state.modal.visible.add = addVisible ?? false;
-        _state.modal.visible.form = formVisible ?? false;
-        _state.modal = cloneDeep(_state.modal);
+        _state.state.modal.type = type;
+        _state.state.modal.title = title;
+        _state.state.modal.themeColor = themeColor;
+        _state.state.modal.visible.status = statusVisible ?? false;
+        _state.state.modal.visible.add = addVisible ?? false;
+        _state.state.modal.visible.form = formVisible ?? false;
+        _state.state.modal = cloneDeep(_state.state.modal);
     });
 };
 </script>

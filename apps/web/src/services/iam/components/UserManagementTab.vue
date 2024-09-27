@@ -47,7 +47,9 @@ interface Props {
 const props = defineProps<Props>();
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
+const userPageGetters = userPageStore.getters;
+
 const storeState = reactive({
     loginUserId: computed(() => store.state.user.userId),
 });
@@ -86,9 +88,9 @@ const multiItemTabState = reactive({
         { label: i18n.t('IAM.USER.MAIN.TAB_SELECTED_DATA'), name: USER_TABS.DATA },
     ])),
     activeTab: USER_TABS.DATA,
-    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageStore.selectedUsers.map((user) => ({
+    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageGetters.selectedUsers.map((user) => ({
         ...user,
-        last_accessed_count: calculateTime(user?.last_accessed_at, userPageStore.timezone),
+        last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
     }))),
 });
 
@@ -160,14 +162,15 @@ const handleSelectDropdownItem = async (value, rowIndex:number) => {
             role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        const roleName = userPageStore.roleMap[response.role_id]?.name ?? '';
+        const roleName = userPageGetters.roleMap[response.role_id]?.name ?? '';
         const originTableIndex = userPageState.selectedIndices[rowIndex];
-        userPageStore.$patch((_state) => {
-            _state.users[originTableIndex].role_binding = {
+        userPageState.users[originTableIndex] = {
+            ...userPageState.users[originTableIndex],
+            role_binding: {
                 name: roleName,
                 type: response.role_type,
-            };
-        });
+            },
+        };
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     }
@@ -258,7 +261,7 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                                      class="role-type-icon"
                                 >
                             </p-tooltip>
-                            <p-select-dropdown v-if="userPageStore.isWorkspaceOwner && multiItemTabState.refinedUserItems[rowIndex].user_id !== storeState.loginUserId"
+                            <p-select-dropdown v-if="userPageGetters.isWorkspaceOwner && multiItemTabState.refinedUserItems[rowIndex].user_id !== storeState.loginUserId"
                                                is-filterable
                                                use-fixed-menu-style
                                                style-type="transparent"

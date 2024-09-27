@@ -31,7 +31,7 @@ import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
 
 const route = useRoute();
 
@@ -59,7 +59,7 @@ const userListApiQueryHelper = new ApiQueryHelper()
 
 /* API */
 const refreshUserList = async () => {
-    userPageStore.$patch({ loading: true });
+    userPageState.loading = true;
     userListApiQueryHelper
         .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
         .setFilters(userPageState.searchFilters);
@@ -70,14 +70,14 @@ const refreshUserList = async () => {
             await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
         }
     } finally {
-        userPageStore.$patch({ loading: false });
+        userPageState.loading = false;
     }
 };
 
 /* Watcher */
 watch(() => storeState.globalGrantLoading, (globalGrantLoading) => {
     if (globalGrantLoading) return;
-    userPageStore.$patch({ isAdminMode: storeState.isAdminMode });
+    userPageState.isAdminMode = storeState.isAdminMode;
 }, { immediate: true });
 
 const init = async () => {

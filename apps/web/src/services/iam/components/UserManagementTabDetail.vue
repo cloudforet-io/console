@@ -6,12 +6,12 @@ import {
 import { cloneDeep } from 'lodash';
 
 import {
-    PButton, PDefinitionTable, PHeading, PI, PStatus, PLink,
+    PButton, PDefinitionTable, PHeading, PI, PStatus,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -22,7 +22,6 @@ import { postUserValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import {
     calculateTime,
     useRoleFormatter,
@@ -39,7 +38,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
+const userPageGetters = userPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(e: 'refresh', id: string): void }>();
@@ -52,7 +52,7 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     verifyEmailLoading: false,
-    selectedUser: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
+    selectedUser: computed<UserListItemType>(() => userPageGetters.selectedUsers[0]),
 });
 
 const tableState = reactive({
@@ -63,7 +63,7 @@ const tableState = reactive({
     fields: computed<DefinitionField[]>(() => {
         const additionalFields: DefinitionField[] = [];
         const additionalRoleFields: DefinitionField[] = [];
-        if (userPageStore.isAdminMode) {
+        if (userPageState.isAdminMode) {
             if (storeState.smtpEnabled) {
                 additionalFields.push(
                     { name: 'email', label: i18n.t('IAM.USER.MAIN.NOTIFICATION_EMAIL'), block: true },
@@ -99,8 +99,7 @@ const tableState = reactive({
             { name: 'created_at', label: i18n.t('IAM.USER.MAIN.CREATED_AT') },
         ];
     }),
-    workspaceGroupRoleBindings: computed(() => (state.selectedUser.role_bindings_info ?? [])
-        .filter((rb) => (rb.workspace_group_id && rb.workspace_id))),
+    workspaceGroupRoleBinding: computed<Partial<RoleBindingModel>>(() => (state.selectedUser.role_binding_info ?? {})),
 });
 
 /* Component */
@@ -143,13 +142,13 @@ const updateModalSettings = ({
     type, title, themeColor, statusVisible, addVisible, formVisible,
 }: ModalSettingState) => {
     userPageStore.$patch((_state) => {
-        _state.modal.type = type;
-        _state.modal.title = title;
-        _state.modal.themeColor = themeColor;
-        _state.modal.visible.status = statusVisible ?? false;
-        _state.modal.visible.add = addVisible ?? false;
-        _state.modal.visible.form = formVisible ?? false;
-        _state.modal = cloneDeep(_state.modal);
+        _state.state.modal.type = type;
+        _state.state.modal.title = title;
+        _state.state.modal.themeColor = themeColor;
+        _state.state.modal.visible.status = statusVisible ?? false;
+        _state.state.modal.visible.add = addVisible ?? false;
+        _state.state.modal.visible.form = formVisible ?? false;
+        _state.state.modal = cloneDeep(_state.state.modal);
     });
 };
 
@@ -209,9 +208,9 @@ const handleClickVerifyButton = async () => {
                             <span class="button-label">{{ $t('IAM.USER.MAIN.DELETE') }}</span>
                         </p-button>
                     </div>
-                    <p-button v-else-if="userPageStore.isWorkspaceOwner"
+                    <p-button v-else-if="userPageGetters.isWorkspaceOwner"
                               style-type="negative-secondary"
-                              :disabled="userPageStore.selectedUsers.length === 0"
+                              :disabled="userPageGetters.selectedUsers.length === 0"
                               @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
                     >
                         {{ $t('IAM.USER.REMOVE') }}
@@ -236,14 +235,14 @@ const handleClickVerifyButton = async () => {
             </template>
             <template #data-role_type>
                 <span class="role-type">
-                    <img :src="useRoleFormatter(userPageStore.isAdminMode ? (userPageStore.roleMap[tableState.refinedUserItems?.role_id]?.role_type) : tableState.refinedUserItems.role_type).image"
+                    <img :src="useRoleFormatter(userPageState.isAdminMode ? (userPageGetters.roleMap[tableState.refinedUserItems?.role_id]?.role_type) : tableState.refinedUserItems.role_type).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
                     <span>
                         {{
-                            useRoleFormatter(userPageStore.isAdminMode
-                                ? (userPageStore.roleMap[tableState.refinedUserItems?.role_id]?.role_type)
+                            useRoleFormatter(userPageState.isAdminMode
+                                ? (userPageGetters.roleMap[tableState.refinedUserItems?.role_id]?.role_type)
                                 : tableState.refinedUserItems?.role_type).name
                         }}
                     </span>
@@ -251,7 +250,7 @@ const handleClickVerifyButton = async () => {
             </template>
             <template #data-role_id="{value}">
                 <span class="role-type">
-                    <span class="pr-4">{{ userPageStore.roleMap[value]?.name ?? '' }}</span>
+                    <span class="pr-4">{{ userPageGetters.roleMap[value]?.name ?? '' }}</span>
                 </span>
             </template>
             <template #data-role_binding="{value}">
@@ -262,27 +261,6 @@ const handleClickVerifyButton = async () => {
                              class="role-type-icon"
                         >
                         <span class="role-type">{{ value.name }}</span>
-                    </div>
-                    <div v-for="role in tableState.workspaceGroupRoleBindings"
-                         :key="role.role_id"
-                         class="role-menu-item"
-                    >
-                        <img :src="useRoleFormatter(role.role_type).image"
-                             alt="role-type-icon"
-                             class="role-type-icon"
-                        >
-                        <span class="role-type">{{ userPageStore.roleMap[role.role_id].name }}</span>
-                        <span v-if="storeState.workspaceGroup[role.workspace_group_id]"
-                              class="workspace-group-link"
-                        >
-                            <p-link :to="{ name: ADVANCED_ROUTE.WORKSPACES._NAME }"
-                                    :action-icon="ACTION_ICON.INTERNAL_LINK"
-                                    new-tab
-                                    highlight
-                            >
-                                {{ storeState.workspaceGroup[role.workspace_group_id]?.name }}
-                            </p-link>
-                        </span>
                     </div>
                 </div>
             </template>
@@ -301,7 +279,7 @@ const handleClickVerifyButton = async () => {
                 </span>
             </template>
             <template #data-created_at="{data}">
-                {{ iso8601Formatter(data, userPageStore.timezone) }}
+                {{ iso8601Formatter(data, userPageGetters.timezone) }}
             </template>
             <template #data-email="{data}">
                 <div v-if="data && data !== ''"

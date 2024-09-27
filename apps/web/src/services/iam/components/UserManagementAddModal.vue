@@ -41,7 +41,7 @@ import type { AddModalMenuItem, AddAdminRoleFormState } from '@/services/iam/typ
 
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
 const domainStore = useDomainStore();
 
 const route = useRoute();
@@ -127,10 +127,10 @@ const handleClose = () => {
     state.isResetPassword = true;
     state.isSetAdminRole = false;
     userPageStore.$patch((_state) => {
-        _state.modal.visible.add = false;
-        _state.modal = cloneDeep(_state.modal);
-        _state.createdWorkspaceId = undefined;
-        _state.afterWorkspaceCreated = false;
+        _state.state.modal.visible.add = false;
+        _state.state.modal = cloneDeep(_state.state.modal);
+        _state.state.createdWorkspaceId = undefined;
+        _state.state.afterWorkspaceCreated = false;
     });
 };
 /* API */
@@ -148,7 +148,7 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
     };
 
     const createRoleBinding = async () => {
-        if (userPageStore.isWorkspaceOwner || state.isSetAdminRole) {
+        if (userPageStore.getters.isWorkspaceOwner || state.isSetAdminRole) {
             await fetchCreateRoleBinding(item);
         } else if (userPageState.afterWorkspaceCreated) {
             await fetchCreateRoleBinding({ ...item, workspace_id: userPageState.createdWorkspaceId });
@@ -180,7 +180,7 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
         role_id: state.role.name || '',
         resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
     };
-    if (userPageStore.isWorkspaceOwner || state.isSetAdminRole) {
+    if (userPageStore.getters.isWorkspaceOwner || state.isSetAdminRole) {
         roleParams = baseRoleParams;
     } else if (userPageState.afterWorkspaceCreated) {
         roleParams = {

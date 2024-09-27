@@ -96,13 +96,13 @@ const handleCreateWorkspace = () => {
 
 const handleConfirm = async ({ id, name }: {id: string, name: string}) => {
     userPageStore.$patch((_state) => {
-        _state.modal.type = USER_MODAL_TYPE.ADD;
-        _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: name }) as string;
-        _state.modal.themeColor = 'primary';
-        _state.afterWorkspaceCreated = true;
-        _state.createdWorkspaceId = id;
-        _state.modal.visible.add = true;
-        _state.modal = cloneDeep(_state.modal);
+        _state.state.modal.type = USER_MODAL_TYPE.ADD;
+        _state.state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: name }) as string;
+        _state.state.modal.themeColor = 'primary';
+        _state.state.afterWorkspaceCreated = true;
+        _state.state.createdWorkspaceId = id;
+        _state.state.modal.visible.add = true;
+        _state.state.modal = cloneDeep(_state.state.modal);
     });
 };
 

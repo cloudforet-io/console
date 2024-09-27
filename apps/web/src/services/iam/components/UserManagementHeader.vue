@@ -22,7 +22,8 @@ const props = defineProps<Props>();
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
+const userPageGetters = userPageStore.getters;
 
 const route = useRoute();
 
@@ -54,12 +55,12 @@ const updateModalSettings = ({
     type, title, themeColor, statusVisible, addVisible,
 }: ModalSettingState) => {
     userPageStore.$patch((_state) => {
-        _state.modal.type = type;
-        _state.modal.title = title;
-        _state.modal.themeColor = themeColor;
-        _state.modal.visible.status = statusVisible ?? false;
-        _state.modal.visible.add = addVisible ?? false;
-        _state.modal = cloneDeep(_state.modal);
+        _state.state.modal.type = type;
+        _state.state.modal.title = title;
+        _state.state.modal.themeColor = themeColor;
+        _state.state.modal.visible.status = statusVisible ?? false;
+        _state.state.modal.visible.add = addVisible ?? false;
+        _state.state.modal = cloneDeep(_state.state.modal);
     });
 };
 
@@ -96,11 +97,11 @@ watch(() => route.query, (query) => {
                     >
                         <span class="button-label">{{ $t('IAM.USER.ADD') }}</span>
                     </p-button>
-                    <div v-else-if="userPageStore.isWorkspaceOwner"
+                    <div v-else-if="userPageGetters.isWorkspaceOwner"
                          class="toolbox"
                     >
                         <p-button style-type="negative-secondary"
-                                  :disabled="userPageStore.selectedUsers.length === 0"
+                                  :disabled="userPageGetters.selectedUsers.length === 0"
                                   @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
                         >
                             {{ $t('IAM.USER.REMOVE') }}
