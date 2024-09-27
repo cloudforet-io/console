@@ -13,20 +13,19 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
-    DashboardType, DashboardFolderType, DashboardModel, DashboardCreateParams,
+    DashboardType,
+    DashboardFolderType,
+    DashboardModel,
+    DashboardCreateParams,
+    DashboardListParams,
+    DashboardUpdateParams,
+    DashboardDeleteParams,
 } from '@/schema/dashboard/_types/dashboard-type';
-import type { FolderCreateParams } from '@/schema/dashboard/_types/folder-type';
+import type { FolderCreateParams, FolderModel } from '@/schema/dashboard/_types/folder-type';
 import type { WidgetListParams, WidgetModel } from '@/schema/dashboard/_types/widget-type';
-import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
-import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/private-dashboard/api-verbs/delete';
-import type { PrivateDashboardListParameters } from '@/schema/dashboard/private-dashboard/api-verbs/list';
-import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
 import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
-import type { PublicDashboardDeleteParameters } from '@/schema/dashboard/public-dashboard/api-verbs/delete';
-import type { PublicDashboardListParameters } from '@/schema/dashboard/public-dashboard/api-verbs/list';
-import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
@@ -46,15 +45,9 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 
 
 
-type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
-type DashboardListParameters = PublicDashboardListParameters|PrivateDashboardListParameters;
-type DashboardUpdateParameters = PublicDashboardUpdateParameters | PrivateDashboardUpdateParameters;
-type DashboardDeleteParameters = PublicDashboardDeleteParameters | PrivateDashboardDeleteParameters;
-type FolderModel = PublicFolderModel|PrivateFolderModel;
 interface LoadOptions {
     isProjectDashboard?: boolean;
 }
-
 
 const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]> => {
     try {
@@ -134,9 +127,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     /* Actions */
     const fetchApiQueryHelper = new ApiQueryHelper();
-    const privateDashboardListFetcher = getCancellableFetcher<DashboardListParameters, ListResponse<DashboardModel>>(SpaceConnector.clientV2.dashboard.privateDashboard.list);
-    const publicDashboardListFetcher = getCancellableFetcher<DashboardListParameters, ListResponse<DashboardModel>>(SpaceConnector.clientV2.dashboard.publicDashboard.list);
-    const _fetchDashboard = async (dashboardType: DashboardType, params?: DashboardListParameters) => {
+    const privateDashboardListFetcher = getCancellableFetcher<DashboardListParams, ListResponse<DashboardModel>>(SpaceConnector.clientV2.dashboard.privateDashboard.list);
+    const publicDashboardListFetcher = getCancellableFetcher<DashboardListParams, ListResponse<DashboardModel>>(SpaceConnector.clientV2.dashboard.publicDashboard.list);
+    const _fetchDashboard = async (dashboardType: DashboardType, params?: DashboardListParams) => {
         const fetcher = dashboardType === 'PRIVATE' ? privateDashboardListFetcher : publicDashboardListFetcher;
         try {
             fetchApiQueryHelper.setFilters(state.searchFilters);
@@ -244,11 +237,11 @@ export const useDashboardStore = defineStore('dashboard', () => {
     };
 
     // dashboard
-    const createDashboard = async (dashboardType: DashboardType, params: DashboardCreateParameters): Promise<DashboardModel> => {
+    const createDashboard = async (dashboardType: DashboardType, params: DashboardCreateParams): Promise<DashboardModel> => {
         const fetcher = dashboardType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateDashboard.create
             : SpaceConnector.clientV2.dashboard.publicDashboard.create;
-        const result = await fetcher<DashboardCreateParameters, DashboardModel>(params);
+        const result = await fetcher<DashboardCreateParams, DashboardModel>(params);
         if (dashboardType === 'PRIVATE') {
             state.privateDashboardItems.push(result as PrivateDashboardModel);
         } else {
@@ -256,13 +249,13 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
         return result;
     };
-    const updateDashboard = async (dashboardId: string, params: DashboardUpdateParameters): Promise<DashboardModel> => {
+    const updateDashboard = async (dashboardId: string, params: DashboardUpdateParams): Promise<DashboardModel> => {
         const isPrivate = dashboardId?.startsWith('private');
         const fetcher = isPrivate
             ? SpaceConnector.clientV2.dashboard.privateDashboard.update
             : SpaceConnector.clientV2.dashboard.publicDashboard.update;
         try {
-            const result = await fetcher<DashboardUpdateParameters, DashboardModel>({
+            const result = await fetcher<DashboardUpdateParams, DashboardModel>({
                 ...params,
                 dashboard_id: dashboardId,
             });
@@ -286,9 +279,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
         const fetcher = isPrivate
             ? SpaceConnector.clientV2.dashboard.privateDashboard.delete
             : SpaceConnector.clientV2.dashboard.publicDashboard.delete;
-        const params: DashboardDeleteParameters = { dashboard_id: dashboardId };
+        const params: DashboardDeleteParams = { dashboard_id: dashboardId };
         try {
-            await fetcher<DashboardDeleteParameters>(params);
+            await fetcher<DashboardDeleteParams>(params);
             if (isPrivate) {
                 const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1);

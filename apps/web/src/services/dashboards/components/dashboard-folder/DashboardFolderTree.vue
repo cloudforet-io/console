@@ -199,6 +199,7 @@ const handleClickShowAll = () => {
                     <dashboard-folder-tree-item :tree-data="child"
                                                 :disable-link="props.disableLink"
                                                 :readonly-mode="props.readonlyMode"
+                                                class="child-tree-item"
                     />
                 </div>
                 <div v-if="!treeData.children?.length"
@@ -255,6 +256,9 @@ const handleClickShowAll = () => {
         &.no-dashboard {
             @apply text-paragraph-md text-gray-300;
             padding: 0.5rem 0.5rem 0.5rem 2.875rem;
+        }
+        .child-tree-item {
+            margin-left: 1rem;
         }
 
         @screen tablet {

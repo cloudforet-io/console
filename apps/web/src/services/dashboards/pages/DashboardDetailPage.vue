@@ -23,11 +23,19 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
+import DashboardCloneModal from '@/services/dashboards/components/dashboard-detail/DashboardCloneModal.vue';
 import DashboardDetailHeader from '@/services/dashboards/components/dashboard-detail/DashboardDetailHeader.vue';
+import DashboardFolderSingleMoveModal
+    from '@/services/dashboards/components/dashboard-detail/DashboardFolderSingleMoveModal.vue';
+import DashboardNameEditModal from '@/services/dashboards/components/dashboard-detail/DashboardNameEditModal.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/components/dashboard-detail/DashboardRefreshDropdown.vue';
+import DashboardShareModal from '@/services/dashboards/components/dashboard-detail/DashboardShareModal.vue';
+import DashboardShareWithCodeModal
+    from '@/services/dashboards/components/dashboard-detail/DashboardShareWithCodeModal.vue';
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
 import DashboardWidgetContainerV2 from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
+import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/constants/dashboard-constant';
@@ -95,7 +103,7 @@ const getDashboardData = async (dashboardId: string) => {
     }
 };
 
-// else
+/* Event */
 const handleRefresh = async () => {
     if (dashboardDetailState.dashboardInfo?.version === '2.0') await dashboardDetailStore.listDashboardWidgets();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -187,6 +195,23 @@ onUnmounted(() => {
         />
         <dashboard-widget-container-v2 v-else
                                        ref="widgetContainerRef"
+        />
+        <!-- Modals -->
+        <dashboard-name-edit-modal :visible.sync="dashboardDetailState.dashboardNameEditModalVisible"
+                                   :dashboard-id="props.dashboardId"
+        />
+        <dashboard-clone-modal :visible.sync="dashboardDetailState.dashboardCloneModalVisible" />
+        <dashboard-folder-single-move-modal :dashboard-id="props.dashboardId"
+                                            :visible.sync="dashboardDetailState.folderMoveModalVisible"
+        />
+        <dashboard-share-with-code-modal :visible.sync="dashboardDetailState.shareWithCodeModalVisible"
+                                         :dashboard-id="props.dashboardId"
+        />
+        <dashboard-share-modal :visible.sync="dashboardDetailState.dashboardShareModalVisible"
+                               :dashboard-id="props.dashboardId"
+        />
+        <dashboard-delete-modal :visible.sync="dashboardDetailState.dashboardDeleteModalVisible"
+                                :dashboard-id="props.dashboardId"
         />
     </div>
 </template>

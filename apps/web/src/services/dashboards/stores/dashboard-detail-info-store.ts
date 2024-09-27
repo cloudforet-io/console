@@ -23,6 +23,8 @@ import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model
 import type { PublicDashboardGetParameters } from '@/schema/dashboard/public-dashboard/api-verbs/get';
 import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -35,6 +37,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { migrateLegacyWidgetOptions } from '@/services/dashboards/helpers/widget-migration-helper';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
+
 
 
 interface WidgetValidMap {
@@ -88,6 +91,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const appContextStore = useAppContextStore();
     const storeState = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+        isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
     const state = reactive({
         dashboardInfo: null as DashboardModel|null,
@@ -118,6 +122,14 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         // validation
         isNameValid: undefined as boolean | undefined,
         widgetValidMap: {} as WidgetValidMap,
+        // modals
+        folderMoveModalVisible: false,
+        dashboardNameEditModalVisible: false,
+        dashboardDeleteModalVisible: false,
+        dashboardCloneModalVisible: false,
+        shareWithCodeModalVisible: false,
+        dashboardShareModalVisible: false,
+        dashboardShareModalType: 'SHARE' as 'SHARE' | 'UNSHARE',
     });
 
     const getters = reactive({
@@ -127,7 +139,13 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         isSharedDashboard: computed<boolean>(() => state.dashboardInfo?.workspace_id === '*'),
         disableManageButtons: computed<boolean>(() => {
             if (state.projectId) return true;
-            return !storeState.isAdminMode && getters.isSharedDashboard;
+            if (state.dashboardId?.startsWith('private')) return false;
+            if (storeState.isAdminMode) return false;
+            if (storeState.isWorkspaceOwner) {
+                if (state.dashboardInfo?.workspace_id === '*') return true;
+                return false;
+            }
+            return true;
         }),
         refinedVariablesSchema: computed<DashboardVariablesSchema>(() => {
             const _storedVariablesSchema = cloneDeep(state.variablesSchema);
@@ -170,50 +188,29 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     });
 
     /* Mutations */
-    const setName = (name: string) => {
-        state.name = name;
-    };
-    const setIsNameValid = (isValid?: boolean) => {
-        state.isNameValid = isValid;
-    };
-    const setOptions = (options: DashboardOptions) => {
-        state.options = options;
-    };
-    const setDashboardWidgetInfoList = (dashboardWidgetInfoList: DashboardLayoutWidgetInfo[]) => {
-        state.dashboardWidgetInfoList = dashboardWidgetInfoList;
-    };
-    const setLabels = (labels: string[]) => {
-        state.labels = labels;
-    };
-    const setVars = (vars: Record<string, string[]>) => {
-        state.vars = vars;
-    };
-    const setVariablesSchema = (variablesSchema: DashboardVariablesSchema) => {
-        state.variablesSchema = variablesSchema;
-    };
-    const setVariables = (variables: DashboardVariables) => {
-        state.variables = variables;
-    };
-    const setVariablesInitMap = (variablesInitMap: Record<string, boolean>) => {
-        state.variablesInitMap = variablesInitMap;
-    };
-    const setDashboardInfo = (dashboardInfo: DashboardModel|null) => {
-        state.dashboardInfo = dashboardInfo;
-    };
-    const setDashboardWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>) => {
-        state.dashboardWidgets = dashboardWidgets;
-    };
-    const setLoadingWidgets = (loading: boolean) => {
-        state.loadingWidgets = loading;
-    };
-    const setDashboardType = (dashboardType: DashboardType) => {
-        state.dashboardType = dashboardType;
-    };
-    const setDashboardScope = (dashboardScope: DashboardScope) => {
-        state.dashboardScope = dashboardScope;
-    };
+    const setName = (name: string) => { state.name = name; };
+    const setIsNameValid = (isValid?: boolean) => { state.isNameValid = isValid; };
+    const setOptions = (options: DashboardOptions) => { state.options = options; };
+    const setDashboardWidgetInfoList = (dashboardWidgetInfoList: DashboardLayoutWidgetInfo[]) => { state.dashboardWidgetInfoList = dashboardWidgetInfoList; };
+    const setLabels = (labels: string[]) => { state.labels = labels; };
+    const setVars = (vars: Record<string, string[]>) => { state.vars = vars; };
+    const setVariablesSchema = (variablesSchema: DashboardVariablesSchema) => { state.variablesSchema = variablesSchema; };
+    const setVariables = (variables: DashboardVariables) => { state.variables = variables; };
+    const setVariablesInitMap = (variablesInitMap: Record<string, boolean>) => { state.variablesInitMap = variablesInitMap; };
+    const setDashboardInfo = (dashboardInfo: DashboardModel|null) => { state.dashboardInfo = dashboardInfo; };
+    const setDashboardWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>) => { state.dashboardWidgets = dashboardWidgets; };
+    const setLoadingWidgets = (loading: boolean) => { state.loadingWidgets = loading; };
+    const setDashboardType = (dashboardType: DashboardType) => { state.dashboardType = dashboardType; };
+    const setDashboardScope = (dashboardScope: DashboardScope) => { state.dashboardScope = dashboardScope; };
     const setProjectId = (projectId?: string) => { state.projectId = projectId; };
     const setDashboardLayouts = (layouts: DashboardLayout[]) => { state.dashboardLayouts = layouts; };
+    const setFolderMoveModalVisible = (visible: boolean) => { state.folderMoveModalVisible = visible; };
+    const setDashboardNameEditModalVisible = (visible: boolean) => { state.dashboardNameEditModalVisible = visible; };
+    const setDashboardDeleteModalVisible = (visible: boolean) => { state.dashboardDeleteModalVisible = visible; };
+    const setDashboardCloneModalVisible = (visible: boolean) => { state.dashboardCloneModalVisible = visible; };
+    const setShareWithCodeModalVisible = (visible: boolean) => { state.shareWithCodeModalVisible = visible; };
+    const setDashboardShareModalVisible = (visible: boolean) => { state.dashboardShareModalVisible = visible; };
+    const setDashboardShareModalType = (type: 'SHARE' | 'UNSHARE') => { state.dashboardShareModalType = type; };
     /* Actions */
     const reset = () => {
         // set default value of all state
@@ -442,6 +439,13 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setDashboardScope,
         setProjectId,
         setDashboardLayouts,
+        setFolderMoveModalVisible,
+        setDashboardNameEditModalVisible,
+        setDashboardDeleteModalVisible,
+        setDashboardCloneModalVisible,
+        setShareWithCodeModalVisible,
+        setDashboardShareModalVisible,
+        setDashboardShareModalType,
     };
     const actions = {
         reset,

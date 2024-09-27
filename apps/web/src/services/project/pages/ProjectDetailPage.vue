@@ -417,7 +417,7 @@ onUnmounted(() => {
                                      height="0.625rem"
                                      color="inherit"
                                 />
-                                <span>Invite only</span>
+                                <span>{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
                             </div>
                             <p-i name="ic_dot"
                                  width="0.125rem"
@@ -433,7 +433,7 @@ onUnmounted(() => {
                                      height="0.75rem"
                                      color="inherit"
                                 />
-                                <span>{{ memberState.totalCount }} Members</span>
+                                <span>{{ $t('PROJECT.DETAIL.MEMBERS', { count: memberState.totalCount }) }}</span>
                             </div>
                             <p-i name="ic_dot"
                                  width="0.125rem"
@@ -450,7 +450,7 @@ onUnmounted(() => {
                                  height="0.75rem"
                                  color="inherit"
                             />
-                            <span>{{ webhooksState.webhookCount }} Webhooks</span>
+                            <span>{{ $t('PROJECT.DETAIL.WEBHOOKS', { count: webhooksState.webhookCount }) }}</span>
                         </div>
                         <p-i name="ic_dot"
                              width="0.125rem"
@@ -466,7 +466,7 @@ onUnmounted(() => {
                                  height="0.75rem"
                                  color="inherit"
                             />
-                            <span>{{ Object.keys(tagsState.tags).length }} Tags</span>
+                            <span>{{ $t('PROJECT.DETAIL.TAGS', { count: Object.keys(tagsState.tags).length }) }}</span>
                         </div>
                     </div>
                 </div>
