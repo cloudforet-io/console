@@ -137,11 +137,6 @@ const getColor = (val: string, field: string): string => {
     return state.formatRulesValue.value.find((d) => d.text === _label)?.color ?? state.formatRulesValue.baseColor;
 };
 
-/* Event */
-const handleUpdateLegendList = (legendList: WidgetLegend[]) => {
-    console.log(legendList);
-};
-
 /* Watcher */
 watch(() => state.formatRulesValue, async () => {
     state.legendList = state.formatRulesValue.value.map((d) => ({
@@ -185,7 +180,6 @@ defineExpose<WidgetExpose<Data>>({
         </div>
         <widget-custom-lagend :legend-list.sync="state.legendList"
                               class="widget-custom-legend"
-                              @update:legend-list="handleUpdateLegendList"
         />
     </widget-frame>
 </template>
