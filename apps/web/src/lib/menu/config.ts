@@ -15,6 +15,7 @@ export const MENU_ID = Object.freeze({
     COST_ANALYSIS: 'cost_analysis',
     COST_ADVANCED_SETTINGS: 'cost_advanced_settings',
     ANOMALY_DETECTION: 'anomaly_detection',
+    CURRENCY_CONVERTER: 'currency_converter',
     // ANOMALY_DETECTION_CONFIGURATION: 'anomaly_detection_configuration',
     // ANOMALY_DETECTION_POLICY: 'anomaly_detection_policy',
     // ANOMALY_DETECTION_HISTORY: 'anomaly_detection_history',
