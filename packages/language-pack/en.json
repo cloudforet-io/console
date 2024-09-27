@@ -1766,7 +1766,20 @@
 			}
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "Anomaly Detection Configuration",
-		"COST_ADVANCED_SETTINGS": "Advanced Settings"
+		"COST_ADVANCED_SETTINGS": "Advanced Settings",
+		"CURRENCY_CONVERTER": {
+			"AGGREGATION_DATE": "Aggregation Date (Monthly)",
+			"ALT_E_RATES": "The number must be greater than 0",
+			"ALT_S_CHANGES": "Currency converter successfully changed",
+			"BASE_CURRENCY": "Base Currency",
+			"CHECKBOX": "Last day of the month",
+			"DATA_ENTER": "The data you enter below",
+			"DEFAULT": "Default",
+			"EXCHANGE_RATES_SOURCE": "Exchange Rates Source",
+			"NOTIFICATION": "The changes will take effect starting next month({month}).",
+			"SAVE_CHANGES": "Save Changes",
+			"YAHOO": "Yahoo Finance"
+		}
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {

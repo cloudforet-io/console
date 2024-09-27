@@ -1766,7 +1766,20 @@
 			}
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "이상 비용 탐지 설정",
-		"COST_ADVANCED_SETTINGS": "고급 설정"
+		"COST_ADVANCED_SETTINGS": "고급 설정",
+		"CURRENCY_CONVERTER": {
+			"AGGREGATION_DATE": "",
+			"ALT_E_RATES": "",
+			"ALT_S_CHANGES": "",
+			"BASE_CURRENCY": "",
+			"CHECKBOX": "",
+			"DATA_ENTER": "",
+			"DEFAULT": "기본",
+			"EXCHANGE_RATES_SOURCE": "",
+			"NOTIFICATION": "",
+			"SAVE_CHANGES": "변경사항 저장",
+			"YAHOO": ""
+		}
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
