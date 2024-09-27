@@ -25,6 +25,7 @@ const AdminBudgetMainPage = () => import('@/services/cost-explorer/pages/admin/A
 const AdminBudgetCreatePage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetCreatePage.vue');
 const AdminBudgetDetailPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetDetailPage.vue');
 const AdminDomainSettingsAnomalyDetectionConfigurationPage = () => import('@/services/cost-explorer/pages/admin/AdminAdvancedSettingsAnomalyDetectionConfigurationPage.vue');
+const AdminAdvancedSettingsCurrencyConverterPage = () => import('@/services/cost-explorer/pages/admin/AdminAdvancedSettingsCurrencyConverterPage.vue');
 
 const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin/AdminCostAnalysisPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
@@ -218,7 +219,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                     path: '/currency-converter',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME),
                     meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.CURRENCY_CONVERTER].translationId },
-                    component: AdminDomainSettingsAnomalyDetectionConfigurationPage,
+                    component: AdminAdvancedSettingsCurrencyConverterPage,
                 },
             ],
         },
