@@ -205,6 +205,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
                     dashboardApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
                 } else {
                     dashboardApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
+                    dashboardApiQueryHelper.addFilter({ k: 'project_id', v: '*', o: '!=' });
                 }
             }
             const response = await fetcher({
