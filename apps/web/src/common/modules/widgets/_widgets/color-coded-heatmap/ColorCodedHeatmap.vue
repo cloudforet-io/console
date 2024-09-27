@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, reactive,
+    computed, defineExpose, reactive, watch,
 } from 'vue';
+
 
 import { orderBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PEmpty,
+} from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -14,6 +18,7 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import WidgetCustomLagend from '@/common/modules/widgets/_components/WidgetCustomLagend.vue';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
@@ -27,6 +32,7 @@ import type { AdvancedFormatRulesValue } from '@/common/modules/widgets/_widget-
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetLegend } from '@/common/modules/widgets/types/widget-legend-typs';
 
 
 type Data = ListResponse<{
@@ -50,13 +56,18 @@ const state = reactive({
     }),
     refinedData: computed(() => {
         if (!state.data) return [];
-        const _orderedData = orderBy(state.data.results, [state.dataField], ['desc']);
+        const _filteredData = state.data.results?.filter((d) => {
+            const _label = getReferenceLabel(props.allReferenceTypeInfo, state.formatRulesField, d[state.formatRulesField]);
+            return state.legendList.find((l) => l.name === _label)?.disabled !== true;
+        }) || [];
+        const _orderedData = orderBy(_filteredData, [state.dataField], ['desc']);
         return _orderedData.map((d) => ({
             name: d[state.groupByField],
             value: numberFormatter(d[state.dataField], { minimumFractionDigits: 2 }),
             color: getColor(d[state.formatRulesField], state.formatRulesField),
         }));
     }),
+    legendList: [] as WidgetLegend[],
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
@@ -126,6 +137,20 @@ const getColor = (val: string, field: string): string => {
     return state.formatRulesValue.value.find((d) => d.text === _label)?.color ?? state.formatRulesValue.baseColor;
 };
 
+/* Event */
+const handleUpdateLegendList = (legendList: WidgetLegend[]) => {
+    console.log(legendList);
+};
+
+/* Watcher */
+watch(() => state.formatRulesValue, async () => {
+    state.legendList = state.formatRulesValue.value.map((d) => ({
+        name: d.text,
+        color: d.color,
+        disabled: false,
+    }));
+}, { immediate: true });
+
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
     loadWidget,
@@ -139,26 +164,37 @@ defineExpose<WidgetExpose<Data>>({
     >
         <!--Do not delete div element below. It's defense code for redraw-->
         <div class="content-wrapper">
-            <div class="box-wrapper"
+            <div v-if="state.refinedData?.length"
+                 class="box-wrapper"
                  :style="{'grid-template-columns': `repeat(auto-fill, ${state.boxWidth-4}px)`}"
             >
                 <div v-for="(data, idx) in state.refinedData"
                      :key="`box-${idx}`"
-                     v-tooltip.bottom="`${data.name}: ${data.value}`"
+                     v-tooltip.bottom="`${getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, data.name)}: ${data.value}`"
                      class="value-box"
                      :style="{'background-color': data.color}"
                 >
-                    <span class="value-text">{{ data.name }}</span>
+                    <span class="value-text">{{ getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, data.name) }}</span>
                 </div>
             </div>
+            <p-empty v-else
+                     class="p-empty"
+            >
+                <span>{{ $t('COMMON.WIDGETS.NO_DATA_TO_DISPLAY') }}</span>
+            </p-empty>
         </div>
+        <widget-custom-lagend :legend-list.sync="state.legendList"
+                              class="widget-custom-legend"
+                              @update:legend-list="handleUpdateLegendList"
+        />
     </widget-frame>
 </template>
 
 <style lang="postcss" scoped>
 .color-coded-heatmap {
     .content-wrapper {
-        height: 96%;
+        position: relative;
+        height: calc(96% - 2rem);
         overflow-y: auto;
     }
     .box-wrapper {
@@ -179,6 +215,14 @@ defineExpose<WidgetExpose<Data>>({
                 text-align: center;
             }
         }
+    }
+    .p-empty {
+        height: 100%;
+    }
+    .widget-custom-legend {
+        position: absolute;
+        bottom: 0;
+        left: 0;
     }
 }
 </style>
