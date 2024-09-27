@@ -74,6 +74,7 @@ const handleSelectProjectGroup = () => {
 const handleSelectItem = (selected: MenuItem) => {
     projectPageStore.setCurrentSelectedProjectGroupId(props.item.id);
     if (selected.name === 'rename') {
+        projectPageStore.setProjectGroupFormUpdateMode(true);
         projectPageStore.setProjectGroupFormVisible(true);
     }
     if (selected.name === 'move') {

@@ -27,11 +27,12 @@ interface Props {
     visible: boolean;
     projectGroupId?: string;
     updateMode: boolean;
+    parentGroupId?: string;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'confirm'): void;
+    (e: 'confirm', isCreating: boolean, projectGroup?: ProjectGroupModel): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -75,37 +76,50 @@ const getProjectGroupNames = async () => {
     }
 };
 
-const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
+const createProjectGroup = async (params: ProjectGroupCreateParameters): Promise<ProjectGroupModel|undefined> => {
     try {
-        await SpaceConnector.clientV2.identity.projectGroup.create<ProjectGroupCreateParameters, ProjectGroupModel>(params);
+        const result = await SpaceConnector.clientV2.identity.projectGroup.create<ProjectGroupCreateParameters, ProjectGroupModel>(params);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
+        return result;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
+        return undefined;
     }
 };
-const updateProjectGroup = async (params: ProjectGroupUpdateParameters) => {
+const updateProjectGroup = async (params: ProjectGroupUpdateParameters): Promise<ProjectGroupModel|undefined> => {
     try {
-        await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters, ProjectGroupModel>(params);
+        const result = await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters, ProjectGroupModel>(params);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
+        return result;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
+        return undefined;
     }
 };
 
 /* Event */
 const confirm = async () => {
     if (state.loading) return;
+    if (!projectGroupName.value) return;
     if (!isAllValid.value) return;
 
     state.loading = true;
-    const params: ProjectGroupCreateParameters | Partial<ProjectGroupUpdateParameters> = {
+    const updateParams: ProjectGroupUpdateParameters = {
         name: projectGroupName.value,
+        project_group_id: props.projectGroupId as string,
     };
 
-    if (!props.updateMode) await createProjectGroup({ ...params } as ProjectGroupCreateParameters);
-    else await updateProjectGroup({ ...params, project_group_id: props.projectGroupId as string });
+    const createParams: ProjectGroupCreateParameters = {
+        name: projectGroupName.value,
+        parent_group_id: props.parentGroupId,
+    };
 
-    emit('confirm');
+    let result: ProjectGroupModel|undefined;
+
+    if (!props.updateMode) result = await createProjectGroup({ ...createParams } as ProjectGroupCreateParameters);
+    else result = await updateProjectGroup({ ...updateParams });
+
+    emit('confirm', !props.updateMode, result);
     state.loading = false;
     state.proxyVisible = false;
 };

@@ -233,7 +233,7 @@ const handleTagUpdate = async (newTags) => {
         tagsState.tagsModalVisible = false;
     }
 };
-const handleConfirmProjectForm = (data: ProjectModel) => {
+const handleConfirmProjectForm = (_, data: ProjectModel) => {
     projectDetailPageStore.setProject(data);
 };
 

@@ -160,7 +160,6 @@ const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
         projectPageStore.setProjectFormModalVisible(true);
     } else if (item.name === 'projectGroup') {
-        state.projectGroupUpdateMode = false;
         projectPageStore.setProjectGroupFormVisible(true);
     }
 };
