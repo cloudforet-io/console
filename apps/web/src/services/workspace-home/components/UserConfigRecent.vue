@@ -41,7 +41,7 @@ const gnbStoreGetters = gnbStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const dashboardStore = useDashboardStore();
-const dashboardGetters = dashboardStore.getters;
+const dashboardState = dashboardStore.state;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 
@@ -69,7 +69,7 @@ const state = reactive({
 const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData => {
     const { itemType } = recentConfig;
     if (itemType === RECENT_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([recentConfig], [...dashboardGetters.workspaceDashboardItems, ...dashboardGetters.privateDashboardItems])[0];
+        return convertDashboardConfigToReferenceData([recentConfig], [...dashboardState.publicDashboardItems, ...dashboardState.privateDashboardItems])[0];
     }
     if (itemType === RECENT_TYPE.PROJECT) {
         return convertProjectConfigToReferenceData([recentConfig], storeState.projects)[0];

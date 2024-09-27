@@ -59,7 +59,7 @@ const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
 const favoriteStoreGetters = favoriteStore.getters;
 const dashboardStore = useDashboardStore();
-const dashboardGetters = dashboardStore.getters;
+const dashboardState = dashboardStore.state;
 const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
 
@@ -112,7 +112,7 @@ const handleClickFavoriteButton = async (event: MouseEvent) => {
 const convertFavoriteToReferenceData = (favoriteConfig: ConfigData) => {
     const { itemType } = favoriteConfig;
     if (itemType === FAVORITE_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([favoriteConfig], [...dashboardGetters.workspaceDashboardItems, ...dashboardGetters.privateDashboardItems])[0];
+        return convertDashboardConfigToReferenceData([favoriteConfig], [...dashboardState.publicDashboardItems, ...dashboardState.privateDashboardItems])[0];
     }
     if (itemType === FAVORITE_TYPE.PROJECT) {
         return convertProjectConfigToReferenceData([favoriteConfig], storeState.projects)[0];

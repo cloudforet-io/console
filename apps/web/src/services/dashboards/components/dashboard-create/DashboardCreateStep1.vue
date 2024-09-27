@@ -38,6 +38,7 @@ const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
+const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
@@ -77,7 +78,7 @@ const state = reactive({
             dashboardItems = dashboardGetters.domainDashboardItems;
         } else if (storeState.isWorkspaceMember) {
             folderItems = dashboardGetters.privateFolderItems;
-            dashboardItems = dashboardGetters.privateDashboardItems;
+            dashboardItems = dashboardState.privateDashboardItems;
         }
         const _refinedDashboardItems = dashboardItems.filter((d) => d.version !== '1.0');
         return getDashboardTreeData(folderItems, _refinedDashboardItems).filter((d) => {
@@ -87,7 +88,7 @@ const state = reactive({
     }),
     allExistingLabels: computed(() => {
         const ootbTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
-        const dashboards: DashboardModel[] = storeState.isWorkspaceMember ? dashboardGetters.privateDashboardItems : dashboardGetters.allDashboardItems;
+        const dashboards: DashboardModel[] = storeState.isWorkspaceMember ? dashboardState.privateDashboardItems : dashboardGetters.allDashboardItems;
         const existingTemplates = getFilteredTemplates(dashboards, '', [], []);
         return uniq([
             ...flatMapDeep(ootbTemplates.map((d) => d.labels)),
