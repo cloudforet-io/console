@@ -3,7 +3,6 @@ import { computed, onMounted, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import {
     PBadge, PBoard, PI, PLabel,
 } from '@cloudforet/mirinae';
@@ -14,7 +13,6 @@ import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -39,8 +37,6 @@ type DashboardBoardSet = BoardSet & DashboardModel;
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
-const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -118,13 +114,6 @@ const handleClickDeleteDashboard = (dashboardId: string) => {
     deleteModalState.visible = true;
 };
 
-const labelQueryHelper = new QueryHelper();
-const handleSetQuery = (selectedLabel: string | string[]) => {
-    labelQueryHelper.setFilters(dashboardState.searchFilters)
-        .addFilter({ k: 'labels', o: '=', v: selectedLabel });
-    dashboardStore.setSearchFilters(labelQueryHelper.filters);
-};
-
 onMounted(() => {
     if (props.isCollapsed) state.isCollapsed = true;
 });
@@ -193,8 +182,6 @@ onMounted(() => {
                         <p-label v-for="(label, idx) in board.labels"
                                  :key="`${board.name}-label-${idx}`"
                                  :text="label"
-                                 clickable
-                                 @item-click="handleSetQuery(label)"
                         />
                     </div>
                 </div>
