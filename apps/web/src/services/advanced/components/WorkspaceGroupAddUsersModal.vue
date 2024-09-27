@@ -77,6 +77,7 @@ const userDropdownState = reactive({
 
 const resetState = () => {
     roleSelectedItems.value = [];
+    userDropdownState.searchText = '';
     userDropdownState.menuList = [];
 };
 
@@ -103,6 +104,7 @@ const handleConfirm = async () => {
 };
 
 const handleCloseModal = () => {
+    resetState();
     workspaceGroupPageStore.closeModal();
 };
 
