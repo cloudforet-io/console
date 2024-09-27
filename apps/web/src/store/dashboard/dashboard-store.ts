@@ -90,10 +90,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const getters = reactive({
         allDashboardItems: computed<DashboardModel[]>(() => [...state.privateDashboardItems, ...state.publicDashboardItems] as DashboardModel[]),
         domainDashboardItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'DOMAIN')),
-        workspaceDashboardItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems
-            .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
-            .filter((item) => !(item.resource_group === 'DOMAIN' && item.scope === 'PROJECT'))),
-        privateDashboardItems: computed<PrivateDashboardModel[]>(() => state.privateDashboardItems),
         //
         allFolderItems: computed<FolderModel[]>(() => [...state.privateFolderItems, ...state.publicFolderItems]),
         domainFolderItems: computed<PublicFolderModel[]>(() => state.publicFolderItems.filter((item) => item.resource_group === 'DOMAIN')),

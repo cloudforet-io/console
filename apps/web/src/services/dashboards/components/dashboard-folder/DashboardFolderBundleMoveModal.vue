@@ -103,7 +103,10 @@ const handleFormConfirm = async () => {
     } if (failCount > 0) {
         ErrorHandler.handleRequestError(new Error(''), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_MOVE_DASHBOARD', { count: failCount }));
     }
-    await dashboardStore.load();
+    await Promise.allSettled([
+        dashboardStore.load(),
+        dashboardMainPageStore.load(),
+    ]);
     dashboardMainPageStore.resetSelectedIdMap(dashboardMainPageState.folderModalType);
     state.proxyVisible = false;
 };

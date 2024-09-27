@@ -89,7 +89,10 @@ const handleDeleteConfirm = async () => {
     } else {
         ErrorHandler.handleRequestError(new Error('Delete failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_DELETE_DASHBOARD'));
     }
-    await dashboardStore.load();
+    await Promise.allSettled([
+        dashboardStore.load(),
+        dashboardMainPageStore.load(),
+    ]);
     state.loading = false;
     dashboardMainPageStore.setSelectedIdMap({}, dashboardMainPageState.folderModalType);
     state.proxyVisible = false;

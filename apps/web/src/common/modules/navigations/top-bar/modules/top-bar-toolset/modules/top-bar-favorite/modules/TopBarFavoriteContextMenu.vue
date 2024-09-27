@@ -69,7 +69,7 @@ const emit = defineEmits<{(e: 'close'): void;
 
 const allReferenceStore = useAllReferenceStore();
 const dashboardStore = useDashboardStore();
-const dashboardGetters = dashboardStore.getters;
+const dashboardState = dashboardStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -197,7 +197,7 @@ const state = reactive({
         if (!isUserAccessibleToDashboards) return [];
         return convertDashboardConfigToReferenceData(
             favoriteGetters.dashboardItems ?? [],
-            [...dashboardGetters.workspaceDashboardItems, ...dashboardGetters.privateDashboardItems],
+            [...dashboardState.publicDashboardItems, ...dashboardState.privateDashboardItems],
         );
     }),
     favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
