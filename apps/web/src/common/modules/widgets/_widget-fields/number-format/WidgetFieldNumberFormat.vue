@@ -101,7 +101,6 @@ const handleSelectMenuItem = (dataField: string, selected: NumberFormat) => {
         ...state.proxyValue,
         [dataField]: {
             format: selected,
-            customNumberFormat: undefined,
         },
     };
 };

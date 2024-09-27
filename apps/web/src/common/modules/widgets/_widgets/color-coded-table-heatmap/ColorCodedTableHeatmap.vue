@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref,
+    computed, defineExpose, reactive, ref, watch,
 } from 'vue';
 
 import { cloneDeep, orderBy, throttle } from 'lodash';
@@ -17,6 +17,7 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 
 import type { APIErrorToast } from '@/common/composables/error/errorHandler';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import WidgetCustomLagend from '@/common/modules/widgets/_components/WidgetCustomLagend.vue';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
@@ -37,6 +38,7 @@ import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-field
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetLegend } from '@/common/modules/widgets/types/widget-legend-typs';
 
 import { gray } from '@/styles/colors';
 
@@ -89,6 +91,7 @@ const state = reactive({
         });
         return orderBy(Object.entries(_subTotalResults), 1, 'desc').slice(0, _valueCount).map(([k]) => k);
     }),
+    legendList: [] as WidgetLegend[],
     // required fields
     granularity: computed<string>(() => props.widgetOptions?.granularity as string),
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
@@ -203,6 +206,15 @@ const getColor = (val: string|number): string => {
     return _color;
 };
 
+/* Watcher */
+watch(() => state.formatRulesValue, async () => {
+    state.legendList = state.formatRulesValue.value.map((d) => ({
+        name: d.text,
+        color: d.color,
+        disabled: false,
+    }));
+}, { immediate: true });
+
 /* Lifecycle */
 useWidgetInitAndRefresh({ props, emit, loadWidget });
 defineExpose<WidgetExpose<Data>>({
@@ -290,6 +302,10 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                 </div>
             </div>
         </div>
+        <widget-custom-lagend :legend-list="state.legendList"
+                              disable-toggle
+                              class="widget-custom-legend"
+        />
     </widget-frame>
 </template>
 
@@ -352,6 +368,11 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                 }
             }
         }
+    }
+    .widget-custom-legend {
+        position: absolute;
+        bottom: 0;
+        left: 0;
     }
 }
 </style>
