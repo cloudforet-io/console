@@ -314,7 +314,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
     .table-wrapper {
         display: flex;
         width: 100%;
-        height: 85%;
+        height: 82%;
         gap: 0.25rem;
         overflow: auto;
         margin-top: 1rem;
@@ -345,6 +345,7 @@ useResizeObserver(colorCodedTableRef, throttle(() => {
                     @apply text-label-xs text-gray-600;
                     display: inline-flex;
                     padding-top: 0.25rem;
+                    padding-bottom: 1rem;
                     .x-field-col {
                         @apply truncate;
                     }

@@ -100,7 +100,7 @@ const handleCloneConfirm = async () => {
     if (_results.every((r) => r.status === 'fulfilled')) {
         showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_S_CLONE_DASHBOARD'), '');
     } else {
-        const _failedCount = _results.map((r) => r.status !== 'fulfilled').length;
+        const _failedCount = _results.filter((r) => r.status !== 'fulfilled').length;
         showErrorMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }), '');
     }
     await Promise.allSettled([

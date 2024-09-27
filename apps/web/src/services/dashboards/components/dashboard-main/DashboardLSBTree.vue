@@ -8,9 +8,9 @@ import { PI, PTreeView } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
+import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -26,9 +26,11 @@ import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboar
 
 
 interface Props {
-    type: 'PUBLIC'|'PRIVATE';
+    dashboards: DashboardModel[];
+    type: 'PRIVATE' | 'PUBLIC';
 }
 const props = withDefaults(defineProps<Props>(), {
+    dashboards: () => ([]),
     type: 'PUBLIC',
 });
 const route = useRoute();
@@ -38,17 +40,19 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
+const appContextStore = useAppContextStore();
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     currentParentPathIds: [] as string[],
     currentFolderId: undefined as string|undefined,
     treeDisplayMap: {} as TreeDisplayMap,
-    v2PrivateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems.filter((d) => d.version !== '1.0')),
-    v2PublicDashboardItems: computed<PublicDashboardModel[]>(() => dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0')),
     dashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         if (props.type === 'PRIVATE') {
-            return getDashboardTreeData(dashboardState.privateFolderItems, state.v2PrivateDashboardItems);
+            return getDashboardTreeData(dashboardState.privateFolderItems, props.dashboards);
         }
-        return getDashboardTreeData(dashboardState.publicFolderItems, state.v2PublicDashboardItems);
+        return getDashboardTreeData(dashboardState.publicFolderItems, props.dashboards);
     }),
     selectedTreeId: undefined as string|undefined,
 });
@@ -97,7 +101,9 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="project-main-tree">
+    <div class="project-main-tree"
+         :style="{ maxHeight: storeState.isAdminMode ? undefined : '19rem' }"
+    >
         <p-tree-view :tree-data="state.dashboardTreeData"
                      :tree-display-map="state.treeDisplayMap"
                      :selected-id="state.selectedTreeId"
@@ -130,7 +136,6 @@ onMounted(() => {
 <style scoped lang="postcss">
 .project-main-tree {
     width: 100%;
-    max-height: 19rem;
     overflow-y: auto;
     .dashboard-menu-item-content {
         @apply flex items-center justify-between w-full;

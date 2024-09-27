@@ -269,7 +269,7 @@ onUnmounted(() => {
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
                 </p-empty>
             </template>
-            <div v-if="storeState.isAdminMode || storeState.isWorkspaceOwner"
+            <div v-if="(storeState.isAdminMode || storeState.isWorkspaceOwner) && state.refinedPublicTreeData.length"
                  class="tree-wrapper"
             >
                 <dashboard-folder-tree-title v-if="storeState.isWorkspaceOwner"
@@ -286,7 +286,7 @@ onUnmounted(() => {
                                        @click-move="handleClickMoveButton('PUBLIC')"
                 />
             </div>
-            <div v-if="!storeState.isAdminMode"
+            <div v-if="!storeState.isAdminMode && state.refinedPrivateTreeData.length"
                  class="tree-wrapper"
             >
                 <dashboard-folder-tree-title :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
