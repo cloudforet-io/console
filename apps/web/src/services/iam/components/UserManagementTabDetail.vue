@@ -12,6 +12,7 @@ import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/table
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -74,7 +75,9 @@ const tableState = reactive({
             );
             if (state.selectedUser?.role_id) {
                 additionalRoleFields.push(
-                    { name: 'role_id', label: i18n.t('IAM.USER.MAIN.ROLE_NAME') },
+                    {
+                        name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
+                    },
                 );
             }
         } else {
@@ -92,7 +95,6 @@ const tableState = reactive({
             ...additionalFields,
             { name: 'last_accessed_count', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY'), disableCopy: true },
             { name: 'domain_id', label: i18n.t('IAM.USER.MAIN.DOMAIN_ID') },
-            { name: 'role_type', label: i18n.t('IAM.USER.MAIN.ROLE_TYPE') },
             ...additionalRoleFields,
             { name: 'language', label: i18n.t('IAM.USER.MAIN.LANGUAGE'), disableCopy: true },
             { name: 'timezone', label: i18n.t('IAM.USER.MAIN.TIMEZONE'), disableCopy: true },
@@ -233,24 +235,15 @@ const handleClickVerifyButton = async () => {
             <template #data-mfa="{data}">
                 {{ data?.state === 'ENABLED' ? 'On' : 'Off' }}
             </template>
-            <template #data-role_type>
-                <span class="role-type">
-                    <img :src="useRoleFormatter(userPageState.isAdminMode ? (userPageGetters.roleMap[tableState.refinedUserItems?.role_id]?.role_type) : tableState.refinedUserItems.role_type).image"
-                         alt="role-type-icon"
-                         class="role-type-icon"
-                    >
-                    <span>
-                        {{
-                            useRoleFormatter(userPageState.isAdminMode
-                                ? (userPageGetters.roleMap[tableState.refinedUserItems?.role_id]?.role_type)
-                                : tableState.refinedUserItems?.role_type).name
-                        }}
-                    </span>
-                </span>
-            </template>
-            <template #data-role_id="{value}">
-                <span class="role-type">
-                    <span class="pr-4">{{ userPageGetters.roleMap[value]?.name ?? '' }}</span>
+            <template #data-role_id="{value, data}">
+                <span class="role-wrapper">
+                    <div class="role-menu-item">
+                        <img :src="useRoleFormatter(userPageGetters.roleMap[data]?.role_type || ROLE_TYPE.USER).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <span class="pr-4">{{ userPageGetters.roleMap[value]?.name ?? '' }}</span>
+                    </div>
                 </span>
             </template>
             <template #data-role_binding="{value}">

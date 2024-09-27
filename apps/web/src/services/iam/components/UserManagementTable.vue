@@ -66,6 +66,7 @@ const state = reactive({
     selectedRemoveItem: '',
     refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => ({
         ...user,
+        type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
         mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
         last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
     }))),
@@ -82,6 +83,7 @@ const tableState = reactive({
             );
         } else {
             additionalFields.push(
+                { name: 'type', label: 'Type', sortable: false },
                 { name: 'role_binding', label: 'Role', sortable: false },
             );
         }
