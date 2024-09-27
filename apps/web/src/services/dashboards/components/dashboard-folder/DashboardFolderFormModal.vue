@@ -137,7 +137,10 @@ const handleFormConfirm = async () => {
     } else {
         await createFolder();
     }
-    await dashboardStore.load();
+    await Promise.allSettled([
+        dashboardStore.load(),
+        dashboardMainPageStore.load(),
+    ]);
 };
 const handleUpdatePrivate = (value: boolean) => {
     state.isPrivate = value;

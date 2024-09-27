@@ -103,7 +103,10 @@ const handleCloneConfirm = async () => {
         const _failedCount = _results.map((r) => r.status !== 'fulfilled').length;
         showErrorMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }), '');
     }
-    await dashboardStore.load();
+    await Promise.allSettled([
+        dashboardStore.load(),
+        dashboardMainPageStore.load(),
+    ]);
     dashboardMainPageStore.setSelectedIdMap({}, dashboardMainPageState.folderModalType);
     state.loading = false;
     state.proxyVisible = false;
