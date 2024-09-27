@@ -4322,6 +4322,7 @@
 		"DETAIL": {
 			"ACCESS": "접근",
 			"ADD": "추가 ",
+			"ADD_MEMBERS": "",
 			"ALERT": {
 				"ACKNOWLEDGED": "확인",
 				"ALL_NOTIFICATIONS": "모든 알림 받기",

@@ -605,12 +605,24 @@ watch([ // Fetch Dynamic Field
 }
 .dynamic-field-value-contents-wrapper {
     margin-top: 0.5rem;
+
+    .dynamic-field-auto-count {
+        height: 2rem;
+    }
 }
 
 /* custom design-system component - p-field-group */
 :deep(.p-field-group) {
     margin-bottom: 0;
 }
+
+/* custom design-system component - p-text-input */
+:deep(.p-text-input) {
+    .input-container {
+        max-height: 2rem;
+    }
+}
+
 .criteria-field {
     @apply w-full;
     margin-bottom: 0.5rem;

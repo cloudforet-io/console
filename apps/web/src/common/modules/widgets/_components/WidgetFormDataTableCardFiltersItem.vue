@@ -171,7 +171,7 @@ onClickOutside(operatorButtonRef, () => {
 .widget-form-data-table-card-filters-item {
     @apply bg-white border border-gray-150 rounded-lg;
     width: 100%;
-    padding: 0 0.5rem 0.5rem;
+    padding: 0.125rem 0.5rem 0.5rem;
     .filter-header {
         @apply flex items-center justify-between;
         height: 2rem;

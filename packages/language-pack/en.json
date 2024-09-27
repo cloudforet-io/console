@@ -4322,6 +4322,7 @@
 		"DETAIL": {
 			"ACCESS": "Access",
 			"ADD": "Add",
+			"ADD_MEMBERS": "Add Members",
 			"ALERT": {
 				"ACKNOWLEDGED": "Acknowledged",
 				"ALL_NOTIFICATIONS": "All Notifications",
