@@ -15,6 +15,7 @@ import { gray } from '@/styles/colors';
 const RANDOM_ID = getRandomId();
 interface Props {
     legendList: WidgetLegend[];
+    disableToggle?: boolean;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:legend-list', legendList: WidgetLegend[]): void}>();
@@ -25,6 +26,8 @@ const state = reactive({
 
 /* Event */
 const handleToggleLegend = (legend: WidgetLegend) => {
+    if (props.disableToggle) return;
+
     const _legendList = cloneDeep(state.proxyLegendList);
     const _legend = _legendList.find((l) => l.name === legend.name);
     if (!_legend) return;
@@ -38,7 +41,7 @@ const handleToggleLegend = (legend: WidgetLegend) => {
         <div v-for="legend in state.proxyLegendList"
              :key="`${RANDOM_ID}-${legend.name}`"
              class="widget-legend"
-             :class="{ 'disabled': legend.disabled }"
+             :class="{ 'disabled': legend.disabled, 'disable-toggle': props.disableToggle }"
              @click="handleToggleLegend(legend)"
         >
             <span class="legend-circle"
@@ -75,6 +78,9 @@ const handleToggleLegend = (legend: WidgetLegend) => {
             .legend-text {
                 @apply text-gray-500;
             }
+        }
+        &.disable-toggle {
+            cursor: default;
         }
     }
 }
