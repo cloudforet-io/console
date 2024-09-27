@@ -26,6 +26,9 @@ const state = reactive({
         if (route.name === makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME)) {
             title = i18n.t('COST_EXPLORER.ANOMALY_DETECTION_CONFIGURATION');
         }
+        if (route.name === makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME)) {
+            title = i18n.t('MENU.CURRENCY_CONVERTER');
+        }
         return title;
     }),
 });

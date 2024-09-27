@@ -18,6 +18,14 @@ const state = reactive({
             label: i18n.t('COST_EXPLORER.ANOMALY_DETECTION_CONFIGURATION'),
             to: { name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME) },
             hideFavorite: true,
+            highlightTag: 'new',
+        },
+        {
+            type: MENU_ITEM_TYPE.ITEM,
+            label: i18n.t('MENU.CURRENCY_CONVERTER'),
+            to: { name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME) },
+            hideFavorite: true,
+            highlightTag: 'new',
         },
     ]),
 });

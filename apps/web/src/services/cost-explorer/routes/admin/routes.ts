@@ -214,6 +214,12 @@ const adminCostExplorerRoutes: RouteConfig = {
                     meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION].translationId },
                     component: AdminDomainSettingsAnomalyDetectionConfigurationPage,
                 },
+                {
+                    path: '/currency-converter',
+                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME),
+                    meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.CURRENCY_CONVERTER].translationId },
+                    component: AdminDomainSettingsAnomalyDetectionConfigurationPage,
+                },
             ],
         },
     ],
