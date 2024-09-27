@@ -64,7 +64,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
 onMounted(() => {
     emit('update:is-valid', true);
     if (!props.value) {
-        state.proxyValue = undefined;
+        state.proxyValue = false;
         return;
     }
     setForm('annotation', props.value.annotation);
