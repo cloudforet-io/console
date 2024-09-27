@@ -159,6 +159,7 @@ const handleSelectItem = (selected: MenuItem) => {
                                      :to="{name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,query: { provider: getProvider(provider) ? provider : null },}"
                                      class="icon-link"
                                      :style="{backgroundImage: `url('${getProvider(provider).icon || require('@/assets/images/ic_cloud-filled.svg')}')`}"
+                                     @click.native.stop.prevent
                         />
                     </template>
                 </div>
@@ -170,6 +171,7 @@ const handleSelectItem = (selected: MenuItem) => {
                 <router-link v-if="props.serviceAccountProviderList.length !== 0"
                              class="icon-wrapper"
                              :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                             @click.native.stop.prevent
                 >
                     <p-i name="ic_plus_thin"
                          scale="0.8"
@@ -180,13 +182,17 @@ const handleSelectItem = (selected: MenuItem) => {
             <div v-else
                  class="account-add"
             >
-                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                             @click.native.stop.prevent
+                >
                     <p-i name="ic_plus_thin"
                          scale="0.8"
                          color="inherit"
                     />
                 </router-link>
-                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                             @click.native.stop.prevent
+                >
                     <span class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
                 </router-link>
             </div>
