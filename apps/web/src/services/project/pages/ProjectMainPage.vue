@@ -101,6 +101,7 @@ const handleClickCreateButton = () => {
     state.createMenuVisible = !state.createMenuVisible;
 };
 const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
+    projectPageStore.setCurrentSelectedProjectGroupId(state.currentProjectGroupId);
     if (item.name === 'project') {
         projectPageStore.setProjectFormModalVisible(true);
     } else if (item.name === 'projectGroup') {
