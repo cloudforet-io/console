@@ -53,7 +53,7 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     targetFolderItem: computed<PublicFolderReferenceItem|undefined>(() => storeState.folders[dashboardMainPageState.selectedFolderId || '']),
-    needToShare: computed<boolean>(() => !state.targetFolderItem?.data?.shared),
+    isShared: computed<boolean>(() => !!state.targetDashboardItem?.data?.shared),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
         const _folderName = state.targetFolderItem?.name || '';
         const _folderItems: DashboardDataTableItem[] = [{
@@ -73,11 +73,11 @@ const state = reactive({
     }),
     headerTitle: computed(() => {
         if (storeState.isAdminMode) {
-            if (state.needToShare) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARE_DASHBOARD');
+            if (!state.isShared) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARE_DASHBOARD');
             if (state.targetFolderItem?.data?.projectId === '*') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.UNSHARE_DASHBOARD_FROM_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.ALL_DASHBOARDS.UNSHARE_DASHBOARD_FROM_ALL_WORKSPACES');
         }
-        if (state.needToShare) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARE_DASHBOARD_TO_ALL_PROJECTS');
+        if (!state.isShared) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARE_DASHBOARD_TO_ALL_PROJECTS');
         return i18n.t('DASHBOARDS.ALL_DASHBOARDS.UNSHARE_DASHBOARD_FROM_ALL_PROJECTS');
     }),
     radioMenuList: computed<MenuItem[]>(() => ([
@@ -122,7 +122,7 @@ const unshareFolder = async () => {
 
 /* Event */
 const handleConfirm = async () => {
-    if (state.needToShare) await shareFolder();
+    if (!state.isShared) await shareFolder();
     else await unshareFolder();
 };
 const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
@@ -149,7 +149,7 @@ watch(() => state.proxyVisible, (visible) => {
                     @confirm="handleConfirm"
     >
         <template #body>
-            <p-field-group v-if="storeState.isAdminMode && state.needToShare"
+            <p-field-group v-if="storeState.isAdminMode && !state.isShared"
                            :label="$t('DASHBOARDS.ALL_DASHBOARDS.SHARE_TO')"
                            required
                            class="share-to-wrapper"

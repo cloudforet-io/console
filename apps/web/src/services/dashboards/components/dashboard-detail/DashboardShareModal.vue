@@ -69,12 +69,12 @@ const state = reactive({
         { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALL_PROJECTS'), name: 'PROJECT' },
     ])),
     selectedShareTo: 'WORKSPACE' as 'WORKSPACE' | 'PROJECT',
-    needToShare: computed<boolean>(() => !state.targetDashboardItem?.data?.shared),
+    isShared: computed<boolean>(() => !!state.targetDashboardItem?.data?.shared),
     hasFolder: computed<boolean>(() => !!state.targetDashboardItem?.data?.folderId),
     headerTitle: computed(() => {
         // admin
         if (storeState.isAdminMode) {
-            if (state.needToShare) {
+            if (!state.isShared) {
                 if (state.hasFolder) return i18n.t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER');
                 return i18n.t('DASHBOARDS.DETAIL.SHARE_DASHBOARD');
             }
@@ -86,7 +86,7 @@ const state = reactive({
             return i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS');
         }
         // workspace owner
-        if (state.needToShare) {
+        if (!state.isShared) {
             if (state.hasFolder) return i18n.t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER_TO_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_PROJECTS');
         }
@@ -206,7 +206,7 @@ const handleChangeShareTo = (value: 'WORKSPACE' | 'PROJECT') => {
     state.selectedShareTo = value;
 };
 const handleConfirm = async () => {
-    if (state.needToShare) {
+    if (!state.isShared) {
         if (state.hasFolder) await shareFolder();
         else await shareDashboard();
         return;
@@ -231,7 +231,7 @@ const handleConfirm = async () => {
                     <b>{{ $t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER_DESC_1') }}</b> {{ $t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER_DESC_2') }}
                 </span>
             </div>
-            <p-field-group v-if="storeState.isAdminMode && state.needToShare"
+            <p-field-group v-if="storeState.isAdminMode && !state.isShared"
                            :label="$t('DASHBOARDS.ALL_DASHBOARDS.SHARE_TO')"
                            required
                            class="share-to-wrapper"
