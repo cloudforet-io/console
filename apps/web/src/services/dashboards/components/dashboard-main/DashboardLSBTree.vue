@@ -10,6 +10,7 @@ import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -39,6 +40,10 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
+const appContextStore = useAppContextStore();
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     currentParentPathIds: [] as string[],
     currentFolderId: undefined as string|undefined,
@@ -96,7 +101,9 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="project-main-tree">
+    <div class="project-main-tree"
+         :style="{ maxHeight: storeState.isAdminMode ? undefined : '19rem' }"
+    >
         <p-tree-view :tree-data="state.dashboardTreeData"
                      :tree-display-map="state.treeDisplayMap"
                      :selected-id="state.selectedTreeId"
@@ -129,7 +136,6 @@ onMounted(() => {
 <style scoped lang="postcss">
 .project-main-tree {
     width: 100%;
-    max-height: 19rem;
     overflow-y: auto;
     .dashboard-menu-item-content {
         @apply flex items-center justify-between w-full;

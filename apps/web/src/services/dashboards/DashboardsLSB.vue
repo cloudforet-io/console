@@ -238,7 +238,9 @@ callApiWithGrantGuard();
         <template v-if="storeState.isAdminMode"
                   #slot-admin
         >
-            <dashboard-l-s-b-tree type="PUBLIC" />
+            <dashboard-l-s-b-tree type="PUBLIC"
+                                  :dashboards="state.publicV2DashboardItems"
+            />
         </template>
         <template v-if="storeState.isWorkspaceOwner"
                   #slot-shared
