@@ -20,6 +20,7 @@ import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-memb
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
 import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -257,6 +258,19 @@ const handleClickBackButton = () => {
         return;
     }
     router.push({ name: PROJECT_ROUTE._NAME });
+};
+
+const handleRemoveProjectUser = async (userId: string) => {
+    try {
+        const params: ProjectRemoveUsersParameters = {
+            project_id: props.id,
+            users: [userId],
+        };
+        await SpaceConnector.clientV2.identity.project.removeUsers<ProjectRemoveUsersParameters, ProjectModel>(params);
+        await fetchUserList();
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
 
@@ -510,6 +524,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                             <span>{{ ROLE_INFO_MAP[storeState.users[userId]?.data.roleInfo.role_type]?.label }}</span>
                                             <p-icon-button name="ic_delete"
                                                            size="sm"
+                                                           @click="handleRemoveProjectUser(userId)"
                                             />
                                         </div>
                                     </div>
