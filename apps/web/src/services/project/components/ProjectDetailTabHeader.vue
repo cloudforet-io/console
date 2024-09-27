@@ -119,8 +119,8 @@ const state = reactive({
             label: i18n.t('PROJECT.DETAIL.CLOUD_SERVICE'),
             to: getProperRouteLocation({
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-                params: {
-                    // TODO: set params
+                query: {
+                    project: [props.id],
                 },
             }),
         },
