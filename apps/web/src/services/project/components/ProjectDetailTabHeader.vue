@@ -93,7 +93,7 @@ const storeState = reactive({
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
-    menuItems: [
+    menuItems: computed(() => [
         {
             type: 'item',
             name: 'update',
@@ -113,7 +113,7 @@ const state = reactive({
             label: i18n.t('PROJECT.DETAIL.DELETE'),
             icon: 'ic_delete',
         },
-    ],
+    ]),
     viewInItems: computed<ViewInItem[]>(() => ([
         {
             label: i18n.t('PROJECT.DETAIL.CLOUD_SERVICE'),
@@ -331,7 +331,7 @@ watch(() => projectDetailPageGetters.projectType, async () => {
         listWebhooks(),
         fetchUserList(),
     ]);
-}, { immediate: false });
+});
 
 watch(() => projectDetailPageState.projectId, async (projectId) => {
     if (projectId) {
@@ -353,9 +353,6 @@ watch([
 watch(() => projectDetailPageState.projectId, (projectId) => {
     gnbStore.setId(projectId);
 }, { immediate: true });
-// watch(() => state.favoriteOptions, (favoriteOptions) => {
-//     gnbStore.setFavoriteItemId(favoriteOptions);
-// }, { immediate: true });
 
 </script>
 
