@@ -2,8 +2,6 @@
 import { watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { cloneDeep } from 'lodash';
-
 import { PHeading, PButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -12,7 +10,6 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { ModalSettingState } from '@/services/iam/types/user-type';
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -30,48 +27,36 @@ const route = useRoute();
 /* Component */
 const handleClickButton = (type: string) => {
     switch (type) {
-    case USER_MODAL_TYPE.REMOVE: updateModalSettings({
+    case USER_MODAL_TYPE.REMOVE: userPageStore.updateModalSettings({
         type,
         title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE') as string,
         themeColor: 'alert',
-        statusVisible: true,
+        modalVisibleType: 'status',
     }); break;
-    case USER_MODAL_TYPE.INVITE: updateModalSettings({
+    case USER_MODAL_TYPE.INVITE: userPageStore.updateModalSettings({
         type,
         title: i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string,
         themeColor: 'primary',
-        addVisible: true,
+        modalVisibleType: 'add',
     }); break;
-    case USER_MODAL_TYPE.ADD: updateModalSettings({
+    case USER_MODAL_TYPE.ADD: userPageStore.updateModalSettings({
         type,
         title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE') as string,
         themeColor: 'primary',
-        addVisible: true,
+        modalVisibleType: 'add',
     }); break;
     default: break;
     }
-};
-const updateModalSettings = ({
-    type, title, themeColor, statusVisible, addVisible,
-}: ModalSettingState) => {
-    userPageStore.$patch((_state) => {
-        _state.state.modal.type = type;
-        _state.state.modal.title = title;
-        _state.state.modal.themeColor = themeColor;
-        _state.state.modal.visible.status = statusVisible ?? false;
-        _state.state.modal.visible.add = addVisible ?? false;
-        _state.state.modal = cloneDeep(_state.state.modal);
-    });
 };
 
 watch(() => route.query, (query) => {
     if (!query) return;
     if (query.isAddUser) {
-        updateModalSettings({
+        userPageStore.updateModalSettings({
             type: USER_MODAL_TYPE.ADD,
             title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE') as string,
             themeColor: 'primary',
-            addVisible: true,
+            modalVisibleType: 'add',
         });
     }
 }, { immediate: true });

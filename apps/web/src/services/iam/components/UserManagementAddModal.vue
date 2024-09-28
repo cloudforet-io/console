@@ -127,7 +127,7 @@ const handleClose = () => {
     state.isResetPassword = true;
     state.isSetAdminRole = false;
     userPageStore.$patch((_state) => {
-        _state.state.modal.visible.add = false;
+        _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
         _state.state.createdWorkspaceId = undefined;
         _state.state.afterWorkspaceCreated = false;
@@ -158,19 +158,23 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
         }
     };
 
-    if (userPageState.isAdminMode || (userPageState.afterWorkspaceCreated && item.isNew)) {
-        await SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>({
-            ...userInfoParams,
-            tags: state.tags,
-        });
-        await createRoleBinding();
-    } else if (item.isNew) {
-        await SpaceConnector.clientV2.identity.workspaceUser.create<WorkspaceUserCreateParameters, WorkspaceUserModel>({
-            ...userInfoParams,
-            role_id: state.role.name || '',
-        });
-    } else {
-        await createRoleBinding();
+    try {
+        if (userPageState.isAdminMode || (userPageState.afterWorkspaceCreated && item.isNew)) {
+            await SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>({
+                ...userInfoParams,
+                tags: state.tags,
+            });
+            await createRoleBinding();
+        } else if (item.isNew) {
+            await SpaceConnector.clientV2.identity.workspaceUser.create<WorkspaceUserCreateParameters, WorkspaceUserModel>({
+                ...userInfoParams,
+                role_id: state.role.name || '',
+            });
+        } else {
+            await createRoleBinding();
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
 };
 const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
@@ -198,6 +202,7 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
 };
 
 const fetchAddUserToWorkspaceGroup = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
+    if (!userItem.user_id) return;
     await SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>({
         workspace_group_id: item?.name || '',
         users: [{
@@ -224,7 +229,7 @@ watch(() => route.query, (query) => {
                     :fade="true"
                     :backdrop="true"
                     :loading="state.loading"
-                    :visible="userPageState.modal.visible.add"
+                    :visible="userPageState.modal.visible?.add"
                     :disabled="state.disabled"
                     @confirm="handleConfirm"
                     @cancel="handleClose"

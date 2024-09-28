@@ -83,7 +83,7 @@ const formState = reactive({
 /* Components */
 const handleClose = () => {
     userPageStore.$patch((_state) => {
-        _state.state.modal.visible.form = false;
+        _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
     });
 };
@@ -235,7 +235,7 @@ const verifyUserEmail = async () => {
 };
 
 /* Watcher */
-watch(() => userPageState.modal.visible.form, async (visible) => {
+watch(() => userPageState.modal.visible?.form, async (visible) => {
     if (visible) {
         await setForm();
         await fetchListRoleBindingInfo();
@@ -255,7 +255,7 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
                     size="md"
                     :fade="true"
                     :backdrop="true"
-                    :visible="userPageState.modal.visible.form"
+                    :visible="userPageState.modal.visible?.form"
                     :disabled="formState.passwordManual && formState.password === ''"
                     @confirm="handleConfirm"
                     @cancel="handleClose"

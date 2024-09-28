@@ -23,13 +23,20 @@ export interface ExtendUserListItemType extends UserListItemType {
     mfa_state?: 'ON'|'OFF'
 }
 
+export type UserPageModalType = 'removeOnlyWorkspaceGroup' | 'add' | 'form' | 'status';
+
 export interface ModalSettingState {
     type: string;
     title: string;
     themeColor: string;
-    formVisible?: boolean;
-    statusVisible?: boolean;
-    addVisible?: boolean;
+    modalVisibleType?: UserPageModalType;
+}
+
+export interface ModalState {
+    visible: Partial<Record<UserPageModalType, boolean>> | undefined;
+    type: string;
+    title: string;
+    themeColor: string;
 }
 
 export interface AddModalMenuItem extends MenuItem {

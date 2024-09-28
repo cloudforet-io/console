@@ -92,7 +92,7 @@ const checkModalConfirm = async () => {
 };
 const handleClose = () => {
     userPageStore.$patch((_state) => {
-        _state.state.modal.visible.status = false;
+        _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
     });
 };
@@ -146,7 +146,7 @@ const disableUser = async (userId?: string): Promise<boolean> => {
 </script>
 
 <template>
-    <p-button-modal :visible="userPageState.modal.visible.status"
+    <p-button-modal :visible="userPageState.modal.visible?.status"
                     :header-title="userPageState.modal.title"
                     :theme-color="userPageState.modal.themeColor"
                     :loading="state.loading"

@@ -21,7 +21,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { UserListItemType } from '@/services/iam/types/user-type';
+import type { UserListItemType, ModalSettingState, ModalState } from '@/services/iam/types/user-type';
 
 export const useUserPageStore = defineStore('page-user', () => {
     const state = reactive({
@@ -46,8 +46,9 @@ export const useUserPageStore = defineStore('page-user', () => {
                 add: false,
                 form: false,
                 status: false,
+                removeOnlyWorkspaceGroup: false,
             },
-        },
+        } as ModalState,
     });
     const getters = reactive({
         timezone: computed(() => store.state.user.timezone),
@@ -143,6 +144,19 @@ export const useUserPageStore = defineStore('page-user', () => {
             if (state.selectedUser.user_id === userId) {
                 state.selectedUser.email = email;
             }
+        },
+        updateModalSettings({
+            type, title, themeColor, modalVisibleType,
+        }: ModalSettingState) {
+            state.modal = {
+                ...state.modal,
+                type,
+                title,
+                themeColor,
+                visible: modalVisibleType ? {
+                    [modalVisibleType]: true,
+                } : undefined,
+            };
         },
         // Role
         async listRoles() {

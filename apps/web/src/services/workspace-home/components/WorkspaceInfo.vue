@@ -116,7 +116,9 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
             _state.state.modal.type = USER_MODAL_TYPE.INVITE;
             _state.state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string;
             _state.state.modal.themeColor = 'primary';
-            _state.state.modal.visible.add = true;
+            _state.state.modal.visible = {
+                add: true,
+            };
             _state.state.modal = cloneDeep(_state.state.modal);
         });
     }
