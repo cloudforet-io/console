@@ -24,6 +24,8 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
 import UserManagementFormModal from '@/services/iam/components/UserManagementFormModal.vue';
 import UserManagementHeader from '@/services/iam/components/UserManagementHeader.vue';
+import UserManagementOnlyRemoveWorkspaceGroupTypeModal
+    from '@/services/iam/components/UserManagementRemoveModal/UserManagementOnlyRemoveWorkspaceGroupTypeModal.vue';
 import UserManagementStatusModal from '@/services/iam/components/UserManagementStatusModal.vue';
 import UserManagementTab from '@/services/iam/components/UserManagementTab.vue';
 import UserManagementTable from '@/services/iam/components/UserManagementTable.vue';
@@ -107,6 +109,7 @@ onUnmounted(() => {
         </p-horizontal-layout>
         <user-management-tab :has-read-write-access="state.hasReadWriteAccess" />
         <user-management-add-modal @confirm="refreshUserList" />
+        <user-management-only-remove-workspace-group-type-modal />
         <user-management-status-modal @confirm="refreshUserList" />
         <user-management-form-modal @confirm="refreshUserList" />
     </section>

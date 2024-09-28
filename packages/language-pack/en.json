@@ -2691,8 +2691,11 @@
 					"DISABLE_TITLE": "Disable User",
 					"ENABLE_DESC": "Are you sure you want to enable selected user below?",
 					"ENABLE_TITLE": "Enable User",
+					"GO_TO_WORKSPACE_GROUP": "Go to set up workspace groups",
 					"INVITE_TITLE": "Invite Users to '{workspace_name}'",
+					"REMOVE_ONLY_WORKSPACE_GROUP_TYPE_DESC": "from this workspace. To proceed with removal, the users must first be removed from the associated workspace groups.",
 					"REMOVE_TITLE": "Are you sure you want to remove following user from this workspace?",
+					"REMOVE_USER_MODAL_BOLD_DESC": "Users of the Workspace Group Type cannot be removed",
 					"REMOVE_WORKSPACE_TITLE": "Are you sure you want to remove this user from the workspace?",
 					"UPDATE_TITLE": "Edit User"
 				},

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { PHeading, PButton } from '@cloudforet/mirinae';
@@ -24,15 +24,37 @@ const userPageGetters = userPageStore.getters;
 
 const route = useRoute();
 
+const state = reactive({
+    selectedUsersType: computed<'OnlyWorkspaceGroupUser'|'OnlyWorkspaceUser'|'Mixed'>(() => {
+        const selectedUsers = userPageGetters.selectedUsers;
+        const userTypeList = selectedUsers.map((user) => (user.role_binding_info?.workspace_group_id ? 'workspaceGroupUser' : 'workspaceUser'));
+        if (userTypeList.includes('workspaceGroupUser') && userTypeList.includes('workspaceUser')) return 'Mixed';
+        if (userTypeList.includes('workspaceGroupUser')) return 'OnlyWorkspaceGroupUser';
+        return 'OnlyWorkspaceUser';
+    }),
+});
+
 /* Component */
 const handleClickButton = (type: string) => {
     switch (type) {
-    case USER_MODAL_TYPE.REMOVE: userPageStore.updateModalSettings({
-        type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE') as string,
-        themeColor: 'alert',
-        modalVisibleType: 'status',
-    }); break;
+    case USER_MODAL_TYPE.REMOVE: {
+        if (state.selectedUsersType === 'OnlyWorkspaceGroupUser') {
+            userPageStore.updateModalSettings({
+                type: '',
+                title: 'The selected user(s) cannot be removed',
+                themeColor: 'alert',
+                modalVisibleType: 'removeOnlyWorkspaceGroup',
+            });
+            return;
+        }
+        userPageStore.updateModalSettings({
+            type,
+            title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE') as string,
+            themeColor: 'alert',
+            modalVisibleType: 'status',
+        });
+        return;
+    }
     case USER_MODAL_TYPE.INVITE: userPageStore.updateModalSettings({
         type,
         title: i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string,

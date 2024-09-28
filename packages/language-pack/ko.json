@@ -2691,8 +2691,11 @@
 					"DISABLE_TITLE": "사용자 비활성화",
 					"ENABLE_DESC": "선택한 사용자를 활성화 하시겠습니까?",
 					"ENABLE_TITLE": "사용자 활성화",
+					"GO_TO_WORKSPACE_GROUP": "",
 					"INVITE_TITLE": "'{workspace_name}'에 사용자 추가",
+					"REMOVE_ONLY_WORKSPACE_GROUP_TYPE_DESC": "",
 					"REMOVE_TITLE": "다음의 사용자들을 워크스페이스로 부터 제거하시겠습니까? ",
+					"REMOVE_USER_MODAL_BOLD_DESC": "",
 					"REMOVE_WORKSPACE_TITLE": "이 사용자를 워크스페이스에서 제거 하시겠습니까?",
 					"UPDATE_TITLE": "사용자 수정"
 				},
