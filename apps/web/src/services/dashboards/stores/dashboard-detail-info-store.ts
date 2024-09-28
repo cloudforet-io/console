@@ -390,14 +390,13 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             const fetcher = isPrivate
                 ? SpaceConnector.clientV2.dashboard.privateWidget.list
                 : SpaceConnector.clientV2.dashboard.publicWidget.list;
-            let res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
+            const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
                 dashboard_id: state.dashboardId,
             });
-            const _isMigrated = await migrateLegacyWidgetOptions(res.results || []);
+            const [_isMigrated, widgets] = await migrateLegacyWidgetOptions(res.results || []);
             if (_isMigrated) {
-                res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
-                    dashboard_id: state.dashboardId,
-                });
+                state.dashboardWidgets = widgets;
+                return;
             }
             state.dashboardWidgets = res.results || [];
         } catch (e) {
