@@ -41,15 +41,24 @@ const handleClickButton = (type: string) => {
         if (state.selectedUsersType === 'OnlyWorkspaceGroupUser') {
             userPageStore.updateModalSettings({
                 type: '',
-                title: 'The selected user(s) cannot be removed',
+                title: i18n.t('IAM.USER.MAIN.MODAL.CAN_NOT_REMOVE_USER_TITLE'),
                 themeColor: 'alert',
                 modalVisibleType: 'removeOnlyWorkspaceGroup',
             });
             return;
         }
+        if (state.selectedUsersType === 'Mixed') {
+            userPageStore.updateModalSettings({
+                type: '',
+                title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_USER_TITLE'),
+                themeColor: 'alert',
+                modalVisibleType: 'removeMixed',
+            });
+            return;
+        }
         userPageStore.updateModalSettings({
             type,
-            title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE') as string,
+            title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE'),
             themeColor: 'alert',
             modalVisibleType: 'status',
         });
@@ -57,13 +66,13 @@ const handleClickButton = (type: string) => {
     }
     case USER_MODAL_TYPE.INVITE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }),
         themeColor: 'primary',
         modalVisibleType: 'add',
     }); break;
     case USER_MODAL_TYPE.ADD: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE'),
         themeColor: 'primary',
         modalVisibleType: 'add',
     }); break;
@@ -76,7 +85,7 @@ watch(() => route.query, (query) => {
     if (query.isAddUser) {
         userPageStore.updateModalSettings({
             type: USER_MODAL_TYPE.ADD,
-            title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE') as string,
+            title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE'),
             themeColor: 'primary',
             modalVisibleType: 'add',
         });

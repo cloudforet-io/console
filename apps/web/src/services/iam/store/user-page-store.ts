@@ -56,6 +56,7 @@ export const useUserPageStore = defineStore('page-user', () => {
             });
             return users ?? [];
         }),
+        selectedOnlyWorkspaceUsers: computed(():UserListItemType[] => state.users.filter((user) => !user.role_binding_info?.workspace_group_id)),
         roleMap: computed(() => {
             const map: Record<string, RoleModel> = {};
             state.roles.forEach((role) => {

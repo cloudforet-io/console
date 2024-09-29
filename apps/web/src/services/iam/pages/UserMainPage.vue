@@ -26,6 +26,8 @@ import UserManagementFormModal from '@/services/iam/components/UserManagementFor
 import UserManagementHeader from '@/services/iam/components/UserManagementHeader.vue';
 import UserManagementOnlyRemoveWorkspaceGroupTypeModal
     from '@/services/iam/components/UserManagementRemoveModal/UserManagementOnlyRemoveWorkspaceGroupTypeModal.vue';
+import UserManagementRemoveMixedTypeModal
+    from '@/services/iam/components/UserManagementRemoveModal/UserManagementRemoveMixedTypeModal.vue';
 import UserManagementStatusModal from '@/services/iam/components/UserManagementStatusModal.vue';
 import UserManagementTab from '@/services/iam/components/UserManagementTab.vue';
 import UserManagementTable from '@/services/iam/components/UserManagementTable.vue';
@@ -110,6 +112,7 @@ onUnmounted(() => {
         <user-management-tab :has-read-write-access="state.hasReadWriteAccess" />
         <user-management-add-modal @confirm="refreshUserList" />
         <user-management-only-remove-workspace-group-type-modal />
+        <user-management-remove-mixed-type-modal />
         <user-management-status-modal @confirm="refreshUserList" />
         <user-management-form-modal @confirm="refreshUserList" />
     </section>

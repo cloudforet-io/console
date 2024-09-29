@@ -57,6 +57,7 @@ const handleClose = () => {
                     hide-footer-confirm-button
                     modal-size="md"
                     @cancel="handleClose"
+                    @close="handleClose"
     >
         <template #body>
             <div>
