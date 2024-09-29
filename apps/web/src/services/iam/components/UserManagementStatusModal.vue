@@ -49,13 +49,14 @@ const state = reactive({
             { name: 'role_type', label: 'Workspace Role Type' },
         ];
     }),
+    isRemoveOnlyWorkspace: computed(() => userPageState.modal.visible === 'removeOnlyWorkspace'),
 });
 
 /* Component */
 const checkModalConfirm = async () => {
     let responses: boolean[] = [];
     let languagePrefix = 'DELETE';
-    const items = userPageGetters.selectedUsers;
+    const items = state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : userPageGetters.selectedUsers;
     state.loading = true;
 
     try {
@@ -92,7 +93,7 @@ const checkModalConfirm = async () => {
 };
 const handleClose = () => {
     userPageStore.$patch((_state) => {
-        _state.state.modal.visible.status = false;
+        _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
     });
 };
@@ -146,7 +147,7 @@ const disableUser = async (userId?: string): Promise<boolean> => {
 </script>
 
 <template>
-    <p-button-modal :visible="userPageState.modal.visible.status"
+    <p-button-modal :visible="userPageState.modal.visible === 'status' || state.isRemoveOnlyWorkspace"
                     :header-title="userPageState.modal.title"
                     :theme-color="userPageState.modal.themeColor"
                     :loading="state.loading"
@@ -158,7 +159,7 @@ const disableUser = async (userId?: string): Promise<boolean> => {
         <template #body>
             <p-data-table
                 :fields="state.fields"
-                :items="userPageGetters.selectedUsers"
+                :items="state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : userPageGetters.selectedUsers"
                 class="mt-8"
             >
                 <template #col-state-format="{value}">

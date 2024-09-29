@@ -21,7 +21,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { UserListItemType } from '@/services/iam/types/user-type';
+import type { UserListItemType, ModalSettingState, ModalState } from '@/services/iam/types/user-type';
 
 export const useUserPageStore = defineStore('page-user', () => {
     const state = reactive({
@@ -42,12 +42,8 @@ export const useUserPageStore = defineStore('page-user', () => {
             type: '',
             title: '',
             themeColor: 'primary',
-            visible: {
-                add: false,
-                form: false,
-                status: false,
-            },
-        },
+            visible: undefined,
+        } as ModalState,
     });
     const getters = reactive({
         timezone: computed(() => store.state.user.timezone),
@@ -60,6 +56,7 @@ export const useUserPageStore = defineStore('page-user', () => {
             });
             return users ?? [];
         }),
+        selectedOnlyWorkspaceUsers: computed(():UserListItemType[] => state.users.filter((user) => !user.role_binding_info?.workspace_group_id)),
         roleMap: computed(() => {
             const map: Record<string, RoleModel> = {};
             state.roles.forEach((role) => {
@@ -143,6 +140,17 @@ export const useUserPageStore = defineStore('page-user', () => {
             if (state.selectedUser.user_id === userId) {
                 state.selectedUser.email = email;
             }
+        },
+        updateModalSettings({
+            type, title, themeColor, modalVisibleType,
+        }: ModalSettingState) {
+            state.modal = {
+                ...state.modal,
+                type,
+                title,
+                themeColor,
+                visible: modalVisibleType ?? undefined,
+            };
         },
         // Role
         async listRoles() {

@@ -101,7 +101,9 @@ const handleConfirm = async ({ id, name }: {id: string, name: string}) => {
         _state.state.modal.themeColor = 'primary';
         _state.state.afterWorkspaceCreated = true;
         _state.state.createdWorkspaceId = id;
-        _state.state.modal.visible.add = true;
+        _state.state.modal.visible = {
+            add: true,
+        };
         _state.state.modal = cloneDeep(_state.state.modal);
     });
 };

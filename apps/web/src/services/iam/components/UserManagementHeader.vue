@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
-
-import { cloneDeep } from 'lodash';
 
 import { PHeading, PButton } from '@cloudforet/mirinae';
 
@@ -12,7 +10,6 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { ModalSettingState } from '@/services/iam/types/user-type';
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -27,51 +24,70 @@ const userPageGetters = userPageStore.getters;
 
 const route = useRoute();
 
+const state = reactive({
+    selectedUsersType: computed<'OnlyWorkspaceGroupUser'|'OnlyWorkspaceUser'|'Mixed'>(() => {
+        const selectedUsers = userPageGetters.selectedUsers;
+        const userTypeList = selectedUsers.map((user) => (user.role_binding_info?.workspace_group_id ? 'workspaceGroupUser' : 'workspaceUser'));
+        if (userTypeList.includes('workspaceGroupUser') && userTypeList.includes('workspaceUser')) return 'Mixed';
+        if (userTypeList.includes('workspaceGroupUser')) return 'OnlyWorkspaceGroupUser';
+        return 'OnlyWorkspaceUser';
+    }),
+});
+
 /* Component */
 const handleClickButton = (type: string) => {
     switch (type) {
-    case USER_MODAL_TYPE.REMOVE: updateModalSettings({
+    case USER_MODAL_TYPE.REMOVE: {
+        if (state.selectedUsersType === 'OnlyWorkspaceGroupUser') {
+            userPageStore.updateModalSettings({
+                type: '',
+                title: i18n.t('IAM.USER.MAIN.MODAL.CAN_NOT_REMOVE_USER_TITLE'),
+                themeColor: 'alert',
+                modalVisibleType: 'removeOnlyWorkspaceGroup',
+            });
+            return;
+        }
+        if (state.selectedUsersType === 'Mixed') {
+            userPageStore.updateModalSettings({
+                type: '',
+                title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_USER_TITLE'),
+                themeColor: 'alert',
+                modalVisibleType: 'removeMixed',
+            });
+            return;
+        }
+        userPageStore.updateModalSettings({
+            type,
+            title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE'),
+            themeColor: 'alert',
+            modalVisibleType: 'status',
+        });
+        return;
+    }
+    case USER_MODAL_TYPE.INVITE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE') as string,
-        themeColor: 'alert',
-        statusVisible: true,
-    }); break;
-    case USER_MODAL_TYPE.INVITE: updateModalSettings({
-        type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }),
         themeColor: 'primary',
-        addVisible: true,
+        modalVisibleType: 'add',
     }); break;
-    case USER_MODAL_TYPE.ADD: updateModalSettings({
+    case USER_MODAL_TYPE.ADD: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE'),
         themeColor: 'primary',
-        addVisible: true,
+        modalVisibleType: 'add',
     }); break;
     default: break;
     }
-};
-const updateModalSettings = ({
-    type, title, themeColor, statusVisible, addVisible,
-}: ModalSettingState) => {
-    userPageStore.$patch((_state) => {
-        _state.state.modal.type = type;
-        _state.state.modal.title = title;
-        _state.state.modal.themeColor = themeColor;
-        _state.state.modal.visible.status = statusVisible ?? false;
-        _state.state.modal.visible.add = addVisible ?? false;
-        _state.state.modal = cloneDeep(_state.state.modal);
-    });
 };
 
 watch(() => route.query, (query) => {
     if (!query) return;
     if (query.isAddUser) {
-        updateModalSettings({
+        userPageStore.updateModalSettings({
             type: USER_MODAL_TYPE.ADD,
-            title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE') as string,
+            title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE'),
             themeColor: 'primary',
-            addVisible: true,
+            modalVisibleType: 'add',
         });
     }
 }, { immediate: true });

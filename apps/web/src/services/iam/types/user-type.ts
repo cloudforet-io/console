@@ -1,3 +1,5 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
 import type { Tags } from '@/schema/_common/model';
@@ -23,13 +25,20 @@ export interface ExtendUserListItemType extends UserListItemType {
     mfa_state?: 'ON'|'OFF'
 }
 
+export type UserPageModalType = 'removeMixed' | 'removeOnlyWorkspaceGroup' | 'removeOnlyWorkspace' | 'add' | 'form' | 'status';
+
 export interface ModalSettingState {
+    type: string;
+    title: string | TranslateResult;
+    themeColor: string;
+    modalVisibleType?: UserPageModalType;
+}
+
+export interface ModalState {
+    visible?: UserPageModalType;
     type: string;
     title: string;
     themeColor: string;
-    formVisible?: boolean;
-    statusVisible?: boolean;
-    addVisible?: boolean;
 }
 
 export interface AddModalMenuItem extends MenuItem {

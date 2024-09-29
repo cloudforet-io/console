@@ -3,15 +3,12 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { cloneDeep } from 'lodash';
-
 import {
     PButton, PDefinitionTable, PHeading, PI, PStatus,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -30,7 +27,7 @@ import {
 } from '@/services/iam/composables/refined-table-data';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { ModalSettingState, UserListItemType, ExtendUserListItemType } from '@/services/iam/types/user-type';
+import type { UserListItemType, ExtendUserListItemType } from '@/services/iam/types/user-type';
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -54,6 +51,7 @@ const state = reactive({
     loading: false,
     verifyEmailLoading: false,
     selectedUser: computed<UserListItemType>(() => userPageGetters.selectedUsers[0]),
+    isWorkspaceGroupUser: computed<boolean>(() => !!state.selectedUser?.role_binding_info?.workspace_group_id),
 });
 
 const tableState = reactive({
@@ -101,57 +99,43 @@ const tableState = reactive({
             { name: 'created_at', label: i18n.t('IAM.USER.MAIN.CREATED_AT') },
         ];
     }),
-    workspaceGroupRoleBinding: computed<Partial<RoleBindingModel>>(() => (state.selectedUser.role_binding_info ?? {})),
 });
 
 /* Component */
 const handleClickButton = (type: string) => {
     switch (type) {
-    case USER_MODAL_TYPE.DISABLE: updateModalSettings({
+    case USER_MODAL_TYPE.DISABLE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.DISABLE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DISABLE_TITLE'),
         themeColor: 'alert',
-        statusVisible: true,
+        modalVisibleType: 'status',
     }); break;
-    case USER_MODAL_TYPE.ENABLE: updateModalSettings({
+    case USER_MODAL_TYPE.ENABLE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.ENABLE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.ENABLE_TITLE'),
         themeColor: 'primary',
-        statusVisible: true,
+        modalVisibleType: 'status',
     }); break;
-    case USER_MODAL_TYPE.REMOVE: updateModalSettings({
+    case USER_MODAL_TYPE.REMOVE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE'),
         themeColor: 'alert',
-        statusVisible: true,
+        modalVisibleType: 'status',
     }); break;
-    case USER_MODAL_TYPE.DELETE: updateModalSettings({
+    case USER_MODAL_TYPE.DELETE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.DELETE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DELETE_TITLE'),
         themeColor: 'alert',
-        statusVisible: true,
+        modalVisibleType: 'status',
     }); break;
-    case USER_MODAL_TYPE.UPDATE: updateModalSettings({
+    case USER_MODAL_TYPE.UPDATE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE'),
         themeColor: 'primary',
-        formVisible: true,
+        modalVisibleType: 'status',
     }); break;
     default: break;
     }
-};
-const updateModalSettings = ({
-    type, title, themeColor, statusVisible, addVisible, formVisible,
-}: ModalSettingState) => {
-    userPageStore.$patch((_state) => {
-        _state.state.modal.type = type;
-        _state.state.modal.title = title;
-        _state.state.modal.themeColor = themeColor;
-        _state.state.modal.visible.status = statusVisible ?? false;
-        _state.state.modal.visible.add = addVisible ?? false;
-        _state.state.modal.visible.form = formVisible ?? false;
-        _state.state.modal = cloneDeep(_state.state.modal);
-    });
 };
 
 /* API */
@@ -210,7 +194,7 @@ const handleClickVerifyButton = async () => {
                             <span class="button-label">{{ $t('IAM.USER.MAIN.DELETE') }}</span>
                         </p-button>
                     </div>
-                    <p-button v-else-if="userPageGetters.isWorkspaceOwner"
+                    <p-button v-else-if="userPageGetters.isWorkspaceOwner && !state.isWorkspaceGroupUser"
                               style-type="negative-secondary"
                               :disabled="userPageGetters.selectedUsers.length === 0"
                               @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"

@@ -363,11 +363,12 @@ const handleRemoveButton = async () => {
                     <span />
                 </template>
             </template>
-            <template #col-remove_button-format="value">
-                <p-button style-type="negative-secondary"
+            <template #col-remove_button-format="{item}">
+                <p-button v-if="!item?.role_binding_info?.workspace_group_id"
+                          style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
-                          @click.stop="handleClickButton(value.item.role_binding_info)"
+                          @click.stop="handleClickButton(item?.role_binding_info)"
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
