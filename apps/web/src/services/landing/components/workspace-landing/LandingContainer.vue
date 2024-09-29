@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onUnmounted, reactive, watch,
+} from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -10,8 +12,10 @@ import FNB from '@/common/modules/navigations/FNB.vue';
 
 import LandingHeader from '@/services/landing/components/workspace-landing/LandingHeader.vue';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
 const userWorkspaceStore = useUserWorkspaceStore();
+const landingPageStore = useLandingPageStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 
 const router = useRouter();
@@ -32,6 +36,10 @@ watch(() => storeState.workspaceList, () => {
         router.push({ name: LANDING_ROUTE.WORKSPACE._NAME }).catch(() => {});
     }
 }, { immediate: true });
+
+onUnmounted(() => {
+    landingPageStore.reset();
+});
 </script>
 
 <template>
