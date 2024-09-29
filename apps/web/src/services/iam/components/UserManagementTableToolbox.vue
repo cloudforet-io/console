@@ -46,25 +46,25 @@ const handleSelectDropdown = (name:string) => {
     switch (name) {
     case USER_MODAL_TYPE.ENABLE: userPageStore.updateModalSettings({
         type: name,
-        title: i18n.t('IAM.USER.MAIN.MODAL.ENABLE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.ENABLE_TITLE'),
         themeColor: 'primary',
         modalVisibleType: 'status',
     }); break;
     case USER_MODAL_TYPE.DISABLE: userPageStore.updateModalSettings({
         type: name,
-        title: i18n.t('IAM.USER.MAIN.MODAL.DISABLE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DISABLE_TITLE'),
         themeColor: 'alert',
         modalVisibleType: 'status',
     }); break;
     case USER_MODAL_TYPE.DELETE: userPageStore.updateModalSettings({
         type: name,
-        title: i18n.t('IAM.USER.MAIN.MODAL.DELETE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DELETE_TITLE'),
         themeColor: 'alert',
         modalVisibleType: 'status',
     }); break;
     case USER_MODAL_TYPE.UPDATE: userPageStore.updateModalSettings({
         type: name,
-        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE'),
         themeColor: 'primary',
         modalVisibleType: 'status',
     }); break;

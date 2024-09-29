@@ -42,12 +42,7 @@ export const useUserPageStore = defineStore('page-user', () => {
             type: '',
             title: '',
             themeColor: 'primary',
-            visible: {
-                add: false,
-                form: false,
-                status: false,
-                removeOnlyWorkspaceGroup: false,
-            },
+            visible: undefined,
         } as ModalState,
     });
     const getters = reactive({
@@ -153,9 +148,7 @@ export const useUserPageStore = defineStore('page-user', () => {
                 type,
                 title,
                 themeColor,
-                visible: modalVisibleType ? {
-                    [modalVisibleType]: true,
-                } : undefined,
+                visible: modalVisibleType ?? undefined,
             };
         },
         // Role

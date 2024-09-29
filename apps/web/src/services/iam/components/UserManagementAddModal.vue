@@ -229,7 +229,7 @@ watch(() => route.query, (query) => {
                     :fade="true"
                     :backdrop="true"
                     :loading="state.loading"
-                    :visible="userPageState.modal.visible?.add"
+                    :visible="userPageState.modal.visible === 'add'"
                     :disabled="state.disabled"
                     @confirm="handleConfirm"
                     @cancel="handleClose"

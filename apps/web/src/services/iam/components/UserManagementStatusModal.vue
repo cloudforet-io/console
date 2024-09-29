@@ -146,7 +146,7 @@ const disableUser = async (userId?: string): Promise<boolean> => {
 </script>
 
 <template>
-    <p-button-modal :visible="userPageState.modal.visible?.status"
+    <p-button-modal :visible="userPageState.modal.visible === 'status'"
                     :header-title="userPageState.modal.title"
                     :theme-color="userPageState.modal.themeColor"
                     :loading="state.loading"

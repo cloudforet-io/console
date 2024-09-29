@@ -50,7 +50,7 @@ const handleClose = () => {
 </script>
 
 <template>
-    <p-button-modal :visible="userPageState.modal.visible?.removeOnlyWorkspaceGroup"
+    <p-button-modal :visible="userPageState.modal.visible === 'removeOnlyWorkspaceGroup'"
                     :header-title="userPageState.modal.title"
                     :theme-color="userPageState.modal.themeColor"
                     :loading="state.loading"

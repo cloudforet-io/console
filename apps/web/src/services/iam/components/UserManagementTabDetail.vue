@@ -9,7 +9,6 @@ import {
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -100,7 +99,6 @@ const tableState = reactive({
             { name: 'created_at', label: i18n.t('IAM.USER.MAIN.CREATED_AT') },
         ];
     }),
-    workspaceGroupRoleBinding: computed<Partial<RoleBindingModel>>(() => (state.selectedUser.role_binding_info ?? {})),
 });
 
 /* Component */
@@ -108,31 +106,31 @@ const handleClickButton = (type: string) => {
     switch (type) {
     case USER_MODAL_TYPE.DISABLE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.DISABLE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DISABLE_TITLE'),
         themeColor: 'alert',
         modalVisibleType: 'status',
     }); break;
     case USER_MODAL_TYPE.ENABLE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.ENABLE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.ENABLE_TITLE'),
         themeColor: 'primary',
         modalVisibleType: 'status',
     }); break;
     case USER_MODAL_TYPE.REMOVE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE'),
         themeColor: 'alert',
         modalVisibleType: 'status',
     }); break;
     case USER_MODAL_TYPE.DELETE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.DELETE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DELETE_TITLE'),
         themeColor: 'alert',
         modalVisibleType: 'status',
     }); break;
     case USER_MODAL_TYPE.UPDATE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE'),
         themeColor: 'primary',
         modalVisibleType: 'status',
     }); break;
