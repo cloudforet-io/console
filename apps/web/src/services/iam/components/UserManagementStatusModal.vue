@@ -160,7 +160,6 @@ const disableUser = async (userId?: string): Promise<boolean> => {
             <p-data-table
                 :fields="state.fields"
                 :items="state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : userPageGetters.selectedUsers"
-                class="mt-8"
             >
                 <template #col-state-format="{value}">
                     <p-status v-bind="userStateFormatter(value)"

@@ -61,6 +61,7 @@ const state = reactive({
         { name: 'user_id', label: 'User ID', sortable: false },
         { name: 'name', label: 'Name', sortable: false },
         { name: 'state', label: 'State', sortable: false },
+        { name: 'type', label: 'Type', sortable: false },
         state.fieldByMode,
         { name: 'tags', label: 'Tags' },
         { name: 'auth_type', label: 'Auth Type', sortable: false },
@@ -90,6 +91,7 @@ const multiItemTabState = reactive({
     activeTab: USER_TABS.DATA,
     refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageGetters.selectedUsers.map((user) => ({
         ...user,
+        type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
         last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
     }))),
 });
