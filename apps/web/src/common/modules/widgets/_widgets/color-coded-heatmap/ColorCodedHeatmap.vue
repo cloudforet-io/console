@@ -64,8 +64,10 @@ const state = reactive({
         const _orderedData = orderBy(_filteredData, [state.dataField], ['desc']);
         return _orderedData.map((d) => ({
             name: d[state.groupByField],
+            label: getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, d[state.groupByField]),
             value: numberFormatter(d[state.dataField], { minimumFractionDigits: 2 }),
             color: getColor(d[state.formatRulesField], state.formatRulesField),
+            legendValue: getReferenceLabel(props.allReferenceTypeInfo, state.formatRulesField, d[state.formatRulesField]),
         }));
     }),
     legendList: [] as WidgetLegend[],
@@ -170,11 +172,11 @@ defineExpose<WidgetExpose<Data>>({
             >
                 <div v-for="(data, idx) in state.refinedData"
                      :key="`box-${idx}`"
-                     v-tooltip.bottom="`${getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, data.name)}: ${data.value}`"
+                     v-tooltip.bottom="`${data.label}: ${data.value} (${ data.legendValue })`"
                      class="value-box"
                      :style="{'background-color': data.color}"
                 >
-                    <span class="value-text">{{ getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, data.name) }}</span>
+                    <span class="value-text">{{ data.label }}</span>
                 </div>
             </div>
             <p-empty v-else
