@@ -37,6 +37,7 @@ const {
     forms: { groupName }, invalidState, invalidTexts, setForm,
 } = useFormValidator({ groupName: '' }, {
     groupName: (value: string) => {
+        if (state.loading) return true;
         if (workspaceGroupPageGetters.selectedWorkspaceGroup.name === value) {
             return true;
         }
@@ -52,8 +53,6 @@ const {
 });
 
 const updateWorkspaceGroups = async () => {
-    state.loading = true;
-
     try {
         await SpaceConnector.clientV2.identity.workspaceGroup.update<WorkspaceGroupUpdateParameters, WorkspaceGroupModel>({
             workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
@@ -62,15 +61,15 @@ const updateWorkspaceGroups = async () => {
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_EDIT_WORKSPACE'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
     }
 };
 
 const handleConfirm = async () => {
+    state.loading = true;
     await updateWorkspaceGroups();
     workspaceGroupPageStore.closeModal();
     emit('confirm');
+    state.loading = false;
 };
 
 const handleCancel = () => {

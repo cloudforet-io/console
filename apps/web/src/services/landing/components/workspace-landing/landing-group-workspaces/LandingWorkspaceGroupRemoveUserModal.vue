@@ -8,10 +8,13 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { MyWorkspaceGroupModel } from '@/schema/identity/user-profile/model';
 import type { WorkspaceGroupUserRemoveParameters } from '@/schema/identity/workspace-group-user/api-verbs/remove';
 import type { WorkspaceUser, WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import { i18n } from '@/translations';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -46,7 +49,7 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 const userTableFields = [{ name: 'user_id', label: 'User ID' },
-    { name: 'name', label: 'Name' },
+    { name: 'user_name', label: 'Name' },
     { name: 'state', label: 'State' },
     { name: 'role_type', label: 'Group Role Type' }];
 
@@ -73,9 +76,10 @@ const deleteGroupUsers = async () => {
             users: (props.removeUserList ?? []).map((item) => ({ user_id: item.user_id })),
         });
         await userWorkspaceGroupStore.load();
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_REMOVE_USERS'), '');
         landingPageStoreGroupUserState.selectedIndices = [];
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_E_REMOVE_USERS'));
     } finally {
         state.loading = false;
     }
