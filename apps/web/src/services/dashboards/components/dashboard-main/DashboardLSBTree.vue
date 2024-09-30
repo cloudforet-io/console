@@ -9,6 +9,7 @@ import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-vi
 import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -48,11 +49,15 @@ const state = reactive({
     currentParentPathIds: [] as string[],
     currentFolderId: undefined as string|undefined,
     treeDisplayMap: {} as TreeDisplayMap,
+    refinedPublicFolderItems: computed<PublicFolderModel[]>(() => {
+        if (storeState.isAdminMode) return dashboardState.publicFolderItems;
+        return dashboardState.publicFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
+    }),
     dashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         if (props.type === 'PRIVATE') {
             return getDashboardTreeData(dashboardState.privateFolderItems, props.dashboards);
         }
-        return getDashboardTreeData(dashboardState.publicFolderItems, props.dashboards);
+        return getDashboardTreeData(state.refinedPublicFolderItems, props.dashboards);
     }),
     selectedTreeId: undefined as string|undefined,
 });
