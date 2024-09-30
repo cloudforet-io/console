@@ -364,7 +364,9 @@ const loadWidget = async (manualLoad?: boolean): Promise<Data|APIErrorToast> => 
     }
 
     const res = await fetchWidget(widgetBaseLoadFetcher, {});
+    if (res === undefined) return state.data;
     const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget(widgetComparisonLoadFetcher, { isComparison: true }) : null;
+    if (comparisonRes === undefined) return state.data;
     if (typeof res === 'function') return res;
     state.data = res;
     state.comparisonData = comparisonRes;
@@ -372,9 +374,11 @@ const loadWidget = async (manualLoad?: boolean): Promise<Data|APIErrorToast> => 
     const _isDynamicAutoValueType = state.tableDataDynamicValueType === 'auto';
     if (state.totalInfo?.toggleValue || _isDynamicAutoValueType) {
         const fullDataRes = await fetchWidget(widgetFullDataLoadFetcher, { fullDataFetch: true });
+        if (fullDataRes === undefined) return state.data;
         const fullDataComparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format
             ? await fetchWidget(widgetFullDataComparisonLoadFetcher, { isComparison: true, fullDataFetch: true })
             : null;
+        if (fullDataComparisonRes === undefined) return state.data;
         state.fullPageData = fullDataRes;
         state.fullPageComparisonData = fullDataComparisonRes;
     }
