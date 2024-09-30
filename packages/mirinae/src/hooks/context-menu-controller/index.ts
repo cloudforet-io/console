@@ -40,7 +40,7 @@ export interface UseContextMenuControllerOptions<Item extends MenuItem = MenuIte
     pageSize?: Ref<number|undefined>|number;
 
     /* In the context of 'useFixedStyle,' to adjust the position of the context menu relative to the target, the default value is 'left.'  */
-    position?: 'left' | 'right';
+    position?: Ref<'left'|'right'|undefined>|'left'|'right';
     boundary?: Ref<string|undefined>|string;
 
     /* Whether to hide the header when there are no items in the header */

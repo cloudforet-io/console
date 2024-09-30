@@ -14,7 +14,7 @@ interface UseContextMenuFixedStyleOptions {
     visibleMenu?: Ref<boolean|undefined>;
     targetRef: Ref<Vue|HTMLElement|null>;
     menuRef: Ref<Vue|HTMLElement|null>;
-    position?: Ref<'left'|'right'>;
+    position?: Ref<'left'|'right'|undefined>|'left'|'right';
     boundary?: Ref<string|undefined>|string; // it's not developed yet. if you want to use it, you can develop it with detectOverflow middleware.
 }
 

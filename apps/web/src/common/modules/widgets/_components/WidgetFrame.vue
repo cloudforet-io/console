@@ -192,6 +192,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                                :selected="[]"
                                :visible-menu.sync="state.etcMenuVisible"
                                size="sm"
+                               menu-position="right"
                                reset-selection-on-menu-close
                                @select="handleSelectEtcMenu"
             />
