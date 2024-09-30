@@ -64,7 +64,10 @@ export const useContextMenuStyle = ({
                             // this is to prevent the content from being too small and prevent flipping too early.
                             if (availableHeight < MIN_HEIGHT && elements.floating.scrollHeight >= availableHeight) {
                                 style.minHeight = `${MIN_HEIGHT}px`;
+                            } else {
+                                style.minHeight = '';
                             }
+
                             Object.assign(elements.floating.style, style);
                             // apply the same style to the state
                             contextMenuFixedStyleState.contextMenuStyle = {

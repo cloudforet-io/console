@@ -142,6 +142,7 @@ const handleDeleteNote = async () => {
                                            button-icon="ic_chevron-down"
                                            :menu="state.menuItems"
                                            menu-position="right"
+                                           use-fixed-menu-style
                                            :disabled="props.manageDisabled"
                                            @select="handleSelect(data.note_id)"
                         />
