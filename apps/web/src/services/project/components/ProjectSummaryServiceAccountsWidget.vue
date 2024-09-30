@@ -6,7 +6,6 @@ import type { Location } from 'vue-router';
 
 import { isEmpty } from 'lodash';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable } from '@cloudforet/mirinae';
 import { byteFormatter } from '@cloudforet/utils';
@@ -23,6 +22,7 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { CloudServicePageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 const DATA_TYPE = {
@@ -52,8 +52,6 @@ const props = withDefaults(defineProps<Props>(), {
     projectId: '',
 });
 const allReferenceStore = useAllReferenceStore();
-
-const queryHelper = new QueryHelper();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -73,18 +71,16 @@ const state = reactive({
 
 /* Util */
 const getLocation = (type, provider, serviceAccountId) => {
-    queryHelper.setFilters([
-        { k: 'collection_info.service_account_id', v: serviceAccountId, o: '=' },
-        { k: 'project_id', o: '=', v: props.projectId },
-    ]);
+    const query: CloudServicePageUrlQuery = {
+        provider: primitiveToQueryString(provider),
+        service: CLOUD_SERVICE_LABEL[type],
+        service_account: arrayToQueryString([serviceAccountId]),
+        project: arrayToQueryString([props.projectId]),
+    };
 
     const location: Location = {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-        query: {
-            provider: primitiveToQueryString(provider),
-            service: CLOUD_SERVICE_LABEL[type],
-            filters: queryHelper.rawQueryStrings,
-        },
+        query,
     };
     return location;
 };

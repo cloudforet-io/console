@@ -17,6 +17,8 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import { arrayToQueryString } from '@/lib/router-query-string';
+
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -120,7 +122,6 @@ const linkFormatter = (category, status) => {
     if (!state.trustedAdvisorId) return '';
 
     const filters: ConsoleFilter[] = [];
-    filters.push({ k: 'project_id', o: '=', v: props.projectId });
     filters.push({ k: 'data.status', o: '=', v: status });
     filters.push({ k: 'data.category', o: '=', v: category });
 
@@ -128,6 +129,7 @@ const linkFormatter = (category, status) => {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
         query: {
             filters: queryHelper.setFilters(filters).rawQueryStrings,
+            project: arrayToQueryString([props.projectId]),
         },
         params: {
             provider: 'aws',
