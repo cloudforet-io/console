@@ -165,14 +165,17 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
 </template>
 
 <style scoped lang="postcss">
-.landing-workspace-recent-list::-webkit-scrollbar {
-    display: none;
-}
 
 .landing-workspace-recent-list {
     @apply flex gap-2;
     overflow-x: auto;
     cursor: pointer;
+
+    scrollbar-width: none; /* for Firefox */
+    -ms-overflow-style: none; /* for IE, Edge */
+    &::-webkit-scrollbar {
+        display: none; /* for Chrome, Safari, Opera */
+    }
 
     .workspace-board-item-wrapper {
         gap: 0.75rem;
