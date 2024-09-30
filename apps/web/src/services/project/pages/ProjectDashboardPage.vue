@@ -1,140 +1,171 @@
 <script lang="ts" setup>
 import {
-    reactive,
+    onUnmounted,
+    reactive, ref, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PHeading, PSkeleton } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
-import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
-import ProjectSummaryAlertWidget from '@/services/project/components/ProjectSummaryAlertWidget.vue';
-import ProjectSummaryAllSummaryWidget from '@/services/project/components/ProjectSummaryAllSummaryWidget.vue';
-// import ProjectSummaryBillingWidget from '@/services/project/components/ProjectSummaryBillingWidget.vue';
-import ProjectSummaryBillingWidget from '@/services/project/components/ProjectSummaryBillingWidget.vue';
-import ProjectSummaryPersonalHealthDashboardWidget from '@/services/project/components/ProjectSummaryPersonalHealthDashboardWidget.vue';
-import ProjectSummaryServiceAccountsWidget from '@/services/project/components/ProjectSummaryServiceAccountsWidget.vue';
-import ProjectSummaryTrustedAdvisorWidget from '@/services/project/components/ProjectSummaryTrustedAdvisorWidget.vue';
-
+import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
+import DashboardRefreshDropdown from '@/services/dashboards/components/dashboard-detail/DashboardRefreshDropdown.vue';
+import DashboardToolsetDateDropdown
+    from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
+import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
+import DashboardWidgetContainerV2
+    from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
+import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {
     id: string;
+    dashboardId: string;
 }
 const props = defineProps<Props>();
+
+const dashboardStore = useDashboardStore();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailGetters = dashboardDetailStore.getters;
+const dashboardDetailState = dashboardDetailStore.state;
+const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
+
+
 const state = reactive({
     hasAlertConfig: false,
+    dashboardVariablesLoading: false,
 });
 
-/* api */
-const getProjectAlertConfig = async () => {
+
+const handleUpdateDashboardVariables = async (params) => {
+    if (!props.dashboardId) return;
+    state.dashboardVariablesLoading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.monitoring.projectAlertConfig.list<ProjectAlertConfigListParameters, ListResponse<ProjectAlertConfigModel>>({
-            project_id: props.id,
-        });
-        state.hasAlertConfig = !!results?.length;
+        const updatedDashboard = await dashboardStore.updateDashboard(props.dashboardId, params);
+        dashboardDetailStore.setDashboardInfo(updatedDashboard);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.dashboardVariablesLoading = false;
+    }
+};
+const handleRefresh = async () => {
+    await dashboardDetailStore.listDashboardWidgets();
+    if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
+};
+/* api */
+const getDashboardData = async (dashboardId: string) => {
+    try {
+        await dashboardDetailStore.getDashboardInfo(dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
 
-(async () => {
-    await Promise.allSettled([
-        getProjectAlertConfig(),
-    ]);
-})();
+watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
+    if (!dashboardId || !props.id) return;
+    /* NOTE: The dashboard data is reset in first entering case */
+    if (dashboardId && !prevDashboardId) { // this includes all three cases
+        dashboardDetailStore.reset();
+    }
+    dashboardDetailStore.setProjectId(props.id);
+    await getDashboardData(dashboardId);
+}, { immediate: true });
+
+onUnmounted(() => {
+    dashboardDetailStore.reset();
+});
 </script>
 
 <template>
-    <div class="grid grid-cols-12 project-dashboard-page">
-        <project-summary-all-summary-widget
-            class="col-span-12"
-            :project-id="props.id"
-        />
-        <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <project-summary-alert-widget
-                v-if="state.hasAlertConfig"
-                class="col-span-12"
-                :project-id="props.id"
-            />
-            <!--            <project-summary-billing-widget-->
-            <!--                class="col-span-12"-->
-            <!--                :project-id="props.id"-->
-            <!--            />-->
-            <project-summary-billing-widget
-                class="col-span-12"
-                :project-id="props.id"
-            />
-            <project-summary-personal-health-dashboard-widget
-                class="col-span-12"
-                :project-id="props.id"
-            />
-            <project-summary-service-accounts-widget
-                class="col-span-12 service-accounts-table"
-                :project-id="props.id"
-            />
-        </div>
-        <div class="col-span-12 lg:col-span-3 grid grid-cols-12 right-part">
-            <daily-updates class="col-span-12 daily-updates"
-                           :project-id="props.id"
-            />
-            <cloud-services class="col-span-12 cloud-services"
-                            :more-info="true"
-                            :project-id="props.id"
-            />
-            <project-summary-trusted-advisor-widget
-                class="col-span-12 trusted-advisor"
-                :project-id="props.id"
-            />
+    <div class="project-dashboard-page">
+        <div class="dashboard-wrapper">
+            <div class="title-wrapper">
+                <p-heading :title="dashboardDetailState.name">
+                    <p-skeleton v-if="!dashboardDetailState.name"
+                                width="20rem"
+                                height="1.5rem"
+                    />
+                    <div v-else
+                         class="dashboard-title"
+                    >
+                        <p class="title">
+                            {{ dashboardDetailState.name }}
+                        </p>
+                        <span class="beta-mark">beta</span>
+                    </div>
+                    <template #title-right-extra>
+                        <dashboard-labels-button dashboard-id="props.dashboardId" />
+                    </template>
+                </p-heading>
+            </div>
+            <div class="contents-wrapper">
+                <div class="toolset">
+                    <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
+                    <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
+                                                :loading="dashboardDetailState.loadingWidgets"
+                                                @refresh="handleRefresh"
+                    />
+                </div>
+                <div class="selectors">
+                    <dashboard-variables-v2 class="variable-selector-wrapper"
+                                            is-project-dashboard
+                                            :disable-save-button="dashboardDetailGetters.disableManageButtons"
+                                            :loading="state.dashboardVariablesLoading"
+                                            @update="handleUpdateDashboardVariables"
+                    />
+                </div>
+                <dashboard-widget-container-v2 ref="widgetContainerRef" />
+            </div>
         </div>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-/* custom widget-layout */
-:deep(.widget-layout) {
-    .title {
-        font-size: 1rem;
-        font-weight: bold;
-        line-height: 1.6;
-    }
-}
-
 .project-dashboard-page {
-    grid-gap: 1rem;
-    padding: 2rem 1rem 0;
+    .dashboard-wrapper {
+        .title-wrapper {
+            @apply flex justify-between items-center;
+            padding: 1.5rem 1rem 0;
+            .dashboard-title {
+                @apply flex;
+                .title {
+                    @apply text-label-xl font-bold text-gray-800;
+                }
+                .beta-mark {
+                    @apply text-coral;
+                    font-size: 0.625rem;
+                    cursor: default;
+                    margin-left: 0.125rem;
+                    height: 1.5rem;
+                }
+            }
+        }
 
-    .left-part, .right-part {
-        display: grid;
-        grid-auto-rows: max-content;
-        row-gap: 1rem;
-    }
-
-    .cloud-services {
-        @apply border border-gray-200 rounded-md;
-        min-height: 25rem;
-        max-height: 35rem;
-
-        @screen tablet {
-            height: 26rem;
+        .contents-wrapper {
+            @apply bg-gray-100 rounded-lg;
+            padding: 1rem 0.5rem 0.5rem;
+            margin: 0 1rem;
+            .toolset {
+                @apply flex justify-between items-center;
+            }
+            .selectors {
+                .variable-selector-wrapper {
+                    @apply flex flex-wrap gap-2;
+                    padding: 1rem 0 1.5rem;
+                    background-color: unset;
+                }
+            }
         }
     }
 
-    .trusted-advisor {
-        @apply border border-gray-200 rounded-md;
-    }
-
-    .service-accounts-table {
-        @apply border border-gray-200 rounded-md;
-    }
-
-    .daily-updates {
-        @apply border border-gray-200 rounded-md;
-        max-height: 35rem;
+    /* custom design-system component - p-heading */
+    :deep(.p-heading) {
+        .heading-wrapper {
+            line-height: unset;
+        }
     }
 }
 </style>

@@ -61,6 +61,16 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('project', data);
     },
+    '/identity/project/add-users': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('project', data);
+    },
+    '/identity/project/remove-users': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('project', data);
+    },
     '/identity/project-group/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
@@ -215,6 +225,28 @@ const getAfterCallApiMap = () => ({
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('public_dashboard', data);
+    },
+    '/dashboard/public-folder/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_folder', data);
+    },
+    '/dashboard/public-folder/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_folder', data);
+    },
+    '/dashboard/public-folder/share': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_folder', data);
+        allReferenceStore.load('public_dashboard', { force: true });
+    },
+    '/dashboard/public-folder/unshare': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_folder', data);
+        allReferenceStore.load('public_dashboard', { force: true });
     },
     '/identity/token/grant': (data) => {
         useAllReferenceStore(pinia);

@@ -9,7 +9,7 @@
             >
                 <template #right>
                     <p-link v-if="state.isDomainAdmin"
-                            :text="i18n.t('View in Admin Mode')"
+                            :text="i18n.t('INVENTORY.COLLECTOR.DETAIL.VIEW_IN_ADMIN_MODE')"
                             :to="{name: makeAdminRouteName($route.name)}"
                             size="sm"
                             highlight

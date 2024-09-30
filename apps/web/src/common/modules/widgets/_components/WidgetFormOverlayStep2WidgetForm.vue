@@ -18,7 +18,7 @@ import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant'
 import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import WidgetHeaderField from '@/common/modules/widgets/_widget-fields/WidgetHeaderField.vue';
+import WidgetHeaderField from '@/common/modules/widgets/_widget-fields/header/WidgetHeaderField.vue';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataTableAddOptions } from '@/common/modules/widgets/types/widget-model';
 

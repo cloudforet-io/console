@@ -7,13 +7,12 @@ import { uniq } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldTitle, PToolbox, PEmpty,
+    PFieldTitle, PEmpty, PPaneLayout,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -56,44 +55,15 @@ const state = reactive({
         }));
         return allProjectList.filter((project) => project.parentId === state.currentProjectGroupId);
     }),
-    filteredCardList: computed<ProjectCardItemType[]>(() => {
-        const projectGroupListFilteredByKeyword = state.currentProjectGroupList.filter((item) => item.name.includes(state.searchText));
-        const projectListFilteredByKeyword = state.currentProjectList.filter((item) => item.name.includes(state.searchText));
-        return [...projectGroupListFilteredByKeyword, ...projectListFilteredByKeyword];
-    }),
-    paginatedCardList: computed(() => {
-        const paginatedList = getPaginatedItems(state.filteredCardList);
-        return {
-            projectGroup: paginatedList.filter((item) => item.type === 'projectGroup'),
-            project: paginatedList.filter((item) => item.type === 'project'),
-        };
-    }),
-    pageSize: 48,
-    pageStart: 1,
-    searchText: '',
-    searchResultLabelText: computed(() => `${i18n.t('Search Result for')} "${state.searchText}"`),
-    placeholer: computed(() => {
-        const defaultPlaceholder = i18n.t('Search project or project group') as string;
-        return defaultPlaceholder;
-    }),
+    filteredCardList: computed<ProjectCardItemType[]>(() => [...state.currentProjectGroupList, ...state.currentProjectList]),
+    paginatedCardList: computed(() => ({
+        projectGroup: state.filteredCardList.filter((item) => item.type === 'projectGroup'),
+        project: state.filteredCardList.filter((item) => item.type === 'project'),
+    })),
 });
 
-/* Event */
-const handleChange = async (options?: any) => {
-    if (options?.searchText !== undefined) {
-        state.searchText = options.searchText;
-    }
-    if (options?.pageLimit !== undefined) {
-        state.pageSize = options.pageLimit;
-    }
-    if (options?.pageStart !== undefined) {
-        state.pageStart = options.pageStart;
-    }
-};
-
-/* Utill */
+/* Util */
 const getDistinctProviders = (projectId: string): string[] => uniq(state.serviceAccountList.filter((d) => d.project_id === projectId).map((d) => d.provider));
-const getPaginatedItems = (items: ProjectCardItemType[]) => items.slice(state.pageStart - 1, state.pageSize + state.pageStart - 1);
 
 const listServiceAccount = async () => {
     try {
@@ -117,31 +87,14 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="project-main">
-        <p-toolbox class="project-tool-box"
-                   :page-size="state.pageSize"
-                   :total-count="state.filteredCardList.length"
-                   :placeholder="state.placeholer"
-                   @change="handleChange"
-                   @refresh="handleChange()"
-        />
+    <p-pane-layout class="project-main">
         <div class="project-contents">
-            <p v-if="state.searchText"
-               class="search-result-label"
-            >
-                {{ state.searchResultLabelText }}
-            </p>
             <div v-if="state.paginatedCardList.projectGroup.length"
                  class="contents-wrapper"
             >
-                <p-field-title v-if="!state.searchText"
-                               class="content-title"
-                               :label="$t('Project Group')"
-                >
-                    <template #right>
-                        <span>({{ state.currentProjectGroupList.length }})</span>
-                    </template>
-                </p-field-title>
+                <p-field-title class="content-title"
+                               :label="$t('PROJECT.LANDING.PROJECT_GROUP')"
+                />
                 <div class="card-contents">
                     <project-main-project-group-card v-for="(projectGroup, idx) in state.paginatedCardList.projectGroup"
                                                      :key="`project-group-${idx}`"
@@ -153,14 +106,9 @@ onMounted(async () => {
             <div v-if="state.paginatedCardList.project.length"
                  class="contents-wrapper"
             >
-                <p-field-title v-if="!state.searchText"
-                               class="content-title"
-                               :label="$t('Project')"
-                >
-                    <template #right>
-                        <span>({{ state.currentProjectList.length }})</span>
-                    </template>
-                </p-field-title>
+                <p-field-title class="content-title"
+                               :label="$t('PROJECT.LANDING.PROJECT')"
+                />
                 <div class="card-contents">
                     <project-main-project-card v-for="(project, idx) in state.paginatedCardList.project"
                                                :key="`project-${idx}`"
@@ -175,24 +123,16 @@ onMounted(async () => {
                      class="empty-contents"
             >
                 <div class="empty-text">
-                    <p>{{ state.searchText ? $t('Looks like there is no result') : $t('Looks like you don’t have any project. Create one by clicking the "Create" button.') }}</p>
+                    <p>{{ $t('PROJECT.LANDING.EMPTY_TEXT') }}</p>
                 </div>
             </p-empty>
         </div>
-    </div>
+    </p-pane-layout>
 </template>
 
 <style scoped lang="postcss">
 .project-main {
-
-    .project-tool-box {
-        margin-bottom: 0.5rem;
-    }
-
-    .search-result-label {
-        @apply text-label-md font-bold text-gray-900;
-        margin-bottom: 1.5rem;
-    }
+    padding: 1.5rem 1rem 2.5rem;
 
     .project-contents {
         .contents-wrapper {

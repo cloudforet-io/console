@@ -9,7 +9,17 @@ export const getTabArgs = (): Args => ({
     tabs: [
         { name: 'detail', label: 'Detail' },
         { name: 'info', label: 'Info' },
+        { name: 'divider', tabType: 'divider' },
         { name: 'tags', label: 'Tags' },
+        {
+            name: 'Folder',
+            tabType: 'folder',
+            icon: 'ic_folder',
+            subItems: [
+                { name: 'sub1' },
+                { name: 'sub2' },
+            ],
+        },
     ],
     activeTab: 'detail',
     stretch: false,

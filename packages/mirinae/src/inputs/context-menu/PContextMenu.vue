@@ -289,7 +289,7 @@ defineExpose({
                                              :ellipsis="props.itemHeightFixed"
                                              :highlight-term="state.proxySearchText || props.highlightTerm"
                                              :tabindex="index"
-                                             @click.stop="onClickMenu(item, index, $event)"
+                                             @click.stop.prevent="onClickMenu(item, index, $event)"
                                              @keyup.enter="onClickMenu(item, index, $event)"
                                              @keydown.up="onKeyUp(index)"
                                              @keydown.down="onKeyDown(index)"

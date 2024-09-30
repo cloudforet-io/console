@@ -3,7 +3,12 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PI, PBadge, PTextHighlighting } from '@cloudforet/mirinae';
+import {
+    PI, PTextHighlighting, PSelectDropdown,
+} from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -18,7 +23,11 @@ import { peacock } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type { ProjectCardItemType } from '@/services/project/types/project-type';
+
+
+
 
 interface Props {
     item: ProjectCardItemType;
@@ -31,6 +40,9 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
+const projectPageStore = useProjectPageStore();
+
+
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -46,22 +58,58 @@ const state = reactive({
         return storeState.projectGroup[props.item.parentId].name;
     }),
     isStarred: computed(() => storeState.favoriteItems.some((item) => item.itemId === props.item.id)),
+    toolsetMenuItems: [
+        {
+            type: 'item',
+            name: 'rename',
+            label: i18n.t('Rename'),
+            icon: 'ic_settings',
+        },
+        {
+            type: 'item',
+            name: 'move',
+            label: i18n.t('Move'),
+            icon: 'ic_move',
+        },
+        { type: 'divider', name: 'divider' },
+        {
+            type: 'item',
+            name: 'delete',
+            label: i18n.t('Delete'),
+            icon: 'ic_delete',
+        },
+    ],
+    toolsetMenuVisible: false,
 });
-const getProvider = (name: string): ProviderItem => storeState.providers[name] || {};
 
+const getProvider = (name: string): ProviderItem => storeState.providers[name] || {};
 
 const handleSelectProject = () => {
     router.push(getProperRouteLocation({
-        name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
+        name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
         params: {
             id: props.item.id as string,
         },
     }));
 };
+
+const handleSelectItem = (selected: MenuItem) => {
+    projectPageStore.setCurrentSelectedProjectId(props.item.id);
+    if (selected.name === 'rename') {
+        projectPageStore.setProjectFormModalVisible(true);
+    }
+    if (selected.name === 'move') {
+        projectPageStore.setProjectGroupMoveModalVisible(true);
+    }
+    if (selected.name === 'delete') {
+        projectPageStore.setProjectDeleteModalVisible(true);
+    }
+};
+
 </script>
 
 <template>
-    <div class="project-main-project-card"
+    <div :class="{'project-main-project-card': true, 'toolset-active': state.toolsetMenuVisible }"
          @click="handleSelectProject"
     >
         <div class="main-contents">
@@ -78,10 +126,23 @@ const handleSelectProject = () => {
                     />
                 </div>
 
-                <favorite-button :class="{'favorite-button': true, 'starred': state.isStarred }"
-                                 :item-id="props.item.id"
-                                 :favorite-type="FAVORITE_TYPE.PROJECT"
-                />
+                <div class="toolset-group">
+                    <p-select-dropdown class="toolset-button"
+                                       style-type="tertiary-icon-button"
+                                       button-icon="ic_ellipsis-horizontal"
+                                       size="sm"
+                                       :visible-menu.sync="state.toolsetMenuVisible"
+                                       :menu="state.toolsetMenuItems"
+                                       :selected="[]"
+                                       use-fixed-menu-style
+                                       reset-selection-on-menu-close
+                                       @select="handleSelectItem"
+                    />
+                    <favorite-button :class="{'favorite-button': true, 'starred': state.isStarred }"
+                                     :item-id="props.item.id"
+                                     :favorite-type="FAVORITE_TYPE.PROJECT"
+                    />
+                </div>
             </div>
             <span class="project-group">
                 {{ state.projectGroupName }}
@@ -98,6 +159,7 @@ const handleSelectProject = () => {
                                      :to="{name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,query: { provider: getProvider(provider) ? provider : null },}"
                                      class="icon-link"
                                      :style="{backgroundImage: `url('${getProvider(provider).icon || require('@/assets/images/ic_cloud-filled.svg')}')`}"
+                                     @click.native.stop.prevent
                         />
                     </template>
                 </div>
@@ -109,6 +171,7 @@ const handleSelectProject = () => {
                 <router-link v-if="props.serviceAccountProviderList.length !== 0"
                              class="icon-wrapper"
                              :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                             @click.native.stop.prevent
                 >
                     <p-i name="ic_plus_thin"
                          scale="0.8"
@@ -119,19 +182,22 @@ const handleSelectProject = () => {
             <div v-else
                  class="account-add"
             >
-                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                             @click.native.stop.prevent
+                >
                     <p-i name="ic_plus_thin"
                          scale="0.8"
                          color="inherit"
                     />
                 </router-link>
-                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                             @click.native.stop.prevent
+                >
                     <span class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
                 </router-link>
             </div>
-            <p-badge v-if="item.projectType === 'PRIVATE'"
-                     badge-type="subtle"
-                     style-type="gray100"
+            <div v-if="item.projectType === 'PRIVATE'"
+                 class="private-badge"
             >
                 <p-i name="ic_lock-filled"
                      scale="0.8"
@@ -139,22 +205,22 @@ const handleSelectProject = () => {
                      class="badge-icon"
                 />
                 {{ $t('PROJECT.LANDING.INVITE_ONLY') }}
-            </p-badge>
+            </div>
         </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .project-main-project-card {
-    @apply flex flex-col justify-between bg-white border border-gray-200 rounded-lg cursor-pointer;
-    height: 6.625rem;
-    padding: 1rem 1rem 0.75rem;
+    @apply flex flex-col justify-between bg-gray-100 rounded-lg cursor-pointer;
+    height: 6.5rem;
+    padding: 0.75rem 0.75rem 1rem;
 
     .main-contents {
         .title-wrapper {
             @apply flex items-center justify-between;
             .title {
-                @apply flex gap-1 items-center text-label-lg text-gray-900;
+                @apply flex gap-1 items-center text-paragraph-md text-gray-900;
                 margin-bottom: 0.25rem;
             }
         }
@@ -205,7 +271,7 @@ const handleSelectProject = () => {
             }
         }
         .account-add {
-            @apply flex-shrink-0 inline-flex text-gray-900;
+            @apply flex-shrink-0 inline-flex text-gray-700;
             .add-label {
                 @apply text-xs;
                 line-height: 1.2;
@@ -216,8 +282,12 @@ const handleSelectProject = () => {
                 }
             }
         }
-        .badge-icon {
-            margin-right: 0.125rem;
+        .private-badge {
+            @apply text-gray-500 flex items-center text-label-sm;
+            gap: 0.125rem;
+            .badge-icon {
+                margin-right: 0.125rem;
+            }
         }
     }
 
@@ -228,12 +298,36 @@ const handleSelectProject = () => {
             display: block;
         }
     }
+    .toolset-button {
+        display: none;
+    }
+
+    .toolset-group {
+        @apply flex gap-1 items-center;
+    }
 
     &:hover {
-        @apply bg-blue-100;
+        @apply bg-gray-150;
 
+        .toolset-button {
+            display: block;
+        }
         .favorite-button {
             display: block;
+        }
+    }
+    &.toolset-active {
+        @apply bg-blue-200;
+    }
+}
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    .dropdown-button-component {
+        @apply bg-white rounded-full;
+
+        &.opened {
+            @apply rounded-full;
         }
     }
 }

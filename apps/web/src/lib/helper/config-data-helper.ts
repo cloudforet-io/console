@@ -1,6 +1,7 @@
 import { cloneDeep, find } from 'lodash';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 
@@ -16,8 +17,6 @@ import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig, FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import type { RecentConfig } from '@/common/modules/navigations/type';
-
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 type Config = FavoriteConfig & RecentConfig;
 

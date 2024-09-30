@@ -30,7 +30,6 @@ const adminDashboardsRoute: RouteConfig = {
             path: 'create',
             name: makeAdminRouteName(DASHBOARDS_ROUTE.CREATE._NAME),
             meta: {
-                centeredLayout: true,
                 translationId: 'DASHBOARDS.CREATE.TITLE',
             },
             component: DashboardCreatePage,
