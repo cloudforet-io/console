@@ -448,7 +448,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                          height="0.75rem"
                                          color="inherit"
                                     />
-                                    <span>{{ $t('PROJECT.DETAIL.MEMBERS', { count: memberState.totalCount }) }}</span>
+                                    <span>{{ memberState.totalCount }}{{ $t('PROJECT.DETAIL.MEMBERS') }}</span>
                                 </template>
                             </div>
                             <p-i name="ic_dot"
@@ -466,7 +466,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                  height="0.75rem"
                                  color="inherit"
                             />
-                            <span>{{ $t('PROJECT.DETAIL.WEBHOOKS', { count: webhooksState.webhookCount }) }}</span>
+                            <span>{{ webhooksState.webhookCount }} {{ $t('PROJECT.DETAIL.WEBHOOKS') }}</span>
                         </div>
                         <p-i name="ic_dot"
                              width="0.125rem"
@@ -482,7 +482,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                  height="0.75rem"
                                  color="inherit"
                             />
-                            <span>{{ $t('PROJECT.DETAIL.TAGS', { count: Object.keys(tagsState.tags).length }) }}</span>
+                            <span>{{ Object.keys(tagsState.tags).length }}{{ $t('PROJECT.DETAIL.TAGS') }}</span>
                         </div>
                     </div>
                 </div>
@@ -532,7 +532,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                 <p-empty v-else
                                          class="project-member-empty"
                                          show-image
-                                         :title="$t('No Project Member')"
+                                         :title="$t('PROJECT.DETAIL.MEMBER.NO_PROJECT_MEMBER')"
                                 >
                                     <template #image>
                                         <img alt="illust_astronaut_radio"
@@ -545,7 +545,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                     </div>
                 </template>
                 <template #confirm-button>
-                    {{ $t('Done') }}
+                    {{ $t('PROJECT.DETAIL.MEMBER.DONE') }}
                 </template>
             </p-button-modal>
             <project-member-invite-modal v-if="memberState.memberInviteModalVisible"
