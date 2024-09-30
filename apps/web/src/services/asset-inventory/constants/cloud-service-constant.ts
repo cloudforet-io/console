@@ -6,6 +6,15 @@ export const CLOUD_SERVICE_PAGE_URL_QUERY_KEY = [
     'service_account',
     'period',
     'filters',
+] as const;
+export const CLOUD_SERVICE_DETAIL_PAGE_URL_QUERY_KEY = [
+    'provider',
+    'service',
+    'region',
+    'project',
+    'service_account',
+    'period',
+    'filters',
     'default_filters',
 ] as const;
 

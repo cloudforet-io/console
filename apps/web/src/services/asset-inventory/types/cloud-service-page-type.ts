@@ -4,12 +4,17 @@ import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type {
     CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY, CLOUD_SERVICE_PAGE_URL_QUERY_KEY, CLOUD_SERVICE_GLOBAL_FILTER_KEY,
+    CLOUD_SERVICE_DETAIL_PAGE_URL_QUERY_KEY,
 } from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { Period } from '@/services/asset-inventory/types/type';
 
+
+
 type CloudServicePageUrlQueryKey = typeof CLOUD_SERVICE_PAGE_URL_QUERY_KEY[number];
+type CloudServiceDetailPageUrlQueryKey = typeof CLOUD_SERVICE_DETAIL_PAGE_URL_QUERY_KEY[number];
 
 export type CloudServicePageUrlQuery = Partial<Record<CloudServicePageUrlQueryKey, RouteQueryString>>;
+export type CloudServiceDetailPageUrlQuery = Partial<Record<CloudServiceDetailPageUrlQueryKey, RouteQueryString>>;
 
 export type CloudServiceCategory = typeof CLOUD_SERVICE_CATEGORY[keyof typeof CLOUD_SERVICE_CATEGORY];
 
