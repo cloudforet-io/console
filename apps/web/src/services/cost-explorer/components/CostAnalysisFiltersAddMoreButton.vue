@@ -51,7 +51,6 @@ const targetRef = ref<HTMLElement | null>(null);
 const {
     visibleMenu,
     refinedMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
     initiateMenu,
@@ -150,7 +149,6 @@ watch(() => state.dataSourceId, async (dataSourceId) => {
                         searchable
                         :loading="!state.initiated"
                         :search-text="state.searchText"
-                        :style="contextMenuStyle"
                         :menu="refinedMenu"
                         :selected="state.selectedItems"
                         multi-selectable
