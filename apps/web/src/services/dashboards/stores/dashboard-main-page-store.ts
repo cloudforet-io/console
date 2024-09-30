@@ -236,6 +236,7 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
         const fetcher = folderType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateFolder.list
             : SpaceConnector.clientV2.dashboard.publicFolder.list;
+        folderApiQueryHelper.setFilters([]);
         try {
             if (folderType === 'PUBLIC') {
                 if (storeState.isAdminMode) {

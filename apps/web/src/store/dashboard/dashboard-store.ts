@@ -45,10 +45,6 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 
 
 
-interface LoadOptions {
-    isProjectDashboard?: boolean;
-}
-
 const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]> => {
     try {
         const isPrivate = dashboardId.startsWith('private');
@@ -153,11 +149,20 @@ export const useDashboardStore = defineStore('dashboard', () => {
             }
         }
     };
+    const folderApiQueryHelper = new ApiQueryHelper();
     const _fetchFolder = async (folderType: DashboardFolderType) => {
         const fetcher = folderType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateFolder.list
             : SpaceConnector.clientV2.dashboard.publicFolder.list;
+        folderApiQueryHelper.setFilters([]);
         try {
+            if (folderType === 'PUBLIC') {
+                if (_state.isAdminMode) {
+                    folderApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
+                } else {
+                    folderApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
+                }
+            }
             const res: ListResponse<FolderModel> = await fetcher({
                 query: {
                     sort: [{ key: 'created_at', desc: true }],
@@ -179,31 +184,13 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const publicDashboardApiQueryHelper = new ApiQueryHelper();
-    const load = async (options?: LoadOptions) => {
-        const { isProjectDashboard } = options || {};
+    const load = async () => {
         publicDashboardApiQueryHelper.setFilters([]);
         if (_state.isAdminMode) {
-            publicDashboardApiQueryHelper.addFilter({
-                k: 'resource_group',
-                v: 'DOMAIN',
-                o: '=',
-            });
+            publicDashboardApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
         } else {
-            publicDashboardApiQueryHelper.addFilter({
-                k: 'resource_group',
-                v: ['WORKSPACE', 'DOMAIN'],
-                o: '=',
-            });
+            publicDashboardApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
         }
-
-        if (isProjectDashboard) {
-            publicDashboardApiQueryHelper.addFilter({
-                k: 'project_id',
-                v: '*',
-                o: '=',
-            });
-        }
-
         const _publicDashboardParams = {
             query: {
                 ...publicDashboardApiQueryHelper.data,
@@ -212,11 +199,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
         };
         state.loading = true;
         if (_state.isAdminMode) {
-            await Promise.all([
-                _fetchDashboard('PUBLIC', _publicDashboardParams),
-                _fetchFolder('PUBLIC'),
-            ]);
-        } else if (isProjectDashboard) {
             await Promise.all([
                 _fetchDashboard('PUBLIC', _publicDashboardParams),
                 _fetchFolder('PUBLIC'),

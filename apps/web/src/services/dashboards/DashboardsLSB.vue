@@ -62,9 +62,11 @@ const state = reactive({
     currentPath: computed(() => route.fullPath),
     privateV2DashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems
         .filter((d) => d.version !== '1.0')),
-    publicV2DashboardItems: computed<PublicDashboardModel[]>(() => dashboardState.publicDashboardItems
-        .filter((d) => d.version !== '1.0')
-        .filter((d) => d.project_id !== '*')),
+    publicV2DashboardItems: computed<PublicDashboardModel[]>(() => {
+        const _filteredDashboardItems = dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _filteredDashboardItems;
+        return _filteredDashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
+    }),
     publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(state.publicV2DashboardItems)),
     privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(state.privateV2DashboardItems)),
     favoriteItemMap: computed(() => {
