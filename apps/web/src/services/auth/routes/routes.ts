@@ -57,6 +57,7 @@ export default [
                 name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH._NAME,
                 meta: {
                     isSignInPage: true,
+                    isCentered: true,
                 },
                 props: (route) => ({
                     previousPath: route.query.previousPath,
