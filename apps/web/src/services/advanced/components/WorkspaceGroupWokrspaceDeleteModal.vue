@@ -8,9 +8,12 @@ import {
 
 import type { WorkspaceChangeWorkspaceGroupParameters } from '@/schema/identity/workspace/api-verbs/change-workspace-group';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -91,9 +94,10 @@ const deleteWorkspaces = async () => {
             });
             await Promise.allSettled(workspaceGroupPageGetters.selectedWorkspaceIds.map((item) => fetcher(item)));
         }
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_REMOVE_WORKSPACES'), '');
         await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_E_REMOVE_WORKSPACES'));
     } finally {
         state.loading = false;
     }

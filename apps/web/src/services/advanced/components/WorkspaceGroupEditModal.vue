@@ -37,7 +37,10 @@ const {
     forms: { groupName }, invalidState, invalidTexts, setForm,
 } = useFormValidator({ groupName: '' }, {
     groupName: (value: string) => {
-        if (!value.length) {
+        if (workspaceGroupPageGetters.selectedWorkspaceGroup.name === value) {
+            return true;
+        }
+        if (!value?.length) {
             return false;
         }
         if (state.workspaceGroupNames.includes(value.trim())) {

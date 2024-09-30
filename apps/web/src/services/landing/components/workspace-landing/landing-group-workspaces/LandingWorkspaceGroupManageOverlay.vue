@@ -1,3 +1,4 @@
+
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
@@ -33,6 +34,11 @@ const state = reactive({
     isOverlayOpenProxy: useProxyValue('isOverlayOpen', props, emit),
     workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageStoreState.selectedWorkspaceGroup]),
 });
+
+const handleClose = () => {
+    state.isOverlayOpenProxy = false;
+    landingPageStore.resetGroupUserTableState();
+};
 </script>
 
 <template>
@@ -66,7 +72,7 @@ const state = reactive({
             <div class="close-button-wrapper">
                 <p-button style-type="substitutive"
                           size="md"
-                          @click="() => { state.isOverlayOpenProxy = false; }"
+                          @click="handleClose"
                 >
                     {{ $t('LADING.DONE') }}
                 </p-button>

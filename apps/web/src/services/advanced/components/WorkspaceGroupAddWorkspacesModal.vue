@@ -223,4 +223,15 @@ watch([() => state.menuIds, () => state.isSelectDropdownVisible], async (menuIds
         }
     }
 }
+
+/* custom design-system component - p-button-modal */
+:deep() {
+    .modal-content {
+        .header {
+            .modal-header {
+                word-break: break-all;
+            }
+        }
+    }
+}
 </style>

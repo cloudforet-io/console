@@ -69,15 +69,18 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
 
             return !!(userIdMatches || userNameMatches);
         },
-        reset: () => {
-            state.selectedWorkspaceGroup = 'all';
-            state.loading = false;
+        resetGroupUserTableState: () => {
             groupUserTableState.selectedIndices = [];
             groupUserTableState.searchText = '';
             groupUserTableState.sortBy = 'user_id';
             groupUserTableState.isDesc = false;
             groupUserTableState.pageStart = 1;
             groupUserTableState.thisPage = 1;
+        },
+        reset: () => {
+            state.selectedWorkspaceGroup = 'all';
+            state.loading = false;
+            actions.resetGroupUserTableState();
         },
     };
 

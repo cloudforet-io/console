@@ -100,7 +100,9 @@ const handleCloseModal = () => {
                         </p>
                     </div>
                 </div>
-                <div class="warning-message-wrapper">
+                <div v-if="workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_count || workspaceGroupPageGetters.selectedWorkspaceGroup.users?.length"
+                     class="warning-message-wrapper"
+                >
                     <div>
                         <p-i name="ic_warning-filled" />
                     </div>

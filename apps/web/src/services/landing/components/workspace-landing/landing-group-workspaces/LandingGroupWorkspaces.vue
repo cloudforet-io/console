@@ -222,6 +222,12 @@ watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
         :deep(.p-button-tab) {
             width: calc(100% - 3rem);
             overflow-x: auto;
+            scrollbar-width: none; /* for Firefox */
+            -ms-overflow-style: none; /* for IE, Edge */
+            &::-webkit-scrollbar {
+                display: none; /* for Chrome, Safari, Opera */
+            }
+
             .button-group {
                 margin: 0;
                 flex-wrap: nowrap;
