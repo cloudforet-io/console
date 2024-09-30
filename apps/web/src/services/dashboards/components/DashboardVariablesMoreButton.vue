@@ -71,7 +71,6 @@ const state = reactive({
 const {
     visibleMenu,
     refinedMenu,
-    contextMenuStyle,
     hideContextMenu,
     focusOnContextMenu,
     initiateMenu,
@@ -252,7 +251,6 @@ const {
                         class="variables-menu"
                         searchable
                         :search-text="state.searchText"
-                        :style="contextMenuStyle"
                         :menu="refinedMenu"
                         :selected="state.selected"
                         :before-select="beforeSelect"

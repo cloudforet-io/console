@@ -194,7 +194,7 @@ export default defineComponent<PopoverProps>({
                 const referenceEl = state.targetRef;
                 const floatingEl = state.contentRef;
                 const arrowEl = state.arrowRef;
-                autoUpdate(referenceEl, floatingEl, () => {
+                cleanup = autoUpdate(referenceEl, floatingEl, () => {
                     computePosition(referenceEl, floatingEl, {
                         placement: props.position,
                         middleware: [
@@ -217,7 +217,7 @@ export default defineComponent<PopoverProps>({
                             left: `${x}px`,
                             top: `${y}px`,
                         });
-                        const side = placement.split('-')[0];
+                        const side = placement.split('-')[0]; //  bottom-end -> bottom
 
                         const staticSide = ARROW_STATIC_SIDES[side] ?? '';
 

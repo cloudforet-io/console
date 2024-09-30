@@ -81,7 +81,6 @@ const modalState = reactive({
 
 const {
     visibleMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
 } = useContextMenuController({
@@ -181,7 +180,6 @@ onUnmounted(() => {
                                         ref="menuRef"
                                         class="create-context-menu"
                                         no-select-indication
-                                        :style="contextMenuStyle"
                                         :menu="state.createDropdownMenuItems"
                                         @select="handleSelectCreateMenu"
                         />
