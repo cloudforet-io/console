@@ -92,11 +92,11 @@ export const useContextMenuStyle = ({
                     (isFixed ? hide({ padding: 5 }) : undefined),
                 ],
             }).then(({
-                x, y, middlewareData,
+                x, y, middlewareData, placement,
             }) => {
                 const style = {
                     left: `${x}px`,
-                    top: `${y}px`,
+                    top: placement.startsWith('bottom') ? `${y}px` : `${y + 2}px`,
                     position: isFixed ? 'fixed' : 'absolute',
                 };
                 Object.assign(floatingEl.style, style);
@@ -105,6 +105,7 @@ export const useContextMenuStyle = ({
                     ...contextMenuFixedStyleState.contextMenuStyle,
                     ...style,
                 };
+                floatingEl.setAttribute('floating-placement', placement);
                 if (middlewareData.hide?.referenceHidden) hideMenu();
             });
         };
