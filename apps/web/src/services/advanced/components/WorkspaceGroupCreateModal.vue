@@ -47,6 +47,9 @@ const {
     forms: { groupName }, invalidState, invalidTexts, setForm,
 } = useFormValidator({ groupName: '' }, {
     groupName: (value: string) => {
+        if (state.loading) {
+            return true;
+        }
         if (!value.length) {
             return false;
         }
