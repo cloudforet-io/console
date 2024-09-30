@@ -133,7 +133,7 @@ const handleModalClose = () => {
         <template #body>
             <div class="form-wrapper">
                 <p-field-group
-                    :required="true"
+                    required
                     :label="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_GROUP_NAME')"
                     :invalid="invalidState.groupName"
                     :invalid-text="invalidTexts.groupName"

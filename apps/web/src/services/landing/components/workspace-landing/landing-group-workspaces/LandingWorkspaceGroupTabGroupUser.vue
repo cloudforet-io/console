@@ -50,7 +50,7 @@ const state = reactive({
 const tableState = reactive({
     fields: [
         { name: 'user_id', label: 'User ID' },
-        { name: 'name', label: 'Name' },
+        { name: 'user_name', label: 'Name' },
         { name: 'state', label: 'State' },
         { name: 'role', label: 'Role' },
         { name: 'remove_button', label: ' ', sortable: false },

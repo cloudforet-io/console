@@ -66,7 +66,7 @@ const handleSelectDropdown = (name:string) => {
         type: name,
         title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE'),
         themeColor: 'primary',
-        modalVisibleType: 'status',
+        modalVisibleType: 'form',
     }); break;
     default: break;
     }
