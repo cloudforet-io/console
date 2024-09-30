@@ -48,9 +48,10 @@
 			"AUTHENTICATION_CODE": "認証コード",
 			"AUTHENTICATION_CODE_LOWER": "認証コード",
 			"CONFIRM": "確認",
-			"EMAIL_INFO": "{code}が入力されたメールアドレスに送信されました：",
+			"EMAIL_INFO": "",
 			"ENTER_CODE": "コードを入力",
 			"GO_BACK": "ログインする",
+			"PROBLEM_TITLE": "",
 			"SUB_TITLE": "マルチファクタ認証を使用してアカウントを確認する必要があります。",
 			"TITLE": "マルチファクタ\n認証"
 		},

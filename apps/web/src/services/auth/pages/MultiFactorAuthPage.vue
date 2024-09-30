@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PButton, PCollapsibleToggle, PFieldGroup, PI, PTextInput, PTextButton,
+    PButton, PIconButton, PFieldGroup, PI, PTextInput, PTextButton,
 } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
@@ -66,6 +66,9 @@ const handleChangeInput = (value: string) => {
 const handleClickGoBackButton = () => {
     router.replace({ name: AUTH_ROUTE.SIGN_IN._NAME });
 };
+const handleClickCollapsedButton = (value: boolean) => {
+    state.isCollapsed = value;
+};
 
 /* API */
 const handleClickResend = async () => {
@@ -120,32 +123,20 @@ onMounted(() => {
     <div class="multi-factor-authentication-page">
         <div class="form-wrapper">
             <div class="headline-wrapper">
-                <p class="title">
-                    {{ $t('AUTH.MFA.TITLE') }}
-                </p>
-                <p class="subtitle">
-                    {{ $t('AUTH.MFA.SUB_TITLE') }}
-                </p>
+                <p-i name="ic_notification-protocol_envelope"
+                     height="2rem"
+                     width="2rem"
+                />
+                <!-- TODO: "MS" is scheduled to be reflected-->
+                <span>
+                    EMAIL
+                </span>
             </div>
             <div class="email-info-wrapper">
-                <span class="email-info-desc">
-                    <i18n path="AUTH.MFA.EMAIL_INFO">
-                        <template #code>
-                            <strong>{{ $t('AUTH.MFA.AUTHENTICATION_CODE_LOWER') }}</strong>
-                        </template>
-                    </i18n>
+                <span class="email-info-desc">{{ $t('AUTH.MFA.EMAIL_INFO') }}</span>
+                <span class="email-text">
+                    {{ mfaEmail }}
                 </span>
-                <div class="email-wrapper">
-                    <p-i name="ic_envelope-filled"
-                         height="1.125rem"
-                         width="1.125rem"
-                         color="inherit"
-                         class="icon-envelope"
-                    />
-                    <strong class="email-text">
-                        {{ mfaEmail }}
-                    </strong>
-                </div>
             </div>
             <p-field-group :label="$t('AUTH.MFA.AUTHENTICATION_CODE')"
                            :invalid="validationState.isVerificationCodeValid"
@@ -161,16 +152,6 @@ onMounted(() => {
                               @keyup.enter="handleClickConfirmButton"
                 />
             </p-field-group>
-            <div>
-                <p-collapsible-toggle v-if="state.isCollapsed"
-                                      v-model="state.isCollapsed"
-                >
-                    {{ $t('AUTH.COLLAPSED.EXTENSION_TITLE_1') }}
-                </p-collapsible-toggle>
-                <collapsible-contents v-else
-                                      @click-resend="handleClickResend"
-                />
-            </div>
             <p-button size="lg"
                       :loading="state.confirmLoading"
                       class="confirm-button"
@@ -179,76 +160,90 @@ onMounted(() => {
             >
                 {{ $t('AUTH.MFA.CONFIRM') }}
             </p-button>
-            <p-text-button class="go-back-button mr-2"
-                           icon-left="ic_arrow-left"
-                           style-type="highlight"
-                           size="md"
-                           @click="handleClickGoBackButton"
+            <div class="toolbox-wrapper">
+                <p-text-button class="go-back-button mr-2"
+                               icon-left="ic_arrow-left"
+                               style-type="highlight"
+                               size="md"
+                               @click="handleClickGoBackButton"
+                >
+                    {{ $t('AUTH.MFA.GO_BACK') }}
+                </p-text-button>
+                <p-text-button class="go-back-button mr-2"
+                               :style-type="state.isCollapsed ? 'highlight' : ''"
+                               size="md"
+                               :disabled="!state.isCollapsed"
+                               @click="handleClickCollapsedButton(false)"
+                >
+                    {{ $t('AUTH.MFA.PROBLEM_TITLE') }}
+                </p-text-button>
+            </div>
+            <div v-if="!state.isCollapsed"
+                 class="collapsible-container"
             >
-                {{ $t('AUTH.MFA.GO_BACK') }}
-            </p-text-button>
+                <p-icon-button name="ic_close"
+                               size="md"
+                               class="close-button"
+                               @click="handleClickCollapsedButton(true)"
+                />
+                <collapsible-contents @click-resend="handleClickResend" />
+            </div>
         </div>
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .multi-factor-authentication-page {
-    @apply flex flex-col bg-white;
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 2.5rem;
+    @apply flex flex-col;
+    width: 100%;
+    margin-top: 6rem;
     .form-wrapper {
-        @apply relative flex flex-col;
+        @apply relative flex flex-col border border-gray-200 bg-white;
         width: 100%;
-        margin: auto 2.5rem;
+        max-width: 28.5rem;
+        padding: 2rem;
         align-self: center;
-        gap: 1rem;
-
-        @screen xs {
-            width: 25rem;
-            margin: auto;
-        }
+        gap: 0.5rem;
+        border-radius: 0.375rem;
         .headline-wrapper {
-            @apply flex flex-col;
-            gap: 1rem;
-            .title {
-                @apply text-display-lg text-primary1;
-            }
-            .subtitle {
-                @apply text-paragraph-md text-gray-700;
-            }
+            @apply flex items-center text-display-md font-bold;
+            gap: 0.75rem;
         }
         .email-info-wrapper {
             .email-info-desc {
-                @apply block text-label-lg text-gray-900;
+                @apply block text-label-md;
                 margin-bottom: 0.5rem;
             }
-            .email-wrapper {
-                @apply inline-flex items-center bg-gray-100 rounded;
-                width: auto;
-                padding: 0.5rem 1rem;
-                gap: 0.25rem;
-                .icon-envelope {
-                    @apply text-gray-700;
-                }
-                .email-text {
-                    @apply text-paragraph-lg;
-                }
+            .email-text {
+                @apply text-violet-600 font-medium;
             }
         }
         .input-form {
-            margin-top: 0.5rem;
+            margin-top: 1rem;
             .text-input {
                 width: 100%;
             }
         }
-        .confirm-button {
-            margin-top: 1.5rem;
+        .toolbox-wrapper {
+            @apply flex items-center justify-between;
+            margin-top: 2rem;
+            .go-back-button {
+                @apply inline-flex items-center justify-center;
+                gap: 0.25rem;
+            }
         }
-        .go-back-button {
-            @apply flex items-center justify-center;
-            margin-top: 1.5rem;
-            gap: 0.25rem;
+        .collapsible-container {
+            @apply relative bg-gray-100 border border-gray-200;
+            width: 100%;
+            max-width: initial;
+            margin-top: 1rem;
+            padding: 2rem 1rem 1rem;
+            border-radius: 0.375rem;
+            .close-button {
+                @apply absolute;
+                top: 0.5rem;
+                right: 1rem;
+            }
         }
     }
 }
