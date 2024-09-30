@@ -316,7 +316,8 @@ onUnmounted(() => {
 
 /* custom design-system component - p-empty */
 :deep(.p-empty) {
-    @apply w-full h-full;
+    @apply w-full;
+    margin-top: 2.5rem;
 }
 
 @screen tablet {
