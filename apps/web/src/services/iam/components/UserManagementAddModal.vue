@@ -56,7 +56,7 @@ const state = reactive({
     disabledResetPassword: false,
     disabled: computed(() => {
         if (userPageState.isAdminMode && !state.isSetAdminRole) {
-            const baseCondition = state.userList.length === 0 || (state.workspace.length === 0 || isEmpty(state.role));
+            const baseCondition = state.userList.length === 0 || ((state.workspaceGroup.length === 0 && state.workspace.length === 0) || isEmpty(state.role));
             if (state.localUserItem.length > 0 && !state.isResetPassword) {
                 return state.password === '' || baseCondition;
             }
