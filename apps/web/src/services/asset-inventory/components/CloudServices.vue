@@ -123,7 +123,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CloudServicePageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
+import type {
+    CloudServiceDetailPageUrlQuery,
+    CloudServicePageUrlQuery,
+} from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 interface Value {
@@ -189,7 +192,7 @@ export default {
         });
 
         const getLink = (data, projectId?) => {
-            const query: CloudServicePageUrlQuery = {};
+            const query: CloudServiceDetailPageUrlQuery = {};
             if (projectId) {
                 query.project = arrayToQueryString([projectId]);
             }

@@ -36,7 +36,10 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CloudServicePageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
+import type {
+    CloudServiceDetailPageUrlQuery,
+    CloudServicePageUrlQuery,
+} from '@/services/asset-inventory/types/cloud-service-page-type';
 import ProjectSummaryAllSummaryWidgetRegionService
     from '@/services/project/components/ProjectSummaryAllSummaryWidgetRegionService.vue';
 import { SERVICE_CATEGORY } from '@/services/project/constants/project-summary-constant';
@@ -325,6 +328,9 @@ const getSummaryInfo = async (type) => {
             workspace_id: storeState.currentWorkspaceId,
         });
         const summaryData: SummaryData[] = [];
+        const query: CloudServiceDetailPageUrlQuery = {
+            project: arrayToQueryString([props.projectId]),
+        };
 
         res.results.forEach((d) => {
             summaryData.push({
@@ -339,9 +345,7 @@ const getSummaryInfo = async (type) => {
                         group: d.cloud_service_group,
                         name: d.cloud_service_type,
                     },
-                    query: {
-                        project: arrayToQueryString([props.projectId]),
-                    },
+                    query,
                 },
                 color: storeState.providers[d.provider]?.color,
             });

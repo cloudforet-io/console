@@ -166,7 +166,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CloudServicePageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
+import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 interface CloudServiceData {
@@ -255,7 +255,7 @@ export default {
         const getConvertedCloudServiceData = (rawData: CloudServiceData[]): Item[] => {
             const results: Item[] = [];
             rawData.forEach((d) => {
-                const query: CloudServicePageUrlQuery = {};
+                const query: CloudServiceDetailPageUrlQuery = {};
                 if (props.projectId) {
                     query.project = arrayToQueryString([props.projectId]);
                 }

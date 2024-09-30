@@ -25,6 +25,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { green, red, yellow } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 const TRUSTED_ADVISOR = 'Check';
@@ -125,12 +126,14 @@ const linkFormatter = (category, status) => {
     filters.push({ k: 'data.status', o: '=', v: status });
     filters.push({ k: 'data.category', o: '=', v: category });
 
+    const query: CloudServiceDetailPageUrlQuery = {
+        filters: queryHelper.setFilters(filters).rawQueryStrings,
+        project: arrayToQueryString([props.projectId]),
+    };
+
     return {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-        query: {
-            filters: queryHelper.setFilters(filters).rawQueryStrings,
-            project: arrayToQueryString([props.projectId]),
-        },
+        query,
         params: {
             provider: 'aws',
             group: CLOUD_SERVICE_GROUP,
