@@ -36,6 +36,10 @@ import {
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
+import type {
+    CloudServiceDetailPageUrlQuery,
+    CloudServiceMainPageUrlQuery,
+} from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
@@ -218,10 +222,7 @@ const handleClickRow = (item) => {
 
     let _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME;
     let _params = {};
-    let apiQuery: {
-        filters: string[],
-        default_filters?: string[],
-    } = {
+    const _query: CloudServiceMainPageUrlQuery|CloudServiceDetailPageUrlQuery = {
         filters: queryHelper.setFilters(_filters).rawQueryStrings,
     };
 
@@ -231,17 +232,14 @@ const handleClickRow = (item) => {
         _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
 
         if (state.metricAdditionalFilter.length) {
-            apiQuery = {
-                ...apiQuery,
-                default_filters: state.metricAdditionalFilter.map((d) => JSON.stringify(d)),
-            };
+            (_query as CloudServiceDetailPageUrlQuery).default_filters = state.metricAdditionalFilter.map((d) => JSON.stringify(d));
         }
     }
 
     window.open(router.resolve(getProperRouteLocation({
         name: _routeName,
         params: _params,
-        query: apiQuery,
+        query: _query,
     })).href, '_blank');
 };
 

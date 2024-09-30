@@ -77,7 +77,6 @@ const state = reactive({
 
 const {
     visibleMenu: visibleContextMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
 } = useContextMenuController({
@@ -149,8 +148,8 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
                            trigger="click"
-                           relative-style
-                           position="bottom-start"
+                           boundary=".cost-analysis-query-section"
+                           width="100%"
                            class="filters-popover"
                 >
                     <p-button style-type="tertiary"
@@ -197,7 +196,6 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                     <p-context-menu v-show="visibleContextMenu"
                                     ref="contextMenuRef"
                                     :menu="state.saveDropdownMenuItems"
-                                    :style="contextMenuStyle"
                                     @select="handleClickSaveAsButton"
                     />
                 </template>
@@ -227,20 +225,22 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
 
 <style lang="postcss" scoped>
 .cost-analysis-query-section {
+    position: relative;
     margin-top: 1.5rem;
     .filter-wrapper {
-        @apply relative flex items-center justify-between;
+        @apply flex justify-between;
+        align-items: flex-start;
         font-size: 0.875rem;
         .left-part {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 0.5rem;
             .granularity-dropdown {
                 min-width: unset;
             }
         }
         .right-part {
-            @apply relative;
             display: flex;
             align-items: flex-start;
             padding-left: 0.5rem;
@@ -270,24 +270,6 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
         .filters-button {
             .filters-badge {
                 margin-left: 0.25rem;
-            }
-        }
-
-        /* custom design-system component - p-popover */
-        :deep(.p-popover) {
-            &.open {
-                .p-button.filters-button {
-                    @apply bg-gray-200;
-                }
-            }
-            .popper {
-                width: 100%;
-                max-width: 100%;
-                left: 2rem;
-                transform: translate(0, 3rem) !important;
-                .arrow {
-                    left: 1.25rem !important;
-                }
             }
         }
     }

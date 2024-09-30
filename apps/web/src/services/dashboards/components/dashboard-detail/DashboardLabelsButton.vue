@@ -78,6 +78,7 @@ onClickOutside(labelPopoverRef, () => { state.visible = false; });
 
 <style lang="postcss" scoped>
 .dashboard-labels-button {
+    line-height: 1;
     .label-button {
         .button-contents-wrapper {
             @apply inline-flex items-center;
@@ -93,6 +94,7 @@ onClickOutside(labelPopoverRef, () => { state.visible = false; });
                 min-height: 1rem;
                 padding: 0 0.375rem;
                 line-height: unset;
+                border: 1px solid green;
             }
         }
     }
@@ -103,7 +105,7 @@ onClickOutside(labelPopoverRef, () => { state.visible = false; });
 
     /* custom design-system component - p-popover */
     :deep(.p-popover) {
-        .popper-content-wrapper {
+        .floating-content-wrapper {
             min-height: 5.1875rem;
             min-width: 18rem;
             max-width: 28rem;

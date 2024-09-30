@@ -35,7 +35,6 @@ const state = reactive({
 
 const {
     visibleMenu: visibleContextMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
 } = useContextMenuController({
@@ -82,7 +81,6 @@ onClickOutside(containerRef, hideContextMenu);
                         ref="contextMenuRef"
                         class="dropdown-context-menu"
                         :menu="props.menu"
-                        :style="contextMenuStyle"
                         :selected="state.selectedMenu"
                         @select="handleSelectMenu"
         />

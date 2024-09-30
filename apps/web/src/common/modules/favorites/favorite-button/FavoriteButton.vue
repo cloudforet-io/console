@@ -20,7 +20,7 @@ import type { MetricReferenceMap } from '@/store/reference/metric-reference-stor
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import type { ConfigData } from '@/lib/helper/config-data-helper';
+import type { ReferenceData } from '@/lib/helper/config-data-helper';
 import {
     convertCloudServiceConfigToReferenceData,
     convertCostAnalysisConfigToReferenceData,
@@ -34,7 +34,7 @@ import {
 } from '@/lib/helper/config-data-helper';
 
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import type { FavoriteType } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteType, FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
@@ -83,7 +83,7 @@ const storeState = reactive({
 const state = reactive({
     active: computed(() => {
         const targetList = props.favoriteType === FAVORITE_TYPE.WORKSPACE ? storeState.favoriteWorkspaceMenuList : storeState.favoriteMenuList;
-        const favoriteItem = targetList.findIndex((d) => (d.itemId === props.itemId
+        const favoriteItem = targetList.findIndex((d) => (d.itemId === props?.itemId
             && (d.itemType === props.favoriteType)));
         return favoriteItem > -1;
     }),
@@ -97,19 +97,20 @@ const handleClickFavoriteButton = async (event: MouseEvent) => {
         await favoriteStore.deleteFavorite({
             itemType: props.favoriteType,
             workspaceId: storeState.currentWorkspaceId,
-            itemId: props.itemId,
+            itemId: props?.itemId,
         });
     } else {
-        const params = {
+        const params: FavoriteConfig = {
             itemType: props.favoriteType,
             workspaceId: storeState.currentWorkspaceId,
-            itemId: props.itemId,
+            itemId: props?.itemId,
         };
-        await favoriteStore.createFavorite(convertFavoriteToReferenceData(params as ConfigData));
+        const referenceData = convertFavoriteToReferenceData(params);
+        await favoriteStore.createFavorite(referenceData || params);
     }
     emit('click-favorite');
 };
-const convertFavoriteToReferenceData = (favoriteConfig: ConfigData) => {
+const convertFavoriteToReferenceData = (favoriteConfig: FavoriteConfig): ReferenceData|undefined => {
     const { itemType } = favoriteConfig;
     if (itemType === FAVORITE_TYPE.DASHBOARD) {
         return convertDashboardConfigToReferenceData([favoriteConfig], [...dashboardState.publicDashboardItems, ...dashboardState.privateDashboardItems])[0];

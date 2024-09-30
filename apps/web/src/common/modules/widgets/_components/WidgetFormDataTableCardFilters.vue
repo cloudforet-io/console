@@ -127,7 +127,6 @@ const targetRef = ref<HTMLElement | null>(null);
 const {
     visibleMenu,
     refinedMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
     initiateMenu,
@@ -354,7 +353,6 @@ onMounted(() => {
                                 ref="contextMenuRef"
                                 class="add-filter-context-menu"
                                 :loading="state.loading"
-                                :style="contextMenuStyle"
                                 :menu="refinedMenu"
                                 :selected="state.selectedItems"
                                 multi-selectable

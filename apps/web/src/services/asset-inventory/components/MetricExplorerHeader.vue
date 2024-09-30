@@ -107,7 +107,6 @@ const state = reactive({
 
 const {
     visibleMenu: visibleContextMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
 } = useContextMenuController({
@@ -353,7 +352,6 @@ const handleOpenEditQuery = () => {
                     <p-context-menu v-show="visibleContextMenu"
                                     ref="contextMenuRef"
                                     :menu="state.saveDropdownMenuItems"
-                                    :style="contextMenuStyle"
                                     @select="handleSelectSaveAsExample"
                     />
                 </template>

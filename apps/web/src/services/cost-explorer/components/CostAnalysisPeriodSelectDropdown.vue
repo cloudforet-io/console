@@ -211,6 +211,7 @@ watch(() => costAnalysisPageState.granularity, (granularity) => {
                            :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.PERIOD')"
                            disable-proxy
                            style-type="rounded"
+                           use-fixed-menu-style
                            :selected="state.selectedPeriod"
                            :invalid="state.isPeriodInvalid"
                            @select="handleSelectPeriod"
