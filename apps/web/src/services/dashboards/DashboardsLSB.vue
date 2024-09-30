@@ -8,10 +8,13 @@ import {
     PIconButton,
 } from '@cloudforet/mirinae';
 
+import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
+import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { MENU_ID } from '@/lib/menu/config';
@@ -30,26 +33,37 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { gray } from '@/styles/colors';
 
+import DashboardLSBTree from '@/services/dashboards/components/dashboard-main/DashboardLSBTree.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+
+
 
 const route = useRoute();
 
+const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const dashboardStore = useDashboardStore();
+const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
 
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 
 const router = useRouter();
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     favoriteItems: computed(() => favoriteGetters.dashboardItems),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     loading: true,
     currentPath: computed(() => route.fullPath),
+    privateV2DashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems
+        .filter((d) => d.version !== '1.0')),
+    publicV2DashboardItems: computed<PublicDashboardModel[]>(() => dashboardState.publicDashboardItems
+        .filter((d) => d.version !== '1.0')
+        .filter((d) => d.project_id !== '*')),
     favoriteItemMap: computed(() => {
         const result: Record<string, FavoriteConfig> = {};
         storeState.favoriteItems?.forEach((d) => {
@@ -61,7 +75,7 @@ const state = reactive({
         ...(storeState.isWorkspaceOwner ? filterStarredItems(state.workspaceV2MenuSet) : []),
         ...filterStarredItems(state.privateV2MenuSet),
     ]),
-    domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
+    domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainDashboardItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -76,7 +90,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    workspaceV2MenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.filter((d) => d.version === '2.0').map((d) => ({
+    workspaceV1MenuSet: computed<LSBItem[]>(() => dashboardState.publicDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -91,22 +105,7 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    workspaceV1MenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.filter((d) => d.version === '1.0').map((d) => ({
-        type: MENU_ITEM_TYPE.ITEM,
-        id: d.dashboard_id,
-        label: d.name,
-        to: getProperRouteLocation({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: d.dashboard_id,
-            },
-        }),
-        favoriteOptions: {
-            type: FAVORITE_TYPE.DASHBOARD,
-            id: d.dashboard_id,
-        },
-    }))),
-    privateV2MenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.filter((d) => d.version === '2.0').map((d) => ({
+    privateV1MenuSet: computed<LSBMenu[]>(() => dashboardState.privateDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -125,25 +124,11 @@ const state = reactive({
             id: d.dashboard_id,
         },
     }))),
-    privateV1MenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.filter((d) => d.version === '1.0').map((d) => ({
-        type: MENU_ITEM_TYPE.ITEM,
-        id: d.dashboard_id,
-        label: d.name,
-        to: getProperRouteLocation({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: d.dashboard_id,
-            },
-        }),
-        icon: {
-            name: 'ic_lock-filled',
-            color: gray[500],
-        },
-        favoriteOptions: {
-            type: FAVORITE_TYPE.DASHBOARD,
-            id: d.dashboard_id,
-        },
-    }))),
+    adminMenu: computed<LSBItem>(() => ({
+        type: MENU_ITEM_TYPE.SLOT,
+        label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.ADMIN'),
+        id: 'admin',
+    })),
     sharedMenu: computed<LSBItem>(() => ({
         type: MENU_ITEM_TYPE.SLOT,
         label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARED'),
@@ -159,8 +144,6 @@ const state = reactive({
         label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED'),
         id: 'deprecated',
     })),
-    sharedSubItem: computed<LSBMenu[]>(() => (storeState.isWorkspaceOwner ? filterMenuItems(state.workspaceV2MenuSet) : [])),
-    privateSubItem: computed<LSBMenu[]>(() => filterMenuItems(state.privateV2MenuSet)),
     deprecatedSubItem: computed<LSBMenu[]>(() => [
         ...state.workspaceV1MenuSet,
         ...state.privateV1MenuSet,
@@ -180,31 +163,29 @@ const state = reactive({
             {
                 type: MENU_ITEM_TYPE.TOP_TITLE,
                 label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARD'),
-                subText: isAdminMode.value ? `(${state.domainMenuSet.length})` : undefined,
+                subText: storeState.isAdminMode ? `(${state.domainMenuSet.length})` : undefined,
             },
         ];
 
-        if (isAdminMode.value) {
-            return [
-                ...defaultMenuSet,
-                ...state.domainMenuSet,
-            ];
+        const menuSet: LSBMenu[] = [...defaultMenuSet];
+        if (storeState.isAdminMode) {
+            menuSet.push(state.adminMenu);
+        } else {
+            // favorite
+            menuSet.unshift(
+                {
+                    type: MENU_ITEM_TYPE.STARRED,
+                    childItems: state.starredMenuItems,
+                    currentPath: state.currentPath,
+                },
+                { type: MENU_ITEM_TYPE.DIVIDER },
+            );
+
+            // shared, private
+            menuSet.push(state.sharedMenu);
+            menuSet.push(state.privateMenu);
         }
 
-        defaultMenuSet.unshift(
-            {
-                type: MENU_ITEM_TYPE.STARRED,
-                childItems: state.starredMenuItems,
-                currentPath: state.currentPath,
-            },
-            { type: MENU_ITEM_TYPE.DIVIDER },
-        );
-
-        const menuSet: LSBMenu[] = [
-            ...defaultMenuSet,
-            state.sharedMenu,
-            state.privateMenu,
-        ];
         if (state.deprecatedSubItem.length) {
             menuSet.push(state.deprecatedMenu);
         }
@@ -219,15 +200,6 @@ const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
             const filtered = d.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]) && menu.type === MENU_ITEM_TYPE.ITEM);
             if (filtered.length > 0) result.push(...filtered);
         } else if ((d.id && state.favoriteItemMap[d.favoriteOptions?.id || d.id]) && d.type === MENU_ITEM_TYPE.ITEM) result.push(d);
-    });
-    return result;
-};
-const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
-    const result = [] as LSBMenu[];
-    menuItems.forEach((d) => {
-        if (!Array.isArray(d)) {
-            result.push(d);
-        }
     });
     return result;
 };
@@ -263,44 +235,45 @@ callApiWithGrantGuard();
                 </template>
             </l-s-b-router-menu-item>
         </template>
+        <template v-if="storeState.isAdminMode"
+                  #slot-admin
+        >
+            <dashboard-l-s-b-tree type="PUBLIC"
+                                  :dashboards="state.publicV2DashboardItems"
+            />
+        </template>
         <template v-if="storeState.isWorkspaceOwner"
                   #slot-shared
         >
-            <l-s-b-collapsible-menu-item v-if="state.sharedSubItem.length"
+            <l-s-b-collapsible-menu-item v-if="state.publicV2DashboardItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
                                              label: $t('DASHBOARDS.LNB.SHARED'),
-                                             subItems: state.sharedSubItem,
                                          }"
                                          is-sub-item
                                          show-sub-item-count
             >
-                <template #collapsible-contents="{ item: _item }">
-                    <l-s-b-menu-item v-for="item in _item?.subItems"
-                                     :key="item.id"
-                                     :menu-data="item"
-                                     :current-path="state.currentPath"
+                <template #collapsible-contents>
+                    <dashboard-l-s-b-tree type="PUBLIC"
+                                          :dashboards="state.publicV2DashboardItems"
                     />
                 </template>
             </l-s-b-collapsible-menu-item>
         </template>
         <template #slot-private>
-            <l-s-b-collapsible-menu-item v-if="state.privateSubItem.length"
+            <l-s-b-collapsible-menu-item v-if="state.privateV2DashboardItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
                                              label: $t('DASHBOARDS.LNB.PRIVATE'),
-                                             subItems: state.privateSubItem,
                                          }"
                                          is-sub-item
                                          show-sub-item-count
             >
-                <template #collapsible-contents="{ item: _item }">
-                    <l-s-b-menu-item v-for="item in _item?.subItems"
-                                     :key="item.id"
-                                     :menu-data="item"
-                                     :current-path="state.currentPath"
+                <template #collapsible-contents>
+                    <dashboard-l-s-b-tree type="PRIVATE"
+                                          :dashboards="state.privateV2DashboardItems"
                     />
                 </template>
             </l-s-b-collapsible-menu-item>

@@ -6,11 +6,12 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
+import type { GroupByValue, GroupByOptions } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
+import type { YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type { GroupByOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type {
-    GroupByValue,
-    TableDataFieldValue,
     WidgetFieldValues,
 } from '@/common/modules/widgets/types/widget-field-value-type';
 
@@ -72,9 +73,19 @@ export const useWidgetOptionsComplexValidation = ({
             const tableDataField = 'tableDataField';
             const groupByFieldValue = valueMap[groupByField] as GroupByValue;
             const tableDataFieldValue = valueMap[tableDataField] as TableDataFieldValue;
-            const allValueExist = groupByFieldValue?.value && !!groupByFieldValue.value.length && tableDataFieldValue?.value;
+            const allValueExist = groupByFieldValue?.value && !!groupByFieldValue.value.length
+                && (tableDataFieldValue?.staticFieldInfo?.fieldValue || tableDataFieldValue?.dynamicFieldInfo?.fieldValue);
             if (tableDataFieldValue?.fieldType === 'dynamicField' && allValueExist) {
-                isValid = !(groupByFieldValue?.value ?? []).includes(tableDataFieldValue.value as string);
+                isValid = !(groupByFieldValue?.value ?? []).includes(tableDataFieldValue.dynamicFieldInfo?.fieldValue as string);
+            }
+        } else if (['clusteredColumnChart', 'lineChart', 'stackedAreaChart', 'stackedColumnChart', 'stackedHorizontalBarChart', 'heatmap', 'colorCodedTableHeatmap'].includes(config.widgetName)) {
+            let fieldValue = valueMap.xAxis as XAxisValue;
+            if (config.widgetName === 'stackedHorizontalBarChart') {
+                fieldValue = valueMap.yAxis as YAxisValue;
+            }
+            const tableDataFieldValue = valueMap.tableDataField as TableDataFieldValue;
+            if (tableDataFieldValue?.fieldType === 'dynamicField') {
+                isValid = fieldValue?.value !== tableDataFieldValue?.dynamicFieldInfo?.fieldValue;
             }
         } else {
             // Label Info Fields Value Duplicate Validation (Except Table Widget)

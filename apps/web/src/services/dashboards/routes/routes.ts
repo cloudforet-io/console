@@ -28,7 +28,6 @@ const dashboardsRoute: RouteConfig = {
             path: 'create',
             name: DASHBOARDS_ROUTE.CREATE._NAME,
             meta: {
-                centeredLayout: true,
                 translationId: 'DASHBOARDS.CREATE.TITLE',
             },
             component: DashboardCreatePage,

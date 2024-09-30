@@ -11,7 +11,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import type { NumberFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';

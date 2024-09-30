@@ -6,7 +6,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PHeading, PButton, PContextMenu, useContextMenuController, PIconButton,
+    PHeading, PButton, PContextMenu, PIconButton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -23,11 +23,11 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
-import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
+import { indigo, peacock } from '@/styles/colors';
+
 import ProjectGroupMemberManagementModal from '@/services/project/components/ProjectGroupMemberManagementModal.vue';
 import ProjectMain from '@/services/project/components/ProjectMain.vue';
-import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
-import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
+import ProjectMainDeleteModal from '@/services/project/components/ProjectMainDeleteModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import { useProjectTreeStore } from '@/services/project/stores/project-tree-store';
@@ -53,14 +53,19 @@ const storeState = reactive({
 
 const state = reactive({
     currentProjectGroupId: computed(() => route.params.projectGroupId),
+    createMenuVisible: false,
     createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: 'project',
             label: i18n.t('PROJECT.LANDING.PROJECT') as string,
+            icon: 'ic_document-filled',
+            iconColor: peacock[600],
         },
         {
             name: 'projectGroup',
             label: i18n.t('PROJECT.LANDING.PROJECT_GROUP') as string,
+            icon: 'ic_folder-filled',
+            iconColor: indigo[500],
         },
     ])),
     projectGroupModalVisible: false,
@@ -72,35 +77,20 @@ const state = reactive({
     projectGroupMemberCount: computed<number|undefined>(() => storeState.projectGroups?.[state.currentProjectGroupIds]?.data.users?.length),
 });
 
-const modalState = reactive({
-    projectGroupFormVisible: false,
-    projectGroupDeleteCheckModalVisible: false,
-    projectFormModalVisible: false,
-    projectGroupUpdateMode: false,
+onClickOutside(menuRef, () => {
+    state.createMenuVisible = false;
 });
-
-const {
-    visibleMenu,
-    showContextMenu,
-    hideContextMenu,
-} = useContextMenuController({
-    useFixedStyle: true,
-    targetRef,
-    contextMenuRef: menuRef,
-    menu: state.createDropdownMenuItems,
-});
-onClickOutside(menuRef, hideContextMenu);
 
 /* Event */
 const handleClickProjectGroupEditButton = () => {
-    modalState.projectGroupUpdateMode = true;
-    modalState.projectGroupFormVisible = true;
+    projectPageStore.setProjectGroupFormUpdateMode(true);
+    projectPageStore.setProjectGroupFormVisible(true);
 };
 const handleClickProjectGroupDeleteButton = () => {
-    modalState.projectGroupDeleteCheckModalVisible = true;
+    projectPageStore.setProjectDeleteModalVisible(true);
 };
 const handleOpenProjectGroupMoveModal = () => {
-    state.projectGroupModalVisible = true;
+    projectPageStore.setProjectGroupMoveModalVisible(true);
 };
 
 /* Handling Forms */
@@ -108,14 +98,33 @@ const handleClickAddProjectGroupMember = () => {
     state.projectGroupMemberManagementModalVisible = true;
 };
 const handleClickCreateButton = () => {
-    showContextMenu();
+    state.createMenuVisible = !state.createMenuVisible;
 };
 const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
+    projectPageStore.setCurrentSelectedProjectGroupId(state.currentProjectGroupId);
     if (item.name === 'project') {
-        modalState.projectFormModalVisible = true;
+        projectPageStore.setProjectFormModalVisible(true);
     } else if (item.name === 'projectGroup') {
-        modalState.projectGroupUpdateMode = false;
-        modalState.projectGroupFormVisible = true;
+        projectPageStore.setProjectGroupFormUpdateMode(false);
+        projectPageStore.setProjectGroupFormVisible(true);
+    }
+};
+const handleUpdateProjectGroupMoveModal = (visible: boolean) => {
+    projectPageStore.setProjectGroupMoveModalVisible(visible);
+    if (projectPageState.currentSelectedProjectGroupId && !visible) {
+        projectPageStore.setCurrentSelectedProjectGroupId(undefined);
+    }
+    if (projectPageState.currentSelectedProjectId && !visible) {
+        projectPageStore.setCurrentSelectedProjectId(undefined);
+    }
+};
+const handleUpdateDeleteModalVisible = (visible: boolean) => {
+    projectPageStore.setProjectDeleteModalVisible(visible);
+    if (projectPageState.currentSelectedProjectGroupId && !visible) {
+        projectPageStore.setCurrentSelectedProjectGroupId(undefined);
+    }
+    if (projectPageState.currentSelectedProjectId && !visible) {
+        projectPageStore.setCurrentSelectedProjectId(undefined);
     }
 };
 
@@ -169,51 +178,45 @@ onUnmounted(() => {
                               class="pl-1"
                         >({{ state.projectGroupMemberCount }})</span>
                     </p-button>
-                    <template v-if="projectPageState.isWorkspaceOwner">
+                    <div v-if="projectPageState.isWorkspaceOwner"
+                         class="create-button-wrapper"
+                    >
                         <p-button ref="targetRef"
                                   icon-left="ic_plus_bold"
                                   @click="handleClickCreateButton"
                         >
                             {{ $t('PROJECT.LANDING.CREATE') }}
                         </p-button>
-                        <p-context-menu v-show="visibleMenu"
+                        <p-context-menu v-show="state.createMenuVisible"
                                         ref="menuRef"
                                         class="create-context-menu"
                                         no-select-indication
                                         :menu="state.createDropdownMenuItems"
                                         @select="handleSelectCreateMenu"
                         />
-                    </template>
+                    </div>
                 </div>
             </template>
         </p-heading>
         <project-main />
-
-        <project-main-project-group-form-modal v-if="modalState.projectGroupFormVisible"
-                                               :visible.sync="modalState.projectGroupFormVisible"
-                                               :project-group-id="state.currentProjectGroupId"
-                                               :update-mode="modalState.projectGroupUpdateMode"
-                                               @confirm="handleRefreshTree"
-        />
-        <project-main-project-group-delete-check-modal v-if="modalState.projectGroupDeleteCheckModalVisible"
-                                                       :visible.sync="modalState.projectGroupDeleteCheckModalVisible"
-                                                       :project-group-id="state.currentProjectGroupId"
-                                                       @confirm="handleRefreshTree"
-        />
-        <project-main-project-group-move-modal v-if="state.projectGroupModalVisible"
-                                               :visible.sync="state.projectGroupModalVisible"
-                                               :is-project="false"
-                                               :target-id="state.currentProjectGroupId"
-                                               @confirm="handleRefreshTree"
-        />
         <project-group-member-management-modal v-if="state.projectGroupMemberManagementModalVisible"
                                                :visible.sync="state.projectGroupMemberManagementModalVisible"
                                                :project-group-id="state.currentProjectGroupId"
         />
-        <project-form-modal v-if="modalState.projectFormModalVisible"
-                            :visible.sync="modalState.projectFormModalVisible"
-                            :project-group-id="state.currentProjectGroupId"
-                            @confirm="handleRefreshTree"
+        <project-main-delete-modal v-if="projectPageState.projectDeleteModalVisible"
+                                   :visible="projectPageState.projectDeleteModalVisible"
+                                   :is-project="!!projectPageState.currentSelectedProjectId"
+                                   :target-id="projectPageState.currentSelectedProjectId || projectPageState.currentSelectedProjectGroupId || state.currentProjectGroupId"
+                                   :skip-redirect="!!projectPageState.currentSelectedProjectId || !!projectPageState.currentSelectedProjectGroupId"
+                                   @update:visible="handleUpdateDeleteModalVisible"
+                                   @confirm="handleRefreshTree"
+        />
+        <project-main-project-group-move-modal v-if="projectPageState.projectGroupMoveModalVisible"
+                                               :visible="projectPageState.projectGroupMoveModalVisible"
+                                               :is-project="!!projectPageState.currentSelectedProjectId"
+                                               :target-id="projectPageState.currentSelectedProjectId || projectPageState.currentSelectedProjectGroupId || state.currentProjectGroupId"
+                                               @update:visible="handleUpdateProjectGroupMoveModal"
+                                               @confirm="handleRefreshTree"
         />
     </div>
 </template>
@@ -232,14 +235,21 @@ onUnmounted(() => {
     margin-right: 0.5rem;
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
 }
 .top-button-box {
-    display: inline-block;
-    float: right;
+    display: flex;
+    align-self: center;
     margin-left: auto;
     .create-context-menu {
+        @apply absolute;
+        top: 100%;
+        right: 0;
         z-index: 10;
+        width: max-content;
+    }
+    .create-button-wrapper {
+        @apply relative inline-block;
+        height: 2rem;
     }
 }
 
@@ -265,4 +275,9 @@ onUnmounted(() => {
     @apply flex-grow;
 }
 
+/* custom design-system component - p-heading */
+:deep(.p-heading) {
+    @apply border-none;
+    padding-bottom: 0;
+}
 </style>

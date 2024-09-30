@@ -19,6 +19,9 @@ import type {
 interface PublicDashboardResourceItemData {
     resourceGroup?: PublicDashboardModel['resource_group'];
     projectId?: string;
+    folderId?: string;
+    shared?: boolean;
+    scope?: string;
 }
 export type PublicDashboardReferenceItem = Required<Pick<ReferenceItem<PublicDashboardResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type PublicDashboardReferenceMap = ReferenceMap<PublicDashboardReferenceItem>;
@@ -56,7 +59,7 @@ export const usePublicDashboardReferenceStore = defineStore('reference-dashboard
 
         const params: PublicDashboardListParameters = {
             query: {
-                only: ['dashboard_id', 'name', 'project_id', 'resource_group'],
+                only: ['dashboard_id', 'name', 'project_id', 'resource_group', 'shared', 'scope', 'folder_id'],
             },
         };
         const res = await SpaceConnector.clientV2.dashboard.publicDashboard.list<PublicDashboardListParameters, ListResponse<PublicDashboardModel>>(params);
@@ -72,6 +75,9 @@ export const usePublicDashboardReferenceStore = defineStore('reference-dashboard
                 data: {
                     resourceGroup: dashboardInfo?.resource_group,
                     projectId: dashboardInfo?.project_id,
+                    folderId: dashboardInfo?.folder_id,
+                    shared: dashboardInfo?.shared,
+                    scope: dashboardInfo?.scope,
                 },
             };
         });
@@ -90,6 +96,9 @@ export const usePublicDashboardReferenceStore = defineStore('reference-dashboard
                 data: {
                     resourceGroup: dashboard?.resource_group,
                     projectId: dashboard?.project_id,
+                    folderId: dashboard?.folder_id,
+                    shared: dashboard?.shared,
+                    scope: dashboard?.scope,
                 },
             },
         };

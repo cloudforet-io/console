@@ -27,12 +27,13 @@ import {
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { FormatRulesValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { FormatRulesValue, NumberFormatValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
 
@@ -80,12 +81,12 @@ const state = reactive({
                     distance: -55,
                     color: gray[700],
                     fontSize: 12,
-                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormatter, state.unit),
+                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormat, state.unit),
                 },
                 detail: {
                     offsetCenter: [0, 0],
                     fontSize: 32,
-                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormatter, state.unit),
+                    formatter: (val) => getFormattedNumber(val, state.dataField, state.numberFormat, state.unit),
                     color: gray[700],
                 },
                 data: [
@@ -127,7 +128,7 @@ const state = reactive({
         return { start: _start, end: _end };
     }),
     // optional fields
-    numberFormatter: computed(() => props.widgetOptions?.numberFormat as NumberFormatValue),
+    numberFormat: computed(() => props.widgetOptions?.numberFormat as NumberFormatValue),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => ({

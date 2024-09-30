@@ -28,6 +28,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/WidgetFormDataTableCardFilters.vue';
 import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
@@ -38,7 +39,7 @@ interface Props {
     sourceId: string;
     sourceKey: string;
     selectedGroupByItems: any[];
-    filter: Record<string, string[]>;
+    filter: Record<string, DataTableQueryFilter>;
     dataFieldName: string;
     dataUnit: string;
 
@@ -77,7 +78,7 @@ const state = reactive({
     proxySelectedGroupByItems: useProxyValue('selectedGroupByItems', props, emit),
     proxyDataFieldName: useProxyValue('dataFieldName', props, emit),
     proxyDataUnit: useProxyValue('dataUnit', props, emit),
-    proxyFilter: useProxyValue('filter', props, emit),
+    proxyFilter: useProxyValue<Record<string, DataTableQueryFilter>>('filter', props, emit),
 });
 
 const advancedOptionsState = reactive({

@@ -57,6 +57,7 @@ const props = withDefaults(defineProps<Props>(), {
         overflow-y: auto;
         .no-data {
             @apply flex items-start text-gray-500;
+            overflow: hidden;
             padding-right: 0.5rem;
             padding-left: 0.5rem;
             gap: 0.125rem;
