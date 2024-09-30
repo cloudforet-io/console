@@ -262,7 +262,7 @@ callApiWithGrantGuard();
         <template v-if="storeState.isWorkspaceOwner"
                   #slot-shared
         >
-            <l-s-b-collapsible-menu-item v-if="state.publicV2DashboardItems.length"
+            <l-s-b-collapsible-menu-item v-if="state.publicV2DashboardItems.length || dashboardGetters.workspaceFolderItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
@@ -279,7 +279,7 @@ callApiWithGrantGuard();
             </l-s-b-collapsible-menu-item>
         </template>
         <template #slot-private>
-            <l-s-b-collapsible-menu-item v-if="state.privateV2DashboardItems.length"
+            <l-s-b-collapsible-menu-item v-if="state.privateV2DashboardItems.length || dashboardGetters.privateFolderItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
