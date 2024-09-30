@@ -7,7 +7,7 @@ import type { XYChart } from '@amcharts/amcharts5/xy';
 import { cloneDeep, debounce, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PEmpty, PSelectButton, PSkeleton, PSelectDropdown, PButton,

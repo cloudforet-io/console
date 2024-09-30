@@ -6,6 +6,8 @@ import {
 import { flatMap, map, uniq } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
+import type { CancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { PPagination } from '@cloudforet/mirinae';
 
@@ -58,6 +60,7 @@ const emit = defineEmits<WidgetEmit>();
 
 const state = reactive({
     loading: false,
+    isPrivateWidget: computed(() => props.widgetId.startsWith('private')),
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     fullPageData: null as Data | null,
@@ -279,15 +282,14 @@ const getAutoValueTypeTopCountField = (fullPageDataResults: TableDataItem[]): st
     return sortedFullTotalDataValues.map((item) => item[state.tableDataField]).slice(0, state.tableDataDynamicCount);
 };
 
-const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: boolean }): Promise<Data|APIErrorToast|undefined> => {
+const fetchWidget = async (
+    loadFetcher: CancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>,
+    options: { isComparison?: boolean, fullDataFetch?: boolean },
+): Promise<Data|APIErrorToast|undefined> => {
     const { isComparison, fullDataFetch } = options;
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
         state.loading = true;
-        const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-            : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
         // Set Query
         const _fields = {};
         let _groupBy: string[] = [...state.groupByField];
@@ -320,7 +322,7 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
                 limit: state.pageSize,
             },
         };
-        const res = await _fetcher({
+        const { status, response } = await loadFetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
@@ -334,8 +336,12 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
             },
             vars: props.dashboardVars,
         });
-        state.errorMessage = undefined;
-        return res;
+
+        if (status === 'succeed') {
+            state.errorMessage = undefined;
+            return response;
+        }
+        return undefined;
     } catch (e: any) {
         state.errorMessage = e.message;
         ErrorHandler.handleError(e);
@@ -344,22 +350,35 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
         state.loading = false;
     }
 };
+
+const defaultFetcher = state.isPrivateWidget ? SpaceConnector.clientV2.dashboard.privateWidget.load : SpaceConnector.clientV2.dashboard.publicWidget.load;
+const widgetBaseLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
+const widgetComparisonLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
+const widgetFullDataLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
+const widgetFullDataComparisonLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
+
 const loadWidget = async (manualLoad?: boolean): Promise<Data|APIErrorToast> => {
     if (!manualLoad) {
         state.sortBy = [];
         state.thisPage = 1;
     }
 
-    const res = await fetchWidget({});
-    const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget({ isComparison: true }) : null;
+    const res = await fetchWidget(widgetBaseLoadFetcher, {});
+    if (res === undefined) return state.data;
+    const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget(widgetComparisonLoadFetcher, { isComparison: true }) : null;
+    if (comparisonRes === undefined) return state.data;
     if (typeof res === 'function') return res;
     state.data = res;
     state.comparisonData = comparisonRes;
 
     const _isDynamicAutoValueType = state.tableDataDynamicValueType === 'auto';
     if (state.totalInfo?.toggleValue || _isDynamicAutoValueType) {
-        const fullDataRes = await fetchWidget({ fullDataFetch: true });
-        const fullDataComparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget({ isComparison: true, fullDataFetch: true }) : null;
+        const fullDataRes = await fetchWidget(widgetFullDataLoadFetcher, { fullDataFetch: true });
+        if (fullDataRes === undefined) return state.data;
+        const fullDataComparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format
+            ? await fetchWidget(widgetFullDataComparisonLoadFetcher, { isComparison: true, fullDataFetch: true })
+            : null;
+        if (fullDataComparisonRes === undefined) return state.data;
         state.fullPageData = fullDataRes;
         state.fullPageComparisonData = fullDataComparisonRes;
     }
