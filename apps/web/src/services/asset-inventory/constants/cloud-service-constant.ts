@@ -6,6 +6,7 @@ export const CLOUD_SERVICE_PAGE_URL_QUERY_KEY = [
     'service_account',
     'period',
     'filters',
+    'default_filters',
 ] as const;
 
 export const CLOUD_SERVICE_CATEGORY = Object.freeze({
