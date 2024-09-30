@@ -1766,7 +1766,20 @@
 			}
 		},
 		"ANOMALY_DETECTION_CONFIGURATION": "異常コスト検知設定",
-		"COST_ADVANCED_SETTINGS": "詳細設定"
+		"COST_ADVANCED_SETTINGS": "詳細設定",
+		"CURRENCY_CONVERTER": {
+			"AGGREGATION_DATE": "",
+			"ALT_E_RATES": "",
+			"ALT_S_CHANGES": "",
+			"BASE_CURRENCY": "",
+			"CHECKBOX": "",
+			"DATA_ENTER": "",
+			"DEFAULT": "デフォルト",
+			"EXCHANGE_RATES_SOURCE": "",
+			"NOTIFICATION": "",
+			"SAVE_CHANGES": "変更事項保存",
+			"YAHOO": ""
+		}
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
