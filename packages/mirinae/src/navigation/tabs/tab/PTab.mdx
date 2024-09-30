@@ -23,6 +23,28 @@ import * as PTabStories from './PTab.stories';
 <br/>
 <br/>
 
+## Tab Menu Type (Divider, Folder)
+The Tab component provides not only standard Tab menus but also **Divider** and **Folder Tab menus** with a 1-depth folder structure. <br/>
+These two types of menus are distinguished by ```tabType``` property. The ```folder``` type accepts a ```subItems``` property, which is ```TabItem[]``` type, and displays the submenu in a dropdown format. <br/>
+
+If you want to use a folder-type Tab menu, set ```tabType: 'folder'``` and populate ```subItems``` with the menu items, then pass it to the ```tabs``` prop.
+<Canvas of={PTabStories.TabMenuType} />
+
+<br/>
+<br/>
+
+## Overflow Tab Menus
+<Canvas of={PTabStories.OverflowTabMenus} />
+
+<br/>
+<br/>
+
+## Slots for Header Right Contents
+<Canvas of={PTabStories.SlotsforHeaderRightContents} />
+
+<br/>
+<br/>
+
 ## Slots for Contents
 <Canvas of={PTabStories.SlotsforContents} />
 

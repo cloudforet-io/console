@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -54,7 +55,7 @@ const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
     currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
-    proxyVisible: useProxyValue('visible', props, emit),
+    proxyVisible: useProxyValue<boolean>('visible', props, emit),
     existingNameList: computed<string[]>(() => {
         if (state.currentMetricExampleId) {
             return metricExplorerPageState.metricExamples
@@ -68,7 +69,7 @@ const state = reactive({
             .filter((d) => d.key !== metricExplorerPageState.metric?.metric_id)
             .map((metric) => metric.name);
     }),
-    headerTitle: computed(() => {
+    headerTitle: computed<TranslateResult>(() => {
         if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE');
         if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS_METRIC_EXAMPLE');
         if (props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
@@ -86,10 +87,10 @@ const {
     invalidTexts,
     isAllValid,
     initForm,
-} = useFormValidator({
+} = useFormValidator<Record<string, string|undefined>>({
     name: undefined as string|undefined,
 }, {
-    name(value) {
+    name(value?: string) {
         if (!value) return i18n.t('INVENTORY.METRIC_EXPLORER.NAME_REQUIRED');
         if (value.length > 40) return i18n.t('INVENTORY.METRIC_EXPLORER.MAX_LENGTH_INVALID', { max: 40 });
         if (state.existingNameList.find((d) => d === value)) return i18n.t('INVENTORY.METRIC_EXPLORER.NAME_DUPLICATED');

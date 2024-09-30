@@ -5,12 +5,35 @@ import type {
 import type {
     InheritOptions, WidgetOptions, WidgetSize,
 } from '@/schema/dashboard/_types/widget-type';
+import type { PrivateDashboardChangeFolderParameters } from '@/schema/dashboard/private-dashboard/api-verbs/change-folder';
+import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
+import type { PrivateDashboardDeleteParameters } from '@/schema/dashboard/private-dashboard/api-verbs/delete';
+import type { PrivateDashboardListParameters } from '@/schema/dashboard/private-dashboard/api-verbs/list';
+import type { PrivateDashboardUpdateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/update';
+import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
+import type { PublicDashboardChangeFolderParameters } from '@/schema/dashboard/public-dashboard/api-verbs/change-folder';
+import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
+import type { PublicDashboardDeleteParameters } from '@/schema/dashboard/public-dashboard/api-verbs/delete';
+import type { PublicDashboardListParameters } from '@/schema/dashboard/public-dashboard/api-verbs/list';
+import type { PublicDashboardUpdateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/update';
+import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 
 import type { VariableModelType } from '@/lib/variable-models';
 import type { Value } from '@/lib/variable-models/_base/types';
 
 
+
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
+export type DashboardFolderType = 'PUBLIC'|'PRIVATE';
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type DashboardModel = PublicDashboardModel & PrivateDashboardModel;
+export type DashboardCreateParams = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
+export type DashboardChangeFolderParams = PublicDashboardChangeFolderParameters | PrivateDashboardChangeFolderParameters;
+export type DashboardListParams = PublicDashboardListParameters | PrivateDashboardListParameters;
+export type DashboardUpdateParams = PublicDashboardUpdateParameters | PrivateDashboardUpdateParameters;
+export type DashboardDeleteParams = PublicDashboardDeleteParameters | PrivateDashboardDeleteParameters;
 
 // dashboard variable schema types
 type VariableSelectionType = 'SINGLE' | 'MULTI';

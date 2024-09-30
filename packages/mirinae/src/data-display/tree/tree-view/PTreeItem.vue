@@ -29,7 +29,7 @@ const emit = defineEmits<{(e: 'click-toggle', node: TreeNode): Promise<void>|voi
 }>();
 
 const state = reactive({
-    toggleIcon: computed(() => (state.proxyIsOpen ? 'ic_caret-down-filled-alt' : 'ic_caret-right')),
+    toggleIcon: computed(() => (state.proxyIsOpen ? 'ic_chevron-down' : 'ic_chevron-right')),
     fetchLoading: false,
     isSelected: computed(() => props.selectedId === props.node.id),
     proxyIsOpen: useProxyValue('isOpen', props, emit),

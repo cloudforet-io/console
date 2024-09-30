@@ -7,7 +7,7 @@ import {
     WIDGET_WIDTH_RANGE_LIST,
     WIDGET_GAP,
     WIDGET_WIDTH_CRITERIA,
-} from '@/services/dashboards/shared/dashboard-widget-container/widget-container-config';
+} from '@/services/dashboards/constants/widget-container-config';
 
 
 const isEveryWidthMax = (sizeRow: string[], widthRow: number[]): boolean => sizeRow.every((size, idx) => {

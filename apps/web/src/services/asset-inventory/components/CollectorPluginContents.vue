@@ -51,7 +51,7 @@
                 >
                     <p-label v-for="(label, idx) in state.labels"
                              :key="`${label}-${idx}`"
-                             class="mb-1"
+                             class="mb-1 mr-1"
                              :text="label"
                     />
                 </div>

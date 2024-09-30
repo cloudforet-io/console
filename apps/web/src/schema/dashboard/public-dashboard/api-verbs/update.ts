@@ -13,4 +13,5 @@ export interface PublicDashboardUpdateParameters {
     variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;
+    folder_id?: string;
 }

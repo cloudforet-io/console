@@ -30,12 +30,12 @@ import {
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
+import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
 import type { DateRange, WidgetLoadData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { LegendValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { coral, gray } from '@/styles/colors';
 

@@ -12,7 +12,6 @@ const stackedHorizontalBarChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        dataField: {},
         yAxis: {
             options: {
                 dataTarget: 'labels_info',
@@ -22,15 +21,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
                 excludeDateField: true,
             },
         },
-        stackBy: {
-            options: {
-                dataTarget: 'labels_info',
-                defaultMaxCount: 5,
-                max: 30,
-                defaultIndex: 1,
-                excludeDateField: true,
-            },
-        },
+        tableDataField: {},
     },
     optionalFieldsSchema: {
         legend: {
