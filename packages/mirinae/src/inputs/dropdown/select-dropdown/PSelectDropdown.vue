@@ -179,6 +179,7 @@ const {
     pageSize: toRef(props, 'pageSize'),
     hideHeaderWithoutItems: toRef(props, 'hideHeaderWithoutItems'),
     boundary: toRef(props, 'boundary'),
+    position: toRef(props, 'menuPosition'),
 });
 
 /* focusing */
@@ -353,7 +354,6 @@ defineExpose({ reloadMenu });
                         :class="{
                             'dropdown-context-menu': true,
                             default: !props.showSelectMarker,
-                            [menuPosition]: !useFixedMenuStyle
                         }"
                         :menu="props.disableHandler ? props.menu : refinedMenu"
                         :loading="props.loading || loading"
@@ -412,16 +412,6 @@ defineExpose({ reloadMenu });
         z-index: 1000;
         min-width: 100%;
         width: auto;
-
-        /* menu position */
-        &.left {
-            left: 0;
-            right: unset;
-        }
-        &.right {
-            left: unset;
-            right: -1px;
-        }
     }
 
     &.is-fixed-width {

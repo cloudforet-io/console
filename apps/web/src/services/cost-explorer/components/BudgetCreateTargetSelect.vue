@@ -187,13 +187,6 @@ watch([() => selectedTargets.value, () => isAllValid.value], debounce(([targets,
             }
         }
     }
-
-    /* custom design-system component - p-select-dropdown */
-    :deep(.p-select-dropdown) {
-        .dropdown-context-menu {
-            z-index: 49 !important;
-        }
-    }
 }
 
 @screen mobile {

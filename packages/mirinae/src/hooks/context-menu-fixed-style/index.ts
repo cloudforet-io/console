@@ -14,7 +14,7 @@ interface UseContextMenuFixedStyleOptions {
     visibleMenu?: Ref<boolean|undefined>;
     targetRef: Ref<Vue|HTMLElement|null>;
     menuRef: Ref<Vue|HTMLElement|null>;
-    position?: Ref<'left'|'right'>;
+    position?: Ref<'left'|'right'|undefined>|'left'|'right';
     boundary?: Ref<string|undefined>|string; // it's not developed yet. if you want to use it, you can develop it with detectOverflow middleware.
 }
 
@@ -46,6 +46,7 @@ export const useContextMenuStyle = ({
     let cleanup: (() => void)|undefined;
     const PAD = 12;
     const MIN_HEIGHT = 72;
+    const MAX_HEIGHT = 576; // 32rem
     const setStyleOfContextMenu = (referenceEl: HTMLElement, floatingEl: HTMLElement) => {
         const setPosition = (isFixed = false) => {
             computePosition(referenceEl, floatingEl, {
@@ -54,17 +55,25 @@ export const useContextMenuStyle = ({
                     offset(1),
                     size({
                         apply({ rects, elements, availableHeight: floatingAvailableHeight }) {
-                            let availableHeight = floatingAvailableHeight - PAD;
+                            const availableHeight = floatingAvailableHeight - PAD;
                             const style: Partial<CSSStyleDeclaration> = {
                                 minWidth: `${rects.reference.width}px`,
-                                maxHeight: availableHeight >= elements.floating.scrollHeight ? '' : `${availableHeight}px`,
                             };
+
+                            if (availableHeight < MAX_HEIGHT) {
+                                style.maxHeight = `${availableHeight}px`;
+                            } else {
+                                style.maxHeight = `${MAX_HEIGHT}px`;
+                            }
 
                             // apply min-height if the content is taller than the available space.
                             // this is to prevent the content from being too small and prevent flipping too early.
                             if (availableHeight < MIN_HEIGHT && elements.floating.scrollHeight >= availableHeight) {
                                 style.minHeight = `${MIN_HEIGHT}px`;
+                            } else {
+                                style.minHeight = '';
                             }
+
                             Object.assign(elements.floating.style, style);
                             // apply the same style to the state
                             contextMenuFixedStyleState.contextMenuStyle = {
@@ -74,11 +83,12 @@ export const useContextMenuStyle = ({
 
                             // adjust the max-height of the content area based on the header height
                             const headerEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .context-menu-title-wrapper');
-                            if (headerEl) {
-                                const contentEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .menu-container');
-                                if (contentEl) {
-                                    availableHeight -= headerEl.clientHeight;
-                                    contentEl.style.maxHeight = availableHeight >= contentEl.scrollHeight ? '' : `${availableHeight}px`;
+                            const contentEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .menu-container');
+                            if (contentEl && headerEl) { // always exist
+                                if (headerEl.clientHeight > 0) {
+                                    contentEl.style.maxHeight = `${availableHeight - headerEl.clientHeight}px`;
+                                } else {
+                                    contentEl.style.maxHeight = 'inherit';
                                 }
                             }
                         },

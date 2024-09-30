@@ -114,6 +114,7 @@ const {
     targetRef,
     contextMenuRef,
     menu: state.saveDropdownMenuItems,
+    position: 'right',
 });
 onClickOutside(rightPartRef, hideContextMenu);
 
@@ -314,7 +315,7 @@ const handleOpenEditQuery = () => {
                 >
                     {{ state.editQueryTitle }}
                 </p-button>
-                <template v-if="!state.currentMetricExampleId">
+                <template v-if="state.currentMetricExampleId">
                     <p-button v-if="state.isDuplicateEnabled"
                               class="mr-2"
                               style-type="tertiary"
@@ -351,6 +352,7 @@ const handleOpenEditQuery = () => {
                     />
                     <p-context-menu v-show="visibleContextMenu"
                                     ref="contextMenuRef"
+                                    :visible-menu="visibleContextMenu"
                                     :menu="state.saveDropdownMenuItems"
                                     @select="handleSelectSaveAsExample"
                     />
@@ -384,16 +386,9 @@ const handleOpenEditQuery = () => {
         border-left: 0;
     }
 
-    /* custom design-system component - p-context-menu */
-    :deep(.p-context-menu) {
-        @apply absolute;
-        top: 2.125rem;
+    .p-context-menu {
         margin-top: -1px;
-        z-index: 100;
-        right: 0;
-        .p-context-menu-item {
-            min-width: 10rem;
-        }
+        min-width: 10rem !important;
     }
 }
 </style>

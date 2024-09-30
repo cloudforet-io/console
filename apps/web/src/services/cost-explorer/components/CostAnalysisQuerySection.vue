@@ -84,6 +84,7 @@ const {
     targetRef,
     contextMenuRef,
     menu: state.saveDropdownMenuItems,
+    position: 'right',
 });
 onClickOutside(rightPartRef, hideContextMenu);
 
@@ -195,6 +196,7 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                     />
                     <p-context-menu v-show="visibleContextMenu"
                                     ref="contextMenuRef"
+                                    :visible-menu="visibleContextMenu"
                                     :menu="state.saveDropdownMenuItems"
                                     @select="handleClickSaveAsButton"
                     />
@@ -255,16 +257,9 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                 border-left: 0;
             }
 
-            /* custom design-system component - p-context-menu */
-            :deep(.p-context-menu) {
-                @apply absolute;
-                top: 2.125rem;
+            .p-context-menu {
                 margin-top: -1px;
-                z-index: 100;
-                right: 0;
-                .p-context-menu-item {
-                    min-width: 10rem;
-                }
+                min-width: 10rem !important;
             }
         }
         .filters-button {

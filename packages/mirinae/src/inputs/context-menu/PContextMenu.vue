@@ -382,7 +382,6 @@ defineExpose({
     min-width: 100%;
     text-align: left;
     background-clip: padding-box;
-    max-height: 32rem;
     border-width: 1px;
     border-style: solid;
     user-select: none;
