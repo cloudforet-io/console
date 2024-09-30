@@ -9,9 +9,12 @@ import {
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceGroupUser } from '@/schema/identity/workspace-group-user/model';
 import type { WorkspaceGroupRemoveUsersParameters } from '@/schema/identity/workspace-group/api-verbs/remove-users';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -69,9 +72,10 @@ const deleteGroupUsers = async () => {
 
         await workspaceGroupPageStore.fetchWorkspaceGroups({ blockSelectedIndicesReset: true });
         await workspaceGroupPageStore.listWorkspaceGroupUsers();
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_REMOVE_USERS'), '');
         userTabState.selectedUserIndices = [];
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_E_REMOVE_USERS'));
     } finally {
         state.loading = false;
     }
