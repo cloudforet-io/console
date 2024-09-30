@@ -28,7 +28,7 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CloudServicePageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
+import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 interface Data {
@@ -93,7 +93,7 @@ const state = reactive({
 
 /* Util */
 const getLocation = (provider: string, region: string, projectId: string, label: string) => {
-    const query: CloudServicePageUrlQuery = {
+    const query: CloudServiceMainPageUrlQuery = {
         provider: primitiveToQueryString(provider),
         region: arrayToQueryString([region]),
         project: arrayToQueryString([projectId]),

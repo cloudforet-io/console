@@ -125,7 +125,7 @@ import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type {
     CloudServiceDetailPageUrlQuery,
-    CloudServicePageUrlQuery,
+    CloudServiceMainPageUrlQuery,
 } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
@@ -180,7 +180,7 @@ export default {
                 href: string;
             }>,
             cloudServiceTypeLink: computed(() => {
-                const query: CloudServicePageUrlQuery = {};
+                const query: CloudServiceMainPageUrlQuery = {};
                 if (props.projectId) {
                     query.project = arrayToQueryString([props.projectId]);
                 }

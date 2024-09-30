@@ -36,7 +36,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CloudServicePageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
+import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 import {
     GRANULARITY,
     GROUP_BY,
@@ -184,7 +184,7 @@ const tableState = reactive({
 /* util */
 const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
     const queryHelper = new QueryHelper();
-    const query: CloudServicePageUrlQuery = {};
+    const query: CloudServiceMainPageUrlQuery = {};
     if (item.region_code) {
         query.region = arrayToQueryString([item.region_code]);
     } else if (costAnalysisPageState.filters?.region_code?.length) {

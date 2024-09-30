@@ -38,7 +38,7 @@ import {
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type {
     CloudServiceDetailPageUrlQuery,
-    CloudServicePageUrlQuery,
+    CloudServiceMainPageUrlQuery,
 } from '@/services/asset-inventory/types/cloud-service-page-type';
 import ProjectSummaryAllSummaryWidgetRegionService
     from '@/services/project/components/ProjectSummaryAllSummaryWidgetRegionService.vue';
@@ -187,7 +187,7 @@ const drawChart = () => {
     state.chart = chart;
 };
 const getLocation = (type: ServiceCategory) => {
-    const query: CloudServicePageUrlQuery = {
+    const query: CloudServiceMainPageUrlQuery = {
         project: arrayToQueryString([props.projectId]),
     };
     if (type !== SERVICE_CATEGORY.ALL) {

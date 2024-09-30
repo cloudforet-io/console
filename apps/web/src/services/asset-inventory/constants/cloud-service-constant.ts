@@ -1,4 +1,4 @@
-export const CLOUD_SERVICE_PAGE_URL_QUERY_KEY = [
+export const CLOUD_SERVICE_MAIN_PAGE_URL_QUERY_KEY = [
     'provider',
     'service',
     'region',

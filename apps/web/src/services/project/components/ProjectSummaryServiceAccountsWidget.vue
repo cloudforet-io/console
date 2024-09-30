@@ -22,7 +22,7 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CloudServicePageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
+import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 const DATA_TYPE = {
@@ -71,7 +71,7 @@ const state = reactive({
 
 /* Util */
 const getLocation = (type, provider, serviceAccountId) => {
-    const query: CloudServicePageUrlQuery = {
+    const query: CloudServiceMainPageUrlQuery = {
         provider: primitiveToQueryString(provider),
         service: CLOUD_SERVICE_LABEL[type],
         service_account: arrayToQueryString([serviceAccountId]),

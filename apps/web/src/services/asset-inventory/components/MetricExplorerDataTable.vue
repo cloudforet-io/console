@@ -38,7 +38,7 @@ import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/me
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 import type {
     CloudServiceDetailPageUrlQuery,
-    CloudServicePageUrlQuery,
+    CloudServiceMainPageUrlQuery,
 } from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
@@ -222,7 +222,7 @@ const handleClickRow = (item) => {
 
     let _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME;
     let _params = {};
-    const _query: CloudServicePageUrlQuery|CloudServiceDetailPageUrlQuery = {
+    const _query: CloudServiceMainPageUrlQuery|CloudServiceDetailPageUrlQuery = {
         filters: queryHelper.setFilters(_filters).rawQueryStrings,
     };
 
