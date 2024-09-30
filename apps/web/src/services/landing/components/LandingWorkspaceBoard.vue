@@ -100,6 +100,7 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                                        ignore-outside-click
                                        trigger="click"
                                        position="top"
+                                       boundary="body"
                                        class="dormant-popover"
                             >
                                 <p-status v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"

@@ -88,6 +88,7 @@ watch(() => route.params, async () => {
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
                            trigger="click"
+                           boundary=".metric-explorer-query-section"
                            width="100%"
                            class="filters-popover"
                 >
@@ -135,12 +136,14 @@ watch(() => route.params, async () => {
 .metric-explorer-query-section {
     margin-top: 1.5rem;
     .filter-wrapper {
-        @apply relative flex items-center justify-between;
+        @apply relative flex justify-between;
+        align-items: flex-start;
         font-size: 0.875rem;
         .left-part {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
         .right-part {
             display: flex;

@@ -45,6 +45,7 @@ const Template: Story = {
                            :hide-padding="hidePadding"
                            :hide-close-button="hideCloseButton"
                            :hide-arrow="hideArrow"
+                           :boundary="boundary"
                            :width="width"
                 >
                     <div v-if="defaultSlot" v-html="defaultSlot" />
@@ -215,14 +216,14 @@ export const HideArrow: Story = {
     }),
 };
 
-export const Width: Story = {
+export const BoundaryAndWidth: Story = {
     render: () => ({
         components: { PPopover, PButton },
         template: `
             <div class="w-full overflow p-8 flex flex-col gap-4" style="height: 300px;">
                 <div class="border border-blue-500 w-full relative p-4 popover-story-container">
                     <p class="text-2xl my-4">The div(blue bordered) which contains all these contents has <strong>relative</strong> position.</p>
-                    <p-popover width="100%">
+                    <p-popover width="100%" boundary=".popover-story-container">
                         <p-button>click me</p-button>
                         <template #content>
                             <div>

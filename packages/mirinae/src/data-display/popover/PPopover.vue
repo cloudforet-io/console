@@ -2,6 +2,9 @@
     <component :is="tag"
                v-click-outside="handleClickOutside"
                class="p-popover"
+               :style="{
+                   position: boundary ? 'static' : 'relative',
+               }"
                v-on="$listeners"
     >
         <span ref="targetRef"
@@ -40,7 +43,7 @@ import {
 } from 'vue';
 
 import {
-    computePosition, autoUpdate, offset, flip, shift, limitShift, arrow, size,
+    computePosition, autoUpdate, offset, flip, shift, limitShift, arrow, size, detectOverflow,
 } from '@floating-ui/dom';
 import vClickOutside from 'v-click-outside';
 
@@ -58,6 +61,7 @@ interface PopoverProps {
     hidePadding?: boolean;
     hideCloseButton?: boolean;
     hideArrow?: boolean;
+    boundary?: string;
     width?: string;
 }
 
@@ -124,6 +128,10 @@ export default defineComponent<PopoverProps>({
         hideArrow: {
             type: Boolean,
             default: false,
+        },
+        boundary: {
+            type: String,
+            default: '',
         },
         width: {
             type: String,
@@ -199,8 +207,6 @@ export default defineComponent<PopoverProps>({
                         placement: props.position,
                         middleware: [
                             offset(props.hideArrow ? 1 : 11),
-                            shift({ limiter: limitShift() }),
-                            flip(),
                             size({
                                 apply({ rects, elements }) {
                                     Object.assign(elements.floating.style, {
@@ -208,15 +214,31 @@ export default defineComponent<PopoverProps>({
                                     });
                                 },
                             }),
+                            props.boundary ? {
+                                name: 'overflow',
+                                async fn(_state) {
+                                    const boundaryEl = floatingEl.closest(props.boundary as string);
+                                    if (boundaryEl) {
+                                        await detectOverflow(_state, {
+                                            boundary: boundaryEl,
+                                        });
+                                    }
+
+                                    return {};
+                                },
+                            } : undefined,
+                            flip(),
+                            shift({ limiter: limitShift() }),
                             (arrowEl ? arrow({ element: arrowEl }) : undefined),
                         ],
                     }).then(({
                         placement, x, y, middlewareData,
                     }) => {
-                        Object.assign(floatingEl.style, {
+                        const style: Partial<CSSStyleDeclaration> = {
                             left: `${x}px`,
                             top: `${y}px`,
-                        });
+                        };
+                        Object.assign(floatingEl.style, style);
                         const side = placement.split('-')[0]; //  bottom-end -> bottom
 
                         const staticSide = ARROW_STATIC_SIDES[side] ?? '';
@@ -265,7 +287,7 @@ export default defineComponent<PopoverProps>({
 <style lang="postcss">
 .p-popover {
     > .target {
-        @apply inline-block;
+        @apply inline-flex;
     }
     > .floating {
         @apply bg-white border rounded-md border-gray-300;

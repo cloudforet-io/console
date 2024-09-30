@@ -12,6 +12,7 @@ export const getPopoverArgs = (): Args => ({
     hidePadding: false,
     hideCloseButton: false,
     hideArrow: false,
+    boundary: '',
     width: '',
     'v-model': false,
     defaultSlot: null,
@@ -167,10 +168,25 @@ export const getPopoverArgTypes = (): ArgTypes => {
             },
             control: 'boolean',
         },
+        boundary: {
+            name: 'boundary',
+            type: { name: 'string' },
+            description: 'Boundary selector. It is used to prevent the popover from overflowing the boundary. To use with `width` props, set`position` to `relative` to the boundary element.',
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: false,
+                },
+            },
+            control: 'text',
+        },
         width: {
             name: 'width',
             type: { name: 'string' },
-            description: 'Width of the popover.',
+            description: 'Width of the popover. If you set the value to `100%`, it would be calculated based on the width of the root element or the boundary element(when `boundary` props is set).',
             table: {
                 type: {
                     summary: 'string',

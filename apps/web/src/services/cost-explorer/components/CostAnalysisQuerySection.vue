@@ -148,6 +148,7 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
                            trigger="click"
+                           boundary=".cost-analysis-query-section"
                            width="100%"
                            class="filters-popover"
                 >

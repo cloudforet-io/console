@@ -299,6 +299,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                    position="right"
                    ignore-outside-click
                    ignore-target-click
+                   boundary=".metric-explorer-l-s-b"
                    :trigger="POPOVER_TRIGGER.NONE"
                    :style="{ left: `${lsbWidth}px`}"
         >
