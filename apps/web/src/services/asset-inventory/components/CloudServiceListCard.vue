@@ -24,6 +24,7 @@ import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
+import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { Period } from '@/services/asset-inventory/types/type';
 
 import type { CloudServiceAnalyzeResult, CloudServiceAnalyzeResultResource } from '../types/cloud-service-card-type';
@@ -86,6 +87,12 @@ const getCloudServiceDetailLink = (item: CloudServiceAnalyzeResult, resource?: C
         'service_code',
     ].includes(f.k)));
 
+    const query: CloudServiceDetailPageUrlQuery = {
+        project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
+        service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
+        filters: cloudServiceDetailQueryHelper.rawQueryStrings,
+        period: objectToQueryString(cloudServicePageState.period),
+    };
     const res: Location = getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
         params: {
@@ -93,12 +100,7 @@ const getCloudServiceDetailLink = (item: CloudServiceAnalyzeResult, resource?: C
             group: item.cloud_service_group,
             name: targetCloudServiceType.cloud_service_type,
         },
-        query: {
-            project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
-            service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
-            filters: cloudServiceDetailQueryHelper.rawQueryStrings,
-            period: objectToQueryString(cloudServicePageState.period),
-        },
+        query,
     });
     return res;
 };

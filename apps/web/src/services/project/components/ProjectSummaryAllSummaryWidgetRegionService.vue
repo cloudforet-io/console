@@ -9,7 +9,6 @@ import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
 import { range, orderBy, isEmpty } from 'lodash';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PSkeleton, PDataLoader,
@@ -29,6 +28,7 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 interface Data {
@@ -48,7 +48,6 @@ const props = withDefaults(defineProps<Props>(), {
 const allReferenceStore = useAllReferenceStore();
 
 const chartContext = ref<HTMLElement|null>(null);
-const queryHelper = new QueryHelper();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -94,21 +93,16 @@ const state = reactive({
 
 /* Util */
 const getLocation = (provider: string, region: string, projectId: string, label: string) => {
-    const query: Location['query'] = {
+    const query: CloudServiceMainPageUrlQuery = {
         provider: primitiveToQueryString(provider),
         region: arrayToQueryString([region]),
+        project: arrayToQueryString([projectId]),
     };
     if (label !== 'All') query.service = arrayToQueryString([label]);
 
-    // set filters
-    queryHelper.setFilters([{ k: 'project_id', o: '=', v: projectId }]);
-
     const location: Location = {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-        query: {
-            filters: queryHelper.rawQueryStrings,
-            ...query,
-        },
+        query,
     };
     return location;
 };

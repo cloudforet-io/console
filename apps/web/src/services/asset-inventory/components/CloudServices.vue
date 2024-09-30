@@ -107,8 +107,6 @@ import { computed, reactive, toRefs } from 'vue';
 
 import { range } from 'lodash';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -118,12 +116,17 @@ import {
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { arrayToQueryString } from '@/lib/router-query-string';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type {
+    CloudServiceDetailPageUrlQuery,
+    CloudServiceMainPageUrlQuery,
+} from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 interface Value {
@@ -161,8 +164,6 @@ export default {
         },
     },
     setup(props) {
-        const queryHelper = new QueryHelper();
-
         const userWorkspaceStore = useUserWorkspaceStore();
         const storeState = reactive({
             currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -179,45 +180,31 @@ export default {
                 href: string;
             }>,
             cloudServiceTypeLink: computed(() => {
-                const filters: ConsoleFilter[] = [];
-                if (props.projectId) filters.push({ k: 'project_id', o: '=', v: props.projectId });
+                const query: CloudServiceMainPageUrlQuery = {};
+                if (props.projectId) {
+                    query.project = arrayToQueryString([props.projectId]);
+                }
                 return {
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-                    query: {
-                        filters: queryHelper.setFilters(filters).rawQueryStrings,
-                    },
+                    query,
                 };
             }),
         });
 
         const getLink = (data, projectId?) => {
-            let link;
-            if (!projectId) {
-                link = {
-                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                    params: {
-                        provider: data.provider,
-                        group: data.cloud_service_group,
-                        name: data.cloud_service_type,
-                    },
-                };
-            }
+            const query: CloudServiceDetailPageUrlQuery = {};
             if (projectId) {
-                link = {
-                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                    params: {
-                        provider: data.provider,
-                        group: data.cloud_service_group,
-                        name: data.cloud_service_type,
-                    },
-                    query: {
-                        filters: queryHelper.setFilters([
-                            { k: 'project_id', v: projectId, o: '=' },
-                        ]).rawQueryStrings,
-                    },
-                };
+                query.project = arrayToQueryString([projectId]);
             }
-            return link;
+            return {
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                params: {
+                    provider: data.provider,
+                    group: data.cloud_service_group,
+                    name: data.cloud_service_type,
+                },
+                query,
+            };
         };
         const projectApiQuery = new ApiQueryHelper();
         const getDataInProject = async () => {
