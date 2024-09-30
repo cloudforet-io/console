@@ -3781,7 +3781,7 @@
 			"TITLE": "マルチクラウド資産を管理コンソールに{domain_icon} すべて集めて表示し、効率性と生産性を{boost_icon}向上させましょう。",
 			"WELCOME_TITLE": "クラウド管理コンソールへようこそ！"
 		},
-		"DONE": "",
+		"DONE": "完了",
 		"DORMANT_WORKSPACE": "休止ワークスペース",
 		"DORMANT_WORKSPACE_POPOVER": "このワークスペースは{date}に管理者が設定した閾値よりもコストが低いため、休止状態に切り替えられました。",
 		"DORMANT_WORKSPACE_POPOVER_ADMIN": "{name}で発生した費用が閾値を下回ったため、{date}に休止状態に移行されました。",

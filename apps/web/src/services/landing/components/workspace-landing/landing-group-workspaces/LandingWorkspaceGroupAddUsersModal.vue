@@ -310,6 +310,9 @@ watch(() => userDropdownState.searchText, debounce(async () => {
 /* custom design-system component - p-button-modal */
 :deep() {
     .modal-content {
+        .close-button {
+            position: static;
+        }
         .header {
             .modal-header {
                 word-break: break-all;
