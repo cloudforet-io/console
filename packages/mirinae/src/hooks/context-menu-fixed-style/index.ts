@@ -1,30 +1,31 @@
 import {
-    computed, nextTick, onMounted, onUnmounted, reactive, ref, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 import type { Ref } from 'vue';
 import type Vue from 'vue';
 
-import type { ResizeObserverEntry } from '@juggle/resize-observer';
-import { ResizeObserver } from '@juggle/resize-observer';
+import {
+    computePosition, autoUpdate, offset, flip, size, hide, shift,
+} from '@floating-ui/dom';
 import { throttle } from 'lodash';
 
 interface UseContextMenuFixedStyleOptions {
     useFixedMenuStyle?: Ref<boolean|undefined> | boolean;
-    visibleMenu: Ref<boolean|undefined>;
-    targetRef?: Ref<Vue|HTMLElement|null>;
-    position?: 'left' | 'right';
-    menuRef?: Ref<Vue|HTMLElement|null>;
-    multiSelectable?: Ref<boolean|undefined>|boolean;
-    parentId?: Ref<string|undefined>|string;
+    visibleMenu?: Ref<boolean|undefined>;
+    targetRef: Ref<Vue|HTMLElement|null>;
+    menuRef: Ref<Vue|HTMLElement|null>;
+    position?: Ref<'left'|'right'>;
+    boundary?: Ref<string|undefined>|string;
 }
 
-export const useContextMenuFixedStyle = ({
-    useFixedMenuStyle, visibleMenu, targetRef, position, menuRef, multiSelectable, parentId,
+export const useContextMenuStyle = ({
+    useFixedMenuStyle, visibleMenu, targetRef, menuRef, position, boundary,
 }: UseContextMenuFixedStyleOptions) => {
     const state = reactive({
         useFixedMenuStyle: useFixedMenuStyle ?? false,
-        multiSelectable: multiSelectable ?? false,
         visibleMenu,
+        position,
+        boundary: boundary ?? undefined,
     });
 
     const contextMenuFixedStyleState = reactive({
@@ -32,138 +33,98 @@ export const useContextMenuFixedStyle = ({
         targetElement: computed<Element|null>(() => (contextMenuFixedStyleState.targetRef as Vue)?.$el ?? contextMenuFixedStyleState.targetRef),
         menuRef: menuRef ?? null,
         menuElement: computed<Element|null>(() => (contextMenuFixedStyleState.menuRef as Vue)?.$el ?? contextMenuFixedStyleState.menuRef),
-        menuTitleElement: computed<Element|null>(() => contextMenuFixedStyleState.menuElement?.getElementsByClassName('context-menu-title-wrapper')[0] ?? null),
         contextMenuStyle: {} as Partial<CSSStyleDeclaration>,
-        parentId: parentId ?? undefined,
     });
 
     const hideMenu = throttle(() => {
-        if (state.visibleMenu) state.visibleMenu = false;
+        if (state.visibleMenu) {
+            state.visibleMenu = false;
+        }
     }, 300);
 
-    const setStyleOfContextMenu = (targetElement: Element, menuElement?:Element) => {
-        const targetRects: DOMRect = targetElement.getBoundingClientRect();
-        const menuTitleRects: DOMRect|undefined = menuElement?.getBoundingClientRect();
 
-        let menuHeaderHeight = 0;
-        if (menuTitleRects) {
-            menuHeaderHeight = menuTitleRects.height;
-        }
-        const contextMenuStyle: Partial<CSSStyleDeclaration> = {
-            // overflowY: 'auto',
-            position: 'absolute',
-            height: 'auto',
-            minHeight: '32px',
+    let cleanup: (() => void)|undefined;
+    const PAD = 12;
+    const MIN_HEIGHT = 72;
+    const setStyleOfContextMenu = (referenceEl: HTMLElement, floatingEl: HTMLElement) => {
+        const setPosition = (isFixed = false) => {
+            computePosition(referenceEl, floatingEl, {
+                placement: `bottom-${state.position === 'left' ? 'start' : 'end'}`,
+                middleware: [
+                    offset(1),
+                    size({
+                        apply({ rects, elements, availableHeight: floatingAvailableHeight }) {
+                            let availableHeight = floatingAvailableHeight - PAD;
+                            const style: Partial<CSSStyleDeclaration> = {
+                                minWidth: `${rects.reference.width}px`,
+                                maxHeight: availableHeight >= elements.floating.scrollHeight ? '' : `${availableHeight}px`,
+                            };
+
+                            // apply min-height if the content is taller than the available space.
+                            // this is to prevent the content from being too small and prevent flipping too early.
+                            if (availableHeight < MIN_HEIGHT && elements.floating.scrollHeight >= availableHeight) {
+                                style.minHeight = `${MIN_HEIGHT}px`;
+                            }
+                            Object.assign(elements.floating.style, style);
+                            // apply the same style to the state
+                            contextMenuFixedStyleState.contextMenuStyle = {
+                                ...contextMenuFixedStyleState.contextMenuStyle,
+                                ...style,
+                            };
+
+                            // adjust the max-height of the content area based on the header height
+                            const headerEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .context-menu-title-wrapper');
+                            if (headerEl) {
+                                const contentEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .menu-container');
+                                if (contentEl) {
+                                    availableHeight -= headerEl.clientHeight;
+                                    contentEl.style.maxHeight = availableHeight >= contentEl.scrollHeight ? '' : `${availableHeight}px`;
+                                }
+                            }
+                        },
+                    }),
+                    flip({
+                        flipAlignment: false,
+                        fallbackStrategy: 'initialPlacement',
+                        crossAxis: false,
+                    }),
+                    shift(),
+                    (isFixed ? hide({ padding: 5 }) : undefined),
+                ],
+            }).then(({
+                x, y, middlewareData,
+            }) => {
+                const style = {
+                    left: `${x}px`,
+                    top: `${y}px`,
+                    position: isFixed ? 'fixed' : 'absolute',
+                };
+                Object.assign(floatingEl.style, style);
+                // apply the same style to the state
+                contextMenuFixedStyleState.contextMenuStyle = {
+                    ...contextMenuFixedStyleState.contextMenuStyle,
+                    ...style,
+                };
+                if (middlewareData.hide?.referenceHidden) hideMenu();
+            });
         };
-
         if (state.useFixedMenuStyle) {
-            contextMenuStyle.position = 'fixed';
-            contextMenuStyle.width = 'auto';
-            contextMenuStyle.minWidth = `${targetRects.width}px`;
-            contextMenuStyle.maxWidth = '100%';
-        }
-
-        if (window.innerHeight * 0.9 > targetRects.bottom + menuHeaderHeight) {
-            const height = window.innerHeight - targetRects.bottom - 12;
-            contextMenuStyle.maxHeight = `${height < 0 ? 0 : height}px`;
-            if (state.useFixedMenuStyle) contextMenuStyle.top = `${targetRects.bottom}px`;
-            else contextMenuStyle.top = `${targetRects.height}px`;
+            cleanup = autoUpdate(referenceEl, floatingEl, () => {
+                setPosition(true);
+            }, { animationFrame: true });
         } else {
-            const height = targetRects.top - 12;
-            contextMenuStyle.maxHeight = `${height < 0 ? 0 : height}px`;
-            if (state.useFixedMenuStyle) contextMenuStyle.bottom = `calc(100vh - ${targetRects.top}px)`;
-            else contextMenuStyle.bottom = `${targetRects.height}px`;
+            setPosition();
         }
-
-        if (state.useFixedMenuStyle) {
-            if (position === 'left') contextMenuStyle.left = `${targetRects.left}px`;
-            else if (position === 'right') contextMenuStyle.right = `${window.innerWidth - targetRects.right}px`;
-        }
-
-        contextMenuFixedStyleState.contextMenuStyle = contextMenuStyle;
     };
 
     watch([() => state.visibleMenu, () => contextMenuFixedStyleState.targetElement, () => contextMenuFixedStyleState.menuElement], async ([_visibleMenu, targetElement, menuElement]) => {
-        if (!_visibleMenu || !targetElement) {
-            contextMenuFixedStyleState.contextMenuStyle = {};
-            return;
-        }
-        if (_visibleMenu && targetElement) {
-            await nextTick(); // Needed codes for timing issues between painting DOM and visibleMenu
-            setStyleOfContextMenu(targetElement, menuElement);
-        }
+        if (_visibleMenu && menuElement && targetElement) {
+            setStyleOfContextMenu(targetElement as HTMLElement, menuElement as HTMLElement);
+        } else if (cleanup) cleanup();
     }, { immediate: true });
 
-    const handleWindowResize = () => {
-        if (state.useFixedMenuStyle) hideMenu();
-    };
-    onMounted(() => {
-        window.addEventListener('resize', handleWindowResize);
-    });
-
     onUnmounted(() => {
-        window.removeEventListener('resize', handleWindowResize);
-    });
-
-    const targetObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-        entries.forEach((entry) => {
-            setStyleOfContextMenu(entry.target);
-        });
-    });
-    const menuObserver = new ResizeObserver((entries) => {
-        entries.forEach((entry) => {
-            setStyleOfContextMenu(contextMenuFixedStyleState.targetElement, entry.target);
-        });
-    });
-
-    onMounted(() => {
-        targetObserver.observe(contextMenuFixedStyleState.targetElement);
-        if (contextMenuFixedStyleState.menuTitleElement) menuObserver.observe(contextMenuFixedStyleState.menuTitleElement);
-    });
-
-    const prevX = ref(0);
-    const prevY = ref(0);
-    const parentElement = ref<HTMLElement|null>(null);
-
-    const observeElementChanges = () => {
-        if (!state.useFixedMenuStyle) return;
-
-        if (!contextMenuFixedStyleState.targetElement) return;
-
-        const { x, y, height } = contextMenuFixedStyleState.targetElement.getBoundingClientRect();
-
-        if (x !== prevX.value || y !== prevY.value) {
-            if (!state.multiSelectable) {
-                hideMenu();
-            } else {
-                if (!contextMenuFixedStyleState.menuElement) return;
-                contextMenuFixedStyleState.menuElement.style.top = `${y + height}px`;
-                contextMenuFixedStyleState.menuElement.style.left = `${x}px`;
-                if (parentElement.value) {
-                    const { y: parentY, bottom } = parentElement.value.getBoundingClientRect();
-                    /*
-                        To address the issue of the menu persistently showing when there is an upper layer of the select-dropdown,
-                        this code is written to close the menu when the select-dropdown is hidden behind an upper layer.
-                    */
-                    if ((parentY > y) || (bottom - height < y)) {
-                        hideMenu();
-                    }
-                }
-            }
-        }
-
-        prevX.value = x;
-        prevY.value = y;
-
-        requestAnimationFrame(observeElementChanges);
-    };
-
-    onMounted(() => {
-        observeElementChanges();
-    });
-    onMounted(() => {
-        if (!contextMenuFixedStyleState.parentId) return;
-        parentElement.value = document.getElementById(contextMenuFixedStyleState.parentId);
+        if (cleanup) cleanup();
     });
 
     return {
