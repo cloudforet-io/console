@@ -1917,6 +1917,7 @@
 			"ALT_E_UPDATE_DASHBOARD": "대시보드 편집 실패",
 			"CANCEL": "취소",
 			"ENTER_NEW_LABEL": "레이블 입력",
+			"NO_LABEL": "라벨 없음",
 			"REFRESH_INTERVAL_10M": "10분",
 			"REFRESH_INTERVAL_15S": "15초",
 			"REFRESH_INTERVAL_1H": "1시간",

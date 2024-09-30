@@ -1917,6 +1917,7 @@
 			"ALT_E_UPDATE_DASHBOARD": "ダッシュボード更新に失敗しました。",
 			"CANCEL": "キャンセル",
 			"ENTER_NEW_LABEL": "ラベル入力",
+			"NO_LABEL": "ラベルなし",
 			"REFRESH_INTERVAL_10M": "10分",
 			"REFRESH_INTERVAL_15S": "15秒",
 			"REFRESH_INTERVAL_1H": "1時間",
