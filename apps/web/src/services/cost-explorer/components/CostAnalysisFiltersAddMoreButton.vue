@@ -169,6 +169,7 @@ watch(() => state.dataSourceId, async (dataSourceId) => {
     vertical-align: middle;
     .add-more-context-menu {
         min-width: 10rem;
+        width: max-content;
     }
 }
 </style>
