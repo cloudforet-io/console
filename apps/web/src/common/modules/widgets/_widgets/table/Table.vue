@@ -6,8 +6,8 @@ import {
 import { flatMap, map, uniq } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { CancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
+import type { CancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { PPagination } from '@cloudforet/mirinae';
 
