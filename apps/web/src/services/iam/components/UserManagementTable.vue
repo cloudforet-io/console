@@ -239,10 +239,7 @@ const handleRemoveButton = async () => {
     }
 };
 
-const isWorkspaceGroupUser = (item: ExtendUserListItemType) => {
-    console.log(item);
-    return !!item?.role_binding_info?.workspace_group_id;
-};
+const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_binding_info?.workspace_group_id;
 </script>
 
 <template>
@@ -282,7 +279,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => {
                      class="role-type-wrapper"
                 >
                     <img :src="useRoleFormatter(userPageGetters.roleMap[value]?.role_type || ROLE_TYPE.USER).image"
-                         alt="role-type-icon"
+                         alt="Role Type Icon"
                          class="role-type-icon"
                     >
                     <span class="pr-4">{{ userPageGetters.roleMap[value]?.name ?? '' }}</span>
@@ -308,7 +305,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => {
                                        class="tooltip"
                             >
                                 <img :src="useRoleFormatter(value?.type).image"
-                                     alt="role-type-icon"
+                                     alt="Role Type Icon"
                                      class="role-type-icon"
                                 >
                             </p-tooltip>
@@ -317,7 +314,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => {
                         <template #menu-item--format="{item}">
                             <div class="role-menu-item">
                                 <img :src="useRoleFormatter(item.role_type).image"
-                                     alt="role-type-icon"
+                                     alt="Role Type Icon"
                                      class="role-type-icon"
                                 >
                                 <p-tooltip position="bottom"
@@ -338,7 +335,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => {
                                    class="tooltip"
                         >
                             <img :src="useRoleFormatter(value?.type).image"
-                                 alt="role-type-icon"
+                                 alt="Role Type Icon"
                                  class="role-type-icon"
                             >
                         </p-tooltip>{{ value.name }}
