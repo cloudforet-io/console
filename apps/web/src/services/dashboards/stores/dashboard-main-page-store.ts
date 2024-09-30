@@ -205,7 +205,6 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
                     dashboardApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
                 } else {
                     dashboardApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
-                    dashboardApiQueryHelper.addFilter({ k: 'project_id', v: '*', o: '!=' });
                 }
             }
             const response = await fetcher({
@@ -217,6 +216,9 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
             const results = response.results || [];
             if (dashboardType === 'PRIVATE') {
                 state.privateDashboardList = results as PrivateDashboardModel[];
+            } else if (!storeState.isAdminMode) {
+                // filter shared project dashboards by admin
+                state.publicDashboardList = results.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
             } else {
                 state.publicDashboardList = results as PublicDashboardModel[];
             }
@@ -229,21 +231,32 @@ export const useDashboardMainPageStore = defineStore('page-dashboard-main', () =
             }
         }
     };
+    const folderApiQueryHelper = new ApiQueryHelper();
     const fetchFolder = async (folderType: 'PUBLIC'|'PRIVATE') => {
         const fetcher = folderType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateFolder.list
             : SpaceConnector.clientV2.dashboard.publicFolder.list;
         try {
+            if (folderType === 'PUBLIC') {
+                if (storeState.isAdminMode) {
+                    folderApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
+                } else {
+                    folderApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
+                }
+            }
             const res: ListResponse<FolderModel> = await fetcher({
                 query: {
+                    ...folderApiQueryHelper.data,
                     sort: [{ key: 'created_at', desc: true }],
                 },
             });
             const results = res.results || [];
             if (folderType === 'PRIVATE') {
-                state.privateFolderList = results as PrivateFolderModel[];
+                state.privateFolderList = results;
+            } else if (!storeState.isAdminMode) {
+                state.publicFolderList = results.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
             } else {
-                state.publicFolderList = results as PublicFolderModel[];
+                state.publicFolderList = results;
             }
         } catch (e) {
             ErrorHandler.handleError(e);

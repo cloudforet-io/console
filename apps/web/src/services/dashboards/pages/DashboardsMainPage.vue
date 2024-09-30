@@ -76,7 +76,7 @@ const state = reactive({
     }),
     isDashboardExist: computed<boolean>(() => {
         if (state.isAdminMode) {
-            return !!dashboardMainPageState.publicDashboardList.length && !!dashboardMainPageState.publicFolderList.length;
+            return !!dashboardMainPageState.publicDashboardList.length || !!dashboardMainPageState.publicFolderList.length;
         }
         return !!(
             dashboardMainPageState.publicDashboardList.length
