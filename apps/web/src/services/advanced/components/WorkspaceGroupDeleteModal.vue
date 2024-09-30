@@ -6,6 +6,9 @@ import { PButtonModal, PI } from '@cloudforet/mirinae';
 
 import type { WorkspaceGroupDeleteParameters } from '@/schema/identity/workspace-group/api-verbs/delete';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -32,8 +35,10 @@ const deleteWorkspaceGroups = async () => {
         await SpaceConnector.clientV2.identity.workspaceGroup.delete<WorkspaceGroupDeleteParameters, WorkspaceGroupModel>({
             workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
         });
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_REMOVE_WORKSPACE_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_E_REMOVE_WORKSPACE_GROUP'));
     } finally {
         state.loading = false;
     }
