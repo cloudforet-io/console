@@ -238,6 +238,11 @@ const handleRemoveButton = async () => {
         modalState.loading = false;
     }
 };
+
+const isWorkspaceGroupUser = (item: ExtendUserListItemType) => {
+    console.log(item);
+    return !!item?.role_binding_info?.workspace_group_id;
+};
 </script>
 
 <template>
@@ -283,17 +288,8 @@ const handleRemoveButton = async () => {
                     <span class="pr-4">{{ userPageGetters.roleMap[value]?.name ?? '' }}</span>
                 </div>
             </template>
-            <template #col-role_binding-format="{value, rowIndex}">
+            <template #col-role_binding-format="{value, rowIndex, item:fieldItem}">
                 <div class="role-type-wrapper">
-                    <p-tooltip position="bottom"
-                               :contents="useRoleFormatter(value?.type).name"
-                               class="tooltip"
-                    >
-                        <img :src="useRoleFormatter(value?.type).image"
-                             alt="role-type-icon"
-                             class="role-type-icon"
-                        >
-                    </p-tooltip>
                     <p-select-dropdown v-if="userPageGetters.isWorkspaceOwner && state.refinedUserItems[rowIndex].user_id !== storeState.loginUserId"
                                        is-filterable
                                        use-fixed-menu-style
@@ -302,11 +298,20 @@ const handleRemoveButton = async () => {
                                        :loading="dropdownState.loading"
                                        :search-text.sync="dropdownState.searchText"
                                        :handler="dropdownMenuHandler"
-                                       :disabled="!props.hasReadWriteAccess"
+                                       :disabled="!props.hasReadWriteAccess || isWorkspaceGroupUser(fieldItem)"
                                        class="role-select-dropdown"
                                        @select="handleSelectDropdownItem($event, rowIndex)"
                     >
                         <template #dropdown-button>
+                            <p-tooltip position="bottom"
+                                       :contents="useRoleFormatter(value?.type).name"
+                                       class="tooltip"
+                            >
+                                <img :src="useRoleFormatter(value?.type).image"
+                                     alt="role-type-icon"
+                                     class="role-type-icon"
+                                >
+                            </p-tooltip>
                             <span>{{ value.name }}</span>
                         </template>
                         <template #menu-item--format="{item}">
@@ -325,7 +330,19 @@ const handleRemoveButton = async () => {
                             </div>
                         </template>
                     </p-select-dropdown>
-                    <span v-else>{{ value.name }}</span>
+                    <div v-else
+                         class="flex gap-1"
+                    >
+                        <p-tooltip position="bottom"
+                                   :contents="useRoleFormatter(value?.type).name"
+                                   class="tooltip"
+                        >
+                            <img :src="useRoleFormatter(value?.type).image"
+                                 alt="role-type-icon"
+                                 class="role-type-icon"
+                            >
+                        </p-tooltip>{{ value.name }}
+                    </div>
                 </div>
             </template>
             <template #col-mfa_state-format="{value}">
@@ -364,7 +381,7 @@ const handleRemoveButton = async () => {
                 </template>
             </template>
             <template #col-remove_button-format="{item}">
-                <p-button v-if="!item?.role_binding_info?.workspace_group_id"
+                <p-button v-if="!isWorkspaceGroupUser(item)"
                           style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
@@ -390,14 +407,14 @@ const handleRemoveButton = async () => {
         gap: 0.25rem;
         .tooltip {
             @apply rounded-full;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1rem;
+            height: 1rem;
             margin-right: 0.25rem;
         }
         .role-type-icon {
             @apply rounded-full;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1rem;
+            height: 1rem;
         }
         .role-select-dropdown {
             width: auto;
