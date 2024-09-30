@@ -8,6 +8,7 @@ import {
     PIconButton,
 } from '@cloudforet/mirinae';
 
+import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -61,9 +62,13 @@ const state = reactive({
     currentPath: computed(() => route.fullPath),
     privateV2DashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems
         .filter((d) => d.version !== '1.0')),
-    publicV2DashboardItems: computed<PublicDashboardModel[]>(() => dashboardState.publicDashboardItems
-        .filter((d) => d.version !== '1.0')
-        .filter((d) => d.project_id !== '*')),
+    publicV2DashboardItems: computed<PublicDashboardModel[]>(() => {
+        const _filteredDashboardItems = dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _filteredDashboardItems;
+        return _filteredDashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
+    }),
+    publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(state.publicV2DashboardItems)),
+    privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(state.privateV2DashboardItems)),
     favoriteItemMap: computed(() => {
         const result: Record<string, FavoriteConfig> = {};
         storeState.favoriteItems?.forEach((d) => {
@@ -72,8 +77,8 @@ const state = reactive({
         return result;
     }),
     starredMenuItems: computed<LSBMenu[]>(() => [
-        ...(storeState.isWorkspaceOwner ? filterStarredItems(state.workspaceV2MenuSet) : []),
-        ...filterStarredItems(state.privateV2MenuSet),
+        ...(storeState.isWorkspaceOwner ? filterStarredItems(state.publicV2DashboardMenuSet) : []),
+        ...filterStarredItems(state.privateV2DashboardMenuSet),
     ]),
     domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainDashboardItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
@@ -193,6 +198,18 @@ const state = reactive({
     }),
 });
 
+/* Util */
+const getDashboardMenuSet = (dashboardList: DashboardModel[]) => dashboardList?.map((d) => ({
+    type: MENU_ITEM_TYPE.ITEM,
+    id: d.dashboard_id,
+    label: d.name,
+    to: getProperRouteLocation({
+        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+        params: {
+            dashboardId: d.dashboard_id,
+        },
+    }),
+})) || [];
 const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
     const result = [] as LSBMenu[];
     menuItems.forEach((d) => {

@@ -51,6 +51,7 @@ const {
     },
 });
 const state = reactive({
+    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
     dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType)),
 });
@@ -67,10 +68,12 @@ const updateDashboard = async () => {
 };
 
 const handleConfirm = async () => {
+    state.loading = true;
     await updateDashboard();
     dashboardDetailStore.setName(_name.value);
     dashboardDetailStore.setOriginDashboardName(_name.value);
     state.proxyVisible = false;
+    state.loading = false;
 };
 
 const handleUpdateVisible = (visible) => {
@@ -93,14 +96,16 @@ watch(() => props.visible, (visible) => {
     >
         <template #body>
             <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_DASHBOARD_NAME')"
-                           :invalid="invalidState._name"
-                           :invalid-text="invalidTexts._name"
+                           :invalid="!state.loading && invalidState._name"
+                           :invalid-text="!state.loading && invalidTexts._name"
                            required
             >
-                <p-text-input :value="_name"
-                              :invalid="invalidState._name"
-                              @update:value="setForm('_name', $event)"
-                />
+                <template #default="{invalid}">
+                    <p-text-input :value="_name"
+                                  :invalid="invalid"
+                                  @update:value="setForm('_name', $event)"
+                    />
+                </template>
             </p-field-group>
         </template>
     </p-button-modal>

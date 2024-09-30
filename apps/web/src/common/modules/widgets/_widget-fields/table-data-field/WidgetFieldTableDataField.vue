@@ -6,7 +6,7 @@ import {
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import dayjs from 'dayjs';
 import {
-    flatMap, isEqual, map, uniq,
+    flatMap, isEqual, map, orderBy, uniq,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -246,12 +246,13 @@ const handleUpdateCount = (value: number) => {
     };
 };
 const handleSelectDynamicFields = (value: MenuItem) => {
+    const _orderedFixedValue = orderBy(state.proxyValue.dynamicFieldInfo?.fixedValue);
     if (state.proxyValue.dynamicFieldInfo?.fixedValue.includes(value.name)) {
         state.proxyValue = {
             ...state.proxyValue,
             dynamicFieldInfo: {
                 ...state.proxyValue.dynamicFieldInfo,
-                fixedValue: [...(state.proxyValue.dynamicFieldInfo?.fixedValue ?? []).filter((d) => d !== value.name)],
+                fixedValue: [...(_orderedFixedValue ?? []).filter((d) => d !== value.name)],
             },
         };
         return;
@@ -261,7 +262,7 @@ const handleSelectDynamicFields = (value: MenuItem) => {
         dynamicFieldInfo: {
             ...state.proxyValue.dynamicFieldInfo,
             fixedValue: [
-                ...(state.proxyValue.dynamicFieldInfo?.fixedValue ?? []), value.name,
+                ...(_orderedFixedValue ?? []), value.name,
             ],
         },
     };
@@ -307,7 +308,7 @@ watch(() => state.selectedFieldType, (selectedFieldType) => {
                 criteria: state.dataInfoMenuItems[0]?.name,
                 fieldValue: props.value?.dynamicFieldInfo?.fieldValue ?? state.menuItems[DEFAULT_INDEX]?.name,
                 valueType: props.value?.fieldType === 'dynamicField' ? props.value.dynamicFieldInfo?.valueType : undefined,
-                fixedValue: props.value?.fieldType === 'dynamicField' && props.value.dynamicFieldInfo?.valueType === 'fixed' ? (props.value?.dynamicFieldInfo?.fixedValue ?? []) : undefined,
+                fixedValue: (props.value?.fieldType === 'dynamicField' && props.value.dynamicFieldInfo?.valueType === 'fixed') ? (orderBy(props.value?.dynamicFieldInfo?.fixedValue)) : undefined,
                 count: props.value?.fieldType === 'dynamicField' && props.value.dynamicFieldInfo?.valueType === 'auto' ? props.value?.dynamicFieldInfo?.count : undefined,
             },
         };
@@ -335,7 +336,7 @@ const initValue = () => {
                 criteria: props.value?.dynamicFieldInfo?.criteria,
                 fieldValue: props.value?.dynamicFieldInfo?.fieldValue,
                 valueType: props.value?.dynamicFieldInfo?.valueType ?? DEFAULT_VALUE_TYPE,
-                fixedValue: props.value?.dynamicFieldInfo?.valueType === 'auto' ? undefined : props.value?.dynamicFieldInfo?.fixedValue,
+                fixedValue: props.value?.dynamicFieldInfo?.valueType === 'auto' ? undefined : orderBy(props.value?.dynamicFieldInfo?.fixedValue),
                 ...(props.value?.dynamicFieldInfo?.valueType === 'auto' && { count: props.value?.dynamicFieldInfo?.count }),
             },
             version: LATEST_TABLE_DATA_FIELD_VERSION,

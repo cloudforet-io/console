@@ -45,12 +45,11 @@ const handleDeleteDashboardConfirm = async () => {
             type: RECENT_TYPE.DASHBOARD,
             itemId: props.dashboardId,
         });
+        state.loading = false;
+        state.proxyVisible = false;
         await SpaceRouter.router.replace(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
-    } finally {
-        state.loading = false;
-        state.proxyVisible = false;
     }
 };
 </script>

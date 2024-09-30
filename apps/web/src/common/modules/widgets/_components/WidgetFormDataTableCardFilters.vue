@@ -310,14 +310,14 @@ onMounted(() => {
     const initialFilter = storeState.dataTable.options?.filter ?? [];
 
     initialFilter.forEach((filter) => {
-        const selectedFilteritemLabel = state.filterItems.find((d) => d.name === filter.k)?.label;
+        const selectedFilteritem = state.filterItems.find((d) => d.name === filter.k);
         state.selectedItems = [
             ...state.selectedItems,
-            { name: filter.k, label: selectedFilteritemLabel },
+            { name: filter.k, label: selectedFilteritem?.label, presetKeys: selectedFilteritem?.presetKeys },
         ];
         state.selectedItemsMap[filter.k] = {
             ...filter,
-            v: filter.v.map((d) => ({ name: d })),
+            v: filter.v.map((d) => ({ name: d, label: d })),
         };
     });
 });

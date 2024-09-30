@@ -1,5 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse as ApiListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';

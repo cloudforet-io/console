@@ -161,6 +161,7 @@ watch(() => props.dateRange, () => {
                            :selected="state.selectedMonthMenuItem.name"
                            menu-position="left"
                            reset-selection-on-menu-close
+                           use-fixed-menu-style
                            @select="handleSelectMonthMenuItem"
         >
             <template #menu-item--format="{ item }">
