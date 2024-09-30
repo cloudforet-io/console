@@ -277,7 +277,8 @@ const getTotalDataItem = (data: TableDataItem[], type: 'static'|'time_series'|'d
 const getAutoValueTypeTopCountField = (fullPageDataResults: TableDataItem[]): string[] => {
     if (!fullPageDataResults) return [];
     const fullTotalDataItem = getTotalDataItem(fullPageDataResults, 'dynamic');
-    const sortedFullTotalDataValues = fullTotalDataItem[state.tableDataCriteria].sort((a, b) => b.value - a.value);
+    const sortedFullTotalDataValues = fullTotalDataItem[state.tableDataCriteria].sort((a, b) => b.value - a.value)
+        .filter((item) => item[state.tableDataField] !== 'sub_total' && item[state.tableDataField] !== 'etc');
 
     return sortedFullTotalDataValues.map((item) => item[state.tableDataField]).slice(0, state.tableDataDynamicCount);
 };
