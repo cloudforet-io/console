@@ -102,6 +102,7 @@ const state = reactive({
         },
         tooltip: {
             trigger: 'axis',
+            confine: true,
             formatter: (params) => {
                 const _params = params as any[];
                 let _axisValue = getReferenceLabel(props.allReferenceTypeInfo, state.xAxisField, _params[0].axisValue);
