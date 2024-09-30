@@ -38,7 +38,7 @@ const {
     showContextMenu,
     hideContextMenu,
 } = useContextMenuController({
-    useFixedStyle: false,
+    useFixedStyle: true,
     targetRef,
     contextMenuRef,
     menu: props.menu,
@@ -79,7 +79,7 @@ onClickOutside(containerRef, hideContextMenu);
         </span>
         <p-context-menu v-if="visibleContextMenu"
                         ref="contextMenuRef"
-                        class="dropdown-context-menu"
+                        :visible-menu="visibleContextMenu"
                         :menu="props.menu"
                         :selected="state.selectedMenu"
                         @select="handleSelectMenu"
@@ -96,7 +96,7 @@ onClickOutside(containerRef, hideContextMenu);
         margin-right: 0.375rem;
         word-break: break-all;
         .ellipsis {
-            @apply text-label-md text-gray-700 cursor-pointer;
+            @apply text-label-md text-gray-700 cursor-pointer relative;
 
             &:hover {
                 @apply text-gray-900 underline;
@@ -105,12 +105,6 @@ onClickOutside(containerRef, hideContextMenu);
         .arrow-icon {
             @apply text-gray-500;
         }
-    }
-    .dropdown-context-menu {
-        left: -0.625rem;
-        width: 12rem;
-        margin-top: 0.25rem;
-        z-index: 100;
     }
 }
 </style>

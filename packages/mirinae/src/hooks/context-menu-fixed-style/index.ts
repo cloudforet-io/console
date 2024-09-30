@@ -46,6 +46,7 @@ export const useContextMenuStyle = ({
     let cleanup: (() => void)|undefined;
     const PAD = 12;
     const MIN_HEIGHT = 72;
+    const MAX_HEIGHT = 576; // 32rem
     const setStyleOfContextMenu = (referenceEl: HTMLElement, floatingEl: HTMLElement) => {
         const setPosition = (isFixed = false) => {
             computePosition(referenceEl, floatingEl, {
@@ -54,11 +55,16 @@ export const useContextMenuStyle = ({
                     offset(1),
                     size({
                         apply({ rects, elements, availableHeight: floatingAvailableHeight }) {
-                            let availableHeight = floatingAvailableHeight - PAD;
+                            const availableHeight = floatingAvailableHeight - PAD;
                             const style: Partial<CSSStyleDeclaration> = {
                                 minWidth: `${rects.reference.width}px`,
-                                maxHeight: availableHeight >= elements.floating.scrollHeight ? '' : `${availableHeight}px`,
                             };
+
+                            if (availableHeight < MAX_HEIGHT) {
+                                style.maxHeight = `${availableHeight}px`;
+                            } else {
+                                style.maxHeight = `${MAX_HEIGHT}px`;
+                            }
 
                             // apply min-height if the content is taller than the available space.
                             // this is to prevent the content from being too small and prevent flipping too early.
@@ -77,11 +83,12 @@ export const useContextMenuStyle = ({
 
                             // adjust the max-height of the content area based on the header height
                             const headerEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .context-menu-title-wrapper');
-                            if (headerEl) {
-                                const contentEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .menu-container');
-                                if (contentEl) {
-                                    availableHeight -= headerEl.clientHeight;
-                                    contentEl.style.maxHeight = availableHeight >= contentEl.scrollHeight ? '' : `${availableHeight}px`;
+                            const contentEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .menu-container');
+                            if (contentEl && headerEl) { // always exist
+                                if (headerEl.clientHeight > 0) {
+                                    contentEl.style.maxHeight = `${availableHeight - headerEl.clientHeight}px`;
+                                } else {
+                                    contentEl.style.maxHeight = 'inherit';
                                 }
                             }
                         },

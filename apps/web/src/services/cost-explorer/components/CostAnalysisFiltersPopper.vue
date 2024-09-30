@@ -274,15 +274,4 @@ watch(() => props.visible, (visible) => {
         }
     }
 }
-
-/* custom design-system component - p-context-menu */
-:deep(.p-context-menu) {
-    /*
-        CAUTION:
-        When the parent has a specific style attribute called 'transform,' 'fixed' behaves like 'absolute,' causing the context-menu's top position not to work correctly,
-        so it is manually forced to be specified.
-    */
-    top: initial !important;
-    left: initial !important;
-}
 </style>
