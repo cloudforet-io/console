@@ -92,7 +92,7 @@ const createWorkspaceGroup = async (): Promise<string | undefined> => {
         });
 
         if (!selectedItems.value.length) {
-            return undefined;
+            return workspace_group_id;
         }
 
 
