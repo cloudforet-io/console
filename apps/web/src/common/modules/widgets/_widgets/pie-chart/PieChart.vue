@@ -30,7 +30,6 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
-    getApiQueryDateRange,
     getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateRange,
@@ -187,13 +186,12 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
-        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _queryDateRange.start,
-                end: _queryDateRange.end,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
                 group_by: [state.groupByField],
                 fields: {
                     [state.dataField]: {
