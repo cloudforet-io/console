@@ -165,6 +165,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             }
             const res: ListResponse<FolderModel> = await fetcher({
                 query: {
+                    ...folderApiQueryHelper.data,
                     sort: [{ key: 'created_at', desc: true }],
                 },
             });
