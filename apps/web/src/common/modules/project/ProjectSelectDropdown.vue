@@ -233,7 +233,10 @@ const refreshProjectTree = async () => {
 };
 
 const handleClickCreateButton = () => {
-    window.open(SpaceRouter.router.resolve({ name: PROJECT_ROUTE._NAME }).href);
+    window.open(SpaceRouter.router.resolve({
+        name: PROJECT_ROUTE._NAME,
+        ...(props.workspaceId ? { params: { workspaceId: props.workspaceId } } : {}),
+    }).href);
     state.visibleMenu = false;
     handleUpdateVisibleMenu(false);
 };
