@@ -11,8 +11,10 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { DashboardChangeFolderParams } from '@/schema/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -32,10 +34,14 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const dashboardMainPageStore = useDashboardMainPageStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     selectedIdMap: computed<Record<string, boolean>>(() => {
@@ -48,6 +54,11 @@ const state = reactive({
         .filter(([, value]) => value)
         .filter(([key]) => key.includes('dash'))
         .map(([key]) => key)),
+    availableFolderItems: computed<FolderModel[]>(() => {
+        if (dashboardMainPageState.folderModalType === 'PRIVATE') return dashboardState.privateFolderItems;
+        if (storeState.isAdminMode) return dashboardState.publicFolderItems;
+        return dashboardState.publicFolderItems.filter((d) => !(d.shared && d.workspace_id === '*'));
+    }),
     headerTitle: computed<TranslateResult>(() => i18n.t('DASHBOARDS.ALL_DASHBOARDS.MOVE_DASHBOARDS', { count: state.targetDashboardIdList.length })),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
         const defaultItem = {
@@ -55,10 +66,9 @@ const state = reactive({
             name: '',
         };
         if (dashboardMainPageState.folderModalType === 'PUBLIC') {
-            const _targetFolderItems = dashboardState.publicFolderItems.filter((d) => !d.shared);
             return [
                 defaultItem,
-                ..._targetFolderItems.map((folder) => ({
+                ...state.availableFolderItems.map((folder) => ({
                     label: folder.name,
                     name: folder.folder_id,
                 })),
@@ -66,7 +76,7 @@ const state = reactive({
         }
         return [
             defaultItem,
-            ...dashboardState.privateFolderItems.map((folder) => ({
+            ...state.availableFolderItems.map((folder) => ({
                 label: folder.name,
                 name: folder.folder_id,
             })),
