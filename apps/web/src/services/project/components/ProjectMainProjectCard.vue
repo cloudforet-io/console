@@ -61,21 +61,21 @@ const state = reactive({
     toolsetMenuItems: [
         {
             type: 'item',
-            name: 'rename',
-            label: i18n.t('Rename'),
+            name: 'update',
+            label: i18n.t('PROJECT.DETAIL.UPDATE'),
             icon: 'ic_settings',
         },
         {
             type: 'item',
             name: 'move',
-            label: i18n.t('Move'),
+            label: i18n.t('PROJECT.DETAIL.MOVE'),
             icon: 'ic_move',
         },
         { type: 'divider', name: 'divider' },
         {
             type: 'item',
             name: 'delete',
-            label: i18n.t('Delete'),
+            label: i18n.t('PROJECT.DETAIL.DELETE'),
             icon: 'ic_delete',
         },
     ],
@@ -95,7 +95,7 @@ const handleSelectProject = () => {
 
 const handleSelectItem = (selected: MenuItem) => {
     projectPageStore.setCurrentSelectedProjectId(props.item.id);
-    if (selected.name === 'rename') {
+    if (selected.name === 'update') {
         projectPageStore.setProjectFormModalVisible(true);
     }
     if (selected.name === 'move') {

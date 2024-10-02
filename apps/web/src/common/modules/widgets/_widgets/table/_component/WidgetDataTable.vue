@@ -170,7 +170,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
             const referenceValueKey = item[field.name];
             return storeState[referenceKey][referenceValueKey]?.label || storeState[referenceKey][referenceValueKey]?.name || referenceValueKey || '-';
         }
-        if (field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat && item[field.name] !== 'Total') {
+        if (field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat && item[props.fields[0].name] !== 'Total') {
             return getFormattedDate(item[field.name], state.refinedDateFormat);
         }
         return item[field.name] || '-';

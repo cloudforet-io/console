@@ -94,7 +94,6 @@ onClickOutside(labelPopoverRef, () => { state.visible = false; });
                 min-height: 1rem;
                 padding: 0 0.375rem;
                 line-height: unset;
-                border: 1px solid green;
             }
         }
     }
