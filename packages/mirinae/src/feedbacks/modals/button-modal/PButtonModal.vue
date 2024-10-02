@@ -300,10 +300,10 @@ export default defineComponent<ButtonModalProps>({
                 align-items: flex-start;
                 min-height: $header-height;
                 margin-bottom: 0.375rem;
+                word-break: break-word;
 
                 &.alert-header {
                     @apply relative;
-                    word-break: break-word;
                     text-indent: 2rem;
                     .modal-alert {
                         @apply text-red-400;
