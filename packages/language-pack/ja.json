@@ -1759,6 +1759,11 @@
 			"WIDGET_TITLE_REQUIRED": "ウィジェットのタイトルを入力してください。"
 		}
 	},
+	"COMPONENT": {
+		"CONTEXT_MENU": {
+			"BACK": "戻る"
+		}
+	},
 	"COST_EXPLORER": {
 		"ANOMALY_DETECTION": {
 			"NOTIFICATION_RULES": {
