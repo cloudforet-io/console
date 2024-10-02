@@ -36,9 +36,9 @@ const _isControlButtonDisabled = (selectedPublicTreeData: TreeNode<DashboardTree
         if (result) return;
         if (node.data.type === 'FOLDER') {
             node.children?.forEach((child) => {
-                if (child.data.shared) result = true;
+                if (child.data.shared && child.data.workspaceId === '*') result = true;
             });
-        } else if (node.data.shared) result = true;
+        } else if (node.data.shared && node.data.workspaceId === '*') result = true;
     });
     return result;
 };

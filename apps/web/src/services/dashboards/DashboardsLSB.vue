@@ -218,7 +218,14 @@ const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
             if (filtered.length > 0) result.push(...filtered);
         } else if ((d.id && state.favoriteItemMap[d.favoriteOptions?.id || d.id]) && d.type === MENU_ITEM_TYPE.ITEM) result.push(d);
     });
-    return result;
+    const _starredItem = result.map((d) => ({
+        ...d,
+        favoriteOptions: {
+            type: FAVORITE_TYPE.DASHBOARD,
+            id: d.id,
+        },
+    }));
+    return _starredItem;
 };
 const loadDashboard = async () => {
     await dashboardStore.load();
@@ -262,7 +269,7 @@ callApiWithGrantGuard();
         <template v-if="storeState.isWorkspaceOwner"
                   #slot-shared
         >
-            <l-s-b-collapsible-menu-item v-if="state.publicV2DashboardItems.length"
+            <l-s-b-collapsible-menu-item v-if="state.publicV2DashboardItems.length || dashboardGetters.workspaceFolderItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
@@ -279,7 +286,7 @@ callApiWithGrantGuard();
             </l-s-b-collapsible-menu-item>
         </template>
         <template #slot-private>
-            <l-s-b-collapsible-menu-item v-if="state.privateV2DashboardItems.length"
+            <l-s-b-collapsible-menu-item v-if="state.privateV2DashboardItems.length || dashboardGetters.privateFolderItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',

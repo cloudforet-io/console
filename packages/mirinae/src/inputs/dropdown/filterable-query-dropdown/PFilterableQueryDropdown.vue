@@ -95,7 +95,7 @@ import { focus as vFocus } from 'vue-focus';
 
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
+import { useContextMenuStyle, useProxyValue } from '@/hooks';
 import { useQuerySearch } from '@/hooks/query-search';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { FilterableQueryDropdownProps } from '@/inputs/dropdown/filterable-query-dropdown/type';
@@ -158,16 +158,17 @@ export default defineComponent<FilterableQueryDropdownProps>({
         const state = reactive({
             proxySelected: useProxyValue('selected', props, emit),
             proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
+            targetRef: null as HTMLElement | null,
+            menuRef: null as any,
         });
 
         const {
-            targetRef, targetElement, contextMenuStyle,
-        } = useContextMenuFixedStyle({
+            contextMenuStyle,
+        } = useContextMenuStyle({
+            targetRef: toRef(state, 'targetRef'),
+            menuRef: toRef(state, 'menuRef'),
             useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
             visibleMenu: toRef(state, 'proxyVisibleMenu'),
-        });
-        const contextMenuFixedStyleState = reactive({
-            targetRef, targetElement, contextMenuStyle,
         });
 
         const {
@@ -223,7 +224,7 @@ export default defineComponent<FilterableQueryDropdownProps>({
         return {
             querySearchState,
             ...toRefs(state),
-            ...toRefs(contextMenuFixedStyleState),
+            contextMenuStyle,
             focus,
             blur,
             showMenu,

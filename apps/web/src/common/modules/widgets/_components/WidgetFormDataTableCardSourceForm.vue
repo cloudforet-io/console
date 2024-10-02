@@ -68,7 +68,6 @@ const targetRef = ref<HTMLElement | null>(null);
 const {
     visibleMenu,
     refinedMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
     initiateMenu,
@@ -162,7 +161,6 @@ watch(() => props.selected, () => {
             <p-context-menu v-show="visibleMenu"
                             ref="contextMenuRef"
                             class="dropdown-context-menu"
-                            :style="contextMenuStyle"
                             :menu="refinedMenu"
                             :selected="state.selectedItems"
                             @select="handleSelectMenuItem"

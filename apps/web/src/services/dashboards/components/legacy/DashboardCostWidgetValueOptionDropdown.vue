@@ -182,7 +182,6 @@ const handleDeleteButton = () => {
 
 /* context menu controller */
 const {
-    contextMenuStyle,
     loading,
     refinedMenu,
     initiateMenu,
@@ -289,7 +288,6 @@ watch(() => props.selected, (selected) => {
                         searchable
                         show-select-marker
                         multi-selectable
-                        :style="contextMenuStyle"
                         :selected="state.selectedItems"
                         :loading="loading"
                         :menu="refinedMenu"

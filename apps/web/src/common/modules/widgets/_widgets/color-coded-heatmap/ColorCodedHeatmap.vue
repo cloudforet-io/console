@@ -24,7 +24,6 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import {
-    getApiQueryDateRange,
     getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateRange,
@@ -64,8 +63,10 @@ const state = reactive({
         const _orderedData = orderBy(_filteredData, [state.dataField], ['desc']);
         return _orderedData.map((d) => ({
             name: d[state.groupByField],
+            label: getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, d[state.groupByField]),
             value: numberFormatter(d[state.dataField], { minimumFractionDigits: 2 }),
             color: getColor(d[state.formatRulesField], state.formatRulesField),
+            legendValue: getReferenceLabel(props.allReferenceTypeInfo, state.formatRulesField, d[state.formatRulesField]),
         }));
     }),
     legendList: [] as WidgetLegend[],
@@ -97,13 +98,12 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
         state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
         const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
-        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
         const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _queryDateRange.start,
-                end: _queryDateRange.end,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
                 group_by: [state.groupByField, state.formatRulesField],
                 fields: {
                     [state.dataField]: {
@@ -170,11 +170,11 @@ defineExpose<WidgetExpose<Data>>({
             >
                 <div v-for="(data, idx) in state.refinedData"
                      :key="`box-${idx}`"
-                     v-tooltip.bottom="`${getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, data.name)}: ${data.value}`"
+                     v-tooltip.bottom="`${data.label}: ${data.value} (${ data.legendValue })`"
                      class="value-box"
                      :style="{'background-color': data.color}"
                 >
-                    <span class="value-text">{{ getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, data.name) }}</span>
+                    <span class="value-text">{{ data.label }}</span>
                 </div>
             </div>
             <p-empty v-else

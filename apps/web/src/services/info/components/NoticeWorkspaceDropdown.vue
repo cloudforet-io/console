@@ -221,13 +221,6 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
             @apply text-gray-600;
         }
     }
-
-    /* custom design-system component - p-select-dropdown */
-    :deep(.p-select-dropdown) {
-        .dropdown-context-menu {
-            z-index: 49 !important;
-        }
-    }
 }
 </style>
 

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
-import type { Location } from 'vue-router';
 
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
@@ -37,6 +36,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 import {
     GRANULARITY,
     GROUP_BY,
@@ -184,7 +184,7 @@ const tableState = reactive({
 /* util */
 const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
     const queryHelper = new QueryHelper();
-    const query: Location['query'] = {};
+    const query: CloudServiceMainPageUrlQuery = {};
     if (item.region_code) {
         query.region = arrayToQueryString([item.region_code]);
     } else if (costAnalysisPageState.filters?.region_code?.length) {
@@ -207,24 +207,24 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
         query.period = objectToQueryString(_period);
     }
 
-
-    const filters: ConsoleFilter[] = [];
     if (typeof item.project_id === 'string') {
-        filters.push({ k: 'project_id', v: item.project_id, o: '=' });
+        query.project = arrayToQueryString([item.project_id]);
     } else if (costAnalysisPageState.filters?.project_id?.length) {
-        filters.push({ k: 'project_id', v: costAnalysisPageState.filters.project_id, o: '=' });
+        query.project = arrayToQueryString([costAnalysisPageState.filters.project_id]);
     }
 
+    if (typeof item.service_account_id === 'string') {
+        query.service_account = arrayToQueryString([item.service_account_id]);
+    } else if (costAnalysisPageState.filters?.service_account_id?.length) {
+        query.service_account = arrayToQueryString([costAnalysisPageState.filters.service_account_id]);
+    }
+
+
+    const filters: ConsoleFilter[] = [];
     if (typeof item.project_group_id === 'string') {
         filters.push({ k: 'project_group_id', v: item.project_group_id, o: '=' });
     } else if (costAnalysisPageState.filters?.project_group_id?.length) {
         filters.push({ k: 'project_group_id', v: costAnalysisPageState.filters.project_group_id, o: '=' });
-    }
-
-    if (typeof item.service_account_id === 'string') {
-        filters.push({ k: 'collection_info.service_account_id', v: item.service_account_id, o: '=' });
-    } else if (costAnalysisPageState.filters?.service_account_id?.length) {
-        filters.push({ k: 'collection_info.service_account_id', v: costAnalysisPageState.filters.service_account_id, o: '=' });
     }
 
     if (typeof item.product === 'string') {

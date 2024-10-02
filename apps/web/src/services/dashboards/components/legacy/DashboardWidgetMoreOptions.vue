@@ -53,7 +53,6 @@ const optionsMenuItems = computed<MenuItem[]>(() => state.propertySchemaTuples.m
 const {
     visibleMenu: visibleContextMenu,
     refinedMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
     initiateMenu,
@@ -131,7 +130,6 @@ watch(() => widgetFormState.schemaProperties, (selectedProperties) => {
                         class="more-context-menu"
                         :menu="state.widgetOptionMenuItems"
                         :selected="selectedOptions"
-                        :style="contextMenuStyle"
                         use-fixed-menu-style
                         multi-selectable
                         item-height-fixed

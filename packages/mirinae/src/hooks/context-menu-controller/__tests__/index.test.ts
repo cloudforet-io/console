@@ -1,5 +1,4 @@
 import { createLocalVue, mount } from '@vue/test-utils';
-import type { ComponentPublicInstance } from 'vue';
 import { defineComponent, ref } from 'vue';
 
 import { describe, expect } from 'vitest';
@@ -11,7 +10,7 @@ import type { MenuItem } from '@/inputs/context-menu/type';
 
 const localVue = createLocalVue();
 
-type ContextMenuComponent = ComponentPublicInstance<typeof PContextMenu>;
+// type ContextMenuComponent = ComponentPublicInstance<typeof PContextMenu>;
 const $t = () => {};
 type UseContextMenuControllerReturns = ReturnType<typeof useContextMenuController>;
 
@@ -80,6 +79,7 @@ describe('Context Menu Controller', () => {
         it('should emit error when useReorderBySelection is true, but menu and handler are not given.', () => {
             const { error } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 useReorderBySelection: true,
                 selected: [],
             }));
@@ -88,12 +88,14 @@ describe('Context Menu Controller', () => {
         it('should emit error when useReorderBySelection is true, and menu or handler is given but selected is not given.', () => {
             const { error } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 useReorderBySelection: true,
                 menu: [],
             }));
             expect(error).toBeTruthy();
             const { error: secondError } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 useReorderBySelection: true,
                 handler: ref(() => ({ results: [] })),
             }));
@@ -102,6 +104,7 @@ describe('Context Menu Controller', () => {
         it('should NOT emit error when useReorderBySelection is true, and menu or handler and selected are given.', () => {
             const { error } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 useReorderBySelection: true,
                 menu: [],
                 selected: [],
@@ -109,6 +112,7 @@ describe('Context Menu Controller', () => {
             expect(error).toBeFalsy();
             const { error: secondError } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 useReorderBySelection: true,
                 handler: ref(() => ({ results: [] })),
                 selected: [],
@@ -118,6 +122,7 @@ describe('Context Menu Controller', () => {
         it('should emit error when useMenuFiltering is true, but menu and handler are not given.', () => {
             const { error } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 useMenuFiltering: true,
                 searchText: ref(''),
             }));
@@ -126,12 +131,14 @@ describe('Context Menu Controller', () => {
         it('should emit error when useMenuFiltering is true, and menu or handler is given but searchText is not given.', () => {
             const { error } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 useMenuFiltering: true,
                 menu: [],
             }));
             expect(error).toBeTruthy();
             const { error: secondError } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 useMenuFiltering: true,
                 handler: ref(() => ({ results: [] })),
             }));
@@ -140,6 +147,7 @@ describe('Context Menu Controller', () => {
         it('should NOT emit error when useMenuFiltering is true, and menu or handler and selected are given.', () => {
             const { error } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 useMenuFiltering: true,
                 menu: [],
                 searchText: ref(''),
@@ -159,7 +167,7 @@ describe('Context Menu Controller', () => {
         describe('showContextMenu(): ', () => {
             const { result, wrapper } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
-                contextMenuRef: ref<ContextMenuComponent|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 visibleMenu: ref(false),
             }));
             const { showContextMenu } = result as UseContextMenuControllerReturns;
@@ -174,7 +182,7 @@ describe('Context Menu Controller', () => {
         describe('hideContextMenu(): ', () => {
             const { result, wrapper } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
-                contextMenuRef: ref<ContextMenuComponent|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 visibleMenu: ref(true),
             }));
             const { hideContextMenu } = result as UseContextMenuControllerReturns;
@@ -189,7 +197,7 @@ describe('Context Menu Controller', () => {
         describe('focusOnContextMenu(): ', () => {
             const { result } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
-                contextMenuRef: ref<ContextMenuComponent|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 visibleMenu: ref(true),
             }), { menu: [{ name: 'a', label: 'A' }, { name: 'b', label: 'B' }, { name: 'c', label: 'C' }] });
             const { focusOnContextMenu } = result as UseContextMenuControllerReturns;
@@ -204,7 +212,7 @@ describe('Context Menu Controller', () => {
         const mockLoadForReorderTest = (options: Partial<UseContextMenuControllerOptions> = {}) => {
             const { result, error } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
-                contextMenuRef: ref<ContextMenuComponent|null>(null),
+                contextMenuRef: ref<any|null>(null),
                 visibleMenu: ref(true),
                 ...options,
             }));

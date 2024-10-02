@@ -13,6 +13,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
@@ -35,6 +36,9 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
             const cloudServiceQuerySet = props.allReferenceTypeInfo.cloud_service_query_set.referenceMap[cloudServiceQuerySetId];
             if (!cloudServiceQuerySet) return undefined;
             const consoleFilters = flattenDeep(Object.values(baseState.options.filters ?? {}));
+            const query: CloudServiceDetailPageUrlQuery = {
+                filters: assetQueryHelper.setFilters(consoleFilters).rawQueryStrings,
+            };
             return getProperRouteLocation({
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
@@ -42,9 +46,7 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
                     group: cloudServiceQuerySet.data?.cloud_service_group,
                     name: cloudServiceQuerySet.data?.cloud_service_type,
                 },
-                query: {
-                    filters: assetQueryHelper.setFilters(consoleFilters).rawQueryStrings,
-                },
+                query,
             });
         }),
         budgetWidgetLocation: computed<Location | undefined>(() => {

@@ -70,6 +70,7 @@ const handleSelectGranularity = async (granularity: Granularity) => {
         <p-select-dropdown :menu="state.granularityItems"
                            :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY')"
                            style-type="rounded"
+                           use-fixed-menu-style
                            :selected="costAnalysisPageState.granularity"
                            class="granularity-dropdown"
                            @select="handleSelectGranularity"

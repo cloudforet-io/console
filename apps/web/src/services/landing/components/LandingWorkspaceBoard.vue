@@ -95,49 +95,53 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                 <div class="text-wrapper">
                     <p class="workspace-name">
                         <span class="name">{{ board?.name }}</span>
-                        <p-popover v-if="state.selectedPopoverItem === board.workspace_id"
-                                   :is-visible="state.popoverVisible"
-                                   ignore-outside-click
-                                   trigger="click"
-                                   relative-style
-                                   position="top"
-                                   class="dormant-popover"
-                                   @close="state.popoverVisible = false"
-                        >
-                            <template #content>
-                                <div class="popover-content">
-                                    <strong class="title">{{ $t('LADING.DORMANT_WORKSPACE') }}</strong>
-                                    <img alt="cost-threshold-chart"
-                                         src="/images/domain-settings/img_auto-dormancy-configuration_cost-threshold-chart.png"
-                                         srcset="/images/domain-settings/img_auto-dormancy-configuration_cost-threshold-chart@2x.png 2x,
+                        <template v-if="board.is_dormant">
+                            <p-popover v-if="state.selectedPopoverItem === board.workspace_id"
+                                       ignore-outside-click
+                                       trigger="click"
+                                       position="top"
+                                       boundary="body"
+                                       class="dormant-popover"
+                            >
+                                <p-status v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                                          class="capitalize"
+                                />
+                                <template #content>
+                                    <div class="popover-content">
+                                        <strong class="title">{{ $t('LADING.DORMANT_WORKSPACE') }}</strong>
+                                        <img alt="cost-threshold-chart"
+                                             src="/images/domain-settings/img_auto-dormancy-configuration_cost-threshold-chart.png"
+                                             srcset="/images/domain-settings/img_auto-dormancy-configuration_cost-threshold-chart@2x.png 2x,
                                             /images/domain-settings/img_auto-dormancy-configuration_cost-threshold-chart@3x.png 3x"
-                                         class="cost-threshold-chart"
-                                    >
-                                    <i18n :path="props.isDomainAdmin ? 'LADING.DORMANT_WORKSPACE_POPOVER_ADMIN' : 'LADING.DORMANT_WORKSPACE_POPOVER'"
-                                          tag="span"
-                                          class="desc"
-                                    >
-                                        <template #date>
-                                            <span class="date">{{ dayjs(board?.dormant_updated_at).format('YYYY-MM-DD') }}</span>
-                                        </template>
-                                        <template v-if="props.isDomainAdmin"
-                                                  #name
+                                             class="cost-threshold-chart"
                                         >
-                                            <span>{{ board.name }}</span>
-                                        </template>
-                                    </i18n>
-                                    <p-link :text="$t('LADING.GO_TO_DORMANT_CONFIG')"
-                                            highlight
-                                            :to="{
-                                                name: makeAdminRouteName(ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME)
-                                            }"
-                                    />
-                                </div>
-                            </template>
-                        </p-popover><p-status v-if="board.is_dormant"
-                                              v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
-                                              class="capitalize"
-                        />
+                                        <i18n :path="props.isDomainAdmin ? 'LADING.DORMANT_WORKSPACE_POPOVER_ADMIN' : 'LADING.DORMANT_WORKSPACE_POPOVER'"
+                                              tag="span"
+                                              class="desc"
+                                        >
+                                            <template #date>
+                                                <span class="date">{{ dayjs(board?.dormant_updated_at).format('YYYY-MM-DD') }}</span>
+                                            </template>
+                                            <template v-if="props.isDomainAdmin"
+                                                      #name
+                                            >
+                                                <span>{{ board.name }}</span>
+                                            </template>
+                                        </i18n>
+                                        <p-link :text="$t('LADING.GO_TO_DORMANT_CONFIG')"
+                                                highlight
+                                                :to="{
+                                                    name: makeAdminRouteName(ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME)
+                                                }"
+                                        />
+                                    </div>
+                                </template>
+                            </p-popover>
+                            <p-status v-else
+                                      v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
+                                      class="capitalize"
+                            />
+                        </template>
                     </p>
                     <div v-if="board?.role_type"
                          class="workspace-info"

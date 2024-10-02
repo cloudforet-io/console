@@ -293,12 +293,6 @@ const checkSelectedId = (id?: string) => {
                 right: 0.5rem;
                 .overlay-contents {
                     @apply bg-white;
-
-                    .p-select-dropdown .dropdown-context-menu {
-                        min-width: 7.25rem !important;
-                        margin-top: 0;
-                        margin-left: -5.25rem;
-                    }
                 }
             }
         }

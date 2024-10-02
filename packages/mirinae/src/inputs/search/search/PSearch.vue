@@ -71,7 +71,7 @@ import { debounce } from 'lodash';
 import type { TranslateResult } from 'vue-i18n';
 
 import PI from '@/foundation/icons/PI.vue';
-import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
+import { useContextMenuStyle, useProxyValue } from '@/hooks';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
 import type { SearchProps } from '@/inputs/search/search/type';
@@ -167,19 +167,19 @@ export default defineComponent<SearchProps>({
             searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
             bindingMenu: computed<SelectDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
             proxyValue: useProxyValue('value', props, emit),
-            menuRef: null,
+            targetRef: null as null|HTMLElement,
+            menuRef: null as any,
         });
 
         const { focused } = useFocus(toRef(state, 'inputRef'));
 
         const {
-            targetRef, targetElement, contextMenuStyle,
-        } = useContextMenuFixedStyle({
+            contextMenuStyle,
+        } = useContextMenuStyle({
+            targetRef: toRef(state, 'targetRef'),
+            menuRef: toRef(state, 'menuRef'),
             useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
             visibleMenu: toRef(state, 'proxyVisibleMenu'),
-        });
-        const contextMenuFixedStyleState = reactive({
-            targetRef, targetElement, contextMenuStyle,
         });
         const defaultHandler = (inputText: string, list: MenuItem[]) => {
             let results: MenuItem[] = [...list];
@@ -291,8 +291,8 @@ export default defineComponent<SearchProps>({
 
         return {
             ...toRefs(state),
+            contextMenuStyle,
             focused,
-            ...toRefs(contextMenuFixedStyleState),
             inputListeners,
             hideMenu,
             handleDelete,

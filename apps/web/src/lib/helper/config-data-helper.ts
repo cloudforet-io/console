@@ -17,21 +17,17 @@ import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import type { FavoriteConfig, FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
-import type { RecentConfig } from '@/common/modules/navigations/type';
+import type { FavoriteItem, FavoriteType, FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
+import type { RecentType, RecentConfig } from '@/common/modules/navigations/type';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
-type Config = FavoriteConfig & RecentConfig;
-
-export interface ConfigData extends Config {
-    [key: string]: any;
+export interface ConfigData extends Omit<RecentConfig, 'itemType'>, Omit<FavoriteConfig, 'itemType'> {
+    itemType: RecentType|FavoriteType;
 }
 
-type ReferenceItem = FavoriteItem;
-
-export interface ReferenceData extends ReferenceItem {
-    [key: string]: any;
+export interface ReferenceData extends Omit<FavoriteItem, 'itemType'> {
+    itemType: RecentType|FavoriteType;
 }
 
 export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menuList: DisplayMenu[]): ReferenceData[] => {

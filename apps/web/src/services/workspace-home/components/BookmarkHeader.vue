@@ -106,7 +106,6 @@ const moreState = reactive({
 
 const {
     visibleMenu: visibleContextMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
 } = useContextMenuController({
@@ -409,7 +408,7 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                                         ref="moreContextMenuRef"
                                         :menu="moreState.menuItems"
                                         :selected="moreState.selectedItems"
-                                        :style="{ ...contextMenuStyle, 'top': `${moreButtonTop + moreButtonHeight}px`} "
+                                        :style="{ 'top': `${moreButtonTop + moreButtonHeight}px`} "
                                         show-select-marker
                                         show-clear-selection
                                         class="more-context-menu"

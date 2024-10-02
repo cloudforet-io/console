@@ -76,9 +76,37 @@ export const getWidgetDateRange = (granularity: string, basedOnDate: string, sub
     const _timeUnit = getTimeUnit(granularity);
     const _dateFormat = getDateFormat(granularity);
     // get start, end with granularity and subtractCount
-    const start = dayjs.utc(basedOnDate).clone().subtract(subtractCount - 1, _timeUnit).format(_dateFormat);
-    const end = dayjs.utc(basedOnDate).format(_dateFormat);
-    return [start, end];
+    const _start = dayjs.utc(basedOnDate).clone().subtract(subtractCount - 1, _timeUnit);
+    const _end = dayjs.utc(basedOnDate);
+
+    let refinedDateRange: DateRange = {
+        start: _start.format(_dateFormat),
+        end: _end.format(_dateFormat),
+    };
+
+    if (granularity === 'DAILY') {
+        if (_end.diff(_start, _timeUnit) > 31) {
+            refinedDateRange = {
+                start: _end.subtract(31, _timeUnit).format(_dateFormat),
+                end: _end.format(_dateFormat),
+            };
+        }
+    } else if (granularity === 'MONTHLY') {
+        if (_end.diff(_start, _timeUnit) > 12) {
+            refinedDateRange = {
+                start: _end.subtract(11, _timeUnit).format(_dateFormat),
+                end: _end.format(_dateFormat),
+            };
+        }
+    } else if (granularity === 'YEARLY') {
+        if (_end.diff(_start, _timeUnit) > 3) {
+            refinedDateRange = {
+                start: _end.subtract(2, _timeUnit).format(_dateFormat),
+                end: _end.format(_dateFormat),
+            };
+        }
+    }
+    return [refinedDateRange.start || '', refinedDateRange.end];
 };
 
 export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, field?: string, val?: string) => {
@@ -99,36 +127,6 @@ export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, fi
         return allReferenceTypeInfo.service_account.referenceMap[val]?.label || val;
     }
     return val;
-};
-
-export const getApiQueryDateRange = (granularity: string, dateRange: DateRange): DateRange => {
-    const _timeUnit = getTimeUnit(granularity);
-    const _dateFormat = getDateFormat(granularity);
-    const _start = dayjs.utc(dateRange.start);
-    const _end = dayjs.utc(dateRange.end);
-    if (granularity === 'DAILY') {
-        if (_end.diff(_start, _timeUnit) > 31) {
-            return {
-                start: _end.subtract(31, _timeUnit).format(_dateFormat),
-                end: _end.format(_dateFormat),
-            };
-        }
-    } else if (granularity === 'MONTHLY') {
-        if (_end.diff(_start, _timeUnit) > 12) {
-            return {
-                start: _end.subtract(11, _timeUnit).format(_dateFormat),
-                end: _end.format(_dateFormat),
-            };
-        }
-    } else if (granularity === 'YEARLY') {
-        if (_end.diff(_start, _timeUnit) > 3) {
-            return {
-                start: _end.subtract(2, _timeUnit).format(_dateFormat),
-                end: _end.format(_dateFormat),
-            };
-        }
-    }
-    return dateRange;
 };
 
 export const getRefinedDateFormatByGranularity = (granularity: string, dateFormat: DateFormat): string => DATE_FORMAT[dateFormat][granularity];

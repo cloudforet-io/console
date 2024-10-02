@@ -57,7 +57,7 @@ interface SelectDropdownProps {
     showClearSelection?: boolean;
     menuPosition?: ContextMenuPosition;
     indexMode?: boolean;
-    parentId?: string;
+    boundary?: string;
 
     /* others */
     handler?: AutocompleteHandler;
@@ -86,7 +86,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     searchText: '',
     menuPosition: CONTEXT_MENU_POSITION.LEFT,
     indexMode: false,
-    parentId: undefined,
+    boundary: undefined,
     /* others */
     handler: undefined,
     pageSize: undefined,
@@ -159,7 +159,6 @@ onClickOutside(containerRef, hideMenu);
 const menuRef = ref<HTMLElement|null>(null);
 const targetRef = ref<HTMLElement|null>(null);
 const {
-    contextMenuStyle,
     loading,
     refinedMenu,
     focusOnContextMenu,
@@ -179,8 +178,8 @@ const {
     menu: toRef(props, 'menu'),
     pageSize: toRef(props, 'pageSize'),
     hideHeaderWithoutItems: toRef(props, 'hideHeaderWithoutItems'),
-    multiSelectable: toRef(props, 'multiSelectable'),
-    parentId: toRef(props, 'parentId'),
+    boundary: toRef(props, 'boundary'),
+    position: toRef(props, 'menuPosition'),
 });
 
 /* focusing */
@@ -355,12 +354,10 @@ defineExpose({ reloadMenu });
                         :class="{
                             'dropdown-context-menu': true,
                             default: !props.showSelectMarker,
-                            [menuPosition]: !useFixedMenuStyle
                         }"
                         :menu="props.disableHandler ? props.menu : refinedMenu"
                         :loading="props.loading || loading"
                         :readonly="props.readonly"
-                        :style="contextMenuStyle"
                         :item-height-fixed="!props.isFilterable"
                         :selected="state.selectedItems"
                         :multi-selectable="props.multiSelectable"
@@ -415,16 +412,6 @@ defineExpose({ reloadMenu });
         z-index: 1000;
         min-width: 100%;
         width: auto;
-
-        /* menu position */
-        &.left {
-            left: 0;
-            right: unset;
-        }
-        &.right {
-            left: unset;
-            right: -1px;
-        }
     }
 
     &.is-fixed-width {

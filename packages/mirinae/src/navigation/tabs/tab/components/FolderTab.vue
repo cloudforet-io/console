@@ -6,7 +6,7 @@ import { reactive, ref, toRef } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 
 import PI from '@/foundation/icons/PI.vue';
-import { useContextMenuFixedStyle } from '@/hooks';
+import { useContextMenuStyle } from '@/hooks';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import type { TabItem } from '@/navigation/tabs/tab/type';
@@ -47,7 +47,7 @@ const handleSelectTabMenu = (menu: MenuItem) => {
 
 const {
     contextMenuStyle,
-} = useContextMenuFixedStyle({
+} = useContextMenuStyle({
     useFixedMenuStyle: true,
     visibleMenu: toRef(state, 'visible'),
     targetRef: folderTabRef,
