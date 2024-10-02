@@ -104,11 +104,15 @@ export const useContextMenuStyle = ({
             }).then(({
                 x, y, middlewareData, placement,
             }) => {
-                const style = {
+                const style: Partial<CSSStyleDeclaration> = {
                     left: `${x}px`,
                     top: placement.startsWith('bottom') ? `${y}px` : `${y + 2}px`,
                     position: isFixed ? 'fixed' : 'absolute',
                 };
+                if (!isFixed && state.position === 'right') {
+                    style.left = 'auto';
+                    style.right = '0px';
+                }
                 Object.assign(floatingEl.style, style);
                 // apply the same style to the state
                 contextMenuFixedStyleState.contextMenuStyle = {
