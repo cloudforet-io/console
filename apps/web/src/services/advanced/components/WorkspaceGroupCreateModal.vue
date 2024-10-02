@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import type Vue from 'vue';
+import {
+    computed, nextTick, reactive, ref, watch,
+} from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
+    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -41,6 +44,9 @@ const state = reactive({
     workspaceGroups: computed<WorkspaceGroupReferenceMap>(() => allReferenceStore.getters.workspace_group),
     workspaceGroupNames: computed(() => Object.values(state.workspaceGroups).map((item:any) => item.name)),
     loading: false,
+    menuIds: computed<string[]>(() => menuList.value.map((item) => item.name)),
+    isSelectDropdownVisible: false,
+    isEllipsisMap: {} as Record<string, boolean>,
 });
 
 const {
@@ -69,6 +75,8 @@ const {
         label: _workspace.name,
         tags: _workspace.tags,
         is_dormant: _workspace.is_dormant,
+        workspace_group_id: _workspace.workspace_group_id,
+        disabled: !!_workspace.workspace_group_id,
     }),
     fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
         query: apiQueryHelper.data,
@@ -120,6 +128,23 @@ const handleConfirm = async () => {
 const handleModalClose = () => {
     workspaceGroupPageStore.closeModal();
 };
+
+const ellipsis = ref<Vue | null>(null);
+
+watch([() => state.menuIds, () => state.isSelectDropdownVisible], async (menuIds, isSelectDropdownVisible) => {
+    if (isSelectDropdownVisible) {
+        await nextTick();
+        menuIds[0].forEach((id) => {
+            const labelTextEl = (ellipsis.value?.$el?.querySelector(`#w-${id}`)?.querySelector('.label-text') as HTMLElement);
+            const clientWidth = labelTextEl?.clientWidth;
+            const scrollWidth = labelTextEl?.scrollWidth;
+            state.isEllipsisMap = {
+                ...state.isEllipsisMap,
+                [`w-${id}`]: scrollWidth > clientWidth,
+            };
+        });
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -153,15 +178,17 @@ const handleModalClose = () => {
                     <template #default>
                         <div class="dropdown-wrapper">
                             <p-select-dropdown
+                                ref="ellipsis"
                                 :loading="loading"
                                 :search-text.sync="searchText"
-                                appearance-type="stack"
+                                appearance-type="badge"
                                 is-filterable
                                 multi-selectable
                                 show-delete-all-button
                                 use-fixed-menu-style
                                 show-select-marker
                                 disable-handler
+                                :visible-menu.sync="state.isSelectDropdownVisible"
                                 :menu="menuList"
                                 :selected.sync="selectedItems"
                                 :placeholder="$t('IAM.WORKSPACE_GROUP.MODAL.CREATE_DROP_DOWN_PLACEHOLDER')"
@@ -172,16 +199,24 @@ const handleModalClose = () => {
                                     <div class="menu-item-wrapper"
                                          :class="{'is-dormant': item?.is_dormant}"
                                     >
-                                        <div class="label">
+                                        <div :id="`w-${item.name}`"
+                                             class="label"
+                                        >
                                             <workspace-logo-icon :text="item?.label || ''"
                                                                  :theme="item?.tags?.theme"
                                                                  size="xs"
                                             />
-                                            <span class="label-text">{{ item.label }}</span>
-                                            <!-- <p-status v-if="item?.is_dormant"
-                                                      v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
-                                                      class="capitalize state"
-                                            /> -->
+                                            <p-tooltip v-if="state.isEllipsisMap[`w-${item.name}`]"
+                                                       position="bottom"
+                                                       :contents="item.label"
+                                                       :class="{'label-text': true, 'group-exist': !item?.workspace_group_id}"
+                                            >
+                                                <span>{{ item.label }}</span>
+                                            </p-tooltip>
+                                            <span v-else
+                                                  :class="{'label-text': true, 'group-exist': !item?.workspace_group_id}"
+                                            >{{ item.label }}</span>
+                                            <span>{{ state.workspaceGroups[item.workspace_group_id]?.label }}</span>
                                         </div>
                                     </div>
                                 </template>
@@ -203,11 +238,11 @@ const handleModalClose = () => {
         .label {
             @apply flex items-center gap-2;
         }
-        .state {
-            @apply text-label-sm;
-        }
         .label-text {
             @apply truncate;
+            max-width: 13.125rem;
+        }
+        .label-text.group-exist {
             max-width: 36.875rem;
         }
         &.is-dormant {
