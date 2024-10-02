@@ -93,6 +93,18 @@ const state = reactive({
         if (state.hasFolder) return i18n.t('DASHBOARDS.DETAIL.UNSHARE_ENTIRE_FOLDER_FROM_ALL_PROJECTS');
         return i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS');
     }),
+    modalDescription: computed(() => {
+        if (!state.isShared) {
+            return [
+                i18n.t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER_DESC_1'),
+                i18n.t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER_DESC_2'),
+            ];
+        }
+        return [
+            i18n.t('DASHBOARDS.DETAIL.UNSHARE_ENTIRE_FOLDER_DESC_1'),
+            i18n.t('DASHBOARDS.DETAIL.UNSHARE_ENTIRE_FOLDER_DESC_2'),
+        ];
+    }),
     tableFields: computed<DataTableField[]>(() => {
         if (state.hasFolder) return TABLE_FIELDS;
         return TABLE_FIELDS.filter((f) => f.name !== 'location');
@@ -228,7 +240,7 @@ const handleConfirm = async () => {
                  class="entire-folder-desc"
             >
                 <span>
-                    <b>{{ $t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER_DESC_1') }}</b> {{ $t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER_DESC_2') }}
+                    <b>{{ state.modalDescription[0] }}</b> {{ state.modalDescription[1] }}
                 </span>
             </div>
             <p-field-group v-if="storeState.isAdminMode && !state.isShared"
