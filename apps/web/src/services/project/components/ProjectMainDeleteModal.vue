@@ -8,7 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProjectGroupDeleteParameters } from '@/schema/identity/project-group/api-verbs/delete';
 import type { ProjectDeleteParameters } from '@/schema/identity/project/api-verbs/delete';
-import { i18n, i18n as _i18n } from '@/translations';
+import { i18n as _i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
