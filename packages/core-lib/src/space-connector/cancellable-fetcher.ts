@@ -16,7 +16,7 @@ interface Fetcher<Param, Res> {
     (params: Param, config?: AxiosRequestConfig): Promise<Res>
 }
 
-interface CancellableFetcher<Param, Res> {
+export interface CancellableFetcher<Param, Res> {
     (params: Param, config?: AxiosRequestConfig): Promise<CancellableFetcherResponse<Res>>
 }
 

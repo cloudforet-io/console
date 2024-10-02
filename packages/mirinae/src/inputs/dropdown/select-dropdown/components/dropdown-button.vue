@@ -92,6 +92,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
     >
         <span v-if="[SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON, SELECT_DROPDOWN_STYLE_TYPE.TERTIARY_ICON_BUTTON].includes(props.styleType)"
               class="dropdown-icon-button-wrapper"
+              @click.stop="emit('click-dropdown-button')"
         >
             <p-i :name="props.buttonIcon || (props.isVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down')"
                  color="inherit"
@@ -99,7 +100,6 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                  :height="props.size === 'sm' ? '1rem' : '1.5rem'"
                  class="dropdown-icon-button"
                  :class="[props.styleType]"
-                 @click.stop="emit('click-dropdown-button')"
                  @keydown.down="emit('enter-key')"
             />
         </span>

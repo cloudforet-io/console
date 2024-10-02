@@ -160,7 +160,6 @@ const tableState = reactive({
             { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
         ];
     }),
-    selectedAccountType: computed<AccountType>(() => serviceAccountSchemaState.selectedAccountType),
     tableTitle: computed(() => {
         let baseTitle:string;
         if (tableState.isTrustedAccount) baseTitle = 'Trusted Account';
@@ -170,7 +169,7 @@ const tableState = reactive({
         return `${state.selectedProviderName} ${baseTitle}`;
     }),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
-    isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
+    isTrustedAccount: computed(() => serviceAccountSchemaState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
     adminModeFilter: computed(() => (state.isAdminMode ? [{ k: 'resource_group', v: 'DOMAIN', o: '=' }] : [])),
     typeField: computed<ValueItem[]>(() => ([
         { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALL') as string, name: 'ALL' },
@@ -278,7 +277,7 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 const clickAddServiceAccount = () => {
     router.push(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-        params: { provider: state.selectedProvider, serviceAccountType: state.isAdminMode ? ACCOUNT_TYPE.TRUSTED : tableState.selectedAccountType },
+        params: { provider: state.selectedProvider, serviceAccountType: state.isAdminMode ? ACCOUNT_TYPE.TRUSTED : serviceAccountSchemaState.selectedAccountType },
         query: { nextPath: route.fullPath },
     }));
 };
@@ -341,7 +340,7 @@ watch(() => tableState.searchFilters, (searchFilters) => {
         replaceUrlQuery('filters', replaceQueryHelper.rawQueryStrings);
     }
 });
-watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
+watch([() => serviceAccountSchemaState.selectedAccountType, () => state.grantLoading], () => {
     if (state.currentGrantInfo.scope === 'USER') return;
     listServiceAccountData();
 }, { immediate: true });
@@ -367,14 +366,14 @@ onMounted(async () => {
         />
         <component :is="width > screens.tablet.max ? PTab : PPaneLayout"
                    :tabs="tableState.accountTypeList"
-                   :active-tab="tableState.selectedAccountType"
-                   @update:activeTab="handleSelectServiceAccountType"
+                   :active-tab="serviceAccountSchemaState.selectedAccountType"
+                   @update:active-tab="handleSelectServiceAccountType"
         >
             <div class="account-type-filter">
                 <span class="label">{{ $t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE') }}</span>
                 <p-select-status v-for="(status, idx) in tableState.accountTypeList"
                                  :key="`${status.name}-${idx}`"
-                                 :selected="tableState.selectedAccountType"
+                                 :selected="serviceAccountSchemaState.selectedAccountType"
                                  :value="status.name"
                                  :multi-selectable="false"
                                  @change="handleSelectServiceAccountType"

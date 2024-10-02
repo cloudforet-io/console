@@ -129,6 +129,7 @@ onClickOutside(operatorButtonRef, () => {
                     <p-context-menu v-if="state.visibleMenu"
                                     class="operator-menu"
                                     :visible.sync="state.visibleMenu"
+                                    searchable
                                     :menu="state.operatorMenu"
                                     :selected="[{ name: state.proxySelectedFilter?.o }]"
                                     @select="handleSelectOperator"

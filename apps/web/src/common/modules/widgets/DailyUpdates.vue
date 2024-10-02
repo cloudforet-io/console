@@ -147,7 +147,6 @@ import dayjs from 'dayjs';
 import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PLazyImg, PSkeleton, PI, PDataLoader, PEmpty,
@@ -160,12 +159,14 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { arrayToQueryString } from '@/lib/router-query-string';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 interface CloudServiceData {
@@ -254,9 +255,9 @@ export default {
         const getConvertedCloudServiceData = (rawData: CloudServiceData[]): Item[] => {
             const results: Item[] = [];
             rawData.forEach((d) => {
-                const filters: ConsoleFilter[] = [];
+                const query: CloudServiceDetailPageUrlQuery = {};
                 if (props.projectId) {
-                    filters.push({ k: 'project_id', v: props.projectId, o: '=' });
+                    query.project = arrayToQueryString([props.projectId]);
                 }
 
                 const result: Item = {
@@ -275,8 +276,8 @@ export default {
                             name: d.cloud_service_type,
                         },
                         query: {
+                            ...query,
                             filters: queryHelper.setFilters([
-                                ...filters,
                                 { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                             ]).rawQueryStrings,
                         },
@@ -289,8 +290,8 @@ export default {
                             name: d.cloud_service_type,
                         },
                         query: {
+                            ...query,
                             filters: queryHelper.setFilters([
-                                ...filters,
                                 { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                                 { k: 'state', v: 'DELETED', o: '=' },
                             ]).rawQueryStrings,

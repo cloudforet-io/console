@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { MetricExampleListParameters } from '@/schema/inventory/metric-example/api-verbs/list';

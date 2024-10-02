@@ -103,7 +103,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.DATA_SOURCES,
         routeName: COST_EXPLORER_ROUTE.DATA_SOURCES._NAME,
         translationId: 'MENU.COST_EXPLORER_DATA_SOURCES',
-        highlightTag: 'new',
         icon: 'ic_service_data-sources',
     },
     [MENU_ID.COST_ADVANCED_SETTINGS]: {
@@ -214,7 +213,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.BOOKMARK,
         routeName: ADVANCED_ROUTE.BOOKMARK._NAME,
         translationId: 'MENU.ADMINISTRATION_BOOKMARK',
-        highlightTag: 'new',
         icon: 'ic_service_bookmark',
     },
     [MENU_ID.MY_PAGE]: {

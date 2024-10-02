@@ -89,6 +89,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
                     .map(([key, value]) => ({
                         name: `additional_info.${key}`,
                         label: value?.name,
+                        presetKeys: metadataAdditionalInfo[key].enums,
                     }));
             } else {
                 _additionalInfoGroupBy = cloneDeep(getters.additionalInfoKeysItems);

@@ -1761,6 +1761,11 @@
 			"WIDGET_TITLE_REQUIRED": "ウィジェットのタイトルを入力してください。"
 		}
 	},
+	"COMPONENT": {
+		"CONTEXT_MENU": {
+			"BACK": "戻る"
+		}
+	},
 	"COST_EXPLORER": {
 		"ANOMALY_DETECTION": {
 			"NOTIFICATION_RULES": {
@@ -1919,6 +1924,7 @@
 			"ALT_E_UPDATE_DASHBOARD": "ダッシュボード更新に失敗しました。",
 			"CANCEL": "キャンセル",
 			"ENTER_NEW_LABEL": "ラベル入力",
+			"NO_LABEL": "ラベルなし",
 			"REFRESH_INTERVAL_10M": "10分",
 			"REFRESH_INTERVAL_15S": "15秒",
 			"REFRESH_INTERVAL_1H": "1時間",
@@ -2027,18 +2033,20 @@
 			"SHARED_TO_ALL_PROJECTS": "すべてのプロジェクトに共有",
 			"SHARED_TO_WORKSPACES": "ワークスペースに共有",
 			"SHARE_DASHBOARD": "ダッシュボードを共有",
-			"SHARE_ENTIRE_FOLDER": "",
+			"SHARE_ENTIRE_FOLDER": "上位フォルダーを共有する",
 			"SHARE_ENTIRE_FOLDER_DESC_1": "",
-			"SHARE_ENTIRE_FOLDER_DESC_2": "",
-			"SHARE_ENTIRE_FOLDER_TO_ALL_PROJECTS": "",
+			"SHARE_ENTIRE_FOLDER_DESC_2": "フォルダー内のダッシュボードは個別に共有することはできません。フォルダー全体を共有しますか？",
+			"SHARE_ENTIRE_FOLDER_TO_ALL_PROJECTS": "上位フォルダーを全プロジェクトに共有する",
 			"SHARE_TO_ALL_PROJECTS": "すべてのプロジェクトに共有",
 			"SHARE_TO_ALL_PROJECTS_DESC": "このダッシュボードをすべてのプロジェクトに共有してもよろしいですか？",
 			"SHARE_TO_ALL_WORKSPACES": "すべてのワークスペースに共有する",
 			"SHARE_TO_ALL_WORKSPACES_DESC": "このダッシュボードをすべてのワークスペースと共有しますか？",
 			"SHARE_WITH_CODE": "コードで共有",
 			"UNSHARE_DASHBOARD": "ダッシュボードの共有を解除",
-			"UNSHARE_ENTIRE_FOLDER_FROM_ALL_PROJECTS": "",
-			"UNSHARE_ENTIRE_FOLDER_FROM_ALL_WORKSPACES": "",
+			"UNSHARE_ENTIRE_FOLDER_DESC_1": "現在、このダッシュボードの上位フォルダーに含まれているすべてのダッシュボードが共有されています。",
+			"UNSHARE_ENTIRE_FOLDER_DESC_2": "フォルダー内のダッシュボードは個別に共有解除することはできません。フォルダー全体を共有解除しますか？",
+			"UNSHARE_ENTIRE_FOLDER_FROM_ALL_PROJECTS": "全プロジェクトから共有解除する",
+			"UNSHARE_ENTIRE_FOLDER_FROM_ALL_WORKSPACES": "全ワークスペースから共有解除する",
 			"UNSHARE_FROM_ALL_PROJECTS": "すべてのプロジェクトから共有解除",
 			"UNSHARE_FROM_ALL_PROJECTS_DESC": "このダッシュボードをすべてのプロジェクトで共有解除しますか？",
 			"UNSHARE_FROM_ALL_WORKSPACES": "すべてのワークスペースから共有解除",
@@ -4427,7 +4435,7 @@
 		"DETAIL": {
 			"ACCESS": "アクセス",
 			"ADD": "追加",
-			"ADD_MEMBERS": "",
+			"ADD_MEMBERS": "メンバー追加",
 			"ALERT": {
 				"ACKNOWLEDGED": "確認",
 				"ALL_NOTIFICATIONS": "全ての通知",
@@ -4536,6 +4544,7 @@
 				"ALT_E_ADD_MEMBER": "メンバー追加に失敗",
 				"BASE_INFORMATION": "基本情報",
 				"DELETE_ALL": "すべて削除",
+				"DONE": "完了",
 				"DUPLICATED_VALUE": "重複した値です。",
 				"ENTER_KEYWORD_TO_SEARCH": "キーワードを入力してください",
 				"EXISTING": "重複",
@@ -4550,6 +4559,7 @@
 				"LABEL_PLACEHOLDER": "ex. 開発者",
 				"MEMBER": "構成員",
 				"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
+				"NO_PROJECT_MEMBER": "プロジェクトメンバーなし",
 				"NO_RESULTS_FOUND": "検索結果が見つかりません",
 				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
 				"PRIVATE_MEMBER_DESC": "設定に基づき、ワークスペースの所有者、プロジェクトグループメンバー、および招待されたワークスペースメンバーのみがこのプロジェクトにアクセスできます {settings}",
@@ -4563,7 +4573,7 @@
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
 				"USER_ID": "ユーザーID"
 			},
-			"MEMBERS": "",
+			"MEMBERS": "構成員",
 			"MEMBER_TITLE": "プロジェクト メンバー",
 			"MODAL_CREATE_PROJECT_LABEL": "名前",
 			"MODAL_CREATE_PROJECT_PLACEHOLDER": "プロジェクト名",
@@ -4637,12 +4647,12 @@
 			"TAB_REPORT": "レポート",
 			"TAB_SUMMARY": "概要情報",
 			"TAB_TAG": "タグ",
-			"TAGS": "",
+			"TAGS": "タグ",
 			"UPDATE": "編集",
-			"UPDATE_TAG": "",
-			"UPDATE_TAG_DESC": "",
+			"UPDATE_TAG": "タグ更新",
+			"UPDATE_TAG_DESC": "各タグはキーとオプションの値で構成されています。Projectでは、タグを使用してより正確な検索やフィルタリングが可能です。",
 			"VIEW_IN": "詳細情報",
-			"WEBHOOKS": "",
+			"WEBHOOKS": "ウェプフク",
 			"WEBHOOK_ACTION": "作業",
 			"WEBHOOK_ADD": "追加",
 			"WEBHOOK_DELETE": "削除",

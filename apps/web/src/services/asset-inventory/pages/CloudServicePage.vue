@@ -12,7 +12,7 @@ import {
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import {
     PDataLoader, PDivider, PButton, PHeading, PEmpty,
 } from '@cloudforet/mirinae';
@@ -54,8 +54,8 @@ import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
 import type {
-    CloudServiceCategory, CloudServicePageUrlQuery,
-    CloudServicePageUrlQueryValue,
+    CloudServiceCategory, CloudServiceMainPageUrlQuery,
+    CloudServiceMainPageUrlQueryValue,
 } from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { EmptyData, Period } from '@/services/asset-inventory/types/type';
 
@@ -114,7 +114,7 @@ const state = reactive({
     pageStart: 1,
     pageLimit: 24,
     // url query
-    urlQueryString: computed<CloudServicePageUrlQuery>(() => ({
+    urlQueryString: computed<CloudServiceMainPageUrlQuery>(() => ({
         provider: cloudServicePageState.selectedProvider === 'all' ? null : primitiveToQueryString(cloudServicePageState.selectedProvider),
         service: arrayToQueryString(cloudServicePageStore.selectedCategories),
         region: arrayToQueryString(cloudServicePageStore.selectedRegions),
@@ -200,7 +200,7 @@ let urlQueryStringWatcherStop;
 const init = async () => {
     /* init states from url query */
     const currentQuery = SpaceRouter.router.currentRoute.query;
-    const urlQueryValue: CloudServicePageUrlQueryValue = {
+    const urlQueryValue: CloudServiceMainPageUrlQueryValue = {
         provider: queryStringToString(currentQuery.provider),
         project: queryStringToArray(currentQuery.project),
         service_account: queryStringToArray(currentQuery.service_account),
@@ -322,7 +322,8 @@ onUnmounted(() => {
 
 /* custom design-system component - p-empty */
 :deep(.p-empty) {
-    @apply w-full h-full;
+    @apply w-full;
+    margin-top: 2.5rem;
 }
 
 @screen tablet {

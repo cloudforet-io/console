@@ -252,12 +252,14 @@ watch(() => tableState.selectedFilter, (selectedFilter) => {
                                              :theme="getWorkspaceInfo(item.name)?.tags?.theme"
                                              size="xs"
                         />
-                        <span>{{ item.label }}</span>
-                        <span v-if="getWorkspaceInfo(item.name)?.tags?.description"
-                              class="description"
-                        >
-                            - {{ getWorkspaceInfo(item.name)?.tags?.description }}
-                        </span>
+                        <p class="workspace-info">
+                            <span>{{ item.label }}</span>
+                            <span v-if="getWorkspaceInfo(item.name)?.tags?.description"
+                                  class="description"
+                            >
+                                - {{ getWorkspaceInfo(item.name)?.tags?.description }}
+                            </span>
+                        </p>
                         <p-status v-if="item?.is_dormant"
                                   v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
                                   class="capitalize state"
@@ -329,6 +331,10 @@ watch(() => tableState.selectedFilter, (selectedFilter) => {
         .workspace-menu-item {
             @apply flex items-center;
             gap: 0.375rem;
+            .workspace-info {
+                @apply truncate;
+                max-width: 22.125rem;
+            }
             .state {
                 @apply text-label-sm;
             }

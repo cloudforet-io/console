@@ -88,15 +88,15 @@ const state = reactive({
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
-        state.enabledFilters.forEach(({ name }) => {
-            handlerMaps[name] = getMenuHandler(name, state.primaryCostStatOptions);
+        state.enabledFilters.forEach((filter) => {
+            handlerMaps[filter.name] = getMenuHandler(filter.name, { presetKeys: filter?.presetKeys }, state.primaryCostStatOptions);
         });
         return handlerMaps;
     }),
 });
 
 /* Util */
-const getMenuHandler = (groupBy: string, listQueryOptions: Record<string, any>): AutocompleteHandler => {
+const getMenuHandler = (groupBy: string, modelOptions: Record<string, any>, listQueryOptions: Record<string, any>): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
         const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
@@ -111,7 +111,7 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Record<string, any>):
             };
         } else {
             const CostVariableModel = new VariableModelFactory({ type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.cost });
-            CostVariableModel[groupBy] = CostVariableModel.generateProperty({ key: groupBy });
+            CostVariableModel[groupBy] = CostVariableModel.generateProperty({ key: groupBy, presetValues: modelOptions?.presetKeys });
             variableModelInfo = {
                 variableModel: CostVariableModel,
                 dataKey: groupBy,
@@ -273,16 +273,5 @@ watch(() => props.visible, (visible) => {
             max-width: 8.375rem;
         }
     }
-}
-
-/* custom design-system component - p-context-menu */
-:deep(.p-context-menu) {
-    /*
-        CAUTION:
-        When the parent has a specific style attribute called 'transform,' 'fixed' behaves like 'absolute,' causing the context-menu's top position not to work correctly,
-        so it is manually forced to be specified.
-    */
-    top: initial !important;
-    left: initial !important;
 }
 </style>

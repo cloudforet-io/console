@@ -12,7 +12,7 @@ import { cloneDeep, sortBy, uniqBy } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@cloudforet/mirinae';
 import { sortArrayInObjectArray } from '@cloudforet/utils';

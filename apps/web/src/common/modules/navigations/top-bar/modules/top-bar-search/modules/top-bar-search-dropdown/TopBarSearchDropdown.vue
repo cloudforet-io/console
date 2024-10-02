@@ -151,7 +151,7 @@ const handleSelect = (item) => {
                :active-tab="storeState.activeTab"
                :tabs="state.tabs"
                :style="{ height: state.tabHeight ? state.tabHeight + 'px': undefined}"
-               @update:activeTab="handleUpdateActiveTab"
+               @update:active-tab="handleUpdateActiveTab"
         >
             <template #service>
                 <top-bar-search-service-tab

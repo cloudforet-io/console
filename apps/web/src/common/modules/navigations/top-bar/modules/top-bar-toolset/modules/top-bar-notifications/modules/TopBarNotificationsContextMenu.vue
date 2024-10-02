@@ -10,7 +10,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PDataLoader, PButtonModal, PI, PLink, PDefinitionTable, PButton, PEmpty, PTextBeautifier,

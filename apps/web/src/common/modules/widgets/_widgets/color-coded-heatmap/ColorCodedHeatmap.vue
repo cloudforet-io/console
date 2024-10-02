@@ -7,6 +7,7 @@ import {
 import { orderBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import {
     PEmpty,
 } from '@cloudforet/mirinae';
@@ -23,7 +24,6 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import {
-    getApiQueryDateRange,
     getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateRange,
@@ -63,8 +63,10 @@ const state = reactive({
         const _orderedData = orderBy(_filteredData, [state.dataField], ['desc']);
         return _orderedData.map((d) => ({
             name: d[state.groupByField],
+            label: getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, d[state.groupByField]),
             value: numberFormatter(d[state.dataField], { minimumFractionDigits: 2 }),
             color: getColor(d[state.formatRulesField], state.formatRulesField),
+            legendValue: getReferenceLabel(props.allReferenceTypeInfo, state.formatRulesField, d[state.formatRulesField]),
         }));
     }),
     legendList: [] as WidgetLegend[],
@@ -88,20 +90,20 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Api */
+const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
+const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
+        state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-            : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
-        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
-        const res = await _fetcher({
+        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
+        const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _queryDateRange.start,
-                end: _queryDateRange.end,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
                 group_by: [state.groupByField, state.formatRulesField],
                 fields: {
                     [state.dataField]: {
@@ -113,8 +115,12 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             },
             vars: props.dashboardVars,
         });
-        state.errorMessage = undefined;
-        return res;
+        if (status === 'succeed') {
+            state.errorMessage = undefined;
+            state.loading = false;
+            return response;
+        }
+        return undefined;
     } catch (e: any) {
         state.loading = false;
         state.errorMessage = e.message;
@@ -125,11 +131,10 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 
 /* Util */
 const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    state.loading = true;
     const res = await fetchWidget();
+    if (!res) return state.data;
     if (typeof res === 'function') return res;
     state.data = res;
-    state.loading = false;
     return state.data;
 };
 const getColor = (val: string, field: string): string => {
@@ -165,11 +170,11 @@ defineExpose<WidgetExpose<Data>>({
             >
                 <div v-for="(data, idx) in state.refinedData"
                      :key="`box-${idx}`"
-                     v-tooltip.bottom="`${getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, data.name)}: ${data.value}`"
+                     v-tooltip.bottom="`${data.label}: ${data.value} (${ data.legendValue })`"
                      class="value-box"
                      :style="{'background-color': data.color}"
                 >
-                    <span class="value-text">{{ getReferenceLabel(props.allReferenceTypeInfo, state.groupByField, data.name) }}</span>
+                    <span class="value-text">{{ data.label }}</span>
                 </div>
             </div>
             <p-empty v-else

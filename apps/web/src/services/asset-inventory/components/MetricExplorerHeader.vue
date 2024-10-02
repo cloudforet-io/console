@@ -124,7 +124,6 @@ const state = reactive({
 
 const {
     visibleMenu: visibleContextMenu,
-    contextMenuStyle,
     showContextMenu,
     hideContextMenu,
 } = useContextMenuController({
@@ -132,6 +131,7 @@ const {
     targetRef,
     contextMenuRef,
     menu: state.saveDropdownMenuItems,
+    position: 'right',
 });
 onClickOutside(rightPartRef, hideContextMenu);
 
@@ -373,7 +373,7 @@ const handleOpenEditQuery = () => {
                         <p-context-menu v-show="visibleContextMenu"
                                         ref="contextMenuRef"
                                         :menu="state.saveDropdownMenuItems"
-                                        :style="contextMenuStyle"
+                                        :visible-menu="visibleContextMenu"
                                         @select="handleSelectSaveAsExample"
                         />
                     </template>
@@ -407,16 +407,9 @@ const handleOpenEditQuery = () => {
         border-left: 0;
     }
 
-    /* custom design-system component - p-context-menu */
-    :deep(.p-context-menu) {
-        @apply absolute;
-        top: 2.125rem;
+    .p-context-menu {
         margin-top: -1px;
-        z-index: 100;
-        right: 0;
-        .p-context-menu-item {
-            min-width: 10rem;
-        }
+        min-width: 10rem !important;
     }
 }
 </style>

@@ -345,7 +345,6 @@ watch(() => route.params, async () => {
                                        style-type="icon-button"
                                        button-icon="ic_ellipsis-horizontal"
                                        use-fixed-menu-style
-                                       class="overlay"
                                        reset-selected-on-unmounted
                                        menu-position="right"
                                        @select="handleSelectDropdownMenu(item, $event)"
@@ -417,11 +416,6 @@ watch(() => route.params, async () => {
             padding-bottom: 2.5rem;
         }
         td {
-            .dropdown-context-menu {
-                min-width: 7.25rem !important;
-                margin-top: 0;
-                margin-left: -5.25rem;
-            }
             &.has-width {
                 padding-top: 0.25rem;
                 padding-bottom: 0.25rem;
