@@ -32,15 +32,15 @@ import { gray, indigo } from '@/styles/colors';
 
 interface Props {
     visible?: boolean;
-    project?: ProjectModel;
+    projectId?: string;
     projectGroupId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
-    project: undefined,
+    projectId: undefined,
     projectGroupId: undefined,
 });
-const emit = defineEmits<{(e: 'confirm', project?: ProjectModel): void;
+const emit = defineEmits<{(e: 'confirm', isCreating: boolean, project?: ProjectModel): void;
     (e: 'update:visible', visible?: boolean): void;
 }>();
 
@@ -92,8 +92,8 @@ const createProject = async (): Promise<ProjectModel|undefined> => {
         const params: ProjectCreateParameters = {
             name: projectName.value?.trim() as string,
             project_type: state.selectedAccess,
+            project_group_id: props.projectGroupId,
         };
-        if (props.projectGroupId) params.project_group_id = props.projectGroupId;
         const res = await SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>({
             ...params,
         });
@@ -110,7 +110,7 @@ const updateProject = async (): Promise<ProjectModel|undefined> => {
     state.loading = true;
     try {
         const params: ProjectUpdateParameters = {
-            project_id: props.project?.project_id || router.currentRoute.params.id,
+            project_id: props.projectId || router.currentRoute.params.id,
             name: projectName.value?.trim() as string,
         };
         const res = await SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>({
@@ -128,7 +128,7 @@ const updateProject = async (): Promise<ProjectModel|undefined> => {
 const updateProjectType = async (): Promise<ProjectModel|undefined> => {
     try {
         const params: ProjectUpdateProjectTypeParameters = {
-            project_id: props.project?.project_id || router.currentRoute.params.id,
+            project_id: props.projectId || router.currentRoute.params.id,
             project_type: state.selectedAccess,
         };
         const res = await SpaceConnector.clientV2.identity.project.updateProjectType<ProjectUpdateProjectTypeParameters, ProjectModel>({
@@ -149,20 +149,20 @@ const confirm = async () => {
 
     state.isConfirmed = true;
 
-    if (props.project) { // update project
+    if (props.projectId) { // update project
         const updatedProject1 = await updateProject();
         const updatedProject2 = await updateProjectType();
         if ((updatedProject1 && updatedProject2) || updatedProject2) {
             await projectStore.sync(updatedProject2);
-            emit('confirm', updatedProject2);
+            emit('confirm', false, updatedProject2);
         } else if (updatedProject1) {
             await projectStore.sync(updatedProject1);
-            emit('confirm', updatedProject1);
+            emit('confirm', false, updatedProject1);
         }
     } else { // create project
         const project = await createProject();
         if (project) {
-            emit('confirm');
+            emit('confirm', true, project);
         }
     }
     state.proxyVisible = false;
@@ -175,23 +175,28 @@ watch(() => state.proxyVisible, (visible) => {
     if (!visible) return;
     state.isConfirmed = false;
 }, { immediate: true });
-watch(() => props.project, async (project) => {
+watch(() => props.projectId, async (projectId) => {
+    if (!projectId) {
+        initForm();
+        return;
+    }
+    const project = projectStore.state.items ? projectStore.state.items[projectId] : undefined;
     if (project) {
         setForm('projectName', project?.name);
-        state.selectedAccess = project?.project_type ?? 'PRIVATE';
+        state.selectedAccess = project?.data.projectType ?? 'PRIVATE';
     } else initForm();
 }, { immediate: true });
 watch(() => projectStore.state.items, (items) => {
     if (isEmpty(items)) return;
-    const names = Object.values(items).map((project: ProjectReferenceItem) => project.name);
-    state.projectNames = names.filter((name) => name !== props.project?.name);
+    const names = Object.values(items).filter((item) => item.key !== props.projectId).map((project: ProjectReferenceItem) => project.name);
+    state.projectNames = names;
 }, { immediate: true });
 </script>
 
 <template>
     <p-button-modal
         class="project-form-modal"
-        :header-title="props.project ? $t('PROJECT.DETAIL.MODAL_UPDATE_PROJECT_TITLE') : $t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_TITLE')"
+        :header-title="props.projectId ? $t('PROJECT.DETAIL.MODAL_UPDATE_PROJECT_TITLE') : $t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_TITLE')"
         centered
         size="sm"
         fade

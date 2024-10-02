@@ -8,18 +8,17 @@ import { isEmpty } from 'lodash';
 
 import type { MenuAttachHandler } from '@/hooks/context-menu-controller/context-menu-attach';
 import { useContextMenuAttach } from '@/hooks/context-menu-controller/context-menu-attach';
-import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
+import { useContextMenuStyle } from '@/hooks/context-menu-fixed-style';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import { getTextHighlightRegex } from '@/utils/helpers';
 
 export interface UseContextMenuControllerOptions<Item extends MenuItem = MenuItem> {
     targetRef: Ref<HTMLElement|Vue|null>; // required for style
 
-    contextMenuRef?: Ref<any|null>; // required when using focusing feature by focusOnContextMenu()
+    contextMenuRef: Ref<HTMLElement|any|null>; // required when using focusing feature by focusOnContextMenu()
     /*
     Useful when used inside an element whose css position attribute value is fixed.
-    It automatically resizes and provides a function that automatically closes when scrolling.
-    contextMenuStyle is returned only when this value is true.
+    It automatically check targetRef's position and adjust the context menu's position.
      */
     useFixedStyle?: Ref<boolean|undefined>|boolean;
 
@@ -41,10 +40,11 @@ export interface UseContextMenuControllerOptions<Item extends MenuItem = MenuIte
     pageSize?: Ref<number|undefined>|number;
 
     /* In the context of 'useFixedStyle,' to adjust the position of the context menu relative to the target, the default value is 'left.'  */
-    position?: 'left' | 'right';
+    position?: Ref<'left'|'right'|undefined>|'left'|'right';
+    boundary?: Ref<string|undefined>|string;
+
+    /* Whether to hide the header when there are no items in the header */
     hideHeaderWithoutItems?: Ref<boolean|undefined>|boolean;
-    multiSelectable?: Ref<boolean|undefined>|boolean;
-    parentId?: Ref<string|undefined>|string;
 }
 
 
@@ -52,7 +52,7 @@ interface FocusOnContextMenu { (position?: number): void }
 
 export const useContextMenuController = <Item extends MenuItem = MenuItem>({
     useFixedStyle, targetRef, contextMenuRef, visibleMenu, useReorderBySelection, menu, selected,
-    useMenuFiltering, searchText, handler, pageSize, position, hideHeaderWithoutItems, multiSelectable, parentId,
+    useMenuFiltering, searchText, handler, pageSize, position, hideHeaderWithoutItems, boundary,
 }: UseContextMenuControllerOptions<Item>) => {
     if (!targetRef) throw new Error('\'targetRef\' option must be given.');
     if (useReorderBySelection) {
@@ -87,14 +87,13 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
     /* fixed style */
     const {
         contextMenuStyle,
-    } = useContextMenuFixedStyle({
+    } = useContextMenuStyle({
         useFixedMenuStyle: toRef(state, 'useFixedStyle'),
         visibleMenu: toRef(state, 'visibleMenu'),
         targetRef,
-        position: state.position,
+        position: toRef(state, 'position'),
         menuRef: contextMenuRef,
-        multiSelectable: multiSelectable ?? false,
-        parentId,
+        boundary,
     });
 
     // menu filtering
@@ -211,7 +210,7 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
     const focusOnContextMenu: FocusOnContextMenu = async (focusPosition?: number) => {
         showContextMenu();
         if (state.contextMenuRef) {
-            state.contextMenuRef.focus(focusPosition);
+            state.contextMenuRef.focus(focusPosition); // contextMenu component has focus method
         }
     };
     const initiateMenu = async () => {

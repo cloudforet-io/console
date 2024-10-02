@@ -12,7 +12,6 @@ const heatmap: WidgetConfig = {
     },
     requiredFieldsSchema: {
         granularity: {},
-        dataField: {},
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
@@ -21,14 +20,7 @@ const heatmap: WidgetConfig = {
                 defaultIndex: 0,
             },
         },
-        yAxis: {
-            options: {
-                dataTarget: 'labels_info',
-                defaultMaxCount: 7,
-                max: 14,
-                defaultIndex: 1,
-            },
-        },
+        tableDataField: {},
         colorSchema: {},
     },
     optionalFieldsSchema: {

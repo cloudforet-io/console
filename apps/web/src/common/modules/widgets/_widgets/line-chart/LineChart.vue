@@ -15,9 +15,10 @@ import {
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { numberFormatter } from '@cloudforet/utils';
 
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
 import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
 
@@ -29,7 +30,6 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
-    getApiQueryDateRange,
     getReferenceLabel, getRefinedDynamicFieldData,
     getWidgetBasedOnDate,
     getWidgetDateFields,
@@ -37,14 +37,18 @@ import {
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import { getWidgetLoadApiQueryDateRange, getWidgetLoadApiQuery } from '@/common/modules/widgets/_helpers/widget-load-helper';
+import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
+import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { DateRange, DynamicFieldData, StaticFieldData } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type {
-    XAxisValue, DateFormatValue, TableDataFieldValue,
-    DisplaySeriesLabelValue, NumberFormatValue, LegendValue, MissingValueValue,
-} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -59,7 +63,14 @@ const state = reactive({
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     chart: null as EChartsType | null,
-    xAxisData: [],
+    xAxisData: computed<string[]>(() => {
+        if (!state.data?.results?.length) return [];
+        if (isDateField(state.xAxisField)) {
+            const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
+            return getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
+        }
+        return state.data.results.map((d) => d[state.xAxisField] as string) || [];
+    }),
     chartData: [],
     isAreaChart: computed<boolean>(() => props.widgetName === 'stackedAreaChart'),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[state.dataField]),
@@ -125,20 +136,26 @@ const state = reactive({
     xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
     xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
     dataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
-    dataField: computed<string|string[]|undefined>(() => state.dataFieldInfo?.value),
-    dynamicFieldValue: computed<string[]>(() => state.dataFieldInfo?.dynamicFieldValue || []),
+    dynamicFieldInfo: computed<TableDataFieldValue['dynamicFieldInfo']>(() => state.dataFieldInfo?.dynamicFieldInfo),
+    staticFieldInfo: computed<TableDataFieldValue['staticFieldInfo']>(() => state.dataFieldInfo?.staticFieldInfo),
+    dataField: computed<string|string[]|undefined>(() => {
+        if (state.dataFieldInfo?.fieldType === 'staticField') return state.staticFieldInfo?.fieldValue;
+        return state.dynamicFieldInfo?.fieldValue;
+    }),
+    dynamicFieldValue: computed<string[]>(() => state.dynamicFieldInfo?.fixedValue || []),
     dateRange: computed<DateRange>(() => {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
-        if (Object.values(DATE_FIELD).includes(state.xAxisField)) {
+        if (isDateField(state.xAxisField)) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
-        } else if (Object.values(DATE_FIELD).includes(state.dataField)) {
-            if (state.dynamicFieldValue.length) {
-                const _sortedDateValue = [...state.dynamicFieldValue];
-                _sortedDateValue.sort();
-                _start = _sortedDateValue[0];
-                _end = _sortedDateValue[_sortedDateValue.length - 1];
+        } else if (isDateField(state.dataField)) {
+            let subtract = state.dynamicFieldInfo.count;
+            if (state.dynamicFieldInfo?.valueType === 'fixed') {
+                if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
+                if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
+                if (state.granularity === GRANULARITY.DAILY) subtract = 30;
             }
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
         }
         return { start: _start, end: _end };
     }),
@@ -160,57 +177,31 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Api */
+const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
+const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
-        const _fields = {};
-        let _groupBy: string[] = [state.xAxisField];
-        let _field_group: string[] = [];
-        let _sort: Query['sort'] = [];
-        let _filter: Query['filter'] = [];
-        if (state.dataFieldInfo?.fieldType === 'staticField') {
-            state.dataField?.forEach((field) => {
-                _fields[field] = { key: field, operator: 'sum' };
-            });
-            _sort = _groupBy.includes('Date') ? [{ key: 'Date', desc: false }] : state.dataField.map((field) => ({ key: field, desc: true }));
-        } else {
-            const _criteria = state.dataFieldInfo?.criteria;
-            _fields[_criteria] = { key: _criteria, operator: 'sum' };
-            _field_group = [state.dataField];
-            _groupBy = [..._groupBy, state.dataField];
-            _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${_criteria}`, desc: true }];
-        }
-        if (isDateField(state.dataField) && state.dataFieldInfo?.fieldType === 'dynamicField' && state.dataFieldInfo?.dynamicFieldValue?.length) {
-            _filter = [{
-                k: state.dataField,
-                v: state.dataFieldInfo.dynamicFieldValue,
-                o: 'in',
-            }];
-        }
-        //
+        state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-            : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
-        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
+        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
         const _query: any = {
             granularity: state.granularity,
-            start: _queryDateRange.start,
-            end: _queryDateRange.end,
-            group_by: _groupBy,
-            fields: _fields,
-            field_group: _field_group,
-            sort: _sort,
             page: { start: 1, limit: state.xAxisCount },
-            filter: _filter,
+            ...getWidgetLoadApiQueryDateRange(state.granularity, state.dateRange),
+            ...getWidgetLoadApiQuery(state.dataFieldInfo, state.xAxisField),
         };
-        const res = await _fetcher({
+        const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             query: _query,
             vars: props.dashboardVars,
         });
-        state.errorMessage = undefined;
-        return res;
+        if (status === 'succeed') {
+            state.errorMessage = undefined;
+            state.loading = false;
+            return response;
+        }
+        return undefined;
     } catch (e: any) {
         state.loading = false;
         state.errorMessage = e.message;
@@ -222,7 +213,7 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
 /* Util */
 const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
     // get refined data and series fields
-    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dataFieldInfo?.criteria, state.dataField, state.dynamicFieldValue);
+    const [_refinedResults, _seriesFields] = getRefinedDynamicFieldData(rawData, state.dynamicFieldInfo, state.xAxisField);
 
     // get chart data
     const _seriesData: any[] = [];
@@ -230,9 +221,9 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
     const _unit = widgetFrameProps.value.unitMap?.[state.dataField];
     _seriesFields.forEach((field) => {
         const _data: number[] = [];
-        state.xAxisData.forEach((d) => {
+        state.xAxisData?.forEach((d) => {
             const _result = _refinedResults.find((result) => result[state.xAxisField] === d);
-            const _value = _result?.[state.dataFieldInfo?.criteria].find((v) => v[state.dataField] === field);
+            const _value = _result?.[state.dynamicFieldInfo?.criteria].find((v) => v[state.dataField] === field);
             _data.push(_value?.value || _defaultValue);
         });
         _seriesData.push({
@@ -246,7 +237,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
                 position: state.displaySeriesLabel?.position,
                 rotate: state.displaySeriesLabel?.rotate,
                 fontSize: 10,
-                formatter: (p) => getFormattedNumber(p.value, state.dataFieldInfo?.criteria, state.numberFormat, _unit),
+                formatter: (p) => getFormattedNumber(p.value, state.dynamicFieldInfo?.criteria, state.numberFormat, _unit),
             },
         });
     });
@@ -256,7 +247,7 @@ const getDynamicFieldData = (rawData: DynamicFieldData): any[] => {
 const getStaticFieldData = (rawData: StaticFieldData): any[] => {
     const _seriesData: any[] = [];
     const _defaultValue = state.missingValue === 'lineToZero' ? 0 : undefined;
-    state.dataField.forEach((field) => {
+    state.dataField?.forEach((field) => {
         const _unit = widgetFrameProps.value.unitMap?.[field];
         _seriesData.push({
             name: field,
@@ -281,14 +272,6 @@ const getStaticFieldData = (rawData: StaticFieldData): any[] => {
 const drawChart = (rawData: Data|null) => {
     if (isEmpty(rawData)) return;
 
-    // set xAxis data
-    if (isDateField(state.xAxisField)) {
-        const _isSeparatedDate = state.xAxisField !== DATE_FIELD.DATE;
-        state.xAxisData = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end, _isSeparatedDate);
-    } else {
-        state.xAxisData = rawData?.results?.map((d) => d[state.xAxisField] as string) || [];
-    }
-
     // get converted chart data
     let _seriesData: any[];
     if (state.dataFieldInfo?.fieldType === 'staticField') {
@@ -300,12 +283,11 @@ const drawChart = (rawData: Data|null) => {
 };
 
 const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    state.loading = true;
     const res = await fetchWidget();
+    if (!res) return state.data;
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);
-    state.loading = false;
     return state.data;
 };
 

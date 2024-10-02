@@ -27,7 +27,7 @@ const extraArgs: Args = {
     visibleMenu: false,
     menuPosition: CONTEXT_MENU_POSITION.LEFT,
     indexMode: false,
-    parentId: undefined,
+    boundary: undefined,
     disableHandler: false,
     pageSize: 10,
     resetSelectedOnUnmounted: true,
@@ -311,10 +311,10 @@ const extraArgTypes: ArgTypes = {
         },
         control: 'boolean',
     },
-    parentId: {
-        name: 'parentId',
+    boundary: {
+        name: 'boundary',
         type: { name: 'string' },
-        description: 'The property to automatically hide the context menu when scrolling, if the Select-Dropdown\'s parent component exists.',
+        description: 'When the menu is opened, the menu is displayed within the boundary element. The boundary element is a CSS selector.',
         table: {
             type: {
                 summary: 'string',

@@ -1,3 +1,5 @@
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+
 import type {
     DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN, DATA_TABLE_OPERATOR, JOIN_TYPE,
     EVAL_EXPRESSION_TYPE,
@@ -27,9 +29,11 @@ export interface DataTableAddOptions {
     date_format?: DateFormat;
     additional_labels?: AdditionalLabels;
     timediff?: TimeDiff;
-    filter?: any[];
-    filter_or?: any[];
+    filter?: DataTableQueryFilter[];
+    filter_or?: DataTableQueryFilter[];
 }
+export type DataTableQueryFilter = ApiFilter;
+
 export interface AssetOptions {
     metric_id: string;
 }

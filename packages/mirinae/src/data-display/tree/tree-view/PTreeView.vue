@@ -57,7 +57,7 @@ const handleUpdateTreeDisplayMap = (id: string|undefined, isOpen: boolean) => {
 
 </script>
 <template>
-    <div class="tree-view">
+    <div class="p-tree-view">
         <p-tree-item v-for="item in treeData"
                      :key="item.id"
                      :node="item"
@@ -95,7 +95,7 @@ const handleUpdateTreeDisplayMap = (id: string|undefined, isOpen: boolean) => {
 </template>
 
 <style scoped lang="postcss">
-.tree-view {
+.p-tree-view {
     width: 100%;
 }
 </style>

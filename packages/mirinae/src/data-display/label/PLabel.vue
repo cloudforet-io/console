@@ -97,7 +97,6 @@ export default defineComponent<LabelProps>({
     height: 1.25rem;
     padding: 0 0.5rem;
     width: fit-content;
-    margin-right: 0.375rem;
     box-sizing: border-box;
 
     .label-content {

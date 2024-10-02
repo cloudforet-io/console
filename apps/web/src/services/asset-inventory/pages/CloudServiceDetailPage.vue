@@ -41,7 +41,11 @@ import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
-import { queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string';
+import {
+    arrayToQueryString, queryStringToArray,
+    queryStringToObject,
+    replaceUrlQuery,
+} from '@/lib/router-query-string';
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -59,6 +63,7 @@ import {
     TABLE_MIN_HEIGHT, useAssetInventorySettingsStore,
 } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
+import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import type { Period } from '@/services/asset-inventory/types/type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
@@ -81,6 +86,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const cloudServiceLSBStore = useCloudServiceLSBStore();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -105,6 +111,14 @@ const fetchOptionState = reactive({
     sortDesc: true,
     sortBy: 'created_at',
     queryTags: computed(() => queryTagsHelper.queryTags.value),
+});
+
+const state = reactive({
+    urlQueryString: computed(() => ({
+        project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
+        service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
+        filters: urlQueryStringFilters.value,
+    })),
 });
 
 const typeOptionState = reactive({
@@ -284,6 +298,7 @@ const getQuery = () => {
     apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters(hiddenFilters.value)
+        .addFilter(...cloudServiceLSBStore.getters.allFilters)
         .addFilter(...searchFilters.value);
 
     if (props.isSecurityPage) {
@@ -341,10 +356,11 @@ const fetchTableData = async (changed: DynamicLayoutFetchOptions = {}) => {
     typeOptionState.selectIndex = [];
 };
 
-watch(urlQueryStringFilters, (queryStringFilters) => {
-    const routeQueryString = route.query.filters ?? '';
-    if (JSON.stringify(queryStringFilters) !== JSON.stringify(routeQueryString)) {
-        replaceUrlQuery('filters', queryStringFilters);
+watch(() => state.urlQueryString, (urlQueryString) => {
+    const routeQueryString = route.query ?? '';
+    if (JSON.stringify(urlQueryString) !== JSON.stringify(routeQueryString)) {
+        replaceUrlQuery(urlQueryString);
+        initPage();
     }
 });
 
@@ -393,7 +409,30 @@ const reloadTable = async () => {
 const handleClickSettings = () => {
     tableState.visibleCustomFieldModal = true;
 };
-
+const initPage = async (initQueryTags = false) => {
+    if (!props.isServerPage && !props.name) return;
+    if (initQueryTags) setQueryTags([]);
+    tableState.schema = await getTableSchema();
+    resetSort(tableState.schema.options);
+    if (tableState.defaultFilter?.length) {
+        queryTagsHelper.setFilters([
+            ...convertToQueryTag(tableState.defaultFilter),
+            ...searchFilters.value,
+        ]);
+    }
+    await fetchTableData();
+};
+const initDefaultFilter = () => {
+    const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : [route.query.default_filters]);
+    if (defaultSearchQuery.length) {
+        tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined))
+            .filter((d) => d);
+    }
+};
+const initExcelFilter = () => {
+    excelQuery.setFiltersAsRawQueryString(route.query.filters);
+    excelQuery.addFilter(...cloudServiceLSBStore.getters.allFilters);
+};
 
 /* Actions */
 const handleDynamicLayoutFetch = (changed: ToolboxOptions = {}) => {
@@ -408,6 +447,7 @@ const handleDynamicLayoutFetch = (changed: ToolboxOptions = {}) => {
     fetchTableData(changed);
 };
 const handleClickConnectToConsole = () => { window.open(tableState.consoleLink, '_blank'); };
+
 /* Usage Overview */
 const handleDeletePeriodFilter = () => {
     overviewState.period = undefined;
@@ -437,15 +477,8 @@ watch(() => keyItemSets.value, (after) => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 debouncedWatch([() => props.group, () => props.name, () => props.provider], async () => {
-    if (!props.isServerPage && !props.name) return;
-    setQueryTags([]);
-    tableState.schema = await getTableSchema();
-    resetSort(tableState.schema.options);
-    if (tableState.defaultFilter?.length) {
-        queryTagsHelper.setFilters(convertToQueryTag(tableState.defaultFilter));
-    }
-    await fetchTableData();
-}, { immediate: true, debounce: 200 });
+    await initPage(true);
+});
 
 
 const ApiQueryToRawQueryMap = {
@@ -458,16 +491,21 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
     o: ApiQueryToRawQueryMap[condition.operator] ?? '=',
 }));
 
-(() => {
-    const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : [route.query.default_filters]);
-    if (defaultSearchQuery.length) {
-        tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined))
-            .filter((d) => d);
-        excelQuery.setFiltersAsRawQueryString(route.query.filters);
-        cloudServiceDetailPageStore.$patch((_state) => {
-            _state.searchFilters = excelQuery.filters;
-        });
-    }
+(async () => {
+    initDefaultFilter();
+    initExcelFilter();
+
+    const urlQueryValue = {
+        project: queryStringToArray(route.query.project),
+        service_account: queryStringToArray(route.query.service_account),
+    };
+    cloudServiceLSBStore.setSelectedProjectsToFilters(urlQueryValue.project);
+    cloudServiceLSBStore.setSelectedServiceAccountsToFilters(urlQueryValue.service_account);
+    cloudServiceDetailPageStore.$patch((_state) => {
+        _state.searchFilters = searchFilters.value;
+    });
+
+    await initPage();
 })();
 </script>
 

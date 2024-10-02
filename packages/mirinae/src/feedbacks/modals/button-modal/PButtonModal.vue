@@ -280,7 +280,6 @@ export default defineComponent<ButtonModalProps>({
         transition: all 0.3s ease;
         justify-content: space-between;
         padding: 2rem 2rem;
-        margin-top: 4rem;
 
         &.no-footer {
             padding-bottom: 2.5rem;
@@ -304,7 +303,7 @@ export default defineComponent<ButtonModalProps>({
 
                 &.alert-header {
                     @apply relative;
-                    word-break: break-all;
+                    word-break: break-word;
                     text-indent: 2rem;
                     .modal-alert {
                         @apply text-red-400;

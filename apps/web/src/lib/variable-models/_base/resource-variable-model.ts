@@ -4,7 +4,7 @@ import {
 
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type {
@@ -94,9 +94,9 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         const apiQueryHelper = new ApiQueryHelper();
 
         // Additional Filter (ex. data_source_id)
-        if (query.primaryOptions) {
+        if (query.options) {
             apiQueryHelper.setFilters([]);
-            Object.entries(query.primaryOptions).forEach(([key, value]) => {
+            Object.entries(query.options).forEach(([key, value]) => {
                 apiQueryHelper.addFilter({ k: key, v: value, o: '=' });
             });
             apiQueryHelper.addFilter({ k: dataKey, v: [null, ''], o: '!=' });
@@ -137,6 +137,12 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         apiQueryHelper.setFilters([
             { k: this._meta.idKey, v: [null, ''], o: '!=' },
         ]);
+
+        if (query.options) {
+            Object.entries(query.options).forEach(([key, value]) => {
+                apiQueryHelper.addFilter({ k: key, v: value, o: '=' });
+            });
+        }
 
         if (query.search) {
             const searchFilters = this.#searchTargets.map((key) => ({
@@ -210,7 +216,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                     const _presetValues = presetValues;
                     const _resultsWithPreset = [
                         ...(query.start === 1 ? (_presetValues ?? []).map((d) => ({ name: d, key: d })) : []),
-                        ...(response.results.filter((d) => !_presetValues?.includes(d)).map((d) => ({ key: d, name: d })) ?? []),
+                        ...(response.results?.filter((d) => !_presetValues?.includes(d)).map((d) => ({ key: d, name: d })) ?? []),
                     ];
 
                     this.#response = {

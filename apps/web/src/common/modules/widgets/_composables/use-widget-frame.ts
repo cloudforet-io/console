@@ -19,10 +19,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetFrameEmit, WidgetProps, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
-import type { WidgetFieldValues, DisplayAnnotationValue } from '@/common/modules/widgets/types/widget-field-value-type';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { FullDataLink, WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';

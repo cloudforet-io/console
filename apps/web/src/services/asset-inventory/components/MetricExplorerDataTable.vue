@@ -10,7 +10,7 @@ import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PTextPagination, PToolboxTable } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
@@ -36,6 +36,10 @@ import {
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
+import type {
+    CloudServiceDetailPageUrlQuery,
+    CloudServiceMainPageUrlQuery,
+} from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
@@ -83,6 +87,11 @@ const state = reactive({
         fields.push(...state.dateFields);
         return fields.map((d) => {
             const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
+            if (d.name === 'workspace_id') field.reference = { reference_key: 'workspace_id', resource_type: 'identity.Workspace' };
+            if (d.name === 'project_id') field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
+            if (d.name === 'service_account_id') field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
+            if (d.name === 'region_code') field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
+            if (d.name === 'provider') field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
             return field;
         });
     }),
@@ -213,10 +222,7 @@ const handleClickRow = (item) => {
 
     let _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME;
     let _params = {};
-    let apiQuery: {
-        filters: string[],
-        default_filters?: string[],
-    } = {
+    const _query: CloudServiceMainPageUrlQuery|CloudServiceDetailPageUrlQuery = {
         filters: queryHelper.setFilters(_filters).rawQueryStrings,
     };
 
@@ -226,17 +232,14 @@ const handleClickRow = (item) => {
         _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
 
         if (state.metricAdditionalFilter.length) {
-            apiQuery = {
-                ...apiQuery,
-                default_filters: state.metricAdditionalFilter.map((d) => JSON.stringify(d)),
-            };
+            (_query as CloudServiceDetailPageUrlQuery).default_filters = state.metricAdditionalFilter.map((d) => JSON.stringify(d));
         }
     }
 
     window.open(router.resolve(getProperRouteLocation({
         name: _routeName,
         params: _params,
-        query: apiQuery,
+        query: _query,
     })).href, '_blank');
 };
 

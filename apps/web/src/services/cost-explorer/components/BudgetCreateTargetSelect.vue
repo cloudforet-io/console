@@ -69,28 +69,34 @@ const {
 });
 
 /* Util */
-const workspaceHandler: AutocompleteHandler = async (keyword: string) => {
+const workspaceHandler: AutocompleteHandler = async (keyword: string, pageStart = 1, pageLimit = 10) => {
     try {
         state.loading = true;
-        const { results, total_count } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
             query: {
                 keyword,
+                filter: [
+                    { k: 'is_dormant', v: false, o: 'eq' },
+                ],
             },
         });
+        const refinedMenuItems = (results ?? []).map((d) => ({
+            name: d.workspace_id,
+            label: d.name,
+            is_dormant: d.is_dormant,
+            tags: d.tags,
+        }));
+        const totalCount = pageStart - 1 + Number(pageLimit);
+        const slicedResults = refinedMenuItems?.slice(pageStart - 1, totalCount);
         return {
-            results: results?.map((d) => ({
-                name: d.workspace_id,
-                label: d.name,
-                is_dormant: d.is_dormant,
-                tags: d.tags,
-            })) ?? [],
-            totalCount: total_count ?? 0,
+            results: slicedResults,
+            more: totalCount < refinedMenuItems.length,
         };
     } catch (e) {
         ErrorHandler.handleError(e);
         return {
             results: [],
-            totalCount: 0,
+            more: false,
         };
     } finally {
         state.loading = false;

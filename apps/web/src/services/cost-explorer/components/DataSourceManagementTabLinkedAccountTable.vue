@@ -132,6 +132,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
     workspaceListApiQueryHelper.setFilters([
         { k: 'name', v: inputText, o: '' },
         { k: 'state', v: 'ENABLED', o: '=' },
+        { k: 'is_dormant', v: false, o: '' },
     ]);
     try {
         const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
@@ -244,12 +245,14 @@ watch(() => tableState.selectedFilter, (selectedFilter) => {
                                              :theme="getWorkspaceInfo(item.name)?.tags?.theme"
                                              size="xs"
                         />
-                        <span>{{ item.label }}</span>
-                        <span v-if="getWorkspaceInfo(item.name)?.tags?.description"
-                              class="description"
-                        >
-                            - {{ getWorkspaceInfo(item.name)?.tags?.description }}
-                        </span>
+                        <p class="workspace-info">
+                            <span>{{ item.label }}</span>
+                            <span v-if="getWorkspaceInfo(item.name)?.tags?.description"
+                                  class="description"
+                            >
+                                - {{ getWorkspaceInfo(item.name)?.tags?.description }}
+                            </span>
+                        </p>
                         <p-status v-if="item?.is_dormant"
                                   v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
                                   class="capitalize state"
@@ -321,6 +324,10 @@ watch(() => tableState.selectedFilter, (selectedFilter) => {
         .workspace-menu-item {
             @apply flex items-center;
             gap: 0.375rem;
+            .workspace-info {
+                @apply truncate;
+                max-width: 22.125rem;
+            }
             .state {
                 @apply text-label-sm;
             }

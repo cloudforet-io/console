@@ -3,7 +3,11 @@ import {
     defineExpose, reactive, computed, watch, onMounted,
 } from 'vue';
 
+import { flatMap, map, uniq } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
+import type { CancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { PPagination } from '@cloudforet/mirinae';
 
@@ -21,11 +25,23 @@ import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import {
-    getWidgetBasedOnDate,
+    getWidgetBasedOnDate, getWidgetDateFields,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
+import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { MissingValueValue } from '@/common/modules/widgets/_widget-fields/missing-value/type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { ProgressBarValue } from '@/common/modules/widgets/_widget-fields/progress-bar/type';
+import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/table-column-width/type';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
+import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
+import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
 import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
@@ -34,20 +50,6 @@ import type {
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type {
-    GroupByValue,
-    TableDataFieldValue,
-    ComparisonValue,
-    TotalValue,
-    ProgressBarValue,
-    DateFormatValue,
-    NumberFormatValue,
-    DataFieldHeatmapColorValue,
-    TableColumnWidthValue,
-    CustomTableColumnWidthValue,
-    TextWrapValue,
-    MissingValueValue,
-} from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -58,6 +60,7 @@ const emit = defineEmits<WidgetEmit>();
 
 const state = reactive({
     loading: false,
+    isPrivateWidget: computed(() => props.widgetId.startsWith('private')),
     errorMessage: undefined as string|undefined,
     data: null as Data | null,
     fullPageData: null as Data | null,
@@ -79,9 +82,15 @@ const state = reactive({
     basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
     tableDataFieldInfo: computed<TableDataFieldValue>(() => props.widgetOptions?.tableDataField as TableDataFieldValue),
     tableDataFieldType: computed<TableDataFieldValue['fieldType']>(() => state.tableDataFieldInfo?.fieldType),
-    tableDataField: computed<string|string[]|undefined>(() => state.tableDataFieldInfo?.value),
-    tableDataCriteria: computed<string|undefined>(() => state.tableDataFieldInfo?.criteria),
-    tableDataMaxCount: computed<number>(() => state.tableDataFieldInfo?.count),
+    tableDataField: computed<string|string[]|undefined>(() => {
+        if (state.tableDataFieldType === 'staticField') return state.tableDataFieldInfo?.staticFieldInfo?.fieldValue;
+        return state.tableDataFieldInfo?.dynamicFieldInfo?.fieldValue;
+    }),
+    tableDataCriteria: computed<string|undefined>(() => state.tableDataFieldInfo?.dynamicFieldInfo?.criteria),
+    tableDataDynamicValueType: computed<string|undefined>(() => state.tableDataFieldInfo?.dynamicFieldInfo?.valueType),
+    tableDataDynamicFixedValue: computed<string[]|undefined>(() => state.tableDataFieldInfo?.dynamicFieldInfo?.fixedValue),
+    tableDataDynamicCount: computed<number>(() => state.tableDataFieldInfo?.dynamicFieldInfo?.count),
+
     groupByField: computed<string[]|undefined>(() => ((props.widgetOptions?.groupBy as GroupByValue)?.value as string[]) ?? []),
     dateRange: computed<DateRange>(() => {
         let subtract = 1;
@@ -140,14 +149,23 @@ const state = reactive({
                 }
             });
         } else if (isDateField(state.tableDataField)) { // 2-2-1. Dynamic Fields - Date Field Case
-            dataFields = (state.tableDataFieldInfo?.dynamicFieldValue ?? []).map((_fieldName) => ({
+            const autoGeneratedFieldNames = getWidgetDateFields(state.granularity, state.dateRange.start, state.dateRange.end);
+            const _fieldNames = state.tableDataDynamicValueType === 'fixed'
+                ? (state.tableDataDynamicFixedValue ?? [])
+                : autoGeneratedFieldNames.slice(-state.tableDataDynamicCount);
+            dataFields = _fieldNames.map((_fieldName) => ({
                 name: _fieldName,
                 label: _fieldName,
                 fieldInfo: { type: 'dataField', additionalType: 'dateFormat', unit: state.dataInfo?.[state.tableDataCriteria]?.unit },
             }));
         } else { // 2-2-2. Dynamic Fields - None Date Field Case
             const isReferenceField = Object.keys(REFERENCE_FIELD_MAP).includes(state.tableDataField);
-            (state.tableDataFieldInfo?.dynamicFieldValue ?? []).forEach((_fieldName) => {
+
+            const fieldNames = state.tableDataDynamicValueType === 'fixed'
+                ? (state.tableDataDynamicFixedValue ?? [])
+                : getAutoValueTypeTopCountField(state.fullPageData?.results);
+
+            fieldNames.forEach((_fieldName) => {
                 dataFields.push({
                     name: _fieldName,
                     label: _fieldName,
@@ -214,7 +232,8 @@ const getTotalDataItem = (data: TableDataItem[], type: 'static'|'time_series'|'d
     const totalDataItem: TableDataItem = {};
     if ((state.groupByField ?? []).length) totalDataItem[(state.groupByField ?? [])[0]] = 'Total';
     if (type === 'static') {
-        [...state.tableDataField, 'sub_total'].forEach((field) => {
+        const _tableDataField = state.tableDataField ?? [];
+        [..._tableDataField, 'sub_total'].forEach((field) => {
             totalDataItem[field] = data.reduce((acc, cur) => acc + cur[field], 0);
             if (field !== 'sub_total' && hasComparisonInfo) {
                 const comparisionFieldName = `comparison_${field}`;
@@ -232,9 +251,11 @@ const getTotalDataItem = (data: TableDataItem[], type: 'static'|'time_series'|'d
                 return { [state.tableDataField]: field.name, value: totalValue };
             });
     } else if (type === 'dynamic') {
-        const fieldForTotal = data?.[0]?.[state.tableDataCriteria] ?? [];
-        totalDataItem[state.tableDataCriteria] = fieldForTotal.map((item) => {
-            const fieldName = `${item[state.tableDataField]}`;
+        const fullDynamicFieldValue = uniq(flatMap(data ?? [], (item) => map(item[state.tableDataCriteria], state.tableDataField))); // all uniq field
+        const fixedFieldValue = state.tableDataDynamicValueType === 'fixed' ? (state.tableDataDynamicFixedValue ?? []) : fullDynamicFieldValue;
+        totalDataItem[state.tableDataCriteria] = [...fixedFieldValue, 'etc', 'sub_total'].map((item) => {
+            const fieldName = `${item}`;
+
             if (fieldName.startsWith('comparison_')) {
                 const targetTotalValue = data.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.target || 0), 0);
                 const subjectTotalValue = data.reduce((acc, cur) => acc + (cur[state.tableDataCriteria].find((c) => c[state.tableDataField] === fieldName)?.value?.subject || 0), 0);
@@ -253,16 +274,23 @@ const getTotalDataItem = (data: TableDataItem[], type: 'static'|'time_series'|'d
 
     return totalDataItem;
 };
+const getAutoValueTypeTopCountField = (fullPageDataResults: TableDataItem[]): string[] => {
+    if (!fullPageDataResults) return [];
+    const fullTotalDataItem = getTotalDataItem(fullPageDataResults, 'dynamic');
+    const sortedFullTotalDataValues = fullTotalDataItem[state.tableDataCriteria].sort((a, b) => b.value - a.value)
+        .filter((item) => item[state.tableDataField] !== 'sub_total' && item[state.tableDataField] !== 'etc');
 
-const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: boolean }): Promise<Data|APIErrorToast|undefined> => {
+    return sortedFullTotalDataValues.map((item) => item[state.tableDataField]).slice(0, state.tableDataDynamicCount);
+};
+
+const fetchWidget = async (
+    loadFetcher: CancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>,
+    options: { isComparison?: boolean, fullDataFetch?: boolean },
+): Promise<Data|APIErrorToast|undefined> => {
     const { isComparison, fullDataFetch } = options;
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
         state.loading = true;
-        const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-            : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
         // Set Query
         const _fields = {};
         let _groupBy: string[] = [...state.groupByField];
@@ -281,10 +309,10 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
             _sort = _groupBy.includes('Date') && !_field_group.includes('Date') ? [{ key: 'Date', desc: false }] : [{ key: `_total_${state.tableDataCriteria}`, desc: true }];
         }
         // Filter (Only for Dynamic Field with Date Field)
-        if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField' && state.tableDataFieldInfo?.dynamicFieldValue?.length) {
+        if (isDateField(state.tableDataField) && state.tableDataFieldType === 'dynamicField' && state.tableDataDynamicFixedValue?.length) {
             _filter = [{
                 k: state.tableDataField,
-                v: state.tableDataFieldInfo.dynamicFieldValue,
+                v: state.tableDataDynamicFixedValue,
                 o: 'in',
             }];
         }
@@ -295,7 +323,7 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
                 limit: state.pageSize,
             },
         };
-        const res = await _fetcher({
+        const { status, response } = await loadFetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
@@ -309,8 +337,12 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
             },
             vars: props.dashboardVars,
         });
-        state.errorMessage = undefined;
-        return res;
+
+        if (status === 'succeed') {
+            state.errorMessage = undefined;
+            return response;
+        }
+        return undefined;
     } catch (e: any) {
         state.errorMessage = e.message;
         ErrorHandler.handleError(e);
@@ -319,23 +351,39 @@ const fetchWidget = async (options: { isComparison?: boolean, fullDataFetch?: bo
         state.loading = false;
     }
 };
+
+const defaultFetcher = state.isPrivateWidget ? SpaceConnector.clientV2.dashboard.privateWidget.load : SpaceConnector.clientV2.dashboard.publicWidget.load;
+const widgetBaseLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
+const widgetComparisonLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
+const widgetFullDataLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
+const widgetFullDataComparisonLoadFetcher = getCancellableFetcher<PrivateWidgetLoadParameters|PublicWidgetLoadParameters, Data>(defaultFetcher);
+
 const loadWidget = async (manualLoad?: boolean): Promise<Data|APIErrorToast> => {
     if (!manualLoad) {
         state.sortBy = [];
         state.thisPage = 1;
     }
-    const res = await fetchWidget({});
-    const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget({ isComparison: true }) : null;
+
+    const res = await fetchWidget(widgetBaseLoadFetcher, {});
+    if (res === undefined) return state.data;
+    const comparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget(widgetComparisonLoadFetcher, { isComparison: true }) : null;
+    if (comparisonRes === undefined) return state.data;
     if (typeof res === 'function') return res;
     state.data = res;
     state.comparisonData = comparisonRes;
 
-    if (state.totalInfo?.toggleValue) {
-        const fullDataRes = await fetchWidget({ fullDataFetch: true });
-        const fullDataComparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format ? await fetchWidget({ isComparison: true, fullDataFetch: true }) : null;
+    const _isDynamicAutoValueType = state.tableDataDynamicValueType === 'auto';
+    if (state.totalInfo?.toggleValue || _isDynamicAutoValueType) {
+        const fullDataRes = await fetchWidget(widgetFullDataLoadFetcher, { fullDataFetch: true });
+        if (fullDataRes === undefined) return state.data;
+        const fullDataComparisonRes = state.isComparisonEnabled && state.comparisonInfo?.format
+            ? await fetchWidget(widgetFullDataComparisonLoadFetcher, { isComparison: true, fullDataFetch: true })
+            : null;
+        if (fullDataComparisonRes === undefined) return state.data;
         state.fullPageData = fullDataRes;
         state.fullPageComparisonData = fullDataComparisonRes;
     }
+
     return state.data;
 };
 
@@ -410,11 +458,11 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
             // Sub Total Data
             const subTotal = {
                 [state.tableDataField]: 'sub_total',
-                value: d[state.tableDataCriteria].slice(-state.tableDataMaxCount).reduce((acc, cur) => acc + cur.value, 0),
+                value: d[state.tableDataCriteria].slice(-state.tableDataDynamicCount).reduce((acc, cur) => acc + cur.value, 0),
             };
             return {
                 ...d,
-                [state.tableDataCriteria]: [...d[state.tableDataCriteria].slice(-state.tableDataMaxCount), subTotal],
+                [state.tableDataCriteria]: [...d[state.tableDataCriteria].slice(-state.tableDataDynamicCount), subTotal],
             };
         });
 
@@ -423,11 +471,11 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
             const fullDataResults = _fullPageDataResults.map((d) => {
                 const subTotal = {
                     [state.tableDataField]: 'sub_total',
-                    value: d[state.tableDataCriteria].slice(-state.tableDataMaxCount).reduce((acc, cur) => acc + cur.value, 0),
+                    value: d[state.tableDataCriteria].slice(-state.tableDataDynamicCount).reduce((acc, cur) => acc + cur.value, 0),
                 };
                 return {
                     ...d,
-                    [state.tableDataCriteria]: [...d[state.tableDataCriteria].slice(-state.tableDataMaxCount), subTotal],
+                    [state.tableDataCriteria]: [...d[state.tableDataCriteria].slice(-state.tableDataDynamicCount), subTotal],
                 };
             });
             const fullTotalDataItem = getTotalDataItem(fullDataResults, 'time_series');
@@ -455,8 +503,11 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
                     });
                 }
             });
+            const _fieldNames = state.tableDataDynamicValueType === 'fixed'
+                ? (state.tableDataDynamicFixedValue ?? [])
+                : getAutoValueTypeTopCountField(_fullPageDataResults);
             const etcValue = d[`_total_${state.tableDataCriteria}`]
-                - (dynamicFieldData.filter((item) => state.tableDataFieldInfo?.dynamicFieldValue?.includes(item[state.tableDataField])).reduce((acc, cur) => acc + cur.value, 0) ?? 0);
+                - (dynamicFieldData.filter((item) => _fieldNames?.includes(item[state.tableDataField])).reduce((acc, cur) => acc + cur.value, 0) ?? 0);
             return {
                 ...d,
                 [state.tableDataCriteria]: [
@@ -474,7 +525,8 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
         });
 
         // Full Total Data
-        if (state.totalInfo?.toggleValue) {
+        const _isDynamicAutoValueType = state.tableDataDynamicValueType === 'auto';
+        if (state.totalInfo?.toggleValue || _isDynamicAutoValueType) {
             const fullDataComparisonData = state.fullPageComparisonData?.results ?? [];
             const fullDataResults = _fullPageDataResults.map((d) => {
                 const dynamicFieldData = d[state.tableDataCriteria] ?? [];
@@ -515,6 +567,7 @@ watch([() => state.data, () => state.fullPageData], ([data, fullPageData]) => {
         state.noneTimeSeriesDynamicFieldSlicedData = { results };
     }
 }, { immediate: true });
+
 
 onMounted(async () => {
     if (!props.dataTableId) return;

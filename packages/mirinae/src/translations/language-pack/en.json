@@ -101,6 +101,9 @@
 	"SELECT_DROPDOWN": {
 		"SELECT": "Select"
 	},
+	"TAB": {
+		"BACK": "Back"
+	},
 	"TEXT_INPUT": {
 		"HIDE": "Hide",
 		"SHOW": "Show"

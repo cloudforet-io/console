@@ -65,6 +65,10 @@ const state = reactive({
 const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
+        const queryOptions: Record<string, any> = {};
+        if (labelKey.key === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
+            queryOptions.is_dormant = false;
+        }
         if (isEmpty(labelKey.reference)) {
             const MetricVariableModel = new VariableModelFactory(
                 { type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.metric_data },
@@ -86,7 +90,7 @@ const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
             }
         }
         if (!variableModelInfo) return async () => ({ results: [] });
-        const handler = getVariableModelMenuHandler([variableModelInfo]);
+        const handler = getVariableModelMenuHandler([variableModelInfo], queryOptions);
         return async (...args) => {
             try {
                 state.loading = true;
@@ -187,16 +191,5 @@ watch(() => props.visible, (visible) => {
         vertical-align: middle;
         padding: 0.5rem 0;
     }
-}
-
-/* custom design-system component - p-context-menu */
-:deep(.p-context-menu) {
-    /*
-        CAUTION:
-        When the parent has a specific style attribute called 'transform,' 'fixed' behaves like 'absolute,' causing the context-menu's top position not to work correctly,
-        so it is manually forced to be specified.
-    */
-    top: initial !important;
-    left: initial !important;
 }
 </style>

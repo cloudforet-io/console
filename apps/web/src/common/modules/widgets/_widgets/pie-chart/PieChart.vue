@@ -15,6 +15,7 @@ import type { LegendOption, EChartsOption } from 'echarts/types/dist/shared';
 import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -29,20 +30,20 @@ import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/u
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
-    getApiQueryDateRange,
     getReferenceLabel,
     getWidgetBasedOnDate,
     getWidgetDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
+import type { DateFormatValue } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-fields/display-series-label/type';
+import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { LegendValue } from '@/common/modules/widgets/_widget-fields/legend/type';
+import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type {
-    GroupByValue, DateFormatValue, DisplaySeriesLabelValue, NumberFormatValue,
-    LegendValue,
-} from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
@@ -135,7 +136,13 @@ const state = reactive({
                     position: state.displaySeriesLabel?.position,
                     rotate: state.displaySeriesLabel?.rotate,
                     fontSize: 10,
-                    formatter: (p) => getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit),
+                    formatter: (p) => {
+                        if (p.percent < 5) return '';
+                        if (state.seriesFormat === 'percent') {
+                            return `${p.percent}%`;
+                        }
+                        return getFormattedNumber(p.value, state.dataField, state.numberFormat, state.unit);
+                    },
                 },
                 data: state.chartData,
             },
@@ -162,6 +169,7 @@ const state = reactive({
     }),
     numberFormat: computed<NumberFormatValue>(() => props.widgetOptions?.numberFormat as NumberFormatValue),
     displaySeriesLabel: computed(() => (props.widgetOptions?.displaySeriesLabel as DisplaySeriesLabelValue)),
+    seriesFormat: computed<string>(() => state.displaySeriesLabel?.format || 'numeric'),
 });
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange: computed(() => state.dateRange),
@@ -170,20 +178,20 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Util */
+const privateWidgetFetcher = getCancellableFetcher<PrivateWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.privateWidget.load);
+const publicWidgetFetcher = getCancellableFetcher<PublicWidgetLoadParameters, Data>(SpaceConnector.clientV2.dashboard.publicWidget.load);
 const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
     if (props.widgetState === 'INACTIVE') return undefined;
     try {
+        state.loading = true;
         const _isPrivate = props.widgetId.startsWith('private');
-        const _fetcher = _isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, Data>
-            : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>;
-        const _queryDateRange = getApiQueryDateRange(state.granularity, state.dateRange);
-        const res = await _fetcher({
+        const _fetcher = _isPrivate ? privateWidgetFetcher : publicWidgetFetcher;
+        const { status, response } = await _fetcher({
             widget_id: props.widgetId,
             query: {
                 granularity: state.granularity,
-                start: _queryDateRange.start,
-                end: _queryDateRange.end,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
                 group_by: [state.groupByField],
                 fields: {
                     [state.dataField]: {
@@ -194,8 +202,12 @@ const fetchWidget = async (): Promise<Data|APIErrorToast|undefined> => {
             },
             vars: props.dashboardVars,
         });
-        state.errorMessage = undefined;
-        return res;
+        if (status === 'succeed') {
+            state.errorMessage = undefined;
+            state.loading = false;
+            return response;
+        }
+        return undefined;
     } catch (e: any) {
         state.loading = false;
         state.errorMessage = e.message;
@@ -222,12 +234,11 @@ const drawChart = (rawData: Data|null) => {
 };
 
 const loadWidget = async (): Promise<Data|APIErrorToast> => {
-    state.loading = true;
     const res = await fetchWidget();
+    if (!res) return state.data;
     if (typeof res === 'function') return res;
     state.data = res;
     drawChart(state.data);
-    state.loading = false;
     return state.data;
 };
 

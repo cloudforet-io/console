@@ -1,10 +1,12 @@
 import type { ManipulateType } from 'dayjs';
 import dayjs from 'dayjs';
-import { sum } from 'lodash';
+import { orderBy, sum } from 'lodash';
 
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
+import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
+import type { DateFormat } from '@/common/modules/widgets/_widget-fields/date-format/type';
+import type { TableDataFieldValue } from '@/common/modules/widgets/_widget-fields/table-data-field/type';
 import type { DateRange, DynamicFieldData } from '@/common/modules/widgets/types/widget-data-type';
-import type { DateFormat } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
@@ -74,9 +76,37 @@ export const getWidgetDateRange = (granularity: string, basedOnDate: string, sub
     const _timeUnit = getTimeUnit(granularity);
     const _dateFormat = getDateFormat(granularity);
     // get start, end with granularity and subtractCount
-    const start = dayjs.utc(basedOnDate).clone().subtract(subtractCount - 1, _timeUnit).format(_dateFormat);
-    const end = dayjs.utc(basedOnDate).format(_dateFormat);
-    return [start, end];
+    const _start = dayjs.utc(basedOnDate).clone().subtract(subtractCount - 1, _timeUnit);
+    const _end = dayjs.utc(basedOnDate);
+
+    let refinedDateRange: DateRange = {
+        start: _start.format(_dateFormat),
+        end: _end.format(_dateFormat),
+    };
+
+    if (granularity === 'DAILY') {
+        if (_end.diff(_start, _timeUnit) > 31) {
+            refinedDateRange = {
+                start: _end.subtract(31, _timeUnit).format(_dateFormat),
+                end: _end.format(_dateFormat),
+            };
+        }
+    } else if (granularity === 'MONTHLY') {
+        if (_end.diff(_start, _timeUnit) > 12) {
+            refinedDateRange = {
+                start: _end.subtract(11, _timeUnit).format(_dateFormat),
+                end: _end.format(_dateFormat),
+            };
+        }
+    } else if (granularity === 'YEARLY') {
+        if (_end.diff(_start, _timeUnit) > 3) {
+            refinedDateRange = {
+                start: _end.subtract(2, _timeUnit).format(_dateFormat),
+                end: _end.format(_dateFormat),
+            };
+        }
+    }
+    return [refinedDateRange.start || '', refinedDateRange.end];
 };
 
 export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, field?: string, val?: string) => {
@@ -99,36 +129,6 @@ export const getReferenceLabel = (allReferenceTypeInfo: AllReferenceTypeInfo, fi
     return val;
 };
 
-export const getApiQueryDateRange = (granularity: string, dateRange: DateRange): DateRange => {
-    const _timeUnit = getTimeUnit(granularity);
-    const _dateFormat = getDateFormat(granularity);
-    const _start = dayjs.utc(dateRange.start);
-    const _end = dayjs.utc(dateRange.end);
-    if (granularity === 'DAILY') {
-        if (_end.diff(_start, _timeUnit) > 31) {
-            return {
-                start: _end.subtract(31, _timeUnit).format(_dateFormat),
-                end: _end.format(_dateFormat),
-            };
-        }
-    } else if (granularity === 'MONTHLY') {
-        if (_end.diff(_start, _timeUnit) > 12) {
-            return {
-                start: _end.subtract(11, _timeUnit).format(_dateFormat),
-                end: _end.format(_dateFormat),
-            };
-        }
-    } else if (granularity === 'YEARLY') {
-        if (_end.diff(_start, _timeUnit) > 3) {
-            return {
-                start: _end.subtract(2, _timeUnit).format(_dateFormat),
-                end: _end.format(_dateFormat),
-            };
-        }
-    }
-    return dateRange;
-};
-
 export const getRefinedDateFormatByGranularity = (granularity: string, dateFormat: DateFormat): string => DATE_FORMAT[dateFormat][granularity];
 
 export const getFormattedDate = (date: string, dateFormat: string): string => {
@@ -138,27 +138,99 @@ export const getFormattedDate = (date: string, dateFormat: string): string => {
 };
 
 
-export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, criteria: string, dataField: string, dynamicFieldValue: string[]): [any[], string[]] => {
+export const getRefinedDynamicFieldData = (rawData: DynamicFieldData, dynamicFieldInfo: TableDataFieldValue['dynamicFieldInfo'], xAxisField: string): [any[], string[]] => {
     if (!rawData?.results?.length) return [[], []];
 
-    const _refinedResults: any[] = [];
-    let _etcExists = false;
-    rawData.results.forEach((result) => {
-        const _refinedData = (result[criteria] || []).filter((d) => dynamicFieldValue.includes(d[dataField]));
-        const _etcData = (result[criteria] || []).filter((d) => !dynamicFieldValue.includes(d[dataField]));
-        const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
-        if (_etcValueSum > 0) _etcExists = true;
-        _refinedResults.push({
-            ...result,
-            [criteria]: [
-                ..._refinedData,
-                { [dataField]: 'etc', value: _etcValueSum },
-            ],
-        });
-    });
+    const valueType = dynamicFieldInfo?.valueType;
+    const valueCount = dynamicFieldInfo?.count || 0;
+    const criteria = dynamicFieldInfo?.criteria as string;
+    const dataField = dynamicFieldInfo?.fieldValue as string;
+    const dynamicFieldValue = dynamicFieldInfo?.fixedValue || [];
 
-    const _seriesFields = [...dynamicFieldValue];
-    if (_etcExists) _seriesFields.push('etc');
+    const _refinedResults: any[] = [];
+    let _seriesFields: string[] = [];
+    if (valueType === 'fixed') {
+        let _etcExists = false;
+        rawData.results.forEach((result) => {
+            const _filteredData = (result[criteria] || []).filter((d) => dynamicFieldValue.includes(d[dataField]));
+
+            // etc data
+            const _etcData = (result[criteria] || []).filter((d) => !dynamicFieldValue.includes(d[dataField]));
+            const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
+            if (_etcValueSum > 0) _etcExists = true;
+
+            _refinedResults.push({
+                ...result,
+                [criteria]: [
+                    ..._filteredData,
+                    { [dataField]: 'etc', value: _etcValueSum },
+                ],
+            });
+        });
+        _seriesFields = [...dynamicFieldValue];
+        if (_etcExists) _seriesFields.push('etc');
+    } else {
+        let _etcExists = false;
+        const _seriesFieldsSet = new Set<string>();
+
+        rawData.results?.forEach((result) => {
+            let _refinedData: any[] = [];
+            if (isDateField(dataField)) {
+                _refinedData = orderBy(result[criteria], dataField, 'desc') ?? [];
+            } else {
+                const _orderedData = orderBy(result[criteria], 'value', 'desc') ?? [];
+                _refinedData = _orderedData.slice(0, valueCount);
+            }
+            _refinedData.forEach((v) => {
+                _seriesFieldsSet.add(v[dataField]);
+            });
+            _seriesFields = Array.from(_seriesFieldsSet);
+            if (isDateField(dataField)) _seriesFields.sort();
+
+            // etc data
+            const _etcData = (result[criteria] || []).filter((d) => !_seriesFields.includes(d[dataField]));
+            const _etcValueSum = sum(_etcData.map((v) => v.value || 0));
+            if (_etcValueSum > 0) _etcExists = true;
+
+            _refinedResults.push({
+                [criteria]: [
+                    ..._refinedData,
+                    { [dataField]: 'etc', value: _etcValueSum },
+                ],
+                [xAxisField]: result[xAxisField],
+            });
+        });
+
+
+        if (_etcExists) _seriesFields.push('etc');
+    }
 
     return [_refinedResults, _seriesFields];
+};
+export const getRefinedHeatmapDynamicFieldData = (rawData: DynamicFieldData, dynamicFieldInfo: TableDataFieldValue['dynamicFieldInfo']): string[] => {
+    if (!rawData?.results?.length) return [];
+
+    const valueType = dynamicFieldInfo?.valueType;
+    const valueCount = dynamicFieldInfo?.count || 0;
+    const criteria = dynamicFieldInfo?.criteria as string;
+    const dataField = dynamicFieldInfo?.fieldValue as string;
+    const dynamicFieldValue = dynamicFieldInfo?.fixedValue || [];
+
+    let _seriesFields: string[] = [];
+    if (valueType === 'fixed') {
+        _seriesFields = [...dynamicFieldValue];
+    } else {
+        const _subTotalResults: Record<string, number> = {};
+        rawData.results.forEach((result) => {
+            result[criteria]?.forEach((d) => {
+                if (d[dataField] in _subTotalResults) {
+                    _subTotalResults[d[dataField]] += d.value;
+                } else {
+                    _subTotalResults[d[dataField]] = d.value;
+                }
+            });
+        });
+        _seriesFields = orderBy(Object.entries(_subTotalResults), 1, 'desc').slice(0, valueCount).map(([k]) => k);
+    }
+    return _seriesFields;
 };
