@@ -130,10 +130,10 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         resetSchedule(hoursOnly = false) {
             state.scheduleHours = state.originCollector?.schedule?.hours ?? [];
             state.isScheduleError = false;
-            if (!hoursOnly) state.schedulePower = state.originCollector?.schedule?.state === 'ENABLED' ?? false;
+            if (!hoursOnly) state.schedulePower = state.originCollector?.schedule?.state === 'ENABLED';
         },
         resetSchedulePower() {
-            state.schedulePower = state.originCollector?.schedule?.state === 'ENABLED' ?? false;
+            state.schedulePower = state.originCollector?.schedule?.state === 'ENABLED';
         },
         async resetAttachedServiceAccount() {
             const allReferenceStore = useAllReferenceStore();

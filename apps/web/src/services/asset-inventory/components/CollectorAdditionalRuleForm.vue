@@ -5,7 +5,7 @@ import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PRadio, PSelectDropdown, PI, PTextInput, PTooltip, PFieldGroup, PCheckbox,
+    PButton, PRadio, PSelectDropdown, PI, PTextInput, PToggleButton, PFieldGroup, PCheckbox, PFieldTitle,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -105,11 +105,10 @@ const state = reactive({
         return isConditionTooltipVisible;
     }),
     conditionPolicies: computed(() => ({
-        [COLLECTOR_RULE_CONDITION_POLICY.ANY]: _i18n.t('PROJECT.EVENT_RULE.ANY'),
-        [COLLECTOR_RULE_CONDITION_POLICY.ALL]: _i18n.t('PROJECT.EVENT_RULE.ALL'),
-        [COLLECTOR_RULE_CONDITION_POLICY.ALWAYS]: _i18n.t('PROJECT.EVENT_RULE.ALWAYS'),
+        [COLLECTOR_RULE_CONDITION_POLICY.ALL]: _i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALL'),
+        [COLLECTOR_RULE_CONDITION_POLICY.ANY]: _i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ANY'),
     })),
-    selectedConditionRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ANY as CollectorRuleConditionPolicy,
+    selectedConditionRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ALL as CollectorRuleConditionPolicy,
     conditionKeyMenu: computed<SelectDropdownMenuItem[]>(() => {
         let keys = Object.keys(COLLECTOR_RULE_CONDITION_KEY);
         if (props.provider) keys = keys.filter((key) => key !== COLLECTOR_RULE_CONDITION_KEY.provider);
@@ -124,6 +123,7 @@ const state = reactive({
     conditionList: convertToUiCondition(props.data?.conditions),
     valueMenuSearchKeyword: '',
     searchLoading: true,
+    conditionState: false,
     // select dropdown menu
     conditionListKey: 0,
     cloudServiceGroupMenu: [] as (SelectDropdownMenuItem[])[],
@@ -142,7 +142,7 @@ const state = reactive({
     sourceInput: '',
     targetInput: '',
     isAllValid: computed(() => {
-        if (state.selectedConditionRadioIdx !== COLLECTOR_RULE_CONDITION_POLICY.ALWAYS) {
+        if (!state.conditionState) {
             const isConditionValid = state.conditionList.every((condition) => condition.key && condition.value);
             if (!isConditionValid) {
                 return false;
@@ -286,7 +286,7 @@ const handleClickDone = () => {
 
     emit('click-done', {
         collector_rule_id: props.data?.collector_rule_id,
-        conditions_policy: state.selectedConditionRadioIdx,
+        conditions_policy: state.conditionState ? COLLECTOR_RULE_CONDITION_POLICY.ALWAYS : state.selectedConditionRadioIdx,
         conditions: convertToApiCondition(state.conditionList),
         actions,
         options: {
@@ -401,25 +401,21 @@ onMounted(() => {
 <template>
     <div class="collector-additional-rule-form">
         <section class="left-section">
-            <h5 class="text-paragraph-lg text-gray-900 font-bold flex justify-between">
-                <span>{{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}<p-tooltip v-if="state.isConditionTooltipVisible"
-                                                                           class="ml-2"
-                                                                           position="bottom"
-                                                                           :contents="$t('INVENTORY.COLLECTOR.ADDITIONAL_RULE_CONDITION_INFO')"
-                ><p-i width="1rem"
-                      height="1rem"
-                      name="ic_info-circle"
-                /></p-tooltip></span>
-                <p-button style-type="tertiary"
-                          icon-left="ic_plus_bold"
-                          class="add-event-rule-button"
-                          size="md"
-                          @click="handleClickAddRule"
-                >
-                    {{ $t('COMMON.BUTTONS.ADD') }}
-                </p-button>
+            <h5 class="text-paragraph-lg text-gray-900 flex gap-4">
+                <span class="condition-title">{{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}</span>
+                <div class="flex items-center gap-1">
+                    <span :class="{
+                        'disabled-condition': !state.conditionState, 'enabled-condition': state.conditionState}"
+                    >{{ state.conditionState ? $t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ENABLED_CONDITION'):$t('INVENTORY.COLLECTOR.COLLECTOR_RULE.DISABLED_CONDITION') }}</span>
+                    <p-toggle-button :value.sync="state.conditionState" />
+                </div>
             </h5>
-            <div class="condition-contents-wrapper">
+            <div v-if="!state.conditionState"
+                 class="condition-contents-wrapper"
+            >
+                <p-field-title :label="$t('INVENTORY.COLLECTOR.COLLECTOR_RULE.CONDITION_SATISFIES')"
+                               class="mb-2"
+                />
                 <div class="condition-policy-wrapper">
                     <p-radio v-for="([key,value], idx) in Object.entries(state.conditionPolicies)"
                              :key="`bookmark-scope-${idx}`"
@@ -430,10 +426,8 @@ onMounted(() => {
                             {{ value }}
                         </span>
                     </p-radio>
-                    <span class="text-label-md text-gray-700">{{ $t('INVENTORY.COLLECTOR.CONDITION_POLICY_DESC') }}</span>
                 </div>
-                <div v-if="state.selectedConditionRadioIdx !== COLLECTOR_RULE_CONDITION_POLICY.ALWAYS"
-                     :key="state.conditionListKey"
+                <div :key="state.conditionListKey"
                      class="condition-list"
                 >
                     <div v-for="(condition, idx) in state.conditionList"
@@ -497,6 +491,14 @@ onMounted(() => {
                              @click="handleClickDeleteCondition(idx)"
                         />
                     </div>
+                    <p-button style-type="tertiary"
+                              icon-left="ic_plus_bold"
+                              class="add-event-rule-button"
+                              size="md"
+                              @click="handleClickAddRule"
+                    >
+                        {{ $t('COMMON.BUTTONS.ADD') }}
+                    </p-button>
                 </div>
             </div>
         </section>
@@ -601,8 +603,16 @@ onMounted(() => {
     .left-section {
         @apply col-span-6;
 
-        > h4 > span {
+        .condition-title {
             font-weight: bold;
+        }
+
+        .disabled-condition {
+            @apply text-gray-300 text-label-md;
+        }
+
+        .enabled-condition {
+            @apply text-blue-600 text-label-md;
         }
     }
 
@@ -647,6 +657,10 @@ onMounted(() => {
 
     .condition-list {
         @apply flex flex-col gap-3;
+
+        .add-event-rule-button {
+            width: 6rem;
+        }
 
         .condition-item-row {
             @apply flex gap-2 items-center justify-between;

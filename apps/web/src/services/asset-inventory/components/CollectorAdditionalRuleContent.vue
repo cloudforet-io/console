@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PLink } from '@cloudforet/mirinae';
+import { PLink, PI, PTooltip } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { isNotEmpty } from '@cloudforet/utils';
 
@@ -80,7 +80,13 @@ const state = reactive({
         </section>
         <section class="middle-section">
             <h5 class="text-paragraph-lg text-gray-900 font-bold">
-                {{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}
+                <span>{{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}<p-tooltip class="ml-2"
+                                                                           position="bottom"
+                                                                           :contents="$t('INVENTORY.COLLECTOR.ADDITIONAL_RULE_CONDITION_INFO')"
+                ><p-i width="1rem"
+                      height="1rem"
+                      name="ic_info-circle"
+                /></p-tooltip></span>
             </h5>
             <table>
                 <tbody>

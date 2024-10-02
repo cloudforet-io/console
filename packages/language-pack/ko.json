@@ -3294,6 +3294,7 @@
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "서비스 어카운트 수정 완료",
 			"CLOUD_SERVICE_TAG": "클라우드 서비스 태그",
 			"COLLECTOR_RULE": {
+				"ALL": "",
 				"ALT_E_CREATE_COLLECTOR_RULE": "컬렉터 규칙 생성 실패",
 				"ALT_E_DELETE_COLLECTOR_RULE": "컬렉터 규칙 삭제 실패",
 				"ALT_E_REORDER_COLLECTOR_RULES": "컬렉터 규칙 순서 변경 실패",
@@ -3301,7 +3302,11 @@
 				"ALT_S_CREATE_COLLECTOR_RULE": "컬렉터 규칙 생성 완료",
 				"ALT_S_DELETE_COLLECTOR_RULE": "컬렉터 규칙 삭제 완료",
 				"ALT_S_REORDER_COLLECTOR_RULES": "컬렉터 규칙 순서 변경 완료",
-				"ALT_S_UPDATE_COLLECTOR_RULE": "컬렉터 규칙 수정 완료"
+				"ALT_S_UPDATE_COLLECTOR_RULE": "컬렉터 규칙 수정 완료",
+				"ANY": "",
+				"CONDITION_SATISFIES": "",
+				"DISABLED_CONDITION": "",
+				"ENABLED_CONDITION": ""
 			},
 			"CONDITIONS": "조건",
 			"CONDITION_POLICY_DESC": "만족시키는 경우",
@@ -3387,8 +3392,8 @@
 				"SPECIFIC_SERVICE_ACCOUNT": "특정 서비스 어카운트",
 				"TAG": "태그",
 				"VERSION": "버전",
-				"WORKSPACE": "워크스페이스",
-				"VIEW_IN_ADMIN_MODE": ""
+				"VIEW_IN_ADMIN_MODE": "",
+				"WORKSPACE": "워크스페이스"
 			},
 			"EDIT_ADDITIONAL_RULE": "추가 규칙 수",
 			"EMPTY": {

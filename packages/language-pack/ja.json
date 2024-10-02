@@ -3294,6 +3294,7 @@
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "サービスアカウントの更新に成功しました",
 			"CLOUD_SERVICE_TAG": "クラウドサービスのタグ",
 			"COLLECTOR_RULE": {
+				"ALL": "",
 				"ALT_E_CREATE_COLLECTOR_RULE": "コレクタールールの作成に失敗しました",
 				"ALT_E_DELETE_COLLECTOR_RULE": "コレクタールールの削除に失敗しました",
 				"ALT_E_REORDER_COLLECTOR_RULES": "コレクタールールの順序変更に失敗しました",
@@ -3301,7 +3302,11 @@
 				"ALT_S_CREATE_COLLECTOR_RULE": "コレクタールールが正常に作成されました",
 				"ALT_S_DELETE_COLLECTOR_RULE": "コレクタールールが正常に削除されました",
 				"ALT_S_REORDER_COLLECTOR_RULES": "コレクタールールの順序が正常に変更されました",
-				"ALT_S_UPDATE_COLLECTOR_RULE": "コレクタールールの更新が完了しました"
+				"ALT_S_UPDATE_COLLECTOR_RULE": "コレクタールールの更新が完了しました",
+				"ANY": "",
+				"CONDITION_SATISFIES": "",
+				"DISABLED_CONDITION": "",
+				"ENABLED_CONDITION": ""
 			},
 			"CONDITIONS": "条件",
 			"CONDITION_POLICY_DESC": "が満足させる場合",
@@ -3387,8 +3392,8 @@
 				"SPECIFIC_SERVICE_ACCOUNT": "特定のサービスアカウント",
 				"TAG": "タグ",
 				"VERSION": "バージョン",
-				"WORKSPACE": "ワークスペース",
-				"VIEW_IN_ADMIN_MODE": ""
+				"VIEW_IN_ADMIN_MODE": "",
+				"WORKSPACE": "ワークスペース"
 			},
 			"EDIT_ADDITIONAL_RULE": "追加ルールを編集",
 			"EMPTY": {
