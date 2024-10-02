@@ -24,7 +24,6 @@ env:
 jobs:
   storybook:
     runs-on: ubuntu-latest
-    needs: mirinae
     steps:
       - name: Invoke storybook release workflow
         uses: convictional/trigger-workflow-and-wait@v1.6.1
@@ -39,7 +38,6 @@ jobs:
 
   versioning_and_docker:
     runs-on: ubuntu-latest
-    needs: mirinae
     outputs:
       new_commit_sha: ${{ steps.get_sha.outputs.NEW_COMMIT_SHA }}
     steps:
