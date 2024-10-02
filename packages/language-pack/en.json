@@ -3387,7 +3387,7 @@
 				"SPECIFIC_SERVICE_ACCOUNT": "Specific Service Account",
 				"TAG": "Tag",
 				"VERSION": "Version",
-				"WORKSPACE": "Workspace"
+				"WORKSPACE": "Workspace",
 				"VIEW_IN_ADMIN_MODE": "View in Admin Mode"
 			},
 			"EDIT_ADDITIONAL_RULE": "Edit Additional Rule",
