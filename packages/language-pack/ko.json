@@ -1759,6 +1759,11 @@
 			"WIDGET_TITLE_REQUIRED": "위젯 제목을 입력해주세요."
 		}
 	},
+	"COMPONENT": {
+		"CONTEXT_MENU": {
+			"BACK": "뒤로가기"
+		}
+	},
 	"COST_EXPLORER": {
 		"ANOMALY_DETECTION": {
 			"NOTIFICATION_RULES": {
