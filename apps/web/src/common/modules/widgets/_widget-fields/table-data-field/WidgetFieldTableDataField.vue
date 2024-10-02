@@ -192,7 +192,7 @@ const handleChangeDataFieldType = (value: string) => {
 };
 const handleUpdateValue = (val: string|MenuItem[]) => {
     state.selectedItem = val;
-    if (state.selectedFieldType === 'staticFeild' && Array.isArray(val)) {
+    if (state.selectedFieldType === 'staticField' && Array.isArray(val)) {
         state.proxyValue = {
             ...state.proxyValue,
             staticFieldInfo: {

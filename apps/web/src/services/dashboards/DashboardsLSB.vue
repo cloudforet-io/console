@@ -218,7 +218,14 @@ const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
             if (filtered.length > 0) result.push(...filtered);
         } else if ((d.id && state.favoriteItemMap[d.favoriteOptions?.id || d.id]) && d.type === MENU_ITEM_TYPE.ITEM) result.push(d);
     });
-    return result;
+    const _starredItem = result.map((d) => ({
+        ...d,
+        favoriteOptions: {
+            type: FAVORITE_TYPE.DASHBOARD,
+            id: d.id,
+        },
+    }));
+    return _starredItem;
 };
 const loadDashboard = async () => {
     await dashboardStore.load();
