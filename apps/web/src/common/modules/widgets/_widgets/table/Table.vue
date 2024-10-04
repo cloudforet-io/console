@@ -3,6 +3,7 @@ import {
     defineExpose, reactive, computed, watch, onMounted,
 } from 'vue';
 
+import dayjs from 'dayjs';
 import { flatMap, map, uniq } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -97,7 +98,12 @@ const state = reactive({
         if (isDateField(state.tableDataField) || state.groupByField?.some((groupBy) => Object.values(DATE_FIELD).includes(groupBy))) {
             if (state.granularity === GRANULARITY.YEARLY) subtract = 3;
             if (state.granularity === GRANULARITY.MONTHLY) subtract = 12;
-            if (state.granularity === GRANULARITY.DAILY) subtract = 30;
+            if (state.granularity === GRANULARITY.DAILY) {
+                // if basedOnDate is end of month, need to assign date count of that month
+                const endOfMonth = dayjs.utc(state.basedOnDate).endOf('month').date();
+                if (dayjs.utc(state.basedOnDate).date() === endOfMonth) subtract = endOfMonth;
+                else subtract = 30;
+            }
         }
         const [start, end] = getWidgetDateRange(state.granularity, state.basedOnDate, subtract);
         return { start, end };
