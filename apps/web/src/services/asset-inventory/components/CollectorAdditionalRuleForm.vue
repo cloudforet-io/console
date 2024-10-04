@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import { debounce } from 'lodash';
 
@@ -10,9 +12,7 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CloudServiceTypeListParameters } from '@/schema/inventory/cloud-service-type/api-verbs/list';
 import type { CloudServiceTypeStatParameters } from '@/schema/inventory/cloud-service-type/api-verbs/stat';
-import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
 import {
     COLLECTOR_RULE_CONDITION_KEY, COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_POLICY,
@@ -41,6 +41,7 @@ import CollectorAdditionalRuleFormOperatorDropdown
     from '@/services/asset-inventory/components/CollectorAdditionalRuleFormOperatorDropdown.vue';
 import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
 
+type ActionPolicy = keyof AdditionalRuleAction;
 
 interface Props {
     data?: CollectorRuleModel;
@@ -72,6 +73,7 @@ const convertToUiCondition = (condition?:AdditionalRuleCondition[]):AdditionalRu
     if (c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)) {
         return {
             ...c,
+            key: c.key.split('.')[0] ?? c.key,
             subkey: c.key.slice(4),
         };
     }
@@ -108,7 +110,7 @@ const state = reactive({
         [COLLECTOR_RULE_CONDITION_POLICY.ALL]: _i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALL'),
         [COLLECTOR_RULE_CONDITION_POLICY.ANY]: _i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ANY'),
     })),
-    selectedConditionRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ALL as CollectorRuleConditionPolicy,
+    selectedConditionRadioIdx: props.data?.conditions_policy ?? COLLECTOR_RULE_CONDITION_POLICY.ALL as CollectorRuleConditionPolicy,
     conditionKeyMenu: computed<SelectDropdownMenuItem[]>(() => {
         let keys = Object.keys(COLLECTOR_RULE_CONDITION_KEY);
         if (props.provider) keys = keys.filter((key) => key !== COLLECTOR_RULE_CONDITION_KEY.provider);
@@ -123,19 +125,20 @@ const state = reactive({
     conditionList: convertToUiCondition(props.data?.conditions),
     valueMenuSearchKeyword: '',
     searchLoading: true,
-    conditionState: false,
+    conditionState: !!(props.data?.conditions_policy === 'ALWAYS'),
     // select dropdown menu
     conditionListKey: 0,
     cloudServiceGroupMenu: [] as (SelectDropdownMenuItem[])[],
     cloudServiceTypeMenu: [] as (SelectDropdownMenuItem[])[],
     regionMenu: [] as (SelectDropdownMenuItem[])[],
     // actions
-    actionPolicies: computed(() => ({
-        change_project: 'Project Routing',
+    actionPolicies: computed<Partial<Record<ActionPolicy, string>>>(() => ((state.conditionState) ? ({
         match_project: 'Match Project',
         match_service_account: 'Match Service Account',
-    })),
-    selectedActionRadioIdx: 'change_project',
+    }) : ({
+        change_project: 'Project Routing',
+    }))),
+    selectedActionRadioIdx: 'change_project' as ActionPolicy,
     selectedProjectId: props.data?.actions?.change_project ? [props.data?.actions?.change_project ?? ''] : undefined,
     selectedWorkspaceId: [] as SelectDropdownMenuItem[],
     isStopProcessingChecked: false,
@@ -157,6 +160,7 @@ const state = reactive({
 
         return true;
     }),
+    initLoading: false,
 });
 const valueDropdownMenu = (key: CollectorRuleConditionKey, idx:number) => {
     if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_group) {
@@ -201,6 +205,7 @@ const handleSelectConditionKey = (value:CollectorRuleConditionKey, idx:number) =
             return {
                 ...condition,
                 key: value,
+                value: '',
             };
         }
         return condition;
@@ -219,9 +224,9 @@ const handleSelectConditionKey = (value:CollectorRuleConditionKey, idx:number) =
         break;
     }
 };
-const handleUpdateSubkeyInput = (value:string) => {
+const handleUpdateSubkeyInput = (value:string, idx:number) => {
     state.conditionList = state.conditionList.map((condition, index) => {
-        if (index === state.conditionList.length - 1) {
+        if (index === idx) {
             return {
                 ...condition,
                 subkey: value,
@@ -259,13 +264,13 @@ const handleClickCancel = () => {
     emit('click-cancel');
 };
 
-const handleSelectProjectId = (value) => {
+const handleSelectProjectId = (value:string[]) => {
     state.selectedProjectId = value;
 };
 
 const handleSelectWorkspaceId = (value:SelectDropdownMenuItem[]) => {
     state.selectedWorkspaceId = value;
-    state.selectedProjectId = [];
+    state.selectedProjectId = undefined;
 };
 const handleClickDone = () => {
     const actions:AdditionalRuleAction = {};
@@ -320,17 +325,18 @@ const fetchCloudServiceGroup = async (keyword = '', idx:number):Promise<SelectDr
 };
 const fetchCloudServiceType = async (keyword = '', idx:number):Promise<SelectDropdownMenuItem[]> => {
     try {
-        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.list<CloudServiceTypeListParameters, ListResponse<CloudServiceTypeModel>>(
+        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.stat(
             {
                 query: {
                     keyword,
                     filter: [{ k: 'provider', v: props.provider, o: 'eq' }],
+                    distinct: 'name',
                 },
             },
         );
-        const menu = results?.map((i) => ({
-            label: i.name,
-            name: i.cloud_service_type_id,
+        const menu = results?.map((i:string) => ({
+            label: i,
+            name: i,
         })) ?? [];
         state.cloudServiceTypeMenu[idx] = menu;
         return menu;
@@ -378,22 +384,33 @@ const DEFAULT_SEARCH_MAP:Record<CollectorRuleConditionKey, SelectDropdownMenuIte
     [COLLECTOR_RULE_CONDITION_KEY.region_code]: [],
 };
 
+watch(() => state.conditionState, (value) => {
+    state.selectedActionRadioIdx = value ? 'match_project' : 'change_project';
+});
+
 (async () => {
     // init search menu list
+    state.initLoading = true;
     DEFAULT_SEARCH_MAP.cloud_service_group = await fetchCloudServiceGroup('', 0);
     DEFAULT_SEARCH_MAP.cloud_service_type = await fetchCloudServiceType('', 0);
     DEFAULT_SEARCH_MAP.region_code = await fetchRegion('', 0);
     state.conditionListKey = 1;
     state.searchLoading = false;
+    state.initLoading = false;
 })();
 
 onMounted(() => {
-    if (props.data?.actions?.change_project) {
+    const defaultActionPolicy = props.data?.actions ? Object.keys(props.data?.actions)[0] : undefined;
+    if (defaultActionPolicy === 'change_project' && props.data?.actions?.change_project) {
         const selectedProject = state.projects[props.data.actions.change_project];
         state.selectedWorkspaceId = [{
             name: selectedProject.data.workspaceId,
             label: state.workspace[selectedProject.data.workspaceId].label,
         }];
+    } else if (defaultActionPolicy === 'match_project' || defaultActionPolicy === 'match_service_account') {
+        state.selectedActionRadioIdx = defaultActionPolicy;
+        state.sourceInput = props.data?.actions[defaultActionPolicy]?.source ?? '';
+        state.targetInput = props.data?.actions[defaultActionPolicy]?.target ?? '';
     }
 });
 </script>
@@ -446,7 +463,7 @@ onMounted(() => {
                                           block
                                           is-fixed-width
                                           placeholder="ex) os.os_type"
-                                          @update:value="handleUpdateSubkeyInput($event)"
+                                          @update:value="handleUpdateSubkeyInput($event, idx)"
                             />
                         </template>
                         <template v-if="condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)">
@@ -455,7 +472,7 @@ onMounted(() => {
                                           block
                                           is-fixed-width
                                           placeholder="ex) a.b.c"
-                                          @update:value="handleUpdateSubkeyInput($event)"
+                                          @update:value="handleUpdateSubkeyInput($event, idx)"
                             />
                         </template>
                         <collector-additional-rule-form-operator-dropdown class="condition-operator"
@@ -472,6 +489,7 @@ onMounted(() => {
                                            :search-text="state.valueMenuSearchKeyword"
                                            :selected="condition.value"
                                            :loading="state.searchLoading"
+                                           :disabled="state.initLoading"
                                            class="condition-value"
                                            is-fixed-width
                                            is-filterable
@@ -535,8 +553,10 @@ onMounted(() => {
                                        :label="$t('INVENTORY.COLLECTOR.DETAIL.PROJECT')"
                                        required
                         >
-                            <project-select-dropdown class="action-project"
+                            <project-select-dropdown :key="state.selectedWorkspaceId[0]?.name"
+                                                     class="action-project"
                                                      is-fixed-width
+                                                     :disabled="!state.selectedWorkspaceId[0]?.name"
                                                      :selected-project-ids="state.selectedProjectId"
                                                      :project-group-selectable="false"
                                                      :workspace-id="state.selectedWorkspaceId[0]?.name"

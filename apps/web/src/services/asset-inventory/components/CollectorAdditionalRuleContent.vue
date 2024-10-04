@@ -79,7 +79,9 @@ const state = reactive({
             <h4><span>{{ state.conditions[props.data.conditions_policy] }}</span> {{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</h4>
         </section>
         <section class="middle-section">
-            <h5 class="text-paragraph-lg text-gray-900 font-bold">
+            <h5 v-if="state.conditionFields.length"
+                class="text-paragraph-lg text-gray-900 font-bold"
+            >
                 <span>{{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}<p-tooltip class="ml-2"
                                                                            position="bottom"
                                                                            :contents="$t('INVENTORY.COLLECTOR.ADDITIONAL_RULE_CONDITION_INFO')"

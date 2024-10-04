@@ -143,6 +143,9 @@ const createCollectorRule = async (data:CollectorRuleForm) => {
 
 const updateCollectorRule = async (data:CollectorRuleForm) => {
     try {
+        if (!data.collector_rule_id) {
+            throw new Error('collector_rule_id is required');
+        }
         await SpaceConnector.clientV2.inventory.collectorRule.update<CollectorRuleUpdateParameters>({
             collector_rule_id: data.collector_rule_id,
             conditions: data.conditions,
