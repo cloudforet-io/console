@@ -162,6 +162,7 @@ const state = reactive({
 
         return true;
     }),
+    initLoading: false,
 });
 const valueDropdownMenu = (key: CollectorRuleConditionKey, idx:number) => {
     if (key === COLLECTOR_RULE_CONDITION_KEY.cloud_service_group) {
@@ -206,6 +207,7 @@ const handleSelectConditionKey = (value:CollectorRuleConditionKey, idx:number) =
             return {
                 ...condition,
                 key: value,
+                value: '',
             };
         }
         return condition;
@@ -389,11 +391,13 @@ watch(() => state.conditionState, (value) => {
 
 (async () => {
     // init search menu list
+    state.initLoading = true;
     DEFAULT_SEARCH_MAP.cloud_service_group = await fetchCloudServiceGroup('', 0);
     DEFAULT_SEARCH_MAP.cloud_service_type = await fetchCloudServiceType('', 0);
     DEFAULT_SEARCH_MAP.region_code = await fetchRegion('', 0);
     state.conditionListKey = 1;
     state.searchLoading = false;
+    state.initLoading = false;
 })();
 
 onMounted(() => {
@@ -486,6 +490,7 @@ onMounted(() => {
                                            :search-text="state.valueMenuSearchKeyword"
                                            :selected="condition.value"
                                            :loading="state.searchLoading"
+                                           :disabled="state.initLoading"
                                            class="condition-value"
                                            is-fixed-width
                                            is-filterable
