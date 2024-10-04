@@ -53,7 +53,6 @@ const {
     targetRef: folderTabRef,
     position: 'left',
     menuRef: contextMenuRef,
-    multiSelectable: false,
 });
 
 onClickOutside(folderTabRef, () => {
