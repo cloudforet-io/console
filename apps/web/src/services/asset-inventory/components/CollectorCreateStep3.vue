@@ -5,7 +5,7 @@
                                            class="attached-service-account-form"
                                            @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid"
             />
-            <collector-options-form show-title-on-empty-schema
+            <collector-form-options show-title-on-empty-schema
                                     @update:isValid="handleChangeIsSchemaFormValid"
             />
         </div>
@@ -55,7 +55,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import AttachedServiceAccountForm
     from '@/services/asset-inventory/components/CollectorFormAttachedServiceAccount.vue';
-import CollectorOptionsForm from '@/services/asset-inventory/components/CollectorFormOptions.vue';
+import CollectorFormOptions from '@/services/asset-inventory/components/CollectorFormOptions.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 
@@ -64,7 +64,7 @@ const emit = defineEmits([
 ]);
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 const appContextStore = useAppContextStore();
 const isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 
@@ -80,6 +80,7 @@ const state = reactive({
 });
 
 /* event */
+
 
 const handleChangeIsAttachedServiceAccountValid = (isValid: boolean) => {
     state.isAttachedServiceAccountValid = isValid;

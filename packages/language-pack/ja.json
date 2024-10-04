@@ -970,6 +970,8 @@
 	"COMMON": {
 		"BUTTONS": {
 			"ADD": "追加",
+			"CANCEL": "キャンセル",
+			"DONE": "完了",
 			"DOWNLOAD": "ダウンロード",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "デスクトップ",
@@ -1274,6 +1276,12 @@
 			"TITLE": "通知メールを確認する",
 			"VERIFICATION_CODE": "認証コード",
 			"VERIFY_NOW": "認証"
+		},
+		"OPERATOR": {
+			"CONTAINS": "含む",
+			"DOES_NOT_CONTAIN": "含まない",
+			"DOES_NOT_EQUAL": "等し",
+			"EQUAL": "等しい"
 		},
 		"POPUP": {
 			"NOTICE": {
@@ -1759,6 +1767,9 @@
 				"WIDGET_HEIGHT": "ウィジェットの高さ"
 			},
 			"WIDGET_TITLE_REQUIRED": "ウィジェットのタイトルを入力してください。"
+		},
+		"WORKSPACE": {
+			"SELECT_WORKSPACE": "ワークスペースの選択"
 		}
 	},
 	"COMPONENT": {
@@ -3359,7 +3370,11 @@
 		},
 		"COLLECTOR": {
 			"ACCOUNT": "アカウント",
+			"ACTIONS": "ルーティング",
 			"ADDITIONAL_OPTIONS": "追加オプション",
+			"ADDITIONAL_RULE": "追加ルール",
+			"ADDITIONAL_RULE_CONDITION_INFO": "データとタグのサブキーを\nクラウドサービス > 詳細 > 生データで確認してください",
+			"ADD_ADDITIONAL_RULE": "ルールを追加",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
 			"ALT_E_COLLECTOR_SCHEDULE": "1日に最大2回までスケジュールを設定できます。",
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
@@ -3377,6 +3392,30 @@
 			"ALT_S_UPDATE_COLLECTOR_OPTIONS": "コレクターオプションの更新に成功しました",
 			"ALT_S_UPDATE_SCHEDULE": "スケジュールの変更完了",
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "サービスアカウントの更新に成功しました",
+			"CLOUD_SERVICE_TAG": "クラウドサービスのタグ",
+			"COLLECTOR_RULE": {
+				"ALL": "",
+				"ALT_E_CREATE_COLLECTOR_RULE": "コレクタールールの作成に失敗しました",
+				"ALT_E_DELETE_COLLECTOR_RULE": "コレクタールールの削除に失敗しました",
+				"ALT_E_REORDER_COLLECTOR_RULES": "コレクタールールの順序変更に失敗しました",
+				"ALT_E_UPDATE_COLLECTOR_RULE": "コレクタールールの更新に失敗しました",
+				"ALT_S_CREATE_COLLECTOR_RULE": "コレクタールールが正常に作成されました",
+				"ALT_S_DELETE_COLLECTOR_RULE": "コレクタールールが正常に削除されました",
+				"ALT_S_REORDER_COLLECTOR_RULES": "コレクタールールの順序が正常に変更されました",
+				"ALT_S_UPDATE_COLLECTOR_RULE": "コレクタールールの更新が完了しました",
+				"ANY": "",
+				"CLOUD_SERVICE_SOURCE_KEY": "クラウドサービスのソースキー",
+				"CONDITION_SATISFIES": "",
+				"DISABLED_CONDITION": "",
+				"ENABLED_CONDITION": "",
+				"MATCH_PROJECT": "最初に一致するプロジェクト",
+				"MATCH_SERVICE_ACCOUNT": "最初に一致するサービスアカウント",
+				"PROJECT_TAG_KEY": "プロジェクトのタグキー",
+				"SELECT_PROJECT": "プロジェクトを選択",
+				"SERVICE_ACCOUNT_TAG_KEY": "サービスアカウントのタグキー"
+			},
+			"CONDITIONS": "条件",
+			"CONDITION_POLICY_DESC": "が満足させる場合",
 			"CREATE": {
 				"ALL": "全体",
 				"ALT_E_COLLECT_EXECUTION": "データ収集は開始に失敗しました",
@@ -3444,6 +3483,7 @@
 				"PAGE_NOTIFICATION": "このコレクターの設定は管理者モードでのみ行うことができます。",
 				"PLUGIN": "プラグイン",
 				"PLUGIN_ID": "プラグイン ID",
+				"PROJECT": "プロジェクト",
 				"REGION": "Region",
 				"SAVE_CHANGES": "変更を保存",
 				"SCHEDULE": "スケジュール",
@@ -3458,7 +3498,14 @@
 				"SPECIFIC_SERVICE_ACCOUNT": "特定のサービスアカウント",
 				"TAG": "タグ",
 				"VERSION": "バージョン",
-				"VIEW_IN_ADMIN_MODE": ""
+				"VIEW_IN_ADMIN_MODE": "",
+				"WORKSPACE": "ワークスペース"
+			},
+			"EDIT_ADDITIONAL_RULE": "追加ルールを編集",
+			"EMPTY": {
+				"DESC1": "追加ルールを追加するには",
+				"DESC2": "以下の追加ボタンをクリックしてください",
+				"HEADER": "このコレクターには追加ルールがありません"
 			},
 			"HISTORY": {
 				"ALL": "すべてを表示",
@@ -3514,7 +3561,9 @@
 			},
 			"NO_DATA": "データがありません",
 			"NO_JOB": "近のジョブはありません",
-			"NO_OPTIONS": "選択可能なオプションはありません。"
+			"NO_OPTIONS": "選択可能なオプションはありません。",
+			"PROJECT_ROUTING": "プロジェクトルーティング",
+			"THEN_STOP_PROCESSING": "その後、作業は停止する"
 		},
 		"CREATE_COLLECTOR": "コレクタ生成",
 		"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
@@ -4676,6 +4725,7 @@
 			"ALT_S_DELETE_EVENT_RULE": "イベントルール削除に成功",
 			"ALT_S_REORDER_EVENT_RULES": "イベントルールの並べ替えに成功",
 			"ALT_S_UPDATE_EVENT_RULE": "イベントルール変更に成功",
+			"ALWAYS": "常に",
 			"ANY": "どれか(Any)",
 			"ASSIGNEE": "担当者",
 			"CANCEL": "キャンセル",

@@ -56,7 +56,9 @@
                                    data-test-id="collector-options-section"
                                    :has-read-write-access="state.hasReadWriteAccess"
         />
-
+        <collector-additional-rule class="section"
+                                   :collector-id="props.collectorId"
+        />
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
                               :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
                               :verification-text="state.collectorName"
@@ -126,6 +128,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import CollectorAdditionalRule from '@/services/asset-inventory/components/CollectorAdditionalRule.vue';
 import CollectorBaseInfoSection from '@/services/asset-inventory/components/CollectorBaseInfoSection.vue';
 import CollectorDataModal
     from '@/services/asset-inventory/components/CollectorDataModal.vue';
@@ -155,7 +158,8 @@ const props = defineProps<{
 }>();
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
+
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
@@ -228,8 +232,8 @@ const getCollector = async (): Promise<CollectorModel|null> => {
     }
 };
 
-const fetchDeleteCollector = async () => (collectorFormStore.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
-    collector_id: collectorFormStore.collectorId,
+const fetchDeleteCollector = async () => (collectorFormState.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
+    collector_id: collectorFormState.collectorId,
 }) : undefined);
 
 const goBackToMainPage = () => {
@@ -254,7 +258,7 @@ const handleDeleteModalConfirm = async () => {
         state.deleteModalVisible = false;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_DELETE_COLLECTOR'), '');
         goBackToMainPage();
-        collectorFormStore.$reset();
+        collectorFormStore.resetState();
     } catch (error) {
         state.deleteModalVisible = false;
         ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_DELETE_COLLECTOR'));
@@ -297,7 +301,7 @@ watch(documentVisibility, (visibility) => {
 
 onMounted(async () => {
     collectorJobStore.$reset();
-    collectorFormStore.$reset();
+    collectorFormStore.resetState();
     collectorDataModalStore.$reset();
     collectorDetailPageStore.reset();
     const collector = await getCollector();
@@ -314,7 +318,7 @@ onMounted(async () => {
 onUnmounted(() => {
     pause();
     collectorJobStore.$reset();
-    collectorFormStore.$reset();
+    collectorFormStore.resetState();
     collectorDataModalStore.$reset();
     collectorDetailPageStore.reset();
 });

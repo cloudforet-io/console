@@ -87,7 +87,7 @@ const props = defineProps<{
 }>();
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 const collectorDetailPageStore = useCollectorDetailPageStore();
 
 const state = reactive({
@@ -120,9 +120,9 @@ const state = reactive({
 });
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
     const params: CollectorUpdatePluginParameters = {
-        collector_id: collectorFormStore.collectorId,
+        collector_id: collectorFormState.collectorId,
         options: collectorFormState.options,
     };
     return SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);
