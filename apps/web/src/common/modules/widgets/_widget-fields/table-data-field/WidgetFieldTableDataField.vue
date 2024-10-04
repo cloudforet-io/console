@@ -246,24 +246,26 @@ const handleUpdateCount = (value: number) => {
     };
 };
 const handleSelectDynamicFields = (value: MenuItem) => {
-    const _orderedFixedValue = orderBy(state.proxyValue.dynamicFieldInfo?.fixedValue);
+    // delete case
     if (state.proxyValue.dynamicFieldInfo?.fixedValue.includes(value.name)) {
+        const _orderedFixedValue = orderBy(state.proxyValue.dynamicFieldInfo?.fixedValue?.filter((d) => d !== value.name)) || [];
         state.proxyValue = {
             ...state.proxyValue,
             dynamicFieldInfo: {
                 ...state.proxyValue.dynamicFieldInfo,
-                fixedValue: [...(_orderedFixedValue ?? []).filter((d) => d !== value.name)],
+                fixedValue: _orderedFixedValue,
             },
         };
         return;
     }
+
+    // add case
+    const _orderedFixedValue = orderBy([...state.proxyValue.dynamicFieldInfo?.fixedValue || [], value.name]);
     state.proxyValue = {
         ...state.proxyValue,
         dynamicFieldInfo: {
             ...state.proxyValue.dynamicFieldInfo,
-            fixedValue: [
-                ...(_orderedFixedValue ?? []), value.name,
-            ],
+            fixedValue: _orderedFixedValue,
         },
     };
 };
