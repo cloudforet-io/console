@@ -1275,6 +1275,12 @@
 			"VERIFICATION_CODE": "인증 코드",
 			"VERIFY_NOW": "인증"
 		},
+		"OPERATOR": {
+			"CONTAINS": "포함(contains)",
+			"DOES_NOT_CONTAIN": "포함하지 않음(does not contain)",
+			"DOES_NOT_EQUAL": "같지 않음(does not equal)",
+			"EQUAL": "같음(equal)"
+		},
 		"POPUP": {
 			"NOTICE": {
 				"CLOSE": "닫기",
@@ -3304,9 +3310,15 @@
 				"ALT_S_REORDER_COLLECTOR_RULES": "컬렉터 규칙 순서 변경 완료",
 				"ALT_S_UPDATE_COLLECTOR_RULE": "컬렉터 규칙 수정 완료",
 				"ANY": "",
+				"CLOUD_SERVICE_SOURCE_KEY": "클라우드 서비스 소스 키",
 				"CONDITION_SATISFIES": "",
 				"DISABLED_CONDITION": "",
-				"ENABLED_CONDITION": ""
+				"ENABLED_CONDITION": "",
+				"MATCH_PROJECT": "첫 번째 프로젝트 매칭",
+				"MATCH_SERVICE_ACCOUNT": "첫 번째 서비스 어카운트 매칭",
+				"PROJECT_TAG_KEY": "프로젝트 태그 키",
+				"SELECT_PROJECT": "프로젝트 선택",
+				"SERVICE_ACCOUNT_TAG_KEY": "서비스 어카운트 태그 키"
 			},
 			"CONDITIONS": "조건",
 			"CONDITION_POLICY_DESC": "만족시키는 경우",
@@ -3395,7 +3407,7 @@
 				"VIEW_IN_ADMIN_MODE": "",
 				"WORKSPACE": "워크스페이스"
 			},
-			"EDIT_ADDITIONAL_RULE": "추가 규칙 수",
+			"EDIT_ADDITIONAL_RULE": "추가 규칙 편집",
 			"EMPTY": {
 				"DESC1": "규칙을 추가하려면",
 				"DESC2": "아래 버튼을 눌러 추가해주세요.",

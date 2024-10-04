@@ -2,6 +2,7 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { debounce } from 'lodash';
 
@@ -25,7 +26,7 @@ import type {
 } from '@/schema/inventory/collector-rule/type';
 import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
 import type { RegionModel } from '@/schema/inventory/region/model';
-import { i18n as _i18n } from '@/translations';
+import { i18n, i18n as _i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -132,11 +133,11 @@ const state = reactive({
     cloudServiceTypeMenu: [] as (SelectDropdownMenuItem[])[],
     regionMenu: [] as (SelectDropdownMenuItem[])[],
     // actions
-    actionPolicies: computed<Partial<Record<ActionPolicy, string>>>(() => ((state.conditionState) ? ({
-        match_project: 'Match Project',
-        match_service_account: 'Match Service Account',
+    actionPolicies: computed<Partial<Record<ActionPolicy, TranslateResult>>>(() => ((state.conditionState) ? ({
+        match_project: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.MATCH_PROJECT'),
+        match_service_account: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.MATCH_SERVICE_ACCOUNT'),
     }) : ({
-        change_project: 'Project Routing',
+        change_project: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.SELECT_PROJECT'),
     }))),
     selectedActionRadioIdx: 'change_project' as ActionPolicy,
     selectedProjectId: props.data?.actions?.change_project ? [props.data?.actions?.change_project ?? ''] : undefined,
@@ -476,6 +477,7 @@ onMounted(() => {
                             />
                         </template>
                         <collector-additional-rule-form-operator-dropdown class="condition-operator"
+                                                                          :value="condition.operator"
                                                                           @update:value="handleUpdateOperator($event, idx)"
                         />
                         <template v-if="condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)">
@@ -568,7 +570,7 @@ onMounted(() => {
                          class="match-box"
                     >
                         <p-field-group class="action-field-group"
-                                       label="Source"
+                                       :label="$t('INVENTORY.COLLECTOR.COLLECTOR_RULE.CLOUD_SERVICE_SOURCE_KEY')"
                                        required
                         >
                             <p-text-input v-model="state.sourceInput"
@@ -577,7 +579,9 @@ onMounted(() => {
                             />
                         </p-field-group>
                         <p-field-group class="action-field-group"
-                                       label="Target"
+                                       :label="state.selectedActionRadioIdx === 'match_project'
+                                           ? $t('INVENTORY.COLLECTOR.COLLECTOR_RULE.PROJECT_TAG_KEY')
+                                           : $t('INVENTORY.COLLECTOR.COLLECTOR_RULE.SERVICE_ACCOUNT_TAG_KEY')"
                                        required
                         >
                             <p-text-input v-model="state.targetInput"

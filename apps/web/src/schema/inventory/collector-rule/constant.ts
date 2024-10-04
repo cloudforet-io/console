@@ -1,3 +1,5 @@
+import { i18n } from '@/translations';
+
 export const COLLECTOR_RULE_TYPE = {
     MANAGED: 'MANAGED',
     CUSTOM: 'CUSTOM',
@@ -42,8 +44,8 @@ export const COLLECTOR_RULE_CONDITION_OPERATOR = {
 } as const;
 
 export const COLLECTOR_RULE_CONDITION_OPERATOR_LABEL = {
-    eq: 'Equal',
-    contain: 'Contain',
-    not: 'Not',
-    not_contain: 'Not Contain',
+    not: i18n.t('COMMON.OPERATOR.DOES_NOT_EQUAL'),
+    not_contain: i18n.t('COMMON.OPERATOR.DOES_NOT_CONTAIN'),
+    eq: i18n.t('COMMON.OPERATOR.EQUAL'),
+    contain: i18n.t('COMMON.OPERATOR.CONTAINS'),
 } as const;

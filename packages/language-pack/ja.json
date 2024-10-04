@@ -1275,6 +1275,12 @@
 			"VERIFICATION_CODE": "認証コード",
 			"VERIFY_NOW": "認証"
 		},
+		"OPERATOR": {
+			"CONTAINS": "含む",
+			"DOES_NOT_CONTAIN": "含まない",
+			"DOES_NOT_EQUAL": "等し",
+			"EQUAL": "等しい"
+		},
 		"POPUP": {
 			"NOTICE": {
 				"CLOSE": "閉じる",
@@ -3304,9 +3310,15 @@
 				"ALT_S_REORDER_COLLECTOR_RULES": "コレクタールールの順序が正常に変更されました",
 				"ALT_S_UPDATE_COLLECTOR_RULE": "コレクタールールの更新が完了しました",
 				"ANY": "",
+				"CLOUD_SERVICE_SOURCE_KEY": "クラウドサービスのソースキー",
 				"CONDITION_SATISFIES": "",
 				"DISABLED_CONDITION": "",
-				"ENABLED_CONDITION": ""
+				"ENABLED_CONDITION": "",
+				"MATCH_PROJECT": "最初に一致するプロジェクト",
+				"MATCH_SERVICE_ACCOUNT": "最初に一致するサービスアカウント",
+				"PROJECT_TAG_KEY": "プロジェクトのタグキー",
+				"SELECT_PROJECT": "プロジェクトを選択",
+				"SERVICE_ACCOUNT_TAG_KEY": "サービスアカウントのタグキー"
 			},
 			"CONDITIONS": "条件",
 			"CONDITION_POLICY_DESC": "が満足させる場合",

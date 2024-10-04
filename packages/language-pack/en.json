@@ -1275,6 +1275,12 @@
 			"VERIFICATION_CODE": "Verification Code",
 			"VERIFY_NOW": "Verify Now"
 		},
+		"OPERATOR": {
+			"CONTAINS": "Contains",
+			"DOES_NOT_CONTAIN": "Does not contain",
+			"DOES_NOT_EQUAL": "Does not equal",
+			"EQUAL": "Equal"
+		},
 		"POPUP": {
 			"NOTICE": {
 				"CLOSE": "Close",
@@ -3304,9 +3310,15 @@
 				"ALT_S_REORDER_COLLECTOR_RULES": "Collector Rules successfully reordered",
 				"ALT_S_UPDATE_COLLECTOR_RULE": "Collector Rule successfully updated",
 				"ANY": "Any one of the following",
+				"CLOUD_SERVICE_SOURCE_KEY": "Cloud service source key",
 				"CONDITION_SATISFIES": "If the condition satisfies",
 				"DISABLED_CONDITION": "Disabled Condition",
-				"ENABLED_CONDITION": "Enabled Condition"
+				"ENABLED_CONDITION": "Enabled Condition",
+				"MATCH_PROJECT": "First Match Project",
+				"MATCH_SERVICE_ACCOUNT": "First Match Service Account",
+				"PROJECT_TAG_KEY": "Project Tag key",
+				"SELECT_PROJECT": "Select Project",
+				"SERVICE_ACCOUNT_TAG_KEY": "Service Account Tag key"
 			},
 			"CONDITIONS": "Conditions",
 			"CONDITION_POLICY_DESC": "of the following are met",
