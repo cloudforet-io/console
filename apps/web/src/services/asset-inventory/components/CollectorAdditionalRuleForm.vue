@@ -8,7 +8,7 @@ import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PRadio, PSelectDropdown, PI, PTextInput, PToggleButton, PFieldGroup, PCheckbox, PFieldTitle,
+    PButton, PRadio, PSelectDropdown, PI, PTextInput, PToggleButton, PFieldGroup, PCheckbox, PFieldTitle, PTooltip,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
@@ -133,12 +133,21 @@ const state = reactive({
     cloudServiceTypeMenu: [] as (SelectDropdownMenuItem[])[],
     regionMenu: [] as (SelectDropdownMenuItem[])[],
     // actions
-    actionPolicies: computed<Partial<Record<ActionPolicy, TranslateResult>>>(() => ((state.conditionState) ? ({
-        match_project: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.MATCH_PROJECT'),
-        match_service_account: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.MATCH_SERVICE_ACCOUNT'),
-    }) : ({
-        change_project: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.SELECT_PROJECT'),
-    }))),
+    actionPolicies: computed<Partial<Record<ActionPolicy, TranslateResult>>>(() => {
+        if (!state.isAdminMode) {
+            return ({
+                change_project: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.SELECT_PROJECT'),
+                match_project: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.MATCH_PROJECT'),
+                match_service_account: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.MATCH_SERVICE_ACCOUNT'),
+            });
+        }
+        return ((state.conditionState) ? ({
+            match_project: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.MATCH_PROJECT'),
+            match_service_account: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.MATCH_SERVICE_ACCOUNT'),
+        }) : ({
+            change_project: i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.SELECT_PROJECT'),
+        }));
+    }),
     selectedActionRadioIdx: 'change_project' as ActionPolicy,
     selectedProjectId: props.data?.actions?.change_project ? [props.data?.actions?.change_project ?? ''] : undefined,
     selectedWorkspaceId: [] as SelectDropdownMenuItem[],
@@ -386,7 +395,9 @@ const DEFAULT_SEARCH_MAP:Record<CollectorRuleConditionKey, SelectDropdownMenuIte
 };
 
 watch(() => state.conditionState, (value) => {
-    state.selectedActionRadioIdx = value ? 'match_project' : 'change_project';
+    if (state.isAdminMode) {
+        state.selectedActionRadioIdx = value ? 'match_project' : 'change_project';
+    }
 });
 
 (async () => {
@@ -433,7 +444,20 @@ onMounted(() => {
             >
                 <p-field-title :label="$t('INVENTORY.COLLECTOR.COLLECTOR_RULE.CONDITION_SATISFIES')"
                                class="mb-2"
-                />
+                >
+                    <template #right>
+                        <p-tooltip v-if="state.isConditionTooltipVisible"
+                                   class="ml-2"
+                                   position="bottom"
+                                   :contents="$t('INVENTORY.COLLECTOR.ADDITIONAL_RULE_CONDITION_INFO')"
+                        >
+                            <p-i width="1rem"
+                                 height="1rem"
+                                 name="ic_info-circle"
+                            />
+                        </p-tooltip>
+                    </template>
+                </p-field-title>
                 <div class="condition-policy-wrapper">
                     <p-radio v-for="([key,value], idx) in Object.entries(state.conditionPolicies)"
                              :key="`bookmark-scope-${idx}`"
@@ -558,7 +582,7 @@ onMounted(() => {
                             <project-select-dropdown :key="state.selectedWorkspaceId[0]?.name"
                                                      class="action-project"
                                                      is-fixed-width
-                                                     :disabled="!state.selectedWorkspaceId[0]?.name"
+                                                     :disabled="state.isAdminMode ? !state.selectedWorkspaceId[0]?.name : false"
                                                      :selected-project-ids="state.selectedProjectId"
                                                      :project-group-selectable="false"
                                                      :workspace-id="state.selectedWorkspaceId[0]?.name"

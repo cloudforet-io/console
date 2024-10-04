@@ -7,6 +7,7 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import { isNotEmpty } from '@cloudforet/utils';
 
 import {
+    COLLECTOR_RULE_CONDITION_KEY,
     COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_OPERATOR_LABEL,
 } from '@/schema/inventory/collector-rule/constant';
@@ -69,6 +70,15 @@ const state = reactive({
         ALL: _i18n.t('PROJECT.EVENT_RULE.ALL'),
         ALWAYS: _i18n.t('PROJECT.EVENT_RULE.ALWAYS'),
     })),
+    isConditionTooltipVisible: computed(() => {
+        let isConditionTooltipVisible = false;
+        state.conditionFields.forEach((condition) => {
+            if (condition.name.slice(0, 4) === COLLECTOR_RULE_CONDITION_KEY.data || condition.name.slice(0, 4) === COLLECTOR_RULE_CONDITION_KEY.tags) {
+                isConditionTooltipVisible = true;
+            }
+        });
+        return isConditionTooltipVisible;
+    }),
 });
 
 </script>
@@ -82,7 +92,8 @@ const state = reactive({
             <h5 v-if="state.conditionFields.length"
                 class="text-paragraph-lg text-gray-900 font-bold"
             >
-                <span>{{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}<p-tooltip class="ml-2"
+                <span>{{ $t('INVENTORY.COLLECTOR.CONDITIONS') }}<p-tooltip v-if="state.isConditionTooltipVisible"
+                                                                           class="ml-2"
                                                                            position="bottom"
                                                                            :contents="$t('INVENTORY.COLLECTOR.ADDITIONAL_RULE_CONDITION_INFO')"
                 ><p-i width="1rem"
