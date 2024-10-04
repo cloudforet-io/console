@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import { debounce } from 'lodash';
 
@@ -41,6 +43,7 @@ import CollectorAdditionalRuleFormOperatorDropdown
     from '@/services/asset-inventory/components/CollectorAdditionalRuleFormOperatorDropdown.vue';
 import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
 
+type ActionPolicy = keyof AdditionalRuleAction;
 
 interface Props {
     data?: CollectorRuleModel;
@@ -109,7 +112,7 @@ const state = reactive({
         [COLLECTOR_RULE_CONDITION_POLICY.ALL]: _i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALL'),
         [COLLECTOR_RULE_CONDITION_POLICY.ANY]: _i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ANY'),
     })),
-    selectedConditionRadioIdx: COLLECTOR_RULE_CONDITION_POLICY.ALL as CollectorRuleConditionPolicy,
+    selectedConditionRadioIdx: props.data?.conditions_policy ?? COLLECTOR_RULE_CONDITION_POLICY.ALL as CollectorRuleConditionPolicy,
     conditionKeyMenu: computed<SelectDropdownMenuItem[]>(() => {
         let keys = Object.keys(COLLECTOR_RULE_CONDITION_KEY);
         if (props.provider) keys = keys.filter((key) => key !== COLLECTOR_RULE_CONDITION_KEY.provider);
@@ -124,19 +127,20 @@ const state = reactive({
     conditionList: convertToUiCondition(props.data?.conditions),
     valueMenuSearchKeyword: '',
     searchLoading: true,
-    conditionState: false,
+    conditionState: !!(props.data?.conditions_policy === 'ALWAYS'),
     // select dropdown menu
     conditionListKey: 0,
     cloudServiceGroupMenu: [] as (SelectDropdownMenuItem[])[],
     cloudServiceTypeMenu: [] as (SelectDropdownMenuItem[])[],
     regionMenu: [] as (SelectDropdownMenuItem[])[],
     // actions
-    actionPolicies: computed(() => ({
-        change_project: 'Project Routing',
+    actionPolicies: computed<Partial<Record<ActionPolicy, string>>>(() => ((state.conditionState) ? ({
         match_project: 'Match Project',
         match_service_account: 'Match Service Account',
-    })),
-    selectedActionRadioIdx: 'change_project',
+    }) : ({
+        change_project: 'Project Routing',
+    }))),
+    selectedActionRadioIdx: 'change_project' as ActionPolicy,
     selectedProjectId: props.data?.actions?.change_project ? [props.data?.actions?.change_project ?? ''] : undefined,
     selectedWorkspaceId: [] as SelectDropdownMenuItem[],
     isStopProcessingChecked: false,
@@ -379,6 +383,10 @@ const DEFAULT_SEARCH_MAP:Record<CollectorRuleConditionKey, SelectDropdownMenuIte
     [COLLECTOR_RULE_CONDITION_KEY.region_code]: [],
 };
 
+watch(() => state.conditionState, (value) => {
+    state.selectedActionRadioIdx = value ? 'match_project' : 'change_project';
+});
+
 (async () => {
     // init search menu list
     DEFAULT_SEARCH_MAP.cloud_service_group = await fetchCloudServiceGroup('', 0);
@@ -389,12 +397,17 @@ const DEFAULT_SEARCH_MAP:Record<CollectorRuleConditionKey, SelectDropdownMenuIte
 })();
 
 onMounted(() => {
-    if (props.data?.actions?.change_project) {
+    const defaultActionPolicy = props.data?.actions ? Object.keys(props.data?.actions)[0] : undefined;
+    if (defaultActionPolicy === 'change_project' && props.data?.actions?.change_project) {
         const selectedProject = state.projects[props.data.actions.change_project];
         state.selectedWorkspaceId = [{
             name: selectedProject.data.workspaceId,
             label: state.workspace[selectedProject.data.workspaceId].label,
         }];
+    } else if (defaultActionPolicy === 'match_project' || defaultActionPolicy === 'match_service_account') {
+        state.selectedActionRadioIdx = defaultActionPolicy;
+        state.sourceInput = props.data?.actions[defaultActionPolicy]?.source ?? '';
+        state.targetInput = props.data?.actions[defaultActionPolicy]?.target ?? '';
     }
 });
 </script>
