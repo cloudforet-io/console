@@ -266,13 +266,13 @@ const handleClickCancel = () => {
     emit('click-cancel');
 };
 
-const handleSelectProjectId = (value) => {
+const handleSelectProjectId = (value:string[]) => {
     state.selectedProjectId = value;
 };
 
 const handleSelectWorkspaceId = (value:SelectDropdownMenuItem[]) => {
     state.selectedWorkspaceId = value;
-    state.selectedProjectId = [];
+    state.selectedProjectId = undefined;
 };
 const handleClickDone = () => {
     const actions:AdditionalRuleAction = {};
@@ -554,8 +554,10 @@ onMounted(() => {
                                        :label="$t('INVENTORY.COLLECTOR.DETAIL.PROJECT')"
                                        required
                         >
-                            <project-select-dropdown class="action-project"
+                            <project-select-dropdown :key="state.selectedWorkspaceId[0]?.name"
+                                                     class="action-project"
                                                      is-fixed-width
+                                                     :disabled="!state.selectedWorkspaceId[0]?.name"
                                                      :selected-project-ids="state.selectedProjectId"
                                                      :project-group-selectable="false"
                                                      :workspace-id="state.selectedWorkspaceId[0]?.name"
