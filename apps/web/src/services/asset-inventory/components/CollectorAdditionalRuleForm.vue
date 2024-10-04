@@ -72,6 +72,7 @@ const convertToUiCondition = (condition?:AdditionalRuleCondition[]):AdditionalRu
     if (c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)) {
         return {
             ...c,
+            key: c.key.split('.')[0] ?? c.key,
             subkey: c.key.slice(4),
         };
     }
@@ -219,9 +220,9 @@ const handleSelectConditionKey = (value:CollectorRuleConditionKey, idx:number) =
         break;
     }
 };
-const handleUpdateSubkeyInput = (value:string) => {
+const handleUpdateSubkeyInput = (value:string, idx:number) => {
     state.conditionList = state.conditionList.map((condition, index) => {
-        if (index === state.conditionList.length - 1) {
+        if (index === idx) {
             return {
                 ...condition,
                 subkey: value,
@@ -446,7 +447,7 @@ onMounted(() => {
                                           block
                                           is-fixed-width
                                           placeholder="ex) os.os_type"
-                                          @update:value="handleUpdateSubkeyInput($event)"
+                                          @update:value="handleUpdateSubkeyInput($event, idx)"
                             />
                         </template>
                         <template v-if="condition.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)">
@@ -455,7 +456,7 @@ onMounted(() => {
                                           block
                                           is-fixed-width
                                           placeholder="ex) a.b.c"
-                                          @update:value="handleUpdateSubkeyInput($event)"
+                                          @update:value="handleUpdateSubkeyInput($event, idx)"
                             />
                         </template>
                         <collector-additional-rule-form-operator-dropdown class="condition-operator"
