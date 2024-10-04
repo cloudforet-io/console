@@ -12,9 +12,7 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CloudServiceTypeListParameters } from '@/schema/inventory/cloud-service-type/api-verbs/list';
 import type { CloudServiceTypeStatParameters } from '@/schema/inventory/cloud-service-type/api-verbs/stat';
-import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
 import {
     COLLECTOR_RULE_CONDITION_KEY, COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_POLICY,
@@ -327,17 +325,18 @@ const fetchCloudServiceGroup = async (keyword = '', idx:number):Promise<SelectDr
 };
 const fetchCloudServiceType = async (keyword = '', idx:number):Promise<SelectDropdownMenuItem[]> => {
     try {
-        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.list<CloudServiceTypeListParameters, ListResponse<CloudServiceTypeModel>>(
+        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.stat(
             {
                 query: {
                     keyword,
                     filter: [{ k: 'provider', v: props.provider, o: 'eq' }],
+                    distinct: 'name',
                 },
             },
         );
-        const menu = results?.map((i) => ({
-            label: i.name,
-            name: i.cloud_service_type_id,
+        const menu = results?.map((i:string) => ({
+            label: i,
+            name: i,
         })) ?? [];
         state.cloudServiceTypeMenu[idx] = menu;
         return menu;
