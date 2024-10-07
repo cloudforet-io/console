@@ -21,7 +21,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { gray, indigo, violet } from '@/styles/colors';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
+import { useDashboardControlStore } from '@/services/dashboards/stores/dashboard-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -39,7 +39,7 @@ const LABELS_LIMIT = 2;
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
-const dashboardMainPageStore = useDashboardMainPageStore();
+const dashboardMainPageStore = useDashboardControlStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),

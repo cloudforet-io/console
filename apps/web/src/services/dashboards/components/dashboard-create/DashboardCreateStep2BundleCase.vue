@@ -32,8 +32,8 @@ import {
     getSelectedTreeData,
 } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import { useDashboardControlStore } from '@/services/dashboards/stores/dashboard-control-store';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
-import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -50,7 +50,7 @@ const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
-const dashboardMainPageStore = useDashboardMainPageStore();
+const dashboardMainPageStore = useDashboardControlStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });

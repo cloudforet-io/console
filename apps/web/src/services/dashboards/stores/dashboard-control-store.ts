@@ -42,7 +42,7 @@ const _isControlButtonDisabled = (selectedPublicTreeData: TreeNode<DashboardTree
     });
     return result;
 };
-export const useDashboardMainPageStore = defineStore('page-dashboard-main', () => {
+export const useDashboardControlStore = defineStore('dashboard-control', () => {
     const appContextStore = useAppContextStore();
     const storeState = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),

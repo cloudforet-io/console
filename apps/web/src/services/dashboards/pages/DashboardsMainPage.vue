@@ -46,14 +46,14 @@ import DashboardFolderTree from '@/services/dashboards/components/dashboard-fold
 import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
+import { useDashboardControlStore } from '@/services/dashboards/stores/dashboard-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
-const dashboardMainPageStore = useDashboardMainPageStore();
+const dashboardMainPageStore = useDashboardControlStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
 const dashboardMainPageGetters = dashboardMainPageStore.getters;
 

@@ -27,7 +27,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
+import { useDashboardControlStore } from '@/services/dashboards/stores/dashboard-control-store';
 
 
 type FolderModel = PublicFolderModel | PrivateFolderModel;
@@ -45,7 +45,7 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
-const dashboardMainPageStore = useDashboardMainPageStore();
+const dashboardMainPageStore = useDashboardControlStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
 const dashboardMainPageGetters = dashboardMainPageStore.getters;
 const storeState = reactive({
