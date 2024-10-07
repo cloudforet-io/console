@@ -211,6 +211,7 @@ defineExpose({
          class="p-context-menu"
          @keyup.esc="onClickEsc"
     >
+        hello world
         <div class="context-menu-title-wrapper">
             <slot name="header">
                 <p v-if="title"
