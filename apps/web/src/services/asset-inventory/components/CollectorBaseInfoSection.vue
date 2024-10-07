@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorDetailPageStore.getters.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
@@ -90,6 +90,7 @@ import { useCollectorJobStore } from '@/services/asset-inventory/stores/collecto
 
 const props = defineProps<{
     historyLink: Location
+    hasReadWriteAccess?: boolean
 }>();
 
 const collectorFormStore = useCollectorFormStore();

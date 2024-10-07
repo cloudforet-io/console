@@ -26,6 +26,7 @@ interface TableItem {
 }
 interface Props {
     activeTab: string;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -33,12 +34,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
 
 const state = reactive({
     items: [] as TableItem[],
-    selectedUser: computed(() => userPageStore.selectedUsers[0]),
-    selectedIdx: computed(() => userPageStore.selectedIndices[0]),
+    selectedUser: computed(() => userPageStore.getters.selectedUsers[0]),
+    selectedIdx: computed(() => userPageStore.state.selectedIndices[0]),
     sortBy: 'key',
     sortDesc: true,
 });
@@ -80,7 +81,7 @@ const handleTagUpdate = async (newTags) => {
         tableState.tagEditPageVisible = false;
         state.items = convertUserTagsToKeyValueArray(newTags);
         userPageStore.$patch((_state) => {
-            _state.users[state.selectedIdx].tags = newTags;
+            _state.state.users[state.selectedIdx].tags = newTags;
         });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
@@ -103,7 +104,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                    :total-count="state.items.length"
                    :title="$t('IAM.USER.MAIN.TAG')"
         >
-            <template v-if="userPageState.isAdminMode"
+            <template v-if="props.hasReadWriteAccess && userPageState.isAdminMode"
                       #extra
             >
                 <p-button style-type="tertiary"

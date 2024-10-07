@@ -15,8 +15,9 @@ interface Props {
     title?: string|TranslateResult;
     type?: 'info' | 'danger' | 'warning';
     hideHeaderCloseButton?: boolean;
+    noTitle?: boolean;
     visible?: boolean;
-    layout?: 'insection' | 'full-width';
+    layout?: 'in-section' | 'full-width';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
     title: '',
     type: 'info',
     hideHeaderCloseButton: false,
+    noTitle: false,
     visible: true,
     layout: 'full-width',
 });
@@ -50,7 +52,7 @@ const handleCloseClick = () => {
 
 <template>
     <div class="scoped-notification"
-         :class="{'info': props.type==='info', 'waring': props.type ==='warning', 'insection': props.layout === 'insection'}"
+         :class="{info: props.type==='info', waring: props.type ==='warning', danger: props.type ==='danger', 'in-section': props.layout === 'in-section'}"
     >
         <p-i v-if="props.titleIcon"
              class="left-icon"
@@ -59,12 +61,18 @@ const handleCloseClick = () => {
              :color="iconColorMap[props.type]"
              :name="props.titleIcon"
         />
-        <div class="content-wrapper">
+        <div class="content-wrapper"
+             :class="{'hide-title-case': props.noTitle}"
+        >
             <div class="left-part">
-                <div class="title-wrapper">
+                <div v-if="!props.noTitle"
+                     class="title-wrapper"
+                >
                     {{ props.title }}
                 </div>
-                <div class="content-wrapper">
+                <div :class="{'hide-title-case': props.noTitle}"
+                     class="body-wrapper"
+                >
                     <slot />
                 </div>
             </div>
@@ -92,21 +100,33 @@ const handleCloseClick = () => {
     }
 
     .content-wrapper {
-        @apply flex flex-grow mt-1;
+        @apply flex flex-grow;
+        margin-top: 0.125rem;
         justify-content: space-between;
         .left-part {
             .title-wrapper {
-                min-height: 1.5rem;
-
                 @apply text-label-lg font-bold;
                 line-height: 1.25rem;
+            }
+
+            .body-wrapper {
+                @apply text-paragraph-md mt-1;
+
+                &.hide-title-case {
+                    @apply mt-0;
+                }
             }
         }
         .right-part {
             @apply flex-shrink-0 flex items-center;
         }
+
+        &.hide-title-case {
+            @apply mt-0;
+        }
     }
 
+    /* type */
     &.info {
         @apply bg-indigo-100;
         .title-wrapper {
@@ -121,18 +141,35 @@ const handleCloseClick = () => {
         }
     }
 
-    &.insection {
+    &.danger {
+        @apply bg-red-100;
+        .title-wrapper {
+            @apply text-label-md font-bold text-red-500;
+        }
+    }
+
+    /* layout */
+    &.in-section {
         @apply rounded gap-1;
         padding: 0.5rem 1rem;
 
         .content-wrapper {
-            @apply flex flex-grow mt-1;
+            @apply flex flex-grow;
             justify-content: space-between;
+            margin-top: 0.125rem;
 
             .left-part {
-                .title-wrapper {
-                    @apply text-label-md font-bold;
+                .body-wrapper {
+                    @apply mt-1;
+
+                    &.hide-title-case {
+                        @apply mt-0;
+                    }
                 }
+            }
+
+            &.hide-title-case {
+                @apply mt-0;
             }
         }
     }

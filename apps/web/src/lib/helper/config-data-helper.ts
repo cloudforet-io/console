@@ -4,7 +4,6 @@ import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/mo
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
-import { i18n } from '@/translations';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
@@ -14,13 +13,10 @@ import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/stor
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
-import { MENU_ID } from '@/lib/menu/config';
 
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteItem, FavoriteType, FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import type { RecentType, RecentConfig } from '@/common/modules/navigations/type';
-
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 export interface ConfigData extends Omit<RecentConfig, 'itemType'>, Omit<FavoriteConfig, 'itemType'> {
     itemType: RecentType|FavoriteType;
@@ -32,27 +28,28 @@ export interface ReferenceData extends Omit<FavoriteItem, 'itemType'> {
 
 export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menuList: DisplayMenu[]): ReferenceData[] => {
     const convertMenuList = cloneDeep(menuList);
-    const costIdx = convertMenuList.findIndex((i) => i.id === MENU_ID.COST_EXPLORER);
+    // const costIdx = convertMenuList.findIndex((i) => i.id === MENU_ID.COST_EXPLORER);
 
-    if (convertMenuList[costIdx].subMenuList?.length === 4) {
-        convertMenuList[costIdx].subMenuList?.push(
-            {
-                id: MENU_ID.ANOMALY_DETECTION_CONFIGURATION,
-                to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION._NAME },
-                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.TITLE'),
-            },
-            {
-                id: MENU_ID.ANOMALY_DETECTION_POLICY,
-                to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.POLICY._NAME },
-                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.POLICY.TITLE'),
-            },
-            {
-                id: MENU_ID.ANOMALY_DETECTION_HISTORY,
-                to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY._NAME },
-                label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE'),
-            },
-        );
-    }
+    // TODO: will be applied after the cost explorer menu is updated
+    // if (convertMenuList[costIdx].subMenuList?.length === 4) {
+    //     convertMenuList[costIdx].subMenuList?.push(
+    //         {
+    //             id: MENU_ID.ANOMALY_DETECTION_CONFIGURATION,
+    //             to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION._NAME },
+    //             label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.TITLE'),
+    //         },
+    //         {
+    //             id: MENU_ID.ANOMALY_DETECTION_POLICY,
+    //             to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.POLICY._NAME },
+    //             label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.POLICY.TITLE'),
+    //         },
+    //         {
+    //             id: MENU_ID.ANOMALY_DETECTION_HISTORY,
+    //             to: { name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY._NAME },
+    //             label: i18n.t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.HISTORY.TITLE'),
+    //         },
+    //     );
+    // }
 
     const allMenuList = getAllSuggestionMenuList(convertMenuList);
     const results: ReferenceData[] = [];

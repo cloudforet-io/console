@@ -2,13 +2,19 @@
 import {
     computed, reactive,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
-import { at } from 'lodash';
+import { at, clone } from 'lodash';
 
 import { PHeading, PButton, PContextMenu } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/inputs/context-menu/type';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
@@ -16,6 +22,7 @@ import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookma
 
 import BookmarkManagementTable from '@/services/advanced/components/BookmarkManagementTable.vue';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
@@ -23,12 +30,15 @@ const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 
+const route = useRoute();
+
 const storeState = reactive({
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
 
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     selectedIndices: computed<number[]>(() => bookmarkPageGetters.selectedIndices),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     visibleMenu: false,
@@ -42,6 +52,16 @@ const state = reactive({
             name: BOOKMARK_MODAL_TYPE.FOLDER,
         },
     ])),
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const handleClickCreateButton = () => {
@@ -67,7 +87,9 @@ const handleClickDeleteButton = () => {
         <p-heading :title="$t('IAM.BOOKMARK.ALL_BOOKMARK')"
                    class="title"
         >
-            <template #extra>
+            <template v-if="state.hasReadWriteAccess"
+                      #extra
+            >
                 <div class="extra">
                     <p-button style-type="tertiary"
                               icon-left="ic_delete"
@@ -93,7 +115,7 @@ const handleClickDeleteButton = () => {
                 </div>
             </template>
         </p-heading>
-        <bookmark-management-table />
+        <bookmark-management-table :has-read-write-access="state.hasReadWriteAccess" />
     </div>
 </template>
 

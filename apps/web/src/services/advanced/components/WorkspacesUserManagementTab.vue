@@ -10,6 +10,12 @@ import WorkspacesUserManagementTabContents from '@/services/advanced/components/
 import WorkspaceTagManagementTabContents from '@/services/advanced/components/WorkspaceTagManagementTabContents.vue';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
 
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
+
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
@@ -33,7 +39,9 @@ const tabState = reactive({
                 <workspaces-user-management-tab-contents />
             </template>
             <template #tags>
-                <workspace-tag-management-tab-contents :active-tab="tabState.activeTab" />
+                <workspace-tag-management-tab-contents :active-tab="tabState.activeTab"
+                                                       :has-read-write-access="props.hasReadWriteAccess"
+                />
             </template>
         </p-tab>
     </section>

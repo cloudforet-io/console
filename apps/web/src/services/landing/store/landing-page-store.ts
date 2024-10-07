@@ -2,22 +2,52 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { RoleModel } from '@/schema/identity/role/model';
+import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
+
+import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
+
+import { sortTableItems } from '@/common/utils/table-sort';
 
 interface LandingPageStoreState {
     loading: boolean;
-    roleList: RoleModel[];
+    selectedWorkspaceGroup: string;
 }
 
 export const useLandingPageStore = defineStore('landing-page-store', () => {
+    const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
+    const userWorkspaceGroupStoreGetters = userWorkspaceGroupStore.getters;
+
     const state = reactive<LandingPageStoreState>({
         loading: false,
-        roleList: [] as RoleModel[],
+        selectedWorkspaceGroup: 'all',
+    });
+
+    const groupUserTableState = reactive({
+        selectedIndices: [] as number[],
+        thisPage: 1,
+        searchText: '',
+        sortBy: 'user_id',
+        isDesc: false,
+        pageStart: 1,
+        pageLimit: 15,
     });
 
     const getters = reactive({
         loading: computed<boolean>(() => state.loading),
-        roleList: computed<RoleModel[]>(() => state.roleList),
+        // workspaceGroupUser
+        workspaceGroupUsers: computed<WorkspaceUser[]>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[state.selectedWorkspaceGroup]?.users || []),
+        workspaceGroupUserTotalCount: computed<number>(() => getters.workspaceGroupUsers.length || 0),
+        workspaceGroupUserTableItem: computed<WorkspaceUser[]>(() => {
+            const filteredUsers:WorkspaceUser[] = getters.workspaceGroupUsers.filter(actions.filterUser);
+
+            const sortedSelectedGroupUsers = sortTableItems<WorkspaceUser>(filteredUsers, groupUserTableState.sortBy, groupUserTableState.isDesc);
+
+            if (getters.groupUserTotalCount < groupUserTableState.pageStart - 1 + groupUserTableState.pageLimit) {
+                return sortedSelectedGroupUsers.slice(groupUserTableState.pageStart - 1);
+            }
+
+            return sortedSelectedGroupUsers?.slice(groupUserTableState.pageStart - 1, groupUserTableState.pageStart - 1 + groupUserTableState.pageLimit);
+        }),
     });
 
     const actions = {
@@ -27,10 +57,37 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
         initState: () => {
             state.loading = false;
         },
+        filterUser: (user:WorkspaceUser):boolean => {
+            const searchText = groupUserTableState.searchText.trim();
+
+            if (searchText === '') {
+                return true;
+            }
+
+            const userIdMatches = user.user_id && user.user_id.includes(searchText);
+            const userNameMatches = user.user_name && user.user_name.includes(searchText);
+
+            return !!(userIdMatches || userNameMatches);
+        },
+        resetGroupUserTableState: () => {
+            groupUserTableState.selectedIndices = [];
+            groupUserTableState.searchText = '';
+            groupUserTableState.sortBy = 'user_id';
+            groupUserTableState.isDesc = false;
+            groupUserTableState.pageStart = 1;
+            groupUserTableState.thisPage = 1;
+        },
+        reset: () => {
+            state.selectedWorkspaceGroup = 'all';
+            state.loading = false;
+            actions.resetGroupUserTableState();
+        },
     };
 
 
     return {
+        state,
+        groupUserTableState,
         getters,
         ...actions,
     };

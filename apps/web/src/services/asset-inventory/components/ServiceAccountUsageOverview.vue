@@ -22,7 +22,6 @@ import { gray, indigo } from '@/styles/colors';
 import { stateFormatter } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 interface Props {
     serviceAccountLoading: boolean;
@@ -34,11 +33,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageState = serviceAccountPageStore.state;
-const costReportPageStore = useCostReportPageStore();
-const constReportPageGetters = costReportPageStore.getters;
+const serviceAccountPageGetters = serviceAccountPageStore.getters;
 
 const storeState = reactive({
-    currency: computed<Currency|undefined>(() => constReportPageGetters.currency),
+    currency: computed<Currency|undefined>(() => serviceAccountPageGetters.currency),
     item: computed<Partial<TrustedAccountModel & ServiceAccountModel>>(() => serviceAccountPageState.originServiceAccountItem),
 });
 const tableState = reactive({

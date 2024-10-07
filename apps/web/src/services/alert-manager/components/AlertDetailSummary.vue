@@ -24,6 +24,7 @@ import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-st
 const props = withDefaults(defineProps<{
     id: string;
     manageDisabled?: boolean;
+    hasReadWriteAccess?: boolean;
 }>(), {
     manageDisabled: false,
 });
@@ -98,7 +99,7 @@ const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
                 <p-select-dropdown
                     :menu="state.alertStateList"
                     :selected="state.alertState"
-                    :disabled="props.manageDisabled"
+                    :disabled="!props.hasReadWriteAccess || props.manageDisabled"
                     class="state-dropdown"
                     @select="changeAlertState"
                 >
@@ -122,7 +123,7 @@ const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
             <p-select-dropdown :menu="state.alertUrgencyList"
                                :selected="state.alertUrgency"
-                               :disabled="state.alertState === ALERT_STATE.ERROR || props.manageDisabled"
+                               :disabled="!props.hasReadWriteAccess || (state.alertState === ALERT_STATE.ERROR || props.manageDisabled)"
                                class="state-dropdown"
                                @select="changeAlertUrgency"
             >

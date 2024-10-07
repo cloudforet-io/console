@@ -2,7 +2,9 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -25,6 +27,9 @@ import { store } from '@/store';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -44,7 +49,6 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
-
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
@@ -52,6 +56,7 @@ const dashboardState = dashboardStore.state;
 const dashboardMainPageStore = useDashboardMainPageStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
 const dashboardMainPageGetters = dashboardMainPageStore.getters;
+
 const router = useRouter();
 const queryTagsHelper = useQueryTags({
     keyItemSets: [{
@@ -61,9 +66,12 @@ const queryTagsHelper = useQueryTags({
         ],
     }],
 });
+const route = useRoute();
+
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -94,6 +102,13 @@ const state = reactive({
         if (storeState.isAdminMode) return dashboardMainPageGetters.adminTreeControlButtonDisableMap;
         return dashboardMainPageGetters.publicTreeControlButtonDisableMap;
     }),
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const queryState = reactive({
@@ -218,7 +233,9 @@ onUnmounted(() => {
 <template>
     <div class="dashboards-main-page">
         <p-heading :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')">
-            <template #extra>
+            <template v-if="state.hasReadWriteAccess"
+                      #extra
+            >
                 <p-button icon-left="ic_plus_bold"
                           style-type="tertiary"
                           class="mr-4"
@@ -252,14 +269,16 @@ onUnmounted(() => {
             <template #no-data>
                 <p-empty
                     show-image
-                    show-button
+                    :show-button="state.hasReadWriteAccess"
                 >
                     <template #image>
                         <img alt="empty-default-image"
                              src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
                         >
                     </template>
-                    <template #button>
+                    <template v-if="state.hasReadWriteAccess"
+                              #button
+                    >
                         <p-button icon-left="ic_plus_bold"
                                   @click="handleCreateDashboard"
                         >

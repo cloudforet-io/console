@@ -4,9 +4,12 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
+import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { RoleBindingListParameters, RoleBindingListResponse } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
@@ -19,7 +22,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 interface WorkspacePageState {
     loading: boolean;
     userLoading: boolean;
-    workspaces: WorkspaceTableModel[];
+    workspaces: WorkspaceModel[];
     totalCount: number;
     selectedIndices: number[];
     pageStart: number,
@@ -27,6 +30,7 @@ interface WorkspacePageState {
     searchFilters: ConsoleFilter[],
     roleBindings: RoleBindingModel[],
     selectedType: string,
+    costReportConfig: CostReportConfigModel|null|undefined,
     // workspace users
     workspaceUsersLoading: boolean,
     workspaceUsers: WorkspaceUserModel[],
@@ -37,15 +41,11 @@ interface WorkspacePageState {
     roles: RoleModel[],
 }
 
-export interface WorkspaceTableModel extends WorkspaceModel {
-    users?: string;
-}
-
 export const useWorkspacePageStore = defineStore('page-workspace', {
     state: (): WorkspacePageState => ({
         loading: false,
         userLoading: false,
-        workspaces: [] as WorkspaceTableModel[],
+        workspaces: [] as WorkspaceModel[],
         totalCount: 0,
         selectedIndices: [] as number[],
         pageStart: 1,
@@ -53,6 +53,7 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
         searchFilters: [],
         roleBindings: [],
         selectedType: 'ALL',
+        costReportConfig: null,
         // workspace users
         workspaceUsersLoading: false,
         workspaceUsers: [],
@@ -77,6 +78,7 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
             map[roleBinding.role_binding_id] = roleBinding;
             return map;
         }, {}),
+        currency: (state) => state.costReportConfig?.currency,
     },
     actions: {
         async load(params: WorkspaceListParameters) {
@@ -92,13 +94,6 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
 
                 const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, RoleBindingListResponse>();
                 this.roleBindings = response.results || [];
-                this.workspaces = this.workspaces.map((workspace) => {
-                    const roleBindingsFilteredByWorkspaceId = this.roleBindings.filter((roleBinding) => roleBinding.workspace_id === workspace.workspace_id);
-                    return {
-                        ...workspace,
-                        users: roleBindingsFilteredByWorkspaceId.length.toString(),
-                    };
-                });
             } catch (e) {
                 ErrorHandler.handleError(e);
                 this.workspaces = [];
@@ -122,13 +117,32 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
         },
         async listRoles(params?: RoleListParameters) {
             try {
-                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
+                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+                    ...params,
+                    query: {
+                        ...params?.query,
+                        filter: [
+                            ...(params?.query?.filter || []),
+                            { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                        ],
+                    },
+                });
                 this.roles = results || [];
                 return results;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 this.roles = [];
                 throw e;
+            }
+        },
+        async fetchCostReportConfig() {
+            if (this.costReportConfig !== null) return;
+            try {
+                const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+                this.costReportConfig = results?.[0];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                this.costReportConfig = undefined;
             }
         },
     },

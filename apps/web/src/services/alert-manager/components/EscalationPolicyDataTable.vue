@@ -29,6 +29,7 @@ const props = withDefaults(defineProps<{
     items?: EscalationPolicyModel[];
     selectIndex?: number[];
     tableCustomStyle?: Record<string, any>;
+    hasReadWriteAccess?: boolean;
 }>(), {
     loading: true,
     items: () => [],
@@ -93,7 +94,7 @@ const onChangeSort = (sortBy: string, sortDesc?: boolean) => {
     <p-data-table :items="props.items"
                   :fields="fields"
                   :loading="props.loading"
-                  selectable
+                  :selectable="props.hasReadWriteAccess"
                   sortable
                   search-type="query"
                   :multi-select="false"

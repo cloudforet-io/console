@@ -60,6 +60,7 @@ const state = reactive({
 <style lang="postcss" scoped>
 .workspace-logo-icon {
     @apply flex items-center justify-center text-white font-bold;
+    flex-shrink: 0;
     border-radius: 0.375rem;
     &.xxs {
         @apply text-label-sm rounded-xs;

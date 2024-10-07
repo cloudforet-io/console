@@ -76,6 +76,20 @@ export const getButtonTabArgTypes = (): ArgTypes => ({
         },
         control: 'text',
     },
+    additionalButtonSlot: {
+        name: 'additional-button',
+        description: 'Use it to insert additional buttons to the tab header.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: 'text',
+    },
     /* events */
     onUpdateActiveTab: {
         name: 'update:activeTab',

@@ -3,6 +3,7 @@ import { MENU_ID } from '@/lib/menu/config';
 export const ADVANCED_ROUTE = {
     _NAME: `${MENU_ID.ADVANCED}`,
     WORKSPACES: { _NAME: `${MENU_ID.ADVANCED}.${MENU_ID.WORKSPACES}` },
+    WORKSPACE_GROUP: { _NAME: `${MENU_ID.ADVANCED}.${MENU_ID.WORKSPACE_GROUP}` },
     PREFERENCES: {
         _NAME: `${MENU_ID.ADVANCED}.${MENU_ID.PREFERENCES}`,
         DOMAIN_INFORMATION: { _NAME: `${MENU_ID.ADVANCED}.${MENU_ID.PREFERENCES}.domain_information` },

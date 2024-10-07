@@ -8,11 +8,15 @@ import {
     PHeading, PDivider, PEmpty, PButton,
 } from '@cloudforet/mirinae';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
@@ -35,6 +39,7 @@ const storeState = reactive({
     selectedCloudServiceType: computed(() => securityPageGetters.selectedCloudServiceType),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     pageParams: computed<CloudServiceDetailPageParams|undefined>(() => route.params as unknown as CloudServiceDetailPageParams),
@@ -43,15 +48,15 @@ const state = reactive({
         let result = {} as EmptyData;
         if (!Object.keys(storeState.serviceAccounts).length) {
             result = {
-                to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
-                buttonText: i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT'),
+                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : {},
+                buttonText: state.writableServiceAccount ? i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT') : undefined,
                 desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE'),
             };
         } else {
             if (!Object.keys(storeState.collectors).length) {
                 result = {
-                    to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME },
-                    buttonText: i18n.t('INVENTORY.CREATE_COLLECTOR'),
+                    to: state.writableCollector ? { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME } : {},
+                    buttonText: state.writableCollector ? i18n.t('INVENTORY.CREATE_COLLECTOR') : undefined,
                     desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE'),
                 };
             }
@@ -63,6 +68,8 @@ const state = reactive({
         }
         return result;
     }),
+    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT].write),
+    writableCollector: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.COLLECTOR].write),
 });
 
 const initData = async () => {
