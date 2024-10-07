@@ -105,7 +105,7 @@ const getDashboardData = async (dashboardId: string) => {
 
 /* Event */
 const handleRefresh = async () => {
-    if (dashboardDetailState.dashboardInfo?.version === '2.0') await dashboardDetailStore.listDashboardWidgets();
+    if (dashboardDetailState.dashboardInfo?.version !== '1.0') await dashboardDetailStore.listDashboardWidgets();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();

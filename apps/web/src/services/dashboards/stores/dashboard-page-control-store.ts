@@ -69,7 +69,7 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
             move: getters.selectedPublicTreeData.length === 0,
             delete: getters.selectedPublicTreeData.length === 0,
         })),
-        // public
+        // public (only for dashboard page, so project dashboards are excluded)
         publicDashboardItems: computed<PublicDashboardModel[]>(() => {
             const _v2DashboardItems = dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0');
             if (storeState.isAdminMode) return _v2DashboardItems;
@@ -98,7 +98,7 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
             move: getters.selectedPrivateTreeData.length === 0,
             delete: getters.selectedPrivateTreeData.length === 0,
         })),
-        // deprecated
+        // deprecated (version 1.0)
         deprecatedDashboardItems: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
             const _publicDeprecated = dashboardState.publicDashboardItems.filter((d) => d.version === '1.0');
             const _privateDeprecated = dashboardState.privateDashboardItems.filter((d) => d.version === '1.0');

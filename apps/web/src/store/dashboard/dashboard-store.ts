@@ -248,8 +248,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const getDashboardNameList = (dashboardType: DashboardType) => {
-        if (dashboardType === 'PRIVATE') return (state.privateDashboardItems.filter((i) => i.version === '2.0')).map((item) => item.name);
-        return state.publicDashboardItems.filter((i) => i.version === '2.0').map((item) => item.name);
+        if (dashboardType === 'PRIVATE') {
+            return (state.privateDashboardItems.filter((i) => i.version !== '1.0')).map((item) => item.name);
+        }
+        return state.publicDashboardItems.filter((i) => i.version !== '1.0').map((item) => item.name);
     };
     const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId?: string): Promise<DashboardModel> => {
         const _dashboardType = isPrivate ? 'PRIVATE' : 'PUBLIC';

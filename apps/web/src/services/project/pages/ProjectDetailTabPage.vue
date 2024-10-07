@@ -116,18 +116,18 @@ const singleItemTabState = reactive({
             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
         },
-        ...(singleItemTabState.dahsboardTabs.length
+        ...(singleItemTabState.dashboardTabs.length
             ? [
                 {
                     name: 'divider',
                     tabType: 'divider',
                 },
-                ...singleItemTabState.dahsboardTabs,
+                ...singleItemTabState.dashboardTabs,
             ]
             : []),
     ]),
-    dahsboardTabs: computed(() => {
-        const projectDashboardItems = storeState.dashboardList.filter((dashboard) => dashboard.project_id === '*' && dashboard.version === '2.0');
+    dashboardTabs: computed(() => {
+        const projectDashboardItems = storeState.dashboardList.filter((dashboard) => dashboard.project_id === '*' && dashboard.version !== '1.0');
         const projectFolderItems = storeState.folderList.filter((folder) => folder.project_id === '*');
 
         const folderTabs = projectFolderItems.map((folder) => ({
