@@ -22,7 +22,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardControlStore } from '@/services/dashboards/stores/dashboard-control-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
 interface Props {
@@ -37,25 +37,25 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
-const dashboardMainPageStore = useDashboardControlStore();
-const dashboardMainPageState = dashboardMainPageStore.state;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlState = dashboardPageControlStore.state;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     selectedIdMap: computed<Record<string, boolean>>(() => {
-        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
-            return dashboardMainPageState.selectedPublicIdMap;
+        if (dashboardPageControlState.folderModalType === 'PUBLIC') {
+            return dashboardPageControlState.selectedPublicIdMap;
         }
-        return dashboardMainPageState.selectedPrivateIdMap;
+        return dashboardPageControlState.selectedPrivateIdMap;
     }),
     targetDashboardIdList: computed<string[]>(() => Object.entries(state.selectedIdMap)
         .filter(([, value]) => value)
         .filter(([key]) => key.includes('dash'))
         .map(([key]) => key)),
     availableFolderItems: computed<FolderModel[]>(() => {
-        if (dashboardMainPageState.folderModalType === 'PRIVATE') return dashboardState.privateFolderItems;
+        if (dashboardPageControlState.folderModalType === 'PRIVATE') return dashboardState.privateFolderItems;
         if (storeState.isAdminMode) return dashboardState.publicFolderItems;
         return dashboardState.publicFolderItems.filter((d) => !(d.shared && d.workspace_id === '*'));
     }),
@@ -65,7 +65,7 @@ const state = reactive({
             label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.NO_PARENT_FOLDER'),
             name: '',
         };
-        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
+        if (dashboardPageControlState.folderModalType === 'PUBLIC') {
             return [
                 defaultItem,
                 ...state.availableFolderItems.map((folder) => ({
@@ -115,16 +115,16 @@ const handleFormConfirm = async () => {
     }
     await Promise.allSettled([
         dashboardStore.load(),
-        dashboardMainPageStore.load(),
+        dashboardPageControlStore.load(),
     ]);
-    dashboardMainPageStore.resetSelectedIdMap(dashboardMainPageState.folderModalType);
+    dashboardPageControlStore.resetSelectedIdMap(dashboardPageControlState.folderModalType);
     state.proxyVisible = false;
 };
 
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
     if (!visible) {
-        dashboardMainPageStore.reset();
+        dashboardPageControlStore.reset();
         state.selectedItem = '';
     }
 });

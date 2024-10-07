@@ -46,16 +46,16 @@ import DashboardFolderTree from '@/services/dashboards/components/dashboard-fold
 import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardControlStore } from '@/services/dashboards/stores/dashboard-control-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
-const dashboardMainPageStore = useDashboardControlStore();
-const dashboardMainPageState = dashboardMainPageStore.state;
-const dashboardMainPageGetters = dashboardMainPageStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 
 const router = useRouter();
 const queryTagsHelper = useQueryTags({
@@ -75,8 +75,8 @@ const storeState = reactive({
 });
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardMainPageGetters.publicDashboardTreeData, dashboardMainPageState.searchFilters)),
-    refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardMainPageGetters.privateDashboardTreeData, dashboardMainPageState.searchFilters)),
+    refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardPageControlGetters.publicDashboardTreeData, dashboardPageControlState.searchFilters)),
+    refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardPageControlGetters.privateDashboardTreeData, dashboardPageControlState.searchFilters)),
     deprecatedDashboardList: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
         const _publicDeprecated = dashboardState.publicDashboardItems.filter((d) => d.version === '1.0');
         const _privateDeprecated = dashboardState.privateDashboardItems.filter((d) => d.version === '1.0');
@@ -84,14 +84,14 @@ const state = reactive({
     }),
     isDashboardExist: computed<boolean>(() => {
         if (state.isAdminMode) {
-            return !!dashboardMainPageState.publicDashboardList.length || !!dashboardMainPageState.publicFolderList.length;
+            return !!dashboardPageControlState.publicDashboardList.length || !!dashboardPageControlState.publicFolderList.length;
         }
         return !!(
-            dashboardMainPageState.publicDashboardList.length
-            || dashboardMainPageState.privateDashboardList.length
+            dashboardPageControlState.publicDashboardList.length
+            || dashboardPageControlState.privateDashboardList.length
             || state.deprecatedDashboardList.length
-            || dashboardMainPageState.publicFolderList.length
-            || dashboardMainPageState.privateFolderList.length
+            || dashboardPageControlState.publicFolderList.length
+            || dashboardPageControlState.privateFolderList.length
         );
     }),
     treeCollapseMap: {
@@ -99,8 +99,8 @@ const state = reactive({
         private: false,
     } as Record<string, boolean>,
     publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
-        if (storeState.isAdminMode) return dashboardMainPageGetters.adminTreeControlButtonDisableMap;
-        return dashboardMainPageGetters.publicTreeControlButtonDisableMap;
+        if (storeState.isAdminMode) return dashboardPageControlGetters.adminTreeControlButtonDisableMap;
+        return dashboardPageControlGetters.publicTreeControlButtonDisableMap;
     }),
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
@@ -138,34 +138,34 @@ const getSearchedTreeData = (treeData: TreeNode<DashboardTreeDataType>[], search
 
 const handleCreateDashboard = () => { router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME })); };
 const handleCreateFolder = () => {
-    dashboardMainPageStore.setFolderFormModalType('CREATE');
-    dashboardMainPageStore.setFolderFormModalVisible(true);
+    dashboardPageControlStore.setFolderFormModalType('CREATE');
+    dashboardPageControlStore.setFolderFormModalVisible(true);
 };
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
-        dashboardMainPageStore.setSearchQueryTags(options.queryTags);
+        dashboardPageControlStore.setSearchQueryTags(options.queryTags);
     } else {
-        dashboardMainPageStore.load();
+        dashboardPageControlStore.load();
     }
 };
 const handleUpdateSelectedIdMap = (type: 'PUBLIC' | 'PRIVATE', selectedIdMap: Record<string, boolean>) => {
     if (type === 'PUBLIC') {
-        dashboardMainPageStore.setSelectedPublicIdMap(selectedIdMap);
+        dashboardPageControlStore.setSelectedPublicIdMap(selectedIdMap);
     } else {
-        dashboardMainPageStore.setSelectedPrivateIdMap(selectedIdMap);
+        dashboardPageControlStore.setSelectedPrivateIdMap(selectedIdMap);
     }
 };
 const handleClickCloneButton = (type: 'PUBLIC' | 'PRIVATE') => {
-    dashboardMainPageStore.setFolderModalType(type);
-    dashboardMainPageStore.setFolderCloneModalVisible(true);
+    dashboardPageControlStore.setFolderModalType(type);
+    dashboardPageControlStore.setFolderCloneModalVisible(true);
 };
 const handleClickDeleteButton = (type: 'PUBLIC' | 'PRIVATE') => {
-    dashboardMainPageStore.setFolderModalType(type);
-    dashboardMainPageStore.setFolderDeleteModalVisible(true);
+    dashboardPageControlStore.setFolderModalType(type);
+    dashboardPageControlStore.setFolderDeleteModalVisible(true);
 };
 const handleClickMoveButton = (type: 'PUBLIC' | 'PRIVATE') => {
-    dashboardMainPageStore.setFolderModalType(type);
-    dashboardMainPageStore.setFolderMoveModalVisible(true);
+    dashboardPageControlStore.setFolderModalType(type);
+    dashboardPageControlStore.setFolderMoveModalVisible(true);
 };
 
 /* init */
@@ -173,12 +173,12 @@ let urlQueryStringWatcherStop;
 const init = async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
     queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
-    dashboardMainPageStore.setSearchQueryTags(queryState.queryTags);
+    dashboardPageControlStore.setSearchQueryTags(queryState.queryTags);
 
     urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
         replaceUrlQuery(urlQueryString);
     });
-    await dashboardMainPageStore.load();
+    await dashboardPageControlStore.load();
 };
 
 const getDashboardValueHandler = (): ValueHandler | undefined => {
@@ -216,17 +216,17 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
     await init();
 })();
 
-watch(() => dashboardMainPageState.searchQueryTags, (queryTags) => {
+watch(() => dashboardPageControlState.searchQueryTags, (queryTags) => {
     queryTagsHelper.setQueryTags(queryTags || []);
-    dashboardMainPageStore.resetSelectedIdMap();
-    dashboardMainPageStore.setSearchFilters(queryTagsHelper.filters.value);
-    dashboardMainPageStore.load();
+    dashboardPageControlStore.resetSelectedIdMap();
+    dashboardPageControlStore.setSearchFilters(queryTagsHelper.filters.value);
+    dashboardPageControlStore.load();
 }, { immediate: true });
 
 onUnmounted(() => {
     if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
-    dashboardMainPageStore.setSearchFilters([]);
-    dashboardMainPageStore.load();
+    dashboardPageControlStore.setSearchFilters([]);
+    dashboardPageControlStore.load();
 });
 </script>
 
@@ -262,7 +262,7 @@ onUnmounted(() => {
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <p-data-loader :loading="dashboardMainPageState.loading"
+        <p-data-loader :loading="dashboardPageControlState.loading"
                        :data="state.isDashboardExist"
                        class="dashboard-list-wrapper"
         >
@@ -296,7 +296,7 @@ onUnmounted(() => {
                                              :is-collapsed.sync="state.treeCollapseMap.public"
                 />
                 <dashboard-folder-tree v-if="!state.treeCollapseMap.public"
-                                       :selected-id-map="dashboardMainPageState.selectedPublicIdMap"
+                                       :selected-id-map="dashboardPageControlState.selectedPublicIdMap"
                                        :dashboard-tree-data="state.refinedPublicTreeData"
                                        :button-disable-map="state.publicTreeControlButtonDisableMap"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
@@ -312,9 +312,9 @@ onUnmounted(() => {
                                              :is-collapsed.sync="state.treeCollapseMap.private"
                 />
                 <dashboard-folder-tree v-if="!state.treeCollapseMap.private"
-                                       :selected-id-map="dashboardMainPageState.selectedPrivateIdMap"
+                                       :selected-id-map="dashboardPageControlState.selectedPrivateIdMap"
                                        :dashboard-tree-data="state.refinedPrivateTreeData"
-                                       :button-disable-map="dashboardMainPageGetters.privateTreeControlButtonDisableMap"
+                                       :button-disable-map="dashboardPageControlGetters.privateTreeControlButtonDisableMap"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
                                        @click-clone="handleClickCloneButton('PRIVATE')"
                                        @click-delete="handleClickDeleteButton('PRIVATE')"
@@ -327,20 +327,20 @@ onUnmounted(() => {
                                        :dashboard-list="state.deprecatedDashboardList"
                                        is-collapsed
             />
-            <dashboard-folder-form-modal :visible="dashboardMainPageState.folderFormModalVisible"
-                                         @update:visible="dashboardMainPageStore.setFolderFormModalVisible"
+            <dashboard-folder-form-modal :visible="dashboardPageControlState.folderFormModalVisible"
+                                         @update:visible="dashboardPageControlStore.setFolderFormModalVisible"
             />
-            <dashboard-folder-delete-modal :visible="dashboardMainPageState.folderDeleteModalVisible"
-                                           @update:visible="dashboardMainPageStore.setFolderDeleteModalVisible"
+            <dashboard-folder-delete-modal :visible="dashboardPageControlState.folderDeleteModalVisible"
+                                           @update:visible="dashboardPageControlStore.setFolderDeleteModalVisible"
             />
-            <dashboard-folder-bundle-move-modal :visible="dashboardMainPageState.folderMoveModalVisible"
-                                                @update:visible="dashboardMainPageStore.setFolderMoveModalVisible"
+            <dashboard-folder-bundle-move-modal :visible="dashboardPageControlState.folderMoveModalVisible"
+                                                @update:visible="dashboardPageControlStore.setFolderMoveModalVisible"
             />
-            <dashboard-folder-clone-modal :visible="dashboardMainPageState.folderCloneModalVisible"
-                                          @update:visible="dashboardMainPageStore.setFolderCloneModalVisible"
+            <dashboard-folder-clone-modal :visible="dashboardPageControlState.folderCloneModalVisible"
+                                          @update:visible="dashboardPageControlStore.setFolderCloneModalVisible"
             />
-            <dashboard-folder-share-modal :visible="dashboardMainPageState.folderShareModalVisible"
-                                          @update:visible="dashboardMainPageStore.setFolderShareModalVisible"
+            <dashboard-folder-share-modal :visible="dashboardPageControlState.folderShareModalVisible"
+                                          @update:visible="dashboardPageControlStore.setFolderShareModalVisible"
             />
         </p-data-loader>
     </div>

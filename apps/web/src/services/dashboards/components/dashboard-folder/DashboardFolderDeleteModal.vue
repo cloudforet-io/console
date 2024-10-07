@@ -18,7 +18,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardControlStore } from '@/services/dashboards/stores/dashboard-control-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -37,17 +37,17 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const dashboardStore = useDashboardStore();
-const dashboardMainPageStore = useDashboardControlStore();
-const dashboardMainPageState = dashboardMainPageStore.state;
-const dashboardMainPageGetters = dashboardMainPageStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
-        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
-            return dashboardMainPageGetters.publicModalTableItems;
+        if (dashboardPageControlState.folderModalType === 'PUBLIC') {
+            return dashboardPageControlGetters.publicModalTableItems;
         }
-        return dashboardMainPageGetters.privateModalTableItems;
+        return dashboardPageControlGetters.privateModalTableItems;
     }),
 });
 
@@ -91,16 +91,16 @@ const handleDeleteConfirm = async () => {
     }
     await Promise.allSettled([
         dashboardStore.load(),
-        dashboardMainPageStore.load(),
+        dashboardPageControlStore.load(),
     ]);
     state.loading = false;
-    dashboardMainPageStore.setSelectedIdMap({}, dashboardMainPageState.folderModalType);
+    dashboardPageControlStore.setSelectedIdMap({}, dashboardPageControlState.folderModalType);
     state.proxyVisible = false;
 };
 
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
-    if (!visible) dashboardMainPageStore.reset();
+    if (!visible) dashboardPageControlStore.reset();
 });
 </script>
 

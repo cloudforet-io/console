@@ -27,7 +27,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardControlStore } from '@/services/dashboards/stores/dashboard-control-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
 type FolderModel = PublicFolderModel | PrivateFolderModel;
@@ -45,9 +45,9 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
-const dashboardMainPageStore = useDashboardControlStore();
-const dashboardMainPageState = dashboardMainPageStore.state;
-const dashboardMainPageGetters = dashboardMainPageStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -55,22 +55,22 @@ const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     isPrivate: false,
     selectedFolder: computed<FolderModel|undefined>(() => {
-        if (dashboardMainPageState.folderFormModalType === 'UPDATE') {
-            if (dashboardMainPageState.selectedFolderId?.startsWith('private')) {
-                return dashboardState.privateFolderItems.find((d) => d.folder_id === dashboardMainPageState.selectedFolderId);
+        if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
+            if (dashboardPageControlState.selectedFolderId?.startsWith('private')) {
+                return dashboardState.privateFolderItems.find((d) => d.folder_id === dashboardPageControlState.selectedFolderId);
             }
-            return dashboardState.publicFolderItems.find((d) => d.folder_id === dashboardMainPageState.selectedFolderId);
+            return dashboardState.publicFolderItems.find((d) => d.folder_id === dashboardPageControlState.selectedFolderId);
         }
         return undefined;
     }),
     existingNameList: computed<string[]>(() => {
-        if (dashboardMainPageState.folderFormModalType === 'UPDATE') {
-            return dashboardMainPageGetters.existingDashboardNameList.filter((d) => d !== state.selectedFolder?.name);
+        if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
+            return dashboardPageControlGetters.existingDashboardNameList.filter((d) => d !== state.selectedFolder?.name);
         }
-        return dashboardMainPageGetters.existingDashboardNameList;
+        return dashboardPageControlGetters.existingDashboardNameList;
     }),
     headerTitle: computed(() => {
-        if (dashboardMainPageState.folderFormModalType === 'UPDATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.EDIT_FOLDER_NAME');
+        if (dashboardPageControlState.folderFormModalType === 'UPDATE') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.EDIT_FOLDER_NAME');
         return i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.CREATE_FOLDER');
     }),
 });
@@ -103,8 +103,8 @@ const createFolder = async () => {
             (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;
         }
         const createdFolder = await fetcher(params);
-        dashboardMainPageStore.setNewIdList([
-            ...dashboardMainPageState.newIdList,
+        dashboardPageControlStore.setNewIdList([
+            ...dashboardPageControlState.newIdList,
             createdFolder.folder_id,
         ]);
         showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_CREATE_FOLDER'), '');
@@ -115,7 +115,7 @@ const createFolder = async () => {
 };
 const updateFolderName = async () => {
     try {
-        const _isPrivate = dashboardMainPageState.selectedFolderId?.startsWith('private');
+        const _isPrivate = dashboardPageControlState.selectedFolderId?.startsWith('private');
         const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.update : SpaceConnector.clientV2.dashboard.publicFolder.update;
         const params: FolderUpdateParams = {
             folder_id: state.selectedFolder?.folder_id as string,
@@ -132,14 +132,14 @@ const updateFolderName = async () => {
 /* Event */
 const handleFormConfirm = async () => {
     if (!isAllValid) return;
-    if (dashboardMainPageState.folderFormModalType === 'UPDATE') {
+    if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
         await updateFolderName();
     } else {
         await createFolder();
     }
     await Promise.allSettled([
         dashboardStore.load(),
-        dashboardMainPageStore.load(),
+        dashboardPageControlStore.load(),
     ]);
 };
 const handleUpdatePrivate = (value: boolean) => {
@@ -149,12 +149,12 @@ const handleUpdatePrivate = (value: boolean) => {
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
     if (visible) {
-        if (dashboardMainPageState.folderFormModalType === 'UPDATE') {
+        if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
             setForm('name', state.selectedFolder?.name);
         }
     } else {
         initForm();
-        dashboardMainPageStore.reset();
+        dashboardPageControlStore.reset();
         state.isPrivate = false;
     }
 });
@@ -187,7 +187,7 @@ watch(() => state.proxyVisible, (visible) => {
                     />
                 </template>
             </p-field-group>
-            <p-field-group v-if="dashboardMainPageState.folderFormModalType === 'CREATE' && !storeState.isAdminMode"
+            <p-field-group v-if="dashboardPageControlState.folderFormModalType === 'CREATE' && !storeState.isAdminMode"
                            :label="$t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.MAKE_PRIVATE')"
                            required
             >

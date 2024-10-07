@@ -16,7 +16,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardControlStore } from '@/services/dashboards/stores/dashboard-control-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -36,9 +36,9 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
-const dashboardMainPageStore = useDashboardControlStore();
-const dashboardMainPageState = dashboardMainPageStore.state;
-const dashboardMainPageGetters = dashboardMainPageStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -53,16 +53,16 @@ const state = reactive({
         return CLONE_TABLE_FIELDS;
     }),
     selectedTreeData: computed(() => {
-        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
-            return dashboardMainPageGetters.selectedPublicTreeData;
+        if (dashboardPageControlState.folderModalType === 'PUBLIC') {
+            return dashboardPageControlGetters.selectedPublicTreeData;
         }
-        return dashboardMainPageGetters.selectedPrivateTreeData;
+        return dashboardPageControlGetters.selectedPrivateTreeData;
     }),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
-        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
-            return dashboardMainPageGetters.publicModalTableItems;
+        if (dashboardPageControlState.folderModalType === 'PUBLIC') {
+            return dashboardPageControlGetters.publicModalTableItems;
         }
-        return dashboardMainPageGetters.privateModalTableItems;
+        return dashboardPageControlGetters.privateModalTableItems;
     }),
 });
 
@@ -70,8 +70,8 @@ const state = reactive({
 const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId?: string) => {
     const createdDashboard = await dashboardStore.cloneDashboard(dashboardId, isPrivate, folderId);
     if (createdDashboard) {
-        dashboardMainPageStore.setNewIdList([
-            ...dashboardMainPageState.newIdList,
+        dashboardPageControlStore.setNewIdList([
+            ...dashboardPageControlState.newIdList,
             createdDashboard.dashboard_id as string,
         ]);
     }
@@ -87,7 +87,7 @@ const handleCloneConfirm = async () => {
         if (item.data.type === 'FOLDER') {
             const createdFolderId = await dashboardStore.createFolder(item.data.name, _isPrivate);
             if (!createdFolderId) return;
-            dashboardMainPageStore.setNewIdList([...dashboardMainPageState.newIdList, createdFolderId]);
+            dashboardPageControlStore.setNewIdList([...dashboardPageControlState.newIdList, createdFolderId]);
             item.children.forEach((child) => {
                 _createDashboardPromises.push(cloneDashboard(child.data.id, _isPrivate, createdFolderId));
             });
@@ -105,9 +105,9 @@ const handleCloneConfirm = async () => {
     }
     await Promise.allSettled([
         dashboardStore.load(),
-        dashboardMainPageStore.load(),
+        dashboardPageControlStore.load(),
     ]);
-    dashboardMainPageStore.setSelectedIdMap({}, dashboardMainPageState.folderModalType);
+    dashboardPageControlStore.setSelectedIdMap({}, dashboardPageControlState.folderModalType);
     state.loading = false;
     state.proxyVisible = false;
 };
@@ -131,7 +131,7 @@ const handleChangePrivate = (id: string, value: boolean) => {
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
     if (!visible) {
-        dashboardMainPageStore.reset();
+        dashboardPageControlStore.reset();
         state.privateMap = {};
     }
 });

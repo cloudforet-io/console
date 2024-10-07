@@ -32,8 +32,8 @@ import {
     getSelectedTreeData,
 } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardControlStore } from '@/services/dashboards/stores/dashboard-control-store';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -50,7 +50,7 @@ const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
-const dashboardMainPageStore = useDashboardControlStore();
+const dashboardPageControlStore = useDashboardPageControlStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -97,8 +97,8 @@ const state = reactive({
 
 /* Util */
 const addToNewIdList = (id: string) => {
-    dashboardMainPageStore.setNewIdList([
-        ...dashboardMainPageStore.state.newIdList,
+    dashboardPageControlStore.setNewIdList([
+        ...dashboardPageControlStore.state.newIdList,
         id,
     ]);
 };
