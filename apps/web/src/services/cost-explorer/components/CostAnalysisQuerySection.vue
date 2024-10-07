@@ -229,6 +229,7 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
 .cost-analysis-query-section {
     position: relative;
     margin-top: 1.5rem;
+    z-index: 1;
     .filter-wrapper {
         @apply flex justify-between;
         align-items: flex-start;
