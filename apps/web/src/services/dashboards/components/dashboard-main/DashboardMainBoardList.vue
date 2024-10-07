@@ -10,6 +10,8 @@ import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type
 
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
+import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -24,8 +26,8 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 interface Props {
     isCollapsed?: boolean;
-    fieldTitle?: string;
-    dashboardList?: DashboardModel[];
+    fieldTitle?: TranslateResult;
+    dashboardList?: Array<PublicDashboardModel|PrivateDashboardModel>;
 }
 const props = withDefaults(defineProps<Props>(), {
     isCollapsed: false,
