@@ -7,7 +7,7 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import type { RecentConfig } from '@/common/modules/navigations/type';
 
-import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
+import LandingWorkspaceRecentList from '@/services/landing/components/workspace-landing/LandingWorkspaceRecentList.vue';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 
@@ -45,8 +45,8 @@ const state = reactive({
                        font-weight="bold"
                        size="md"
         />
-        <landing-workspace-board :board-sets="state.recentBoardSets"
-                                 :board-type="BOARD_TYPE.RECENT"
+        <landing-workspace-recent-list :board-sets="state.recentBoardSets"
+                                       :board-type="BOARD_TYPE.RECENT"
         />
     </div>
 </template>

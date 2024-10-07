@@ -7,7 +7,7 @@ import { cloneDeep } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
+    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown, PToggleButton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 import type { InputItem } from '@cloudforet/mirinae/types/inputs/input/text-input/type';
@@ -16,6 +16,7 @@ import type { InputItem } from '@cloudforet/mirinae/types/inputs/input/text-inpu
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type { AppModel } from '@/schema/identity/app/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -25,11 +26,13 @@ import { i18n } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import { getInputItemsFromTagKeys } from '@/services/iam/composables/tag-data';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
+import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
 interface AppDropdownMenuItem extends SelectDropdownMenuItem {
@@ -47,12 +50,17 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isEdit: computed(() => appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.EDIT),
 });
+const state = reactive({
+    activeProject: false,
+    selectedProjects: [] as string[],
+});
 const formState = reactive({
     name: '',
     role: {} as AppDropdownMenuItem,
     tags: {} as Tags,
     selectedTags: [] as AppDropdownMenuItem[],
     searchText: '',
+    selectedProjectId: computed<string|undefined>(() => (state.selectedProjects.length ? state.selectedProjects[0] : undefined)),
 });
 const dropdownState = reactive({
     visible: false,
@@ -122,12 +130,23 @@ const setFormState = () => {
     formState.tags = appPageStore.selectedApp.tags as Tags;
     formState.selectedTags = getInputItemsFromTagKeys(formState.tags);
 };
+const handleSelectedProject = (projectTreeNodeData: ProjectTreeNodeData[]) => {
+    state.selectedProjects = projectTreeNodeData.map((item) => item.id);
+};
+const handleChangeProjectToggle = (value: boolean) => {
+    state.activeProject = value;
+    state.selectedProjects = [];
+    dropdownState.searchText = '';
+    dropdownState.selectedMenuItems = [];
+};
 const initState = () => {
     formState.name = '';
     formState.role = {} as AppDropdownMenuItem;
     formState.tags = {} as Tags;
     formState.selectedTags = [];
     formState.searchText = '';
+    state.activeProject = false;
+    state.selectedProjects = [];
     dropdownState.searchText = '';
     dropdownState.selectedMenuItems = [];
 };
@@ -138,8 +157,16 @@ const roleListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 const fetchListRoles = async (inputText: string) => {
     dropdownState.loading = true;
+    let roleType = '';
+    if (storeState.isAdminMode) {
+        roleType = ROLE_TYPE.DOMAIN_ADMIN;
+    } else if (!state.activeProject) {
+        roleType = ROLE_TYPE.WORKSPACE_OWNER;
+    } else {
+        roleType = ROLE_TYPE.WORKSPACE_MEMBER;
+    }
     roleListApiQueryHelper.setFilters([
-        { k: 'role_type', v: storeState.isAdminMode ? [ROLE_TYPE.DOMAIN_ADMIN] : [ROLE_TYPE.WORKSPACE_OWNER], o: '=' },
+        { k: 'role_type', v: [roleType], o: '=' },
         { k: 'state', v: ROLE_STATE.ENABLED, o: '=' },
     ]);
     if (inputText) {
@@ -152,7 +179,13 @@ const fetchListRoles = async (inputText: string) => {
 
     try {
         const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-            query: roleListApiQueryHelper.data,
+            query: {
+                ...roleListApiQueryHelper.data,
+                filter: [
+                    ...(roleListApiQueryHelper.data?.filter || []),
+                    { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                ],
+            },
         });
         dropdownState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
@@ -173,11 +206,22 @@ const handleConfirm = async () => {
             });
             emit('confirm');
         } else {
+            const isProject = formState.selectedProjectId?.includes('project');
+            const isProjectGroup = formState.selectedProjectId?.includes('pg');
+            let resourceGroup:ResourceGroupType;
+            if (storeState.isAdminMode) {
+                resourceGroup = RESOURCE_GROUP.DOMAIN;
+            } else {
+                resourceGroup = (isProject || isProjectGroup) ? RESOURCE_GROUP.PROJECT : RESOURCE_GROUP.WORKSPACE;
+            }
+
             const res = await appPageStore.createApp({
                 name: formState.name,
                 role_id: formState.role.name,
                 tags: formState.tags,
-                resource_group: storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+                resource_group: resourceGroup,
+                project_id: isProject ? formState.selectedProjectId : undefined,
+                project_group_id: isProjectGroup ? formState.selectedProjectId : undefined,
             });
             emit('confirm', res);
             appPageStore.$patch((_state) => {
@@ -209,7 +253,7 @@ watch(() => storeState.isEdit, (isEdit) => {
                         :visible="appPageState.modal.visible.form"
                         :disabled="storeState.isEdit
                             ? formState.name === ''
-                            : formState.name === '' || dropdownState.selectedMenuItems.length === 0"
+                            : formState.name === '' || dropdownState.selectedMenuItems.length === 0 || (state.activeProject && state.selectedProjects.length === 0)"
                         :loading="appPageState.modal.loading"
                         @confirm="handleConfirm"
                         @cancel="handleClose"
@@ -224,6 +268,31 @@ watch(() => storeState.isEdit, (isEdit) => {
                         <p-text-input v-model="formState.name"
                                       class="text-input"
                                       block
+                        />
+                    </p-field-group>
+                    <p-field-group v-if="!storeState.isAdminMode && !storeState.isEdit"
+                                   class="input-form"
+                                   required
+                    >
+                        <template #label>
+                            <div class="project-label">
+                                <p>
+                                    {{ $t('IAM.APP.MODAL.COL_PROJECT') }}
+                                </p>
+                                <p-toggle-button :value="state.activeProject"
+                                                 class="project-toggle"
+                                                 @change-toggle="handleChangeProjectToggle"
+                                />
+                            </div>
+                        </template>
+                        <project-select-dropdown
+                            class="project-select-dropdown"
+                            :selected-project-ids="state.selectedProjects"
+                            project-selectable
+                            :disabled="!state.activeProject"
+                            is-init-selected-item
+                            project-group-selectable
+                            @select="handleSelectedProject"
                         />
                     </p-field-group>
                     <p-field-group v-if="!storeState.isEdit"
@@ -300,7 +369,21 @@ watch(() => storeState.isEdit, (isEdit) => {
                     @apply text-gray-500;
                 }
             }
+            .project-label {
+                @apply flex items-center justify-between;
+                width: 100%;
+            }
         }
+    }
+    .project-select-dropdown {
+        .p-select-dropdown {
+            .dropdown-context-menu {
+                min-width: 25.875rem !important;
+            }
+        }
+    }
+    .p-field-title .title-wrapper .title {
+        width: 100%;
     }
 }
 </style>

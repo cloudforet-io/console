@@ -16,6 +16,8 @@ import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';
+import type { WorkspaceGroupAddUsersParameters } from '@/schema/identity/workspace-group/api-verbs/add-users';
+import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceUserCreateParameters } from '@/schema/identity/workspace-user/api-verbs/create';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
@@ -35,11 +37,11 @@ import UserManagementAddUser from '@/services/iam/components/UserManagementAddUs
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { AddModalMenuItem } from '@/services/iam/types/user-type';
+import type { AddModalMenuItem, AddAdminRoleFormState } from '@/services/iam/types/user-type';
 
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
 const domainStore = useDomainStore();
 
 const route = useRoute();
@@ -54,7 +56,7 @@ const state = reactive({
     disabledResetPassword: false,
     disabled: computed(() => {
         if (userPageState.isAdminMode && !state.isSetAdminRole) {
-            const baseCondition = state.userList.length === 0 || (state.workspace.length === 0 || isEmpty(state.role));
+            const baseCondition = state.userList.length === 0 || ((state.workspaceGroup.length === 0 && state.workspace.length === 0) || isEmpty(state.role));
             if (state.localUserItem.length > 0 && !state.isResetPassword) {
                 return state.password === '' || baseCondition;
             }
@@ -76,15 +78,20 @@ const state = reactive({
     // role
     role: {} as AddModalMenuItem,
     workspace: [] as AddModalMenuItem[],
+    workspaceGroup: [] as AddModalMenuItem[],
     isSetAdminRole: false,
     // tag
     tags: {} as Tags,
 });
 
 /* Component */
-const handleChangeInput = (items) => {
+const handleAdminRoleChangeInput = (items: AddAdminRoleFormState) => {
     if (items.role) state.role = items.role;
     if (items.workspace) state.workspace = items.workspace;
+    if (items.workspaceGroup) state.workspaceGroup = items.workspaceGroup;
+};
+const handleChangeInput = (items) => {
+    if (items.role) state.role = items.role;
     if (items.userList) {
         state.userList = items.userList;
         const newUserItem = state.userList.filter((item) => item.isNew);
@@ -120,10 +127,10 @@ const handleClose = () => {
     state.isResetPassword = true;
     state.isSetAdminRole = false;
     userPageStore.$patch((_state) => {
-        _state.modal.visible.add = false;
-        _state.modal = cloneDeep(_state.modal);
-        _state.createdWorkspaceId = undefined;
-        _state.afterWorkspaceCreated = false;
+        _state.state.modal.visible = undefined;
+        _state.state.modal = cloneDeep(_state.state.modal);
+        _state.state.createdWorkspaceId = undefined;
+        _state.state.afterWorkspaceCreated = false;
     });
 };
 /* API */
@@ -141,28 +148,33 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
     };
 
     const createRoleBinding = async () => {
-        if (userPageStore.isWorkspaceOwner || state.isSetAdminRole) {
+        if (userPageStore.getters.isWorkspaceOwner || state.isSetAdminRole) {
             await fetchCreateRoleBinding(item);
         } else if (userPageState.afterWorkspaceCreated) {
             await fetchCreateRoleBinding({ ...item, workspace_id: userPageState.createdWorkspaceId });
         } else {
-            await Promise.all(state.workspace.map((w) => fetchCreateRoleBinding(item, w)));
+            await Promise.allSettled(state.workspace.map((w) => fetchCreateRoleBinding(item, w)));
+            await Promise.allSettled(state.workspaceGroup.map((wg) => fetchAddUserToWorkspaceGroup(item, wg)));
         }
     };
 
-    if (userPageState.isAdminMode || (userPageState.afterWorkspaceCreated && item.isNew)) {
-        await SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>({
-            ...userInfoParams,
-            tags: state.tags,
-        });
-        await createRoleBinding();
-    } else if (item.isNew) {
-        await SpaceConnector.clientV2.identity.workspaceUser.create<WorkspaceUserCreateParameters, WorkspaceUserModel>({
-            ...userInfoParams,
-            role_id: state.role.name || '',
-        });
-    } else {
-        await createRoleBinding();
+    try {
+        if (userPageState.isAdminMode || (userPageState.afterWorkspaceCreated && item.isNew)) {
+            await SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>({
+                ...userInfoParams,
+                tags: state.tags,
+            });
+            await createRoleBinding();
+        } else if (item.isNew) {
+            await SpaceConnector.clientV2.identity.workspaceUser.create<WorkspaceUserCreateParameters, WorkspaceUserModel>({
+                ...userInfoParams,
+                role_id: state.role.name || '',
+            });
+        } else {
+            await createRoleBinding();
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
 };
 const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
@@ -172,7 +184,7 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
         role_id: state.role.name || '',
         resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
     };
-    if (userPageStore.isWorkspaceOwner || state.isSetAdminRole) {
+    if (userPageStore.getters.isWorkspaceOwner || state.isSetAdminRole) {
         roleParams = baseRoleParams;
     } else if (userPageState.afterWorkspaceCreated) {
         roleParams = {
@@ -187,6 +199,16 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
     }
 
     await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(roleParams);
+};
+
+const fetchAddUserToWorkspaceGroup = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
+    if (!userItem.user_id) return;
+    await SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>({
+        workspace_group_id: item?.name || '',
+        users: [{
+            user_id: userItem.user_id, role_id: state.role.name || '',
+        }],
+    });
 };
 
 watch(() => route.query, (query) => {
@@ -207,7 +229,7 @@ watch(() => route.query, (query) => {
                     :fade="true"
                     :backdrop="true"
                     :loading="state.loading"
-                    :visible="userPageState.modal.visible.add"
+                    :visible="userPageState.modal.visible === 'add'"
                     :disabled="state.disabled"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
@@ -223,7 +245,7 @@ watch(() => route.query, (query) => {
                 />
                 <user-management-add-admin-role v-if="userPageState.isAdminMode"
                                                 :is-set-admin-role.sync="state.isSetAdminRole"
-                                                @change-input="handleChangeInput"
+                                                @change-input="handleAdminRoleChangeInput"
                 />
                 <user-management-add-role v-else
                                           @change-input="handleChangeInput"
@@ -239,6 +261,7 @@ watch(() => route.query, (query) => {
 
 <style lang="postcss">
 .user-management-additional-modal {
+    min-height: 34.875rem;
     .modal-contents {
         @apply flex flex-col bg-primary-4 rounded-md;
         margin-bottom: 9rem;

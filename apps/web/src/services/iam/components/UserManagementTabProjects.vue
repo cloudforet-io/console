@@ -5,7 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PDataTable, PHeading, PI,
 } from '@cloudforet/mirinae';
-
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
@@ -22,7 +22,6 @@ import UserManagementRemoveModal from '@/services/iam/components/UserManagementR
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-
 interface TableItem {
     project_id?: string;
     name?: string;
@@ -32,6 +31,7 @@ interface TableItem {
 }
 interface Props {
     activeTab: string;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -45,14 +45,19 @@ const state = reactive({
     loading: false,
     items: [] as TableItem[],
     selectedRemoveItem: '',
-    selectedUser: computed(() => userPageStore.selectedUsers[0]),
+    selectedUser: computed(() => userPageStore.getters.selectedUsers[0]),
 });
 const tableState = reactive({
-    fields: computed(() => [
-        { name: 'name', label: i18n.t('IAM.USER.MAIN.PROJECT') as string },
-        { name: 'project_id', label: i18n.t('IAM.USER.MAIN.PROJECT_ID') as string },
-        { name: 'remove_button', label: ' ' },
-    ]),
+    fields: computed<DataTableFieldType[]>(() => {
+        const defaultFields: DataTableFieldType[] = [
+            { name: 'name', label: i18n.t('IAM.USER.MAIN.PROJECT') as string },
+            { name: 'project_id', label: i18n.t('IAM.USER.MAIN.PROJECT_ID') as string },
+        ];
+        if (props.hasReadWriteAccess) {
+            defaultFields.push({ name: 'remove_button', label: ' ' });
+        }
+        return defaultFields;
+    }),
 });
 const modalState = reactive({
     visible: false,

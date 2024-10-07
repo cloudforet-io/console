@@ -16,6 +16,8 @@ import type { ReferenceMap } from '@/store/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { indigo, peacock } from '@/styles/colors';
+
 import type { ProjectTreeOptions } from '@/services/project/composables/use-project-tree';
 import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
@@ -43,6 +45,7 @@ interface Props {
     selectionLabel?: string;
     hideCreateButton?: boolean;
     workspaceId?: string;
+    isInitSelectedItem?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -59,6 +62,7 @@ const props = withDefaults(defineProps<Props>(), {
     selectionLabel: undefined,
     hideCreateButton: false,
     workspaceId: undefined,
+    isInitSelectedItem: false,
 });
 
 const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
@@ -119,7 +123,13 @@ const getSearchPath = async (id: string|undefined, type?: ProjectTreeItemType): 
 const findNodes = async () => {
     if (!state.root) return;
 
-    const pathList: string[][] = await Promise.all(props.selectedProjectIds.map((d) => getSearchPath(d, props.projectGroupSelectable ? 'PROJECT_GROUP' : 'PROJECT')));
+    let selectedItemType = undefined as ProjectTreeItemType|undefined;
+    if (props.multiSelectable) {
+        selectedItemType = props.projectGroupSelectable ? 'PROJECT_GROUP' : 'PROJECT';
+    } else {
+        selectedItemType = props.selectedProjectIds[0]?.includes('pg') ? 'PROJECT_GROUP' : 'PROJECT';
+    }
+    const pathList: string[][] = await Promise.all(props.selectedProjectIds.map((d) => getSearchPath(d, selectedItemType)));
     const predicateList = pathList.map((paths) => paths.map((d) => ((data) => data.id === d)));
     await state.root.fetchAndFindNodes(predicateList);
 };
@@ -251,6 +261,10 @@ watch(() => props.selectedProjectIds, async (after, before) => {
             const deletedId = before.filter((d) => !after.includes(d))[0];
             const deletedIdx = state._selectedProjectIds.indexOf(deletedId);
             handleDeleteTag(deletedId, deletedIdx);
+            if (props.isInitSelectedItem) {
+                state._selectedProjectIds = [];
+                state.selectedProjectItems = [];
+            }
         }
     }
 });
@@ -332,7 +346,11 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                                        class="mr-1"
                                        @change="handleChangeSelectState(node, path, ...arguments)"
                             />
-                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_folder-filled' : 'ic_document-filled'" />
+                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_folder-filled' : 'ic_document-filled'"
+                                 :color="node.data.item_type === 'PROJECT_GROUP' ? indigo[500] : peacock[600]"
+                                 width="1rem"
+                                 height="1rem"
+                            />
                             <p-badge v-if="props.projectGroupSelectOptions && node.data.id === props.projectGroupSelectOptions.currentProjectGroupId"
                                      badge-type="subtle"
                                      style-type="gray200"

@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router/composables';
+import { computed, reactive } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import {
     PHeading, PDivider, PButton,
 } from '@cloudforet/mirinae';
+
+import { store } from '@/store';
+
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
@@ -11,7 +20,26 @@ import BudgetMainList from '@/services/cost-explorer/components/BudgetMainList.v
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const router = useRouter();
+const route = useRoute();
+
 const { getProperRouteLocation } = useProperRouteLocation();
+
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
+const state = reactive({
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+});
+
 const handleCreateBudgetSelect = () => {
     router.push(getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME }));
 };
@@ -20,7 +48,9 @@ const handleCreateBudgetSelect = () => {
 <template>
     <div class="budget-page">
         <p-heading :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
-            <template #extra>
+            <template v-if="state.hasReadWriteAccess"
+                      #extra
+            >
                 <p-button style-type="primary"
                           icon-left="ic_plus_bold"
                           @click="handleCreateBudgetSelect"

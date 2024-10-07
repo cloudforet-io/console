@@ -2,7 +2,9 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -14,6 +16,9 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
 import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config/api-verbs/update';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
+import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
+import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
+import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
@@ -21,26 +26,27 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { Currency } from '@/store/modules/display/type';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { DormancyConfig } from '@/services/advanced/types/preferences-type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 const DORMANCY_CONFIG_NAME = 'identity:dormancy:workspace';
 
-const costReportPageStore = useCostReportPageStore();
-const constReportPageGetters = costReportPageStore.getters;
-
 const router = useRouter();
+const route = useRoute();
 
 const storeState = reactive({
-    currency: computed<Currency|undefined>(() => constReportPageGetters.currency),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
+    currency: undefined as Currency|undefined,
     toggleText: computed<string>(() => (state.statusToggle
         ? 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_TOGGLE_ENABLED'
         : 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_TOGGLE_DISABLED'
@@ -55,6 +61,16 @@ const state = reactive({
     }),
     statusToggle: false,
     checkbox: false,
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const {
@@ -140,6 +156,16 @@ const fetchDomainSettings = async () => {
         state.dormancyConfig = null;
     }
 };
+const fetchCostReportConfig = async () => {
+    if (!state.currency) return;
+    try {
+        const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+        state.currency = results?.[0]?.currency;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.currency = undefined;
+    }
+};
 
 watch(() => state.dormancyConfig, (config) => {
     if (!config) return;
@@ -151,7 +177,7 @@ watch(() => state.dormancyConfig, (config) => {
 onMounted(async () => {
     await initForm();
     await fetchDomainSettings();
-    await costReportPageStore.fetchCostReportConfig();
+    await fetchCostReportConfig;
 });
 </script>
 
@@ -161,6 +187,7 @@ onMounted(async () => {
             <div class="toggle-wrapper">
                 <p-toggle-button :value.sync="state.statusToggle"
                                  class="toggle-button"
+                                 :disabled="!state.hasReadWriteAccess"
                                  @change-toggle="handleChangeToggleButton"
                 />
                 <p class="toggle-text">
@@ -214,18 +241,18 @@ onMounted(async () => {
                             <div class="cost-input">
                                 <p-text-input :value="state.statusToggle ? cost : undefined"
                                               :invalid="invalid"
-                                              :disabled="!state.statusToggle"
+                                              :disabled="!state.hasReadWriteAccess || !state.statusToggle"
                                               masking-mode
                                               class="cost-input"
                                               @update:value="handleUpdateCost"
                                 />
-                                <span class="placeholder">{{ CURRENCY_SYMBOL[storeState.currency] }} {{ storeState.currency }}</span>
+                                <span class="placeholder">{{ CURRENCY_SYMBOL[state.currency] }} {{ state.currency }}</span>
                             </div>
                         </template>
                     </p-field-group>
                     <p-divider class="divider" />
                     <p-checkbox v-model="state.checkbox"
-                                :disabled="!state.statusToggle"
+                                :disabled="!state.hasReadWriteAccess || !state.statusToggle"
                     >
                         <span>{{ $t('IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_CHECKBOX') }}</span>
                     </p-checkbox>
@@ -239,7 +266,7 @@ onMounted(async () => {
                 </div>
             </div>
             <p-button v-if="state.statusToggle"
-                      :disabled="!isAllValid || !state.isChanged"
+                      :disabled="!state.hasReadWriteAccess || !isAllValid || !state.isChanged"
                       class="save-button"
                       @click="handleSaveConfig"
             >

@@ -73,6 +73,7 @@ const storeState = reactive({
             storeState.workspaceList,
         );
     }),
+    isRootRoleReadonly: computed<boolean>(() => store.getters['user/isRootRoleReadonly']),
 });
 const state = reactive({
     searchText: '',
@@ -275,7 +276,7 @@ onMounted(() => {
                     >
                         {{ $t("COMMON.GNB.WORKSPACE.VIEW_WORKSPACES") }}
                     </p-button>
-                    <div v-if="storeState.isDomainAdmin"
+                    <div v-if="storeState.isDomainAdmin && !storeState.isRootRoleReadonly"
                          class="workspace-toolbox"
                     >
                         <p-divider />

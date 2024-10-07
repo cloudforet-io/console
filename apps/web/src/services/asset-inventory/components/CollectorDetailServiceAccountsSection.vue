@@ -2,13 +2,14 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorDetailPageStore.getters.isEditableCollector"
                                          :total-count="state.totalCount"
                                          @click-edit="handleClickEdit"
         />
 
         <attached-service-accounts v-if="!state.isEditMode"
                                    :manage-disabled="props.manageDisabled"
+                                   :has-read-write-access="props.hasReadWriteAccess"
                                    @update:totalCount="state.totalCount = $event"
         />
 
@@ -79,6 +80,7 @@ const collectorDetailPageStore = useCollectorDetailPageStore();
 
 const props = defineProps<{
     manageDisabled?: boolean;
+    hasReadWriteAccess?: boolean
 }>();
 
 const state = reactive({

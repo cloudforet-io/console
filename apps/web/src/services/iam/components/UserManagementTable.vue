@@ -3,7 +3,6 @@ import {
     computed, reactive,
 } from 'vue';
 
-
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -11,7 +10,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PBadge, PStatus, PToolboxTable, PButton, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -36,17 +35,21 @@ import {
 } from '@/services/iam/composables/refined-table-data';
 import { USER_SEARCH_HANDLERS, USER_STATE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+import type { ExtendUserListItemType } from '@/services/iam/types/user-type';
 
 interface Props {
     tableHeight: number;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
+    hasReadWriteAccess: true,
 });
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
+const userPageGetters = userPageStore.getters;
 
 const roleListApiQueryHelper = new ApiQueryHelper();
 const userListApiQueryHelper = new ApiQueryHelper()
@@ -61,24 +64,26 @@ const storeState = reactive({
 });
 const state = reactive({
     selectedRemoveItem: '',
-    refinedUserItems: computed(() => userPageState.users.map((user) => ({
+    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => ({
         ...user,
-        mfa: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
-        last_accessed_at: calculateTime(user?.last_accessed_at, userPageStore.timezone),
+        type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
+        mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
+        last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
     }))),
 });
 const tableState = reactive({
-    userTableFields: computed(() => {
-        const additionalFields: DefinitionField[] = [];
+    userTableFields: computed<DataTableFieldType[]>(() => {
+        const additionalFields: DataTableFieldType[] = [];
         if (userPageState.isAdminMode) {
             additionalFields.push(
-                { name: 'mfa', label: 'MFA' },
+                { name: 'mfa_state', label: 'MFA' },
                 {
                     name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
                 },
             );
         } else {
             additionalFields.push(
+                { name: 'type', label: 'Type', sortable: false },
                 { name: 'role_binding', label: 'Role', sortable: false },
             );
         }
@@ -89,9 +94,9 @@ const tableState = reactive({
             ...additionalFields,
             { name: 'tags', label: 'Tags', sortable: false },
             { name: 'auth_type', label: 'Auth Type' },
-            { name: 'last_accessed_at', label: 'Last Activity' },
+            { name: 'last_accessed_count', label: 'Last Activity' },
         ];
-        return userPageStore.isWorkspaceOwner
+        return userPageGetters.isWorkspaceOwner && props.hasReadWriteAccess
             ? [
                 ...baseFields,
                 { name: 'remove_button', label: ' ', sortable: false },
@@ -106,7 +111,7 @@ const tableState = reactive({
             state: makeEnumValueHandler(USER_STATE),
             email: makeDistinctValueHandler(resourceType, 'email'),
             auth_type: makeDistinctValueHandler(resourceType, 'auth_type'),
-            last_accessed_at: makeDistinctValueHandler(resourceType, 'last_accessed_at', 'datetime'),
+            last_accessed_count: makeDistinctValueHandler(resourceType, 'last_accessed_count', 'datetime'),
             tags: makeDistinctValueHandler(resourceType, 'tags'),
         };
     }),
@@ -125,9 +130,10 @@ const modalState = reactive({
 
 /* Component */
 const handleSelect = async (index) => {
-    userPageStore.$patch({ selectedIndices: index });
+    userPageState.selectedIndices = index;
 };
-const handleClickButton = async (value: RoleBindingModel) => {
+const handleClickButton = async (value: RoleBindingModel|undefined) => {
+    if (!value) return;
     state.selectedRemoveItem = value.role_binding_id;
     modalState.visible = true;
     modalState.title = i18n.t('IAM.USER.MAIN.MODAL.REMOVE_WORKSPACE_TITLE') as string;
@@ -136,11 +142,11 @@ const handleChange = (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
         userPageStore.$patch((_state) => {
-            _state.searchFilters = userListApiQueryHelper.filters;
+            _state.state.searchFilters = userListApiQueryHelper.filters;
         });
     }
-    if (options.pageStart !== undefined) userPageStore.$patch({ pageStart: options.pageStart });
-    if (options.pageLimit !== undefined) userPageStore.$patch({ pageLimit: options.pageLimit });
+    if (options.pageStart !== undefined) userPageState.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) userPageState.pageLimit = options.pageLimit;
     fetchUserList();
 };
 const closeRemoveModal = () => {
@@ -163,7 +169,13 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
     }
     try {
         const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-            query: roleListApiQueryHelper.data,
+            query: {
+                ...roleListApiQueryHelper.data,
+                filter: [
+                    ...(roleListApiQueryHelper.data?.filter || []),
+                    { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                ],
+            },
         });
         dropdownState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
@@ -183,13 +195,13 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
 const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
         const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
-            role_binding_id: state.refinedUserItems[rowIndex].role_binding_info?.role_binding_id || '',
+            role_binding_id: state.refinedUserItems[rowIndex]?.role_binding_info?.role_binding_id || '',
             role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        const roleName = userPageStore.roleMap[response.role_id]?.name ?? '';
+        const roleName = userPageGetters.roleMap[response.role_id]?.name ?? '';
         userPageStore.$patch((_state) => {
-            _state.users[rowIndex].role_binding = {
+            _state.state.users[rowIndex].role_binding = {
                 name: roleName,
                 type: response.role_type,
             };
@@ -199,7 +211,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
     }
 };
 const fetchUserList = async () => {
-    userPageStore.$patch({ loading: true });
+    userPageState.loading = true;
     try {
         if (userPageState.isAdminMode) {
             await userPageStore.listUsers({ query: userListApiQuery });
@@ -207,7 +219,7 @@ const fetchUserList = async () => {
             await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
         }
     } finally {
-        userPageStore.$patch({ loading: false });
+        userPageState.loading = false;
     }
 };
 const handleRemoveButton = async () => {
@@ -226,6 +238,8 @@ const handleRemoveButton = async () => {
         modalState.loading = false;
     }
 };
+
+const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_binding_info?.workspace_group_id;
 </script>
 
 <template>
@@ -250,7 +264,7 @@ const handleRemoveButton = async () => {
             @change="handleChange"
             @refresh="handleChange()"
         >
-            <template v-if="userPageState.isAdminMode"
+            <template v-if="props.hasReadWriteAccess && userPageState.isAdminMode"
                       #toolbox-left
             >
                 <user-management-table-toolbox />
@@ -261,28 +275,19 @@ const handleRemoveButton = async () => {
                 />
             </template>
             <template #col-role_id-format="{value}">
-                <div v-if="userPageStore.roleMap[value]?.name"
+                <div v-if="userPageGetters.roleMap[value]?.name"
                      class="role-type-wrapper"
                 >
-                    <img :src="useRoleFormatter(userPageStore.roleMap[value]?.role_type || ROLE_TYPE.USER).image"
-                         alt="role-type-icon"
+                    <img :src="useRoleFormatter(userPageGetters.roleMap[value]?.role_type || ROLE_TYPE.USER).image"
+                         alt="Role Type Icon"
                          class="role-type-icon"
                     >
-                    <span class="pr-4">{{ userPageStore.roleMap[value]?.name ?? '' }}</span>
+                    <span class="pr-4">{{ userPageGetters.roleMap[value]?.name ?? '' }}</span>
                 </div>
             </template>
-            <template #col-role_binding-format="{value, rowIndex}">
+            <template #col-role_binding-format="{value, rowIndex, item:fieldItem}">
                 <div class="role-type-wrapper">
-                    <p-tooltip position="bottom"
-                               :contents="useRoleFormatter(value?.type).name"
-                               class="tooltip"
-                    >
-                        <img :src="useRoleFormatter(value?.type).image"
-                             alt="role-type-icon"
-                             class="role-type-icon"
-                        >
-                    </p-tooltip>
-                    <p-select-dropdown v-if="userPageStore.isWorkspaceOwner && state.refinedUserItems[rowIndex].user_id !== storeState.loginUserId"
+                    <p-select-dropdown v-if="userPageGetters.isWorkspaceOwner && state.refinedUserItems[rowIndex].user_id !== storeState.loginUserId"
                                        is-filterable
                                        use-fixed-menu-style
                                        style-type="transparent"
@@ -290,16 +295,26 @@ const handleRemoveButton = async () => {
                                        :loading="dropdownState.loading"
                                        :search-text.sync="dropdownState.searchText"
                                        :handler="dropdownMenuHandler"
+                                       :disabled="!props.hasReadWriteAccess || isWorkspaceGroupUser(fieldItem)"
                                        class="role-select-dropdown"
                                        @select="handleSelectDropdownItem($event, rowIndex)"
                     >
                         <template #dropdown-button>
+                            <p-tooltip position="bottom"
+                                       :contents="useRoleFormatter(value?.type).name"
+                                       class="tooltip"
+                            >
+                                <img :src="useRoleFormatter(value?.type).image"
+                                     alt="Role Type Icon"
+                                     class="role-type-icon"
+                                >
+                            </p-tooltip>
                             <span>{{ value.name }}</span>
                         </template>
                         <template #menu-item--format="{item}">
                             <div class="role-menu-item">
                                 <img :src="useRoleFormatter(item.role_type).image"
-                                     alt="role-type-icon"
+                                     alt="Role Type Icon"
                                      class="role-type-icon"
                                 >
                                 <p-tooltip position="bottom"
@@ -312,15 +327,27 @@ const handleRemoveButton = async () => {
                             </div>
                         </template>
                     </p-select-dropdown>
-                    <span v-else>{{ value.name }}</span>
+                    <div v-else
+                         class="flex gap-1"
+                    >
+                        <p-tooltip position="bottom"
+                                   :contents="useRoleFormatter(value?.type).name"
+                                   class="tooltip"
+                        >
+                            <img :src="useRoleFormatter(value?.type).image"
+                                 alt="Role Type Icon"
+                                 class="role-type-icon"
+                            >
+                        </p-tooltip>{{ value.name }}
+                    </div>
                 </div>
             </template>
-            <template #col-mfa-format="{value}">
+            <template #col-mfa_state-format="{value}">
                 <p-status v-bind="userMfaFormatter(value)"
                           class="capitalize"
                 />
             </template>
-            <template #col-last_accessed_at-format="{ value }">
+            <template #col-last_accessed_count-format="{ value }">
                 <span v-if="value === -1">
                     -
                 </span>
@@ -350,11 +377,12 @@ const handleRemoveButton = async () => {
                     <span />
                 </template>
             </template>
-            <template #col-remove_button-format="value">
-                <p-button style-type="negative-secondary"
+            <template #col-remove_button-format="{item}">
+                <p-button v-if="!isWorkspaceGroupUser(item)"
+                          style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
-                          @click.stop="handleClickButton(value.item.role_binding_info)"
+                          @click.stop="handleClickButton(item?.role_binding_info)"
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
@@ -376,14 +404,14 @@ const handleRemoveButton = async () => {
         gap: 0.25rem;
         .tooltip {
             @apply rounded-full;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1rem;
+            height: 1rem;
             margin-right: 0.25rem;
         }
         .role-type-icon {
             @apply rounded-full;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1rem;
+            height: 1rem;
         }
         .role-select-dropdown {
             width: auto;

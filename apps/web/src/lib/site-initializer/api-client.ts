@@ -121,6 +121,16 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('provider', data);
     },
+    '/identity/role/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('role', data);
+    },
+    '/identity/role/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('role', data);
+    },
     '/inventory/region/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
@@ -237,6 +247,41 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('public_folder', data);
         allReferenceStore.load('public_dashboard', { force: true });
+    },
+    '/identity/token/grant': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('role', data);
+    },
+    '/identity/workspace-group/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace_group', data);
+    },
+    '/identity/workspace-group/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace_group', data);
+    },
+    '/identity/workspace-group/delete': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace_group', data);
+    },
+    '/identity/workspace/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace', data);
+    },
+    '/identity/workspace/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace', data);
+    },
+    '/identity/workspace/delete': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('workspace', data);
     },
 });
 

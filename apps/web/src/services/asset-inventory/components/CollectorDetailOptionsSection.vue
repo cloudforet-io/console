@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="state.isCollectorOptionsSchemaEmpty || !collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || state.isCollectorOptionsSchemaEmpty || !collectorDetailPageStore.getters.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
         <p-definition-table v-if="!state.isEditMode"
@@ -82,8 +82,9 @@ import CollectorOptionsForm from '@/services/asset-inventory/components/Collecto
 import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
-
-
+const props = defineProps<{
+    hasReadWriteAccess?: boolean
+}>();
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;

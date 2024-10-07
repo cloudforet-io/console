@@ -3,17 +3,17 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { cloneDeep } from 'lodash';
-
 import {
-    PButton,
-    PDefinitionTable, PHeading, PI, PStatus,
+    PButton, PDefinitionTable, PHeading, PI, PStatus,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import config from '@/lib/config';
 import { postUserValidationEmail } from '@/lib/helper/verify-email-helper';
@@ -27,31 +27,42 @@ import {
 } from '@/services/iam/composables/refined-table-data';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { ModalSettingState } from '@/services/iam/types/user-type';
+import type { UserListItemType, ExtendUserListItemType } from '@/services/iam/types/user-type';
+
+interface Props {
+    hasReadWriteAccess?: boolean;
+}
+
+const props = defineProps<Props>();
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
+const userPageGetters = userPageStore.getters;
+const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(e: 'refresh', id: string): void }>();
 
 const storeState = reactive({
     userInfo: computed(() => store.state.user),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+    workspaceGroup: computed(() => allReferenceStore.getters.workspaceGroup),
 });
 const state = reactive({
     loading: false,
     verifyEmailLoading: false,
-    selectedUser: computed(() => userPageStore.selectedUsers[0]),
+    selectedUser: computed<UserListItemType>(() => userPageGetters.selectedUsers[0]),
+    isWorkspaceGroupUser: computed<boolean>(() => !!state.selectedUser?.role_binding_info?.workspace_group_id),
 });
+
 const tableState = reactive({
-    refinedUserItems: computed(() => ({
+    refinedUserItems: computed<ExtendUserListItemType>(() => ({
         ...state.selectedUser,
-        last_accessed_at: calculateTime(state.selectedUser.last_accessed_at, state.selectedUser.timezone),
+        last_accessed_count: calculateTime(state.selectedUser.last_accessed_at, state.selectedUser.timezone),
     })),
     fields: computed<DefinitionField[]>(() => {
         const additionalFields: DefinitionField[] = [];
         const additionalRoleFields: DefinitionField[] = [];
-        if (userPageStore.isAdminMode) {
+        if (userPageState.isAdminMode) {
             if (storeState.smtpEnabled) {
                 additionalFields.push(
                     { name: 'email', label: i18n.t('IAM.USER.MAIN.NOTIFICATION_EMAIL'), block: true },
@@ -62,13 +73,16 @@ const tableState = reactive({
             );
             if (state.selectedUser?.role_id) {
                 additionalRoleFields.push(
-                    { name: 'role_id', label: i18n.t('IAM.USER.MAIN.ROLE_NAME') },
+                    {
+                        name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
+                    },
                 );
             }
         } else {
             additionalRoleFields.push({
                 name: 'role_binding',
                 label: i18n.t('IAM.USER.MAIN.ROLE'),
+                disableCopy: true,
             });
         }
 
@@ -77,9 +91,8 @@ const tableState = reactive({
             { name: 'name', label: i18n.t('IAM.USER.MAIN.NAME') },
             { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE'), disableCopy: true },
             ...additionalFields,
-            { name: 'last_accessed_at', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY'), disableCopy: true },
+            { name: 'last_accessed_count', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY'), disableCopy: true },
             { name: 'domain_id', label: i18n.t('IAM.USER.MAIN.DOMAIN_ID') },
-            { name: 'role_type', label: i18n.t('IAM.USER.MAIN.ROLE_TYPE') },
             ...additionalRoleFields,
             { name: 'language', label: i18n.t('IAM.USER.MAIN.LANGUAGE'), disableCopy: true },
             { name: 'timezone', label: i18n.t('IAM.USER.MAIN.TIMEZONE'), disableCopy: true },
@@ -91,51 +104,38 @@ const tableState = reactive({
 /* Component */
 const handleClickButton = (type: string) => {
     switch (type) {
-    case USER_MODAL_TYPE.DISABLE: updateModalSettings({
+    case USER_MODAL_TYPE.DISABLE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.DISABLE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DISABLE_TITLE'),
         themeColor: 'alert',
-        statusVisible: true,
+        modalVisibleType: 'status',
     }); break;
-    case USER_MODAL_TYPE.ENABLE: updateModalSettings({
+    case USER_MODAL_TYPE.ENABLE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.ENABLE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.ENABLE_TITLE'),
         themeColor: 'primary',
-        statusVisible: true,
+        modalVisibleType: 'status',
     }); break;
-    case USER_MODAL_TYPE.REMOVE: updateModalSettings({
+    case USER_MODAL_TYPE.REMOVE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE'),
         themeColor: 'alert',
-        statusVisible: true,
+        modalVisibleType: 'status',
     }); break;
-    case USER_MODAL_TYPE.DELETE: updateModalSettings({
+    case USER_MODAL_TYPE.DELETE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.DELETE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DELETE_TITLE'),
         themeColor: 'alert',
-        statusVisible: true,
+        modalVisibleType: 'status',
     }); break;
-    case USER_MODAL_TYPE.UPDATE: updateModalSettings({
+    case USER_MODAL_TYPE.UPDATE: userPageStore.updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE'),
         themeColor: 'primary',
-        formVisible: true,
+        modalVisibleType: 'status',
     }); break;
     default: break;
     }
-};
-const updateModalSettings = ({
-    type, title, themeColor, statusVisible, addVisible, formVisible,
-}: ModalSettingState) => {
-    userPageStore.$patch((_state) => {
-        _state.modal.type = type;
-        _state.modal.title = title;
-        _state.modal.themeColor = themeColor;
-        _state.modal.visible.status = statusVisible ?? false;
-        _state.modal.visible.add = addVisible ?? false;
-        _state.modal.visible.form = formVisible ?? false;
-        _state.modal = cloneDeep(_state.modal);
-    });
 };
 
 /* API */
@@ -147,7 +147,7 @@ const handleClickVerifyButton = async () => {
             user_id: tableState.refinedUserItems.user_id || '',
             email: tableState.refinedUserItems.email || '',
         });
-        await emit('refresh', tableState.refinedUserItems.user_id || '');
+        emit('refresh', tableState.refinedUserItems.user_id || '');
         await store.dispatch('user/setUser', { email: tableState.refinedUserItems.email });
     } catch (e: any) {
         ErrorHandler.handleError(e);
@@ -162,7 +162,9 @@ const handleClickVerifyButton = async () => {
         <p-heading heading-type="sub"
                    :title="$t('IAM.USER.MAIN.BASE_INFORMATION')"
         >
-            <template #extra>
+            <template v-if="props.hasReadWriteAccess"
+                      #extra
+            >
                 <div class="toolbox-wrapper">
                     <div v-if="userPageState.isAdminMode"
                          class="toolbox"
@@ -192,9 +194,9 @@ const handleClickVerifyButton = async () => {
                             <span class="button-label">{{ $t('IAM.USER.MAIN.DELETE') }}</span>
                         </p-button>
                     </div>
-                    <p-button v-else-if="userPageStore.isWorkspaceOwner"
+                    <p-button v-else-if="userPageGetters.isWorkspaceOwner && !state.isWorkspaceGroupUser"
                               style-type="negative-secondary"
-                              :disabled="userPageStore.selectedUsers.length === 0"
+                              :disabled="userPageGetters.selectedUsers.length === 0"
                               @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
                     >
                         {{ $t('IAM.USER.REMOVE') }}
@@ -217,30 +219,29 @@ const handleClickVerifyButton = async () => {
             <template #data-mfa="{data}">
                 {{ data?.state === 'ENABLED' ? 'On' : 'Off' }}
             </template>
-            <template #data-role_type>
-                <span class="role-type">
-                    <img :src="useRoleFormatter(userPageStore.isAdminMode ? (userPageStore.roleMap[tableState.refinedUserItems?.role_id]?.role_type) : tableState.refinedUserItems.role_type).image"
-                         alt="role-type-icon"
-                         class="role-type-icon"
-                    >
-                    <span>
-                        {{
-                            useRoleFormatter(userPageStore.isAdminMode
-                                ? (userPageStore.roleMap[tableState.refinedUserItems?.role_id]?.role_type)
-                                : tableState.refinedUserItems?.role_type).name
-                        }}
-                    </span>
-                </span>
-            </template>
-            <template #data-role_id="{value}">
-                <span class="role-type">
-                    <span class="pr-4">{{ userPageStore.roleMap[value]?.name ?? '' }}</span>
+            <template #data-role_id="{value, data}">
+                <span class="role-wrapper">
+                    <div class="role-menu-item">
+                        <img :src="useRoleFormatter(userPageGetters.roleMap[data]?.role_type || ROLE_TYPE.USER).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <span class="pr-4">{{ userPageGetters.roleMap[value]?.name ?? '' }}</span>
+                    </div>
                 </span>
             </template>
             <template #data-role_binding="{value}">
-                {{ value.name }}
+                <div class="role-wrapper">
+                    <div class="role-menu-item">
+                        <img :src="useRoleFormatter(value.type).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <span class="role-type">{{ value.name }}</span>
+                    </div>
+                </div>
             </template>
-            <template #data-last_accessed_at="{data}">
+            <template #data-last_accessed_count="{data}">
                 <span v-if="data === -1">
                     -
                 </span>
@@ -255,7 +256,7 @@ const handleClickVerifyButton = async () => {
                 </span>
             </template>
             <template #data-created_at="{data}">
-                {{ iso8601Formatter(data, userPageStore.timezone) }}
+                {{ iso8601Formatter(data, userPageGetters.timezone) }}
             </template>
             <template #data-email="{data}">
                 <div v-if="data && data !== ''"
@@ -281,7 +282,8 @@ const handleClickVerifyButton = async () => {
                 <p-button v-if="label === $t('IAM.USER.MAIN.NOTIFICATION_EMAIL')
                               && !tableState.refinedUserItems.email_verified
                               && tableState.refinedUserItems.email
-                              && tableState.refinedUserItems.email !== ''"
+                              && tableState.refinedUserItems.email !== ''
+                              && props.hasReadWriteAccess"
                           style-type="primary"
                           size="sm"
                           :loading="state.verifyEmailLoading"
@@ -309,7 +311,6 @@ const handleClickVerifyButton = async () => {
 
     /* custom design-system component - p-definition */
     :deep(.p-definition) {
-        height: 2.25rem;
         .value-wrapper {
             @apply items-center;
             padding: 0 1rem;
@@ -340,7 +341,7 @@ const handleClickVerifyButton = async () => {
                 right: -7rem;
             }
             .verified-text {
-                margin-left: 1.5rem;
+                padding-left: 1.25rem;
             }
             .verified-icon {
                 @apply absolute;
@@ -348,6 +349,27 @@ const handleClickVerifyButton = async () => {
                 left: 0;
             }
         }
+
+        .role-type-icon {
+            @apply rounded-full;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .role-wrapper {
+            @apply flex flex-col;
+            gap: 0.375rem;
+            padding: 0.375rem 0;
+
+            .role-menu-item {
+                @apply flex items-center;
+                gap: 0.25rem;
+                .role-type {
+                    @apply text-label-md text-gray-900;
+                }
+            }
+        }
+
         .role-type {
             @apply flex items-center;
             gap: 0.5rem;

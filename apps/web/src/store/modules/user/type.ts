@@ -2,18 +2,21 @@ import type { RoleType } from '@/schema/identity/role/type';
 import type { GrantScope } from '@/schema/identity/token/type';
 import type { AuthType, UserType } from '@/schema/identity/user/type';
 
+import type { PageAccessType } from '@/lib/access-control/config';
+
 export type LanguageCode = 'ko' | 'en' | string;
 // export type Timezone = 'UTC' | 'Asia/Seoul' | string;
 
 export interface RoleInfo {
     roleType: RoleType;
     roleId: string;
-    pageAccess: string[];
+    pageAccess: PageAccessType[]|string[];
 }
 
 export interface GrantInfo {
     scope: GrantScope;
     workspaceId?: string;
+    pageAccess?: string[];
 }
 
 export interface UserState {

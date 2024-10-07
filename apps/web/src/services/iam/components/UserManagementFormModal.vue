@@ -51,14 +51,14 @@ interface UserManagementData {
 }
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
+const userPageState = userPageStore.state;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const state = reactive({
     loading: false,
     mfaLoading: false,
-    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
+    data: computed<UserListItemType>(() => userPageStore.getters.selectedUsers[0]),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     mfa: computed(() => store.state.user.mfa),
     loginUserId: computed(() => store.state.user.userId),
@@ -83,8 +83,8 @@ const formState = reactive({
 /* Components */
 const handleClose = () => {
     userPageStore.$patch((_state) => {
-        _state.modal.visible.form = false;
-        _state.modal = cloneDeep(_state.modal);
+        _state.state.modal.visible = undefined;
+        _state.state.modal = cloneDeep(_state.state.modal);
     });
 };
 const setForm = () => {
@@ -235,8 +235,8 @@ const verifyUserEmail = async () => {
 };
 
 /* Watcher */
-watch(() => userPageState.modal.visible.form, async (visible) => {
-    if (visible) {
+watch(() => userPageState.modal.visible, async (visible) => {
+    if (visible === 'form') {
         await setForm();
         await fetchListRoleBindingInfo();
     } else {
@@ -255,7 +255,7 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
                     size="md"
                     :fade="true"
                     :backdrop="true"
-                    :visible="userPageState.modal.visible.form"
+                    :visible="userPageState.modal.visible === 'form'"
                     :disabled="formState.passwordManual && formState.password === ''"
                     @confirm="handleConfirm"
                     @cancel="handleClose"

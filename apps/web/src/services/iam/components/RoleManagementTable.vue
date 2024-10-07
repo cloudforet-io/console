@@ -5,13 +5,15 @@ import { useRouter } from 'vue-router/composables';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PToolboxTable, PSelectDropdown, PButton, PBadge,
+    PToolboxTable, PSelectDropdown, PButton, PBadge, PStatus,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleState } from '@/schema/identity/role/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -25,17 +27,18 @@ import { useQueryTags } from '@/common/composables/query-tags';
 
 import RoleDeleteModal
     from '@/services/iam/components/RoleDeleteModal.vue';
-import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
+import RoleStateUpdateModal from '@/services/iam/components/RoleStateUpdateModal.vue';
+import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import {
     EXCEL_TABLE_FIELDS,
     ROLE_SEARCH_HANDLERS,
-    ROLE_TABLE_FIELDS,
 } from '@/services/iam/constants/role-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
 
 interface Props {
     tableHeight?: number;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -49,13 +52,34 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const router = useRouter();
 
 const roleListApiQueryHelper = new ApiQueryHelper()
-    .setSort('name', true);
+    .setPageStart(rolePageState.pageStart).setPageLimit(rolePageState.pageLimit)
+    .setSort('is_managed', true);
+const queryTagHelper = useQueryTags({ keyItemSets: ROLE_SEARCH_HANDLERS.keyItemSets });
+const { queryTags } = queryTagHelper;
+let roleListApiQuery = roleListApiQueryHelper.data;
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
+const state = reactive({
+    fields: computed<DataTableFieldType[]>(() => {
+        const defaultFields: DataTableFieldType[] = [
+            { name: 'name', label: 'Name' },
+            { name: 'state', label: 'State' },
+            { name: 'role_type', label: 'Role Type' },
+            { name: 'created_at', label: 'Created', sortable: false },
+        ];
+        if (props.hasReadWriteAccess) {
+            defaultFields.push({ name: 'edit_button', label: ' ', sortable: false });
+        }
+        return defaultFields;
+    }),
+});
 const modalState = reactive({
     modalVisible: false,
+    stateModalVisible: false,
+    selectedState: '' as RoleState,
+    loading: false,
 });
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
@@ -69,6 +93,23 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         name: 'delete',
         label: i18n.t('IAM.ROLE.DELETE'),
         disabled: rolePageState.selectedIndices.length === 0 || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0,
+    },
+    { type: 'divider' },
+    {
+        type: 'item',
+        name: 'enabled',
+        label: i18n.t('IAM.ROLE.ENABLE'),
+        disabled: rolePageState.selectedIndices.length === 0
+            || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0
+            || rolePageStore.selectedRoles.filter((item) => item.state === ROLE_STATE.DISABLED).length === 0,
+    },
+    {
+        type: 'item',
+        name: 'disabled',
+        label: i18n.t('IAM.ROLE.DISABLE'),
+        disabled: rolePageState.selectedIndices.length === 0
+            || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0
+            || rolePageStore.selectedRoles.filter((item) => item.state === ROLE_STATE.ENABLED).length === 0,
     },
 ]));
 
@@ -85,6 +126,14 @@ const handleSelectDropdown = (name) => {
     case 'delete':
         modalState.modalVisible = true;
         break;
+    case 'enabled':
+        modalState.stateModalVisible = true;
+        modalState.selectedState = ROLE_STATE.ENABLED;
+        break;
+    case 'disabled':
+        modalState.stateModalVisible = true;
+        modalState.selectedState = ROLE_STATE.DISABLED;
+        break;
     default: break;
     }
 };
@@ -98,18 +147,19 @@ const handleChange = async (options: ToolboxOptions = {}) => {
     }
     if (options.pageStart !== undefined) rolePageStore.$patch({ pageStart: options.pageStart });
     if (options.pageLimit !== undefined) rolePageStore.$patch({ pageLimit: options.pageLimit });
-    await rolePageStore.listRoles({ query: roleListApiQuery });
+    await getListRoles();
 };
 
 /* API */
-const queryTagHelper = useQueryTags({ keyItemSets: ROLE_SEARCH_HANDLERS.keyItemSets });
-const { queryTags } = queryTagHelper;
-let roleListApiQuery = roleListApiQueryHelper.data;
 const getListRoles = async () => {
-    roleListApiQueryHelper
-        .setPageStart(rolePageState.pageStart).setPageLimit(rolePageState.pageLimit)
-        .setFilters(queryTagHelper.filters.value);
-    await rolePageStore.listRoles({ query: roleListApiQuery });
+    modalState.loading = true;
+    try {
+        roleListApiQueryHelper
+            .setFilters(queryTagHelper.filters.value);
+        await rolePageStore.listRoles({ query: roleListApiQuery });
+    } finally {
+        modalState.loading = false;
+    }
 };
 const handleExport = async () => {
     try {
@@ -140,11 +190,11 @@ const handleExport = async () => {
                          selectable
                          sortable
                          exportable
-                         :loading="false"
+                         :loading="modalState.loading"
                          disabled
                          :items="rolePageState.roles"
                          :select-index="rolePageState.selectedIndices"
-                         :fields="ROLE_TABLE_FIELDS"
+                         :fields="state.fields"
                          sort-by="name"
                          :sort-desc="true"
                          :total-count="rolePageState.totalCount"
@@ -158,12 +208,19 @@ const handleExport = async () => {
                          @refresh="handleChange()"
                          @export="handleExport"
         >
-            <template #toolbox-left>
+            <template v-if="props.hasReadWriteAccess"
+                      #toolbox-left
+            >
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :menu="dropdownMenu"
                                    reset-selection-on-menu-close
                                    :placeholder="$t('IAM.ROLE.ACTION')"
                                    @select="handleSelectDropdown"
+                />
+            </template>
+            <template #col-state-format="{value}">
+                <p-status v-bind="userStateFormatter(value)"
+                          class="capitalize"
                 />
             </template>
             <template #col-role_type-format="{value, item}">
@@ -198,6 +255,10 @@ const handleExport = async () => {
         </p-toolbox-table>
         <role-delete-modal :visible.sync="modalState.modalVisible"
                            @refresh="handleChange"
+        />
+        <role-state-update-modal :visible.sync="modalState.stateModalVisible"
+                                 :state="modalState.selectedState"
+                                 @refresh="handleChange"
         />
     </section>
 </template>

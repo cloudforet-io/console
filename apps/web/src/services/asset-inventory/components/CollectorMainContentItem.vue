@@ -28,6 +28,7 @@ import type { CollectorItemInfo, JobAnalyzeStatus } from '@/services/asset-inven
 
 interface Props {
     item: CollectorItemInfo;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -137,12 +138,14 @@ watch(() => props.item.schedule, (schedule) => {
                     </div>
                     <collector-item-schedule :collector-id="props.item.collectorId"
                                              :is-schedule-activated="state.isScheduleActivated"
-                                             :mode="state.isScheduleEditable ? 'edit' : 'view'"
+                                             :mode="(props.hasReadWriteAccess && state.isScheduleEditable) ? 'edit' : 'view'"
                                              @change-toggle="handleChangeToggle"
                     />
                 </div>
             </div>
-            <div :class="['collector-status-wrapper', { 'is-mobile': isMobile()}]">
+            <div v-if="props.hasReadWriteAccess"
+                 :class="['collector-status-wrapper', { 'is-mobile': isMobile()}]"
+            >
                 <p-button style-type="tertiary"
                           class="collector-data-button"
                           @click.stop="handleClickCollectData"

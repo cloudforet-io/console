@@ -1,23 +1,46 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { PButton, screens, PTextButton } from '@cloudforet/mirinae';
 
+import { store } from '@/store';
+
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const router = useRouter();
+const route = useRoute();
 
 const { width } = useWindowSize();
 
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
+});
 const state = reactive({
     isTabletSize: computed(() => width.value < screens.tablet.max),
     isMobileSize: computed(() => width.value < screens.mobile.max),
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const handleClickButton = (type: string) => {
@@ -49,7 +72,9 @@ const handleClickButton = (type: string) => {
                   class="desc"
             >{{ $t('LADING.DOMAIN.GET_STARTED_DESC') }}</span>
             <div class="buttons-wrapper">
-                <div class="buttons">
+                <div v-if="state.hasReadWriteAccess"
+                     class="buttons"
+                >
                     <p-button style-type="primary"
                               size="lg"
                               @click="handleClickButton('create')"

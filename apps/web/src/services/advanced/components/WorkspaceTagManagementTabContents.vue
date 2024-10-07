@@ -30,6 +30,7 @@ interface TableItem {
 
 interface Props {
     activeTab: string;
+    hasReadWriteAccess?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -104,7 +105,9 @@ watch([() => props.activeTab, () => state.selectedWorkspace], async () => {
                    :total-count="state.items.length"
                    :title="$t('IAM.USER.MAIN.TAG')"
         >
-            <template #extra>
+            <template v-if="props.hasReadWriteAccess"
+                      #extra
+            >
                 <p-button style-type="tertiary"
                           icon-left="ic_edit"
                           @click="handleEditTag"

@@ -56,6 +56,7 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 const props = withDefaults(defineProps<{
     serviceAccountId: string;
     attachedGeneralAccounts: ServiceAccountModel[];
+    hasReadWriteAccess?: boolean;
 }>(), {
     serviceAccountId: undefined,
     attachedGeneralAccounts: () => ([]),
@@ -248,7 +249,9 @@ watch(() => state.trustedAccountId, async (ta) => {
                    use-total-count
                    :total-count="state.totalCount"
         >
-            <template #extra>
+            <template v-if="props.hasReadWriteAccess"
+                      #extra
+            >
                 <p-tooltip :contents="!state.isSyncEnabled ? $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.DISABLED_SYNC_DESC') : ''"
                            position="left"
                 >

@@ -14,6 +14,7 @@ import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import type { SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 import type { MenuInfo } from '@/lib/menu/config';
@@ -60,6 +61,7 @@ const storeState = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     inputText: computed(() => topBarSearchStore.getters.inputText),
     trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 
 const state = reactive({
@@ -86,15 +88,23 @@ const state = reactive({
         }
         return results;
     }),
-    recentMenuList: computed(() => recentStore.state.recentMenuList.map((r: RecentItem) => {
-        // NOTE: Code corresponding to data stored as 'home-dashboard'
-        const id = r.data.id === 'home-dashboard' ? MENU_ID.WORKSPACE_HOME : r.data.id;
-        return {
-            id,
-            label: state.allMenuMap.get(id)?.fullLabel ?? r.data.label,
-            icon: state.allMenuMap.get(id)?.icon,
-        };
-    })),
+    recentMenuList: computed(() => {
+        const _recentMenuList: RecentItem[] = [];
+        recentStore.state.recentMenuList.forEach((i) => {
+            if (storeState.pageAccessPermissionMap[i.data.id]) {
+                _recentMenuList.push(i);
+            }
+        });
+        return _recentMenuList.map((r: RecentItem) => {
+            // NOTE: Code corresponding to data stored as 'home-dashboard'
+            const id = r.data.id === 'home-dashboard' ? MENU_ID.WORKSPACE_HOME : r.data.id;
+            return {
+                id,
+                label: state.allMenuMap.get(id)?.fullLabel ?? r.data.label,
+                icon: state.allMenuMap.get(id)?.icon,
+            };
+        });
+    }),
     recentMenuItems: computed(() => {
         let results: SuggestionItem[] = [];
         if (state.recentMenuList?.length) {

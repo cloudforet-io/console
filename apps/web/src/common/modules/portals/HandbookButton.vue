@@ -146,7 +146,10 @@ export default defineComponent({
         @apply ml-1 mr-0;
     }
 }
-
+.handbook-title {
+    @apply text-label-lg;
+    margin-top: 0.375rem;
+}
 .handbook-contents {
     @apply relative flex h-full flex-col;
     height: calc(32vh - 7.5rem);
@@ -190,9 +193,6 @@ export default defineComponent({
 }
 
 @screen lg {
-    .handbook-title {
-        @apply text-center ml-8;
-    }
     .handbook-contents {
         @apply overflow-auto;
         height: calc(100vh - 10.325rem);

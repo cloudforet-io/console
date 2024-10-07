@@ -2,9 +2,10 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { render } from 'ejs';
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -26,6 +27,10 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
@@ -43,7 +48,7 @@ import ServiceAccountEditModal from '@/services/asset-inventory/components/Servi
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const router = useRouter();
 
@@ -51,12 +56,13 @@ const props = defineProps<{
     serviceAccountId?: string;
 }>();
 
-const costReportPageStore = useCostReportPageStore();
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const { getProperRouteLocation } = useProperRouteLocation();
+
+const route = useRoute();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -66,9 +72,20 @@ const storeState = reactive({
         : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => store.getters['user/pageAccessPermissionMap']),
 });
 const state = reactive({
     loading: true,
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     originServiceAccountItem: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
     isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
@@ -95,7 +112,7 @@ const state = reactive({
     deleteModalVisible: false,
     editModalVisible: false,
     isManagedTrustedAccount: computed(() => state.originServiceAccountItem.workspace_id === '*'),
-    isEditable: computed(() => !state.isManagedTrustedAccount || storeState.isAdminMode),
+    isEditable: computed(() => state.hasReadWriteAccess && (!state.isManagedTrustedAccount || storeState.isAdminMode)),
 });
 
 /* Api */
@@ -144,7 +161,7 @@ const handleClickBackbutton = () => {
 
 onMounted(async () => {
     if (storeState.isWorkspaceMember) return;
-    await costReportPageStore.fetchCostReportConfig();
+    await serviceAccountPageStore.fetchCostReportConfig();
 });
 
 watch(() => state.providerId, async (provider) => {
@@ -214,6 +231,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             <service-account-attached-general-accounts v-if="state.isTrustedAccount && props.serviceAccountId"
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
+                                                       :has-read-write-access="state.hasReadWriteAccess"
             />
             <service-account-cluster v-if="state.isKubernetesAgentMode"
                                      :service-account-id="props.serviceAccountId"
