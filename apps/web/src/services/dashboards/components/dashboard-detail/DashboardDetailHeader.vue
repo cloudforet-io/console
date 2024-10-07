@@ -12,13 +12,13 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { gray } from '@/styles/colors';
 
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
 interface Props {
@@ -30,8 +30,8 @@ const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
-const dashboardStore = useDashboardStore();
-const dashboardGetters = dashboardStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -143,8 +143,8 @@ const state = reactive({
         ];
     }),
     folderName: computed<string|undefined>(() => {
-        const _folderId = dashboardGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
-        const folder = dashboardGetters.allFolderItems.find((d) => d.folder_id === _folderId);
+        const _folderId = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
+        const folder = dashboardPageControlGetters.allFolderItems.find((d) => d.folder_id === _folderId);
         return folder?.name;
     }),
 });

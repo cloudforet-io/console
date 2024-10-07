@@ -19,13 +19,10 @@ import type {
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import { SpaceRouter } from '@/router';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -49,10 +46,9 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
+
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
@@ -77,21 +73,16 @@ const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardPageControlGetters.publicDashboardTreeData, dashboardPageControlState.searchFilters)),
     refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardPageControlGetters.privateDashboardTreeData, dashboardPageControlState.searchFilters)),
-    deprecatedDashboardList: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
-        const _publicDeprecated = dashboardState.publicDashboardItems.filter((d) => d.version === '1.0');
-        const _privateDeprecated = dashboardState.privateDashboardItems.filter((d) => d.version === '1.0');
-        return [..._publicDeprecated, ..._privateDeprecated];
-    }),
     isDashboardExist: computed<boolean>(() => {
         if (state.isAdminMode) {
-            return !!dashboardPageControlState.publicDashboardList.length || !!dashboardPageControlState.publicFolderList.length;
+            return !!dashboardPageControlGetters.publicDashboardItems.length || !!dashboardPageControlGetters.publicFolderItems.length;
         }
         return !!(
-            dashboardPageControlState.publicDashboardList.length
-            || dashboardPageControlState.privateDashboardList.length
-            || state.deprecatedDashboardList.length
-            || dashboardPageControlState.publicFolderList.length
-            || dashboardPageControlState.privateFolderList.length
+            dashboardPageControlGetters.publicDashboardItems.length
+            || dashboardPageControlGetters.privateDashboardItems.length
+            || dashboardPageControlGetters.deprecatedDashboardItems.length
+            || dashboardPageControlGetters.publicFolderItems.length
+            || dashboardPageControlGetters.privateFolderItems.length
         );
     }),
     treeCollapseMap: {
@@ -145,7 +136,7 @@ const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         dashboardPageControlStore.setSearchQueryTags(options.queryTags);
     } else {
-        dashboardPageControlStore.load();
+        // dashboardPageControlStore.load();
     }
 };
 const handleUpdateSelectedIdMap = (type: 'PUBLIC' | 'PRIVATE', selectedIdMap: Record<string, boolean>) => {
@@ -178,7 +169,7 @@ const init = async () => {
     urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
         replaceUrlQuery(urlQueryString);
     });
-    await dashboardPageControlStore.load();
+    // await dashboardPageControlStore.load();
 };
 
 const getDashboardValueHandler = (): ValueHandler | undefined => {
@@ -216,17 +207,17 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
     await init();
 })();
 
-watch(() => dashboardPageControlState.searchQueryTags, (queryTags) => {
+watch(() => dashboardPageControlState.searchQueryTags, (queryTags: QueryTag[]) => {
     queryTagsHelper.setQueryTags(queryTags || []);
     dashboardPageControlStore.resetSelectedIdMap();
     dashboardPageControlStore.setSearchFilters(queryTagsHelper.filters.value);
-    dashboardPageControlStore.load();
+    // dashboardPageControlStore.load();
 }, { immediate: true });
 
 onUnmounted(() => {
     if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
     dashboardPageControlStore.setSearchFilters([]);
-    dashboardPageControlStore.load();
+    // dashboardPageControlStore.load();
 });
 </script>
 
@@ -262,7 +253,7 @@ onUnmounted(() => {
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <p-data-loader :loading="dashboardPageControlState.loading"
+        <p-data-loader :loading="dashboardPageControlGetters.loading"
                        :data="state.isDashboardExist"
                        class="dashboard-list-wrapper"
         >
@@ -321,10 +312,10 @@ onUnmounted(() => {
                                        @click-move="handleClickMoveButton('PRIVATE')"
                 />
             </div>
-            <dashboard-main-board-list v-if="state.deprecatedDashboardList.length"
+            <dashboard-main-board-list v-if="dashboardPageControlGetters.deprecatedDashboardItems.length"
                                        class="dashboard-list"
                                        :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED')"
-                                       :dashboard-list="state.deprecatedDashboardList"
+                                       :dashboard-list="dashboardPageControlGetters.deprecatedDashboardItems"
                                        is-collapsed
             />
             <dashboard-folder-form-modal :visible="dashboardPageControlState.folderFormModalVisible"

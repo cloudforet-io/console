@@ -36,9 +36,9 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -55,9 +55,9 @@ const state = reactive({
         .filter(([key]) => key.includes('dash'))
         .map(([key]) => key)),
     availableFolderItems: computed<FolderModel[]>(() => {
-        if (dashboardPageControlState.folderModalType === 'PRIVATE') return dashboardState.privateFolderItems;
-        if (storeState.isAdminMode) return dashboardState.publicFolderItems;
-        return dashboardState.publicFolderItems.filter((d) => !(d.shared && d.workspace_id === '*'));
+        if (dashboardPageControlState.folderModalType === 'PRIVATE') return dashboardPageControlGetters.privateFolderItems;
+        if (storeState.isAdminMode) return dashboardPageControlGetters.publicFolderItems;
+        return dashboardPageControlGetters.publicFolderItems.filter((d) => !(d.shared && d.workspace_id === '*'));
     }),
     headerTitle: computed<TranslateResult>(() => i18n.t('DASHBOARDS.ALL_DASHBOARDS.MOVE_DASHBOARDS', { count: state.targetDashboardIdList.length })),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
@@ -113,10 +113,7 @@ const handleFormConfirm = async () => {
     } if (failCount > 0) {
         ErrorHandler.handleRequestError(new Error(''), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_MOVE_DASHBOARD', { count: failCount }));
     }
-    await Promise.allSettled([
-        dashboardStore.load(),
-        dashboardPageControlStore.load(),
-    ]);
+    await dashboardStore.load();
     dashboardPageControlStore.resetSelectedIdMap(dashboardPageControlState.folderModalType);
     state.proxyVisible = false;
 };

@@ -5,6 +5,8 @@ import {
     PDataTable, PI, PToggleButton, PButtonModal,
 } from '@cloudforet/mirinae';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -41,13 +43,14 @@ const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     privateMap: {} as Record<string, boolean>,
     tableFields: computed(() => {
-        if (storeState.isAdminMode) {
+        if (storeState.isAdminMode || storeState.isWorkspaceMember) {
             return CLONE_TABLE_FIELDS.filter((f) => f.name !== 'private');
         }
         return CLONE_TABLE_FIELDS;
@@ -83,7 +86,7 @@ const handleCloneConfirm = async () => {
     const _createDashboardPromises: Promise<void>[] = [];
 
     await Promise.allSettled(state.selectedTreeData.map(async (item) => {
-        const _isPrivate = state.privateMap[item.data.id];
+        const _isPrivate = storeState.isWorkspaceMember ? true : state.privateMap[item.data.id];
         if (item.data.type === 'FOLDER') {
             const createdFolderId = await dashboardStore.createFolder(item.data.name, _isPrivate);
             if (!createdFolderId) return;
@@ -103,10 +106,7 @@ const handleCloneConfirm = async () => {
         const _failedCount = _results.filter((r) => r.status !== 'fulfilled').length;
         showErrorMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }), '');
     }
-    await Promise.allSettled([
-        dashboardStore.load(),
-        dashboardPageControlStore.load(),
-    ]);
+    await dashboardStore.load();
     dashboardPageControlStore.setSelectedIdMap({}, dashboardPageControlState.folderModalType);
     state.loading = false;
     state.proxyVisible = false;

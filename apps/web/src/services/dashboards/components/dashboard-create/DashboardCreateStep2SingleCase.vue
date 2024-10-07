@@ -28,6 +28,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import DashboardCreateScopeForm from '@/services/dashboards/components/dashboard-create/DashboardCreateScopeForm.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
 
@@ -41,10 +42,11 @@ const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
-const dashboardGetters = dashboardStore.getters;
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -60,7 +62,7 @@ const state = reactive({
         if (dashboardCreatePageState.dashboardScope === 'PRIVATE') {
             return [
                 defaultItem,
-                ...dashboardGetters.privateFolderItems.map((folder) => ({
+                ...dashboardPageControlGetters.privateFolderItems.map((folder) => ({
                     label: folder.name,
                     name: folder.folder_id,
                 })),
@@ -68,7 +70,7 @@ const state = reactive({
         }
         return [
             defaultItem,
-            ...dashboardGetters.workspaceFolderItems.map((folder) => ({
+            ...dashboardPageControlGetters.publicFolderItems.map((folder) => ({
                 label: folder.name,
                 name: folder.folder_id,
             })),

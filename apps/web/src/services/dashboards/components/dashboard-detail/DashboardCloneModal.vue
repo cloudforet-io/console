@@ -27,6 +27,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
 type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
@@ -43,9 +44,10 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const dashboardStore = useDashboardStore();
-const dashboardGetters = dashboardStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const {
     forms: {
         name,
@@ -79,8 +81,10 @@ const state = reactive({
     isPrivate: true,
     targetDashboard: computed(() => dashboardDetailState.dashboardInfo),
     dashboardNameList: computed<string[]>(() => {
-        if (storeState.isAdminMode) return dashboardGetters.domainDashboardItems.map((item) => item.name);
-        return dashboardStore.getDashboardNameList(state.dashboardType);
+        if (state.dashboardType === 'PRIVATE') {
+            return dashboardPageControlGetters.privateDashboardItems.map((item) => item.name);
+        }
+        return dashboardPageControlGetters.publicDashboardItems.map((item) => item.name);
     }),
 });
 

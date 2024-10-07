@@ -15,6 +15,7 @@ import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model
 import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
 import type { PublicFolderUpdateParameters } from '@/schema/dashboard/public-folder/api-verbs/update';
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -44,12 +45,12 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
@@ -57,9 +58,9 @@ const state = reactive({
     selectedFolder: computed<FolderModel|undefined>(() => {
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
             if (dashboardPageControlState.selectedFolderId?.startsWith('private')) {
-                return dashboardState.privateFolderItems.find((d) => d.folder_id === dashboardPageControlState.selectedFolderId);
+                return dashboardPageControlGetters.privateFolderItems.find((d) => d.folder_id === dashboardPageControlState.selectedFolderId);
             }
-            return dashboardState.publicFolderItems.find((d) => d.folder_id === dashboardPageControlState.selectedFolderId);
+            return dashboardPageControlGetters.publicFolderItems.find((d) => d.folder_id === dashboardPageControlState.selectedFolderId);
         }
         return undefined;
     }),
@@ -94,12 +95,14 @@ const {
 /* Api */
 const createFolder = async () => {
     try {
-        const fetcher = state.isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
+        const _isPrivate = storeState.isWorkspaceMember ? true : state.isPrivate;
+
+        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
         const params: FolderCreateParams = {
             name: name.value as string,
             tags: { created_by: store.state.user.userId },
         };
-        if (!state.isPrivate) {
+        if (!_isPrivate) {
             (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;
         }
         const createdFolder = await fetcher(params);
@@ -137,10 +140,7 @@ const handleFormConfirm = async () => {
     } else {
         await createFolder();
     }
-    await Promise.allSettled([
-        dashboardStore.load(),
-        dashboardPageControlStore.load(),
-    ]);
+    await dashboardStore.load();
 };
 const handleUpdatePrivate = (value: boolean) => {
     state.isPrivate = value;
@@ -187,7 +187,7 @@ watch(() => state.proxyVisible, (visible) => {
                     />
                 </template>
             </p-field-group>
-            <p-field-group v-if="dashboardPageControlState.folderFormModalType === 'CREATE' && !storeState.isAdminMode"
+            <p-field-group v-if="dashboardPageControlState.folderFormModalType === 'CREATE' && !storeState.isAdminMode && !storeState.isWorkspaceMember"
                            :label="$t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.MAKE_PRIVATE')"
                            required
             >

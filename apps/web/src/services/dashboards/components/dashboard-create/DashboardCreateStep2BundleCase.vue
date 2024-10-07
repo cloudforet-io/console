@@ -8,6 +8,7 @@ import { isEmpty } from 'lodash';
 import {
     PDataTable, PI, PToggleButton,
 } from '@cloudforet/mirinae';
+import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import { getClonedName } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
@@ -34,7 +35,7 @@ import {
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
-import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
+import type { DashboardDataTableItem, DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
@@ -46,11 +47,11 @@ const TABLE_FIELDS = [
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
-const dashboardGetters = dashboardStore.getters;
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -71,8 +72,8 @@ const state = reactive({
         return state.existingDashboardItems;
     }),
     existingFolderNameList: computed<string[]>(() => {
-        const _publicNames = dashboardState.publicFolderItems.map((d) => d.name);
-        const _privateNames = dashboardState.privateFolderItems.map((d) => d.name);
+        const _publicNames = dashboardPageControlGetters.publicFolderItems.map((d) => d.name);
+        const _privateNames = dashboardPageControlGetters.privateFolderItems.map((d) => d.name);
         return [..._publicNames, ..._privateNames];
     }),
     // template
@@ -85,20 +86,20 @@ const state = reactive({
         }));
     }),
     // existing dashboard
-    existingDashboardTreeData: computed(() => getDashboardTreeData(dashboardGetters.allFolderItems, dashboardGetters.allDashboardItems)),
-    existingSelectedTreeData: computed(() => getSelectedTreeData(state.existingDashboardTreeData, dashboardCreatePageState.selectedExistingDashboardIdMap)),
+    existingDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(dashboardPageControlGetters.allFolderItems, dashboardPageControlGetters.allDashboardItems)),
+    existingSelectedTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSelectedTreeData(state.existingDashboardTreeData, dashboardCreatePageState.selectedExistingDashboardIdMap)),
     existingDashboardItems: computed<DashboardDataTableItem[]>(() => {
         const _items = convertTreeDataToDataTableItems(state.existingDashboardTreeData, state.existingSelectedTreeData);
         return _items;
     }),
-    existingPublicDashboardNameList: computed<string[]>(() => dashboardState.publicDashboardItems.map((d) => d.name)),
-    existingPrivateDashboardNameList: computed<string[]>(() => dashboardState.privateDashboardItems.map((d) => d.name)),
+    existingPublicDashboardNameList: computed<string[]>(() => dashboardPageControlGetters.publicDashboardItems.map((d) => d.name)),
+    existingPrivateDashboardNameList: computed<string[]>(() => dashboardPageControlGetters.privateDashboardItems.map((d) => d.name)),
 });
 
 /* Util */
 const addToNewIdList = (id: string) => {
     dashboardPageControlStore.setNewIdList([
-        ...dashboardPageControlStore.state.newIdList,
+        ...dashboardPageControlState.newIdList,
         id,
     ]);
 };

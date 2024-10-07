@@ -77,6 +77,7 @@ const handleDeleteConfirm = async () => {
     state.loading = true;
     const _deletePromises: Promise<boolean>[] = [];
     state.modalTableItems.forEach((item) => {
+        if (!item.id) return;
         if (item.type === 'DASHBOARD') {
             _deletePromises.push(deleteDashboard(item.id));
         } else {
@@ -89,10 +90,7 @@ const handleDeleteConfirm = async () => {
     } else {
         ErrorHandler.handleRequestError(new Error('Delete failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_DELETE_DASHBOARD'));
     }
-    await Promise.allSettled([
-        dashboardStore.load(),
-        dashboardPageControlStore.load(),
-    ]);
+    await dashboardStore.load();
     state.loading = false;
     dashboardPageControlStore.setSelectedIdMap({}, dashboardPageControlState.folderModalType);
     state.proxyVisible = false;

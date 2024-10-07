@@ -18,7 +18,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
@@ -29,6 +28,7 @@ import DashboardFolderTree from '@/services/dashboards/components/dashboard-fold
 import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -37,12 +37,11 @@ const emit = defineEmits<{(e: 'click-next'): void }>();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
-const dashboardGetters = dashboardStore.getters;
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
@@ -71,29 +70,25 @@ const state = reactive({
         return results;
     }),
     existingDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-        let folderItems: FolderModel[] = dashboardGetters.allFolderItems;
-        let dashboardItems: DashboardModel[] = getFilteredTemplates(dashboardGetters.allDashboardItems, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
-        if (storeState.isAdminMode) {
-            folderItems = dashboardGetters.domainFolderItems;
-            dashboardItems = dashboardGetters.domainDashboardItems;
-        } else if (storeState.isWorkspaceMember) {
-            folderItems = dashboardGetters.privateFolderItems;
-            dashboardItems = dashboardState.privateDashboardItems;
+        let _allFolderItems: FolderModel[] = dashboardPageControlGetters.allFolderItems;
+        let _allDashboardItems: DashboardModel[] = dashboardPageControlGetters.allDashboardItems;
+        if (storeState.isWorkspaceMember) {
+            _allFolderItems = dashboardPageControlGetters.privateFolderItems;
+            _allDashboardItems = dashboardPageControlGetters.privateDashboardItems;
         }
-        const _refinedDashboardItems = dashboardItems.filter((d) => d.version !== '1.0');
-        return getDashboardTreeData(folderItems, _refinedDashboardItems).filter((d) => {
+        const _filteredDashboardItems: DashboardModel[] = getFilteredTemplates(_allDashboardItems, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
+        return getDashboardTreeData(_allFolderItems, _filteredDashboardItems).filter((d) => {
             if (d.data.type === 'FOLDER') return !!d.children?.length;
             return true;
         });
     }),
-    allExistingLabels: computed(() => {
-        const ootbTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
-        const dashboards: DashboardModel[] = storeState.isWorkspaceMember ? dashboardState.privateDashboardItems : dashboardGetters.allDashboardItems;
-        const existingTemplates = getFilteredTemplates(dashboards, '', [], []);
-        return uniq([
-            ...flatMapDeep(ootbTemplates.map((d) => d.labels)),
-            ...flatMapDeep(existingTemplates.map((d) => d.labels)),
-        ]);
+    allExistingLabels: computed<string[]>(() => {
+        const _ootbTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
+        const _existingTemplates = getFilteredTemplates(dashboardPageControlGetters.allDashboardItems, '', [], []);
+
+        const _ootbLabels = flatMapDeep(_ootbTemplates.map((d) => d.labels ?? []));
+        const _existingLabels = flatMapDeep(_existingTemplates.map((d) => d.labels ?? []));
+        return uniq([..._ootbLabels, ..._existingLabels]);
     }),
 });
 
@@ -115,10 +110,9 @@ const getFilteredTemplates = (
     const _selectedLabels = selectedLabels;
     const _selectedProviders = selectedProviders;
     return dashboards
-        .filter((d) => d?.version !== '1.0')
         .filter((d) => (!_selectedLabels.length || d.labels?.some((label) => _selectedLabels.includes(label.toLowerCase()))))
         .filter((d) => (!_selectedProviders.length || d.labels?.some((label) => _selectedProviders.includes(label.toLowerCase()))))
-        .filter((d) => (_inputValue === '' || d.name.toLowerCase().includes(_inputValue.toLowerCase())));
+        .filter((d) => (_inputValue === '' || d.name?.toLowerCase().includes(_inputValue.toLowerCase())));
 };
 
 /* Event */

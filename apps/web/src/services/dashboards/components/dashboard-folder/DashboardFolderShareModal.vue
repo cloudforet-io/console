@@ -12,7 +12,6 @@ import type { PublicFolderUnshareParameters } from '@/schema/dashboard/public-fo
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PublicFolderReferenceItem, PublicFolderReferenceMap } from '@/store/reference/public-folder-reference-store';
 
@@ -41,10 +40,9 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
-const dashboardGetters = dashboardStore.getters;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -62,7 +60,7 @@ const state = reactive({
             name: _folderName,
             type: 'FOLDER',
         }];
-        const _dashboardItems: DashboardDataTableItem[] = Object.entries(dashboardGetters.allDashboardItems)
+        const _dashboardItems: DashboardDataTableItem[] = Object.entries(dashboardPageControlGetters.allDashboardItems)
             .filter(([, d]) => d.folder_id === dashboardPageControlState.selectedFolderId)
             .map(([, d]) => ({
                 id: d.dashboard_id,

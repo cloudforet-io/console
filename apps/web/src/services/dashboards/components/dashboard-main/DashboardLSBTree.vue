@@ -9,10 +9,8 @@ import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-vi
 import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -22,6 +20,7 @@ import { gray } from '@/styles/colors';
 
 import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -38,9 +37,8 @@ const route = useRoute();
 const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
-const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
-const dashboardGetters = dashboardStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -49,15 +47,11 @@ const state = reactive({
     currentParentPathIds: [] as string[],
     currentFolderId: undefined as string|undefined,
     treeDisplayMap: {} as TreeDisplayMap,
-    refinedPublicFolderItems: computed<PublicFolderModel[]>(() => {
-        if (storeState.isAdminMode) return dashboardState.publicFolderItems;
-        return dashboardState.publicFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
-    }),
     dashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         if (props.type === 'PRIVATE') {
-            return getDashboardTreeData(dashboardState.privateFolderItems, props.dashboards);
+            return getDashboardTreeData(dashboardPageControlGetters.privateFolderItems, props.dashboards);
         }
-        return getDashboardTreeData(state.refinedPublicFolderItems, props.dashboards);
+        return getDashboardTreeData(dashboardPageControlGetters.publicFolderItems, props.dashboards);
     }),
     selectedTreeId: undefined as string|undefined,
 });
@@ -74,7 +68,7 @@ const init = (dashboardId?: string, _onMounted?: boolean) => {
         return;
     }
     state.selectedTreeId = dashboardId as string;
-    const folderId = dashboardGetters.allDashboardItems.find((d) => d.dashboard_id === dashboardId)?.folder_id;
+    const folderId = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === dashboardId)?.folder_id;
     if (_onMounted && folderId) {
         updateTreeDisplayMap(folderId);
     }
