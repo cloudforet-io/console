@@ -173,21 +173,23 @@ watch([() => state.menuIds, () => state.isSelectDropdownVisible], async (menuIds
                                         <div :id="`w-${item.name}`"
                                              class="label"
                                         >
-                                            <workspace-logo-icon :text="item?.label || ''"
-                                                                 :theme="item?.tags?.theme"
-                                                                 size="xs"
-                                            />
-                                            <p-tooltip v-if="state.isEllipsisMap[`w-${item.name}`]"
-                                                       position="bottom"
-                                                       :contents="item.label"
-                                                       :class="{'label-text': true, 'group-exist': !item?.workspace_group_id}"
-                                            >
-                                                <span>{{ item.label }}</span>
-                                            </p-tooltip>
-                                            <span v-else
-                                                  :class="{'label-text': true, 'group-exist': !item?.workspace_group_id}"
-                                            >{{ item.label }}</span>
-                                            <span>{{ state.workspaceGroups[item.workspace_group_id]?.label }}</span>
+                                            <span class="flex gap-2">
+                                                <workspace-logo-icon :text="item?.label || ''"
+                                                                     :theme="item?.tags?.theme"
+                                                                     size="xs"
+                                                />
+                                                <p-tooltip v-if="state.isEllipsisMap[`w-${item.name}`]"
+                                                           position="bottom"
+                                                           :contents="item.label"
+                                                           :class="{'label-text': true, 'group-exist': !item?.workspace_group_id}"
+                                                >
+                                                    <span>{{ item.label }}</span>
+                                                </p-tooltip>
+                                                <span v-else
+                                                      :class="{'label-text': true, 'group-exist': !item?.workspace_group_id}"
+                                                >{{ item.label }}</span>
+                                            </span>
+                                            <span class="workspace-group-label">{{ state.workspaceGroups[item.workspace_group_id]?.label }}</span>
                                         </div>
                                     </div>
                                 </template>
@@ -203,19 +205,24 @@ watch([() => state.menuIds, () => state.isSelectDropdownVisible], async (menuIds
 <style lang="postcss" scoped>
 .workspace-select-dropdown {
     .menu-item-wrapper {
-        @apply flex justify-between;
-        max-width: 100%;
 
         .label {
-            @apply flex items-center gap-2;
+            @apply flex items-center gap-2 justify-between;
+            max-width: 25.875rem;
+
+            .label-text {
+                @apply truncate;
+                max-width: 12.5rem;
+            }
+            .label-text.group-exist {
+                max-width: 36.875rem;
+            }
+
+            .workspace-group-label {
+                @apply text-gray-500;
+            }
         }
-        .label-text {
-            @apply truncate;
-            max-width: 13.125rem;
-        }
-        .label-text.group-exist {
-            max-width: 36.875rem;
-        }
+
         &.is-dormant {
             .label-text {
                 max-width: 31.25rem;
