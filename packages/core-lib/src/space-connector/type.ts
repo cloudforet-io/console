@@ -74,6 +74,7 @@ export interface Query {
     keyword?: string;
     minimal?: boolean;
     count_only?: boolean;
+    distinct?: string;
 }
 
 export interface MockConfig {

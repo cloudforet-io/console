@@ -970,6 +970,8 @@
 	"COMMON": {
 		"BUTTONS": {
 			"ADD": "Add",
+			"CANCEL": "Cancel",
+			"DONE": "Done",
 			"DOWNLOAD": "Download",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "desktop",
@@ -1274,6 +1276,12 @@
 			"TITLE": "Verify Notification Email",
 			"VERIFICATION_CODE": "Verification Code",
 			"VERIFY_NOW": "Verify Now"
+		},
+		"OPERATOR": {
+			"CONTAINS": "Contains",
+			"DOES_NOT_CONTAIN": "Does not contain",
+			"DOES_NOT_EQUAL": "Does not equal",
+			"EQUAL": "Equal"
 		},
 		"POPUP": {
 			"NOTICE": {
@@ -1759,6 +1767,9 @@
 				"WIDGET_HEIGHT": "Widget Height"
 			},
 			"WIDGET_TITLE_REQUIRED": "Please enter widget title."
+		},
+		"WORKSPACE": {
+			"SELECT_WORKSPACE": "Select workspace"
 		}
 	},
 	"COMPONENT": {
@@ -3359,7 +3370,11 @@
 		},
 		"COLLECTOR": {
 			"ACCOUNT": "Account",
+			"ACTIONS": "Routing",
 			"ADDITIONAL_OPTIONS": "Additional Options",
+			"ADDITIONAL_RULE": "Additional Rule",
+			"ADDITIONAL_RULE_CONDITION_INFO": "Check the subkeys of data and tags in \nCloud Service > Details > Raw Data.",
+			"ADD_ADDITIONAL_RULE": "Add Additional Rule",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "Failed to Change Collector Name",
 			"ALT_E_COLLECTOR_SCHEDULE": "You can set a schedule with a maximum of 2 times (a day). ",
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",
@@ -3377,6 +3392,30 @@
 			"ALT_S_UPDATE_COLLECTOR_OPTIONS": "Collector options successfully updated",
 			"ALT_S_UPDATE_SCHEDULE": "Schedule successfully updated ",
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "Attached Service Accounts successfully updated",
+			"CLOUD_SERVICE_TAG": "Cloud Service Tag",
+			"COLLECTOR_RULE": {
+				"ALL": "All of the following",
+				"ALT_E_CREATE_COLLECTOR_RULE": "Failed to Create Collector Rule",
+				"ALT_E_DELETE_COLLECTOR_RULE": "Failed to Delete Collector Rule",
+				"ALT_E_REORDER_COLLECTOR_RULES": "Failed to Reorder Collector Rules",
+				"ALT_E_UPDATE_COLLECTOR_RULE": "Failed to Update Collector Rule",
+				"ALT_S_CREATE_COLLECTOR_RULE": "Collector Rule successfully created",
+				"ALT_S_DELETE_COLLECTOR_RULE": "Collector Rule successfully deleted",
+				"ALT_S_REORDER_COLLECTOR_RULES": "Collector Rules successfully reordered",
+				"ALT_S_UPDATE_COLLECTOR_RULE": "Collector Rule successfully updated",
+				"ANY": "Any one of the following",
+				"CLOUD_SERVICE_SOURCE_KEY": "Cloud service source key",
+				"CONDITION_SATISFIES": "If the condition satisfies",
+				"DISABLED_CONDITION": "Disabled Condition",
+				"ENABLED_CONDITION": "Enabled Condition",
+				"MATCH_PROJECT": "First Match Project",
+				"MATCH_SERVICE_ACCOUNT": "First Match Service Account",
+				"PROJECT_TAG_KEY": "Project Tag key",
+				"SELECT_PROJECT": "Select Project",
+				"SERVICE_ACCOUNT_TAG_KEY": "Service Account Tag key"
+			},
+			"CONDITIONS": "Conditions",
+			"CONDITION_POLICY_DESC": "of the following are met",
 			"CREATE": {
 				"ALL": "All",
 				"ALT_E_COLLECT_EXECUTION": "Data collection failed to start",
@@ -3444,6 +3483,7 @@
 				"PAGE_NOTIFICATION": "This collector's settings can only be in admin mode",
 				"PLUGIN": "Plugin",
 				"PLUGIN_ID": "Plugin ID",
+				"PROJECT": "Project",
 				"REGION": "Region",
 				"SAVE_CHANGES": "Save Changes",
 				"SCHEDULE": "Schedule",
@@ -3458,7 +3498,14 @@
 				"SPECIFIC_SERVICE_ACCOUNT": "Specific Service Account",
 				"TAG": "Tag",
 				"VERSION": "Version",
-				"VIEW_IN_ADMIN_MODE": "View in Admin Mode"
+				"VIEW_IN_ADMIN_MODE": "View in Admin Mode",
+				"WORKSPACE": "Workspace"
+			},
+			"EDIT_ADDITIONAL_RULE": "Edit Additional Rule",
+			"EMPTY": {
+				"DESC1": "To add additional rules:",
+				"DESC2": "Click the add button below.",
+				"HEADER": "No additional rules on this collector"
 			},
 			"HISTORY": {
 				"ALL": "All",
@@ -3514,7 +3561,9 @@
 			},
 			"NO_DATA": "No Data",
 			"NO_JOB": "No recent jobs",
-			"NO_OPTIONS": "No Selectable Options"
+			"NO_OPTIONS": "No Selectable Options",
+			"PROJECT_ROUTING": "Project Routing",
+			"THEN_STOP_PROCESSING": "Then stop processing"
 		},
 		"CREATE_COLLECTOR": "Create Collector",
 		"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
@@ -4676,6 +4725,7 @@
 			"ALT_S_DELETE_EVENT_RULE": "Event Rule successfully deleted ",
 			"ALT_S_REORDER_EVENT_RULES": "Event Rules successfully reordered ",
 			"ALT_S_UPDATE_EVENT_RULE": "Event Rule successfully updated ",
+			"ALWAYS": "Always",
 			"ANY": "Any",
 			"ASSIGNEE": "Assignee",
 			"CANCEL": "Cancel",

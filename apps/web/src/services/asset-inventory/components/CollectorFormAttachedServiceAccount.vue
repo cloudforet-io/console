@@ -39,7 +39,7 @@ const emit = defineEmits<{(e: 'update:isAttachedServiceAccountValid', value: boo
 
 const props = defineProps<Props>();
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 const attachedServiceAccountList = computed(() => [
     {
@@ -61,8 +61,8 @@ const state = reactive({
         return !invalidState.selectedAttachedServiceAccount;
     }),
     handlerParams: computed(() => {
-        if (collectorFormStore.collectorProvider) {
-            queryHelper.addFilter({ k: 'provider', v: collectorFormStore.collectorProvider, o: '=' });
+        if (collectorFormState.collectorProvider) {
+            queryHelper.addFilter({ k: 'provider', v: collectorFormState.collectorProvider, o: '=' });
         } else if (collectorFormState.provider) {
             queryHelper.addFilter({ k: 'provider', v: collectorFormState.provider, o: '=' });
         } else if (collectorFormState.repositoryPlugin?.provider) {
@@ -134,23 +134,23 @@ const {
 });
 
 const handleChangeAttachedServiceAccountType = (selectedValue: AttachedServiceAccountType) => {
-    collectorFormStore.$patch({
-        attachedServiceAccountType: selectedValue,
-        attachedServiceAccount: [],
+    collectorFormStore.$patch((_state) => {
+        _state.state.attachedServiceAccountType = selectedValue;
+        _state.state.attachedServiceAccount = [];
     });
 };
 
 const handleSelectAttachedServiceAccount = (selectedValue: AttachedServiceAccount) => {
     setForm('selectedAttachedServiceAccount', selectedValue);
-    collectorFormStore.$patch({
-        attachedServiceAccount: selectedValue,
+    collectorFormStore.$patch((_state) => {
+        _state.state.attachedServiceAccount = selectedValue;
     });
 };
 
 const handleSelectIncludeExcludeOption = (selectedValue: ServiceAccountFilterOption) => {
     if (!selectedValue) return;
-    collectorFormStore.$patch({
-        selectedServiceAccountFilterOption: selectedValue,
+    collectorFormStore.$patch((_state) => {
+        _state.state.selectedServiceAccountFilterOption = selectedValue;
     });
 };
 
@@ -158,15 +158,15 @@ watch(() => isAllValid.value, (value) => {
     emit('update:isAttachedServiceAccountValid', value);
 }, { immediate: true });
 
-watch(() => collectorFormStore.collectorId, (collectorId) => {
+watch(() => collectorFormState.collectorId, (collectorId) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetAttachedServiceAccount();
 }, { immediate: true });
 
 watch(() => collectorFormState.provider, () => {
     setForm('selectedAttachedServiceAccount', []);
-    collectorFormStore.$patch({
-        attachedServiceAccount: [],
+    collectorFormStore.$patch((_state) => {
+        _state.state.attachedServiceAccount = [];
     });
 });
 

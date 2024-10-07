@@ -1,98 +1,3 @@
-<template>
-    <div class="collector-detail-page">
-        <portal to="page-top-notification">
-            <scoped-notification v-if="state.isNotiVisible"
-                                 :title="i18n.t('INVENTORY.COLLECTOR.DETAIL.PAGE_NOTIFICATION')"
-                                 title-icon="ic_info-circle"
-                                 type="info"
-                                 hide-header-close-button
-            >
-                <template #right>
-                    <p-link v-if="state.isDomainAdmin"
-                            :text="i18n.t('INVENTORY.COLLECTOR.DETAIL.VIEW_IN_ADMIN_MODE')"
-                            :to="{name: makeAdminRouteName($route.name)}"
-                            size="sm"
-                            highlight
-                            action-icon="internal-link"
-                            new-tab
-                    />
-                </template>
-            </scoped-notification>
-        </portal>
-        <p-heading :title="state.collectorName"
-                   show-back-button
-                   @click-back-button="handleClickBackButton"
-        >
-            <p-skeleton v-if="state.loading"
-                        width="20rem"
-                        height="1.5rem"
-            />
-            <template v-if="state.hasReadWriteAccess && state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
-                      #title-right-extra
-            >
-                <span class="title-right-button-wrapper">
-                    <p-icon-button name="ic_edit-text"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   @click="handleClickEditButton"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   class="delete-button"
-                                   @click="handleClickDeleteButton"
-                    />
-                </span>
-            </template>
-            <template #extra>
-                <div v-if="collectorJobStore.AllJobsInfoLoaded"
-                     class="collector-button-box"
-                >
-                    <collect-data-button-group v-if="state.hasReadWriteAccess"
-                                               @collect="handleCollectData"
-                    />
-                    <router-link v-if="collectorJobStore.hasJobs"
-                                 :to="state.collectorHistoryLink"
-                    >
-                        <p-button style-type="tertiary"
-                                  icon-left="ic_history"
-                        >
-                            {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
-                        </p-button>
-                    </router-link>
-                </div>
-            </template>
-        </p-heading>
-
-        <collector-base-info-section class="section"
-                                     :history-link="state.collectorHistoryLink"
-                                     :has-read-write-access="state.hasReadWriteAccess"
-        />
-        <collector-schedule-section class="section"
-                                    :has-read-write-access="state.hasReadWriteAccess"
-        />
-        <collector-options-section class="section"
-                                   data-test-id="collector-options-section"
-                                   :has-read-write-access="state.hasReadWriteAccess"
-        />
-        <collector-service-accounts-section class="section"
-                                            :has-read-write-access="state.hasReadWriteAccess"
-        />
-
-        <p-double-check-modal :visible.sync="state.deleteModalVisible"
-                              :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
-                              :verification-text="state.collectorName"
-                              modal-size="sm"
-                              :loading="state.deleteLoading"
-                              @confirm="handleDeleteModalConfirm"
-        />
-        <collector-name-edit-modal :visible="state.editModalVisible"
-                                   @update:visible="handleUpdateEditModalVisible"
-        />
-        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
-    </div>
-</template>
-
 <script lang="ts">
 // eslint-disable-next-line import/order,import/no-duplicates
 import { defineComponent, type ComponentPublicInstance } from 'vue';
@@ -148,6 +53,7 @@ import ScopedNotification from '@/common/components/scoped-notification/ScopedNo
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 
+import CollectorAdditionalRule from '@/services/asset-inventory/components/CollectorAdditionalRule.vue';
 import CollectorBaseInfoSection from '@/services/asset-inventory/components/CollectorBaseInfoSection.vue';
 import CollectorDataModal
     from '@/services/asset-inventory/components/CollectorDataModal.vue';
@@ -176,7 +82,8 @@ const props = defineProps<{
 }>();
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
+
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
@@ -248,8 +155,8 @@ const getCollector = async (): Promise<CollectorModel|null> => {
     }
 };
 
-const fetchDeleteCollector = async () => (collectorFormStore.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
-    collector_id: collectorFormStore.collectorId,
+const fetchDeleteCollector = async () => (collectorFormState.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
+    collector_id: collectorFormState.collectorId,
 }) : undefined);
 
 const goBackToMainPage = () => {
@@ -274,7 +181,7 @@ const handleDeleteModalConfirm = async () => {
         state.deleteModalVisible = false;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_DELETE_COLLECTOR'), '');
         goBackToMainPage();
-        collectorFormStore.$reset();
+        collectorFormStore.resetState();
     } catch (error) {
         state.deleteModalVisible = false;
         ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_DELETE_COLLECTOR'));
@@ -317,7 +224,7 @@ watch(documentVisibility, (visibility) => {
 
 onMounted(async () => {
     collectorJobStore.$reset();
-    collectorFormStore.$reset();
+    collectorFormStore.resetState();
     collectorDataModalStore.$reset();
     collectorDetailPageStore.reset();
     const collector = await getCollector();
@@ -327,14 +234,16 @@ onMounted(async () => {
     if (collector) {
         collectorJobStore.getAllJobsCount();
         await collectorFormStore.setOriginCollector(collector);
-        collectorDetailPageStore.state.collector = collector;
+        collectorDetailPageStore.$patch((_state) => {
+            _state.state.collector = collector;
+        });
         resume();
     }
 });
 onUnmounted(() => {
     pause();
     collectorJobStore.$reset();
-    collectorFormStore.$reset();
+    collectorFormStore.resetState();
     collectorDataModalStore.$reset();
     collectorDetailPageStore.reset();
 });
@@ -343,7 +252,95 @@ onUnmounted(() => {
 
 
 </script>
+<template>
+    <div class="collector-detail-page">
+        <portal to="page-top-notification">
+            <scoped-notification v-if="state.isNotiVisible"
+                                 :title="i18n.t('INVENTORY.COLLECTOR.DETAIL.PAGE_NOTIFICATION')"
+                                 title-icon="ic_info-circle"
+                                 type="info"
+                                 hide-header-close-button
+            >
+                <template #right>
+                    <p-link v-if="state.isDomainAdmin"
+                            :text="i18n.t('INVENTORY.COLLECTOR.DETAIL.VIEW_IN_ADMIN_MODE')"
+                            :to="{name: makeAdminRouteName($route.name)}"
+                            size="sm"
+                            highlight
+                            action-icon="internal-link"
+                            new-tab
+                    />
+                </template>
+            </scoped-notification>
+        </portal>
+        <p-heading :title="state.collectorName"
+                   show-back-button
+                   @click-back-button="handleClickBackButton"
+        >
+            <p-skeleton v-if="state.loading"
+                        width="20rem"
+                        height="1.5rem"
+            />
+            <template v-if="state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
+                      #title-right-extra
+            >
+                <span class="title-right-button-wrapper">
+                    <p-icon-button name="ic_edit-text"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   @click="handleClickEditButton"
+                    />
+                    <p-icon-button name="ic_delete"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   class="delete-button"
+                                   @click="handleClickDeleteButton"
+                    />
+                </span>
+            </template>
+            <template #extra>
+                <div v-if="collectorJobStore.AllJobsInfoLoaded"
+                     class="collector-button-box"
+                >
+                    <collect-data-button-group @collect="handleCollectData" />
+                    <router-link v-if="collectorJobStore.hasJobs"
+                                 :to="state.collectorHistoryLink"
+                    >
+                        <p-button style-type="tertiary"
+                                  icon-left="ic_history"
+                        >
+                            {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
+                        </p-button>
+                    </router-link>
+                </div>
+            </template>
+        </p-heading>
 
+        <collector-base-info-section class="section"
+                                     :history-link="state.collectorHistoryLink"
+        />
+        <collector-schedule-section class="section" />
+        <collector-options-section class="section"
+                                   data-test-id="collector-options-section"
+        />
+        <collector-additional-rule class="section"
+                                   :collector-id="props.collectorId"
+        />
+        <collector-service-accounts-section class="section" />
+
+        <p-double-check-modal :visible.sync="state.deleteModalVisible"
+                              :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
+                              :verification-text="state.collectorName"
+                              modal-size="sm"
+                              :loading="state.deleteLoading"
+                              @confirm="handleDeleteModalConfirm"
+        />
+        <collector-name-edit-modal :visible="state.editModalVisible"
+                                   @update:visible="handleUpdateEditModalVisible"
+        />
+        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
+    </div>
+</template>
 <style lang="postcss" scoped>
 .section {
     margin-bottom: 1rem;

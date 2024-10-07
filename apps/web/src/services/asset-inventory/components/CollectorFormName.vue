@@ -33,7 +33,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/stores/collect
 
 
 interface Props {
-    loading: boolean;
+    loading?: boolean;
 }
 
 const allReferenceStore = useAllReferenceStore();
@@ -46,7 +46,7 @@ const emits = defineEmits<{(event: 'update-valid', value: boolean): void;
 }>();
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 const state = reactive({
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),

@@ -74,7 +74,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/stores/collect
 
 
 const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
+const collectorFormState = collectorFormStore.state;
 
 const collectorDetailPageStore = useCollectorDetailPageStore();
 
@@ -93,20 +93,20 @@ const state = reactive({
 
 /* api fetchers */
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
     const originSecretFilter = collectorFormState.originCollector?.secret_filter ?? {};
     const params: CollectorUpdateParameters = {
-        collector_id: collectorFormStore.collectorId,
+        collector_id: collectorFormState.collectorId,
         secret_filter: {
             ...originSecretFilter,
             state: collectorFormState.attachedServiceAccountType === 'specific' ? 'ENABLED' : 'DISABLED',
         },
     };
     const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
-        service_accounts: collectorFormStore.serviceAccounts,
+        service_accounts: collectorFormState.serviceAccounts,
         exclude_service_accounts: [],
     } : {
-        exclude_service_accounts: collectorFormStore.serviceAccounts,
+        exclude_service_accounts: collectorFormState.serviceAccounts,
         service_accounts: [],
     };
     Object.assign(params.secret_filter ?? {}, serviceAccountParams);
@@ -118,12 +118,12 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
 const handleClickEdit = () => {
     const isExcludeOption = !!collectorFormState.originCollector?.secret_filter?.exclude_service_accounts?.length;
     if (isExcludeOption) {
-        collectorFormStore.$patch({
-            selectedServiceAccountFilterOption: 'exclude',
+        collectorFormStore.$patch((_state) => {
+            _state.state.selectedServiceAccountFilterOption = 'exclude';
         });
     } else {
-        collectorFormStore.$patch({
-            selectedServiceAccountFilterOption: 'include',
+        collectorFormStore.$patch((_state) => {
+            _state.state.selectedServiceAccountFilterOption = 'include';
         });
     }
     state.isEditMode = true;
