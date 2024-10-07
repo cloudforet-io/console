@@ -3,12 +3,10 @@ import { computed, reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { QueryTag } from '@cloudforet/mirinae/src/inputs/search/query-search-tags/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
 import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
 import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
@@ -18,8 +16,7 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import {
     convertTreeDataToDataTableItems,
@@ -44,17 +41,13 @@ const _isControlButtonDisabled = (selectedPublicTreeData: TreeNode<DashboardTree
 };
 export const useDashboardPageControlStore = defineStore('page-dashboard-control', () => {
     const appContextStore = useAppContextStore();
+    const dashboardStore = useDashboardStore();
+    const dashboardState = dashboardStore.state;
     const storeState = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
         isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
     const state = reactive({
-        loading: false,
-        publicDashboardList: [] as PublicDashboardModel[],
-        privateDashboardList: [] as PrivateDashboardModel[],
-        publicFolderList: [] as PublicFolderModel[],
-        privateFolderList: [] as PrivateFolderModel[],
-        // modal
         folderFormModalVisible: false,
         folderFormModalType: 'CREATE' as 'CREATE' | 'UPDATE',
         folderModalType: 'PUBLIC' as 'PUBLIC' | 'PRIVATE',
@@ -77,7 +70,16 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
             delete: getters.selectedPublicTreeData.length === 0,
         })),
         // public
-        publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(state.publicFolderList, state.publicDashboardList, state.newIdList)),
+        publicDashboardItems: computed<PublicDashboardModel[]>(() => {
+            const _v2DashboardItems = dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0');
+            if (storeState.isAdminMode) return _v2DashboardItems;
+            return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
+        }),
+        publicFolderItems: computed<PublicFolderModel[]>(() => {
+            if (storeState.isAdminMode) return dashboardState.publicFolderItems;
+            return dashboardState.publicFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
+        }),
+        publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
         selectedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSelectedTreeData(getters.publicDashboardTreeData, state.selectedPublicIdMap)),
         publicModalTableItems: computed<DashboardDataTableItem[]>(() => convertTreeDataToDataTableItems(getters.publicDashboardTreeData, getters.selectedPublicTreeData)),
         publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => ({
@@ -86,7 +88,9 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
             delete: _isControlButtonDisabled(getters.selectedPublicTreeData),
         })),
         // private
-        privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(state.privateFolderList, state.privateDashboardList, state.newIdList)),
+        privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems.filter((d) => d.version !== '1.0')),
+        privateFolderItems: computed<PrivateFolderModel[]>(() => dashboardState.privateFolderItems),
+        privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.privateFolderItems, getters.privateDashboardItems, state.newIdList)),
         selectedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSelectedTreeData(getters.privateDashboardTreeData, state.selectedPrivateIdMap)),
         privateModalTableItems: computed<DashboardDataTableItem[]>(() => convertTreeDataToDataTableItems(getters.privateDashboardTreeData, getters.selectedPrivateTreeData)),
         privateTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => ({
@@ -94,21 +98,29 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
             move: getters.selectedPrivateTreeData.length === 0,
             delete: getters.selectedPrivateTreeData.length === 0,
         })),
+        // deprecated
+        deprecatedDashboardItems: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
+            const _publicDeprecated = dashboardState.publicDashboardItems.filter((d) => d.version === '1.0');
+            const _privateDeprecated = dashboardState.privateDashboardItems.filter((d) => d.version === '1.0');
+            return [..._publicDeprecated, ..._privateDeprecated];
+        }),
         //
+        allDashboardItems: computed<DashboardModel[]>(() => [...getters.publicDashboardItems, ...getters.privateDashboardItems]),
+        allFolderItems: computed<FolderModel[]>(() => [...getters.publicFolderItems, ...getters.privateFolderItems]),
         existingFolderNameList: computed<string[]>(() => {
-            const _publicNames = state.publicFolderList.map((d) => d.name);
-            const _privateNames = state.privateFolderList.map((d) => d.name);
+            const _publicNames = dashboardState.publicFolderItems.map((d) => d.name);
+            const _privateNames = dashboardState.privateFolderItems.map((d) => d.name);
             return [..._publicNames, ..._privateNames];
         }),
         existingDashboardNameList: computed<string[]>(() => {
-            const _publicNames = state.publicDashboardList.map((d) => d.name);
-            const _privateNames = state.privateDashboardList.map((d) => d.name);
+            const _publicNames = dashboardState.publicDashboardItems.map((d) => d.name);
+            const _privateNames = dashboardState.privateDashboardItems.map((d) => d.name);
             return [..._publicNames, ..._privateNames];
         }),
+        loading: computed<boolean>(() => dashboardState.loading),
     });
 
     /* Mutations */
-    const setLoading = (loading: boolean) => { state.loading = loading; };
     const setFolderFormModalVisible = (visible: boolean) => {
         state.folderFormModalVisible = visible;
     };
@@ -147,7 +159,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     };
     const setSearchFilters = (filters: ConsoleFilter[]) => { state.searchFilters = filters; };
     const mutations = {
-        setLoading,
         setFolderFormModalVisible,
         setFolderFormModalType,
         setSelectedFolderId,
@@ -165,7 +176,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
 
     /* Actions */
     const reset = () => {
-        setLoading(false);
         setFolderFormModalVisible(false);
         setFolderFormModalType('CREATE');
         setSelectedFolderId(undefined);
@@ -192,97 +202,10 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
             setSelectedPrivateIdMap(idMap);
         }
     };
-    const dashboardApiQueryHelper = new ApiQueryHelper();
-    const fetchDashboard = async (dashboardType: 'PUBLIC'|'PRIVATE') => {
-        const fetcher = dashboardType === 'PRIVATE'
-            ? SpaceConnector.clientV2.dashboard.privateDashboard.list
-            : SpaceConnector.clientV2.dashboard.publicDashboard.list;
-        try {
-            dashboardApiQueryHelper.setFilters(state.searchFilters);
-            dashboardApiQueryHelper.addFilter({ k: 'version', v: '2.0', o: '=' });
-            if (dashboardType === 'PUBLIC') {
-                if (storeState.isAdminMode) {
-                    dashboardApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
-                } else {
-                    dashboardApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
-                }
-            }
-            const response = await fetcher({
-                query: {
-                    ...dashboardApiQueryHelper.data,
-                    sort: [{ key: 'created_at', desc: true }],
-                },
-            });
-            const results = response.results || [];
-            if (dashboardType === 'PRIVATE') {
-                state.privateDashboardList = results as PrivateDashboardModel[];
-            } else if (!storeState.isAdminMode) {
-                // filter shared project dashboards by admin
-                state.publicDashboardList = results.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
-            } else {
-                state.publicDashboardList = results as PublicDashboardModel[];
-            }
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            if (dashboardType === 'PRIVATE') {
-                state.privateDashboardList = [];
-            } else {
-                state.publicDashboardList = [];
-            }
-        }
-    };
-    const folderApiQueryHelper = new ApiQueryHelper();
-    const fetchFolder = async (folderType: 'PUBLIC'|'PRIVATE') => {
-        const fetcher = folderType === 'PRIVATE'
-            ? SpaceConnector.clientV2.dashboard.privateFolder.list
-            : SpaceConnector.clientV2.dashboard.publicFolder.list;
-        folderApiQueryHelper.setFilters([]);
-        try {
-            if (folderType === 'PUBLIC') {
-                if (storeState.isAdminMode) {
-                    folderApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
-                } else {
-                    folderApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
-                }
-            }
-            const res: ListResponse<FolderModel> = await fetcher({
-                query: {
-                    ...folderApiQueryHelper.data,
-                    sort: [{ key: 'created_at', desc: true }],
-                },
-            });
-            const results = res.results || [];
-            if (folderType === 'PRIVATE') {
-                state.privateFolderList = results;
-            } else if (!storeState.isAdminMode) {
-                state.publicFolderList = results.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
-            } else {
-                state.publicFolderList = results;
-            }
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            if (folderType === 'PRIVATE') {
-                state.privateFolderList = [];
-            } else {
-                state.publicFolderList = [];
-            }
-        }
-    };
-    const load = async () => {
-        state.loading = true;
-        await Promise.allSettled([
-            fetchDashboard('PUBLIC'),
-            fetchDashboard('PRIVATE'),
-            fetchFolder('PUBLIC'),
-            fetchFolder('PRIVATE'),
-        ]);
-        state.loading = false;
-    };
     const actions = {
         reset,
         resetSelectedIdMap,
         setSelectedIdMap,
-        load,
     };
 
     return {
