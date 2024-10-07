@@ -58,7 +58,7 @@ const state = reactive({
         return storeState.projectGroup[props.item.parentId].name;
     }),
     isStarred: computed(() => storeState.favoriteItems.some((item) => item.itemId === props.item.id)),
-    toolsetMenuItems: [
+    toolsetMenuItems: computed(() => [
         {
             type: 'item',
             name: 'update',
@@ -78,7 +78,7 @@ const state = reactive({
             label: i18n.t('PROJECT.DETAIL.DELETE'),
             icon: 'ic_delete',
         },
-    ],
+    ]),
     toolsetMenuVisible: false,
 });
 
