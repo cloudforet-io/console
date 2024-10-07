@@ -62,9 +62,9 @@ const state = reactive({
             name: _folderName,
             type: 'FOLDER',
         }];
-        const _dashboardItems: DashboardDataTableItem[] = Object.entries(dashboardPageControlGetters.allDashboardItems)
-            .filter(([, d]) => d.folder_id === dashboardPageControlState.selectedFolderId)
-            .map(([, d]) => ({
+        const _dashboardItems: DashboardDataTableItem[] = dashboardPageControlGetters.allDashboardItems
+            .filter((d) => d.folder_id === dashboardPageControlState.selectedFolderId)
+            .map((d) => ({
                 id: d.dashboard_id,
                 name: d.name,
                 location: _folderName,
