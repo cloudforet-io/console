@@ -12,8 +12,8 @@ import type { PublicFolderUnshareParameters } from '@/schema/dashboard/public-fo
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PublicDashboardReferenceMap } from '@/store/reference/public-dashboard-reference-store';
 import type { PublicFolderReferenceItem, PublicFolderReferenceMap } from '@/store/reference/public-folder-reference-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -41,12 +41,13 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
+const dashboardStore = useDashboardStore();
+const dashboardGetters = dashboardStore.getters;
 const dashboardMainPageStore = useDashboardMainPageStore();
 const dashboardMainPageState = dashboardMainPageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    dashboards: computed<PublicDashboardReferenceMap>(() => allReferenceStore.getters.publicDashboard),
     folders: computed<PublicFolderReferenceMap>(() => allReferenceStore.getters.publicFolder),
 });
 const state = reactive({
@@ -61,10 +62,10 @@ const state = reactive({
             name: _folderName,
             type: 'FOLDER',
         }];
-        const _dashboardItems: DashboardDataTableItem[] = Object.entries(storeState.dashboards)
-            .filter(([, d]) => d.data.folderId === dashboardMainPageState.selectedFolderId)
+        const _dashboardItems: DashboardDataTableItem[] = Object.entries(dashboardGetters.allDashboardItems)
+            .filter(([, d]) => d.folder_id === dashboardMainPageState.selectedFolderId)
             .map(([, d]) => ({
-                id: d.key,
+                id: d.dashboard_id,
                 name: d.name,
                 location: _folderName,
                 type: 'DASHBOARD',

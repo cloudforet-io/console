@@ -22,25 +22,8 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
-  mirinae:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Invoke mirinae release workflow
-        id: mirinae
-        uses: convictional/trigger-workflow-and-wait@v1.6.1
-        with:
-          owner: ${{ github.repository_owner }}
-          repo: ${{ github.event.repository.name }}
-          github_token: ${{ secrets.PAT_TOKEN }}
-          workflow_file_name: dispatch_mirinae_release.yaml
-          wait_workflow: true
-          propagate_failure: true
-          wait_interval: 5
-          ref: ${{ github.ref_name }}
-
   storybook:
     runs-on: ubuntu-latest
-    needs: mirinae
     steps:
       - name: Invoke storybook release workflow
         uses: convictional/trigger-workflow-and-wait@v1.6.1
@@ -55,7 +38,6 @@ jobs:
 
   versioning_and_docker:
     runs-on: ubuntu-latest
-    needs: mirinae
     outputs:
       new_commit_sha: ${{ steps.get_sha.outputs.NEW_COMMIT_SHA }}
     steps:

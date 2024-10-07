@@ -36,12 +36,7 @@ export const getWidgetBasedOnDate = (granularity: string, end?: string): string 
     const _dateFormat = getDateFormat(granularity);
     if (end) {
         if (granularity === 'DAILY') {
-            const now = dayjs.utc();
             const endDate = dayjs.utc(end);
-
-            if (now.isSame(endDate, 'month')) {
-                return now.format(_dateFormat);
-            }
             return endDate.endOf('month').format(_dateFormat);
         }
         return dayjs.utc(end).format(_dateFormat);
