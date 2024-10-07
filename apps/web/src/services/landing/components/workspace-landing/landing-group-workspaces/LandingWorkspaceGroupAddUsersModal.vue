@@ -74,6 +74,8 @@ const {
 const resetState = () => {
     roleSelectedItems.value = [];
     userDropdownState.menuList = [];
+    userDropdownState.searchText = '';
+    userDropdownState.selectedItems = [];
 };
 
 const handleConfirm = async () => {
@@ -99,6 +101,7 @@ const handleConfirm = async () => {
 
 const handleCloseModal = () => {
     state.proxyVisible = false;
+    resetState();
 };
 
 const handleRemoveUser = (item: string) => {
