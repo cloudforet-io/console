@@ -83,23 +83,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
         loading: true,
     });
 
-    const getters = reactive({
-        allDashboardItems: computed<DashboardModel[]>(() => [...state.privateDashboardItems, ...state.publicDashboardItems] as DashboardModel[]),
-        domainDashboardItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'DOMAIN')),
-        //
-        allFolderItems: computed<FolderModel[]>(() => [...state.privateFolderItems, ...state.publicFolderItems]),
-        domainFolderItems: computed<PublicFolderModel[]>(() => state.publicFolderItems.filter((item) => item.resource_group === 'DOMAIN')),
-        workspaceFolderItems: computed<PublicFolderModel[]>(() => state.publicFolderItems
-            .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
-            .filter((item) => !(item.resource_group === 'DOMAIN' && item.project_id === '*'))),
-        privateFolderItems: computed<PrivateFolderModel[]>(() => state.privateFolderItems),
-        existingFolderNameList: computed<string[]>(() => {
-            const _publicNames = state.publicFolderItems.map((d) => d.name);
-            const _privateNames = state.privateFolderItems.map((d) => d.name);
-            return [..._publicNames, ..._privateNames];
-        }),
-    });
-
     /* Mutations */
     const setScope = (scope?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>) => {
         state.scope = scope;
@@ -121,15 +104,21 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const fetchApiQueryHelper = new ApiQueryHelper();
     const privateDashboardListFetcher = getCancellableFetcher<DashboardListParams, ListResponse<DashboardModel>>(SpaceConnector.clientV2.dashboard.privateDashboard.list);
     const publicDashboardListFetcher = getCancellableFetcher<DashboardListParams, ListResponse<DashboardModel>>(SpaceConnector.clientV2.dashboard.publicDashboard.list);
-    const _fetchDashboard = async (dashboardType: DashboardType, params?: DashboardListParams) => {
+    const _fetchDashboard = async (dashboardType: DashboardType) => {
         const fetcher = dashboardType === 'PRIVATE' ? privateDashboardListFetcher : publicDashboardListFetcher;
         try {
             fetchApiQueryHelper.setFilters(state.searchFilters);
+            if (dashboardType === 'PUBLIC') {
+                if (_state.isAdminMode) {
+                    fetchApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
+                } else {
+                    fetchApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
+                }
+            }
             const { status, response } = await fetcher({
-                ...params,
                 query: {
-                    ...(params?.query || {}),
                     ...fetchApiQueryHelper.data,
+                    sort: [{ key: 'created_at', desc: true }],
                 },
             });
             if (status === 'succeed') {
@@ -184,30 +173,17 @@ export const useDashboardStore = defineStore('dashboard', () => {
             }
         }
     };
-    const publicDashboardApiQueryHelper = new ApiQueryHelper();
     const load = async () => {
-        publicDashboardApiQueryHelper.setFilters([]);
-        if (_state.isAdminMode) {
-            publicDashboardApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
-        } else {
-            publicDashboardApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
-        }
-        const _publicDashboardParams = {
-            query: {
-                ...publicDashboardApiQueryHelper.data,
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        };
         state.loading = true;
         if (_state.isAdminMode) {
             await Promise.all([
-                _fetchDashboard('PUBLIC', _publicDashboardParams),
+                _fetchDashboard('PUBLIC'),
                 _fetchFolder('PUBLIC'),
             ]);
         } else {
             await Promise.allSettled([
                 _fetchDashboard('PRIVATE'),
-                _fetchDashboard('PUBLIC', _publicDashboardParams),
+                _fetchDashboard('PUBLIC'),
                 _fetchFolder('PRIVATE'),
                 _fetchFolder('PUBLIC'),
             ]);
@@ -290,7 +266,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     };
     const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId?: string): Promise<DashboardModel> => {
         const _dashboardType = isPrivate ? 'PRIVATE' : 'PUBLIC';
-        const _dashboard = getters.allDashboardItems.find((item) => item.dashboard_id === dashboardId);
+        const _allDashboardItems = [...state.privateDashboardItems, ...state.publicDashboardItems];
+        const _dashboard = _allDashboardItems.find((item) => item.dashboard_id === dashboardId);
         if (!_dashboard) throw new Error('Dashboard not found');
 
         const _dashboardNameList = getDashboardNameList(_dashboardType);
@@ -350,7 +327,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     return {
         state,
-        getters,
         ...actions,
         ...mutations,
     };
