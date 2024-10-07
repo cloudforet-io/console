@@ -28,6 +28,7 @@ import type { Currency } from '@/store/modules/display/type';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 
+import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import TableHeader from '@/common/components/cost-report-page/table-header.vue';
@@ -130,6 +131,8 @@ const state = reactive({
     printMode: false,
 });
 
+const ETC = config.get('COST_REPORT.ETC_CUSTOM_LABEL') ?? 'ETC';
+
 const tableState = reactive({
     costByProduct: [] as CostReportDataAnalyzeResult[],
     costByProject: [] as CostReportDataAnalyzeResult[],
@@ -179,7 +182,7 @@ const makeTableFields = (customField:DataTableFieldType, currency:string, valueF
         sortable: false,
     },
 ]);
-const getSortedTableData = (rawData: CostReportDataAnalyzeResult[]) => {
+const getSortedTableData = (rawData: CostReportDataAnalyzeResult[]):CostReportDataAnalyzeResult[] => {
     const results: CostReportDataAnalyzeResult[] = [];
     rawData.forEach((data) => {
         results.push({
@@ -322,19 +325,29 @@ const handlePrint = () => {
                 />
             </div>
             <div class="invoice-information">
-                <p class="report-info">
+                <p v-if="!config.get('COST_REPORT.EXCLUDE.HEADERS.report_number')"
+                   class="report-info"
+                >
                     <label>{{ $t('COMMON.COST_REPORT.REPORT_NUMBER') }}:</label>{{ state.baseInfo?.report_number }}
                 </p>
-                <p class="report-info">
+                <p v-if="!config.get('COST_REPORT.EXCLUDE.HEADERS.from')"
+                   class="report-info"
+                >
                     <label>{{ $t('COMMON.COST_REPORT.FROM') }}:</label>{{ storeState.domainName }}
                 </p>
-                <p class="report-info">
+                <p v-if="!config.get('COST_REPORT.EXCLUDE.HEADERS.to')"
+                   class="report-info"
+                >
                     <label>{{ $t('COMMON.COST_REPORT.TO') }}:</label>{{ state.baseInfo?.workspace_name }}
                 </p>
-                <p class="report-info">
+                <p v-if="!config.get('COST_REPORT.EXCLUDE.HEADERS.currency_reference')"
+                   class="report-info"
+                >
                     <label>{{ $t('COMMON.COST_REPORT.CURRENCY_REFERENCE') }}:</label> {{ state.baseInfo?.currency_date }} ({{ state.baseInfo?.bank_name }})
                 </p>
-                <p class="report-info">
+                <p v-if="!config.get('COST_REPORT.EXCLUDE.HEADERS.issue_date')"
+                   class="report-info"
+                >
                     <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.reportDateRage }})</span>
                 </p>
             </div>
@@ -356,28 +369,32 @@ const handlePrint = () => {
                 <p class="title">
                     {{ $t('COMMON.COST_REPORT.INDEX') }}
                 </p>
-                <p-link :to="{ ...router.currentRoute, hash: '#total-amount-by-provider' }"
+                <p-link v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.provider.ui')"
+                        :to="{ ...router.currentRoute, hash: '#total-amount-by-provider' }"
                         class="table-link"
                         highlight
                         use-anchor-scroll
                 >
                     {{ $t('COMMON.COST_REPORT.TOTAL_AMOUNT_BY_PROVIDER') }}
                 </p-link>
-                <p-link :to="{ ...router.currentRoute, hash: '#details-by-product' }"
+                <p-link v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.product')"
+                        :to="{ ...router.currentRoute, hash: '#details-by-product' }"
                         class="table-link"
                         highlight
                         use-anchor-scroll
                 >
                     {{ $t('COMMON.COST_REPORT.DETAILS_BY_PRODUCT') }}
                 </p-link>
-                <p-link :to="{ ...router.currentRoute, hash: '#details-by-project' }"
+                <p-link v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.project')"
+                        :to="{ ...router.currentRoute, hash: '#details-by-project' }"
                         class="table-link"
                         highlight
                         use-anchor-scroll
                 >
                     {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
                 </p-link>
-                <p-link :to="{ ...router.currentRoute, hash: '#details-by-service-account' }"
+                <p-link v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.service_account')"
+                        :to="{ ...router.currentRoute, hash: '#details-by-service-account' }"
                         class="table-link"
                         highlight
                         use-anchor-scroll
@@ -385,7 +402,9 @@ const handlePrint = () => {
                     {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
                 </p-link>
             </div>
-            <div id="total-amount-by-provider">
+            <div v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.provider.ui')"
+                 id="total-amount-by-provider"
+            >
                 <div ref="chartContext"
                      class="chart"
                 />
@@ -405,7 +424,7 @@ const handlePrint = () => {
                                 <span class="legend-icon"
                                       :style="{ 'background-color': storeState.providers[value]?.color }"
                                 /><span>{{ storeState.providers[value]?.label ?? value }}</span>
-                                <span v-if="state.totalCost"
+                                <span v-if="state.totalCost && !config.get('COST_REPORT.EXCLUDE.CONTENTS.provider.percentage')"
                                       class="ratio"
                                 >{{ ((item._total_value_sum / state.totalCost) * 100).toFixed(0) }}%</span>
                             </div>
@@ -416,7 +435,8 @@ const handlePrint = () => {
                     </p-data-table>
                 </div>
             </div>
-            <div id="details-by-product"
+            <div v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.product')"
+                 id="details-by-product"
                  class="data-table-section"
             >
                 <p class="title">
@@ -443,7 +463,7 @@ const handlePrint = () => {
                             {{ rowIndex + 1 }}
                         </template>
                         <template #col-product-format="{value}">
-                            {{ value === 'Unknown' ? 'ETC' : value }}
+                            {{ value === 'Unknown' ? ETC : value }}
                         </template>
                         <template #col-value-format="{value}">
                             {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
@@ -451,7 +471,8 @@ const handlePrint = () => {
                     </p-data-table>
                 </div>
             </div>
-            <div id="details-by-project"
+            <div v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.project')"
+                 id="details-by-project"
                  class="data-table-section"
             >
                 <p class="title">
@@ -468,14 +489,15 @@ const handlePrint = () => {
                         {{ rowIndex + 1 }}
                     </template>
                     <template #col-project_name-format="{value}">
-                        {{ value === 'Unknown' ? 'ETC' : value }}
+                        {{ value === 'Unknown' ? ETC : value }}
                     </template>
                     <template #col-value_sum-format="{value}">
                         {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
                     </template>
                 </p-data-table>
             </div>
-            <div id="details-by-service-account"
+            <div v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.service_account')"
+                 id="details-by-service-account"
                  class="data-table-section"
             >
                 <p class="title">
@@ -503,7 +525,7 @@ const handlePrint = () => {
                             {{ rowIndex + 1 }}
                         </template>
                         <template #col-service_account_name-format="{value}">
-                            {{ value === 'Unknown' ? 'ETC' : value }}
+                            {{ value === 'Unknown' ? ETC : value }}
                         </template>
                         <template #col-value-format="{value}">
                             {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
