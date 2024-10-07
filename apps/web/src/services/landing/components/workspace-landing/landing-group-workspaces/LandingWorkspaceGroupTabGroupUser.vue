@@ -58,7 +58,6 @@ const tableState = reactive({
     loginUserId: computed(() => store.state.user.userId),
     loginUserRoleType: computed(() => landingPageStoreGetter.workspaceGroupUsers.find((user) => user.user_id === tableState.loginUserId).role_type),
     isUserOwnerRole: computed(() => store.state.user.roleType === ROLE_TYPE.DOMAIN_ADMIN || tableState.loginUserRoleType === ROLE_TYPE.WORKSPACE_OWNER),
-    items: [] as WorkspaceUser[],
     roleMap: {} as Record<string, BasicRoleModel>,
 });
 
@@ -257,6 +256,17 @@ const setRoleMap = async () => {
                             </div>
                         </template>
                     </p-select-dropdown>
+                    <div v-else
+                         class="readonly-role-field"
+                    >
+                        <img :src="useRoleFormatter(item.role_type).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        ><p-tooltip position="bottom"
+                                    :contents="tableState.roleMap[item.role_id]?.name"
+                                    class="role-label"
+                        ><span>{{ tableState.roleMap[item.role_id]?.name }}</span></p-tooltip>
+                    </div>
                 </span>
             </template>
             <template #col-remove_button-format="{ item }">
@@ -319,6 +329,16 @@ const setRoleMap = async () => {
             .role-type {
                 @apply text-label-sm text-gray-400;
             }
+        }
+    }
+
+    .readonly-role-field {
+        @apply flex items-center;
+        gap: 0.25rem;
+
+        > span {
+            @apply truncate;
+            width: 14.375rem;
         }
     }
 
