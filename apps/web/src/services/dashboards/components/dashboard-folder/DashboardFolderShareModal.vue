@@ -12,6 +12,7 @@ import type { PublicFolderUnshareParameters } from '@/schema/dashboard/public-fo
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PublicFolderReferenceItem, PublicFolderReferenceMap } from '@/store/reference/public-folder-reference-store';
 
@@ -40,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
+const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
@@ -123,7 +125,7 @@ const unshareFolder = async () => {
 const handleConfirm = async () => {
     if (!state.isShared) await shareFolder();
     else await unshareFolder();
-    await dashboardPageControlStore.load();
+    await dashboardStore.load();
 };
 const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
     state.selectedTarget = value;
