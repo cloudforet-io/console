@@ -55,7 +55,7 @@ export const useContextMenuStyle = ({
                     offset(1),
                     size({
                         apply({ rects, elements, availableHeight: floatingAvailableHeight }) {
-                            const availableHeight = floatingAvailableHeight - PAD;
+                            let availableHeight = floatingAvailableHeight - PAD;
                             const style: Partial<CSSStyleDeclaration> = {
                                 minWidth: `${rects.reference.width}px`,
                             };
@@ -64,6 +64,7 @@ export const useContextMenuStyle = ({
                                 style.maxHeight = `${availableHeight}px`;
                             } else {
                                 style.maxHeight = `${MAX_HEIGHT}px`;
+                                availableHeight = MAX_HEIGHT;
                             }
 
                             // apply min-height if the content is taller than the available space.
@@ -84,9 +85,16 @@ export const useContextMenuStyle = ({
                             // adjust the max-height of the content area based on the header height
                             const headerEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .context-menu-title-wrapper');
                             const contentEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .menu-container');
+                            const bottomEl = elements.floating.querySelector<HTMLElement>('.p-context-menu > .bottom-slot-area');
                             if (contentEl && headerEl) { // always exist
                                 if (headerEl.clientHeight > 0) {
-                                    contentEl.style.maxHeight = `${availableHeight - headerEl.clientHeight}px`;
+                                    if (bottomEl && bottomEl.clientHeight > 0) {
+                                        contentEl.style.maxHeight = `${availableHeight - headerEl.clientHeight - bottomEl.clientHeight}px`;
+                                    } else {
+                                        contentEl.style.maxHeight = `${availableHeight - headerEl.clientHeight}px`;
+                                    }
+                                } else if (bottomEl && bottomEl.clientHeight > 0) {
+                                    contentEl.style.maxHeight = `${availableHeight - bottomEl.clientHeight}px`;
                                 } else {
                                     contentEl.style.maxHeight = 'inherit';
                                 }
