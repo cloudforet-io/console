@@ -3,7 +3,6 @@ import { computed, reactive } from 'vue';
 import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -11,7 +10,6 @@ import { getClonedName } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
     DashboardType,
     DashboardFolderType,
@@ -41,7 +39,6 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
-import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 
 
@@ -78,25 +75,15 @@ export const useDashboardStore = defineStore('dashboard', () => {
         privateDashboardItems: [] as PrivateDashboardModel[],
         publicFolderItems: [] as PublicFolderModel[],
         privateFolderItems: [] as PrivateFolderModel[],
-        searchFilters: [] as ConsoleFilter[],
-        scope: undefined as DashboardScope | undefined,
         loading: true,
     });
 
     /* Mutations */
-    const setScope = (scope?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>) => {
-        state.scope = scope;
-    };
-    const setSearchFilters = (filters: ConsoleFilter[]) => {
-        state.searchFilters = filters;
-    };
     const reset = () => {
         state.publicDashboardItems = [];
         state.privateDashboardItems = [];
         state.publicFolderItems = [];
         state.privateFolderItems = [];
-        state.searchFilters = [];
-        state.scope = undefined;
         state.loading = true;
     };
 
@@ -107,7 +94,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const _fetchDashboard = async (dashboardType: DashboardType) => {
         const fetcher = dashboardType === 'PRIVATE' ? privateDashboardListFetcher : publicDashboardListFetcher;
         try {
-            fetchApiQueryHelper.setFilters(state.searchFilters);
+            fetchApiQueryHelper.setFilters([]);
             if (dashboardType === 'PUBLIC') {
                 if (_state.isAdminMode) {
                     fetchApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
@@ -309,11 +296,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
 
-
-    const mutations = {
-        setScope,
-        setSearchFilters,
-    };
     const actions = {
         load,
         createDashboard,
@@ -328,6 +310,5 @@ export const useDashboardStore = defineStore('dashboard', () => {
     return {
         state,
         ...actions,
-        ...mutations,
     };
 });
