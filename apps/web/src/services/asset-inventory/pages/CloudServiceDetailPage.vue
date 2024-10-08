@@ -355,7 +355,8 @@ const fetchTableData = async (changed: DynamicLayoutFetchOptions = {}) => {
     typeOptionState.selectIndex = [];
 };
 
-watch(() => state.globalFilters, () => {
+const initGlobalFilters = (): boolean => {
+    let _initPage = false;
     const routeQueryString = route.query ?? '';
     const urlQueryString = {
         ...state.globalFilters,
@@ -363,9 +364,14 @@ watch(() => state.globalFilters, () => {
     };
     if (JSON.stringify(urlQueryString) !== JSON.stringify(routeQueryString)) {
         replaceUrlQuery(urlQueryString);
-        initPage();
+        _initPage = true;
     }
-});
+    return _initPage;
+};
+watch(() => state.globalFilters, () => {
+    const _initPage = initGlobalFilters();
+    if (_initPage) initPage();
+}, { immediate: true });
 
 // excel
 const excelState = reactive({
@@ -480,6 +486,7 @@ watch(() => keyItemSets.value, (after) => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 debouncedWatch([() => props.group, () => props.name, () => props.provider], async () => {
+    initGlobalFilters();
     await initPage(true);
 });
 
