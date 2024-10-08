@@ -4,10 +4,12 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { clone } from 'lodash';
+import { clone, cloneDeep } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
 } from '@cloudforet/mirinae';
@@ -19,6 +21,8 @@ import type {
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
 
 import { SpaceRouter } from '@/router';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { DashboardListParams, DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
@@ -29,6 +33,7 @@ import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -45,6 +50,7 @@ import DashboardMainBoardList from '@/services/dashboards/components/dashboard-m
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
+
 
 
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -71,8 +77,8 @@ const storeState = reactive({
 });
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardPageControlGetters.publicDashboardTreeData, dashboardPageControlState.searchFilters)),
-    refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardPageControlGetters.privateDashboardTreeData, dashboardPageControlState.searchFilters)),
+    refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardPageControlGetters.publicDashboardTreeData, state.searchedDashboardIdList)),
+    refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardPageControlGetters.privateDashboardTreeData, state.searchedDashboardIdList)),
     isDashboardExist: computed<boolean>(() => {
         if (state.isAdminMode) {
             return !!dashboardPageControlGetters.publicDashboardItems.length || !!dashboardPageControlGetters.publicFolderItems.length;
@@ -100,6 +106,10 @@ const state = reactive({
         return targetMenuId;
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    // search
+    isSearching: false,
+    searchFilters: [] as ConsoleFilter[],
+    searchedDashboardIdList: new Set<string>(),
 });
 
 const queryState = reactive({
@@ -119,14 +129,66 @@ const queryState = reactive({
 });
 
 /* Util */
-const getSearchedTreeData = (treeData: TreeNode<DashboardTreeDataType>[], searchFilters: ConsoleFilter[]): TreeNode<DashboardTreeDataType>[] => {
-    if (!searchFilters.length) return treeData;
-    return treeData.filter((node) => {
-        if (node.data.type === 'DASHBOARD') return true;
-        return !!node.children?.length;
+const getSearchedTreeData = (treeData: TreeNode<DashboardTreeDataType>[], searchedDashboardIdList: Set<string>): TreeNode<DashboardTreeDataType>[] => {
+    if (state.isSearching) return [];
+    if (!state.searchFilters.length) return treeData;
+    const _results = [] as TreeNode<DashboardTreeDataType>[];
+    treeData.forEach((node) => {
+        const _node = cloneDeep(node);
+        if (_node.data.type === 'DASHBOARD') {
+            if (searchedDashboardIdList.has(_node.data.id)) {
+                _results.push(_node);
+            }
+        } else {
+            const _children = getSearchedTreeData(_node.children || [], searchedDashboardIdList);
+            if (_children.length) {
+                _node.children = _children;
+                _results.push(_node);
+            }
+        }
     });
+    return _results;
+};
+const setSearchedDashboardIdList = async () => {
+    state.isSearching = true;
+    state.searchedDashboardIdList.clear();
+    let _publicDashboardIdList: string[] = [];
+    let _privateDashboardIdList: string[] = [];
+    if (storeState.isAdminMode) {
+        _publicDashboardIdList = await searchDashboards('PUBLIC');
+    } else if (storeState.isWorkspaceOwner) {
+        _publicDashboardIdList = await searchDashboards('PUBLIC');
+        _privateDashboardIdList = await searchDashboards('PRIVATE');
+    } else {
+        _publicDashboardIdList = await searchDashboards('PRIVATE');
+    }
+    _publicDashboardIdList.forEach((id) => state.searchedDashboardIdList.add(id));
+    _privateDashboardIdList.forEach((id) => state.searchedDashboardIdList.add(id));
+    state.isSearching = false;
 };
 
+/* Api */
+const searchApiQueryHelper = new ApiQueryHelper();
+const searchDashboards = async (dashboardType: 'PUBLIC' | 'PRIVATE'): Promise<string[]> => {
+    try {
+        searchApiQueryHelper.setFilters(state.searchFilters);
+        const fetcher = dashboardType === 'PRIVATE'
+            ? SpaceConnector.clientV2.dashboard.privateDashboard.list
+            : SpaceConnector.clientV2.dashboard.publicDashboard.list;
+        const { results } = await fetcher<DashboardListParams, ListResponse<DashboardModel>>({
+            query: {
+                only: ['dashboard_id'],
+                ...searchApiQueryHelper.data,
+            },
+        });
+        return results?.map((d) => d.dashboard_id) || [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+};
+
+/* Event */
 const handleCreateDashboard = () => { router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME })); };
 const handleCreateFolder = () => {
     dashboardPageControlStore.setFolderFormModalType('CREATE');
@@ -135,8 +197,6 @@ const handleCreateFolder = () => {
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         dashboardPageControlStore.setSearchQueryTags(options.queryTags);
-    } else {
-        // dashboardPageControlStore.load();
     }
 };
 const handleUpdateSelectedIdMap = (type: 'PUBLIC' | 'PRIVATE', selectedIdMap: Record<string, boolean>) => {
@@ -169,7 +229,6 @@ const init = async () => {
     urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
         replaceUrlQuery(urlQueryString);
     });
-    // await dashboardPageControlStore.load();
 };
 
 const getDashboardValueHandler = (): ValueHandler | undefined => {
@@ -207,17 +266,22 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
     await init();
 })();
 
-watch(() => dashboardPageControlState.searchQueryTags, (queryTags: QueryTag[]) => {
+watch(() => dashboardPageControlState.searchQueryTags, async (queryTags: QueryTag[]) => {
     queryTagsHelper.setQueryTags(queryTags || []);
     dashboardPageControlStore.resetSelectedIdMap();
-    dashboardPageControlStore.setSearchFilters(queryTagsHelper.filters.value);
-    // dashboardPageControlStore.load();
+    state.searchFilters = queryTagsHelper.filters.value;
+    if (!state.searchFilters.length) {
+        state.searchedDashboardIdList.clear();
+        state.isSearching = false;
+        return;
+    }
+    await setSearchedDashboardIdList();
 }, { immediate: true });
 
 onUnmounted(() => {
     if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
-    dashboardPageControlStore.setSearchFilters([]);
-    // dashboardPageControlStore.load();
+    state.searchFilters = [];
+    state.searchedDashboardIdList.clear();
 });
 </script>
 
