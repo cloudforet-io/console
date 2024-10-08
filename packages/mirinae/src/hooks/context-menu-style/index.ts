@@ -9,22 +9,24 @@ import {
 } from '@floating-ui/dom';
 import { throttle } from 'lodash';
 
-interface UseContextMenuFixedStyleOptions {
+interface UseContextMenuStyleOptions {
     useFixedMenuStyle?: Ref<boolean|undefined> | boolean;
     visibleMenu?: Ref<boolean|undefined>;
     targetRef: Ref<Vue|HTMLElement|null>;
     menuRef: Ref<Vue|HTMLElement|null>;
     position?: Ref<'left'|'right'|undefined>|'left'|'right';
+    menuWidth?: Ref<'target-width'|string|undefined>|'target-width'|string|undefined; // default is 'auto'.
     boundary?: Ref<string|undefined>|string; // it's not developed yet. if you want to use it, you can develop it with detectOverflow middleware.
 }
 
 export const useContextMenuStyle = ({
-    useFixedMenuStyle, visibleMenu, targetRef, menuRef, position, boundary,
-}: UseContextMenuFixedStyleOptions) => {
+    useFixedMenuStyle, visibleMenu, targetRef, menuRef, position, boundary, menuWidth,
+}: UseContextMenuStyleOptions) => {
     const state = reactive({
         useFixedMenuStyle: useFixedMenuStyle ?? false,
         visibleMenu,
         position,
+        menuWidth,
         boundary: boundary ?? undefined,
     });
 
@@ -57,7 +59,8 @@ export const useContextMenuStyle = ({
                         apply({ rects, elements, availableHeight: floatingAvailableHeight }) {
                             let availableHeight = floatingAvailableHeight - PAD;
                             const style: Partial<CSSStyleDeclaration> = {
-                                minWidth: `${rects.reference.width}px`,
+                                minWidth: state.menuWidth === 'target-width' || state.menuWidth === 'auto' || !state.menuWidth ? `${rects.reference.width}px` : state.menuWidth,
+                                width: state.menuWidth === 'target-width' ? `${rects.reference.width}px` : state.menuWidth,
                             };
 
                             if (availableHeight < MAX_HEIGHT) {
@@ -132,6 +135,7 @@ export const useContextMenuStyle = ({
             });
         };
         if (state.useFixedMenuStyle) {
+            if (cleanup) cleanup();
             cleanup = autoUpdate(referenceEl, floatingEl, () => {
                 setPosition(true);
             }, { animationFrame: true });
@@ -143,11 +147,17 @@ export const useContextMenuStyle = ({
     watch([() => state.visibleMenu, () => contextMenuFixedStyleState.targetElement, () => contextMenuFixedStyleState.menuElement], async ([_visibleMenu, targetElement, menuElement]) => {
         if (_visibleMenu && menuElement && targetElement) {
             setStyleOfContextMenu(targetElement as HTMLElement, menuElement as HTMLElement);
-        } else if (cleanup) cleanup();
+        } else if (cleanup) {
+            cleanup();
+            cleanup = undefined;
+        }
     }, { immediate: true });
 
     onUnmounted(() => {
-        if (cleanup) cleanup();
+        if (cleanup) {
+            cleanup();
+            cleanup = undefined;
+        }
     });
 
     return {

@@ -57,6 +57,7 @@ interface SelectDropdownProps {
     showClearSelection?: boolean;
     menuPosition?: ContextMenuPosition;
     indexMode?: boolean;
+    menuWidth?: 'target-width'|string;
     boundary?: string;
 
     /* others */
@@ -86,6 +87,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     searchText: '',
     menuPosition: CONTEXT_MENU_POSITION.LEFT,
     indexMode: false,
+    menuWidth: 'auto',
     boundary: undefined,
     /* others */
     handler: undefined,
@@ -178,6 +180,7 @@ const {
     menu: toRef(props, 'menu'),
     pageSize: toRef(props, 'pageSize'),
     hideHeaderWithoutItems: toRef(props, 'hideHeaderWithoutItems'),
+    menuWidth: toRef(props, 'menuWidth'),
     boundary: toRef(props, 'boundary'),
     position: toRef(props, 'menuPosition'),
 });
@@ -410,8 +413,6 @@ defineExpose({ reloadMenu });
         @apply absolute;
         margin-top: -1px;
         z-index: 1000;
-        min-width: 100%;
-        width: auto;
     }
 
     &.is-fixed-width {
