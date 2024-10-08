@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
 
 import type { MenuAttachHandler } from '@/hooks/context-menu-controller/context-menu-attach';
 import { useContextMenuAttach } from '@/hooks/context-menu-controller/context-menu-attach';
-import { useContextMenuStyle } from '@/hooks/context-menu-fixed-style';
+import { useContextMenuStyle } from '@/hooks/context-menu-style';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import { getTextHighlightRegex } from '@/utils/helpers';
 
@@ -39,8 +39,9 @@ export interface UseContextMenuControllerOptions<Item extends MenuItem = MenuIte
     /* Required when to use show more button to attach items  */
     pageSize?: Ref<number|undefined>|number;
 
-    /* In the context of 'useFixedStyle,' to adjust the position of the context menu relative to the target, the default value is 'left.'  */
+    /* Required for context menu style */
     position?: Ref<'left'|'right'|undefined>|'left'|'right';
+    menuWidth?: Ref<'target-width'|string|undefined>|'target-width'|string|undefined;
     boundary?: Ref<string|undefined>|string;
 
     /* Whether to hide the header when there are no items in the header */
@@ -52,7 +53,7 @@ interface FocusOnContextMenu { (position?: number): void }
 
 export const useContextMenuController = <Item extends MenuItem = MenuItem>({
     useFixedStyle, targetRef, contextMenuRef, visibleMenu, useReorderBySelection, menu, selected,
-    useMenuFiltering, searchText, handler, pageSize, position, hideHeaderWithoutItems, boundary,
+    useMenuFiltering, searchText, handler, pageSize, position, hideHeaderWithoutItems, menuWidth, boundary,
 }: UseContextMenuControllerOptions<Item>) => {
     if (!targetRef) throw new Error('\'targetRef\' option must be given.');
     if (useReorderBySelection) {
@@ -93,6 +94,7 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
         targetRef,
         position: toRef(state, 'position'),
         menuRef: contextMenuRef,
+        menuWidth,
         boundary,
     });
 
