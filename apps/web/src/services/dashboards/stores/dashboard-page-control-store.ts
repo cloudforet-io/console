@@ -2,7 +2,6 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { QueryTag } from '@cloudforet/mirinae/src/inputs/search/query-search-tags/type';
 
@@ -59,7 +58,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         selectedPublicIdMap: {} as Record<string, boolean>,
         selectedPrivateIdMap: {} as Record<string, boolean>,
         newIdList: [] as string[],
-        searchFilters: [] as ConsoleFilter[],
         searchQueryTags: [] as QueryTag[],
     });
     const getters = reactive({
@@ -157,7 +155,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     const setSearchQueryTags = (queryTags: QueryTag[] = []) => {
         state.searchQueryTags = queryTags;
     };
-    const setSearchFilters = (filters: ConsoleFilter[]) => { state.searchFilters = filters; };
     const mutations = {
         setFolderFormModalVisible,
         setFolderFormModalType,
@@ -171,7 +168,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         setNewIdList,
         setFolderShareModalVisible,
         setSearchQueryTags,
-        setSearchFilters,
     };
 
     /* Actions */

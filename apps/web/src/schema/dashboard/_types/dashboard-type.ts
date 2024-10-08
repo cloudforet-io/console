@@ -28,7 +28,7 @@ export type DashboardFolderType = 'PUBLIC'|'PRIVATE';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export type DashboardModel = Partial<PublicDashboardModel> & Partial<PrivateDashboardModel>;
+export type DashboardModel = PublicDashboardModel & PrivateDashboardModel;
 export type DashboardCreateParams = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
 export type DashboardChangeFolderParams = PublicDashboardChangeFolderParameters | PrivateDashboardChangeFolderParameters;
 export type DashboardListParams = PublicDashboardListParameters | PrivateDashboardListParameters;
