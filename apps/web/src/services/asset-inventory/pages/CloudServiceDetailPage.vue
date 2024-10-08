@@ -114,10 +114,9 @@ const fetchOptionState = reactive({
 });
 
 const state = reactive({
-    urlQueryString: computed(() => ({
+    globalFilters: computed(() => ({
         project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
         service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
-        filters: urlQueryStringFilters.value,
     })),
 });
 
@@ -356,8 +355,12 @@ const fetchTableData = async (changed: DynamicLayoutFetchOptions = {}) => {
     typeOptionState.selectIndex = [];
 };
 
-watch(() => state.urlQueryString, (urlQueryString) => {
+watch(() => state.globalFilters, () => {
     const routeQueryString = route.query ?? '';
+    const urlQueryString = {
+        ...state.globalFilters,
+        filters: urlQueryStringFilters.value,
+    };
     if (JSON.stringify(urlQueryString) !== JSON.stringify(routeQueryString)) {
         replaceUrlQuery(urlQueryString);
         initPage();
