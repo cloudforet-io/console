@@ -77,8 +77,16 @@ const storeState = reactive({
 });
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardPageControlGetters.publicDashboardTreeData, state.searchedDashboardIdList)),
-    refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getSearchedTreeData(dashboardPageControlGetters.privateDashboardTreeData, state.searchedDashboardIdList)),
+    refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
+        if (state.isSearching) return [];
+        if (!state.searchFilters.length) return dashboardPageControlGetters.publicDashboardTreeData;
+        return getSearchedTreeData(dashboardPageControlGetters.publicDashboardTreeData, state.searchedDashboardIdList);
+    }),
+    refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
+        if (state.isSearching) return [];
+        if (!state.searchFilters.length) return dashboardPageControlGetters.privateDashboardTreeData;
+        return getSearchedTreeData(dashboardPageControlGetters.privateDashboardTreeData, state.searchedDashboardIdList);
+    }),
     isDashboardExist: computed<boolean>(() => {
         if (state.isAdminMode) {
             return !!dashboardPageControlGetters.publicDashboardItems.length || !!dashboardPageControlGetters.publicFolderItems.length;
@@ -130,18 +138,16 @@ const queryState = reactive({
 
 /* Util */
 const getSearchedTreeData = (treeData: TreeNode<DashboardTreeDataType>[], searchedDashboardIdList: Set<string>): TreeNode<DashboardTreeDataType>[] => {
-    if (state.isSearching) return [];
-    if (!state.searchFilters.length) return treeData;
     const _results = [] as TreeNode<DashboardTreeDataType>[];
     treeData.forEach((node) => {
-        const _node = cloneDeep(node);
-        if (_node.data.type === 'DASHBOARD') {
-            if (searchedDashboardIdList.has(_node.data.id)) {
-                _results.push(_node);
+        if (node.data.type === 'DASHBOARD') {
+            if (searchedDashboardIdList.has(node.data.id)) {
+                _results.push(cloneDeep(node));
             }
         } else {
-            const _children = getSearchedTreeData(_node.children || [], searchedDashboardIdList);
+            const _children = getSearchedTreeData(node.children || [], searchedDashboardIdList);
             if (_children.length) {
+                const _node = cloneDeep(node);
                 _node.children = _children;
                 _results.push(_node);
             }
