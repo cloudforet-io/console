@@ -35,9 +35,11 @@ const collectorDetailPageStore = useCollectorDetailPageStore();
 
 interface Props {
     collectorId?: string;
+    hasReadWriteAccess?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
     collectorId: undefined,
+    hasReadWriteAccess: false,
 });
 
 const state = reactive({
@@ -51,7 +53,7 @@ const state = reactive({
     isAddCase: computed<boolean>(() => collectorFormState.originCollectorRules?.length === 0
         || collectorFormState.originCollectorRules.length < collectorFormState.additionalRules.length),
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
-    isEditable: computed<boolean>(() => state.editModeCardOrder === 0 && !state.isNotiVisible),
+    isEditable: computed<boolean>(() => props.hasReadWriteAccess && state.editModeCardOrder === 0 && !state.isNotiVisible),
 });
 
 const changeOrder = (targetData, clickedData, tempOrder) => {
@@ -197,7 +199,8 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                             <div class="left-part">
                                 <div v-if="!isEditModeByOrder(data.order)">
                                     <span class="order-text">#<strong>{{ data.order }}</strong></span>
-                                    <span class="arrow-button"
+                                    <span v-if="state.isEditable"
+                                          class="arrow-button"
                                           :class="{'disabled': data.order === 1}"
                                           @click="handleClickUpButton(data)"
                                     >
@@ -207,7 +210,8 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                                              color="inherit transparent"
                                         />
                                     </span>
-                                    <span class="arrow-button"
+                                    <span v-if="state.isEditable"
+                                          class="arrow-button"
                                           :class="{'disabled': (data.order === collectorFormState.originCollectorRules?.length)}"
                                           @click="handleClickDownButton(data)"
                                     >
@@ -222,7 +226,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                                     {{ $t('INVENTORY.COLLECTOR.EDIT_ADDITIONAL_RULE') }}
                                 </div>
                             </div>
-                            <div v-if="!isEditModeByOrder(data.order)"
+                            <div v-if="!isEditModeByOrder(data.order) && state.isEditable"
                                  class="right-part"
                             >
                                 <span class="text-button delete"

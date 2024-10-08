@@ -318,15 +318,22 @@ onUnmounted(() => {
 
         <collector-base-info-section class="section"
                                      :history-link="state.collectorHistoryLink"
+                                     :has-read-write-access="state.hasReadWriteAccess"
         />
-        <collector-schedule-section class="section" />
+        <collector-schedule-section class="section"
+                                    :has-read-write-access="state.hasReadWriteAccess"
+        />
         <collector-options-section class="section"
                                    data-test-id="collector-options-section"
+                                   :has-read-write-access="state.hasReadWriteAccess"
         />
         <collector-additional-rule class="section"
                                    :collector-id="props.collectorId"
+                                   :has-read-write-access="state.hasReadWriteAccess"
         />
-        <collector-service-accounts-section class="section" />
+        <collector-service-accounts-section class="section"
+                                            :has-read-write-access="state.hasReadWriteAccess"
+        />
 
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
                               :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
