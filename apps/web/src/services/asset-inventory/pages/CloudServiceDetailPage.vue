@@ -114,10 +114,9 @@ const fetchOptionState = reactive({
 });
 
 const state = reactive({
-    urlQueryString: computed(() => ({
+    globalFilters: computed(() => ({
         project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
         service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
-        filters: urlQueryStringFilters.value,
     })),
 });
 
@@ -356,14 +355,6 @@ const fetchTableData = async (changed: DynamicLayoutFetchOptions = {}) => {
     typeOptionState.selectIndex = [];
 };
 
-watch(() => state.urlQueryString, (urlQueryString) => {
-    const routeQueryString = route.query ?? '';
-    if (JSON.stringify(urlQueryString) !== JSON.stringify(routeQueryString)) {
-        replaceUrlQuery(urlQueryString);
-        initPage();
-    }
-});
-
 // excel
 const excelState = reactive({
     visible: false,
@@ -469,7 +460,26 @@ const handleClearDefaultFilter = async () => {
     await fetchTableData();
 };
 
+// set global filters to url query
+const initGlobalFilters = (): boolean => {
+    let _initPage = false;
+    const routeQueryString = route.query ?? '';
+    const urlQueryString = {
+        ...state.globalFilters,
+        filters: urlQueryStringFilters.value,
+    };
+    if (JSON.stringify(urlQueryString) !== JSON.stringify(routeQueryString)) {
+        replaceUrlQuery(urlQueryString);
+        _initPage = true;
+    }
+    return _initPage;
+};
 /* Watchers */
+watch(() => state.globalFilters, () => {
+    const _initPage = initGlobalFilters();
+    if (_initPage) initPage();
+}, { immediate: true });
+
 watch(() => keyItemSets.value, (after) => {
     // initiate queryTags with keyItemSets
     queryTagsHelper.setKeyItemSets(after);
@@ -477,6 +487,7 @@ watch(() => keyItemSets.value, (after) => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 debouncedWatch([() => props.group, () => props.name, () => props.provider], async () => {
+    initGlobalFilters(); // maintain global filters when changing service menu
     await initPage(true);
 });
 
