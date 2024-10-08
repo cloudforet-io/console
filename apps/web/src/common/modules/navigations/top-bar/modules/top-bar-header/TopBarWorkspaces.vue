@@ -76,6 +76,7 @@ const storeState = reactive({
     isRootRoleReadonly: computed<boolean>(() => store.getters['user/isRootRoleReadonly']),
 });
 const state = reactive({
+    visibleSelectDropdown: false,
     searchText: '',
 });
 
@@ -198,11 +199,14 @@ onMounted(() => {
                            ref="selectDropdownRef"
                            :class="{'workspace-dropdown': true, 'is-domain-admin': storeState.isDomainAdmin}"
                            style-type="transparent"
+                           menu-width="20rem"
+                           :visible-menu.sync="state.visibleSelectDropdown"
                            :handler="menuHandler"
                            :search-text.sync="state.searchText"
                            is-filterable
                            hide-header-without-items
                            show-delete-all-button
+                           use-fixed-menu-style
                            :selected="storeState.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
         >
@@ -368,8 +372,8 @@ onMounted(() => {
         }
 
         .menu-header-selected-workspace {
-            @apply relative flex items-center justify-between text-label-md font-medium;
-            margin: 0.875rem 1rem;
+            @apply flex items-center justify-between text-label-md font-medium;
+            padding: 0.875rem 1rem;
             .workspace-wrapper {
                 @apply flex items-center;
                 flex: 1;
@@ -399,12 +403,12 @@ onMounted(() => {
             max-width: 18rem;
             &.is-starred {
                 .label-text {
-                    max-width: 15rem;
+                    max-width: 14rem;
                 }
             }
             &:hover {
                 .label-text {
-                    max-width: 15rem;
+                    max-width: 14rem;
                 }
             }
             .label {
@@ -412,7 +416,7 @@ onMounted(() => {
             }
             .label-text {
                 @apply truncate;
-                max-width: 16.25rem;
+                max-width: 15.25rem;
             }
         }
 
@@ -448,15 +452,13 @@ onMounted(() => {
             }
         }
 
+        /* custom design-system component - p-select-dropdown */
+
         /* custom design-system component - p-context-menu */
         :deep(.p-context-menu) {
-            width: 20rem;
-            margin-top: -0.125rem;
-            margin-left: 0;
             .menu-container {
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
-                max-height: calc(100vh - $top-bar-height - 7.1rem) !important;
             }
             .p-context-menu-item {
                 .favorite-button {
@@ -479,13 +481,6 @@ onMounted(() => {
         &.is-domain-admin {
             .workspace-toolbox-wrapper {
                 padding-bottom: 1rem;
-            }
-
-            /* custom design-system component - p-context-menu */
-            :deep(.p-context-menu) {
-                .menu-container {
-                    max-height: calc(100vh - $top-bar-height - 12.85rem) !important;
-                }
             }
         }
 
