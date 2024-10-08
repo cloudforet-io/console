@@ -9,6 +9,7 @@ import { clone, cloneDeep } from 'lodash';
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
@@ -78,12 +79,12 @@ const storeState = reactive({
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-        if (state.isSearching) return [];
+        if (state.isSearching.PUBLIC) return [];
         if (!state.searchFilters.length) return dashboardPageControlGetters.publicDashboardTreeData;
         return getSearchedTreeData(dashboardPageControlGetters.publicDashboardTreeData, state.searchedDashboardIdList);
     }),
     refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-        if (state.isSearching) return [];
+        if (state.isSearching.PRIVATE) return [];
         if (!state.searchFilters.length) return dashboardPageControlGetters.privateDashboardTreeData;
         return getSearchedTreeData(dashboardPageControlGetters.privateDashboardTreeData, state.searchedDashboardIdList);
     }),
@@ -115,7 +116,10 @@ const state = reactive({
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     // search
-    isSearching: false,
+    isSearching: {
+        PUBLIC: false,
+        PRIVATE: false,
+    },
     searchFilters: [] as ConsoleFilter[],
     searchedDashboardIdList: new Set<string>(),
 });
@@ -155,42 +159,40 @@ const getSearchedTreeData = (treeData: TreeNode<DashboardTreeDataType>[], search
     });
     return _results;
 };
-const setSearchedDashboardIdList = async () => {
-    state.isSearching = true;
-    state.searchedDashboardIdList.clear();
-    let _publicDashboardIdList: string[] = [];
-    let _privateDashboardIdList: string[] = [];
+const searchedDashboards = async () => {
     if (storeState.isAdminMode) {
-        _publicDashboardIdList = await searchDashboards('PUBLIC');
+        await fetchSearchedDashboard('PUBLIC');
     } else if (storeState.isWorkspaceOwner) {
-        _publicDashboardIdList = await searchDashboards('PUBLIC');
-        _privateDashboardIdList = await searchDashboards('PRIVATE');
+        await fetchSearchedDashboard('PRIVATE');
+        await fetchSearchedDashboard('PUBLIC');
     } else {
-        _publicDashboardIdList = await searchDashboards('PRIVATE');
+        await fetchSearchedDashboard('PRIVATE');
     }
-    _publicDashboardIdList.forEach((id) => state.searchedDashboardIdList.add(id));
-    _privateDashboardIdList.forEach((id) => state.searchedDashboardIdList.add(id));
-    state.isSearching = false;
 };
 
 /* Api */
 const searchApiQueryHelper = new ApiQueryHelper();
-const searchDashboards = async (dashboardType: 'PUBLIC' | 'PRIVATE'): Promise<string[]> => {
+const privateDashboardFetcher = getCancellableFetcher(SpaceConnector.clientV2.dashboard.privateDashboard.list);
+const publicDashboardFetcher = getCancellableFetcher(SpaceConnector.clientV2.dashboard.publicDashboard.list);
+const fetchSearchedDashboard = async (dashboardType: 'PUBLIC' | 'PRIVATE'): Promise<void> => {
     try {
+        state.isSearching[dashboardType] = true;
+        state.searchedDashboardIdList.clear();
         searchApiQueryHelper.setFilters(state.searchFilters);
-        const fetcher = dashboardType === 'PRIVATE'
-            ? SpaceConnector.clientV2.dashboard.privateDashboard.list
-            : SpaceConnector.clientV2.dashboard.publicDashboard.list;
-        const { results } = await fetcher<DashboardListParams, ListResponse<DashboardModel>>({
+        const fetcher = dashboardType === 'PRIVATE' ? privateDashboardFetcher : publicDashboardFetcher;
+        const { status, response } = await fetcher<DashboardListParams, ListResponse<DashboardModel>>({
             query: {
                 only: ['dashboard_id'],
                 ...searchApiQueryHelper.data,
             },
         });
-        return results?.map((d) => d.dashboard_id) || [];
+        if (status === 'succeed') {
+            response.results?.map((d) => d.dashboard_id).forEach((id) => state.searchedDashboardIdList.add(id));
+            state.isSearching[dashboardType] = false;
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
+        state.isSearching[dashboardType] = false;
     }
 };
 
@@ -281,7 +283,7 @@ watch(() => dashboardPageControlState.searchQueryTags, async (queryTags: QueryTa
         state.isSearching = false;
         return;
     }
-    await setSearchedDashboardIdList();
+    await searchedDashboards();
 }, { immediate: true });
 
 onUnmounted(() => {
