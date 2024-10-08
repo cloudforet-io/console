@@ -23,7 +23,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -42,9 +42,9 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
-const dashboardGetters = dashboardStore.getters;
-const dashboardMainPageStore = useDashboardMainPageStore();
-const dashboardMainPageState = dashboardMainPageStore.state;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -53,7 +53,7 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
-    targetFolderItem: computed<PublicFolderReferenceItem|undefined>(() => storeState.folders[dashboardMainPageState.selectedFolderId || '']),
+    targetFolderItem: computed<PublicFolderReferenceItem|undefined>(() => storeState.folders[dashboardPageControlState.selectedFolderId || '']),
     isShared: computed<boolean>(() => !!state.targetFolderItem?.data?.shared),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
         const _folderName = state.targetFolderItem?.name || '';
@@ -62,9 +62,9 @@ const state = reactive({
             name: _folderName,
             type: 'FOLDER',
         }];
-        const _dashboardItems: DashboardDataTableItem[] = Object.entries(dashboardGetters.allDashboardItems)
-            .filter(([, d]) => d.folder_id === dashboardMainPageState.selectedFolderId)
-            .map(([, d]) => ({
+        const _dashboardItems: DashboardDataTableItem[] = dashboardPageControlGetters.allDashboardItems
+            .filter((d) => d.folder_id === dashboardPageControlState.selectedFolderId)
+            .map((d) => ({
                 id: d.dashboard_id,
                 name: d.name,
                 location: _folderName,
@@ -125,7 +125,7 @@ const unshareFolder = async () => {
 const handleConfirm = async () => {
     if (!state.isShared) await shareFolder();
     else await unshareFolder();
-    await dashboardMainPageStore.load();
+    await dashboardStore.load();
 };
 const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
     state.selectedTarget = value;
@@ -134,7 +134,7 @@ const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
     if (!visible) {
-        dashboardMainPageStore.reset();
+        dashboardPageControlStore.reset();
         state.selectedTarget = 'WORKSPACE';
     }
 });

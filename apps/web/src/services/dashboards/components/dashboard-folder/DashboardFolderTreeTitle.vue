@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { TranslateResult } from 'vue-i18n';
+
 import {
     PI,
 } from '@cloudforet/mirinae';
@@ -6,7 +8,7 @@ import {
 
 interface Props {
     isCollapsed?: boolean;
-    fieldTitle?: string;
+    fieldTitle?: TranslateResult;
 }
 const props = withDefaults(defineProps<Props>(), {
     isCollapsed: false,

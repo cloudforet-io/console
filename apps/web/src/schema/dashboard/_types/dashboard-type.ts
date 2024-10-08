@@ -28,7 +28,7 @@ export type DashboardFolderType = 'PUBLIC'|'PRIVATE';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export type DashboardModel = PublicDashboardModel & PrivateDashboardModel;
+export type DashboardModel = Partial<PublicDashboardModel> & Partial<PrivateDashboardModel>;
 export type DashboardCreateParams = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
 export type DashboardChangeFolderParams = PublicDashboardChangeFolderParameters | PrivateDashboardChangeFolderParameters;
 export type DashboardListParams = PublicDashboardListParameters | PrivateDashboardListParameters;
@@ -120,13 +120,4 @@ export interface DashboardLayoutWidgetInfo {
     inherit_options?: InheritOptions; // inherit information for the widget option
     schema_properties?: string[]; // schema properties that are shown on widget form. updated when use add more options.
     fixed_options?: Record<string, any>; // fixed options for the widget
-}
-
-export interface DataSource {
-    // data_domain: string; // Cost/Asset/Security
-    // data_source_from?: string; // cost_analysis
-    // value: string[]; // Usage
-    // TODO: create ResrouceType
-    resource_type: any; // 'cost_analysis.Cost' || 'inventory.MetricData'
-    value: string;
 }

@@ -11,8 +11,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -40,13 +38,16 @@ import { gray } from '@/styles/colors';
 
 import DashboardLSBTree from '@/services/dashboards/components/dashboard-main/DashboardLSBTree.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+
+
 
 const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
-const dashboardGetters = dashboardStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -62,15 +63,8 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     currentPath: computed(() => route.fullPath),
-    privateV2DashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems
-        .filter((d) => d.version !== '1.0')),
-    publicV2DashboardItems: computed<PublicDashboardModel[]>(() => {
-        const _filteredDashboardItems = dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0');
-        if (storeState.isAdminMode) return _filteredDashboardItems;
-        return _filteredDashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && d.project_id === '*'));
-    }),
-    publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(state.publicV2DashboardItems)),
-    privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(state.privateV2DashboardItems)),
+    publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.publicDashboardItems)),
+    privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.privateDashboardItems)),
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
@@ -89,7 +83,7 @@ const state = reactive({
         ...(storeState.isWorkspaceOwner ? filterStarredItems(state.publicV2DashboardMenuSet) : []),
         ...filterStarredItems(state.privateV2DashboardMenuSet),
     ]),
-    domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainDashboardItems.map((d) => ({
+    deprecatedMenuSet: computed<LSBItem[]>(() => dashboardPageControlGetters.deprecatedDashboardItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -99,40 +93,10 @@ const state = reactive({
                 dashboardId: d.dashboard_id,
             },
         }),
-        favoriteOptions: {
-            type: FAVORITE_TYPE.DASHBOARD,
-            id: d.dashboard_id,
-        },
-    }))),
-    workspaceV1MenuSet: computed<LSBItem[]>(() => dashboardState.publicDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
-        type: MENU_ITEM_TYPE.ITEM,
-        id: d.dashboard_id,
-        label: d.name,
-        to: getProperRouteLocation({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: d.dashboard_id,
-            },
-        }),
-        favoriteOptions: {
-            type: FAVORITE_TYPE.DASHBOARD,
-            id: d.dashboard_id,
-        },
-    }))),
-    privateV1MenuSet: computed<LSBMenu[]>(() => dashboardState.privateDashboardItems.filter((d) => d.version === '1.0').map((d) => ({
-        type: MENU_ITEM_TYPE.ITEM,
-        id: d.dashboard_id,
-        label: d.name,
-        to: getProperRouteLocation({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: d.dashboard_id,
-            },
-        }),
-        icon: {
+        icon: d.dashboard_id.startsWith('private') ? {
             name: 'ic_lock-filled',
             color: gray[500],
-        },
+        } : undefined,
         favoriteOptions: {
             type: FAVORITE_TYPE.DASHBOARD,
             id: d.dashboard_id,
@@ -158,10 +122,6 @@ const state = reactive({
         label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED'),
         id: 'deprecated',
     })),
-    deprecatedSubItem: computed<LSBMenu[]>(() => [
-        ...state.workspaceV1MenuSet,
-        ...state.privateV1MenuSet,
-    ]),
     menuSet: computed<LSBMenu[]>(() => {
         const defaultMenuSet: LSBMenu[] = [
             {
@@ -177,7 +137,7 @@ const state = reactive({
             {
                 type: MENU_ITEM_TYPE.TOP_TITLE,
                 label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARD'),
-                subText: storeState.isAdminMode ? `(${state.domainMenuSet.length})` : undefined,
+                subText: storeState.isAdminMode ? `(${state.publicV2DashboardMenuSet.length})` : undefined,
             },
         ];
 
@@ -200,7 +160,7 @@ const state = reactive({
             menuSet.push(state.privateMenu);
         }
 
-        if (state.deprecatedSubItem.length) {
+        if (state.deprecatedMenuSet.length) {
             menuSet.push(state.deprecatedMenu);
         }
         return menuSet;
@@ -274,13 +234,13 @@ callApiWithGrantGuard();
                   #slot-admin
         >
             <dashboard-l-s-b-tree type="PUBLIC"
-                                  :dashboards="state.publicV2DashboardItems"
+                                  :dashboards="dashboardPageControlGetters.publicDashboardItems"
             />
         </template>
         <template v-if="storeState.isWorkspaceOwner"
                   #slot-shared
         >
-            <l-s-b-collapsible-menu-item v-if="state.publicV2DashboardItems.length || dashboardGetters.workspaceFolderItems.length"
+            <l-s-b-collapsible-menu-item v-if="dashboardPageControlGetters.publicDashboardItems.length || dashboardPageControlGetters.privateFolderItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
@@ -291,13 +251,13 @@ callApiWithGrantGuard();
             >
                 <template #collapsible-contents>
                     <dashboard-l-s-b-tree type="PUBLIC"
-                                          :dashboards="state.publicV2DashboardItems"
+                                          :dashboards="dashboardPageControlGetters.publicDashboardItems"
                     />
                 </template>
             </l-s-b-collapsible-menu-item>
         </template>
         <template #slot-private>
-            <l-s-b-collapsible-menu-item v-if="state.privateV2DashboardItems.length || dashboardGetters.privateFolderItems.length"
+            <l-s-b-collapsible-menu-item v-if="dashboardPageControlGetters.privateDashboardItems.length || dashboardPageControlGetters.privateFolderItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
@@ -308,18 +268,18 @@ callApiWithGrantGuard();
             >
                 <template #collapsible-contents>
                     <dashboard-l-s-b-tree type="PRIVATE"
-                                          :dashboards="state.privateV2DashboardItems"
+                                          :dashboards="dashboardPageControlGetters.privateDashboardItems"
                     />
                 </template>
             </l-s-b-collapsible-menu-item>
         </template>
         <template #slot-deprecated>
-            <l-s-b-collapsible-menu-item v-if="state.deprecatedSubItem.length"
+            <l-s-b-collapsible-menu-item v-if="state.deprecatedMenuSet.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
                                              label: $t('DASHBOARDS.LNB.DEPRECATED'),
-                                             subItems: state.deprecatedSubItem,
+                                             subItems: state.deprecatedMenuSet,
                                          }"
                                          is-sub-item
                                          :override-collapsed="true"

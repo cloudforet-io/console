@@ -21,7 +21,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { gray, indigo, violet } from '@/styles/colors';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -39,8 +39,8 @@ const LABELS_LIMIT = 2;
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
-const dashboardMainPageStore = useDashboardMainPageStore();
-const dashboardMainPageState = dashboardMainPageStore.state;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlState = dashboardPageControlStore.state;
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     folderControlButtons: computed(() => {
@@ -110,17 +110,17 @@ const handleClickTreeItem = (): void => {
     router.push(_location);
 };
 const handleEditFolderName = () => {
-    dashboardMainPageStore.setFolderFormModalType('UPDATE');
-    dashboardMainPageStore.setSelectedFolderId(props.treeData.data.id);
-    dashboardMainPageStore.setFolderFormModalVisible(true);
+    dashboardPageControlStore.setFolderFormModalType('UPDATE');
+    dashboardPageControlStore.setSelectedFolderId(props.treeData.data.id);
+    dashboardPageControlStore.setFolderFormModalVisible(true);
 };
 const handleShareFolder = () => {
-    dashboardMainPageStore.setSelectedFolderId(props.treeData.data.id);
-    dashboardMainPageStore.setFolderShareModalVisible(true);
+    dashboardPageControlStore.setSelectedFolderId(props.treeData.data.id);
+    dashboardPageControlStore.setFolderShareModalVisible(true);
 };
 const handleClickLabel = (label: string) => {
-    dashboardMainPageStore.setSearchQueryTags([
-        ...dashboardMainPageState.searchQueryTags,
+    dashboardPageControlStore.setSearchQueryTags([
+        ...dashboardPageControlState.searchQueryTags,
         {
             key: { name: 'labels', label: 'Label' },
             value: { name: label, label },

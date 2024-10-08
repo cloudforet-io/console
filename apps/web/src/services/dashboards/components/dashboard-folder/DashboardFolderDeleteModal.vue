@@ -18,7 +18,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardMainPageStore } from '@/services/dashboards/stores/dashboard-main-page-store';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -37,17 +37,17 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const dashboardStore = useDashboardStore();
-const dashboardMainPageStore = useDashboardMainPageStore();
-const dashboardMainPageState = dashboardMainPageStore.state;
-const dashboardMainPageGetters = dashboardMainPageStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
-        if (dashboardMainPageState.folderModalType === 'PUBLIC') {
-            return dashboardMainPageGetters.publicModalTableItems;
+        if (dashboardPageControlState.folderModalType === 'PUBLIC') {
+            return dashboardPageControlGetters.publicModalTableItems;
         }
-        return dashboardMainPageGetters.privateModalTableItems;
+        return dashboardPageControlGetters.privateModalTableItems;
     }),
 });
 
@@ -77,6 +77,7 @@ const handleDeleteConfirm = async () => {
     state.loading = true;
     const _deletePromises: Promise<boolean>[] = [];
     state.modalTableItems.forEach((item) => {
+        if (!item.id) return;
         if (item.type === 'DASHBOARD') {
             _deletePromises.push(deleteDashboard(item.id));
         } else {
@@ -89,18 +90,15 @@ const handleDeleteConfirm = async () => {
     } else {
         ErrorHandler.handleRequestError(new Error('Delete failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_DELETE_DASHBOARD'));
     }
-    await Promise.allSettled([
-        dashboardStore.load(),
-        dashboardMainPageStore.load(),
-    ]);
+    await dashboardStore.load();
     state.loading = false;
-    dashboardMainPageStore.setSelectedIdMap({}, dashboardMainPageState.folderModalType);
+    dashboardPageControlStore.setSelectedIdMap({}, dashboardPageControlState.folderModalType);
     state.proxyVisible = false;
 };
 
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
-    if (!visible) dashboardMainPageStore.reset();
+    if (!visible) dashboardPageControlStore.reset();
 });
 </script>
 

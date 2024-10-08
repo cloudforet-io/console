@@ -18,6 +18,8 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+
 
 
 interface Props {
@@ -31,8 +33,8 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
 const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
-const dashboardGetters = dashboardStore.getters;
+const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
@@ -43,7 +45,7 @@ const state = reactive({
         if (props.dashboardId.startsWith('public')) {
             return [
                 defaultItem,
-                ...dashboardState.publicFolderItems.map((folder) => ({
+                ...dashboardPageControlGetters.publicFolderItems.map((folder) => ({
                     label: folder.name,
                     name: folder.folder_id,
                 })),
@@ -51,7 +53,7 @@ const state = reactive({
         }
         return [
             defaultItem,
-            ...dashboardState.privateFolderItems.map((folder) => ({
+            ...dashboardPageControlGetters.privateFolderItems.map((folder) => ({
                 label: folder.name,
                 name: folder.folder_id,
             })),
@@ -90,7 +92,7 @@ watch(() => state.proxyVisible, (visible) => {
     if (!visible) {
         state.selectedFolderId = '';
     } else {
-        const _folderId = dashboardGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
+        const _folderId = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
         if (_folderId) state.selectedFolderId = _folderId;
     }
 }, { immediate: true });

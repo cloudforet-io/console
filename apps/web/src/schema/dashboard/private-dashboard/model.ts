@@ -12,7 +12,7 @@ export interface PrivateDashboardModel {
     dashboard_id: string;
     name: string;
     description: string;
-    version: number|string;
+    version: string;
     layouts: DashboardLayout[];
     vars?: DashboardVars;
     options: DashboardOptions;

@@ -3,7 +3,6 @@ import { computed, reactive } from 'vue';
 import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -11,7 +10,6 @@ import { getClonedName } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
     DashboardType,
     DashboardFolderType,
@@ -41,7 +39,6 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
-import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 
 
@@ -78,42 +75,15 @@ export const useDashboardStore = defineStore('dashboard', () => {
         privateDashboardItems: [] as PrivateDashboardModel[],
         publicFolderItems: [] as PublicFolderModel[],
         privateFolderItems: [] as PrivateFolderModel[],
-        searchFilters: [] as ConsoleFilter[],
-        scope: undefined as DashboardScope | undefined,
         loading: true,
     });
 
-    const getters = reactive({
-        allDashboardItems: computed<DashboardModel[]>(() => [...state.privateDashboardItems, ...state.publicDashboardItems] as DashboardModel[]),
-        domainDashboardItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'DOMAIN')),
-        //
-        allFolderItems: computed<FolderModel[]>(() => [...state.privateFolderItems, ...state.publicFolderItems]),
-        domainFolderItems: computed<PublicFolderModel[]>(() => state.publicFolderItems.filter((item) => item.resource_group === 'DOMAIN')),
-        workspaceFolderItems: computed<PublicFolderModel[]>(() => state.publicFolderItems
-            .filter((item) => ['WORKSPACE', 'DOMAIN'].includes(item.resource_group))
-            .filter((item) => !(item.resource_group === 'DOMAIN' && item.project_id === '*'))),
-        privateFolderItems: computed<PrivateFolderModel[]>(() => state.privateFolderItems),
-        existingFolderNameList: computed<string[]>(() => {
-            const _publicNames = state.publicFolderItems.map((d) => d.name);
-            const _privateNames = state.privateFolderItems.map((d) => d.name);
-            return [..._publicNames, ..._privateNames];
-        }),
-    });
-
     /* Mutations */
-    const setScope = (scope?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>) => {
-        state.scope = scope;
-    };
-    const setSearchFilters = (filters: ConsoleFilter[]) => {
-        state.searchFilters = filters;
-    };
     const reset = () => {
         state.publicDashboardItems = [];
         state.privateDashboardItems = [];
         state.publicFolderItems = [];
         state.privateFolderItems = [];
-        state.searchFilters = [];
-        state.scope = undefined;
         state.loading = true;
     };
 
@@ -121,15 +91,21 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const fetchApiQueryHelper = new ApiQueryHelper();
     const privateDashboardListFetcher = getCancellableFetcher<DashboardListParams, ListResponse<DashboardModel>>(SpaceConnector.clientV2.dashboard.privateDashboard.list);
     const publicDashboardListFetcher = getCancellableFetcher<DashboardListParams, ListResponse<DashboardModel>>(SpaceConnector.clientV2.dashboard.publicDashboard.list);
-    const _fetchDashboard = async (dashboardType: DashboardType, params?: DashboardListParams) => {
+    const _fetchDashboard = async (dashboardType: DashboardType) => {
         const fetcher = dashboardType === 'PRIVATE' ? privateDashboardListFetcher : publicDashboardListFetcher;
         try {
-            fetchApiQueryHelper.setFilters(state.searchFilters);
+            fetchApiQueryHelper.setFilters([]);
+            if (dashboardType === 'PUBLIC') {
+                if (_state.isAdminMode) {
+                    fetchApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
+                } else {
+                    fetchApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
+                }
+            }
             const { status, response } = await fetcher({
-                ...params,
                 query: {
-                    ...(params?.query || {}),
                     ...fetchApiQueryHelper.data,
+                    sort: [{ key: 'created_at', desc: true }],
                 },
             });
             if (status === 'succeed') {
@@ -184,30 +160,17 @@ export const useDashboardStore = defineStore('dashboard', () => {
             }
         }
     };
-    const publicDashboardApiQueryHelper = new ApiQueryHelper();
     const load = async () => {
-        publicDashboardApiQueryHelper.setFilters([]);
-        if (_state.isAdminMode) {
-            publicDashboardApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
-        } else {
-            publicDashboardApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
-        }
-        const _publicDashboardParams = {
-            query: {
-                ...publicDashboardApiQueryHelper.data,
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        };
         state.loading = true;
         if (_state.isAdminMode) {
             await Promise.all([
-                _fetchDashboard('PUBLIC', _publicDashboardParams),
+                _fetchDashboard('PUBLIC'),
                 _fetchFolder('PUBLIC'),
             ]);
         } else {
             await Promise.allSettled([
                 _fetchDashboard('PRIVATE'),
-                _fetchDashboard('PUBLIC', _publicDashboardParams),
+                _fetchDashboard('PUBLIC'),
                 _fetchFolder('PRIVATE'),
                 _fetchFolder('PUBLIC'),
             ]);
@@ -285,12 +248,15 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const getDashboardNameList = (dashboardType: DashboardType) => {
-        if (dashboardType === 'PRIVATE') return (state.privateDashboardItems.filter((i) => i.version === '2.0')).map((item) => item.name);
-        return state.publicDashboardItems.filter((i) => i.version === '2.0').map((item) => item.name);
+        if (dashboardType === 'PRIVATE') {
+            return (state.privateDashboardItems.filter((i) => i.version !== '1.0')).map((item) => item.name);
+        }
+        return state.publicDashboardItems.filter((i) => i.version !== '1.0').map((item) => item.name);
     };
     const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId?: string): Promise<DashboardModel> => {
         const _dashboardType = isPrivate ? 'PRIVATE' : 'PUBLIC';
-        const _dashboard = getters.allDashboardItems.find((item) => item.dashboard_id === dashboardId);
+        const _allDashboardItems = [...state.privateDashboardItems, ...state.publicDashboardItems];
+        const _dashboard = _allDashboardItems.find((item) => item.dashboard_id === dashboardId);
         if (!_dashboard) throw new Error('Dashboard not found');
 
         const _dashboardNameList = getDashboardNameList(_dashboardType);
@@ -332,11 +298,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
 
-
-    const mutations = {
-        setScope,
-        setSearchFilters,
-    };
     const actions = {
         load,
         createDashboard,
@@ -350,8 +311,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     return {
         state,
-        getters,
         ...actions,
-        ...mutations,
     };
 });
