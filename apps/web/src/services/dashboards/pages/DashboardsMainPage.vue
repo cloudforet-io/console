@@ -38,22 +38,17 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import DashboardFolderBundleMoveModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderBundleMoveModal.vue';
-import DashboardFolderCloneModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderCloneModal.vue';
-import DashboardFolderDeleteModal
-    from '@/services/dashboards/components/dashboard-folder/DashboardFolderDeleteModal.vue';
-import DashboardFolderFormModal
-    from '@/services/dashboards/components/dashboard-folder/DashboardFolderFormModal.vue';
-import DashboardFolderShareModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderShareModal.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
+import { useDashboardControlButtons } from '@/services/dashboards/composables/use-dashboard-control-buttons';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
+const controlButtonsHelper = useDashboardControlButtons();
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
@@ -214,18 +209,6 @@ const handleUpdateSelectedIdMap = (type: 'PUBLIC' | 'PRIVATE', selectedIdMap: Re
         dashboardPageControlStore.setSelectedPrivateIdMap(selectedIdMap);
     }
 };
-const handleClickCloneButton = (type: 'PUBLIC' | 'PRIVATE') => {
-    dashboardPageControlStore.setFolderModalType(type);
-    dashboardPageControlStore.setFolderCloneModalVisible(true);
-};
-const handleClickDeleteButton = (type: 'PUBLIC' | 'PRIVATE') => {
-    dashboardPageControlStore.setFolderModalType(type);
-    dashboardPageControlStore.setFolderDeleteModalVisible(true);
-};
-const handleClickMoveButton = (type: 'PUBLIC' | 'PRIVATE') => {
-    dashboardPageControlStore.setFolderModalType(type);
-    dashboardPageControlStore.setFolderMoveModalVisible(true);
-};
 
 /* init */
 let urlQueryStringWatcherStop;
@@ -363,9 +346,9 @@ onUnmounted(() => {
                                        :dashboard-tree-data="state.refinedPublicTreeData"
                                        :button-disable-map="state.publicTreeControlButtonDisableMap"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
-                                       @click-clone="handleClickCloneButton('PUBLIC')"
-                                       @click-delete="handleClickDeleteButton('PUBLIC')"
-                                       @click-move="handleClickMoveButton('PUBLIC')"
+                                       @click-clone="controlButtonsHelper.clickBundleCloneMenu('PUBLIC')"
+                                       @click-delete="controlButtonsHelper.clickBundleDeleteMenu('PUBLIC')"
+                                       @click-move="controlButtonsHelper.clickBundleMoveMenu('PUBLIC')"
                 />
             </div>
             <div v-if="!storeState.isAdminMode && state.refinedPrivateTreeData.length"
@@ -379,9 +362,9 @@ onUnmounted(() => {
                                        :dashboard-tree-data="state.refinedPrivateTreeData"
                                        :button-disable-map="dashboardPageControlGetters.privateTreeControlButtonDisableMap"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
-                                       @click-clone="handleClickCloneButton('PRIVATE')"
-                                       @click-delete="handleClickDeleteButton('PRIVATE')"
-                                       @click-move="handleClickMoveButton('PRIVATE')"
+                                       @click-clone="controlButtonsHelper.clickBundleCloneMenu('PRIVATE')"
+                                       @click-delete="controlButtonsHelper.clickBundleDeleteMenu('PRIVATE')"
+                                       @click-move="controlButtonsHelper.clickBundleMoveMenu('PRIVATE')"
                 />
             </div>
             <dashboard-main-board-list v-if="dashboardPageControlGetters.deprecatedDashboardItems.length"
@@ -389,21 +372,6 @@ onUnmounted(() => {
                                        :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED')"
                                        :dashboard-list="dashboardPageControlGetters.deprecatedDashboardItems"
                                        is-collapsed
-            />
-            <dashboard-folder-form-modal :visible="dashboardPageControlState.folderFormModalVisible"
-                                         @update:visible="dashboardPageControlStore.setFolderFormModalVisible"
-            />
-            <dashboard-folder-delete-modal :visible="dashboardPageControlState.folderDeleteModalVisible"
-                                           @update:visible="dashboardPageControlStore.setFolderDeleteModalVisible"
-            />
-            <dashboard-folder-bundle-move-modal :visible="dashboardPageControlState.folderMoveModalVisible"
-                                                @update:visible="dashboardPageControlStore.setFolderMoveModalVisible"
-            />
-            <dashboard-folder-clone-modal :visible="dashboardPageControlState.folderCloneModalVisible"
-                                          @update:visible="dashboardPageControlStore.setFolderCloneModalVisible"
-            />
-            <dashboard-folder-share-modal :visible="dashboardPageControlState.folderShareModalVisible"
-                                          @update:visible="dashboardPageControlStore.setFolderShareModalVisible"
             />
         </p-data-loader>
     </div>

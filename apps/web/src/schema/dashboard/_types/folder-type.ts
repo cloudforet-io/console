@@ -6,6 +6,6 @@ import type { PublicFolderDeleteParameters } from '@/schema/dashboard/public-fol
 import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 
 
-export type FolderModel = PublicFolderModel | PrivateFolderModel;
+export type FolderModel = PublicFolderModel & PrivateFolderModel;
 export type FolderCreateParams = PublicFolderCreateParameters | PrivateFolderCreateParameters;
 export type FolderDeleteParams = PublicFolderDeleteParameters | PrivateFolderDeleteParameters;
