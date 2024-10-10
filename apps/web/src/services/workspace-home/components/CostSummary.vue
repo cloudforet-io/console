@@ -13,8 +13,8 @@ import {
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
-import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
+import type { UnifiedCostAnalyzeParameters } from '@/schema/cost-analysis/unified-cost/api-verbs/analyze';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -36,7 +36,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
-import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
+import type { UnifiedCostAnalyzeResult } from '@/services/cost-explorer/types/unified-cost-type';
 import CostSummaryChart from '@/services/workspace-home/components/CostSummaryChart.vue';
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
 import { costStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
@@ -120,8 +120,7 @@ const handleSelectedProject = async (selectedProject: string[]) => {
 const analyzeCostReportData = async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
-            cost_report_config_id: storeState.costReportConfig?.cost_report_config_id,
+        const { results } = await SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze<UnifiedCostAnalyzeParameters, AnalyzeResponse<UnifiedCostAnalyzeResult>>({
             query: {
                 start: state.period.start,
                 end: state.period.end,
