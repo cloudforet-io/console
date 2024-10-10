@@ -1,5 +1,5 @@
 export * from './context-menu-controller';
-export * from './context-menu-fixed-style';
+export * from './context-menu-style';
 export * from './query-search';
 export * from './ignore-window-arrow-keydown-events';
 export * from './list-focus';
