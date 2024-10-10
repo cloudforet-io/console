@@ -269,6 +269,7 @@ const isSortable = (field: TableWidgetField) => {
 };
 
 const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
+    const BASE_OPACITY = 0.1;
     const _style: Record<string, string> = {};
     const heatmapSkipCondition = field.fieldInfo?.type === 'labelField'
         || (field?.fieldInfo?.additionalType && SKIP_HEATMAP_FIELD.includes(field?.fieldInfo?.additionalType));
@@ -287,7 +288,7 @@ const getHeatmapColorStyle = (item: TableDataItem, field: TableWidgetField) => {
         _dataField = props.criteria as string;
     }
 
-    const opacity = 0.1 + (0.9 * ((_value - minValue) / absGapValue));
+    const opacity = absGapValue !== 0 ? (BASE_OPACITY + (0.9 * ((_value - minValue) / absGapValue))) : BASE_OPACITY;
     const _colorInfo = props.dataFieldHeatmapColorInfo?.[_dataField]?.value;
     if (_colorInfo && _colorInfo !== 'NONE') {
         const rgbaString = hexToRgba(HEATMAP_COLOR_HEX_MAP[_colorInfo], opacity);
