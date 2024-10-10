@@ -49,7 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
     selected: () => ([]),
 });
 
-const emit = defineEmits<{(e: 'click-done', value: (string|undefined)[]): void;
+const emit = defineEmits<{(e: 'select', value: string[]): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -120,12 +120,8 @@ const menuHandler = (inputText: string) => {
 };
 
 /* event */
-const handleChangeSelected = (selected?: SelectDropdownMenuItem[]) => {
-    if (!selected || selected.length === 0) {
-        emit('click-done', []);
-        return;
-    }
-    emit('click-done', selected.map((d) => d.name));
+const handleChangeSelected = (selected: SelectDropdownMenuItem[]) => {
+    emit('select', selected.map((d) => d.name));
 };
 </script>
 
@@ -138,8 +134,7 @@ const handleChangeSelected = (selected?: SelectDropdownMenuItem[]) => {
                        show-select-marker
                        :handler="type !== CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY ? menuHandler : undefined"
                        is-filterable
-                       show-select-header
-                       @click-done="handleChangeSelected"
+                       @update:selected="handleChangeSelected"
                        @clear-selection="handleChangeSelected"
     >
         <template v-if="props.type === CLOUD_SERVICE_FILTER_KEY.REGION"
