@@ -149,10 +149,10 @@ export const useDashboardControlButtons = () => {
     const clickShareMenu = (id: string) => {
         if (id.includes('folder')) {
             dashboardPageControlStore.setSelectedFolderId(id);
-            dashboardPageControlStore.setShareModalVisible(true);
+            dashboardPageControlStore.setBundleShareModalVisible(true);
         } else {
             dashboardPageControlStore.setSelectedDashboardId(id);
-            dashboardPageControlStore.setShareModalVisible(true);
+            dashboardPageControlStore.setBundleShareModalVisible(true);
         }
     };
     const clickShareWithCodeMenu = (dashboardId: string) => {
@@ -162,7 +162,7 @@ export const useDashboardControlButtons = () => {
     const clickCloneMenu = (id: string) => {
         if (id.includes('folder')) {
             dashboardPageControlStore.setSelectedFolderId(id);
-            dashboardPageControlStore.setFolderCloneModalVisible(true);
+            dashboardPageControlStore.setBundleCloneModalVisible(true);
         } else {
             dashboardPageControlStore.setSelectedDashboardId(id);
             dashboardPageControlStore.setDashboardCloneModalVisible(true);
@@ -171,7 +171,7 @@ export const useDashboardControlButtons = () => {
     const clickDeleteMenu = (id: string) => {
         if (id.includes('folder')) {
             dashboardPageControlStore.setSelectedFolderId(id);
-            dashboardPageControlStore.setFolderDeleteModalVisible(true);
+            dashboardPageControlStore.setBundleDeleteModalVisible(true);
         } else {
             dashboardPageControlStore.setSelectedDashboardId(id);
             dashboardPageControlStore.setDashboardDeleteModalVisible(true);
@@ -185,15 +185,15 @@ export const useDashboardControlButtons = () => {
     // Bundle (Folder + Dashboard)
     const clickBundleCloneMenu = (type: 'PRIVATE'|'PUBLIC') => {
         dashboardPageControlStore.setFolderModalType(type);
-        dashboardPageControlStore.setFolderCloneModalVisible(true);
+        dashboardPageControlStore.setBundleCloneModalVisible(true);
     };
     const clickBundleMoveMenu = (type: 'PRIVATE'|'PUBLIC') => {
         dashboardPageControlStore.setFolderModalType(type);
-        dashboardPageControlStore.setDashboardFolderBundleMoveModalVisible(true);
+        dashboardPageControlStore.setBundleMoveModalVisible(true);
     };
     const clickBundleDeleteMenu = (type: 'PRIVATE'|'PUBLIC') => {
         dashboardPageControlStore.setFolderModalType(type);
-        dashboardPageControlStore.setFolderDeleteModalVisible(true);
+        dashboardPageControlStore.setBundleDeleteModalVisible(true);
     };
 
     return {

@@ -12,13 +12,13 @@ import DashboardFolderSingleMoveModal
 import DashboardNameEditModal from '@/services/dashboards/components/dashboard-detail/DashboardNameEditModal.vue';
 import DashboardShareWithCodeModal
     from '@/services/dashboards/components/dashboard-detail/DashboardShareWithCodeModal.vue';
-import DashboardFolderBundleMoveModal
-    from '@/services/dashboards/components/dashboard-folder/DashboardFolderBundleMoveModal.vue';
-import DashboardFolderCloneModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderCloneModal.vue';
-import DashboardFolderDeleteModal
-    from '@/services/dashboards/components/dashboard-folder/DashboardFolderDeleteModal.vue';
 import DashboardFolderFormModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderFormModal.vue';
-import DashboardFolderShareModal from '@/services/dashboards/components/dashboard-folder/DashboardFolderShareModal.vue';
+import DashboardBundleCloneModal from '@/services/dashboards/components/dashboard-main/DashboardBundleCloneModal.vue';
+import DashboardBundleDeleteModal
+    from '@/services/dashboards/components/dashboard-main/DashboardBundleDeleteModal.vue';
+import DashboardBundleMoveModal
+    from '@/services/dashboards/components/dashboard-main/DashboardBundleMoveModal.vue';
+import DashboardBundleShareModal from '@/services/dashboards/components/dashboard-main/DashboardBundleShareModal.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import DashboardsLSB from '@/services/dashboards/DashboardsLSB.vue';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -55,11 +55,6 @@ callApiWithGrantGuard();
             <router-view />
         </general-page-layout>
         <!-- Modals -->
-        <!-- Single (Folder | Dashboard) -->
-        <dashboard-folder-share-modal :visible="dashboardPageControlState.shareModalVisible"
-                                      :dashboard-id="dashboardPageControlState.selectedDashboardId"
-                                      :folder-id="dashboardPageControlState.selectedFolderId"
-        />
         <!-- Single (Dashboard) -->
         <dashboard-name-edit-modal :visible="dashboardPageControlState.dashboardNameEditModalVisible"
                                    :dashboard-id="dashboardPageControlState.selectedDashboardId"
@@ -81,12 +76,16 @@ callApiWithGrantGuard();
                                      :folder-id="dashboardPageControlState.selectedFolderId"
         />
         <!-- Bundle (Folder & Dashboard)-->
-        <dashboard-folder-clone-modal :visible="dashboardPageControlState.folderCloneModalVisible"
+        <dashboard-bundle-share-modal :visible="dashboardPageControlState.bundleShareModalVisible"
+                                      :dashboard-id="dashboardPageControlState.selectedDashboardId"
                                       :folder-id="dashboardPageControlState.selectedFolderId"
         />
-        <dashboard-folder-delete-modal :visible="dashboardPageControlState.folderDeleteModalVisible"
+        <dashboard-bundle-clone-modal :visible="dashboardPageControlState.bundleCloneModalVisible"
+                                      :folder-id="dashboardPageControlState.selectedFolderId"
+        />
+        <dashboard-bundle-delete-modal :visible="dashboardPageControlState.bundleDeleteModalVisible"
                                        :folder-id="dashboardPageControlState.selectedFolderId"
         />
-        <dashboard-folder-bundle-move-modal :visible="dashboardPageControlState.dashboardFolderBundleMoveModalVisible" />
+        <dashboard-bundle-move-modal :visible="dashboardPageControlState.bundleMoveModalVisible" />
     </fragment>
 </template>

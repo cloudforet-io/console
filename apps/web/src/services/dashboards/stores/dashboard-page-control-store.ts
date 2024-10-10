@@ -51,18 +51,19 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         folderFormModalVisible: false,
         folderFormModalType: 'CREATE' as 'CREATE' | 'UPDATE',
         folderModalType: 'PUBLIC' as 'PUBLIC' | 'PRIVATE',
-        folderDeleteModalVisible: false,
-        folderCloneModalVisible: false,
         selectedFolderId: undefined as string | undefined,
         // dashboard
         dashboardNameEditModalVisible: false,
         dashboardDeleteModalVisible: false,
         dashboardCloneModalVisible: false,
         dashboardShareWithCodeModalVisible: false,
-        shareModalVisible: false,
         dashboardFolderSingleMoveModalVisible: false,
-        dashboardFolderBundleMoveModalVisible: false,
         selectedDashboardId: undefined as string | undefined,
+        // bundle
+        bundleShareModalVisible: false,
+        bundleMoveModalVisible: false,
+        bundleCloneModalVisible: false,
+        bundleDeleteModalVisible: false,
         //
         selectedPublicIdMap: {} as Record<string, boolean>,
         selectedPrivateIdMap: {} as Record<string, boolean>,
@@ -132,12 +133,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     const setSelectedFolderId = (folderId: string | undefined) => {
         state.selectedFolderId = folderId;
     };
-    const setFolderDeleteModalVisible = (visible: boolean) => {
-        state.folderDeleteModalVisible = visible;
-    };
-    const setFolderCloneModalVisible = (visible: boolean) => {
-        state.folderCloneModalVisible = visible;
-    };
     const setSelectedPublicIdMap = (idMap: Record<string, boolean>) => {
         state.selectedPublicIdMap = idMap;
     };
@@ -150,9 +145,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     const setNewIdList = (newIdList: string[]) => {
         state.newIdList = newIdList;
     };
-    const setShareModalVisible = (visible: boolean) => {
-        state.shareModalVisible = visible;
-    };
     const setSearchQueryTags = (queryTags: QueryTag[] = []) => {
         state.searchQueryTags = queryTags;
     };
@@ -161,26 +153,29 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     const setDashboardCloneModalVisible = (visible: boolean) => { state.dashboardCloneModalVisible = visible; };
     const setDashboardShareWithCodeModalVisible = (visible: boolean) => { state.dashboardShareWithCodeModalVisible = visible; };
     const setDashboardFolderSingleMoveModalVisible = (visible: boolean) => { state.dashboardFolderSingleMoveModalVisible = visible; };
-    const setDashboardFolderBundleMoveModalVisible = (visible: boolean) => { state.dashboardFolderBundleMoveModalVisible = visible; };
+    const setBundleShareModalVisible = (visible: boolean) => { state.bundleShareModalVisible = visible; };
+    const setBundleMoveModalVisible = (visible: boolean) => { state.bundleMoveModalVisible = visible; };
+    const setBundleCloneModalVisible = (visible: boolean) => { state.bundleCloneModalVisible = visible; };
+    const setBundleDeleteModalVisible = (visible: boolean) => { state.bundleDeleteModalVisible = visible; };
     const setSelectedDashboardId = (dashboardId: string | undefined) => { state.selectedDashboardId = dashboardId; };
     const mutations = {
         setFolderFormModalVisible,
         setFolderFormModalType,
         setSelectedFolderId,
-        setFolderDeleteModalVisible,
+        setBundleDeleteModalVisible,
         setSelectedPublicIdMap,
         setSelectedPrivateIdMap,
         setFolderModalType,
-        setFolderCloneModalVisible,
+        setBundleCloneModalVisible,
         setNewIdList,
-        setShareModalVisible,
+        setBundleShareModalVisible,
         setSearchQueryTags,
         setDashboardNameEditModalVisible,
         setDashboardDeleteModalVisible,
         setDashboardCloneModalVisible,
         setDashboardShareWithCodeModalVisible,
         setDashboardFolderSingleMoveModalVisible,
-        setDashboardFolderBundleMoveModalVisible,
+        setBundleMoveModalVisible,
         setSelectedDashboardId,
     };
 
@@ -189,16 +184,16 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         setFolderFormModalVisible(false);
         setFolderFormModalType('CREATE');
         setSelectedFolderId(undefined);
-        setFolderDeleteModalVisible(false);
+        setBundleDeleteModalVisible(false);
         setFolderModalType('PUBLIC');
-        setFolderCloneModalVisible(false);
-        setShareModalVisible(false);
+        setBundleCloneModalVisible(false);
+        setBundleShareModalVisible(false);
         setDashboardNameEditModalVisible(false);
         setDashboardDeleteModalVisible(false);
         setDashboardCloneModalVisible(false);
         setDashboardShareWithCodeModalVisible(false);
         setDashboardFolderSingleMoveModalVisible(false);
-        setDashboardFolderBundleMoveModalVisible(false);
+        setBundleMoveModalVisible(false);
         setSelectedDashboardId(undefined);
         setSelectedFolderId(undefined);
         setSelectedPublicIdMap({});
