@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -7,14 +8,16 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { PublicDashboardShareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/share';
+import type { PublicDashboardUnshareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/unshare';
+import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import type { PublicFolderShareParameters } from '@/schema/dashboard/public-folder/api-verbs/share';
 import type { PublicFolderUnshareParameters } from '@/schema/dashboard/public-folder/api-verbs/unshare';
+import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PublicFolderReferenceItem, PublicFolderReferenceMap } from '@/store/reference/public-folder-reference-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -23,6 +26,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
@@ -34,36 +38,53 @@ const TABLE_FIELDS = [
 ];
 interface Props {
     visible?: boolean;
+    dashboardId?: string;
+    folderId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    dashboardId: undefined,
+    folderId: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
+const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardPageControlGetters = dashboardPageControlStore.getters;
-const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    folders: computed<PublicFolderReferenceMap>(() => allReferenceStore.getters.publicFolder),
 });
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
-    targetFolderItem: computed<PublicFolderReferenceItem|undefined>(() => storeState.folders[dashboardPageControlState.selectedFolderId || '']),
-    isShared: computed<boolean>(() => !!state.targetFolderItem?.data?.shared),
+    targetFolderId: computed<string|undefined>(() => props.folderId || state.targetDashboardItem?.folder_id),
+    targetFolderItem: computed<PublicFolderModel|undefined>(() => dashboardPageControlGetters.allFolderItems.find((f) => f.folder_id === state.targetFolderId)),
+    targetDashboardItem: computed<PublicDashboardModel|undefined>(() => dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)),
+    isShared: computed<boolean>(() => {
+        if (props.folderId) return !!state.targetFolderItem?.shared;
+        return !!state.targetDashboardItem?.shared;
+    }),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
+        // share dashboard case
+        if (!state.targetFolderId) {
+            return [{
+                id: state.targetDashboardItem?.dashboard_id || '',
+                name: state.targetDashboardItem?.name || '',
+                type: 'DASHBOARD',
+            }];
+        }
+
+        // share folder case
         const _folderName = state.targetFolderItem?.name || '';
         const _folderItems: DashboardDataTableItem[] = [{
-            id: state.targetFolderItem?.key || '',
+            id: state.targetFolderItem?.folder_id || '',
             name: _folderName,
             type: 'FOLDER',
         }];
         const _dashboardItems: DashboardDataTableItem[] = dashboardPageControlGetters.allDashboardItems
-            .filter((d) => d.folder_id === dashboardPageControlState.selectedFolderId)
+            .filter((d) => d.folder_id === state.targetFolderId)
             .map((d) => ({
                 id: d.dashboard_id,
                 name: d.name,
@@ -72,14 +93,40 @@ const state = reactive({
             }));
         return [..._folderItems, ..._dashboardItems];
     }),
-    headerTitle: computed(() => {
+    headerTitle: computed<TranslateResult>(() => {
+        // admin
         if (storeState.isAdminMode) {
-            if (!state.isShared) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARE_DASHBOARD');
-            if (state.targetFolderItem?.data?.projectId === '*') return i18n.t('DASHBOARDS.ALL_DASHBOARDS.UNSHARE_DASHBOARD_FROM_ALL_PROJECTS');
-            return i18n.t('DASHBOARDS.ALL_DASHBOARDS.UNSHARE_DASHBOARD_FROM_ALL_WORKSPACES');
+            if (!state.isShared) {
+                if (state.targetFolderId) return i18n.t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER');
+                return i18n.t('DASHBOARDS.DETAIL.SHARE_DASHBOARD');
+            }
+            if (state.targetDashboardItem?.data?.scope === 'WORKSPACE') {
+                if (state.targetFolderId) return i18n.t('DASHBOARDS.DETAIL.UNSHARE_ENTIRE_FOLDER_FROM_ALL_WORKSPACES');
+                return i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_WORKSPACES');
+            }
+            if (state.targetFolderId) return i18n.t('DASHBOARDS.DETAIL.UNSHARE_ENTIRE_FOLDER_FROM_ALL_PROJECTS');
+            return i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS');
         }
-        if (!state.isShared) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARE_DASHBOARD_TO_ALL_PROJECTS');
-        return i18n.t('DASHBOARDS.ALL_DASHBOARDS.UNSHARE_DASHBOARD_FROM_ALL_PROJECTS');
+        // workspace owner
+        if (!state.isShared) {
+            if (state.targetFolderId) return i18n.t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER_TO_ALL_PROJECTS');
+            return i18n.t('DASHBOARDS.DETAIL.SHARE_TO_ALL_PROJECTS');
+        }
+        if (state.targetFolderId) return i18n.t('DASHBOARDS.DETAIL.UNSHARE_ENTIRE_FOLDER_FROM_ALL_PROJECTS');
+        return i18n.t('DASHBOARDS.DETAIL.UNSHARE_FROM_ALL_PROJECTS');
+    }),
+    modalDescription: computed<TranslateResult[]|undefined>(() => {
+        if (!state.targetFolderId) return undefined;
+        if (!state.isShared) {
+            return [
+                i18n.t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER_DESC_1'),
+                i18n.t('DASHBOARDS.DETAIL.SHARE_ENTIRE_FOLDER_DESC_2'),
+            ];
+        }
+        return [
+            i18n.t('DASHBOARDS.DETAIL.UNSHARE_ENTIRE_FOLDER_DESC_1'),
+            i18n.t('DASHBOARDS.DETAIL.UNSHARE_ENTIRE_FOLDER_DESC_2'),
+        ];
     }),
     radioMenuList: computed<MenuItem[]>(() => ([
         { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALL_WORKSPACES'), name: 'WORKSPACE' },
@@ -93,11 +140,10 @@ const shareFolder = async () => {
     state.loading = true;
     try {
         await SpaceConnector.clientV2.dashboard.publicFolder.share<PublicFolderShareParameters>({
-            folder_id: state.targetFolderItem?.key || '',
+            folder_id: state.targetFolderId || '',
             scope: storeState.isAdminMode ? state.selectedTarget : 'PROJECT',
         });
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
-        state.proxyVisible = false;
     } catch (e: any) {
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
@@ -109,10 +155,38 @@ const unshareFolder = async () => {
     state.loading = true;
     try {
         await SpaceConnector.clientV2.dashboard.publicFolder.unshare<PublicFolderUnshareParameters>({
-            folder_id: state.targetFolderItem?.key || '',
+            folder_id: state.targetFolderId || '',
         });
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
-        state.proxyVisible = false;
+    } catch (e: any) {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+const shareDashboard = async () => {
+    state.loading = true;
+    try {
+        await SpaceConnector.clientV2.dashboard.publicDashboard.share<PublicDashboardShareParameters>({
+            dashboard_id: props.dashboardId || '',
+            scope: storeState.isAdminMode ? state.selectedTarget : 'PROJECT',
+        });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
+    } catch (e: any) {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+const unshareDashboard = async () => {
+    state.loading = true;
+    try {
+        await SpaceConnector.clientV2.dashboard.publicDashboard.unshare<PublicDashboardUnshareParameters>({
+            dashboard_id: props.dashboardId || '',
+        });
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
     } catch (e: any) {
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
@@ -123,9 +197,22 @@ const unshareFolder = async () => {
 
 /* Event */
 const handleConfirm = async () => {
-    if (!state.isShared) await shareFolder();
-    else await unshareFolder();
+    if (!state.isShared) {
+        if (state.targetFolderId) await shareFolder();
+        else await shareDashboard();
+    } else if (state.targetFolderId) {
+        await unshareFolder();
+    } else {
+        await unshareDashboard();
+    }
     await dashboardStore.load();
+
+    // for dashboard detail page
+    if (props.dashboardId) {
+        const _updatedDashboard = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId);
+        dashboardDetailStore.setDashboardInfo(_updatedDashboard);
+    }
+    state.proxyVisible = false;
 };
 const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
     state.selectedTarget = value;
@@ -151,6 +238,13 @@ watch(() => state.proxyVisible, (visible) => {
                     @confirm="handleConfirm"
     >
         <template #body>
+            <div v-if="state.modalDescription"
+                 class="entire-folder-desc"
+            >
+                <span>
+                    <b>{{ state.modalDescription[0] }}</b> {{ state.modalDescription[1] }}
+                </span>
+            </div>
             <p-field-group v-if="storeState.isAdminMode && !state.isShared"
                            :label="$t('DASHBOARDS.ALL_DASHBOARDS.SHARE_TO')"
                            required

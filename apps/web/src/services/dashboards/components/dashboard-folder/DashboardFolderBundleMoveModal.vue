@@ -26,7 +26,7 @@ import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashb
 
 
 interface Props {
-    visible: boolean;
+    visible?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
@@ -114,7 +114,6 @@ const handleFormConfirm = async () => {
         ErrorHandler.handleRequestError(new Error(''), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_MOVE_DASHBOARD', { count: failCount }));
     }
     await dashboardStore.load();
-    dashboardPageControlStore.resetSelectedIdMap(dashboardPageControlState.folderModalType);
     state.proxyVisible = false;
 };
 

@@ -23,6 +23,10 @@ import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboa
 
 
 
+/* Cases
+* Single Case: If props.folderId exists, delete single folder
+* Multiple Case: Otherwise, delete multiple folders (get selected data from dashboardPageControlGetters)
+*/
 const DELETE_TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
     { name: 'location', label: 'Location' },
@@ -30,9 +34,11 @@ const DELETE_TABLE_FIELDS = [
 type FolderDeleteParams = PublicFolderDeleteParameters | PrivateFolderDeleteParameters;
 interface Props {
     visible?: boolean;
+    folderId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    folderId: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
@@ -44,6 +50,27 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
+        // single folder case
+        if (props.folderId) {
+            const _targetFolderItem = dashboardPageControlGetters.allFolderItems.find((f) => f.folder_id === props.folderId);
+            const _folderName = _targetFolderItem?.name || '';
+            const _folderItems: DashboardDataTableItem[] = [{
+                id: _targetFolderItem?.folder_id || '',
+                name: _folderName,
+                type: 'FOLDER',
+            }];
+            const _dashboardItems: DashboardDataTableItem[] = dashboardPageControlGetters.allDashboardItems
+                .filter((d) => d.folder_id === props.folderId)
+                .map((d) => ({
+                    id: d.dashboard_id,
+                    name: d.name,
+                    location: _folderName,
+                    type: 'DASHBOARD',
+                }));
+            return [..._folderItems, ..._dashboardItems];
+        }
+
+        // multiple folders case
         if (dashboardPageControlState.folderModalType === 'PUBLIC') {
             return dashboardPageControlGetters.publicModalTableItems;
         }
@@ -92,7 +119,6 @@ const handleDeleteConfirm = async () => {
     }
     await dashboardStore.load();
     state.loading = false;
-    dashboardPageControlStore.setSelectedIdMap({}, dashboardPageControlState.folderModalType);
     state.proxyVisible = false;
 };
 

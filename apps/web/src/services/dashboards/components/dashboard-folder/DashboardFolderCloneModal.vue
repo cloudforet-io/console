@@ -23,6 +23,10 @@ import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboa
 
 
 
+/* Cases
+* Single Case: If props.folderId exists, clone single folder
+* Multiple Case: Otherwise, clone multiple folders (get selected data from dashboardPageControlGetters)
+*/
 const CLONE_TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
     { name: 'location', label: 'Location' },
@@ -30,9 +34,11 @@ const CLONE_TABLE_FIELDS = [
 ];
 interface Props {
     visible?: boolean;
+    folderId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    folderId: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
@@ -55,13 +61,29 @@ const state = reactive({
         }
         return CLONE_TABLE_FIELDS;
     }),
-    selectedTreeData: computed(() => {
-        if (dashboardPageControlState.folderModalType === 'PUBLIC') {
-            return dashboardPageControlGetters.selectedPublicTreeData;
-        }
-        return dashboardPageControlGetters.selectedPrivateTreeData;
-    }),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
+        // single folder case
+        if (props.folderId) {
+            const _targetFolderItem = dashboardPageControlGetters.allFolderItems.find((f) => f.folder_id === props.folderId);
+            const _folderName = _targetFolderItem?.name || '';
+            const _folderItems: DashboardDataTableItem[] = [{
+                id: _targetFolderItem?.folder_id || '',
+                name: _folderName,
+                type: 'FOLDER',
+            }];
+            const _dashboardItems: DashboardDataTableItem[] = dashboardPageControlGetters.allDashboardItems
+                .filter((d) => d.folder_id === props.folderId)
+                .map((d) => ({
+                    id: d.dashboard_id,
+                    name: d.name,
+                    location: _folderName,
+                    folderId: d.folder_id,
+                    type: 'DASHBOARD',
+                }));
+            return [..._folderItems, ..._dashboardItems];
+        }
+
+        // multiple folders case
         if (dashboardPageControlState.folderModalType === 'PUBLIC') {
             return dashboardPageControlGetters.publicModalTableItems;
         }
@@ -85,17 +107,18 @@ const handleCloneConfirm = async () => {
     state.loading = true;
     const _createDashboardPromises: Promise<void>[] = [];
 
-    await Promise.allSettled(state.selectedTreeData.map(async (item) => {
-        const _isPrivate = storeState.isWorkspaceMember ? true : state.privateMap[item.data.id];
-        if (item.data.type === 'FOLDER') {
-            const createdFolderId = await dashboardStore.createFolder(item.data.name, _isPrivate);
+    await Promise.allSettled(state.modalTableItems.map(async (item) => {
+        const _isPrivate = storeState.isWorkspaceMember ? true : state.privateMap[item.id];
+        if (item.type === 'FOLDER') {
+            const createdFolderId = await dashboardStore.createFolder(item.name, _isPrivate);
             if (!createdFolderId) return;
             dashboardPageControlStore.setNewIdList([...dashboardPageControlState.newIdList, createdFolderId]);
-            item.children.forEach((child) => {
-                _createDashboardPromises.push(cloneDashboard(child.data.id, _isPrivate, createdFolderId));
+            const _children = state.modalTableItems.filter((d) => d.folderId === item.id);
+            _children.forEach((child) => {
+                _createDashboardPromises.push(cloneDashboard(child.id, _isPrivate, createdFolderId));
             });
-        } else {
-            _createDashboardPromises.push(cloneDashboard(item.data.id, _isPrivate));
+        } else if (!item.folderId) {
+            _createDashboardPromises.push(cloneDashboard(item.id, _isPrivate));
         }
     }));
     const _results = await Promise.allSettled(_createDashboardPromises);
@@ -107,7 +130,6 @@ const handleCloneConfirm = async () => {
         showErrorMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }), '');
     }
     await dashboardStore.load();
-    dashboardPageControlStore.setSelectedIdMap({}, dashboardPageControlState.folderModalType);
     state.loading = false;
     state.proxyVisible = false;
 };
@@ -119,10 +141,10 @@ const handleChangePrivate = (id: string, value: boolean) => {
 
     const _isFolder = id.includes('folder');
     if (_isFolder) {
-        state.selectedTreeData.find((item) => item.data.id === id)?.children.forEach((child) => {
+        state.modalTableItems.filter((item) => item.folderId === id).forEach((child) => {
             state.privateMap = {
                 ...state.privateMap,
-                [child.data.id]: value,
+                [child.id]: value,
             };
         });
     }
