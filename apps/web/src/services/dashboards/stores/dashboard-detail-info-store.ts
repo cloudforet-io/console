@@ -122,14 +122,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         // validation
         isNameValid: undefined as boolean | undefined,
         widgetValidMap: {} as WidgetValidMap,
-        // modals
-        folderMoveModalVisible: false,
-        dashboardNameEditModalVisible: false,
-        dashboardDeleteModalVisible: false,
-        dashboardCloneModalVisible: false,
-        shareWithCodeModalVisible: false,
-        dashboardShareModalVisible: false,
-        dashboardShareModalType: 'SHARE' as 'SHARE' | 'UNSHARE',
     });
 
     const getters = reactive({
@@ -204,13 +196,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setDashboardScope = (dashboardScope: DashboardScope) => { state.dashboardScope = dashboardScope; };
     const setProjectId = (projectId?: string) => { state.projectId = projectId; };
     const setDashboardLayouts = (layouts: DashboardLayout[]) => { state.dashboardLayouts = layouts; };
-    const setFolderMoveModalVisible = (visible: boolean) => { state.folderMoveModalVisible = visible; };
-    const setDashboardNameEditModalVisible = (visible: boolean) => { state.dashboardNameEditModalVisible = visible; };
-    const setDashboardDeleteModalVisible = (visible: boolean) => { state.dashboardDeleteModalVisible = visible; };
-    const setDashboardCloneModalVisible = (visible: boolean) => { state.dashboardCloneModalVisible = visible; };
-    const setShareWithCodeModalVisible = (visible: boolean) => { state.shareWithCodeModalVisible = visible; };
-    const setDashboardShareModalVisible = (visible: boolean) => { state.dashboardShareModalVisible = visible; };
-    const setDashboardShareModalType = (type: 'SHARE' | 'UNSHARE') => { state.dashboardShareModalType = type; };
+
     /* Actions */
     const reset = () => {
         // set default value of all state
@@ -438,13 +424,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setDashboardScope,
         setProjectId,
         setDashboardLayouts,
-        setFolderMoveModalVisible,
-        setDashboardNameEditModalVisible,
-        setDashboardDeleteModalVisible,
-        setDashboardCloneModalVisible,
-        setShareWithCodeModalVisible,
-        setDashboardShareModalVisible,
-        setDashboardShareModalType,
     };
     const actions = {
         reset,
