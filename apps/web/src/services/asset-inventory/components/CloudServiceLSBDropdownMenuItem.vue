@@ -47,7 +47,7 @@ const handleFilterUpdate = (name: string, selected: string[]) => {
     <div class="cloud-service-l-s-b-dropdown-menu-item">
         <cloud-service-filter-search-dropdown :type="props.type"
                                               :selected="state.filters[props.type]"
-                                              @click-done="handleFilterUpdate(props.type, $event)"
+                                              @select="handleFilterUpdate(props.type, $event)"
         />
     </div>
 </template>
