@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PI } from '@cloudforet/mirinae';
@@ -118,14 +118,10 @@ const handleDeleteConfirm = async () => {
         ErrorHandler.handleRequestError(new Error('Delete failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_DELETE_DASHBOARD'));
     }
     await dashboardStore.load();
+    dashboardPageControlStore.reset();
     state.loading = false;
     state.proxyVisible = false;
 };
-
-/* Watcher */
-watch(() => state.proxyVisible, (visible) => {
-    if (!visible) dashboardPageControlStore.reset();
-});
 </script>
 
 <template>
