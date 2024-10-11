@@ -59,7 +59,7 @@ export const useContextMenuStyle = ({
                         apply({ rects, elements, availableHeight: floatingAvailableHeight }) {
                             let availableHeight = floatingAvailableHeight - PAD;
                             const style: Partial<CSSStyleDeclaration> = {
-                                minWidth: state.menuWidth === 'target-width' || state.menuWidth === 'auto' || !state.menuWidth ? `${rects.reference.width}px` : state.menuWidth,
+                                minWidth: (state.menuWidth === 'target-width' || state.menuWidth === 'auto' || !state.menuWidth) ? `${rects.reference.width}px` : state.menuWidth,
                                 width: state.menuWidth === 'target-width' ? `${rects.reference.width}px` : state.menuWidth,
                             };
 
