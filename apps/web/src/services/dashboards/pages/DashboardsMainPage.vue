@@ -344,6 +344,9 @@ onUnmounted(() => {
                                        :dashboard-tree-data="state.refinedPublicTreeData"
                                        :button-disable-map="state.publicTreeControlButtonDisableMap"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
+                                       @click-clone="dashboardPageControlStore.openBundleCloneModal('PUBLIC')"
+                                       @click-delete="dashboardPageControlStore.openBundleDeleteModal('PUBLIC')"
+                                       @click-move="dashboardPageControlStore.openBundleMoveModal('PUBLIC')"
                 />
             </div>
             <div v-if="!storeState.isAdminMode && state.refinedPrivateTreeData.length"
@@ -357,6 +360,9 @@ onUnmounted(() => {
                                        :dashboard-tree-data="state.refinedPrivateTreeData"
                                        :button-disable-map="dashboardPageControlGetters.privateTreeControlButtonDisableMap"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
+                                       @click-clone="dashboardPageControlStore.openBundleCloneModal('PRIVATE')"
+                                       @click-delete="dashboardPageControlStore.openBundleDeleteModal('PRIVATE')"
+                                       @click-move="dashboardPageControlStore.openBundleMoveModal('PRIVATE')"
                 />
             </div>
             <dashboard-main-board-list v-if="dashboardPageControlGetters.deprecatedDashboardItems.length"
