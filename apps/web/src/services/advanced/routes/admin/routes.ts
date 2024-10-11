@@ -105,13 +105,13 @@ const adminAdvancedRoutes: RouteConfig = {
             component: DomainSettingsContainer,
             children: [
                 {
-                    path: '/domain-information',
+                    path: 'domain-information',
                     name: makeAdminRouteName(ADVANCED_ROUTE.PREFERENCES.DOMAIN_INFORMATION._NAME),
                     meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.DOMAIN_INFORMATION].translationId },
                     component: AdminDomainSettingsBaseInformationPage,
                 },
                 {
-                    path: '/appearance',
+                    path: 'appearance',
                     name: makeAdminRouteName(ADVANCED_ROUTE.PREFERENCES.APPEARANCE._NAME),
                     meta: { lsbVisible: true, translationId: MENU_INFO_MAP[MENU_ID.APPEARANCE].translationId },
                     component: AdminDomainSettingsBrandAssetsPage,
