@@ -15,7 +15,6 @@ export const getHeadingArgs = (): Args => ({
     titleLeftExtraSlot: null,
     totalCountSLot: null,
     titleRightExtraSlot: null,
-    extraSlot: null,
 });
 
 export const getHeadingParameters = (): Parameters => ({
@@ -176,16 +175,6 @@ export const getHeadingArgTypes = (): ArgTypes => ({
     titleRightExtraSlot: {
         name: 'title-right-extra',
         description: 'The slot displayed right next to the title.',
-        table: {
-            type: {
-                summary: null,
-            },
-            category: 'slots',
-        },
-    },
-    extraSlot: {
-        name: 'extra',
-        description: 'The slot on the right edge of the title block.',
         table: {
             type: {
                 summary: null,
