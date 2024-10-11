@@ -16,14 +16,14 @@
 
 <style lang="postcss">
 .p-heading-layout {
-    container-name: p-heading-layout;
-    container-type: inline-size;
     width: 100%;
     >.layout-container {
         display: flex;
         width: 100%;
+        flex-wrap: wrap;
         gap: 0.5rem;
         > .heading-container {
+            min-width: 360px;
             flex-grow: 1;
         }
         > .extra-container {
@@ -34,18 +34,7 @@
             flex-shrink: 0;
             float: right;
             margin-top: auto;
-        }
-    }
-
-    @container p-heading-layout (max-width: theme('screens.mobile.max')) {
-        .layout-container {
-            flex-direction: column;
-            > .heading-container {
-                width: 100%;
-            }
-            > .extra-container {
-                width: 100%;
-            }
+            margin-left: auto;
         }
     }
 }

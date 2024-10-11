@@ -95,12 +95,12 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-heading {
-    vertical-align: middle;
+    vertical-align: top;
+    line-height: 2rem;
     > h2 {
         @apply text-2xl;
         display: inline;
         word-break: break-word;
-        vertical-align: top;
         &.has-left {
             margin-left: 0.5rem;
         }

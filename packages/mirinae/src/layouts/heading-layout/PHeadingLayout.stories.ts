@@ -91,8 +91,8 @@ export const Basic: Story = {
                         </template>
                     </p-heading-layout>
                 </div>
-                <p class="mt-4 mb-2">width: 767px (mobile max)</p>
-                <div style="width: 767px; height: auto; border: 1px dashed grey">
+                <p class="mt-4 mb-2">width: 400px</p>
+                <div style="width: 400px; height: auto; border: 1px dashed grey">
                     <p-heading-layout>
                         <template #heading>
                             <p-heading>Heading</p-heading>
